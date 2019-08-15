@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+                name="clickListener"
+                type="com.samco.grapheasy.selecttrackgroup.TrackGroupListener"/>
+        <variable
+                name="trackGroup"
+                type="com.samco.grapheasy.database.TrackGroup"/>
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:onClick="@{() -> clickListener.onClick(trackGroup)}">
+        <TextView
+                android:id="@+id/nameText"
+                android:text="@{trackGroup.name}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:text="Track Group Name"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
