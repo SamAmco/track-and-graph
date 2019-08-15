@@ -33,7 +33,6 @@ class TrackGroupAdapter(val clickListener: TrackGroupListener)
                 return ViewHolder(binding)
             }
         }
-
     }
 }
 
