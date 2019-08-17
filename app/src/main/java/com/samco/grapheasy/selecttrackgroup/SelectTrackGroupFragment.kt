@@ -42,6 +42,11 @@ class SelectTrackGroupFragment : Fragment() {
                 adapter.submitList(it)
             }
         })
+        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                binding.groupList.smoothScrollToPosition(0)
+            }
+        })
     }
 
     private fun createViewModel(): SelectTrackGroupViewModel {
