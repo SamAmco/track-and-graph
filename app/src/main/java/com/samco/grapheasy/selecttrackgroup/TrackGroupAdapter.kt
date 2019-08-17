@@ -24,6 +24,10 @@ class TrackGroupAdapter(val clickListener: TrackGroupListener)
         fun bind(item: TrackGroup, clickListener: TrackGroupListener) {
             binding.trackGroup = item
             binding.clickListener = clickListener
+            binding.cardView.setOnLongClickListener {
+                clickListener.onLongClick(item)
+                return@setOnLongClickListener true
+            }
         }
 
         companion object {
@@ -47,6 +51,8 @@ class TrackGroupDiffCallback : DiffUtil.ItemCallback<TrackGroup>() {
 }
 
 
-class TrackGroupListener(val clickListener: (groupId: Long) -> Unit) {
-    fun onClick(trackGroup: TrackGroup) = clickListener(trackGroup.id)
+class TrackGroupListener(val clickListener: (trackGroup: TrackGroup) -> Unit,
+                         val longClickListener: (trackGroup: TrackGroup) -> Unit) {
+    fun onClick(trackGroup: TrackGroup) = clickListener(trackGroup)
+    fun onLongClick(trackGroup: TrackGroup) = longClickListener(trackGroup)
 }

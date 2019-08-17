@@ -20,6 +20,8 @@
                 android:id="@+id/foreground"
                 android:layout_width="290dp"
                 android:layout_height="140dp"
+                android:clickable="true"
+                android:focusable="true"
                 app:srcCompat="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="@id/background"
                 app:layout_constraintTop_toTopOf="@id/background"

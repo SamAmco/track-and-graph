@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.GraphEasyDatabase
+import com.samco.grapheasy.database.TrackGroup
 import com.samco.grapheasy.databinding.FragmentSelectTrackGroupBinding
 
 class SelectTrackGroupFragment : Fragment() {
@@ -23,9 +24,11 @@ class SelectTrackGroupFragment : Fragment() {
         val selectTrackGroupViewModel = createViewModel()
         binding.selectTrackGroupViewModel = selectTrackGroupViewModel
 
-        val adapter = TrackGroupAdapter(TrackGroupListener { groupId ->
-            selectTrackGroupViewModel.onTrackGroupSelected(groupId)
-        })
+        val adapter = TrackGroupAdapter(
+            TrackGroupListener(
+                this::onTrackGroupSelected,
+                this::onTrackGroupLongPress)
+        )
         binding.groupList.adapter = adapter
         binding.groupList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
 
@@ -33,6 +36,20 @@ class SelectTrackGroupFragment : Fragment() {
         setHasOptionsMenu(true)
         //TODO observe clicks for track groups
         return binding.root
+    }
+
+    private fun onTrackGroupLongPress(trackGroup: TrackGroup) {
+        fragmentManager?.apply {
+            beginTransaction().apply {
+                add(R.id.overlay_container, DeleteTrackGroupFragment(trackGroup))
+                addToBackStack(null)
+                commit()
+            }
+        }
+    }
+
+    private fun onTrackGroupSelected(trackGroup: TrackGroup) {
+
     }
 
     private fun observeTrackGroupDataAndUpdate(selectTrackGroupViewModel: SelectTrackGroupViewModel,
