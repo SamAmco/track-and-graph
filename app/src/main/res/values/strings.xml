@@ -2,5 +2,9 @@
     <string name="app_name">GraphEasy</string>
     <string name="add">Add</string>
     <string name="name_hint">Name</string>
-    <string name="delete_this_track_group">delete this track group</string>
+    <string name="delete">Delete</string>
+    <string name="rename">Rename</string>
+    <string name="yes">Yes</string>
+    <string name="cancel">Cancel</string>
+    <string name="ru_sure_del_track_group">Are you sure you want to delete this track group and all of it\'s tracked data?</string>
 </resources>

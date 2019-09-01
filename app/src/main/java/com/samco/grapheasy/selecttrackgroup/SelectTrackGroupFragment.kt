@@ -12,9 +12,14 @@ import com.samco.grapheasy.R
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.database.TrackGroup
 import com.samco.grapheasy.databinding.FragmentSelectTrackGroupBinding
+import com.samco.grapheasy.ui.YesCancelDialogFragment
+import kotlinx.coroutines.*
+import timber.log.Timber
 
 class SelectTrackGroupFragment : Fragment() {
     lateinit var binding: FragmentSelectTrackGroupBinding
+    private var updateJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater,
@@ -27,29 +32,17 @@ class SelectTrackGroupFragment : Fragment() {
         val adapter = TrackGroupAdapter(
             TrackGroupListener(
                 this::onTrackGroupSelected,
-                this::onTrackGroupLongPress)
+                this::onRenameTrackGroup,
+                this::onDeleteTrackGroup)
         )
         binding.groupList.adapter = adapter
         binding.groupList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        registerForContextMenu(binding.groupList)
 
         observeTrackGroupDataAndUpdate(selectTrackGroupViewModel, adapter)
         setHasOptionsMenu(true)
         //TODO observe clicks for track groups
         return binding.root
-    }
-
-    private fun onTrackGroupLongPress(trackGroup: TrackGroup) {
-        fragmentManager?.apply {
-            beginTransaction().apply {
-                add(R.id.overlay_container, DeleteTrackGroupFragment(trackGroup))
-                addToBackStack(null)
-                commit()
-            }
-        }
-    }
-
-    private fun onTrackGroupSelected(trackGroup: TrackGroup) {
-
     }
 
     private fun observeTrackGroupDataAndUpdate(selectTrackGroupViewModel: SelectTrackGroupViewModel,
@@ -73,6 +66,33 @@ class SelectTrackGroupFragment : Fragment() {
         return ViewModelProviders.of(this, viewModelFactory).get(SelectTrackGroupViewModel::class.java)
     }
 
+    private fun onRenameTrackGroup(trackGroup: TrackGroup) {
+        //TODO
+        Timber.d("onRename: ${trackGroup.name}")
+    }
+
+    private fun onDeleteTrackGroup(trackGroup: TrackGroup) {
+        Timber.d("onDelete: ${trackGroup.name}")
+        val dialog = YesCancelDialogFragment(R.string.ru_sure_del_track_group,
+            { deleteTrackGroup(trackGroup) },
+            {}) //TODO add functionality for rename
+        fragmentManager?.let { dialog.show(it, "ru_sure_del_track_group_fragment") }
+    }
+
+    private fun deleteTrackGroup(trackGroup: TrackGroup) {
+        val application = requireNotNull(activity).application
+        val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                dao.deleteTrackGroup(trackGroup)
+            }
+        }
+    }
+
+    private fun onTrackGroupSelected(trackGroup: TrackGroup) {
+        //TODO respond to onTrackGroupSelected
+    }
+
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.select_track_group_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
@@ -93,5 +113,10 @@ class SelectTrackGroupFragment : Fragment() {
                 commit()
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        updateJob.cancel()
     }
 }
