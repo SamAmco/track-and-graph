@@ -3,7 +3,6 @@ package com.samco.grapheasy.selecttrackgroup
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -17,7 +16,7 @@ import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class SelectTrackGroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
+class SelectTrackGroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener, AddTrackGroupDialogFragment.AddTrackGroupDialogListener {
     private lateinit var binding: FragmentSelectTrackGroupBinding
     private lateinit var viewModel: SelectTrackGroupViewModel
     private var updateJob = Job()
@@ -117,11 +116,17 @@ class SelectTrackGroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDi
     }
 
     private fun onAddClicked() {
-        fragmentManager?.apply {
-            beginTransaction().apply {
-                add(R.id.overlay_container, AddTrackGroupOverlayFragment())
-                addToBackStack(null)
-                commit()
+        val dialog = AddTrackGroupDialogFragment()
+        childFragmentManager?.let { dialog.show(it, "add_track_group_dialog") }
+    }
+
+    override fun onAddTrackGroup(name: String) {
+        val application = requireActivity().application
+        val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                val trackGroup = TrackGroup(0, name)
+                dao.insertTrackGroup(trackGroup)
             }
         }
     }
