@@ -16,7 +16,11 @@ import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class SelectTrackGroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener, AddTrackGroupDialogFragment.AddTrackGroupDialogListener {
+class SelectTrackGroupFragment : Fragment(),
+    YesCancelDialogFragment.YesCancelDialogListener,
+    AddTrackGroupDialogFragment.AddTrackGroupDialogListener,
+    RenameTrackGroupDialogFragment.RenameTrackGroupDialogListener
+{
     private lateinit var binding: FragmentSelectTrackGroupBinding
     private lateinit var viewModel: SelectTrackGroupViewModel
     private var updateJob = Job()
@@ -33,8 +37,8 @@ class SelectTrackGroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDi
         val adapter = TrackGroupAdapter(
             TrackGroupListener(
                 this::onTrackGroupSelected,
-                this::onRenameTrackGroup,
-                this::onDeleteTrackGroup)
+                this::onRenameClicked,
+                this::onDeleteClicked)
         )
         binding.groupList.adapter = adapter
         binding.groupList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -67,12 +71,25 @@ class SelectTrackGroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDi
         return ViewModelProviders.of(this, viewModelFactory).get(SelectTrackGroupViewModel::class.java)
     }
 
-    private fun onRenameTrackGroup(trackGroup: TrackGroup) {
-        //TODO
-        Timber.d("onRename: ${trackGroup.name}")
+    private fun onRenameClicked(trackGroup: TrackGroup) {
+        viewModel.currentActionTrackGroup = trackGroup
+        val dialog = RenameTrackGroupDialogFragment()
+        childFragmentManager?.let { dialog.show(it, "rename_track_group_dialog") }
     }
 
-    private fun onDeleteTrackGroup(trackGroup: TrackGroup) {
+    override fun getTrackGroup(): TrackGroup = viewModel.currentActionTrackGroup!!
+
+    override fun onRenameTrackGroup(trackGroup: TrackGroup) {
+        val application = requireActivity().application
+        val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                dao.updateTrackGroup(trackGroup)
+            }
+        }
+    }
+
+    private fun onDeleteClicked(trackGroup: TrackGroup) {
         Timber.d("onDelete: ${trackGroup.name}")
         viewModel.currentActionTrackGroup = trackGroup
         val dialog = YesCancelDialogFragment() //TODO add functionality for rename
