@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="trackGroup"
+                type="com.samco.grapheasy.database.TrackGroup" />
+        <variable
+                name="displayTrackGroupViewModel"
+                type="com.samco.grapheasy.displaytrackgroup.DisplayTrackGroupViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Testing testing"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

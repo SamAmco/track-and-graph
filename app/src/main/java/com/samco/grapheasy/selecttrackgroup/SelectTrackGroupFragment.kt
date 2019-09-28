@@ -6,6 +6,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.grapheasy.R
@@ -21,12 +23,14 @@ class SelectTrackGroupFragment : Fragment(),
     AddTrackGroupDialogFragment.AddTrackGroupDialogListener,
     RenameTrackGroupDialogFragment.RenameTrackGroupDialogListener
 {
+    private var navController: NavController? = null
     private lateinit var binding: FragmentSelectTrackGroupBinding
     private lateinit var viewModel: SelectTrackGroupViewModel
     private var updateJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        this.navController = container?.findNavController()
         binding = DataBindingUtil.inflate(inflater,
             R.layout.fragment_select_track_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
@@ -46,7 +50,6 @@ class SelectTrackGroupFragment : Fragment(),
 
         observeTrackGroupDataAndUpdate(viewModel, adapter)
         setHasOptionsMenu(true)
-        //TODO observe clicks for track groups
         return binding.root
     }
 
@@ -90,7 +93,6 @@ class SelectTrackGroupFragment : Fragment(),
     }
 
     private fun onDeleteClicked(trackGroup: TrackGroup) {
-        Timber.d("onDelete: ${trackGroup.name}")
         viewModel.currentActionTrackGroup = trackGroup
         val dialog = YesCancelDialogFragment() //TODO add functionality for rename
         var args = Bundle()
@@ -117,7 +119,11 @@ class SelectTrackGroupFragment : Fragment(),
     }
 
     private fun onTrackGroupSelected(trackGroup: TrackGroup) {
-        //TODO respond to onTrackGroupSelected
+        Timber.d("onTrackGroupSelected called")
+        navController?.navigate(
+            SelectTrackGroupFragmentDirections
+                .actionSelectTackGroup(trackGroup.id)
+        )
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
