@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+                name="clickListener"
+                type="com.samco.grapheasy.displaytrackgroup.FeatureClickListener"/>
+        <variable
+                name="feature"
+                type="com.samco.grapheasy.database.Feature"/>
+    </data>
+    <!--TODO add click listener-->
+    <!--TODO we will need a max title size for features to prevent layout issues-->
+    <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_marginStart="10dp"
+            android:layout_marginEnd="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="170dp"
+            android:layout_gravity="center"
+            app:contentPadding="@dimen/card_padding"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            tools:layout_width="170dp">
+
+        <LinearLayout
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="30dp">
+            <TextView
+                    android:id="@+id/nameText"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textSize="20sp"
+                    tools:text="@{feature.name}"/>
+
+            <TextView
+                    android:id="@+id/lastDataPointValue"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="25sp"
+                    tools:text="No" />
+
+            <TextView
+                    android:id="@+id/lastDateText"
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    tools:text="02/03/2019  20:18:11" />
+
+            <TextView
+                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="234 Entries"/>
+        </LinearLayout>
+
+        <Button
+                android:id="@+id/addButton"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:background="@color/colorAccent"
+                android:layout_gravity="bottom|right"
+                android:text="@string/add" />
+
+
+
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.samco.grapheasy.database.GraphEasyDatabaseDao
 
-class SelectTrackGroupViewModelFactory(val dataSource: GraphEasyDatabaseDao,
-                                       val application: Application) : ViewModelProvider.Factory {
+class SelectTrackGroupViewModelFactory(private val dataSource: GraphEasyDatabaseDao,
+                                       private val application: Application) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(SelectTrackGroupViewModel::class.java)) {

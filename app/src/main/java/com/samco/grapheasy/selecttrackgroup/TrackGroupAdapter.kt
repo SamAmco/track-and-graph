@@ -10,7 +10,7 @@ import com.samco.grapheasy.R
 import com.samco.grapheasy.database.TrackGroup
 import com.samco.grapheasy.databinding.ListItemTrackGroupBinding
 
-class TrackGroupAdapter(val clickListener: TrackGroupListener)
+class TrackGroupAdapter(private val clickListener: TrackGroupListener)
     : ListAdapter<TrackGroup, TrackGroupAdapter.ViewHolder>(TrackGroupDiffCallback()) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -21,7 +21,7 @@ class TrackGroupAdapter(val clickListener: TrackGroupListener)
         return ViewHolder.from(parent)
     }
 
-    class ViewHolder private constructor(val binding: ListItemTrackGroupBinding)
+    class ViewHolder private constructor(private val binding: ListItemTrackGroupBinding)
         : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
         var clickListener: TrackGroupListener? = null
         var trackGroup: TrackGroup? = null

@@ -1,11 +1,14 @@
 package com.samco.grapheasy.database
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
 
-@Database(entities = [TrackGroup::class], version = 1, exportSchema = false)
+@Database(
+    entities = [TrackGroup::class, Feature::class, FeatureTrackGroupJoin::class],
+    version = 3,
+    exportSchema = false
+)
+@TypeConverters(Converters::class)
 abstract class GraphEasyDatabase : RoomDatabase() {
     abstract val graphEasyDatabaseDao: GraphEasyDatabaseDao
 
@@ -25,4 +28,18 @@ abstract class GraphEasyDatabase : RoomDatabase() {
             }
         }
     }
+}
+
+class Converters {
+    @TypeConverter
+    fun stringToListLong(value: String): List<Long> = value.split(",").map { f -> f.toLong() }.toList()
+
+    @TypeConverter
+    fun listLongToString(longs: List<Long>): String = longs.joinToString(",") { l -> l.toString() }
+
+    @TypeConverter
+    fun intToFeatureType(i: Int): FeatureType = FeatureType.values()[i]
+
+    @TypeConverter
+    fun featureTypeToInt(featureType: FeatureType): Int = featureType.index
 }

@@ -98,7 +98,7 @@ class SelectTrackGroupFragment : Fragment(),
         var args = Bundle()
         args.putString("title", getString(R.string.ru_sure_del_track_group))
         dialog.arguments = args
-        childFragmentManager?.let { dialog.show(it, "ru_sure_del_track_group_fragment") }
+        childFragmentManager.let { dialog.show(it, "ru_sure_del_track_group_fragment") }
     }
 
     override fun onDialogYes(dialog: YesCancelDialogFragment) {
@@ -140,7 +140,7 @@ class SelectTrackGroupFragment : Fragment(),
 
     private fun onAddClicked() {
         val dialog = AddTrackGroupDialogFragment()
-        childFragmentManager?.let { dialog.show(it, "add_track_group_dialog") }
+        childFragmentManager.let { dialog.show(it, "add_track_group_dialog") }
     }
 
     override fun onAddTrackGroup(name: String) {
