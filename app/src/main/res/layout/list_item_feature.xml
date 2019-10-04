@@ -9,16 +9,19 @@
         <variable
                 name="feature"
                 type="com.samco.grapheasy.database.Feature"/>
+        <variable
+                name="viewModel"
+                type="com.samco.grapheasy.displaytrackgroup.DisplayTrackGroupViewModel" />
     </data>
     <!--TODO add click listener-->
     <!--TODO we will need a max title size for features to prevent layout issues-->
     <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
-            android:layout_marginStart="10dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:layout_width="match_parent"
+            android:layout_width="170dp"
             android:layout_height="170dp"
             android:layout_gravity="center"
             app:contentPadding="@dimen/card_padding"
@@ -46,6 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="25sp"
+                    android:text="@{viewModel.getLastDisplayDataPointValueForFeature(feature)}"
                     tools:text="No" />
 
             <TextView
@@ -54,12 +58,14 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="12sp"
+                    android:text="@{viewModel.getLastDisplayDataPointTimeForFeature(feature)}"
                     tools:text="02/03/2019  20:18:11" />
 
             <TextView
                     android:gravity="center"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:text="@{String.format(@string/data_points, viewModel.getNumDataPointsForFeatre(feature))}"
                     tools:text="234 Entries"/>
         </LinearLayout>
 

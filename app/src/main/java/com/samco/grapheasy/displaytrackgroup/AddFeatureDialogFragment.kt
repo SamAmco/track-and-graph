@@ -190,6 +190,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         discreteValuesTextView.visibility = vis
         discreteValuesLinearLayout.visibility = vis
         addDiscreteValueButton.visibility = vis
+        validateForm()
     }
 
     private fun getDiscreteValues() = discreteValuesLinearLayout.children

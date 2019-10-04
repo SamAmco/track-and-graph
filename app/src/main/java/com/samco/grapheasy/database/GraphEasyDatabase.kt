@@ -2,10 +2,19 @@ package com.samco.grapheasy.database
 
 import android.content.Context
 import androidx.room.*
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.FormatStyle
+
+val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
+val displayFormatter: DateTimeFormatter = DateTimeFormatter
+    .ofLocalizedDateTime(FormatStyle.SHORT)
+    .withZone(ZoneId.systemDefault())
 
 @Database(
-    entities = [TrackGroup::class, Feature::class, FeatureTrackGroupJoin::class],
-    version = 3,
+    entities = [TrackGroup::class, Feature::class, FeatureTrackGroupJoin::class, DataPoint::class],
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -42,4 +51,10 @@ class Converters {
 
     @TypeConverter
     fun featureTypeToInt(featureType: FeatureType): Int = featureType.index
+
+    @TypeConverter
+    fun stringToOffsetDateTime(value: String): OffsetDateTime = databaseFormatter.parse(value, OffsetDateTime::from)
+
+    @TypeConverter
+    fun offsetDateTimeToString(value: OffsetDateTime): String = databaseFormatter.format(value)
 }

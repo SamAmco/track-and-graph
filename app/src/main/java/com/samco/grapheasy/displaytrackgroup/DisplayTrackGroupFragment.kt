@@ -16,7 +16,6 @@ import com.samco.grapheasy.database.FeatureTrackGroupJoin
 import com.samco.grapheasy.database.FeatureType
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.databinding.FragmentDisplayTrackGroupBinding
-import com.samco.grapheasy.selecttrackgroup.AddTrackGroupDialogFragment
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -39,21 +38,28 @@ class DisplayTrackGroupFragment : Fragment(),
         viewModel = createViewModel()
         binding.displayTrackGroupViewModel = viewModel
 
-
-        val adapter = FeatureAdapter(FeatureClickListener())
+        val adapter = FeatureAdapter(FeatureClickListener(), viewModel)
         observeFeatureDataAndUpdate(viewModel, adapter)
         binding.featureList.adapter = adapter
-        //TODO should we use a different column count for horizontal orientation?
-        binding.featureList.layoutManager = GridLayoutManager(context, 2)
+        initializeGridLayout()
 
         setHasOptionsMenu(true)
         return binding.root
     }
 
+    private fun initializeGridLayout() {
+        val dm = resources.displayMetrics
+        val screenWidth = dm.widthPixels / dm.density
+        Timber.d("Screen width: $screenWidth")
+        val itemSize = 180f //roughly
+        val gridLayout = GridLayoutManager(context, (screenWidth / itemSize).toInt())
+        binding.featureList.layoutManager = gridLayout
+    }
+
     private fun createViewModel(): DisplayTrackGroupViewModel {
         val application = requireNotNull(this.activity).application
         val dataSource = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
-        val viewModelFactory = DisplayTrackGroupViewModelFactory(args.trackGroup, dataSource)
+        val viewModelFactory = DisplayTrackGroupViewModelFactory(args.trackGroup, getString(R.string.no_data), dataSource)
         return ViewModelProviders.of(this, viewModelFactory).get(DisplayTrackGroupViewModel::class.java)
     }
 
