@@ -21,7 +21,7 @@ import kotlinx.coroutines.*
 import timber.log.Timber
 
 class DisplayTrackGroupFragment : Fragment(),
-    AddTrackGroupDialogFragment.AddTrackGroupDialogListener {
+    AddFeatureDialogFragment.AddFeatureDialogListener {
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
@@ -67,12 +67,17 @@ class DisplayTrackGroupFragment : Fragment(),
     }
 
     private fun onAddClicked() {
-        //TODO create custom dialog fragment
-        val dialog = AddTrackGroupDialogFragment()
-        childFragmentManager.let { dialog.show(it, "add_track_group_dialog") }
+        val dialog = AddFeatureDialogFragment()
+        val args = Bundle()
+        Timber.d("Existing features: ${viewModel.features.value?.joinToString { f -> f.name }}")
+        args.putString(EXISTING_FEATURES_ARG_KEY,
+            viewModel.features.value?.joinToString(EXISTING_FEATURES_DELIM) { f -> f.name }
+        )
+        dialog.arguments = args
+        childFragmentManager.let { dialog.show(it, "add_feature_dialog") }
     }
 
-    override fun onAddTrackGroup(name: String) {
+    override fun onAddFeature(name: String, featureType: FeatureType, discreteValues: String) {
         val application = requireActivity().application
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
@@ -81,8 +86,8 @@ class DisplayTrackGroupFragment : Fragment(),
                 val feature = Feature(
                     0,
                     name,
-                    FeatureType.CONTINUOUS,
-                    ""
+                    featureType,
+                    discreteValues
                 )
                 val featureId = dao.insertFeature(feature)
                 dao.insertFeatureTrackGroupJoin(FeatureTrackGroupJoin(0, featureId, args.trackGroup))

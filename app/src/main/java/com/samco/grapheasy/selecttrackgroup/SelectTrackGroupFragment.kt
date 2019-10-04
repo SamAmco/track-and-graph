@@ -94,7 +94,7 @@ class SelectTrackGroupFragment : Fragment(),
 
     private fun onDeleteClicked(trackGroup: TrackGroup) {
         viewModel.currentActionTrackGroup = trackGroup
-        val dialog = YesCancelDialogFragment() //TODO add functionality for rename
+        val dialog = YesCancelDialogFragment()
         var args = Bundle()
         args.putString("title", getString(R.string.ru_sure_del_track_group))
         dialog.arguments = args
@@ -103,6 +103,7 @@ class SelectTrackGroupFragment : Fragment(),
 
     override fun onDialogYes(dialog: YesCancelDialogFragment) {
         when (dialog.title) {
+            //TODO delete the features for this track group also
             getString(R.string.ru_sure_del_track_group) -> deleteTrackGroup(viewModel.currentActionTrackGroup)
         }
     }

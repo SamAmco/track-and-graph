@@ -14,7 +14,7 @@
 
 
     <androidx.cardview.widget.CardView
-            android:layout_width="100dp"
+            android:layout_width="match_parent"
             android:layout_height="100dp"
             android:layout_margin="5dp"
             android:onClick="@{() -> clickListener.onClick(trackGroup)}"
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"/>
         <TextView
-                android:id="@+id/nameText"
+                android:id="@+id/featureNameText"
                 android:text="@{trackGroup.name}"
                 android:textSize="20sp"
                 android:layout_width="wrap_content"
