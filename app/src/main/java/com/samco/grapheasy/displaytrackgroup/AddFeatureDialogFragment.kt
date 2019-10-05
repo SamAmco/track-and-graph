@@ -33,7 +33,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     private var selectedFeatureType = FeatureType.CONTINUOUS
 
     interface AddFeatureDialogListener {
-        fun onAddFeature(name: String, featureType: FeatureType, discreteValues: String)
+        fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<String>)
     }
 
     override fun onAttach(context: Context) {
@@ -198,7 +198,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         .toList()
 
     private fun onPositiveClicked() {
-        listener.onAddFeature(nameEditText.text.toString(), selectedFeatureType, getDiscreteValues().joinToString())
+        listener.onAddFeature(nameEditText.text.toString(), selectedFeatureType, getDiscreteValues())
     }
 
 }

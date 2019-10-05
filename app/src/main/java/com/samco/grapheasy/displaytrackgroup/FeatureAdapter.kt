@@ -40,7 +40,8 @@ class FeatureAdapter(
             binding.clickListener = clickListener
             binding.viewModel = viewModel
             binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
-            //TODO set on click listeners..
+            binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
+            binding.historyButton.setOnClickListener { clickListener.onHistory(feature) }
         }
 
         private fun createContextMenu(view: View) {
@@ -81,8 +82,12 @@ class FeatureDiffCallback : DiffUtil.ItemCallback<Feature>() {
     }
 }
 
-class FeatureClickListener(val onRenameListener: (feature: Feature) -> Unit,
-                           val onDeleteListener: (feature: Feature) -> Unit) {
+class FeatureClickListener(private val onRenameListener: (feature: Feature) -> Unit,
+                           private val onDeleteListener: (feature: Feature) -> Unit,
+                           private val onAddListener: (feature: Feature) -> Unit,
+                           private val onHistoryListener: (feature: Feature) -> Unit) {
     fun onRename(feature: Feature) = onRenameListener(feature)
     fun onDelete(feature: Feature) = onDeleteListener(feature)
+    fun onAdd(feature: Feature) = onAddListener(feature)
+    fun onHistory(feature: Feature) = onHistoryListener(feature)
 }

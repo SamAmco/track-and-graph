@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/card_padding"
+        >
+
+    <TextView
+            android:id="@+id/headerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_header_top_margin"
+            android:textSize="14sp"
+            android:text="@string/add_data_point_hint"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+    <TextView
+            android:id="@+id/indexText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_header_top_margin"
+            android:textSize="14sp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            tools:text="4/16"
+            />
+
+    <TextView
+            android:id="@+id/titleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_header_top_margin"
+            android:textSize="@dimen/dialog_header_size"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/headerText"
+            tools:text="Some header"
+        />
+
+    <EditText
+            android:id="@+id/numberInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/titleText"
+            android:inputType="numberDecimal|numberSigned"
+        />
+
+    <ScrollView
+            android:id="@+id/buttonsScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:visibility="gone"
+            app:layout_constraintTop_toBottomOf="@id/titleText"
+            >
+        <LinearLayout
+                android:id="@+id/buttonsLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                />
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

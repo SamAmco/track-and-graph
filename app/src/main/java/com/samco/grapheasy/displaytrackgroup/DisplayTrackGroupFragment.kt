@@ -11,10 +11,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import com.samco.grapheasy.R
-import com.samco.grapheasy.database.Feature
-import com.samco.grapheasy.database.FeatureTrackGroupJoin
-import com.samco.grapheasy.database.FeatureType
-import com.samco.grapheasy.database.GraphEasyDatabase
+import com.samco.grapheasy.database.*
 import com.samco.grapheasy.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
@@ -22,8 +19,10 @@ import kotlinx.coroutines.*
 class DisplayTrackGroupFragment : Fragment(),
     AddFeatureDialogFragment.AddFeatureDialogListener,
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
-    YesCancelDialogFragment.YesCancelDialogListener
+    YesCancelDialogFragment.YesCancelDialogListener,
+    AddDataPointDialog.AddDataPointDialogListener
 {
+
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
@@ -43,7 +42,9 @@ class DisplayTrackGroupFragment : Fragment(),
 
         val adapter = FeatureAdapter(FeatureClickListener(
             this::onFeatureRenameClicked,
-            this::onFeatureDeleteClicked
+            this::onFeatureDeleteClicked,
+            this::onFeatureAddClicked,
+            this::onFeatureHistoryClicked
         ), viewModel)
         observeFeatureDataAndUpdate(viewModel, adapter)
         binding.featureList.adapter = adapter
@@ -87,7 +88,7 @@ class DisplayTrackGroupFragment : Fragment(),
         childFragmentManager.let { dialog.show(it, "add_feature_dialog") }
     }
 
-    override fun onAddFeature(name: String, featureType: FeatureType, discreteValues: String) {
+    override fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<String>) {
         val application = requireActivity().application
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
@@ -114,7 +115,7 @@ class DisplayTrackGroupFragment : Fragment(),
         var args = Bundle()
         args.putString("title", getString(R.string.ru_sure_del_feature))
         dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "ru_sure_del_track_group_fragment") }
+        childFragmentManager.let { dialog.show(it, "ru_sure_del_feature_fragment") }
     }
 
     override fun onDialogYes(dialog: YesCancelDialogFragment) {
@@ -136,7 +137,7 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun onFeatureRenameClicked(feature: Feature) {
         viewModel.currentActionFeature = feature
         val dialog = RenameFeatureDialogFragment()
-        childFragmentManager?.let { dialog.show(it, "rename_track_group_dialog") }
+        childFragmentManager?.let { dialog.show(it, "rename_feature_dialog") }
     }
 
     override fun onRenameFeature(feature: Feature) {
@@ -148,6 +149,18 @@ class DisplayTrackGroupFragment : Fragment(),
             }
         }
     }
+
+    private fun onFeatureAddClicked(feature: Feature) {
+        viewModel.currentActionFeature = feature
+        val dialog = AddDataPointDialog()
+        childFragmentManager.let { dialog.show(it, "") }
+    }
+
+    //TODO implement onAddDataPoint
+    override fun onAddDataPoint(dataPoint: DataPoint) { }
+
+    //TODO implement onFeatureHistoryClicked
+    private fun onFeatureHistoryClicked(feature: Feature) { }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {

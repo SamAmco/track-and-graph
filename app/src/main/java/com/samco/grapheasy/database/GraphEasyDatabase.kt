@@ -14,7 +14,7 @@ val displayFormatter: DateTimeFormatter = DateTimeFormatter
 
 @Database(
     entities = [TrackGroup::class, Feature::class, FeatureTrackGroupJoin::class, DataPoint::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -40,6 +40,12 @@ abstract class GraphEasyDatabase : RoomDatabase() {
 }
 
 class Converters {
+    @TypeConverter
+    fun stringToListOfStrings(value: String): List<String> = value.split(",").toList()
+
+    @TypeConverter
+    fun listOfStringsToString(value: List<String>): String = value.joinToString(",")
+
     @TypeConverter
     fun stringToListLong(value: String): List<Long> = value.split(",").map { f -> f.toLong() }.toList()
 
