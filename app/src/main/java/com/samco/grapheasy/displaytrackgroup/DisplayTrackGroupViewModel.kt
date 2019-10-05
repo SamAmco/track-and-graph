@@ -10,6 +10,8 @@ class DisplayTrackGroupViewModel(
     private val noDataString: String,
     private val dataSource: GraphEasyDatabaseDao
 ): ViewModel() {
+    var currentActionFeature: Feature? = null
+
     val features = dataSource.getFeaturesForTrackGroup(trackGroupId)
 
     //TODO getLastDataPointForFeature

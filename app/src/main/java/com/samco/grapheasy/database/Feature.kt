@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "features_table")
-class Feature (
+data class Feature (
     @PrimaryKey(autoGenerate = true)
     var id: Long = -1L,
 

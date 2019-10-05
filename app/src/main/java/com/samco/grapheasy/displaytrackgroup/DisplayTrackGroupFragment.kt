@@ -16,11 +16,14 @@ import com.samco.grapheasy.database.FeatureTrackGroupJoin
 import com.samco.grapheasy.database.FeatureType
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.databinding.FragmentDisplayTrackGroupBinding
+import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
-import timber.log.Timber
 
 class DisplayTrackGroupFragment : Fragment(),
-    AddFeatureDialogFragment.AddFeatureDialogListener {
+    AddFeatureDialogFragment.AddFeatureDialogListener,
+    RenameFeatureDialogFragment.RenameFeatureDialogListener,
+    YesCancelDialogFragment.YesCancelDialogListener
+{
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
@@ -38,9 +41,13 @@ class DisplayTrackGroupFragment : Fragment(),
         viewModel = createViewModel()
         binding.displayTrackGroupViewModel = viewModel
 
-        val adapter = FeatureAdapter(FeatureClickListener(), viewModel)
+        val adapter = FeatureAdapter(FeatureClickListener(
+            this::onFeatureRenameClicked,
+            this::onFeatureDeleteClicked
+        ), viewModel)
         observeFeatureDataAndUpdate(viewModel, adapter)
         binding.featureList.adapter = adapter
+        registerForContextMenu(binding.featureList)
         initializeGridLayout()
 
         setHasOptionsMenu(true)
@@ -50,8 +57,7 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun initializeGridLayout() {
         val dm = resources.displayMetrics
         val screenWidth = dm.widthPixels / dm.density
-        Timber.d("Screen width: $screenWidth")
-        val itemSize = 180f //roughly
+        val itemSize = 180f
         val gridLayout = GridLayoutManager(context, (screenWidth / itemSize).toInt())
         binding.featureList.layoutManager = gridLayout
     }
@@ -66,7 +72,6 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun observeFeatureDataAndUpdate(displayTrackGroupViewModel: DisplayTrackGroupViewModel, adapter: FeatureAdapter) {
         displayTrackGroupViewModel.features.observe(viewLifecycleOwner, Observer {
             it?.let {
-                Timber.d("RECOVERED FEATURES: ${it.joinToString { f -> f.name }}")
                 adapter.submitList(it)
             }
         })
@@ -75,7 +80,6 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun onAddClicked() {
         val dialog = AddFeatureDialogFragment()
         val args = Bundle()
-        Timber.d("Existing features: ${viewModel.features.value?.joinToString { f -> f.name }}")
         args.putString(EXISTING_FEATURES_ARG_KEY,
             viewModel.features.value?.joinToString(EXISTING_FEATURES_DELIM) { f -> f.name }
         )
@@ -88,7 +92,6 @@ class DisplayTrackGroupFragment : Fragment(),
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                Timber.d("Adding feature: $name")
                 val feature = Feature(
                     0,
                     name,
@@ -97,6 +100,51 @@ class DisplayTrackGroupFragment : Fragment(),
                 )
                 val featureId = dao.insertFeature(feature)
                 dao.insertFeatureTrackGroupJoin(FeatureTrackGroupJoin(0, featureId, args.trackGroup))
+            }
+        }
+    }
+
+    override fun getFeature(): Feature {
+        return viewModel.currentActionFeature!!
+    }
+
+    private fun onFeatureDeleteClicked(feature: Feature) {
+        viewModel.currentActionFeature = feature
+        val dialog = YesCancelDialogFragment()
+        var args = Bundle()
+        args.putString("title", getString(R.string.ru_sure_del_feature))
+        dialog.arguments = args
+        childFragmentManager.let { dialog.show(it, "ru_sure_del_track_group_fragment") }
+    }
+
+    override fun onDialogYes(dialog: YesCancelDialogFragment) {
+        when (dialog.title) {
+            getString(R.string.ru_sure_del_feature) -> onDeleteFeature(viewModel.currentActionFeature!!)
+        }
+    }
+
+    private fun onDeleteFeature(feature: Feature) {
+        val application = requireActivity().application
+        val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                dao.deleteFeature(feature)
+            }
+        }
+    }
+
+    private fun onFeatureRenameClicked(feature: Feature) {
+        viewModel.currentActionFeature = feature
+        val dialog = RenameFeatureDialogFragment()
+        childFragmentManager?.let { dialog.show(it, "rename_track_group_dialog") }
+    }
+
+    override fun onRenameFeature(feature: Feature) {
+        val application = requireActivity().application
+        val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                dao.updateFeature(feature)
             }
         }
     }

@@ -2,10 +2,14 @@ package com.samco.grapheasy.displaytrackgroup
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.grapheasy.R
 import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.databinding.ListItemFeatureBinding
 
@@ -24,9 +28,10 @@ class FeatureAdapter(
 
     class ViewHolder private constructor(private val binding: ListItemFeatureBinding,
                                          private val viewModel: DisplayTrackGroupViewModel)
-        : RecyclerView.ViewHolder(binding.root) {
-        var clickListener: FeatureClickListener? = null
-        var feature: Feature? = null
+        : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+
+        private var clickListener: FeatureClickListener? = null
+        private var feature: Feature? = null
 
         fun bind(feature: Feature, clickListener: FeatureClickListener) {
             this.feature = feature
@@ -34,7 +39,26 @@ class FeatureAdapter(
             binding.feature = feature
             binding.clickListener = clickListener
             binding.viewModel = viewModel
+            binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
             //TODO set on click listeners..
+        }
+
+        private fun createContextMenu(view: View) {
+            val popup = PopupMenu(view.context, view)
+            popup.menuInflater.inflate(R.menu.edit_feature_context_menu, popup.menu)
+            popup.setOnMenuItemClickListener(this)
+            popup.show()
+        }
+
+        override fun onMenuItemClick(item: MenuItem?): Boolean {
+            feature?.let {
+                when (item?.itemId) {
+                    R.id.rename -> clickListener?.onRename(it)
+                    R.id.delete -> clickListener?.onDelete(it)
+                    else -> {}
+                }
+            }
+            return false
         }
 
         companion object {
@@ -57,4 +81,8 @@ class FeatureDiffCallback : DiffUtil.ItemCallback<Feature>() {
     }
 }
 
-class FeatureClickListener
+class FeatureClickListener(val onRenameListener: (feature: Feature) -> Unit,
+                           val onDeleteListener: (feature: Feature) -> Unit) {
+    fun onRename(feature: Feature) = onRenameListener(feature)
+    fun onDelete(feature: Feature) = onDeleteListener(feature)
+}

@@ -26,6 +26,12 @@ interface GraphEasyDatabaseDao {
     @Insert
     fun insertFeature(feature: Feature): Long
 
+    @Update
+    fun updateFeature(feature: Feature)
+
+    @Delete
+    fun deleteFeature(feature: Feature)
+
     @Insert
     fun insertFeatureTrackGroupJoin(featureTrackGroupJoin: FeatureTrackGroupJoin): Long
 }

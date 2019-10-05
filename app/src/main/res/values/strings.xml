@@ -3,6 +3,7 @@
     <string name="add_track_group">Add Track Group: </string>
     <string name="add">Add</string>
     <string name="track_group_name">Track Group Name</string>
+    <string name="feature_name_hint">Feature Name</string>
     <string name="delete">Delete</string>
     <string name="rename">Rename</string>
     <string name="new_name">New name: </string>
@@ -11,12 +12,13 @@
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="ru_sure_del_track_group">Are you sure you want to delete this track group and all of it\'s tracked data?</string>
+    <string name="ru_sure_del_feature">Are you sure you want to delete this feature and all of it\'s tracked data?</string>
     <string name="discrete_values">Discrete values</string>
     <string name="feature_name_cannot_be_null">Please add a feature name</string>
     <string name="feature_with_that_name_exists">A feature with that name already exists</string>
     <string name="discrete_value_must_have_name">Please make sure all your discrete values have names</string>
     <string name="discrete_feature_needs_at_least_one_value">Please add at least one discrete value</string>
-    <string name="data_points">%d Data Points</string>
+    <string name="data_points">%d Tracked</string>
     <string name="no_data">No Data</string>
     <string name="standard_name_allowed_digits">0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.$%£()_-+=!^&amp;/*\|#~@;:?</string>
     <string-array name="feature_types">

@@ -23,7 +23,18 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                tools:listitem="@layout/list_item_feature"/>
+                tools:listitem="@layout/list_item_feature" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/queueAddAllButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="16dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/queue_add_box"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
