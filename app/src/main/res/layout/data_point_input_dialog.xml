@@ -73,14 +73,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dialog_input_spacing"
-            android:visibility="gone"
             app:layout_constraintTop_toBottomOf="@id/timeButton"
             android:inputType="numberDecimal|numberSigned"
         />
 
     <HorizontalScrollView
             android:id="@+id/buttonsScrollView"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="80dp"
             android:layout_marginTop="@dimen/dialog_input_spacing"
             android:scrollbars="none"
@@ -93,9 +92,7 @@
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:gravity="center"
-                />
+                android:gravity="center" />
     </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
