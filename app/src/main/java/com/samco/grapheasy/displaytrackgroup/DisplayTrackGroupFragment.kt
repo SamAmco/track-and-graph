@@ -67,7 +67,7 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun createViewModel(): DisplayTrackGroupViewModel {
         val application = requireNotNull(this.activity).application
         val dataSource = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
-        val viewModelFactory = DisplayTrackGroupViewModelFactory(args.trackGroup, getString(R.string.no_data), dataSource)
+        val viewModelFactory = DisplayTrackGroupViewModelFactory(args.trackGroup, dataSource)
         return ViewModelProviders.of(this, viewModelFactory).get(DisplayTrackGroupViewModel::class.java)
     }
 
@@ -106,11 +106,11 @@ class DisplayTrackGroupFragment : Fragment(),
         }
     }
 
-    override fun getFeature(): Feature {
+    override fun getFeature(): DisplayFeature {
         return viewModel.currentActionFeature!!
     }
 
-    private fun onFeatureDeleteClicked(feature: Feature) {
+    private fun onFeatureDeleteClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
         val dialog = YesCancelDialogFragment()
         var args = Bundle()
@@ -125,33 +125,33 @@ class DisplayTrackGroupFragment : Fragment(),
         }
     }
 
-    private fun onDeleteFeature(feature: Feature) {
+    private fun onDeleteFeature(feature: DisplayFeature) {
         val application = requireActivity().application
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                dao.deleteFeature(feature)
+                dao.deleteFeature(feature.id)
             }
         }
     }
 
-    private fun onFeatureRenameClicked(feature: Feature) {
+    private fun onFeatureRenameClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
         val dialog = RenameFeatureDialogFragment()
         childFragmentManager?.let { dialog.show(it, "rename_feature_dialog") }
     }
 
-    override fun onRenameFeature(feature: Feature) {
+    override fun onRenameFeature(feature: DisplayFeature) {
         val application = requireActivity().application
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                dao.updateFeature(feature)
+                dao.updateFeature(Feature(feature.id, feature.name, feature.featureType, feature.discreteValues))
             }
         }
     }
 
-    private fun onFeatureAddClicked(feature: Feature) {
+    private fun onFeatureAddClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
         val dialog = AddDataPointDialog()
         childFragmentManager.let { dialog.show(it, "") }
@@ -169,7 +169,7 @@ class DisplayTrackGroupFragment : Fragment(),
     }
 
     //TODO implement onFeatureHistoryClicked
-    private fun onFeatureHistoryClicked(feature: Feature) { }
+    private fun onFeatureHistoryClicked(feature: DisplayFeature) { }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {

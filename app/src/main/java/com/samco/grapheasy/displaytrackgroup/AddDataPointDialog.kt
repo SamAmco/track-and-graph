@@ -9,18 +9,18 @@ import android.view.View
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import com.samco.grapheasy.database.DataPoint
-import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.database.FeatureType
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import android.content.DialogInterface
 import com.samco.grapheasy.R
+import com.samco.grapheasy.database.DisplayFeature
 
 class AddDataPointDialog : DialogFragment() {
     private lateinit var listener: AddDataPointDialogListener
     private lateinit var alertDialog: AlertDialog
-    private lateinit var feature: Feature
+    private lateinit var feature: DisplayFeature
     private lateinit var titleText: TextView
     private lateinit var numberInput: EditText
     private lateinit var dateButton: Button
@@ -40,7 +40,7 @@ class AddDataPointDialog : DialogFragment() {
 
     interface AddDataPointDialogListener {
         fun onAddDataPoint(dataPoint: DataPoint)
-        fun getFeature(): Feature
+        fun getFeature(): DisplayFeature
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {

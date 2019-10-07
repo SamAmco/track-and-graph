@@ -10,13 +10,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.grapheasy.R
-import com.samco.grapheasy.database.Feature
+import com.samco.grapheasy.database.DisplayFeature
 import com.samco.grapheasy.databinding.ListItemFeatureBinding
 
 class FeatureAdapter(
     private val clickListener: FeatureClickListener,
     private val viewModel: DisplayTrackGroupViewModel
-) : ListAdapter<Feature, FeatureAdapter.ViewHolder>(FeatureDiffCallback()) {
+) : ListAdapter<DisplayFeature, FeatureAdapter.ViewHolder>(DisplayFeatureDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(parent, viewModel)
@@ -31,9 +31,9 @@ class FeatureAdapter(
         : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
         private var clickListener: FeatureClickListener? = null
-        private var feature: Feature? = null
+        private var feature: DisplayFeature? = null
 
-        fun bind(feature: Feature, clickListener: FeatureClickListener) {
+        fun bind(feature: DisplayFeature, clickListener: FeatureClickListener) {
             this.feature = feature
             this.clickListener = clickListener
             binding.feature = feature
@@ -72,22 +72,22 @@ class FeatureAdapter(
     }
 }
 
-class FeatureDiffCallback : DiffUtil.ItemCallback<Feature>() {
-    override fun areItemsTheSame(oldItem: Feature, newItem: Feature): Boolean {
+class DisplayFeatureDiffCallback : DiffUtil.ItemCallback<DisplayFeature>() {
+    override fun areItemsTheSame(oldItem: DisplayFeature, newItem: DisplayFeature): Boolean {
         return oldItem.id == newItem.id
     }
     @SuppressLint("DiffUtilEquals")
-    override fun areContentsTheSame(oldItem: Feature, newItem: Feature): Boolean {
+    override fun areContentsTheSame(oldItem: DisplayFeature, newItem: DisplayFeature): Boolean {
         return oldItem == newItem
     }
 }
 
-class FeatureClickListener(private val onRenameListener: (feature: Feature) -> Unit,
-                           private val onDeleteListener: (feature: Feature) -> Unit,
-                           private val onAddListener: (feature: Feature) -> Unit,
-                           private val onHistoryListener: (feature: Feature) -> Unit) {
-    fun onRename(feature: Feature) = onRenameListener(feature)
-    fun onDelete(feature: Feature) = onDeleteListener(feature)
-    fun onAdd(feature: Feature) = onAddListener(feature)
-    fun onHistory(feature: Feature) = onHistoryListener(feature)
+class FeatureClickListener(private val onRenameListener: (feature: DisplayFeature) -> Unit,
+                           private val onDeleteListener: (feature: DisplayFeature) -> Unit,
+                           private val onAddListener: (feature: DisplayFeature) -> Unit,
+                           private val onHistoryListener: (feature: DisplayFeature) -> Unit) {
+    fun onRename(feature: DisplayFeature) = onRenameListener(feature)
+    fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
+    fun onAdd(feature: DisplayFeature) = onAddListener(feature)
+    fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
 }

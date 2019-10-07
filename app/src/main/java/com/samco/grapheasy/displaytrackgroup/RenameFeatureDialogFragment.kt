@@ -2,16 +2,16 @@ package com.samco.grapheasy.displaytrackgroup
 
 import androidx.fragment.app.Fragment
 import com.samco.grapheasy.R
-import com.samco.grapheasy.database.Feature
+import com.samco.grapheasy.database.DisplayFeature
 import com.samco.grapheasy.ui.NameInputDialogFragment
 
 class RenameFeatureDialogFragment : NameInputDialogFragment() {
     private lateinit var listener: RenameFeatureDialogListener
-    private lateinit var feature: Feature
+    private lateinit var feature: DisplayFeature
 
     interface RenameFeatureDialogListener {
-        fun getFeature() : Feature
-        fun onRenameFeature(feature: Feature)
+        fun getFeature() : DisplayFeature
+        fun onRenameFeature(feature: DisplayFeature)
     }
 
     override fun registerListener(parentFragment: Fragment?) {

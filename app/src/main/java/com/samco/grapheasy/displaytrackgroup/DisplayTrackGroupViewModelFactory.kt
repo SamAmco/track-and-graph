@@ -6,12 +6,11 @@ import com.samco.grapheasy.database.GraphEasyDatabaseDao
 
 class DisplayTrackGroupViewModelFactory(
     private val trackGroupId: Long,
-    private val noDataString: String,
     private val dataSource: GraphEasyDatabaseDao
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(DisplayTrackGroupViewModel::class.java)) {
-            return DisplayTrackGroupViewModel(trackGroupId, noDataString,  dataSource) as T
+            return DisplayTrackGroupViewModel(trackGroupId, dataSource) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

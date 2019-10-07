@@ -70,3 +70,4 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+database-extract/ge_database.db

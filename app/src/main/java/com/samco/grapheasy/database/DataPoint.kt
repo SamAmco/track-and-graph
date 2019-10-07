@@ -11,7 +11,7 @@ import org.threeten.bp.OffsetDateTime
             androidx.room.ForeignKey(
                 entity = Feature::class,
                 parentColumns = arrayOf("id"),
-                childColumns = arrayOf("featureId"),
+                childColumns = arrayOf("feature_id"),
                 onDelete = ForeignKey.CASCADE
             )
     ]
@@ -20,7 +20,7 @@ class DataPoint (
     @PrimaryKey(autoGenerate = true)
     var id: Long = -1L,
 
-    @ColumnInfo(name = "featureId")
+    @ColumnInfo(name = "feature_id")
     val featureId: Long,
 
     @ColumnInfo(name = "value")

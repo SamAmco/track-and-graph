@@ -9,11 +9,11 @@ import androidx.room.PrimaryKey
     foreignKeys = [
         ForeignKey(entity = Feature::class,
             parentColumns = arrayOf("id"),
-            childColumns = arrayOf("featureId"),
+            childColumns = arrayOf("feature_id"),
             onDelete = ForeignKey.CASCADE),
         ForeignKey(entity = TrackGroup::class,
             parentColumns = arrayOf("id"),
-            childColumns = arrayOf("trackGroupId"),
+            childColumns = arrayOf("track_group_id"),
             onDelete = ForeignKey.CASCADE)
     ]
 )
@@ -21,9 +21,9 @@ class FeatureTrackGroupJoin (
     @PrimaryKey(autoGenerate = true)
     var id: Long = -1L,
 
-    @ColumnInfo(name = "featureId")
+    @ColumnInfo(name = "feature_id")
     val featureId: Long,
 
-    @ColumnInfo(name = "trackGroupId")
+    @ColumnInfo(name = "track_group_id")
     val trackGroupId: Long
 )

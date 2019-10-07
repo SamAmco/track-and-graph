@@ -20,8 +20,15 @@ interface GraphEasyDatabaseDao {
     @Update
     fun updateTrackGroup(trackGroup: TrackGroup)
 
-    @Query("SELECT * FROM features_table WHERE id IN(SELECT featureId FROM feature_track_group_join WHERE trackGroupId = :trackGroupId)")
-    fun getFeaturesForTrackGroup(trackGroupId: Long): LiveData<List<Feature>>
+    @Query("""SELECT track_group_id, features_table.id, features_table.name, features_table.type, features_table.discrete_values, num_data_points, last_timestamp from features_table 
+        LEFT JOIN (
+            SELECT feature_id as id, COUNT(id) as num_data_points, MAX(timestamp) as last_timestamp 
+            FROM data_points_table GROUP BY feature_id
+        ) as feature_data 
+        ON feature_data.id = features_table.id
+		LEFT JOIN feature_track_group_join ON feature_track_group_join.feature_id = features_table.id 
+		WHERE track_group_id = :trackGroupId""")
+    fun getDisplayFeaturesForTrackGroup(trackGroupId: Long): LiveData<List<DisplayFeature>>
 
     @Insert
     fun insertFeature(feature: Feature): Long
@@ -32,15 +39,12 @@ interface GraphEasyDatabaseDao {
     @Delete
     fun deleteFeature(feature: Feature)
 
+    @Query("DELETE FROM features_table WHERE id = :id")
+    fun deleteFeature(id: Long)
+
     @Insert
     fun insertFeatureTrackGroupJoin(featureTrackGroupJoin: FeatureTrackGroupJoin): Long
 
     @Insert
     fun insertDataPoint(dataPoint: DataPoint): Long
-
-    @Query("SELECT * FROM data_points_table WHERE featureId = :featureId LIMIT 1")
-    fun getLastDataPointForFeature(featureId: Long): LiveData<DataPoint>
-
-    @Query("SELECT COUNT(id) FROM data_points_table")
-    fun getNumDataPointsForFeature(): LiveData<Int>
 }
