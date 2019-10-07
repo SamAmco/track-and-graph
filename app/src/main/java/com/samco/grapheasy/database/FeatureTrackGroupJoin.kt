@@ -7,10 +7,14 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "feature_track_group_join",
     foreignKeys = [
-        ForeignKey(entity = Feature::class, parentColumns = arrayOf("id"),
-            childColumns = arrayOf("featureId"), onDelete = ForeignKey.CASCADE),
-        ForeignKey(entity = TrackGroup::class, parentColumns = arrayOf("id"),
-            childColumns = arrayOf("trackGroupId"), onDelete = ForeignKey.CASCADE)
+        ForeignKey(entity = Feature::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("featureId"),
+            onDelete = ForeignKey.CASCADE),
+        ForeignKey(entity = TrackGroup::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("trackGroupId"),
+            onDelete = ForeignKey.CASCADE)
     ]
 )
 class FeatureTrackGroupJoin (

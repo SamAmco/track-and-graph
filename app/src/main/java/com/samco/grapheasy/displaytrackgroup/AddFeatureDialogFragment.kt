@@ -36,28 +36,14 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<String>)
     }
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            listener = parentFragment as AddFeatureDialogListener
-        } catch (e: ClassCastException) {
-            throw ClassCastException((context.toString() +
-                    " must implement YesCancelDialogListener"))
-        }
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
     }
 
-    override fun onStart() {
-        super.onStart()
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
-    }
-
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
+            listener = parentFragment as AddFeatureDialogListener
             val view = it.layoutInflater.inflate(R.layout.feature_input_dialog, null)
             scrollView = view.findViewById(R.id.scrollView)
             baseLinearLayout = view.findViewById(R.id.baseLinearLayout)
@@ -84,6 +70,11 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             alertDialog = builder.create()
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
     }
 
     private fun onAddDiscreteValue() {

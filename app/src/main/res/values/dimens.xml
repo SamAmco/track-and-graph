@@ -9,5 +9,6 @@
     <dimen name="feature_add_box_button_size">35dp</dimen>
     <dimen name="feature_history_button_size">30dp</dimen>
     <dimen name="dialog_header_size">20sp</dimen>
+    <dimen name="dialog_header_size_large">30sp</dimen>
     <dimen name="dialog_header_top_margin">16dp</dimen>
 </resources>

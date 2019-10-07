@@ -14,7 +14,7 @@ val displayFormatter: DateTimeFormatter = DateTimeFormatter
 
 @Database(
     entities = [TrackGroup::class, Feature::class, FeatureTrackGroupJoin::class, DataPoint::class],
-    version = 5,
+    version = 6,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

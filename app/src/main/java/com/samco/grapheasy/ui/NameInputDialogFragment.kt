@@ -2,7 +2,6 @@ package com.samco.grapheasy.ui
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,16 +16,6 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
     private lateinit var editText: EditText
     private lateinit var alertDialog: AlertDialog
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        try {
-            registerListener(parentFragment)
-        } catch (e: ClassCastException) {
-            throw ClassCastException((context.toString() +
-                    " must implement YesCancelDialogListener"))
-        }
-    }
-
     abstract fun registerListener(parentFragment: Fragment?)
     abstract fun getPositiveButtonName() : String
     abstract fun onPositiveClicked(name: String)
@@ -36,6 +25,7 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
 
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
+            registerListener(parentFragment)
             val view = it.layoutInflater.inflate(R.layout.name_input_dialog, null)
             editText = view.findViewById(R.id.edit_name_input)
             editText.hint = getNameInputHint()

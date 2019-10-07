@@ -15,6 +15,7 @@ import com.samco.grapheasy.database.*
 import com.samco.grapheasy.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
+import timber.log.Timber
 
 class DisplayTrackGroupFragment : Fragment(),
     AddFeatureDialogFragment.AddFeatureDialogListener,
@@ -156,8 +157,16 @@ class DisplayTrackGroupFragment : Fragment(),
         childFragmentManager.let { dialog.show(it, "") }
     }
 
-    //TODO implement onAddDataPoint
-    override fun onAddDataPoint(dataPoint: DataPoint) { }
+    override fun onAddDataPoint(dataPoint: DataPoint) {
+        val application = requireActivity().application
+        val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
+        uiScope.launch {
+            withContext(Dispatchers.IO) {
+                Timber.d("adding data point: ${dataPoint.value} to feature ${dataPoint.featureId}")
+                dao.insertDataPoint(dataPoint)
+            }
+        }
+    }
 
     //TODO implement onFeatureHistoryClicked
     private fun onFeatureHistoryClicked(feature: Feature) { }

@@ -34,4 +34,13 @@ interface GraphEasyDatabaseDao {
 
     @Insert
     fun insertFeatureTrackGroupJoin(featureTrackGroupJoin: FeatureTrackGroupJoin): Long
+
+    @Insert
+    fun insertDataPoint(dataPoint: DataPoint): Long
+
+    @Query("SELECT * FROM data_points_table WHERE featureId = :featureId LIMIT 1")
+    fun getLastDataPointForFeature(featureId: Long): LiveData<DataPoint>
+
+    @Query("SELECT COUNT(id) FROM data_points_table")
+    fun getNumDataPointsForFeature(): LiveData<Int>
 }
