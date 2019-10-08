@@ -11,6 +11,10 @@ interface GraphEasyDatabaseDao {
     @Delete
     fun deleteTrackGroup(trackGroup: TrackGroup)
 
+    @Query("""DELETE FROM features_table WHERE id IN
+            (SELECT feature_id FROM feature_track_group_join WHERE track_group_id = :trackGroupId)""")
+    fun deleteTrackGroupFeatures(trackGroupId: Long)
+
     @Query("SELECT * FROM track_groups_table ORDER BY id DESC")
     fun getTrackGroups() : LiveData<List<TrackGroup>>
 

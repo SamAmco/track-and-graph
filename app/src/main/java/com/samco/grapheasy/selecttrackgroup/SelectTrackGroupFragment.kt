@@ -103,7 +103,6 @@ class SelectTrackGroupFragment : Fragment(),
 
     override fun onDialogYes(dialog: YesCancelDialogFragment) {
         when (dialog.title) {
-            //TODO delete the features for this track group also
             getString(R.string.ru_sure_del_track_group) -> deleteTrackGroup(viewModel.currentActionTrackGroup)
         }
     }
@@ -114,6 +113,7 @@ class SelectTrackGroupFragment : Fragment(),
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
             withContext(Dispatchers.IO) {
+                dao.deleteTrackGroupFeatures(trackGroup.id)
                 dao.deleteTrackGroup(trackGroup)
             }
         }
