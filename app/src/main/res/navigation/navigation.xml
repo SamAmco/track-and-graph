@@ -7,7 +7,7 @@
 
     <fragment android:id="@+id/selectTrackGroupFragment"
               android:name="com.samco.grapheasy.selecttrackgroup.SelectTrackGroupFragment"
-              android:label="SelectTrackGroupFragment"
+              android:label="@string/app_name"
               tools:layout="@layout/fragment_select_track_group">
         <action
                 android:id="@+id/action_select_tack_group"
@@ -15,7 +15,6 @@
     </fragment>
     <fragment android:id="@+id/displayTrackGroupFragment"
             android:name="com.samco.grapheasy.displaytrackgroup.DisplayTrackGroupFragment"
-            android:label="DisplayTrackGroupFragment"
             tools:layout="@layout/fragment_display_track_group">
         <argument
                 android:name="trackGroup"
@@ -23,13 +22,18 @@
         <action
                 android:id="@+id/action_feature_history"
                 app:destination="@id/featureHistoryFragment" />
+        <argument
+                android:name="trackGroupName"
+                app:argType="string" />
     </fragment>
     <fragment android:id="@+id/featureHistoryFragment"
             android:name="com.samco.grapheasy.featurehistory.FragmentFeatureHistory"
-            android:label="FeatureHistoryFragment"
             tools:layout="@layout/fragment_feature_history">
         <argument
                 android:name="feature"
                 app:argType="long" />
+        <argument
+                android:name="featureName"
+                app:argType="string" />
     </fragment>
 </navigation>

@@ -10,7 +10,9 @@
             android:supportsRtl="true"
             android:name=".GraphEasyApplication"
             android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
+        <activity
+                android:theme="@style/AppTheme.NoActionBar"
+                android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

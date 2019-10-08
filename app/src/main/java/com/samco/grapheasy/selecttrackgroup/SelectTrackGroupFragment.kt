@@ -123,7 +123,7 @@ class SelectTrackGroupFragment : Fragment(),
         Timber.d("onTrackGroupSelected called")
         navController?.navigate(
             SelectTrackGroupFragmentDirections
-                .actionSelectTackGroup(trackGroup.id)
+                .actionSelectTackGroup(trackGroup.id, trackGroup.name)
         )
     }
 
@@ -136,7 +136,7 @@ class SelectTrackGroupFragment : Fragment(),
         when (item.itemId) {
             R.id.add -> onAddClicked()
         }
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     private fun onAddClicked() {

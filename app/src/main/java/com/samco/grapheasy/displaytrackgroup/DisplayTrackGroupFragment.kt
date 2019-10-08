@@ -2,6 +2,7 @@ package com.samco.grapheasy.displaytrackgroup
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,7 +24,6 @@ class DisplayTrackGroupFragment : Fragment(),
     YesCancelDialogFragment.YesCancelDialogListener,
     AddDataPointDialog.AddDataPointDialogListener
 {
-
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
@@ -53,6 +53,7 @@ class DisplayTrackGroupFragment : Fragment(),
         initializeGridLayout()
 
         setHasOptionsMenu(true)
+        (activity as AppCompatActivity).supportActionBar?.title = args.trackGroupName
         return binding.root
     }
 
@@ -172,7 +173,7 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun onFeatureHistoryClicked(feature: DisplayFeature) {
         navController?.navigate(
             DisplayTrackGroupFragmentDirections
-                .actionFeatureHistory(feature.id)
+                .actionFeatureHistory(feature.id, feature.name)
         )
     }
 
@@ -180,7 +181,7 @@ class DisplayTrackGroupFragment : Fragment(),
         when (item.itemId) {
             R.id.add -> onAddClicked()
         }
-        return true
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
