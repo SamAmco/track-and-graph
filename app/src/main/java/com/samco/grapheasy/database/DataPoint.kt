@@ -16,7 +16,7 @@ import org.threeten.bp.OffsetDateTime
             )
     ]
 )
-class DataPoint (
+data class DataPoint (
     @PrimaryKey(autoGenerate = true)
     var id: Long = -1L,
 
@@ -29,5 +29,5 @@ class DataPoint (
     @ColumnInfo(name = "timestamp")
     val timestamp: OffsetDateTime = OffsetDateTime.now()
 ) {
-    fun getDisplayTimestamp() = displayFormatter.format(timestamp)
+    fun getDisplayTimestamp() = displayFeatureDateFormat.format(timestamp)
 }

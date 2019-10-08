@@ -2,12 +2,6 @@ package com.samco.grapheasy.database
 
 import androidx.room.ColumnInfo
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
-
-val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
-    .ofPattern("dd/MM/YY  HH:mm")
-    .withZone(ZoneId.systemDefault())
 
 data class DisplayFeature(
     @ColumnInfo(name = "id")

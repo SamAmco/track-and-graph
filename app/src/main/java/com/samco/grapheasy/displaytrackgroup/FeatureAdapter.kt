@@ -14,20 +14,18 @@ import com.samco.grapheasy.database.DisplayFeature
 import com.samco.grapheasy.databinding.ListItemFeatureBinding
 
 class FeatureAdapter(
-    private val clickListener: FeatureClickListener,
-    private val viewModel: DisplayTrackGroupViewModel
+    private val clickListener: FeatureClickListener
 ) : ListAdapter<DisplayFeature, FeatureAdapter.ViewHolder>(DisplayFeatureDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, viewModel)
+        return ViewHolder.from(parent)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
     }
 
-    class ViewHolder private constructor(private val binding: ListItemFeatureBinding,
-                                         private val viewModel: DisplayTrackGroupViewModel)
+    class ViewHolder private constructor(private val binding: ListItemFeatureBinding)
         : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
         private var clickListener: FeatureClickListener? = null
@@ -38,10 +36,9 @@ class FeatureAdapter(
             this.clickListener = clickListener
             binding.feature = feature
             binding.clickListener = clickListener
-            binding.viewModel = viewModel
             binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
             binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
-            binding.historyButton.setOnClickListener { clickListener.onHistory(feature) }
+            binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
         }
 
         private fun createContextMenu(view: View) {
@@ -63,10 +60,10 @@ class FeatureAdapter(
         }
 
         companion object {
-            fun from(parent: ViewGroup, viewModel: DisplayTrackGroupViewModel): ViewHolder {
+            fun from(parent: ViewGroup): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemFeatureBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding, viewModel)
+                return ViewHolder(binding)
             }
         }
     }

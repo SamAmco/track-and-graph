@@ -20,5 +20,16 @@
         <argument
                 android:name="trackGroup"
                 app:argType="long" />
+        <action
+                android:id="@+id/action_feature_history"
+                app:destination="@id/featureHistoryFragment" />
+    </fragment>
+    <fragment android:id="@+id/featureHistoryFragment"
+            android:name="com.samco.grapheasy.featurehistory.FragmentFeatureHistory"
+            android:label="FeatureHistoryFragment"
+            tools:layout="@layout/fragment_feature_history">
+        <argument
+                android:name="feature"
+                app:argType="long" />
     </fragment>
 </navigation>

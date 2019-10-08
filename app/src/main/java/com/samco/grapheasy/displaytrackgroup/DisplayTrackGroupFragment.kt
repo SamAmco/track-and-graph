@@ -46,7 +46,7 @@ class DisplayTrackGroupFragment : Fragment(),
             this::onFeatureDeleteClicked,
             this::onFeatureAddClicked,
             this::onFeatureHistoryClicked
-        ), viewModel)
+        ))
         observeFeatureDataAndUpdate(viewModel, adapter)
         binding.featureList.adapter = adapter
         registerForContextMenu(binding.featureList)
@@ -135,10 +135,11 @@ class DisplayTrackGroupFragment : Fragment(),
         }
     }
 
+    //TODO allow people to rename the discrete values if it is a discrete feature
     private fun onFeatureRenameClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
         val dialog = RenameFeatureDialogFragment()
-        childFragmentManager?.let { dialog.show(it, "rename_feature_dialog") }
+        childFragmentManager.let { dialog.show(it, "rename_feature_dialog") }
     }
 
     override fun onRenameFeature(feature: DisplayFeature) {
@@ -168,8 +169,12 @@ class DisplayTrackGroupFragment : Fragment(),
         }
     }
 
-    //TODO implement onFeatureHistoryClicked
-    private fun onFeatureHistoryClicked(feature: DisplayFeature) { }
+    private fun onFeatureHistoryClicked(feature: DisplayFeature) {
+        navController?.navigate(
+            DisplayTrackGroupFragmentDirections
+                .actionFeatureHistory(feature.id)
+        )
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {

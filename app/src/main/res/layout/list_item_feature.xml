@@ -9,11 +9,7 @@
         <variable
                 name="feature"
                 type="com.samco.grapheasy.database.DisplayFeature"/>
-        <variable
-                name="viewModel"
-                type="com.samco.grapheasy.displaytrackgroup.DisplayTrackGroupViewModel" />
     </data>
-    <!--TODO add click listener-->
     <!--TODO we will need a max title size for features to prevent layout issues-->
     <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
@@ -70,11 +66,11 @@
                     app:layout_constraintBottom_toTopOf="@id/divider"
                     app:layout_constraintTop_toBottomOf="@id/featureNameText"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/historyButton"
+                    app:layout_constraintLeft_toRightOf="@id/historyIcon"
                     tools:text="02/03/19  20:18" />
 
-            <ImageButton
-                    android:id="@+id/historyButton"
+            <ImageView
+                    android:id="@+id/historyIcon"
                     android:layout_width="@dimen/feature_history_button_size"
                     android:layout_height="0dp"
                     android:layout_gravity="bottom|right"

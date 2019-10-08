@@ -47,4 +47,7 @@ interface GraphEasyDatabaseDao {
 
     @Insert
     fun insertDataPoint(dataPoint: DataPoint): Long
+
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
+    fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
 }

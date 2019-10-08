@@ -11,6 +11,9 @@ val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIM
 val displayFormatter: DateTimeFormatter = DateTimeFormatter
     .ofLocalizedDateTime(FormatStyle.SHORT)
     .withZone(ZoneId.systemDefault())
+val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
+    .ofPattern("dd/MM/YY  HH:mm")
+    .withZone(ZoneId.systemDefault())
 
 @Database(
     entities = [TrackGroup::class, Feature::class, FeatureTrackGroupJoin::class, DataPoint::class],
