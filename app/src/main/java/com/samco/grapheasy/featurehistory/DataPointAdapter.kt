@@ -8,28 +8,32 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.grapheasy.database.DataPoint
 import com.samco.grapheasy.databinding.ListItemDataPointBinding
 
-class DataPointAdapter : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(DataPointDiffCallback()) {
+class DataPointAdapter(private val clickListener: DataPointClickListener)
+    : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(DataPointDiffCallback()) {
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
+        return ViewHolder.from(parent, clickListener)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class ViewHolder private constructor(private val binding: ListItemDataPointBinding)
+    class ViewHolder private constructor(private val binding: ListItemDataPointBinding,
+                                         private val clickListener: DataPointClickListener)
         : RecyclerView.ViewHolder(binding.root) {
 
-        //TODO add a click callback
         fun bind(dataPoint: DataPoint) {
             binding.dataPoint = dataPoint
+            binding.editButton.setOnClickListener { clickListener.editClicked(dataPoint) }
+            binding.deleteButton.setOnClickListener { clickListener.deleteClicked(dataPoint) }
         }
 
         companion object {
-            fun from(parent: ViewGroup): ViewHolder {
+            fun from(parent: ViewGroup, clickListener: DataPointClickListener): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemDataPointBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding)
+                return ViewHolder(binding, clickListener)
             }
         }
     }
@@ -37,4 +41,9 @@ class DataPointAdapter : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(Dat
 class DataPointDiffCallback : DiffUtil.ItemCallback<DataPoint>() {
     override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem == newItem
     override fun areContentsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem.id == newItem.id
+}
+class DataPointClickListener(private val onEditDataPoint: (DataPoint) -> Unit,
+                             private val onDeleteDataPoint: (DataPoint) -> Unit) {
+    fun editClicked(dataPoint: DataPoint) = onEditDataPoint(dataPoint)
+    fun deleteClicked(dataPoint: DataPoint) = onDeleteDataPoint(dataPoint)
 }

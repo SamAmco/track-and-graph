@@ -73,8 +73,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:gravity="center"
             app:layout_constraintTop_toBottomOf="@id/timeButton"
             android:inputType="numberDecimal|numberSigned"
+            tools:text="33"
         />
 
     <HorizontalScrollView

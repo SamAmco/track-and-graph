@@ -16,14 +16,16 @@ import com.samco.grapheasy.database.*
 import com.samco.grapheasy.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
+import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 class DisplayTrackGroupFragment : Fragment(),
     AddFeatureDialogFragment.AddFeatureDialogListener,
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener,
-    AddDataPointDialog.AddDataPointDialogListener
+    InputDataPointDialog.InputDataPointDialogListener
 {
+
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
@@ -107,9 +109,16 @@ class DisplayTrackGroupFragment : Fragment(),
         }
     }
 
-    override fun getFeature(): DisplayFeature {
-        return viewModel.currentActionFeature!!
+    override fun getFeature(): Feature {
+        val f = viewModel.currentActionFeature!!
+        return Feature(f.id, f.name, f.featureType, f.discreteValues)
     }
+
+    override fun getDisplayDateTimeForInputDataPoint(): OffsetDateTime? = null
+
+    override fun getIdForInputDataPoint(): Long? = null
+
+    override fun getValueForInputDataPoint(): String? = null
 
     private fun onFeatureDeleteClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
@@ -143,23 +152,23 @@ class DisplayTrackGroupFragment : Fragment(),
         childFragmentManager.let { dialog.show(it, "rename_feature_dialog") }
     }
 
-    override fun onRenameFeature(feature: DisplayFeature) {
+    override fun onRenameFeature(feature: Feature) {
         val application = requireActivity().application
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                dao.updateFeature(Feature(feature.id, feature.name, feature.featureType, feature.discreteValues))
+                dao.updateFeature(feature)
             }
         }
     }
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
-        val dialog = AddDataPointDialog()
-        childFragmentManager.let { dialog.show(it, "") }
+        val dialog = InputDataPointDialog()
+        childFragmentManager.let { dialog.show(it, "input_data_point_dialog") }
     }
 
-    override fun onAddDataPoint(dataPoint: DataPoint) {
+    override fun onDataPointInput(dataPoint: DataPoint) {
         val application = requireActivity().application
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {

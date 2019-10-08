@@ -15,12 +15,12 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import android.content.DialogInterface
 import com.samco.grapheasy.R
-import com.samco.grapheasy.database.DisplayFeature
+import com.samco.grapheasy.database.Feature
 
-class AddDataPointDialog : DialogFragment() {
-    private lateinit var listener: AddDataPointDialogListener
+class InputDataPointDialog : DialogFragment() {
+    private lateinit var listener: InputDataPointDialogListener
     private lateinit var alertDialog: AlertDialog
-    private lateinit var feature: DisplayFeature
+    private lateinit var feature: Feature
     private lateinit var titleText: TextView
     private lateinit var numberInput: EditText
     private lateinit var dateButton: Button
@@ -38,14 +38,17 @@ class AddDataPointDialog : DialogFragment() {
         .ofPattern("HH:mm")
         .withZone(ZoneId.systemDefault())
 
-    interface AddDataPointDialogListener {
-        fun onAddDataPoint(dataPoint: DataPoint)
-        fun getFeature(): DisplayFeature
+    interface InputDataPointDialogListener {
+        fun getDisplayDateTimeForInputDataPoint(): OffsetDateTime?
+        fun getIdForInputDataPoint(): Long?
+        fun getValueForInputDataPoint(): String?
+        fun onDataPointInput(dataPoint: DataPoint)
+        fun getFeature(): Feature
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
-            listener = parentFragment as AddDataPointDialogListener
+            listener = parentFragment as InputDataPointDialogListener
             feature = listener.getFeature()
 
             val view = it.layoutInflater.inflate(R.layout.data_point_input_dialog, null)
@@ -57,17 +60,21 @@ class AddDataPointDialog : DialogFragment() {
             buttonsLayout = view.findViewById(R.id.buttonsLayout)
 
             titleText.text = feature.name
+            val parentDateTime = listener.getDisplayDateTimeForInputDataPoint()
+            if (parentDateTime != null) selectedDateTime = parentDateTime
             updateDateTimeButtonText()
             initDateButton()
             initTimeButton()
 
-            var builder = AlertDialog.Builder(it)
+            val builder = AlertDialog.Builder(it)
             builder.setView(view)
                 .setNegativeButton(R.string.cancel) { _, _ -> {} }
 
             if (feature.featureType == FeatureType.CONTINUOUS) {
                 buttonsScroll.visibility = View.GONE
                 numberInput.visibility = View.VISIBLE
+                val initValue = listener.getValueForInputDataPoint()
+                if (initValue != null) numberInput.setText(initValue)
                 builder.setPositiveButton(R.string.add) { _, _ -> onPositiveClicked() }
             } else {
                 buttonsScroll.visibility = View.VISIBLE
@@ -127,10 +134,12 @@ class AddDataPointDialog : DialogFragment() {
     }
 
     private fun createButtons() {
+        val initValue = listener.getValueForInputDataPoint()
         for (discreteValue in feature.discreteValues) {
             val item = layoutInflater.inflate(R.layout.discrete_value_input_button,
                 buttonsLayout, false) as CheckBox
             item.text = discreteValue
+            if (initValue == discreteValue) item.isChecked = true
             item.setOnClickListener {
                 onSubmitResult(discreteValue)
                 val positiveButton = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
@@ -145,7 +154,9 @@ class AddDataPointDialog : DialogFragment() {
     }
 
     private fun onSubmitResult(value: String) {
-        val dataPoint = DataPoint(0, feature.id, value, selectedDateTime)
-        listener.onAddDataPoint(dataPoint)
+        var id = listener.getIdForInputDataPoint()
+        if (id == null) id = 0
+        val dataPoint = DataPoint(id, feature.id, value, selectedDateTime)
+        listener.onDataPointInput(dataPoint)
     }
 }
