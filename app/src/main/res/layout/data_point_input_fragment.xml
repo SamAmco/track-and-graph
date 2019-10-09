@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <TextView
+            android:id="@+id/titleText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_header_top_margin"
+            android:textSize="@dimen/dialog_header_size_large"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Some header"
+            />
+
+    <Button
+            android:id="@+id/dateButton"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginTop="@dimen/dialog_header_top_margin"
+            android:background="@color/colorShadowButton"
+            app:layout_constraintTop_toBottomOf="@id/titleText"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/timeButton"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            tools:text="02/03/2017"
+            />
+
+    <Button
+            android:id="@+id/timeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="@dimen/dialog_header_top_margin"
+            android:background="@color/colorShadowButton"
+            app:layout_constraintTop_toBottomOf="@id/titleText"
+            app:layout_constraintLeft_toRightOf="@id/dateButton"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            tools:text="08:22"
+            />
+
+    <EditText
+            android:id="@+id/numberInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:gravity="center"
+            app:layout_constraintTop_toBottomOf="@id/timeButton"
+            android:inputType="numberDecimal|numberSigned"
+            android:hint="0"
+            tools:text="33"
+            />
+
+    <HorizontalScrollView
+            android:id="@+id/buttonsScrollView"
+            android:layout_width="wrap_content"
+            android:layout_height="80dp"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:scrollbars="none"
+            app:layout_constraintTop_toBottomOf="@id/timeButton"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            >
+        <LinearLayout
+                android:id="@+id/buttonsLayout"
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center" />
+    </HorizontalScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -23,6 +23,7 @@
     <string name="no_data">No Data</string>
     <string name="standard_name_allowed_digits">0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.$%£()_-+=!^&amp;/*\|#~@;:?</string>
     <string name="add_data_point_hint">Enter a value for:</string>
+    <string name="skip">Skip</string>
     <string-array name="feature_types">
         <item>Continuous</item>
         <item>Discrete</item>

@@ -8,7 +8,7 @@ import org.threeten.bp.OffsetDateTime
 class DisplayTrackGroupViewModel(
     private val trackGroupId: Long,
     private val dataSource: GraphEasyDatabaseDao
-): ViewModel(), InputDataPointDialog.InputDataPointViewModel {
+): ViewModel(), DataPointInputFragment.InputDataPointViewModel {
 
     override var selectedDateTime: OffsetDateTime? = null
     override var currentValue: String? = null

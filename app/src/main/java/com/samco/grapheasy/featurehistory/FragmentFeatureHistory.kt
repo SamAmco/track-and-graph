@@ -16,6 +16,7 @@ import com.samco.grapheasy.R
 import com.samco.grapheasy.database.DataPoint
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.databinding.FragmentFeatureHistoryBinding
+import com.samco.grapheasy.displaytrackgroup.DataPointInputFragment
 import com.samco.grapheasy.displaytrackgroup.InputDataPointDialog
 import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
@@ -100,7 +101,7 @@ class FragmentFeatureHistory : Fragment(),
 
     override fun getValueForInputDataPoint() = viewModel.currentActionDataPoint!!.value
 
-    override fun getViewModel(): InputDataPointDialog.InputDataPointViewModel = viewModel
+    override fun getViewModel(): DataPointInputFragment.InputDataPointViewModel = viewModel
 
     private fun onDeleteDataPointClicked(dataPoint: DataPoint) {
         viewModel.currentActionDataPoint = dataPoint

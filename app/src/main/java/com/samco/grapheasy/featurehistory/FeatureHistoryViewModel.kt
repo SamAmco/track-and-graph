@@ -4,13 +4,13 @@ import androidx.lifecycle.ViewModel
 import com.samco.grapheasy.database.DataPoint
 import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.database.GraphEasyDatabaseDao
-import com.samco.grapheasy.displaytrackgroup.InputDataPointDialog
+import com.samco.grapheasy.displaytrackgroup.DataPointInputFragment
 import org.threeten.bp.OffsetDateTime
 
 class FeatureHistoryViewModel(
     featureId: Long,
     dataSource: GraphEasyDatabaseDao
-) : ViewModel(), InputDataPointDialog.InputDataPointViewModel {
+) : ViewModel(), DataPointInputFragment.InputDataPointViewModel {
 
     var feature: Feature? = null
     val dataPoints = dataSource.getDataPointsForFeature(featureId)
