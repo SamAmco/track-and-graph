@@ -24,6 +24,7 @@ import org.threeten.bp.OffsetDateTime
 class FragmentFeatureHistory : Fragment(),
         YesCancelDialogFragment.YesCancelDialogListener,
         InputDataPointDialog.InputDataPointDialogListener {
+
     private lateinit var binding: FragmentFeatureHistoryBinding
     private lateinit var viewModel: FeatureHistoryViewModel
     private val args: FragmentFeatureHistoryArgs by navArgs()
@@ -98,6 +99,8 @@ class FragmentFeatureHistory : Fragment(),
     override fun getIdForInputDataPoint() = viewModel.currentActionDataPoint!!.id
 
     override fun getValueForInputDataPoint() = viewModel.currentActionDataPoint!!.value
+
+    override fun getViewModel(): InputDataPointDialog.InputDataPointViewModel = viewModel
 
     private fun onDeleteDataPointClicked(dataPoint: DataPoint) {
         viewModel.currentActionDataPoint = dataPoint

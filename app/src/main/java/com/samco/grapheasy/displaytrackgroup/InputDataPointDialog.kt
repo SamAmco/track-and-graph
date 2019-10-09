@@ -1,9 +1,6 @@
 package com.samco.grapheasy.displaytrackgroup
 
-import android.app.AlertDialog
-import android.app.DatePickerDialog
-import android.app.Dialog
-import android.app.TimePickerDialog
+import android.app.*
 import android.os.Bundle
 import android.view.View
 import android.widget.*
@@ -14,11 +11,15 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import android.content.DialogInterface
+import android.text.Editable
+import android.text.TextWatcher
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.Feature
 
-class InputDataPointDialog : DialogFragment() {
+class InputDataPointDialog : DialogFragment(), TextWatcher {
     private lateinit var listener: InputDataPointDialogListener
+    private lateinit var viewModel:InputDataPointViewModel
+
     private lateinit var alertDialog: AlertDialog
     private lateinit var feature: Feature
     private lateinit var titleText: TextView
@@ -29,6 +30,10 @@ class InputDataPointDialog : DialogFragment() {
     private lateinit var buttonsLayout: LinearLayout
 
     private var selectedDateTime: OffsetDateTime = OffsetDateTime.now()
+        set(value) {
+            viewModel.selectedDateTime = value
+            field = value
+       }
 
     private val dateDisplayFormatter: DateTimeFormatter = DateTimeFormatter
         .ofPattern("dd/MM/yyyy")
@@ -38,52 +43,82 @@ class InputDataPointDialog : DialogFragment() {
         .ofPattern("HH:mm")
         .withZone(ZoneId.systemDefault())
 
+    interface InputDataPointViewModel {
+        var selectedDateTime: OffsetDateTime?
+        var currentValue: String?
+    }
+
     interface InputDataPointDialogListener {
         fun getDisplayDateTimeForInputDataPoint(): OffsetDateTime?
         fun getIdForInputDataPoint(): Long?
         fun getValueForInputDataPoint(): String?
         fun onDataPointInput(dataPoint: DataPoint)
         fun getFeature(): Feature
+        fun getViewModel(): InputDataPointViewModel
+    }
+
+    private fun createView(activity: Activity): View {
+        feature = listener.getFeature()
+        viewModel = listener.getViewModel()
+
+        val view = activity.layoutInflater.inflate(R.layout.data_point_input_dialog, null)
+        numberInput = view.findViewById(R.id.numberInput)
+        titleText = view.findViewById(R.id.titleText)
+        dateButton = view.findViewById(R.id.dateButton)
+        timeButton = view.findViewById(R.id.timeButton)
+        buttonsScroll = view.findViewById(R.id.buttonsScrollView)
+        buttonsLayout = view.findViewById(R.id.buttonsLayout)
+
+        titleText.text = feature.name
+        selectedDateTime = getInitialSelectedDateTime()
+        updateDateTimeButtonText()
+        initDateButton()
+        initTimeButton()
+
+        if (feature.featureType == FeatureType.CONTINUOUS) {
+            buttonsScroll.visibility = View.GONE
+            numberInput.visibility = View.VISIBLE
+            numberInput.setText(getInitialEditTextValue())
+            numberInput.addTextChangedListener(this)
+        } else {
+            buttonsScroll.visibility = View.VISIBLE
+            numberInput.visibility = View.GONE
+        }
+        return view
+    }
+
+    private fun getInitialEditTextValue(): String {
+        if (viewModel.currentValue != null) return viewModel.currentValue!!
+        val parentValue = listener.getValueForInputDataPoint()
+        if (parentValue != null) return parentValue
+        return ""
+    }
+
+    private fun getInitialSelectedDateTime(): OffsetDateTime {
+        if (viewModel.selectedDateTime != null) return viewModel.selectedDateTime!!
+        val parentDateTime = listener.getDisplayDateTimeForInputDataPoint()
+        if (parentDateTime != null) return parentDateTime
+        return selectedDateTime
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
             listener = parentFragment as InputDataPointDialogListener
-            feature = listener.getFeature()
-
-            val view = it.layoutInflater.inflate(R.layout.data_point_input_dialog, null)
-            numberInput = view.findViewById(R.id.numberInput)
-            titleText = view.findViewById(R.id.titleText)
-            dateButton = view.findViewById(R.id.dateButton)
-            timeButton = view.findViewById(R.id.timeButton)
-            buttonsScroll = view.findViewById(R.id.buttonsScrollView)
-            buttonsLayout = view.findViewById(R.id.buttonsLayout)
-
-            titleText.text = feature.name
-            val parentDateTime = listener.getDisplayDateTimeForInputDataPoint()
-            if (parentDateTime != null) selectedDateTime = parentDateTime
-            updateDateTimeButtonText()
-            initDateButton()
-            initTimeButton()
-
+            val view = createView(it)
             val builder = AlertDialog.Builder(it)
             builder.setView(view)
-                .setNegativeButton(R.string.cancel) { _, _ -> {} }
-
+                .setNegativeButton(R.string.cancel) { _, _ -> clearViewModel() }
             if (feature.featureType == FeatureType.CONTINUOUS) {
-                buttonsScroll.visibility = View.GONE
-                numberInput.visibility = View.VISIBLE
-                val initValue = listener.getValueForInputDataPoint()
-                if (initValue != null) numberInput.setText(initValue)
                 builder.setPositiveButton(R.string.add) { _, _ -> onPositiveClicked() }
-            } else {
-                buttonsScroll.visibility = View.VISIBLE
-                numberInput.visibility = View.GONE
             }
-
             alertDialog = builder.create()
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        clearViewModel()
     }
 
     private fun initDateButton() {
@@ -121,6 +156,15 @@ class InputDataPointDialog : DialogFragment() {
         }
     }
 
+    override fun afterTextChanged(editText: Editable?) {
+        viewModel.currentValue = editText.toString()
+    }
+
+    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+
+    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+
+
     private fun updateDateTimeButtonText() {
         dateButton.text = selectedDateTime.format(dateDisplayFormatter)
         timeButton.text = selectedDateTime.format(timeDisplayFormatter)
@@ -153,10 +197,16 @@ class InputDataPointDialog : DialogFragment() {
         onSubmitResult(numberInput.text.toString())
     }
 
+    private fun clearViewModel() {
+        viewModel.selectedDateTime = null
+        viewModel.currentValue = null
+    }
+
     private fun onSubmitResult(value: String) {
         var id = listener.getIdForInputDataPoint()
         if (id == null) id = 0
         val dataPoint = DataPoint(id, feature.id, value, selectedDateTime)
         listener.onDataPointInput(dataPoint)
+        clearViewModel()
     }
 }

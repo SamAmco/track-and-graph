@@ -120,6 +120,8 @@ class DisplayTrackGroupFragment : Fragment(),
 
     override fun getValueForInputDataPoint(): String? = null
 
+    override fun getViewModel(): InputDataPointDialog.InputDataPointViewModel = viewModel
+
     private fun onFeatureDeleteClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
         val dialog = YesCancelDialogFragment()
