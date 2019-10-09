@@ -17,6 +17,8 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
+const val FEATURE_ID_KEY = "FEATURE_ID"
+
 class DataPointInputFragment : Fragment(), TextWatcher {
     private lateinit var listener: InputDataPointFragmentListener
     private lateinit var viewModel: InputDataPointViewModel
@@ -37,28 +39,24 @@ class DataPointInputFragment : Fragment(), TextWatcher {
         .ofPattern("HH:mm")
         .withZone(ZoneId.systemDefault())
 
-    private var selectedDateTime: OffsetDateTime = OffsetDateTime.now()
-        set(value) {
-            viewModel.selectedDateTime = value
-            field = value
-        }
-
     interface InputDataPointFragmentListener {
-        fun getFeature(): Feature
         fun getViewModel(): InputDataPointViewModel
-        fun getDisplayDateTimeForInputDataPoint(): OffsetDateTime?
-        fun getValueForInputDataPoint(): String?
         fun onValueSubmitted(value: String, timestamp: OffsetDateTime)
     }
 
+    data class DataPointDisplayData(val featureId: Long) {
+        lateinit var selectedDateTime: OffsetDateTime
+        lateinit var value: String
+        lateinit var feature: Feature
+    }
+
     interface InputDataPointViewModel {
-        var selectedDateTime: OffsetDateTime?
-        var currentValue: String?
+        fun putDataPointDisplayData(displayData: DataPointDisplayData)
+        fun getDataPointDisplayData(featureId: Long): DataPointDisplayData
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         listener = parentFragment as InputDataPointFragmentListener
-        feature = listener.getFeature()
         viewModel = listener.getViewModel()
         val view = inflater.inflate(R.layout.data_point_input_fragment, container, false)
 
@@ -69,8 +67,9 @@ class DataPointInputFragment : Fragment(), TextWatcher {
         buttonsScroll = view.findViewById(R.id.buttonsScrollView)
         buttonsLayout = view.findViewById(R.id.buttonsLayout)
 
+        initFeatureData()
+
         titleText.text = feature.name
-        selectedDateTime = getInitialSelectedDateTime()
         updateDateTimeButtonText()
         initDateButton()
         initTimeButton()
@@ -78,7 +77,6 @@ class DataPointInputFragment : Fragment(), TextWatcher {
         if (feature.featureType == FeatureType.CONTINUOUS) {
             buttonsScroll.visibility = View.GONE
             numberInput.visibility = View.VISIBLE
-            numberInput.setText(getInitialEditTextValue())
             numberInput.addTextChangedListener(this)
         } else {
             buttonsScroll.visibility = View.VISIBLE
@@ -86,6 +84,22 @@ class DataPointInputFragment : Fragment(), TextWatcher {
         }
 
         return view
+    }
+
+    private fun setSelectedDateTime(dateTime: OffsetDateTime) {
+        val displayData = DataPointDisplayData(feature.id)
+        displayData.feature = feature
+        displayData.value = numberInput.text.toString()
+        displayData.selectedDateTime = dateTime
+        viewModel.putDataPointDisplayData(displayData)
+    }
+
+    private fun initFeatureData() {
+        arguments?.let {
+            val initDisplayData = viewModel.getDataPointDisplayData(it.getLong(FEATURE_ID_KEY))
+            feature = initDisplayData.feature
+            numberInput.setText(initDisplayData.value)
+        }
     }
 
     override fun onStart() {
@@ -96,58 +110,50 @@ class DataPointInputFragment : Fragment(), TextWatcher {
     }
 
     override fun afterTextChanged(editText: Editable?) {
-        if (editText.toString().isEmpty() || editText.toString().toLongOrNull() == null) {
-            viewModel.currentValue = "0"
-        } else viewModel.currentValue = editText.toString()
+        val displayData = DataPointDisplayData(feature.id)
+        displayData.feature = feature
+        displayData.value = editText.toString()
+        displayData.selectedDateTime = viewModel.getDataPointDisplayData(feature.id).selectedDateTime
+        viewModel.putDataPointDisplayData(displayData)
     }
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
 
     private fun createButtons() {
-        val initValue = listener.getValueForInputDataPoint()
+        val initValue = viewModel.getDataPointDisplayData(feature.id).value
         for (discreteValue in feature.discreteValues) {
             val item = layoutInflater.inflate(R.layout.discrete_value_input_button,
                 buttonsLayout, false) as CheckBox
             item.text = discreteValue
             if (initValue == discreteValue) item.isChecked = true
             item.setOnClickListener {
-                listener.onValueSubmitted(discreteValue, selectedDateTime)
+                val displayData = viewModel.getDataPointDisplayData(feature.id)
+                listener.onValueSubmitted(discreteValue, displayData.selectedDateTime)
             }
             buttonsLayout.addView(item)
         }
     }
 
-    private fun getInitialEditTextValue(): String {
-        if (viewModel.currentValue != null) return viewModel.currentValue!!
-        val parentValue = listener.getValueForInputDataPoint()
-        if (parentValue != null) return parentValue
-        return ""
-    }
-
-    private fun getInitialSelectedDateTime(): OffsetDateTime {
-        if (viewModel.selectedDateTime != null) return viewModel.selectedDateTime!!
-        val parentDateTime = listener.getDisplayDateTimeForInputDataPoint()
-        if (parentDateTime != null) return parentDateTime
-        return selectedDateTime
-    }
-
     private fun updateDateTimeButtonText() {
-        dateButton.text = selectedDateTime.format(dateDisplayFormatter)
-        timeButton.text = selectedDateTime.format(timeDisplayFormatter)
+        val displayData = viewModel.getDataPointDisplayData(feature.id)
+        dateButton.text = displayData.selectedDateTime.format(dateDisplayFormatter)
+        timeButton.text = displayData.selectedDateTime.format(timeDisplayFormatter)
     }
 
     private fun initDateButton() {
         context?.let {
             dateButton.setOnClickListener {
+                val displayData = viewModel.getDataPointDisplayData(feature.id)
+                val dateTime = displayData.selectedDateTime
                 val picker = DatePickerDialog(context!!,
                     DatePickerDialog.OnDateSetListener { _, year, month, day ->
-                        selectedDateTime = selectedDateTime
+                        setSelectedDateTime(dateTime
                             .withYear(year)
                             .withMonth(month+1)
-                            .withDayOfMonth(day)
+                            .withDayOfMonth(day))
                         updateDateTimeButtonText()
                     },
-                    selectedDateTime.year, selectedDateTime.monthValue, selectedDateTime.dayOfMonth
+                    dateTime.year, dateTime.monthValue, dateTime.dayOfMonth
                 )
                 picker.show()
             }
@@ -157,14 +163,16 @@ class DataPointInputFragment : Fragment(), TextWatcher {
     private fun initTimeButton() {
         context?.let {
             timeButton.setOnClickListener {
+                val displayData = viewModel.getDataPointDisplayData(feature.id)
+                val dateTime = displayData.selectedDateTime
                 val picker = TimePickerDialog(context!!,
                     TimePickerDialog.OnTimeSetListener { _, hour, minute ->
-                        selectedDateTime = selectedDateTime
+                        setSelectedDateTime(dateTime
                             .withHour(hour)
-                            .withMinute(minute)
+                            .withMinute(minute))
                         updateDateTimeButtonText()
                     },
-                    selectedDateTime.hour, selectedDateTime.minute, true
+                    dateTime.hour, dateTime.minute, true
                 )
                 picker.show()
             }

@@ -25,7 +25,6 @@ class DisplayTrackGroupFragment : Fragment(),
     YesCancelDialogFragment.YesCancelDialogListener,
     InputDataPointDialog.InputDataPointDialogListener
 {
-
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
@@ -53,6 +52,8 @@ class DisplayTrackGroupFragment : Fragment(),
         binding.featureList.adapter = adapter
         registerForContextMenu(binding.featureList)
         initializeGridLayout()
+
+        binding.queueAddAllButton.setOnClickListener { onQueueAddAllClicked() }
 
         setHasOptionsMenu(true)
         (activity as AppCompatActivity).supportActionBar?.title = args.trackGroupName
@@ -114,13 +115,18 @@ class DisplayTrackGroupFragment : Fragment(),
         return Feature(f.id, f.name, f.featureType, f.discreteValues)
     }
 
+    override fun getFeatures(): List<Feature> {
+        val f = viewModel.currentActionFeatures!!
+        return f.map { df -> Feature(df.id, df.name, df.featureType, df.discreteValues) }
+    }
+
     override fun getDisplayDateTimeForInputDataPoint(): OffsetDateTime? = null
 
     override fun getIdForInputDataPoint(): Long? = null
 
     override fun getValueForInputDataPoint(): String? = null
 
-    override fun getViewModel(): DataPointInputFragment.InputDataPointViewModel = viewModel
+    override fun getViewModel(): InputDataPointDialog.InputDataPointDialogViewModel = viewModel
 
     private fun onFeatureDeleteClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
@@ -165,9 +171,17 @@ class DisplayTrackGroupFragment : Fragment(),
     }
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
-        viewModel.currentActionFeature = feature
+        viewModel.currentActionFeatures = listOf(feature)
         val dialog = InputDataPointDialog()
         childFragmentManager.let { dialog.show(it, "input_data_point_dialog") }
+    }
+
+    private fun onQueueAddAllClicked() {
+        viewModel.features.value?.let { feats ->
+            viewModel.currentActionFeatures = feats
+            val dialog = InputDataPointDialog()
+            childFragmentManager.let { dialog.show(it, "input_data_points_dialog") }
+        }
     }
 
     override fun onDataPointInput(dataPoint: DataPoint) {

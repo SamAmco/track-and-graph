@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.DataPoint
+import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.databinding.FragmentFeatureHistoryBinding
 import com.samco.grapheasy.displaytrackgroup.DataPointInputFragment
@@ -93,7 +94,7 @@ class FragmentFeatureHistory : Fragment(),
         }
     }
 
-    override fun getFeature() = viewModel.feature!!
+    override fun getFeatures() = listOf(viewModel.feature!!)
 
     override fun getDisplayDateTimeForInputDataPoint() = viewModel.currentActionDataPoint!!.timestamp
 
@@ -101,7 +102,7 @@ class FragmentFeatureHistory : Fragment(),
 
     override fun getValueForInputDataPoint() = viewModel.currentActionDataPoint!!.value
 
-    override fun getViewModel(): DataPointInputFragment.InputDataPointViewModel = viewModel
+    override fun getViewModel(): InputDataPointDialog.InputDataPointDialogViewModel = viewModel
 
     private fun onDeleteDataPointClicked(dataPoint: DataPoint) {
         viewModel.currentActionDataPoint = dataPoint
