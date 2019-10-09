@@ -77,6 +77,7 @@ class DataPointInputFragment : Fragment(), TextWatcher {
         if (feature.featureType == FeatureType.CONTINUOUS) {
             buttonsScroll.visibility = View.GONE
             numberInput.visibility = View.VISIBLE
+            numberInput.requestFocus()
             numberInput.addTextChangedListener(this)
         } else {
             buttonsScroll.visibility = View.VISIBLE

@@ -1,5 +1,6 @@
 package com.samco.grapheasy.displaytrackgroup
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
@@ -9,6 +10,7 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.ViewParent
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
@@ -108,6 +110,11 @@ class InputDataPointDialog : DialogFragment(), DataPointInputFragment.InputDataP
         if (index == listener.getFeatures().size-1) skipButton.visibility = View.GONE
         else skipButton.visibility = View.VISIBLE
         indexText.text = "${index+1} / ${listener.getFeatures().size}"
+
+        //SHOW/HIDE KEYBOARD
+        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        if (feature.featureType == FeatureType.CONTINUOUS) imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+        else imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
 
@@ -151,6 +158,8 @@ class InputDataPointDialog : DialogFragment(), DataPointInputFragment.InputDataP
     private fun skip() = viewPager.setCurrentItem(viewPager.currentItem + 1, true)
 
     private fun closeDialog() {
+        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
         viewModel.clearDataPointDisplayData()
         dismiss()
     }
