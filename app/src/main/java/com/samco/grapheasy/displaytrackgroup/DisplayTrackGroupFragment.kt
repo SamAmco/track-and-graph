@@ -179,6 +179,7 @@ class DisplayTrackGroupFragment : Fragment(),
 
     private fun onQueueAddAllClicked() {
         viewModel.features.value?.let { feats ->
+            if (feats.isEmpty()) return
             viewModel.currentActionFeatures = feats
             val dialog = InputDataPointDialog()
             childFragmentManager.let { dialog.show(it, "input_data_points_dialog") }

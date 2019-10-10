@@ -17,6 +17,7 @@ import com.samco.grapheasy.database.FeatureType
 const val EXISTING_FEATURES_ARG_KEY = "existingFeatures"
 const val EXISTING_FEATURES_DELIM = ","
 
+//TODO view model persistence for AddFeatureDialogFragment
 class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private lateinit var scrollView: ScrollView
     private lateinit var baseLinearLayout: LinearLayout
