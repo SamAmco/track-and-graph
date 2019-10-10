@@ -34,6 +34,9 @@ interface GraphEasyDatabaseDao {
 		WHERE track_group_id = :trackGroupId""")
     fun getDisplayFeaturesForTrackGroup(trackGroupId: Long): LiveData<List<DisplayFeature>>
 
+    @Query("SELECT features_table.* FROM features_table LEFT JOIN feature_track_group_join ON feature_track_group_join.feature_id = features_table.id WHERE track_group_id = :trackGroupId")
+    fun getFeaturesForTrackGroupSync(trackGroupId: Long): List<Feature>
+
     @Query("""SELECT * from features_table WHERE id = :featureId LIMIT 1""")
     fun getFeatureById(featureId: Long): Feature
 
@@ -60,6 +63,9 @@ interface GraphEasyDatabaseDao {
 
     @Update
     fun updateDataPoint(dataPoint: DataPoint)
+
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
+    fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>

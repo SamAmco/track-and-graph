@@ -2,6 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/importButton"
+            android:title="@string/importButton"
+            android:icon="@drawable/import_icon"
+            app:showAsAction="ifRoom" />
+
+    <item android:id="@+id/exportButton"
+            android:title="@string/exportButton"
+            android:icon="@drawable/export_icon"
+            app:showAsAction="ifRoom" />
+
     <item android:id="@+id/add"
             android:title="@string/add"
             android:icon="@drawable/add_icon"

@@ -202,9 +202,23 @@ class DisplayTrackGroupFragment : Fragment(),
         )
     }
 
+    private fun onExportClicked() {
+        val dialog = ExportFeaturesDialog()
+        val argBundle = Bundle()
+        argBundle.putLong(TRACK_GROUP_ID_KEY, args.trackGroup)
+        argBundle.putString(TRACK_GROUP_NAME_KEY, args.trackGroupName)
+        dialog.arguments = argBundle
+        childFragmentManager.let { dialog.show(it, "export_features_dialog") }
+    }
+
+    //TODO onImportClicked
+    private fun onImportClicked() { }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.add -> onAddClicked()
+            R.id.exportButton -> onExportClicked()
+            R.id.importButton -> onImportClicked()
         }
         return super.onOptionsItemSelected(item)
     }

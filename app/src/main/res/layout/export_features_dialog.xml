@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+    <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="@dimen/card_padding"
+                >
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/export_to"
+                    android:textSize="@dimen/dialog_label_text_size"
+                    />
+
+            <Button
+                    android:id="@+id/fileButton"
+                    android:layout_width="match_parent"
+                    android:layout_marginLeft="@dimen/card_padding"
+                    android:layout_marginRight="@dimen/card_padding"
+                    android:padding="@dimen/card_padding"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_header_top_margin"
+                    android:background="@color/colorShadowButton"
+                    android:textAllCaps="false"
+                    android:ellipsize="start"
+                    android:singleLine="true"
+                    tools:text="/home/sam/some-directory/some-file-20190703-162203"
+                    />
+
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:text="@string/features_colon"
+                    android:textSize="@dimen/dialog_label_text_size"
+                    />
+
+            <LinearLayout
+                    android:id="@+id/checkboxLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:orientation="vertical"
+                    />
+
+        </LinearLayout>
+    </ScrollView>
+    <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+</FrameLayout>

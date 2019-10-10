@@ -11,9 +11,11 @@
     <string name="feature_type">Feature type: </string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
+    <string name="select_file">Select File</string>
     <string name="ru_sure_del_track_group">Are you sure you want to delete this track group and all of it\'s tracked data?</string>
     <string name="ru_sure_del_feature">Are you sure you want to delete this feature and all of it\'s tracked data?</string>
     <string name="ru_sure_del_data_point">Are you sure you want to delete this data point?</string>
+    <string name="export_file_name_suffix">%s-%s-%04d%02d%02d-%02d%02d%02d.csv</string>
     <string name="discrete_values">Discrete values</string>
     <string name="feature_name_cannot_be_null">Please add a feature name</string>
     <string name="feature_with_that_name_exists">A feature with that name already exists</string>
@@ -24,6 +26,10 @@
     <string name="standard_name_allowed_digits">0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.$%£()_-+=!^&amp;/*\|#~@;:?</string>
     <string name="add_data_point_hint">Enter a value for:</string>
     <string name="skip">Skip</string>
+    <string name="exportButton">Export</string>
+    <string name="importButton">Import</string>
+    <string name="export_to">Export to:</string>
+    <string name="features_colon">Features:</string>
     <string-array name="feature_types">
         <item>Continuous</item>
         <item>Discrete</item>

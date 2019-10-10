@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorShadowButton">#E0E0E0</color>
     <color name="colorAccent">#D81B60</color>
+    <color name="regularText">@android:color/tab_indicator_text</color>
     <color name="errorText">#FF0000</color>
 </resources>
