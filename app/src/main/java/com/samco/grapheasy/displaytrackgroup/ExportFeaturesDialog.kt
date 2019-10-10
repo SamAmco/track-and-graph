@@ -162,7 +162,7 @@ class ExportFeaturesDialog : DialogFragment() {
                 if (outStream != null) {
                     val application = requireActivity().application
                     val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
-                    CSVReadWriter.WriteFeaturesToCSV(viewModel.selectedFeatures!!, dao, outStream)
+                    CSVReadWriter.writeFeaturesToCSV(viewModel.selectedFeatures!!, dao, outStream)
                 }
                 viewModel.selectedFeatures = null
                 dismiss()
