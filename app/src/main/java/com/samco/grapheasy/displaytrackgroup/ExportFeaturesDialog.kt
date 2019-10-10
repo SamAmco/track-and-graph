@@ -5,7 +5,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.view.View
 import android.widget.*
@@ -29,6 +28,8 @@ class ExportFeaturesDialog : DialogFragment() {
     private var trackGroupId: Long? = null
 
     private lateinit var features: List<Feature>
+    private lateinit var listener: ExportFeaturesDialogListener
+    private lateinit var viewModel: ExportFeaturesViewModel
 
     private var updateJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
@@ -38,11 +39,20 @@ class ExportFeaturesDialog : DialogFragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var checkboxLayout: LinearLayout
 
-    private var selectedFeatures = mutableListOf<Feature>()
     private var selectedFileUri: Uri? = null
+
+    interface ExportFeaturesDialogListener {
+        fun getViewModel(): ExportFeaturesViewModel
+    }
+
+    interface ExportFeaturesViewModel {
+        var selectedFeatures: MutableList<Feature>?
+    }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
+            listener = parentFragment as ExportFeaturesDialogListener
+            viewModel = listener.getViewModel()
             val view = it.layoutInflater.inflate(R.layout.export_features_dialog, null)
             trackGroupName = arguments!!.getString(TRACK_GROUP_NAME_KEY)
             trackGroupId = arguments!!.getLong(TRACK_GROUP_ID_KEY)
@@ -60,8 +70,9 @@ class ExportFeaturesDialog : DialogFragment() {
             var builder = AlertDialog.Builder(it)
             builder.setView(view)
                 .setPositiveButton(R.string.exportButton) { _, _ -> null }
-                .setNegativeButton(R.string.cancel) { _, _ -> {} }
+                .setNegativeButton(R.string.cancel) { _, _ -> onCancel() }
             alertDialog = builder.create()
+            alertDialog.setCanceledOnTouchOutside(true)
             alertDialog.setOnShowListener {
                 val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 positiveButton.isEnabled = false
@@ -69,6 +80,11 @@ class ExportFeaturesDialog : DialogFragment() {
             }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    private fun initSelectedFeatures() {
+        if (viewModel.selectedFeatures == null)
+            viewModel.selectedFeatures = features.toMutableList()
     }
 
     private fun onFileButtonClicked() {
@@ -115,6 +131,7 @@ class ExportFeaturesDialog : DialogFragment() {
         uiScope.launch {
             withContext(Dispatchers.IO) {
                 features = dao.getFeaturesForTrackGroupSync(trackGroupId!!)
+                initSelectedFeatures()
             }
             withContext(Dispatchers.Main) {
                 createFeatureCheckboxes()
@@ -128,11 +145,10 @@ class ExportFeaturesDialog : DialogFragment() {
             val item = layoutInflater.inflate(R.layout.list_item_feature_checkbox, checkboxLayout, false)
             val checkBox = item.findViewById<CheckBox>(R.id.checkbox)
             checkBox.text = feature.name
-            checkBox.isChecked = true
-            selectedFeatures.add(feature)
+            checkBox.isChecked = viewModel.selectedFeatures!!.contains(feature)
             checkBox.setOnCheckedChangeListener { _, b ->
-                if (b && !selectedFeatures.contains(feature)) selectedFeatures.add(feature)
-                else if (!b && selectedFeatures.contains(feature)) selectedFeatures.remove(feature)
+                if (b && !viewModel.selectedFeatures!!.contains(feature)) viewModel.selectedFeatures!!.add(feature)
+                else if (!b && viewModel.selectedFeatures!!.contains(feature)) viewModel.selectedFeatures!!.remove(feature)
             }
             checkboxLayout.addView(item)
         }
@@ -146,39 +162,22 @@ class ExportFeaturesDialog : DialogFragment() {
                 if (outStream != null) {
                     val application = requireActivity().application
                     val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
-                    CSVReadWriter.WriteFeaturesToCSV(selectedFeatures, dao, outStream)
+                    CSVReadWriter.WriteFeaturesToCSV(viewModel.selectedFeatures!!, dao, outStream)
                 }
+                viewModel.selectedFeatures = null
                 dismiss()
                 updateJob.cancel()
             } }
         }
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        super.onCancel(dialog)
+    private fun onCancel() {
+        viewModel.selectedFeatures = null
         updateJob.cancel()
     }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        onCancel()
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

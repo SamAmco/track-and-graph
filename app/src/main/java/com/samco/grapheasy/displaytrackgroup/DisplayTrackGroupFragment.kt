@@ -23,7 +23,8 @@ class DisplayTrackGroupFragment : Fragment(),
     AddFeatureDialogFragment.AddFeatureDialogListener,
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener,
-    InputDataPointDialog.InputDataPointDialogListener
+    InputDataPointDialog.InputDataPointDialogListener,
+    ExportFeaturesDialog.ExportFeaturesDialogListener
 {
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
@@ -126,7 +127,7 @@ class DisplayTrackGroupFragment : Fragment(),
 
     override fun getValueForInputDataPoint(): String? = null
 
-    override fun getViewModel(): InputDataPointDialog.InputDataPointDialogViewModel = viewModel
+    override fun getViewModel() = viewModel
 
     private fun onFeatureDeleteClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
