@@ -16,8 +16,8 @@ val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
     .withZone(ZoneId.systemDefault())
 
 @Database(
-    entities = [TrackGroup::class, Feature::class, FeatureTrackGroupJoin::class, DataPoint::class],
-    version = 9,
+    entities = [TrackGroup::class, Feature::class, DataPoint::class],
+    version = 10,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

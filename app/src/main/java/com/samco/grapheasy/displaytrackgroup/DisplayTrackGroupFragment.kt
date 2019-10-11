@@ -102,23 +102,23 @@ class DisplayTrackGroupFragment : Fragment(),
                 val feature = Feature(
                     0,
                     name,
+                    args.trackGroup,
                     featureType,
                     discreteValues
                 )
                 val featureId = dao.insertFeature(feature)
-                dao.insertFeatureTrackGroupJoin(FeatureTrackGroupJoin(0, featureId, args.trackGroup))
             }
         }
     }
 
     override fun getFeature(): Feature {
         val f = viewModel.currentActionFeature!!
-        return Feature(f.id, f.name, f.featureType, f.discreteValues)
+        return Feature(f.id, f.name, f.trackGroupId, f.featureType, f.discreteValues)
     }
 
     override fun getFeatures(): List<Feature> {
         val f = viewModel.currentActionFeatures!!
-        return f.map { df -> Feature(df.id, df.name, df.featureType, df.discreteValues) }
+        return f.map { df -> Feature(df.id, df.name, df.trackGroupId, df.featureType, df.discreteValues) }
     }
 
     override fun getDisplayDateTimeForInputDataPoint(): OffsetDateTime? = null

@@ -11,10 +11,6 @@ interface GraphEasyDatabaseDao {
     @Delete
     fun deleteTrackGroup(trackGroup: TrackGroup)
 
-    @Query("""DELETE FROM features_table WHERE id IN
-            (SELECT feature_id FROM feature_track_group_join WHERE track_group_id = :trackGroupId)""")
-    fun deleteTrackGroupFeatures(trackGroupId: Long)
-
     @Query("SELECT * FROM track_groups_table ORDER BY id DESC")
     fun getTrackGroups() : LiveData<List<TrackGroup>>
 
@@ -24,17 +20,16 @@ interface GraphEasyDatabaseDao {
     @Update
     fun updateTrackGroup(trackGroup: TrackGroup)
 
-    @Query("""SELECT track_group_id, features_table.id, features_table.name, features_table.type, features_table.discrete_values, num_data_points, last_timestamp from features_table 
+    @Query("""SELECT features_table.*, num_data_points, last_timestamp from features_table 
         LEFT JOIN (
             SELECT feature_id as id, COUNT(id) as num_data_points, MAX(timestamp) as last_timestamp 
             FROM data_points_table GROUP BY feature_id
         ) as feature_data 
         ON feature_data.id = features_table.id
-		LEFT JOIN feature_track_group_join ON feature_track_group_join.feature_id = features_table.id 
 		WHERE track_group_id = :trackGroupId""")
     fun getDisplayFeaturesForTrackGroup(trackGroupId: Long): LiveData<List<DisplayFeature>>
 
-    @Query("SELECT features_table.* FROM features_table LEFT JOIN feature_track_group_join ON feature_track_group_join.feature_id = features_table.id WHERE track_group_id = :trackGroupId")
+    @Query("SELECT features_table.* FROM features_table WHERE track_group_id = :trackGroupId")
     fun getFeaturesForTrackGroupSync(trackGroupId: Long): List<Feature>
 
     @Query("""SELECT * from features_table WHERE id = :featureId LIMIT 1""")
@@ -54,9 +49,6 @@ interface GraphEasyDatabaseDao {
 
     @Query("DELETE FROM features_table WHERE id = :id")
     fun deleteFeature(id: Long)
-
-    @Insert
-    fun insertFeatureTrackGroupJoin(featureTrackGroupJoin: FeatureTrackGroupJoin): Long
 
     @Insert
     fun insertDataPoint(dataPoint: DataPoint): Long

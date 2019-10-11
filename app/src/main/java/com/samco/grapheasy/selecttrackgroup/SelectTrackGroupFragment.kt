@@ -113,7 +113,6 @@ class SelectTrackGroupFragment : Fragment(),
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                dao.deleteTrackGroupFeatures(trackGroup.id)
                 dao.deleteTrackGroup(trackGroup)
             }
         }
