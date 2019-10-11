@@ -24,7 +24,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="16dp"
-            android:inputType="textNoSuggestions|textVisiblePassword">
+            >
         <requestFocus/>
     </EditText>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -13,8 +13,6 @@
             android:layout_marginEnd="@dimen/card_padding"
             android:layout_marginTop="@dimen/card_padding"
             android:layout_marginBottom="@dimen/card_padding"
-            android:focusable="true"
-            android:focusableInTouchMode="true"
             >
 
         <TextView
@@ -25,7 +23,6 @@
                 android:layout_marginTop="@dimen/dialog_input_spacing"
                 android:gravity="center"
                 android:textColor="@color/errorText"
-                android:labelFor="@id/featureNameText"
                 android:textSize="@dimen/dialog_small_text_size"
                 android:visibility="gone"
                 tools:text="Can not have an empty feature name"
@@ -43,8 +40,7 @@
                 android:layout_height="wrap_content"
                 android:digits="@string/standard_name_allowed_digits"
                 android:maxLength="20"
-                android:inputType="textNoSuggestions|textVisiblePassword">
-        </EditText>
+                />
 
         <TextView
                 android:layout_width="match_parent"

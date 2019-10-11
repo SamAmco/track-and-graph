@@ -80,14 +80,17 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     private fun onAddDiscreteValue() {
         val item = layoutInflater.inflate(R.layout.feature_discrete_value_list_item, discreteValuesLinearLayout, false)
-        item.findViewById<EditText>(R.id.featureNameText).addTextChangedListener(formValidator())
+        val inputText = item.findViewById<EditText>(R.id.discreteValueNameText)
+        inputText.addTextChangedListener(formValidator())
         item.findViewById<ImageButton>(R.id.deleteButton).setOnClickListener { onDeleteDiscreteValue(item) }
         item.findViewById<ImageButton>(R.id.upButton).setOnClickListener { onUpClickedDiscreteValue(item) }
         item.findViewById<ImageButton>(R.id.downButton).setOnClickListener { onDownClickedDiscreteValue(item) }
         discreteValuesLinearLayout.addView(item)
         reIndexDiscreteValueListItems()
-        baseLinearLayout.clearFocus()
-        scrollView.post { scrollView.fullScroll(View.FOCUS_DOWN) }
+        scrollView.post {
+            scrollView.fullScroll(View.FOCUS_DOWN)
+            inputText.requestFocus()
+        }
         validateForm()
     }
 
@@ -186,7 +189,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     }
 
     private fun getDiscreteValues() = discreteValuesLinearLayout.children
-        .map { v -> v.findViewById<EditText>(R.id.featureNameText).text.toString() }
+        .map { v -> v.findViewById<EditText>(R.id.discreteValueNameText).text.toString() }
         .toList()
 
     private fun onPositiveClicked() {
