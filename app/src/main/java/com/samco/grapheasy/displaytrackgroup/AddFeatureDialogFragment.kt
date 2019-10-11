@@ -2,7 +2,7 @@ package com.samco.grapheasy.displaytrackgroup
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -17,7 +17,6 @@ import com.samco.grapheasy.database.FeatureType
 const val EXISTING_FEATURES_ARG_KEY = "existingFeatures"
 const val EXISTING_FEATURES_DELIM = ","
 
-//TODO view model persistence for AddFeatureDialogFragment
 class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private lateinit var scrollView: ScrollView
     private lateinit var baseLinearLayout: LinearLayout
@@ -29,12 +28,18 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     private lateinit var addDiscreteValueButton: ImageButton
     private lateinit var alertDialog: AlertDialog
     private lateinit var listener: AddFeatureDialogListener
+    private lateinit var viewModel: AddFeatureDialogViewModel
     private lateinit var existingFeatures: List<String>
 
-    private var selectedFeatureType = FeatureType.CONTINUOUS
-
     interface AddFeatureDialogListener {
+        fun getViewModel(): AddFeatureDialogViewModel
         fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<String>)
+    }
+
+    interface AddFeatureDialogViewModel {
+        var featureName: String?
+        var featureType: FeatureType?
+        var discreteValues: MutableList<String>?
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -45,6 +50,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
             listener = parentFragment as AddFeatureDialogListener
+            viewModel = listener.getViewModel()
             val view = it.layoutInflater.inflate(R.layout.feature_input_dialog, null)
             scrollView = view.findViewById(R.id.scrollView)
             baseLinearLayout = view.findViewById(R.id.baseLinearLayout)
@@ -59,29 +65,49 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 ?.split(EXISTING_FEATURES_DELIM)
                 ?: listOf()
 
+            initFromViewModel()
+
             nameEditText.setSelection(nameEditText.text.length)
-            nameEditText.addTextChangedListener(formValidator())
+            nameEditText.addTextChangedListener(nameEditTextFormValidator())
             nameEditText.requestFocus()
             featureTypeSpinner.onItemSelectedListener = this
             addDiscreteValueButton.setOnClickListener { onAddDiscreteValue() }
             var builder = AlertDialog.Builder(it)
             builder.setView(view)
                 .setPositiveButton(R.string.add) { _, _ -> onPositiveClicked() }
-                .setNegativeButton(R.string.cancel) { _, _ -> {} }
+                .setNegativeButton(R.string.cancel) { _, _ -> clearViewModel() }
             alertDialog = builder.create()
+            alertDialog.setCanceledOnTouchOutside(true)
+            alertDialog.setOnShowListener {
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+                inflateDiscreteValuesFromViewModel()
+            }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
-    override fun onStart() {
-        super.onStart()
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+    private fun initFromViewModel() {
+        if (viewModel.featureName != null) nameEditText.setText(viewModel.featureName!!)
+        else viewModel.featureName = ""
+        if (viewModel.featureType != null) featureTypeSpinner.setSelection(spinnerIndexOf(viewModel.featureType!!))
+        else viewModel.featureType = FeatureType.CONTINUOUS
+        if (viewModel.discreteValues == null) viewModel.discreteValues = mutableListOf()
     }
 
-    private fun onAddDiscreteValue() {
+    private fun inflateDiscreteValuesFromViewModel() {
+        viewModel.discreteValues!!.forEachIndexed { i, v -> inflateDiscreteValue(i, v) }
+    }
+
+    private fun spinnerIndexOf(featureType: FeatureType): Int = when(featureType) {
+        FeatureType.CONTINUOUS -> 0
+        else -> 1
+    }
+
+    private fun inflateDiscreteValue(viewModelIndex: Int, initialText: String) {
         val item = layoutInflater.inflate(R.layout.feature_discrete_value_list_item, discreteValuesLinearLayout, false)
         val inputText = item.findViewById<EditText>(R.id.discreteValueNameText)
-        inputText.addTextChangedListener(formValidator())
+        inputText.setText(initialText)
+        inputText.addTextChangedListener(discreteValueTextFormValidator(viewModelIndex))
         item.findViewById<ImageButton>(R.id.deleteButton).setOnClickListener { onDeleteDiscreteValue(item) }
         item.findViewById<ImageButton>(R.id.upButton).setOnClickListener { onUpClickedDiscreteValue(item) }
         item.findViewById<ImageButton>(R.id.downButton).setOnClickListener { onDownClickedDiscreteValue(item) }
@@ -94,16 +120,32 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         validateForm()
     }
 
-    private fun formValidator() = object: TextWatcher {
-        override fun afterTextChanged(p0: Editable?) { validateForm() }
+    private fun onAddDiscreteValue() {
+        inflateDiscreteValue(viewModel.discreteValues!!.size, "")
+    }
+
+    private fun discreteValueTextFormValidator(index: Int) = object: TextWatcher {
+        override fun afterTextChanged(editText: Editable?) {
+            viewModel.discreteValues!![index] = editText.toString()
+            validateForm()
+        }
+        override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+        override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
+    }
+
+    private fun nameEditTextFormValidator() = object: TextWatcher {
+        override fun afterTextChanged(p0: Editable?) {
+            viewModel.featureName = nameEditText.text.toString()
+            validateForm()
+        }
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
         override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     }
 
     private fun validateForm() {
         var errorSet = false
-        var discreteValueStrings = getDiscreteValues()
-        if (selectedFeatureType == FeatureType.DISCRETE && discreteValueStrings.isNullOrEmpty()) {
+        var discreteValueStrings = viewModel.discreteValues!!
+        if (viewModel.featureType!! == FeatureType.DISCRETE && discreteValueStrings.isNullOrEmpty()) {
             setErrorText(getString(R.string.discrete_feature_needs_at_least_one_value))
             errorSet = true
         }
@@ -167,8 +209,11 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     }
 
     private fun reIndexDiscreteValueListItems() {
+        viewModel.discreteValues = mutableListOf()
         discreteValuesLinearLayout.children.forEachIndexed { index, view ->
             view.findViewById<TextView>(R.id.indexText).text = "$index :"
+            val currText = view.findViewById<EditText>(R.id.discreteValueNameText).text.toString()
+            viewModel.discreteValues!!.add(currText)
         }
     }
 
@@ -180,7 +225,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     override fun onNothingSelected(p0: AdapterView<*>?) { }
 
     private fun onFeatureTypeSelected(discrete: Boolean) {
-        selectedFeatureType = if (discrete) FeatureType.DISCRETE else FeatureType.CONTINUOUS
+        viewModel.featureType = if (discrete) FeatureType.DISCRETE else FeatureType.CONTINUOUS
         val vis = if (discrete) View.VISIBLE else View.GONE
         discreteValuesTextView.visibility = vis
         discreteValuesLinearLayout.visibility = vis
@@ -188,12 +233,19 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         validateForm()
     }
 
-    private fun getDiscreteValues() = discreteValuesLinearLayout.children
-        .map { v -> v.findViewById<EditText>(R.id.discreteValueNameText).text.toString() }
-        .toList()
-
     private fun onPositiveClicked() {
-        listener.onAddFeature(nameEditText.text.toString(), selectedFeatureType, getDiscreteValues())
+        listener.onAddFeature(nameEditText.text.toString(), viewModel.featureType!!, viewModel.discreteValues!!)
+        clearViewModel()
     }
 
+    private fun clearViewModel() {
+        viewModel.featureName = null
+        viewModel.discreteValues = null
+        viewModel.featureType = null
+    }
+
+    override fun onCancel(dialog: DialogInterface) {
+        super.onCancel(dialog)
+        clearViewModel()
+    }
 }
