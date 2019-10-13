@@ -24,7 +24,8 @@ class DisplayTrackGroupFragment : Fragment(),
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener,
     InputDataPointDialog.InputDataPointDialogListener,
-    ExportFeaturesDialog.ExportFeaturesDialogListener
+    ExportFeaturesDialog.ExportFeaturesDialogListener,
+    ImportFeaturesDialog.ImportFeaturesDialogListener
 {
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
@@ -94,19 +95,13 @@ class DisplayTrackGroupFragment : Fragment(),
         childFragmentManager.let { dialog.show(it, "add_feature_dialog") }
     }
 
-    override fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<String>) {
+    override fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<DiscreteValue>) {
         val application = requireActivity().application
         val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                val feature = Feature(
-                    0,
-                    name,
-                    args.trackGroup,
-                    featureType,
-                    discreteValues
-                )
-                val featureId = dao.insertFeature(feature)
+                val feature = Feature(0, name, args.trackGroup, featureType, discreteValues)
+                dao.insertFeature(feature)
             }
         }
     }
@@ -121,11 +116,7 @@ class DisplayTrackGroupFragment : Fragment(),
         return f.map { df -> Feature(df.id, df.name, df.trackGroupId, df.featureType, df.discreteValues) }
     }
 
-    override fun getDisplayDateTimeForInputDataPoint(): OffsetDateTime? = null
-
-    override fun getIdForInputDataPoint(): Long? = null
-
-    override fun getValueForInputDataPoint(): String? = null
+    override fun getInputDataPoint(): DataPoint? = null
 
     override fun getViewModel() = viewModel
 
@@ -214,7 +205,14 @@ class DisplayTrackGroupFragment : Fragment(),
     }
 
     //TODO onImportClicked
-    private fun onImportClicked() { }
+    private fun onImportClicked() {
+        val dialog = ImportFeaturesDialog()
+        val argBundle = Bundle()
+        argBundle.putLong(TRACK_GROUP_ID_KEY, args.trackGroup)
+        argBundle.putString(TRACK_GROUP_NAME_KEY, args.trackGroupName)
+        dialog.arguments = argBundle
+        childFragmentManager.let { dialog.show(it, "import_features_dialog") }
+    }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {

@@ -22,7 +22,7 @@ interface GraphEasyDatabaseDao {
 
     @Query("""SELECT features_table.*, num_data_points, last_timestamp from features_table 
         LEFT JOIN (
-            SELECT feature_id as id, COUNT(id) as num_data_points, MAX(timestamp) as last_timestamp 
+            SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
             FROM data_points_table GROUP BY feature_id
         ) as feature_data 
         ON feature_data.id = features_table.id
@@ -50,8 +50,11 @@ interface GraphEasyDatabaseDao {
     @Query("DELETE FROM features_table WHERE id = :id")
     fun deleteFeature(id: Long)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDataPoint(dataPoint: DataPoint): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertDataPoints(dataPoint: List<DataPoint>)
 
     @Update
     fun updateDataPoint(dataPoint: DataPoint)

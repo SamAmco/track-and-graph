@@ -5,19 +5,15 @@ import androidx.room.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.FormatStyle
 
 val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-val displayFormatter: DateTimeFormatter = DateTimeFormatter
-    .ofLocalizedDateTime(FormatStyle.SHORT)
-    .withZone(ZoneId.systemDefault())
 val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
     .ofPattern("dd/MM/YY  HH:mm")
     .withZone(ZoneId.systemDefault())
 
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class],
-    version = 10,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -50,10 +46,13 @@ class Converters {
     fun listOfStringsToString(value: List<String>): String = value.joinToString(",")
 
     @TypeConverter
-    fun stringToListLong(value: String): List<Long> = value.split(",").map { f -> f.toLong() }.toList()
+    fun stringToListOfDiscreteValues(value: String): List<DiscreteValue> {
+        return if (value.isEmpty()) listOf()
+        else value.split(",").map { s -> DiscreteValue.fromString(s) }.toList()
+    }
 
     @TypeConverter
-    fun listLongToString(longs: List<Long>): String = longs.joinToString(",") { l -> l.toString() }
+    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String = values.joinToString(",") { v -> v.toString() }
 
     @TypeConverter
     fun intToFeatureType(i: Int): FeatureType = FeatureType.values()[i]
@@ -62,12 +61,12 @@ class Converters {
     fun featureTypeToInt(featureType: FeatureType): Int = featureType.index
 
     @TypeConverter
-    fun stringToOffsetDateTime(value: String?): OffsetDateTime? = value?.let {
-        databaseFormatter.parse(value, OffsetDateTime::from)
-    }
+    fun stringToOffsetDateTime(value: String?): OffsetDateTime? = value?.let { timestampFromDatabase(value) }
 
     @TypeConverter
     fun offsetDateTimeToString(value: OffsetDateTime?): String = value?.let {
         databaseFormatter.format(value)
     } ?: ""
 }
+
+fun timestampFromDatabase(value: String): OffsetDateTime = databaseFormatter.parse(value, OffsetDateTime::from)

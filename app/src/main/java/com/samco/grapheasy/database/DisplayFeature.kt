@@ -17,7 +17,7 @@ data class DisplayFeature(
     val featureType: FeatureType = FeatureType.CONTINUOUS,
 
     @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<String>,
+    val discreteValues: List<DiscreteValue>,
 
     @ColumnInfo(name = "last_timestamp")
     val timestamp: OffsetDateTime?,

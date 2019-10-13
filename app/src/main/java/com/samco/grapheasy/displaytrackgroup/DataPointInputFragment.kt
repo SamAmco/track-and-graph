@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
 import com.samco.grapheasy.R
+import com.samco.grapheasy.database.DataPoint
+import com.samco.grapheasy.database.DiscreteValue
 import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.database.FeatureType
 import org.threeten.bp.OffsetDateTime
@@ -41,13 +43,12 @@ class DataPointInputFragment : Fragment(), TextWatcher {
 
     interface InputDataPointFragmentListener {
         fun getViewModel(): InputDataPointViewModel
-        fun onValueSubmitted(value: String, timestamp: OffsetDateTime)
+        fun onValueSubmitted(dataPoint: DataPoint)
     }
 
     data class DataPointDisplayData(val featureId: Long) {
-        lateinit var selectedDateTime: OffsetDateTime
-        lateinit var value: String
         lateinit var feature: Feature
+        lateinit var dataPoint: DataPoint
     }
 
     interface InputDataPointViewModel {
@@ -90,8 +91,7 @@ class DataPointInputFragment : Fragment(), TextWatcher {
     private fun setSelectedDateTime(dateTime: OffsetDateTime) {
         val displayData = DataPointDisplayData(feature.id)
         displayData.feature = feature
-        displayData.value = numberInput.text.toString()
-        displayData.selectedDateTime = dateTime
+        displayData.dataPoint = displayData.dataPoint.copy(timestamp = dateTime)
         viewModel.putDataPointDisplayData(displayData)
     }
 
@@ -99,7 +99,7 @@ class DataPointInputFragment : Fragment(), TextWatcher {
         arguments?.let {
             val initDisplayData = viewModel.getDataPointDisplayData(it.getLong(FEATURE_ID_KEY))
             feature = initDisplayData.feature
-            numberInput.setText(initDisplayData.value)
+            numberInput.setText(initDisplayData.dataPoint.value)
         }
     }
 
@@ -111,25 +111,25 @@ class DataPointInputFragment : Fragment(), TextWatcher {
     }
 
     override fun afterTextChanged(editText: Editable?) {
-        val displayData = DataPointDisplayData(feature.id)
-        displayData.feature = feature
-        displayData.value = editText.toString()
-        displayData.selectedDateTime = viewModel.getDataPointDisplayData(feature.id).selectedDateTime
+        val displayData = viewModel.getDataPointDisplayData(feature.id)
+        displayData.dataPoint = displayData.dataPoint.copy(value = editText.toString())
         viewModel.putDataPointDisplayData(displayData)
     }
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
 
     private fun createButtons() {
-        val initValue = viewModel.getDataPointDisplayData(feature.id).value
-        for (discreteValue in feature.discreteValues) {
+        val initDataPoint = viewModel.getDataPointDisplayData(feature.id).dataPoint
+        for (discreteValue in feature.discreteValues.sortedBy { f -> f.index }) {
             val item = layoutInflater.inflate(R.layout.discrete_value_input_button,
                 buttonsLayout, false) as CheckBox
-            item.text = discreteValue
-            if (initValue == discreteValue) item.isChecked = true
+            item.text = discreteValue.label
+            if (initDataPoint.label == discreteValue.label) item.isChecked = true
             item.setOnClickListener {
-                val displayData = viewModel.getDataPointDisplayData(feature.id)
-                listener.onValueSubmitted(discreteValue, displayData.selectedDateTime)
+                var displayData = viewModel.getDataPointDisplayData(feature.id)
+                displayData.dataPoint = displayData.dataPoint.copy(value = discreteValue.index.toString(), label = discreteValue.label)
+                viewModel.putDataPointDisplayData(displayData)
+                listener.onValueSubmitted(displayData.dataPoint)
             }
             buttonsLayout.addView(item)
         }
@@ -137,15 +137,15 @@ class DataPointInputFragment : Fragment(), TextWatcher {
 
     private fun updateDateTimeButtonText() {
         val displayData = viewModel.getDataPointDisplayData(feature.id)
-        dateButton.text = displayData.selectedDateTime.format(dateDisplayFormatter)
-        timeButton.text = displayData.selectedDateTime.format(timeDisplayFormatter)
+        dateButton.text = displayData.dataPoint.timestamp.format(dateDisplayFormatter)
+        timeButton.text = displayData.dataPoint.timestamp.format(timeDisplayFormatter)
     }
 
     private fun initDateButton() {
         context?.let {
             dateButton.setOnClickListener {
                 val displayData = viewModel.getDataPointDisplayData(feature.id)
-                val dateTime = displayData.selectedDateTime
+                val dateTime = displayData.dataPoint.timestamp
                 val picker = DatePickerDialog(context!!,
                     DatePickerDialog.OnDateSetListener { _, year, month, day ->
                         setSelectedDateTime(dateTime
@@ -165,7 +165,7 @@ class DataPointInputFragment : Fragment(), TextWatcher {
         context?.let {
             timeButton.setOnClickListener {
                 val displayData = viewModel.getDataPointDisplayData(feature.id)
-                val dateTime = displayData.selectedDateTime
+                val dateTime = displayData.dataPoint.timestamp
                 val picker = TimePickerDialog(context!!,
                     TimePickerDialog.OnTimeSetListener { _, hour, minute ->
                         setSelectedDateTime(dateTime

@@ -42,7 +42,7 @@
                     android:textSize="16sp"
                     android:singleLine="true"
                     android:gravity="center"
-                    android:text="@{dataPoint.value}"
+                    android:text="@{dataPoint.getDisplayValue()}"
                     app:layout_constraintLeft_toRightOf="@id/timestampText"
                     app:layout_constraintRight_toLeftOf="@id/editButton"
                     tools:text="Some value that goes on for a really long time"

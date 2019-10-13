@@ -41,7 +41,6 @@
                 app:layout_constraintRight_toLeftOf="@+id/upButton"
                 app:layout_constraintHorizontal_weight="6"
                 android:digits="@string/standard_name_allowed_digits"
-                android:maxLength="20"
                 />
         <ImageButton
                 android:id="@+id/upButton"

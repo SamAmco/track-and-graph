@@ -96,11 +96,7 @@ class FragmentFeatureHistory : Fragment(),
 
     override fun getFeatures() = listOf(viewModel.feature!!)
 
-    override fun getDisplayDateTimeForInputDataPoint() = viewModel.currentActionDataPoint!!.timestamp
-
-    override fun getIdForInputDataPoint() = viewModel.currentActionDataPoint!!.id
-
-    override fun getValueForInputDataPoint() = viewModel.currentActionDataPoint!!.value
+    override fun getInputDataPoint(): DataPoint = viewModel.currentActionDataPoint!!
 
     override fun getViewModel(): InputDataPointDialog.InputDataPointDialogViewModel = viewModel
 

@@ -3,10 +3,10 @@ package com.samco.grapheasy.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
 import org.threeten.bp.OffsetDateTime
 
 @Entity(tableName = "data_points_table",
+        primaryKeys = ["timestamp", "feature_id"],
         foreignKeys = [
             androidx.room.ForeignKey(
                 entity = Feature::class,
@@ -17,17 +17,23 @@ import org.threeten.bp.OffsetDateTime
     ]
 )
 data class DataPoint (
-    @PrimaryKey(autoGenerate = true)
-    var id: Long = -1L,
+    @ColumnInfo(name = "timestamp")
+    val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
     @ColumnInfo(name = "feature_id")
     val featureId: Long,
 
     @ColumnInfo(name = "value")
-    val value: String = "",
+    val value: String,
 
-    @ColumnInfo(name = "timestamp")
-    val timestamp: OffsetDateTime = OffsetDateTime.now()
+    @ColumnInfo(name = "label")
+    val label: String
+
 ) {
-    fun getDisplayTimestamp() = displayFeatureDateFormat.format(timestamp)
+    fun getDisplayTimestamp(): String = displayFeatureDateFormat.format(timestamp)
+    fun getDisplayValue(): String {
+        var ans = value
+        if (label.isNotEmpty()) ans += " : $label"
+        return ans
+    }
 }

@@ -20,7 +20,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dialog_header_top_margin"
-                    android:text="@string/export_to"
+                    android:text="@string/import_from"
                     android:textSize="@dimen/dialog_label_text_size"
                     />
 
@@ -39,22 +39,21 @@
                     tools:text="/home/sam/some-directory/some-file-20190703-162203"
                     />
 
+            <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:scaleType="fitXY"
+                    android:alpha="0.4"
+                    android:layout_gravity="center"
+                    android:src="@drawable/warning_icon"/>
             <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:text="@string/features_colon"
+                    android:text="@string/import_warning"
                     android:textSize="@dimen/dialog_label_text_size"
                     />
-
-            <LinearLayout
-                    android:id="@+id/checkboxLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:orientation="vertical"
-                    />
-
         </LinearLayout>
     </ScrollView>
     <ProgressBar

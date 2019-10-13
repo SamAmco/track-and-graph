@@ -9,10 +9,10 @@ import org.threeten.bp.OffsetDateTime
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.ViewParent
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.view.size
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentPagerAdapter
@@ -21,6 +21,7 @@ import com.samco.grapheasy.R
 import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.database.FeatureType
 import kotlinx.android.synthetic.main.data_point_input_dialog.*
+import kotlinx.android.synthetic.main.fragment_display_track_group.*
 
 class InputDataPointDialog : DialogFragment(), DataPointInputFragment.InputDataPointFragmentListener,
     ViewPager.OnPageChangeListener {
@@ -33,9 +34,7 @@ class InputDataPointDialog : DialogFragment(), DataPointInputFragment.InputDataP
     private lateinit var indexText: TextView
 
     interface InputDataPointDialogListener {
-        fun getDisplayDateTimeForInputDataPoint(): OffsetDateTime?
-        fun getIdForInputDataPoint(): Long?
-        fun getValueForInputDataPoint(): String?
+        fun getInputDataPoint(): DataPoint?
         fun onDataPointInput(dataPoint: DataPoint)
         fun getFeatures(): List<Feature>
         fun getViewModel(): InputDataPointDialogViewModel
@@ -77,8 +76,9 @@ class InputDataPointDialog : DialogFragment(), DataPointInputFragment.InputDataP
         for (feature in listener.getFeatures()) {
             val displayData = DataPointInputFragment.DataPointDisplayData(feature.id)
             displayData.feature = feature
-            displayData.selectedDateTime = listener.getDisplayDateTimeForInputDataPoint() ?: OffsetDateTime.now()
-            displayData.value = listener.getValueForInputDataPoint() ?: ""
+            val inputDataPoint = listener.getInputDataPoint()
+            if (listener.getFeatures().size == 1 && inputDataPoint != null) displayData.dataPoint = inputDataPoint
+            else displayData.dataPoint = DataPoint(OffsetDateTime.now(), feature.id, "", "")
             viewModel.putDataPointDisplayData(displayData)
         }
     }
@@ -125,8 +125,8 @@ class InputDataPointDialog : DialogFragment(), DataPointInputFragment.InputDataP
 
     override fun getViewModel(): DataPointInputFragment.InputDataPointViewModel = listener.getViewModel()
 
-    override fun onValueSubmitted(value: String, timestamp: OffsetDateTime) {
-        onSubmitResult(value, timestamp)
+    override fun onValueSubmitted(dataPoint: DataPoint) {
+        onSubmitResult(dataPoint)
     }
 
     private fun onCancelClicked() {
@@ -135,8 +135,7 @@ class InputDataPointDialog : DialogFragment(), DataPointInputFragment.InputDataP
 
     private fun onAddClicked() {
         val displayData = viewModel.getDataPointDisplayData(viewModel.currentDataPointInputFeature!!.id)
-        val value = if (displayData.value.isEmpty()) "0" else displayData.value
-        onSubmitResult(value, displayData.selectedDateTime)
+        onSubmitResult(displayData.dataPoint)
     }
 
     override fun onCancel(dialog: DialogInterface) {
@@ -144,14 +143,11 @@ class InputDataPointDialog : DialogFragment(), DataPointInputFragment.InputDataP
         closeDialog()
     }
 
-    private fun onSubmitResult(value: String, timestamp: OffsetDateTime) {
-        var id = listener.getIdForInputDataPoint()
-        if (id == null) id = 0
-        val currFeatureId = viewModel.currentDataPointInputFeature!!.id
-        val dataPoint = DataPoint(id, currFeatureId, value, timestamp)
+    private fun onSubmitResult(dataPoint: DataPoint) {
         listener.onDataPointInput(dataPoint)
+        val currFeature = viewModel.currentDataPointInputFeature!!
         val allFeatures = listener.getFeatures().map { f -> f.id }
-        if (allFeatures.indexOf(currFeatureId) == allFeatures.size-1) closeDialog()
+        if (allFeatures.indexOf(currFeature.id) == allFeatures.size-1) closeDialog()
         else skip()
     }
 

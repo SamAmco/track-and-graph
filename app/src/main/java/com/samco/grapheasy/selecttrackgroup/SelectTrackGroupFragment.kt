@@ -77,7 +77,7 @@ class SelectTrackGroupFragment : Fragment(),
     private fun onRenameClicked(trackGroup: TrackGroup) {
         viewModel.currentActionTrackGroup = trackGroup
         val dialog = RenameTrackGroupDialogFragment()
-        childFragmentManager?.let { dialog.show(it, "rename_track_group_dialog") }
+        childFragmentManager.let { dialog.show(it, "rename_track_group_dialog") }
     }
 
     override fun getTrackGroup(): TrackGroup = viewModel.currentActionTrackGroup!!

@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import java.lang.Exception
 
 @Entity(tableName = "features_table",
     foreignKeys = [ForeignKey(entity = TrackGroup::class,
@@ -13,6 +14,7 @@ import androidx.room.PrimaryKey
 )
 data class Feature (
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id", index = true)
     var id: Long = -1L,
 
     @ColumnInfo(name = "name")
@@ -25,10 +27,28 @@ data class Feature (
     val featureType: FeatureType = FeatureType.CONTINUOUS,
 
     @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<String>
+    val discreteValues: List<DiscreteValue>
 )
 
 enum class FeatureType constructor(val index: Int) {
     DISCRETE(0), CONTINUOUS(1)
 }
 
+const val MAX_FEATURE_NAME_LENGTH = 20
+const val MAX_LABEL_LENGTH = 20
+const val MAX_DISCRETE_VALUES_PER_FEATURE = 10
+
+data class DiscreteValue (val index: Int, val label: String) {
+    override fun toString() = "$index:$label"
+    companion object {
+        fun fromString(value: String): DiscreteValue {
+            if (!value.contains(':')) throw Exception("value did not contain a colon")
+            val label = value.substring(value.indexOf(':')+1).trim()
+            if (label.length > MAX_LABEL_LENGTH) throw Exception("label size exceeded the maximum size allowed")
+            val index = value.substring(0, value.indexOf(':')).trim().toIntOrNull()
+                ?: throw Exception("could not get index from value")
+            return DiscreteValue(index, label)
+        }
+        fun fromDataPoint(dataPoint: DataPoint) = DiscreteValue(dataPoint.value.toInt(), dataPoint.label)
+    }
+}

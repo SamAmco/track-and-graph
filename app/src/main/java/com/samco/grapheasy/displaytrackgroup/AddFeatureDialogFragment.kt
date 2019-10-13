@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
@@ -12,7 +13,7 @@ import android.widget.*
 import androidx.core.view.children
 import androidx.fragment.app.DialogFragment
 import com.samco.grapheasy.R
-import com.samco.grapheasy.database.FeatureType
+import com.samco.grapheasy.database.*
 
 const val EXISTING_FEATURES_ARG_KEY = "existingFeatures"
 const val EXISTING_FEATURES_DELIM = ","
@@ -33,13 +34,13 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     interface AddFeatureDialogListener {
         fun getViewModel(): AddFeatureDialogViewModel
-        fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<String>)
+        fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<DiscreteValue>)
     }
 
     interface AddFeatureDialogViewModel {
         var featureName: String?
         var featureType: FeatureType?
-        var discreteValues: MutableList<String>?
+        var discreteValues: MutableList<DiscreteValue>?
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -68,6 +69,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             initFromViewModel()
 
             nameEditText.setSelection(nameEditText.text.length)
+            nameEditText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
             nameEditText.addTextChangedListener(nameEditTextFormValidator())
             nameEditText.requestFocus()
             featureTypeSpinner.onItemSelectedListener = this
@@ -95,7 +97,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     }
 
     private fun inflateDiscreteValuesFromViewModel() {
-        viewModel.discreteValues!!.forEachIndexed { i, v -> inflateDiscreteValue(i, v) }
+        viewModel.discreteValues!!.forEachIndexed { i, v -> inflateDiscreteValue(i, v.label) }
     }
 
     private fun spinnerIndexOf(featureType: FeatureType): Int = when(featureType) {
@@ -107,6 +109,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         val item = layoutInflater.inflate(R.layout.feature_discrete_value_list_item, discreteValuesLinearLayout, false)
         val inputText = item.findViewById<EditText>(R.id.discreteValueNameText)
         inputText.setText(initialText)
+        inputText.filters = arrayOf(InputFilter.LengthFilter(MAX_LABEL_LENGTH))
         inputText.addTextChangedListener(discreteValueTextFormValidator(viewModelIndex))
         item.findViewById<ImageButton>(R.id.deleteButton).setOnClickListener { onDeleteDiscreteValue(item) }
         item.findViewById<ImageButton>(R.id.upButton).setOnClickListener { onUpClickedDiscreteValue(item) }
@@ -122,11 +125,14 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     private fun onAddDiscreteValue() {
         inflateDiscreteValue(viewModel.discreteValues!!.size, "")
+        if (viewModel.discreteValues!!.size == MAX_DISCRETE_VALUES_PER_FEATURE)
+            addDiscreteValueButton.isEnabled = false
     }
 
     private fun discreteValueTextFormValidator(index: Int) = object: TextWatcher {
         override fun afterTextChanged(editText: Editable?) {
-            viewModel.discreteValues!![index] = editText.toString()
+            viewModel.discreteValues!![index] = viewModel.discreteValues!![index]
+                .copy(label = editText.toString().trim())
             validateForm()
         }
         override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
@@ -150,7 +156,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             errorSet = true
         }
         for (s in discreteValueStrings) {
-            if (s.isEmpty()) {
+            if (s.label.isEmpty()) {
                 setErrorText(getString(R.string.discrete_value_must_have_name))
                 errorSet = true
             }
@@ -206,6 +212,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     private fun onDeleteDiscreteValue(item: View) {
         discreteValuesLinearLayout.removeView(item)
         reIndexDiscreteValueListItems()
+        addDiscreteValueButton.isEnabled = true
     }
 
     private fun reIndexDiscreteValueListItems() {
@@ -213,7 +220,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         discreteValuesLinearLayout.children.forEachIndexed { index, view ->
             view.findViewById<TextView>(R.id.indexText).text = "$index :"
             val currText = view.findViewById<EditText>(R.id.discreteValueNameText).text.toString()
-            viewModel.discreteValues!!.add(currText)
+            viewModel.discreteValues!!.add(DiscreteValue(index, currText.trim()))
         }
     }
 

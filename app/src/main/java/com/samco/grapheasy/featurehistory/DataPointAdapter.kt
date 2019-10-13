@@ -39,8 +39,8 @@ class DataPointAdapter(private val clickListener: DataPointClickListener)
     }
 }
 class DataPointDiffCallback : DiffUtil.ItemCallback<DataPoint>() {
-    override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem == newItem
-    override fun areContentsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem.id == newItem.id
+    override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem.timestamp == newItem.timestamp && oldItem.featureId == newItem.featureId
+    override fun areContentsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem == newItem
 }
 class DataPointClickListener(private val onEditDataPoint: (DataPoint) -> Unit,
                              private val onDeleteDataPoint: (DataPoint) -> Unit) {

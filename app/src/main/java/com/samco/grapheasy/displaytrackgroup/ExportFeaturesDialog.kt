@@ -15,6 +15,7 @@ import com.samco.grapheasy.R
 import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.util.CSVReadWriter
+import com.samco.grapheasy.util.ImportExportFeatureUtils
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 
@@ -39,14 +40,13 @@ class ExportFeaturesDialog : DialogFragment() {
     private lateinit var progressBar: ProgressBar
     private lateinit var checkboxLayout: LinearLayout
 
-    private var selectedFileUri: Uri? = null
-
     interface ExportFeaturesDialogListener {
         fun getViewModel(): ExportFeaturesViewModel
     }
 
     interface ExportFeaturesViewModel {
         var selectedFeatures: MutableList<Feature>?
+        var selectedFileUri: Uri?
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -67,16 +67,17 @@ class ExportFeaturesDialog : DialogFragment() {
             fileButton.text = getString(R.string.select_file)
             fileButton.setTextColor(ContextCompat.getColor(context!!, R.color.errorText))
 
-            var builder = AlertDialog.Builder(it)
+            val builder = AlertDialog.Builder(it)
             builder.setView(view)
                 .setPositiveButton(R.string.exportButton) { _, _ -> null }
-                .setNegativeButton(R.string.cancel) { _, _ -> onCancel() }
+                .setNegativeButton(R.string.cancel) { _, _ -> onDone() }
             alertDialog = builder.create()
             alertDialog.setCanceledOnTouchOutside(true)
             alertDialog.setOnShowListener {
                 val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 positiveButton.isEnabled = false
                 positiveButton.setOnClickListener { onExportClicked() }
+                if (viewModel.selectedFileUri != null) setFileButtonTextFromUri(viewModel.selectedFileUri!!)
             }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
@@ -105,7 +106,7 @@ class ExportFeaturesDialog : DialogFragment() {
         if (requestCode == CREATE_FILE_REQUEST_CODE) {
             resultData?.data.also { uri ->
                 if (uri != null) {
-                    selectedFileUri = uri
+                    viewModel.selectedFileUri = uri
                     setFileButtonTextFromUri(uri)
                 }
             }
@@ -113,15 +114,7 @@ class ExportFeaturesDialog : DialogFragment() {
     }
 
     private fun setFileButtonTextFromUri(uri: Uri) {
-        val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
-        val cursor = activity?.contentResolver?.query(uri, projection, null, null, null)
-        val index = cursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        cursor?.moveToFirst()
-        if (cursor != null && index != null) {
-            fileButton.text = cursor.getString(index)
-            fileButton.setTextColor(ContextCompat.getColor(context!!, R.color.regularText))
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
-        }
+        ImportExportFeatureUtils.setFileButtonTextFromUri(activity, context!!, uri, fileButton, alertDialog)
     }
 
     private fun createCheckboxes() {
@@ -156,7 +149,7 @@ class ExportFeaturesDialog : DialogFragment() {
 
     private fun onExportClicked() {
         progressBar.visibility = View.VISIBLE
-        selectedFileUri?.let {
+        viewModel.selectedFileUri?.let {
             uiScope.launch { withContext(Dispatchers.IO) {
                 val outStream = activity!!.contentResolver.openOutputStream(it)
                 if (outStream != null) {
@@ -164,20 +157,20 @@ class ExportFeaturesDialog : DialogFragment() {
                     val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
                     CSVReadWriter.writeFeaturesToCSV(viewModel.selectedFeatures!!, dao, outStream)
                 }
-                viewModel.selectedFeatures = null
-                dismiss()
-                updateJob.cancel()
+                onDone()
             } }
         }
     }
 
-    private fun onCancel() {
+    private fun onDone() {
+        viewModel.selectedFileUri = null
         viewModel.selectedFeatures = null
         updateJob.cancel()
+        dismiss()
     }
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        onCancel()
+        onDone()
     }
 }
