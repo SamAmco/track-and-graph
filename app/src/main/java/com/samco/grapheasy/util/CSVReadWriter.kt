@@ -19,7 +19,7 @@ object CSVReadWriter {
         Value
     }
 
-    fun writeFeaturesToCSV(features: List<Feature>, dataSource: GraphEasyDatabaseDao, outStream: OutputStream) {
+    suspend fun writeFeaturesToCSV(features: List<Feature>, dataSource: GraphEasyDatabaseDao, outStream: OutputStream) {
         outStream.writer().use {
             val csvWriter = CSVPrinter(it, CSVFormat.DEFAULT.withHeader(HEADERS::class.java))
             for (feature in features) {
@@ -30,6 +30,7 @@ object CSVReadWriter {
                         value = DiscreteValue.fromDataPoint(dp).toString()
                     }
                     csvWriter.printRecord(feature.name, dp.timestamp.toString(), value)
+                    yield()
                 }
             }
             it.flush()

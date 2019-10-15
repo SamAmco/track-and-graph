@@ -22,8 +22,7 @@ class DisplayTrackGroupFragment : Fragment(),
     AddFeatureDialogFragment.AddFeatureDialogListener,
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener,
-    InputDataPointDialog.InputDataPointDialogListener,
-    ExportFeaturesDialog.ExportFeaturesDialogListener
+    InputDataPointDialog.InputDataPointDialogListener
 {
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
