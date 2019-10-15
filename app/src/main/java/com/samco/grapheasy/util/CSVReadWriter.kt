@@ -2,6 +2,7 @@ package com.samco.grapheasy.util
 
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
+import kotlinx.coroutines.yield
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.csv.CSVRecord
@@ -35,14 +36,13 @@ object CSVReadWriter {
         }
     }
 
-    fun readFeaturesFromCSV(dataSource: GraphEasyDatabaseDao, inputStream: InputStream, trackGroupId: Long, validationCharacters: String) {
+    suspend fun readFeaturesFromCSV(dataSource: GraphEasyDatabaseDao, inputStream: InputStream, trackGroupId: Long, validationCharacters: String) {
         try {
             inputStream.reader().use {
                 val records = CSVFormat.DEFAULT
                     .withHeader(HEADERS::class.java)
                     .withFirstRecordAsHeader()
                     .parse(it)
-
                 val headerMap = records.headerMap
                 validateHeaderMap(headerMap)
                 ingestRecords(dataSource, records, trackGroupId, validationCharacters)
@@ -53,7 +53,7 @@ object CSVReadWriter {
         }
     }
 
-    private fun ingestRecords(dataSource: GraphEasyDatabaseDao, records: Iterable<CSVRecord>, trackGroupId: Long, validationCharacters: String) {
+    private suspend fun ingestRecords(dataSource: GraphEasyDatabaseDao, records: Iterable<CSVRecord>, trackGroupId: Long, validationCharacters: String) {
         val existingFeatures = dataSource.getFeaturesForTrackGroupSync(trackGroupId).toMutableList()
         val existingFeaturesByName = existingFeatures.map { it.name to it }.toMap().toMutableMap()
         val newDataPoints = mutableListOf<DataPoint>()
@@ -112,6 +112,7 @@ object CSVReadWriter {
                 dataSource.insertDataPoints(newDataPoints)
                 newDataPoints.clear()
             }
+            yield()
         }
         if (newDataPoints.isNotEmpty()) dataSource.insertDataPoints(newDataPoints)
     }

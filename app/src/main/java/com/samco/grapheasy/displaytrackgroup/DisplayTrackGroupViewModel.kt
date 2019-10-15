@@ -8,7 +8,6 @@ class DisplayTrackGroupViewModel(trackGroupId: Long, dataSource: GraphEasyDataba
     : DataPointInputViewModel(),
     InputDataPointDialog.InputDataPointDialogViewModel,
     ExportFeaturesDialog.ExportFeaturesViewModel,
-    ImportFeaturesDialog.ImportFeaturesViewModel,
     AddFeatureDialogFragment.AddFeatureDialogViewModel
 {
     override var featureName: String? = null

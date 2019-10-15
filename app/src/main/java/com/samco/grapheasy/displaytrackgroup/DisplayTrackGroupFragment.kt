@@ -16,7 +16,6 @@ import com.samco.grapheasy.database.*
 import com.samco.grapheasy.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
-import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 
 class DisplayTrackGroupFragment : Fragment(),
@@ -24,8 +23,7 @@ class DisplayTrackGroupFragment : Fragment(),
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener,
     InputDataPointDialog.InputDataPointDialogListener,
-    ExportFeaturesDialog.ExportFeaturesDialogListener,
-    ImportFeaturesDialog.ImportFeaturesDialogListener
+    ExportFeaturesDialog.ExportFeaturesDialogListener
 {
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
@@ -204,7 +202,6 @@ class DisplayTrackGroupFragment : Fragment(),
         childFragmentManager.let { dialog.show(it, "export_features_dialog") }
     }
 
-    //TODO onImportClicked
     private fun onImportClicked() {
         val dialog = ImportFeaturesDialog()
         val argBundle = Bundle()
