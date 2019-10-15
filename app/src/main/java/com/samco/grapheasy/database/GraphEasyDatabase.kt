@@ -13,7 +13,7 @@ val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
 
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -61,12 +61,11 @@ class Converters {
     fun featureTypeToInt(featureType: FeatureType): Int = featureType.index
 
     @TypeConverter
-    fun stringToOffsetDateTime(value: String?): OffsetDateTime? = value?.let { timestampFromDatabase(value) }
+    fun stringToOffsetDateTime(value: String?): OffsetDateTime? = value?.let { odtFromString(value) }
 
     @TypeConverter
-    fun offsetDateTimeToString(value: OffsetDateTime?): String = value?.let {
-        databaseFormatter.format(value)
-    } ?: ""
+    fun offsetDateTimeToString(value: OffsetDateTime?): String = value?.let { stringFromOdt(it) } ?: ""
 }
 
-fun timestampFromDatabase(value: String): OffsetDateTime = databaseFormatter.parse(value, OffsetDateTime::from)
+fun odtFromString(value: String): OffsetDateTime = databaseFormatter.parse(value, OffsetDateTime::from)
+fun stringFromOdt(value: OffsetDateTime): String = databaseFormatter.format(value)

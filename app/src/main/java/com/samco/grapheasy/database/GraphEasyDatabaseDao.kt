@@ -2,6 +2,7 @@ package com.samco.grapheasy.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import org.threeten.bp.OffsetDateTime
 
 @Dao
 interface GraphEasyDatabaseDao {
@@ -35,6 +36,9 @@ interface GraphEasyDatabaseDao {
     @Query("""SELECT * from features_table WHERE id = :featureId LIMIT 1""")
     fun getFeatureById(featureId: Long): Feature
 
+    @Query("""SELECT * from features_table WHERE id IN (:featureIds)""")
+    fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
+
     @Insert
     fun insertFeature(feature: Feature): Long
 
@@ -64,4 +68,7 @@ interface GraphEasyDatabaseDao {
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
+
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp = :timestamp")
+    fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
 }

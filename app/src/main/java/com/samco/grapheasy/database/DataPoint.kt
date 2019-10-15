@@ -20,7 +20,7 @@ data class DataPoint (
     @ColumnInfo(name = "timestamp")
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
-    @ColumnInfo(name = "feature_id")
+    @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,
 
     @ColumnInfo(name = "value")

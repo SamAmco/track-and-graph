@@ -7,7 +7,6 @@ import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.csv.CSVRecord
 import org.threeten.bp.OffsetDateTime
-import timber.log.Timber
 import java.io.InputStream
 import java.io.OutputStream
 import java.lang.Exception
@@ -189,7 +188,7 @@ object CSVReadWriter {
         val timestamp = record.get(HEADERS.Timestamp)
         val value = record.get(HEADERS.Value)
         lateinit var parsedTimestamp: OffsetDateTime
-        try { parsedTimestamp = timestampFromDatabase(timestamp) }
+        try { parsedTimestamp = odtFromString(timestamp) }
         catch (_: Exception) { throw ImportFeaturesException(R.string.import_exception_bad_timestamp, listOf(lineNumber.toString())) }
         return RecordData(featureName, value, parsedTimestamp)
     }

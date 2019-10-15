@@ -23,7 +23,6 @@ import com.samco.grapheasy.database.*
 import kotlinx.coroutines.*
 
 const val EXISTING_FEATURES_ARG_KEY = "existingFeatures"
-const val EXISTING_FEATURES_DELIM = ","
 
 class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val trackGroupId: Long by lazy { arguments!!.getLong(TRACK_GROUP_ID_KEY) }
@@ -58,10 +57,7 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             discreteValuesTextView = view.findViewById(R.id.discreteValuesTextView)
             discreteValuesLinearLayout = view.findViewById(R.id.discreteValues)
             addDiscreteValueButton = view.findViewById(R.id.addDiscreteValueButton)
-            existingFeatures = arguments
-                ?.getString(EXISTING_FEATURES_ARG_KEY)
-                ?.split(EXISTING_FEATURES_DELIM)
-                ?: listOf()
+            existingFeatures = arguments?.getStringArray(EXISTING_FEATURES_ARG_KEY)?.toList() ?: listOf()
 
             initFromViewModel()
 

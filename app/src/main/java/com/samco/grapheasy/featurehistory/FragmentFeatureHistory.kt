@@ -14,18 +14,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.DataPoint
-import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.database.GraphEasyDatabase
+import com.samco.grapheasy.database.stringFromOdt
 import com.samco.grapheasy.databinding.FragmentFeatureHistoryBinding
-import com.samco.grapheasy.displaytrackgroup.DataPointInputFragment
+import com.samco.grapheasy.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
+import com.samco.grapheasy.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.grapheasy.displaytrackgroup.InputDataPointDialog
 import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
-import org.threeten.bp.OffsetDateTime
 
-class FragmentFeatureHistory : Fragment(),
-        YesCancelDialogFragment.YesCancelDialogListener,
-        InputDataPointDialog.InputDataPointDialogListener {
+
+class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
 
     private lateinit var binding: FragmentFeatureHistoryBinding
     private lateinit var viewModel: FeatureHistoryViewModel
@@ -78,27 +77,14 @@ class FragmentFeatureHistory : Fragment(),
 
     private fun onEditDataPointClicked(dataPoint: DataPoint) {
         viewModel.feature?.let {
-            viewModel.currentActionDataPoint = dataPoint
             val dialog = InputDataPointDialog()
+            val argBundle = Bundle()
+            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(args.feature))
+            argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(dataPoint.timestamp))
+            dialog.arguments = argBundle
             childFragmentManager.let { dialog.show(it, "input_data_point_dialog") }
         }
     }
-
-    override fun onDataPointInput(dataPoint: DataPoint) {
-        val application = requireActivity().application
-        val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                dao.updateDataPoint(dataPoint)
-            }
-        }
-    }
-
-    override fun getFeatures() = listOf(viewModel.feature!!)
-
-    override fun getInputDataPoint(): DataPoint = viewModel.currentActionDataPoint!!
-
-    override fun getViewModel(): InputDataPointDialog.InputDataPointDialogViewModel = viewModel
 
     private fun onDeleteDataPointClicked(dataPoint: DataPoint) {
         viewModel.currentActionDataPoint = dataPoint
