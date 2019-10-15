@@ -1,8 +1,8 @@
 package com.samco.grapheasy.displaytrackgroup
 
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
@@ -12,14 +12,23 @@ import android.view.WindowManager
 import android.widget.*
 import androidx.core.view.children
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProviders
+import androidx.room.withTransaction
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
+import kotlinx.coroutines.*
 
 const val EXISTING_FEATURES_ARG_KEY = "existingFeatures"
 const val EXISTING_FEATURES_DELIM = ","
 
 class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
+    private val trackGroupId: Long by lazy { arguments!!.getLong(TRACK_GROUP_ID_KEY) }
     private lateinit var scrollView: ScrollView
+    private lateinit var progressBar: ProgressBar
     private lateinit var baseLinearLayout: LinearLayout
     private lateinit var errorText: TextView
     private lateinit var nameEditText: EditText
@@ -28,20 +37,8 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     private lateinit var discreteValuesLinearLayout: LinearLayout
     private lateinit var addDiscreteValueButton: ImageButton
     private lateinit var alertDialog: AlertDialog
-    private lateinit var listener: AddFeatureDialogListener
     private lateinit var viewModel: AddFeatureDialogViewModel
     private lateinit var existingFeatures: List<String>
-
-    interface AddFeatureDialogListener {
-        fun getViewModel(): AddFeatureDialogViewModel
-        fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<DiscreteValue>)
-    }
-
-    interface AddFeatureDialogViewModel {
-        var featureName: String?
-        var featureType: FeatureType?
-        var discreteValues: MutableList<DiscreteValue>?
-    }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
@@ -50,10 +47,10 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
-            listener = parentFragment as AddFeatureDialogListener
-            viewModel = listener.getViewModel()
+            viewModel = ViewModelProviders.of(this).get(AddFeatureDialogViewModel::class.java)
             val view = it.layoutInflater.inflate(R.layout.feature_input_dialog, null)
             scrollView = view.findViewById(R.id.scrollView)
+            progressBar = view.findViewById(R.id.progressBar)
             baseLinearLayout = view.findViewById(R.id.baseLinearLayout)
             errorText = view.findViewById(R.id.errorText)
             nameEditText = view.findViewById(R.id.featureNameText)
@@ -76,16 +73,35 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             addDiscreteValueButton.setOnClickListener { onAddDiscreteValue() }
             var builder = AlertDialog.Builder(it)
             builder.setView(view)
-                .setPositiveButton(R.string.add) { _, _ -> onPositiveClicked() }
-                .setNegativeButton(R.string.cancel) { _, _ -> clearViewModel() }
+                .setPositiveButton(R.string.add) { _, _ -> null }
+                .setNegativeButton(R.string.cancel) { _, _ -> dismiss() }
             alertDialog = builder.create()
             alertDialog.setCanceledOnTouchOutside(true)
-            alertDialog.setOnShowListener {
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
-                inflateDiscreteValuesFromViewModel()
-            }
+            alertDialog.setOnShowListener {onShowListener() }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    private fun onShowListener() {
+        val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton.isEnabled = false
+        positiveButton.setOnClickListener { onPositiveClicked() }
+        listenToAddState()
+        inflateDiscreteValuesFromViewModel()
+        alertDialog.setOnCancelListener { null }
+    }
+
+    private fun listenToAddState() {
+        viewModel.addFeatureState.observe(this, Observer { state ->
+            when (state) {
+                AddFeatureState.WAITING -> progressBar.visibility = View.INVISIBLE
+                AddFeatureState.ADDING -> {
+                    setPositiveButtonEnabled(false)
+                    progressBar.visibility = View.VISIBLE
+                }
+                AddFeatureState.DONE -> dismiss()
+            }
+        })
     }
 
     private fun initFromViewModel() {
@@ -241,18 +257,41 @@ class AddFeatureDialogFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     }
 
     private fun onPositiveClicked() {
-        listener.onAddFeature(nameEditText.text.toString(), viewModel.featureType!!, viewModel.discreteValues!!)
-        clearViewModel()
+        viewModel.onAddFeature(activity!!, nameEditText.text.toString(), trackGroupId)
+    }
+}
+
+enum class AddFeatureState { WAITING, ADDING, DONE }
+class AddFeatureDialogViewModel : ViewModel() {
+    private var updateJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
+
+    var featureName: String? = null
+    var featureType: FeatureType? = null
+    var discreteValues: MutableList<DiscreteValue>? = null
+    val addFeatureState: LiveData<AddFeatureState> get() { return _isAdding }
+    private val _isAdding by lazy {
+        val adding = MutableLiveData<AddFeatureState>()
+        adding.value = AddFeatureState.WAITING
+        return@lazy adding
     }
 
-    private fun clearViewModel() {
-        viewModel.featureName = null
-        viewModel.discreteValues = null
-        viewModel.featureType = null
+    fun onAddFeature(activity: Activity, name: String, trackGroupId: Long) {
+        val application = activity.application
+        val database = GraphEasyDatabase.getInstance(application)
+        val dao = database.graphEasyDatabaseDao
+        uiScope.launch {
+            _isAdding.value = AddFeatureState.ADDING
+            withContext(Dispatchers.IO) {
+                val feature = Feature(0, name, trackGroupId, featureType!!, discreteValues!!)
+                database.withTransaction { dao.insertFeature(feature) }
+            }
+            _isAdding.value = AddFeatureState.DONE
+        }
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        super.onCancel(dialog)
-        clearViewModel()
+    override fun onCleared() {
+        super.onCleared()
+        uiScope.cancel()
     }
 }

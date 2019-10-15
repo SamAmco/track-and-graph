@@ -189,7 +189,6 @@ class ImportFeaturesViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        Timber.d("onCleared called")
         updateJob.cancel()
     }
 }

@@ -25,8 +25,6 @@ import com.samco.grapheasy.util.ImportExportFeatureUtils
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 
-const val TRACK_GROUP_NAME_KEY = "TRACK_GROUP_NAME_KEY"
-const val TRACK_GROUP_ID_KEY = "TRACK_GROUP_ID_KEY"
 const val CREATE_FILE_REQUEST_CODE = 123
 
 enum class ExportState { LOADING, WAITING, EXPORTING, DONE }

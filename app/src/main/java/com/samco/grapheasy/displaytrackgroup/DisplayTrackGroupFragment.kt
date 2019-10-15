@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -14,16 +16,19 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
 import com.samco.grapheasy.databinding.FragmentDisplayTrackGroupBinding
+import com.samco.grapheasy.ui.DataPointInputViewModel
 import com.samco.grapheasy.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
 import timber.log.Timber
 
+const val TRACK_GROUP_ID_KEY = "TRACK_GROUP_ID_KEY"
+const val TRACK_GROUP_NAME_KEY = "TRACK_GROUP_NAME_KEY"
+
 class DisplayTrackGroupFragment : Fragment(),
-    AddFeatureDialogFragment.AddFeatureDialogListener,
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener,
-    InputDataPointDialog.InputDataPointDialogListener
-{
+    InputDataPointDialog.InputDataPointDialogListener {
+
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
@@ -84,24 +89,15 @@ class DisplayTrackGroupFragment : Fragment(),
 
     private fun onAddClicked() {
         val dialog = AddFeatureDialogFragment()
-        val args = Bundle()
-        args.putString(EXISTING_FEATURES_ARG_KEY,
+        val argsBundle = Bundle()
+        argsBundle.putString(EXISTING_FEATURES_ARG_KEY,
             viewModel.features.value?.joinToString(EXISTING_FEATURES_DELIM) { f -> f.name }
         )
-        dialog.arguments = args
+        argsBundle.putLong(TRACK_GROUP_ID_KEY, args.trackGroup)
+        dialog.arguments = argsBundle
         childFragmentManager.let { dialog.show(it, "add_feature_dialog") }
     }
 
-    override fun onAddFeature(name: String, featureType: FeatureType, discreteValues: List<DiscreteValue>) {
-        val application = requireActivity().application
-        val dao = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                val feature = Feature(0, name, args.trackGroup, featureType, discreteValues)
-                dao.insertFeature(feature)
-            }
-        }
-    }
 
     override fun getFeature(): Feature {
         val f = viewModel.currentActionFeature!!
@@ -228,4 +224,23 @@ class DisplayTrackGroupFragment : Fragment(),
         super.onDestroy()
         updateJob.cancel()
     }
+}
+
+class DisplayTrackGroupViewModelFactory(
+    private val trackGroupId: Long,
+    private val dataSource: GraphEasyDatabaseDao
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DisplayTrackGroupViewModel::class.java)) {
+            return DisplayTrackGroupViewModel(trackGroupId, dataSource) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
+
+class DisplayTrackGroupViewModel(trackGroupId: Long, dataSource: GraphEasyDatabaseDao)
+    : DataPointInputViewModel(), InputDataPointDialog.InputDataPointDialogViewModel {
+    var currentActionFeature: DisplayFeature? = null
+    var currentActionFeatures: List<DisplayFeature>? = null
+    val features = dataSource.getDisplayFeaturesForTrackGroup(trackGroupId)
 }
