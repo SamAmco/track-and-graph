@@ -51,4 +51,6 @@
     <string name="import_exception_not_a_valid_number">Import failed: Failed to read continuous value on line: %s</string>
     <string name="import_exception_feature_name_too_long">Import failed: Feature name too long on line: %s</string>
     <string name="import_exception_max_discrete_values_reached">Import failed: Max discrete values for a feature is: %s</string>
+    <string name="track">Track</string>
+    <string name="graphs_and_statistics"><![CDATA[Graphs & Statistics]]></string>
 </resources>

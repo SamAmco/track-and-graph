@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:id="@+id/selectTrackGroupFragment"
+            android:title="@string/track"
+            />
+    <item android:id="@+id/graphsAndStatsFragment"
+            android:title="@string/graphs_and_statistics"
+            />
+
+</menu>

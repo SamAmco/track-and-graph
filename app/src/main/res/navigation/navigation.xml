@@ -36,4 +36,9 @@
                 android:name="featureName"
                 app:argType="string" />
     </fragment>
+    <fragment
+            android:id="@+id/graphsAndStatsFragment"
+            android:name="com.samco.grapheasy.graphsandstats.GraphsAndStatsFragment"
+            android:label="graphs_and_stats_fragment"
+            tools:layout="@layout/graphs_and_stats_fragment" />
 </navigation>
