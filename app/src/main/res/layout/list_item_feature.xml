@@ -10,112 +10,118 @@
                 name="feature"
                 type="com.samco.grapheasy.database.DisplayFeature"/>
     </data>
-    <!--TODO we will need a max title size for features to prevent layout issues-->
-    <androidx.cardview.widget.CardView
-            android:id="@+id/cardView"
-            android:layout_marginStart="5dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginTop="5dp"
-            android:layout_marginBottom="5dp"
-            android:layout_width="170dp"
-            android:layout_height="170dp"
-            android:layout_gravity="center"
-            app:contentPadding="@dimen/card_padding"
-            app:cardCornerRadius="@dimen/card_corner_radius"
-            tools:layout_width="170dp">
+    <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+        <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-                android:orientation="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-            <ImageButton
-                    android:id="@+id/menuButton"
-                    android:src="@drawable/list_menu_icon"
-                    android:background="#00FFFFFF"
-                    android:paddingStart="5dp"
-                    android:paddingBottom="5dp"
-                    android:layout_width="26dp"
-                    android:layout_height="26dp"
-                    android:scaleType="fitCenter"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    />
-
-            <TextView
-                    android:id="@+id/featureNameText"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    app:layout_constraintTop_toTopOf="parent"
-                    android:maxHeight="70dp"
-                    android:textStyle="bold"
-                    android:textSize="22sp"
-                    android:gravity="center"
-                    android:text="@{feature.name}"
-                    tools:text="Some name"
-                    />
-
-            <TextView
-                    android:id="@+id/lastDateText"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
+            <!--TODO we will need a max title size for features to prevent layout issues-->
+            <androidx.cardview.widget.CardView
+                    android:id="@+id/cardView"
                     android:layout_marginStart="5dp"
-                    android:gravity="left|center"
-                    android:text="@{feature.getDisplayTimestamp() != null ? feature.getDisplayTimestamp() : @string/no_data}"
-                    android:textSize="14sp"
-                    app:layout_constraintBottom_toTopOf="@id/divider"
-                    app:layout_constraintTop_toBottomOf="@id/featureNameText"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintLeft_toRightOf="@id/historyIcon"
-                    tools:text="02/03/19  20:18" />
-
-            <ImageView
-                    android:id="@+id/historyIcon"
-                    android:layout_width="@dimen/feature_history_button_size"
-                    android:layout_height="0dp"
-                    android:layout_gravity="bottom|right"
-                    android:background="@null"
-                    android:scaleType="fitCenter"
-                    android:src="@drawable/history"
-                    android:alpha="0.55"
-                    app:layout_constraintBottom_toTopOf="@id/divider"
-                    app:layout_constraintTop_toBottomOf="@id/featureNameText"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                     />
-
-            <ImageView
-                    android:id="@+id/divider"
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
+                    android:layout_marginEnd="5dp"
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
-                    android:src="@color/colorAccent"
-                    app:layout_constraintBottom_toTopOf="@id/addButton"
-                    />
-            <TextView
-                    android:id="@+id/numEntriesText"
-                    android:layout_width="0dp"
-                    android:layout_height="@dimen/feature_add_box_button_size"
-                    android:textSize="14sp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/addButton"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:gravity="center|left"
-                    android:text="@{feature.numDataPoints != null ? String.format(@string/data_points, feature.numDataPoints) : @string/no_data}"
-                    tools:text="1324 Tracked"/>
+                    android:layout_width="170dp"
+                    android:layout_height="170dp"
+                    android:layout_gravity="center"
+                    app:contentPadding="@dimen/card_padding"
+                    app:cardCornerRadius="@dimen/card_corner_radius"
+                    tools:layout_width="170dp">
 
-            <ImageButton
-                    android:id="@+id/addButton"
-                    android:layout_width="@dimen/feature_add_box_button_size"
-                    android:layout_height="@dimen/feature_add_box_button_size"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    android:scaleType="fitXY"
-                    android:background="@null"
-                    android:src="@drawable/add_box" />
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                    <TextView
+                            android:id="@+id/featureNameText"
+                            android:layout_width="match_parent"
+                            android:layout_height="60dp"
+                            app:layout_constraintTop_toTopOf="parent"
+                            android:maxHeight="70dp"
+                            android:textStyle="bold"
+                            android:textSize="22sp"
+                            android:gravity="center"
+                            android:text="@{feature.name}"
+                            tools:text="Some name"
+                            />
+
+                    <TextView
+                            android:id="@+id/lastDateText"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_marginStart="5dp"
+                            android:gravity="left|center"
+                            android:text="@{feature.getDisplayTimestamp() != null ? feature.getDisplayTimestamp() : @string/no_data}"
+                            android:textSize="14sp"
+                            app:layout_constraintBottom_toTopOf="@id/divider"
+                            app:layout_constraintTop_toBottomOf="@id/featureNameText"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintLeft_toRightOf="@id/historyIcon"
+                            tools:text="02/03/19  20:18" />
+
+                    <ImageView
+                            android:id="@+id/historyIcon"
+                            android:layout_width="@dimen/feature_history_button_size"
+                            android:layout_height="0dp"
+                            android:layout_gravity="bottom|right"
+                            android:background="@null"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/history"
+                            android:alpha="0.55"
+                            app:layout_constraintBottom_toTopOf="@id/divider"
+                            app:layout_constraintTop_toBottomOf="@id/featureNameText"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                             />
+
+                    <ImageView
+                            android:id="@+id/divider"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:src="@color/colorAccent"
+                            app:layout_constraintBottom_toTopOf="@id/addButton"
+                            />
+                    <TextView
+                            android:id="@+id/numEntriesText"
+                            android:layout_width="0dp"
+                            android:layout_height="@dimen/feature_add_box_button_size"
+                            android:textSize="14sp"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/addButton"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:gravity="center|left"
+                            android:text="@{feature.numDataPoints != null ? String.format(@string/data_points, feature.numDataPoints) : @string/no_data}"
+                            tools:text="1324 Tracked"/>
+
+                    <ImageButton
+                            android:id="@+id/addButton"
+                            android:layout_width="@dimen/feature_add_box_button_size"
+                            android:layout_height="@dimen/feature_add_box_button_size"
+                            app:layout_constraintRight_toRightOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            android:scaleType="fitXY"
+                            android:background="@null"
+                            android:src="@drawable/add_box" />
 
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.cardview.widget.CardView>
+            </androidx.cardview.widget.CardView>
+        </FrameLayout>
+        <ImageButton
+                android:id="@+id/menuButton"
+                android:src="@drawable/list_menu_icon"
+                android:background="#00FFFFFF"
+                android:padding="8dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:scaleType="fitCenter"
+                android:layout_gravity="top|right"
+                />
+    </FrameLayout>
 </layout>
