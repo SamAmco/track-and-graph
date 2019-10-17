@@ -1,10 +1,13 @@
 package com.samco.grapheasy.selecttrackgroup
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -12,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.GraphEasyDatabase
+import com.samco.grapheasy.database.GraphEasyDatabaseDao
 import com.samco.grapheasy.database.TrackGroup
 import com.samco.grapheasy.databinding.FragmentSelectTrackGroupBinding
 import com.samco.grapheasy.ui.YesCancelDialogFragment
@@ -35,8 +39,8 @@ class SelectTrackGroupFragment : Fragment(),
             R.layout.fragment_select_track_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel = createViewModel()
-        binding.selectTrackGroupViewModel = viewModel
+        viewModel = ViewModelProviders.of(this).get(SelectTrackGroupViewModel::class.java)
+        viewModel.initViewModel(requireActivity())
 
         val adapter = TrackGroupAdapter(
             TrackGroupListener(
@@ -65,13 +69,6 @@ class SelectTrackGroupFragment : Fragment(),
                 binding.groupList.smoothScrollToPosition(0)
             }
         })
-    }
-
-    private fun createViewModel(): SelectTrackGroupViewModel {
-        val application = requireNotNull(this.activity).application
-        val dataSource = GraphEasyDatabase.getInstance(application).graphEasyDatabaseDao
-        val viewModelFactory = SelectTrackGroupViewModelFactory(dataSource, application)
-        return ViewModelProviders.of(this, viewModelFactory).get(SelectTrackGroupViewModel::class.java)
     }
 
     private fun onRenameClicked(trackGroup: TrackGroup) {
@@ -157,5 +154,17 @@ class SelectTrackGroupFragment : Fragment(),
     override fun onDestroy() {
         super.onDestroy()
         updateJob.cancel()
+    }
+}
+
+class SelectTrackGroupViewModel : ViewModel() {
+    private var dataSource: GraphEasyDatabaseDao? = null
+    var currentActionTrackGroup: TrackGroup? = null
+    lateinit var trackGroups: LiveData<List<TrackGroup>>
+
+    fun initViewModel(activity: Activity) {
+        if (dataSource != null) return
+        dataSource = GraphEasyDatabase.getInstance(activity.application).graphEasyDatabaseDao
+        trackGroups = dataSource!!.getTrackGroups()
     }
 }
