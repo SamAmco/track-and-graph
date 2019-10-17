@@ -58,6 +58,6 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
 
     override fun onStart() {
         super.onStart()
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = editText.text.isNotEmpty()
     }
 }
