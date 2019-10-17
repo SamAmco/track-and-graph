@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            app:layout_constraintHorizontal_chainStyle="spread"
+            >
+        <Spinner
+                android:id="@+id/featureSpinner"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/offsetLabel"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                android:entries="@array/graph_types"
+                tools:entries="@array/graph_types"
+                />
+
+        <TextView
+                android:id="@+id/offsetLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/offset"
+                android:textAlignment="center"
+                app:layout_constraintLeft_toRightOf="@id/featureSpinner"
+                app:layout_constraintRight_toLeftOf="@id/offsetInput"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+        <EditText
+                android:id="@+id/offsetInput"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned|numberDecimal"
+                android:textAlignment="center"
+                app:layout_constraintLeft_toRightOf="@id/offsetLabel"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/scaleLabel"
+                app:layout_constraintHorizontal_weight="1"
+                />
+
+        <TextView
+                android:id="@+id/scaleLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/scale"
+                android:textAlignment="center"
+                app:layout_constraintLeft_toRightOf="@id/offsetInput"
+                app:layout_constraintRight_toLeftOf="@id/scaleInput"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+        <EditText
+                android:id="@+id/scaleInput"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:inputType="numberSigned|numberDecimal"
+                android:textAlignment="center"
+                app:layout_constraintLeft_toRightOf="@id/scaleLabel"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_weight="1"
+                />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

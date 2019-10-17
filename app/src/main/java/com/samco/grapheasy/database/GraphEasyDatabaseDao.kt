@@ -33,8 +33,14 @@ interface GraphEasyDatabaseDao {
     @Query("SELECT features_table.* FROM features_table WHERE track_group_id = :trackGroupId")
     fun getFeaturesForTrackGroupSync(trackGroupId: Long): List<Feature>
 
-    @Query("""SELECT * from features_table WHERE id = :featureId LIMIT 1""")
+    @Query("""SELECT * FROM features_table WHERE id = :featureId LIMIT 1""")
     fun getFeatureById(featureId: Long): Feature
+
+    @Query("""SELECT features_table.*, track_groups_table.name as track_group_name 
+        FROM features_table 
+        LEFT JOIN track_groups_table 
+        ON features_table.track_group_id = track_groups_table.id""")
+    fun getAllFeaturesAndTrackGroups(): LiveData<List<FeatureAndTrackGroup>>
 
     @Query("""SELECT * from features_table WHERE id IN (:featureIds)""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>

@@ -40,5 +40,14 @@
             android:id="@+id/graphsAndStatsFragment"
             android:name="com.samco.grapheasy.graphsandstats.GraphsAndStatsFragment"
             android:label="@string/graphs_and_statistics"
-            tools:layout="@layout/graphs_and_stats_fragment" />
+            tools:layout="@layout/graphs_and_stats_fragment" >
+        <action
+                android:id="@+id/action_graph_stat_input"
+                app:destination="@id/graphStatInputFragment" />
+    </fragment>
+    <fragment
+            android:id="@+id/graphStatInputFragment"
+            android:name="com.samco.grapheasy.graphstatinput.GraphStatInputFragment"
+            android:label="@string/add_a_graph_or_stat"
+            tools:layout="@layout/fragment_graph_stat_input" />
 </navigation>
