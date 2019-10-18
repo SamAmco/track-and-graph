@@ -5,10 +5,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.grapheasy.database.GraphOrStat
 import com.samco.grapheasy.databinding.ListItemGraphStatBinding
 
 class GraphStatAdapter(private val clickListener: GraphStatClickListener)
-    : ListAdapter<GraphStat, GraphStatAdapter.ViewHolder>(GraphStatDiffCallback()) {
+    : ListAdapter<GraphOrStat, GraphStatAdapter.ViewHolder>(GraphStatDiffCallback()) {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
@@ -21,7 +22,7 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener)
     class ViewHolder(private val binding: ListItemGraphStatBinding)
         : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(graphStat: GraphStat, clickListener: GraphStatClickListener) {
+        fun bind(graphStat: GraphOrStat, clickListener: GraphStatClickListener) {
             binding.clickListener = clickListener
         }
 
@@ -35,12 +36,12 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener)
     }
 }
 
-class GraphStatDiffCallback() : DiffUtil.ItemCallback<GraphStat>() {
+class GraphStatDiffCallback() : DiffUtil.ItemCallback<GraphOrStat>() {
     //TODO GraphStatDiffCallback.areItemsTheSame
-    override fun areItemsTheSame(oldItem: GraphStat, newItem: GraphStat) = false
+    override fun areItemsTheSame(oldItem: GraphOrStat, newItem: GraphOrStat) = false
 
     //TODO GraphStatDiffCallback.areContentsTheSame
-    override fun areContentsTheSame(oldItem: GraphStat, newItem: GraphStat) = false
+    override fun areContentsTheSame(oldItem: GraphOrStat, newItem: GraphOrStat) = false
 }
 
 class GraphStatClickListener

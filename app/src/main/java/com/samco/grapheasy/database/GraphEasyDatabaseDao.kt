@@ -78,6 +78,6 @@ interface GraphEasyDatabaseDao {
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp = :timestamp")
     fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
 
-    @Query("SELECT * FROM data_sampler_specs_table")
-    fun getDataSamplerSpecs(): LiveData<List<DataSamplerSpec>>
+    @Query("SELECT * FROM graphs_and_stats_table")
+    fun getDataSamplerSpecs(): LiveData<List<GraphOrStat>>
 }

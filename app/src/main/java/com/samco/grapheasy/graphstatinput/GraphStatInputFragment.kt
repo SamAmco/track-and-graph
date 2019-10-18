@@ -20,6 +20,19 @@ class GraphStatInputFragment : Fragment() {
     private lateinit var binding: FragmentGraphStatInputBinding
     private lateinit var viewModel: GraphStatInputViewModel
 
+    private val colorList = listOf(
+        R.color.visColor1,
+        R.color.visColor2,
+        R.color.visColor3,
+        R.color.visColor4,
+        R.color.visColor5,
+        R.color.visColor6,
+        R.color.visColor7,
+        R.color.visColor8,
+        R.color.visColor9,
+        R.color.visColor10
+    )
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_graph_stat_input, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
@@ -29,25 +42,59 @@ class GraphStatInputFragment : Fragment() {
         listenToMovingAveragePeriod()
         listenToTimePeriod()
         listenToAllFeatures()
+
         return binding.root
     }
 
     private fun listenToAllFeatures() {
         viewModel.allFeatures.observe(this, Observer {
-            val itemNames = it.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
-            val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
-            binding.pieChartFeatureSpinner.adapter = adapter
-            when (val selected = viewModel.selectedPieChartFeature.value) {
-                null -> viewModel.selectedPieChartFeature.value = it[0]
-                else -> binding.pieChartFeatureSpinner.setSelection(it.indexOf(selected))
-            }
-            binding.pieChartFeatureSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(p0: AdapterView<*>?) { }
-                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                    viewModel.selectedPieChartFeature.value = it[index]
-                }
-            }
+            initPieChartAdapter(it)
+            listenToAddLineGraphFeatureButton(it)
+            createLineGraphFeatureViews(it)
+            binding.progressBar.visibility = View.GONE
         })
+    }
+
+    private fun listenToAddLineGraphFeatureButton(features: List<FeatureAndTrackGroup>) {
+        binding.addFeatureButton.isClickable = true
+        binding.addFeatureButton.setOnClickListener {
+            val color = colorList[(colorList.size - 1).coerceAtMost(viewModel.lineGraphFeatures.size)]
+            val newLineGraphFeature = LineGraphFeature(-1, color, 0f, 1f)
+            viewModel.lineGraphFeatures.add(newLineGraphFeature)
+            inflateLineGraphFeatureView(newLineGraphFeature, features)
+        }
+    }
+
+    private fun createLineGraphFeatureViews(features: List<FeatureAndTrackGroup>) {
+        viewModel.lineGraphFeatures.forEach { lgf -> inflateLineGraphFeatureView(lgf, features) }
+    }
+
+    private fun inflateLineGraphFeatureView(lgf: LineGraphFeature, features: List<FeatureAndTrackGroup>) {
+        val view = GraphFeatureListItemView(context!!, features, colorList, lgf)
+        view.setOnRemoveListener {
+            viewModel.lineGraphFeatures.remove(lgf)
+            binding.lineGraphFeaturesLayout.removeView(view)
+        }
+        val params = ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+        view.layoutParams = params
+        binding.lineGraphFeaturesLayout.addView(view)
+    }
+
+    private fun initPieChartAdapter(features: List<FeatureAndTrackGroup>) {
+        val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
+        val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
+        binding.pieChartFeatureSpinner.adapter = adapter
+        val selected = viewModel.selectedPieChartFeature.value
+        if (selected != null) binding.pieChartFeatureSpinner.setSelection(features.indexOf(selected))
+        binding.pieChartFeatureSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) { }
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                viewModel.selectedPieChartFeature.value = features[index]
+            }
+        }
     }
 
     private fun listenToTimePeriod() {
@@ -59,7 +106,9 @@ class GraphStatInputFragment : Fragment() {
                     1 -> Period.ofDays(1)
                     2 -> Period.ofWeeks(1)
                     3 -> Period.ofMonths(1)
-                    4 -> Period.ofYears(1)
+                    4 -> Period.ofMonths(3)
+                    5 -> Period.ofMonths(6)
+                    6 -> Period.ofYears(1)
                     else -> null
                 }
             }
@@ -103,24 +152,33 @@ class GraphStatInputFragment : Fragment() {
                 GraphStatType.LINE_GRAPH -> {
                     binding.movingAverageLayout.visibility = View.VISIBLE
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
+                    binding.addFeatureButton.visibility = View.VISIBLE
+                    binding.lineGraphFeaturesLayout.visibility = View.VISIBLE
                 }
                 GraphStatType.PIE_CHART -> {
                     binding.movingAverageLayout.visibility = View.GONE
                     binding.pieChartSelectFeatureLayout.visibility = View.VISIBLE
+                    binding.addFeatureButton.visibility = View.GONE
+                    binding.lineGraphFeaturesLayout.visibility = View.GONE
                 }
                 GraphStatType.AVERAGE_TIME_BETWEEN -> {
                     binding.movingAverageLayout.visibility = View.GONE
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
+                    binding.addFeatureButton.visibility = View.GONE
+                    binding.lineGraphFeaturesLayout.visibility = View.GONE
                 }
                 GraphStatType.TIME_SINCE -> {
                     binding.movingAverageLayout.visibility = View.GONE
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
+                    binding.addFeatureButton.visibility = View.GONE
+                    binding.lineGraphFeaturesLayout.visibility = View.GONE
                 }
             }
         })
     }
 
 }
+
 
 class GraphStatInputViewModel : ViewModel() {
     private var dataSource: GraphEasyDatabaseDao? = null
@@ -129,6 +187,7 @@ class GraphStatInputViewModel : ViewModel() {
     val movingAveragePeriod = MutableLiveData<Period?>(null)
     val samplePeriod = MutableLiveData<Period?>(null)
     val selectedPieChartFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
+    val lineGraphFeatures = mutableListOf<LineGraphFeature>()
 
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
 

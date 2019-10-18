@@ -3,6 +3,7 @@ package com.samco.grapheasy.database
 import android.content.Context
 import androidx.room.*
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -12,8 +13,9 @@ val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
     .withZone(ZoneId.systemDefault())
 
 @Database(
-    entities = [TrackGroup::class, Feature::class, DataPoint::class, DataSamplerSpec::class],
-    version = 13,
+    entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphOrStat::class, LineGraph::class,
+        AverageTimeBetweenStat::class, PieChart::class, TimeSinceLastStat::class],
+    version = 15,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -58,14 +60,41 @@ class Converters {
     fun intToFeatureType(i: Int): FeatureType = FeatureType.values()[i]
 
     @TypeConverter
-    fun featureTypeToInt(featureType: FeatureType): Int = featureType.index
+    fun featureTypeToInt(featureType: FeatureType): Int = featureType.ordinal
+
+    @TypeConverter
+    fun intToGraphStatType(i: Int): GraphStatType = GraphStatType.values()[i]
+
+    @TypeConverter
+    fun graphStatTypeToInt(graphStat: GraphStatType): Int = graphStat.ordinal
 
     @TypeConverter
     fun stringToOffsetDateTime(value: String?): OffsetDateTime? = value?.let { odtFromString(value) }
 
     @TypeConverter
     fun offsetDateTimeToString(value: OffsetDateTime?): String = value?.let { stringFromOdt(it) } ?: ""
+
+    @TypeConverter
+    fun lineGraphFeaturesToString(value: List<LineGraphFeature>): String {
+        return value.joinToString(","){ v -> "${v.featureId};${v.colorId};${v.offset};${v.scale}" }
+    }
+
+    @TypeConverter
+    fun stringToLineGraphFeatures(value: String): List<LineGraphFeature> {
+        return value.split(",").map {
+            val strs = it.split(';')
+            LineGraphFeature(strs[0].toLong(), strs[1].toInt(), strs[2].toFloat(), strs[3].toFloat())
+        }
+    }
+
+    @TypeConverter
+    fun periodToString(value: Period?): String = value?.let { value.toString() } ?: ""
+
+    @TypeConverter
+    fun stringToPeriod(value: String): Period? = if (value.isEmpty()) null else Period.parse(value)
 }
+
 
 fun odtFromString(value: String): OffsetDateTime = databaseFormatter.parse(value, OffsetDateTime::from)
 fun stringFromOdt(value: OffsetDateTime): String = databaseFormatter.format(value)
+

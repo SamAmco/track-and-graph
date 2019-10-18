@@ -11,9 +11,7 @@ import android.view.View
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
-import androidx.lifecycle.ViewModel
 import com.samco.grapheasy.R
-import com.samco.grapheasy.database.DataPoint
 import com.samco.grapheasy.database.DiscreteValue
 import com.samco.grapheasy.database.Feature
 import com.samco.grapheasy.database.FeatureType

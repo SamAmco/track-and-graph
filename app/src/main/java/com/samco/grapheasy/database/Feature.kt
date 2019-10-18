@@ -15,28 +15,28 @@ import java.lang.Exception
 data class Feature (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
-    var id: Long = -1L,
+    var id: Long,
 
     @ColumnInfo(name = "name")
-    val name: String = "",
+    val name: String,
 
     @ColumnInfo(name = "track_group_id")
     val trackGroupId: Long,
 
     @ColumnInfo(name = "type")
-    val featureType: FeatureType = FeatureType.CONTINUOUS,
+    val featureType: FeatureType,
 
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>
 )
 
-enum class FeatureType constructor(val index: Int) {
-    DISCRETE(0), CONTINUOUS(1)
-}
+enum class FeatureType { DISCRETE, CONTINUOUS }
 
 const val MAX_FEATURE_NAME_LENGTH = 20
 const val MAX_LABEL_LENGTH = 20
 const val MAX_DISCRETE_VALUES_PER_FEATURE = 10
+//TODO add a max length for a track group name
+//TODO add a max length for a graph name
 
 data class DiscreteValue (val index: Int, val label: String) {
     override fun toString() = "$index:$label"

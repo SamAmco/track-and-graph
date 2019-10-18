@@ -15,11 +15,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import com.samco.grapheasy.R
-import com.samco.grapheasy.database.DataSamplerSpec
+import com.samco.grapheasy.database.GraphOrStat
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.database.GraphEasyDatabaseDao
 import com.samco.grapheasy.databinding.GraphsAndStatsFragmentBinding
-import com.samco.grapheasy.selecttrackgroup.SelectTrackGroupFragmentDirections
 
 class GraphsAndStatsFragment : Fragment() {
     private var navController: NavController? = null
@@ -45,9 +44,7 @@ class GraphsAndStatsFragment : Fragment() {
 
     private fun observeGraphStatsAndUpdate(adapter: GraphStatAdapter) {
         viewModel.graphStatDataSamplers.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                adapter.submitList(it.map { s -> GraphStat.fromDataSamplerSpec(s) })
-            }
+            it?.let { adapter.submitList(it) }
         })
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -78,7 +75,7 @@ class GraphsAndStatsFragment : Fragment() {
 
 class GraphsAndStatsViewModel : ViewModel() {
     private var dataSource: GraphEasyDatabaseDao? = null
-    lateinit var graphStatDataSamplers: LiveData<List<DataSamplerSpec>>
+    lateinit var graphStatDataSamplers: LiveData<List<GraphOrStat>>
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return

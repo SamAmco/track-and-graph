@@ -7,4 +7,15 @@
     <color name="regularText">@android:color/tab_indicator_text</color>
     <color name="divider">#616161</color>
     <color name="errorText">#FF0000</color>
+
+    <color name="visColor1">#a50026</color>
+    <color name="visColor2">#d73027</color>
+    <color name="visColor3">#f46d43</color>
+    <color name="visColor4">#fdae61</color>
+    <color name="visColor5">#fee090</color>
+    <color name="visColor6">#e0f3f8</color>
+    <color name="visColor7">#abd9e9</color>
+    <color name="visColor8">#74add1</color>
+    <color name="visColor9">#4575b4</color>
+    <color name="visColor10">#313695</color>
 </resources>

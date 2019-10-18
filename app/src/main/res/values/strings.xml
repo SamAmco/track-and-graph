@@ -57,6 +57,8 @@
         <item>A Day</item>
         <item>A Week</item>
         <item>A Month</item>
+        <item>Three Months</item>
+        <item>Six Months</item>
         <item>A Year</item>
     </string-array>
 
