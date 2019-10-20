@@ -14,6 +14,7 @@ import com.samco.grapheasy.R
 import com.samco.grapheasy.database.FeatureAndTrackGroup
 import com.samco.grapheasy.database.LineGraphFeature
 import com.samco.grapheasy.databinding.ListItemLineGraphFeatureBinding
+import java.text.DecimalFormat
 
 class GraphFeatureListItemView(
     context: Context,
@@ -22,6 +23,7 @@ class GraphFeatureListItemView(
     private val lineGraphFeature: LineGraphFeature
 ) : ConstraintLayout(context) {
     private var onRemoveListener: ((GraphFeatureListItemView) -> Unit)? = null
+    private val decimalFormat = DecimalFormat("0.###############")
 
     init {
         val binding = ListItemLineGraphFeatureBinding.inflate(LayoutInflater.from(context), this, true)
@@ -37,15 +39,15 @@ class GraphFeatureListItemView(
                 lineGraphFeature.featureId = features[index].id
             }
         }
-        binding.offsetInput.setText(lineGraphFeature.offset.toString())
+        binding.offsetInput.setText(decimalFormat.format(lineGraphFeature.offset))
         binding.offsetInput.addTextChangedListener { text ->
-            if (text.toString().isEmpty()) lineGraphFeature.offset = 0f
-            else lineGraphFeature.offset = text.toString().toFloat()
+            if (text.toString().isEmpty()) lineGraphFeature.offset = 0.toDouble()
+            else lineGraphFeature.offset = text.toString().toDouble()
         }
-        binding.scaleInput.setText(lineGraphFeature.scale.toString())
+        binding.scaleInput.setText(decimalFormat.format(lineGraphFeature.scale))
         binding.scaleInput.addTextChangedListener { text ->
-            if (text.toString().isEmpty()) lineGraphFeature.scale = 1f
-            else lineGraphFeature.scale = text.toString().toFloat()
+            if (text.toString().isEmpty()) lineGraphFeature.scale = 1.toDouble()
+            else lineGraphFeature.scale = text.toString().toDouble()
         }
         binding.removeButton.setOnClickListener { onRemoveListener?.invoke(this) }
         binding.colorSpinner.adapter = CustomColorSpinnerAdapter(context, colorsList)

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" >
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
     <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -105,6 +106,139 @@
                         android:layout_marginTop="@dimen/input_spacing_large"
                         android:background="@color/divider"/>
 
+                <androidx.constraintlayout.widget.ConstraintLayout
+                        android:id="@+id/valueStatInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/input_spacing_large"
+                        >
+                    <TextView
+                            android:id="@+id/valueStatFeatureLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:text="@string/select_a_feature"
+                            android:textSize="@dimen/dialog_label_text_size"
+                            android:gravity="center"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            app:layout_constraintRight_toLeftOf="@id/valueStatFeatureSpinner"
+                            app:layout_constraintBottom_toBottomOf="@id/valueStatFeatureSpinner"
+                            />
+                    <Spinner
+                            android:id="@+id/valueStatFeatureSpinner"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:spinnerMode="dialog"
+                            android:layout_margin="5dp"
+                            android:background="@color/colorShadowButton"
+                            app:layout_constraintTop_toTopOf="@id/valueStatFeatureLabel"
+                            app:layout_constraintLeft_toRightOf="@id/valueStatFeatureLabel"
+                            app:layout_constraintRight_toRightOf="parent"
+                            />
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/valueStatDiscreteValueInputLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/input_spacing_large"
+                            app:layout_constraintTop_toBottomOf="@id/valueStatFeatureSpinner"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            >
+                        <TextView
+                                android:id="@+id/valueStatSelectValueLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="0dp"
+                                android:text="@string/select_a_value"
+                                android:textSize="@dimen/dialog_label_text_size"
+                                android:gravity="center"
+                                app:layout_constraintTop_toTopOf="@id/valueStatDiscreteValueSpinner"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintBottom_toBottomOf="@id/valueStatDiscreteValueSpinner"
+                                app:layout_constraintRight_toLeftOf="@id/valueStatDiscreteValueSpinner"
+                                />
+                        <Spinner
+                                android:id="@+id/valueStatDiscreteValueSpinner"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="5dp"
+                                android:spinnerMode="dialog"
+                                android:background="@color/colorShadowButton"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintLeft_toRightOf="@id/valueStatSelectValueLabel"
+                                app:layout_constraintRight_toRightOf="parent"
+                                />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/valueStatContinuousValueInputLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/input_spacing_large"
+                            app:layout_constraintTop_toBottomOf="@id/valueStatFeatureSpinner"
+                            app:layout_constraintLeft_toLeftOf="parent"
+                            >
+                        <TextView
+                                android:id="@+id/valueStatSelectValueRangeLabel"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/select_a_value_range"
+                                android:textSize="@dimen/dialog_label_text_size"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                />
+                        <TextView
+                                android:id="@+id/valueStatFromLabel"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:paddingBottom="8dp"
+                                android:gravity="right"
+                                android:text="@string/from"
+                                android:textSize="@dimen/dialog_label_text_size"
+                                android:layout_marginTop="@dimen/dialog_input_spacing"
+                                app:layout_constraintLeft_toLeftOf="parent"
+                                app:layout_constraintTop_toBottomOf="@id/valueStatSelectValueRangeLabel"
+                                app:layout_constraintRight_toLeftOf="@id/valueStatFromInput"
+                                app:layout_constraintHorizontal_weight="1"
+                                />
+                        <EditText
+                                android:id="@+id/valueStatFromInput"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:hint="0"
+                                android:gravity="center"
+                                android:inputType="numberSigned|numberDecimal"
+                                app:layout_constraintTop_toTopOf="@id/valueStatFromLabel"
+                                app:layout_constraintLeft_toRightOf="@id/valueStatFromLabel"
+                                app:layout_constraintRight_toLeftOf="@id/valueStatToLabel"
+                                app:layout_constraintHorizontal_weight="1"
+                                />
+                        <TextView
+                                android:id="@+id/valueStatToLabel"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:paddingBottom="8dp"
+                                android:text="@string/to"
+                                android:gravity="right"
+                                android:textSize="@dimen/dialog_label_text_size"
+                                android:layout_marginTop="@dimen/dialog_input_spacing"
+                                app:layout_constraintLeft_toRightOf="@id/valueStatFromInput"
+                                app:layout_constraintRight_toLeftOf="@id/valueStatToInput"
+                                app:layout_constraintTop_toTopOf="@id/valueStatFromLabel"
+                                app:layout_constraintHorizontal_weight="1"
+                                />
+                        <EditText
+                                android:id="@+id/valueStatToInput"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:hint="0"
+                                android:gravity="center"
+                                android:inputType="numberSigned|numberDecimal"
+                                app:layout_constraintTop_toTopOf="@id/valueStatFromLabel"
+                                app:layout_constraintLeft_toRightOf="@id/valueStatToLabel"
+                                app:layout_constraintRight_toRightOf="parent"
+                                app:layout_constraintHorizontal_weight="1"
+                                />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
                 <LinearLayout
                         android:id="@+id/pieChartSelectFeatureLayout"
                         android:layout_width="match_parent"
@@ -115,7 +249,7 @@
                             android:id="@+id/singleFeatureSelectLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/select_a_feature"
+                            android:text="@string/select_a_discrete_feature"
                             android:textSize="@dimen/dialog_label_text_size"
                             />
                     <Spinner

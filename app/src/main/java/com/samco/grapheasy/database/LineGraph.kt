@@ -6,7 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import org.threeten.bp.Period
 
-class LineGraphFeature(var featureId: Long, var colorId: Int, var offset: Float, var scale: Float)
+class LineGraphFeature(var featureId: Long, var colorId: Int, var offset: Double, var scale: Double)
 
 @Entity(tableName = "line_graphs_table",
     foreignKeys = [ForeignKey(entity = GraphOrStat::class,

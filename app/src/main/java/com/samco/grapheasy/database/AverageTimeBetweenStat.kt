@@ -32,8 +32,11 @@ data class AverageTimeBetweenStat(
     @ColumnInfo(name = "feature_id")
     val featureId: Long,
 
-    @ColumnInfo(name = "value")
-    val value: String,
+    @ColumnInfo(name = "from_value")
+    val fromValue: String,
+
+    @ColumnInfo(name = "to_value")
+    val toValue: String,
 
     @ColumnInfo(name = "period")
     val period: Period?

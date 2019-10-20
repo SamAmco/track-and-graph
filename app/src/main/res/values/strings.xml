@@ -83,7 +83,12 @@
     <string name="graph_type_label">Graph Type:</string>
     <string name="maximum_sample_period">Max sample period:</string>
     <string name="moving_average_period">Moving average period:</string>
-    <string name="select_a_feature">Select A Feature:</string>
+    <string name="select_a_discrete_feature">Select a discrete feature:</string>
+    <string name="select_a_feature">Select a feature:</string>
     <string name="offset">Offset:</string>
     <string name="scale">Scale:</string>
+    <string name="select_a_value">Select a value:</string>
+    <string name="from">From:</string>
+    <string name="to">To:</string>
+    <string name="select_a_value_range">Select a value range:</string>
 </resources>

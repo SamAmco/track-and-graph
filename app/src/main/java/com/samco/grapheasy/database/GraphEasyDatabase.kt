@@ -15,7 +15,7 @@ val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphOrStat::class, LineGraph::class,
         AverageTimeBetweenStat::class, PieChart::class, TimeSinceLastStat::class],
-    version = 15,
+    version = 16,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -83,7 +83,7 @@ class Converters {
     fun stringToLineGraphFeatures(value: String): List<LineGraphFeature> {
         return value.split(",").map {
             val strs = it.split(';')
-            LineGraphFeature(strs[0].toLong(), strs[1].toInt(), strs[2].toFloat(), strs[3].toFloat())
+            LineGraphFeature(strs[0].toLong(), strs[1].toInt(), strs[2].toDouble(), strs[3].toDouble())
         }
     }
 

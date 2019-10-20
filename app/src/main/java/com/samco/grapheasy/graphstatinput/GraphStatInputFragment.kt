@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
 
@@ -15,10 +16,13 @@ import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
 import com.samco.grapheasy.databinding.FragmentGraphStatInputBinding
 import org.threeten.bp.Period
+import java.text.DecimalFormat
 
 class GraphStatInputFragment : Fragment() {
     private lateinit var binding: FragmentGraphStatInputBinding
     private lateinit var viewModel: GraphStatInputViewModel
+
+    private val decimalFormat = DecimalFormat("0.###############")
 
     private val colorList = listOf(
         R.color.visColor1,
@@ -42,7 +46,6 @@ class GraphStatInputFragment : Fragment() {
         listenToMovingAveragePeriod()
         listenToTimePeriod()
         listenToAllFeatures()
-
         return binding.root
     }
 
@@ -51,15 +54,85 @@ class GraphStatInputFragment : Fragment() {
             initPieChartAdapter(it)
             listenToAddLineGraphFeatureButton(it)
             createLineGraphFeatureViews(it)
+            listentToValueStat(it)
             binding.progressBar.visibility = View.GONE
         })
+    }
+
+    private fun listentToValueStat(features: List<FeatureAndTrackGroup>) {
+        val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
+        val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
+        binding.valueStatFeatureSpinner.adapter = adapter
+        val selected = viewModel.selectedValueStatFeature.value
+        if (selected != null) binding.valueStatFeatureSpinner.setSelection(features.indexOf(selected))
+        binding.valueStatFeatureSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) { }
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                viewModel.selectedValueStatFeature.value = features[index]
+            }
+        }
+        listenToValueStatFeature()
+    }
+
+    private fun listenToValueStatFeature() {
+        binding.valueStatDiscreteValueInputLayout.visibility = View.GONE
+        binding.valueStatContinuousValueInputLayout.visibility = View.GONE
+        viewModel.selectedValueStatFeature.observe(this, Observer {
+            it?.let {
+                if (it.featureType == FeatureType.DISCRETE) {
+                    binding.valueStatDiscreteValueInputLayout.visibility = View.VISIBLE
+                    binding.valueStatContinuousValueInputLayout.visibility = View.GONE
+                }
+                else {
+                    binding.valueStatDiscreteValueInputLayout.visibility = View.GONE
+                    binding.valueStatContinuousValueInputLayout.visibility = View.VISIBLE
+                }
+            }
+        })
+        listenToValueStatDiscreteValueSpinner()
+        listenToValueStatContinuousRange()
+    }
+
+    private fun listenToValueStatDiscreteValueSpinner() {
+        viewModel.selectedValueStatFeature.observe(this, Observer {
+            if(it != null && it.featureType == FeatureType.DISCRETE) {
+                val itemNames = it.discreteValues.map { dv -> dv.label }
+                val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
+                binding.valueStatDiscreteValueSpinner.adapter = adapter
+                val selected = viewModel.selectedValueStatDiscreteValue.value
+                val index = it.discreteValues.indexOf(selected)
+                if (selected != null && index >= 0) binding.valueStatDiscreteValueSpinner.setSelection(index)
+                else binding.valueStatDiscreteValueSpinner.setSelection(0)
+                binding.valueStatDiscreteValueSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(p0: AdapterView<*>?) { }
+                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                        viewModel.selectedValueStatDiscreteValue.value = it.discreteValues[index]
+                    }
+                }
+            }
+        })
+    }
+
+    private fun listenToValueStatContinuousRange() {
+        if (viewModel.selectedValueStatToValue.value != null)
+            binding.valueStatToInput.setText(decimalFormat.format(viewModel.selectedValueStatToValue.value!!))
+        binding.valueStatToInput.addTextChangedListener { editText ->
+            val string = editText.toString()
+            viewModel.selectedValueStatToValue.value = if (string.isEmpty()) 0.toDouble() else string.toDouble()
+        }
+        if (viewModel.selectedValueStatFromValue.value != null)
+            binding.valueStatFromInput.setText(decimalFormat.format(viewModel.selectedValueStatFromValue.value!!))
+        binding.valueStatFromInput.addTextChangedListener { editText ->
+            val string = editText.toString()
+            viewModel.selectedValueStatFromValue.value = if (string.isEmpty()) 0.toDouble() else string.toDouble()
+        }
     }
 
     private fun listenToAddLineGraphFeatureButton(features: List<FeatureAndTrackGroup>) {
         binding.addFeatureButton.isClickable = true
         binding.addFeatureButton.setOnClickListener {
             val color = colorList[(colorList.size - 1).coerceAtMost(viewModel.lineGraphFeatures.size)]
-            val newLineGraphFeature = LineGraphFeature(-1, color, 0f, 1f)
+            val newLineGraphFeature = LineGraphFeature(-1, color, 0.toDouble(), 1.toDouble())
             viewModel.lineGraphFeatures.add(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
         }
@@ -84,15 +157,18 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initPieChartAdapter(features: List<FeatureAndTrackGroup>) {
-        val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
+        val discreteFeatures = features
+            .filter { f -> f.featureType == FeatureType.DISCRETE }
+        val itemNames = discreteFeatures
+            .map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
         val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.pieChartFeatureSpinner.adapter = adapter
         val selected = viewModel.selectedPieChartFeature.value
-        if (selected != null) binding.pieChartFeatureSpinner.setSelection(features.indexOf(selected))
+        if (selected != null) binding.pieChartFeatureSpinner.setSelection(discreteFeatures.indexOf(selected))
         binding.pieChartFeatureSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                viewModel.selectedPieChartFeature.value = features[index]
+                viewModel.selectedPieChartFeature.value = discreteFeatures[index]
             }
         }
     }
@@ -158,6 +234,7 @@ class GraphStatInputFragment : Fragment() {
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
                     binding.addFeatureButton.visibility = View.VISIBLE
                     binding.lineGraphFeaturesLayout.visibility = View.VISIBLE
+                    binding.valueStatInputLayout.visibility = View.GONE
                 }
                 GraphStatType.PIE_CHART -> {
                     binding.movingAverageLayout.visibility = View.GONE
@@ -165,6 +242,7 @@ class GraphStatInputFragment : Fragment() {
                     binding.pieChartSelectFeatureLayout.visibility = View.VISIBLE
                     binding.addFeatureButton.visibility = View.GONE
                     binding.lineGraphFeaturesLayout.visibility = View.GONE
+                    binding.valueStatInputLayout.visibility = View.GONE
                 }
                 GraphStatType.AVERAGE_TIME_BETWEEN -> {
                     binding.movingAverageLayout.visibility = View.GONE
@@ -172,6 +250,7 @@ class GraphStatInputFragment : Fragment() {
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
                     binding.addFeatureButton.visibility = View.GONE
                     binding.lineGraphFeaturesLayout.visibility = View.GONE
+                    binding.valueStatInputLayout.visibility = View.VISIBLE
                 }
                 GraphStatType.TIME_SINCE -> {
                     binding.movingAverageLayout.visibility = View.GONE
@@ -179,6 +258,7 @@ class GraphStatInputFragment : Fragment() {
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
                     binding.addFeatureButton.visibility = View.GONE
                     binding.lineGraphFeaturesLayout.visibility = View.GONE
+                    binding.valueStatInputLayout.visibility = View.VISIBLE
                 }
             }
         })
@@ -194,6 +274,10 @@ class GraphStatInputViewModel : ViewModel() {
     val movingAveragePeriod = MutableLiveData<Period?>(null)
     val samplePeriod = MutableLiveData<Period?>(null)
     val selectedPieChartFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
+    val selectedValueStatFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
+    val selectedValueStatDiscreteValue = MutableLiveData<DiscreteValue?>(null)
+    val selectedValueStatFromValue = MutableLiveData<Double>(0.toDouble())
+    val selectedValueStatToValue = MutableLiveData<Double>(0.toDouble())
     val lineGraphFeatures = mutableListOf<LineGraphFeature>()
 
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
