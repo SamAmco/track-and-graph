@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
@@ -65,7 +66,11 @@ class GraphStatInputFragment : Fragment() {
                 GraphStatInputState.INITIALIZING -> binding.progressBar.visibility = View.VISIBLE
                 GraphStatInputState.WAITING -> binding.progressBar.visibility = View.INVISIBLE
                 GraphStatInputState.ADDING -> binding.progressBar.visibility = View.VISIBLE
-                GraphStatInputState.FINISHED -> navController?.popBackStack()
+                GraphStatInputState.FINISHED -> {
+                    val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.hideSoftInputFromWindow(view?.windowToken, 0)
+                    navController?.popBackStack()
+                }
             }
 
         })
@@ -436,17 +441,17 @@ class GraphStatInputViewModel : ViewModel() {
 
     private fun addLineGraph(graphStatId: Long) {
         dataSource?.insertLineGraph(LineGraph(0, graphStatId, lineGraphFeatures,
-            samplePeriod.value!!, movingAveragePeriod.value!!))
+            samplePeriod.value, movingAveragePeriod.value))
     }
 
     private fun addPieChart(graphStatId: Long) {
         dataSource?.insertPieChart(PieChart(0, graphStatId,
-            selectedPieChartFeature.value!!.id, samplePeriod.value!!))
+            selectedPieChartFeature.value!!.id, samplePeriod.value))
     }
 
     private fun addAverageTimeBetweenStat(graphStatId: Long) {
         dataSource?.insertAverageTimeBetweenStat(AverageTimeBetweenStat(0, graphStatId,
-            selectedValueStatFeature.value!!.id, getFromValue(), getToValue(), samplePeriod.value!!))
+            selectedValueStatFeature.value!!.id, getFromValue(), getToValue(), samplePeriod.value))
     }
 
     private fun addTimeSinceStat(graphStatId: Long) {

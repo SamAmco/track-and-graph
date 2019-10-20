@@ -66,15 +66,9 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private fun listenToState() {
         viewModel.state.observe(this, Observer { state ->
             when (state) {
-                InputDataPointDialogState.LOADING -> {
-                    addButton.isEnabled = false
-                }
-                InputDataPointDialogState.WAITING -> {
-                    addButton.isEnabled = true
-                }
-                InputDataPointDialogState.ADDING -> {
-                    addButton.isEnabled = false
-                }
+                InputDataPointDialogState.LOADING -> { addButton.isEnabled = false }
+                InputDataPointDialogState.WAITING -> { addButton.isEnabled = true }
+                InputDataPointDialogState.ADDING -> { addButton.isEnabled = false }
                 InputDataPointDialogState.ADDED -> {
                     addButton.isEnabled = true
                     if (viewModel.currentFeatureIndex.value!! < viewModel.features.value!!.size-1) {
