@@ -98,77 +98,84 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToTimePeriod() {
+        val timePeriods = listOf(
+            null,
+            Period.ofDays(1),
+            Period.ofWeeks(1),
+            Period.ofMonths(1),
+            Period.ofMonths(3),
+            Period.ofMonths(6),
+            Period.ofYears(1)
+        )
+        binding.samplePeriodSpinner.setSelection(timePeriods.indexOf(viewModel.samplePeriod.value))
         binding.samplePeriodSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                viewModel.samplePeriod.value = when(index) {
-                    0 -> null
-                    1 -> Period.ofDays(1)
-                    2 -> Period.ofWeeks(1)
-                    3 -> Period.ofMonths(1)
-                    4 -> Period.ofMonths(3)
-                    5 -> Period.ofMonths(6)
-                    6 -> Period.ofYears(1)
-                    else -> null
-                }
+                viewModel.samplePeriod.value = timePeriods[index]
             }
         }
     }
 
     private fun listenToMovingAveragePeriod() {
+        val timePeriods = listOf(
+            null,
+            Period.ofDays(1),
+            Period.ofDays(3),
+            Period.ofWeeks(1),
+            Period.ofMonths(1),
+            Period.ofMonths(3),
+            Period.ofMonths(6),
+            Period.ofYears(1)
+        )
+        binding.movingAverageSpinner.setSelection(timePeriods.indexOf(viewModel.movingAveragePeriod.value))
         binding.movingAverageSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                viewModel.movingAveragePeriod.value = when (index) {
-                    0 -> null
-                    1 -> Period.ofDays(1)
-                    2 -> Period.ofDays(3)
-                    3 -> Period.ofWeeks(1)
-                    4 -> Period.ofMonths(1)
-                    5 -> Period.ofMonths(3)
-                    6 -> Period.ofMonths(6)
-                    7 -> Period.ofYears(1)
-                    else -> null
-                }
+                viewModel.movingAveragePeriod.value = timePeriods[index]
             }
         }
     }
 
     private fun listenToGraphTypeSpinner() {
+        val graphTypes = listOf(
+            GraphStatType.LINE_GRAPH,
+            GraphStatType.PIE_CHART,
+            GraphStatType.AVERAGE_TIME_BETWEEN,
+            GraphStatType.TIME_SINCE
+        )
+        binding.graphTypeSpinner.setSelection(graphTypes.indexOf(viewModel.graphStatType.value))
         binding.graphTypeSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                viewModel.graphStatType.value = when(index) {
-                    0 -> GraphStatType.LINE_GRAPH
-                    1 -> GraphStatType.PIE_CHART
-                    2 -> GraphStatType.AVERAGE_TIME_BETWEEN
-                    3 -> GraphStatType.TIME_SINCE
-                    else -> GraphStatType.LINE_GRAPH
-                }
+                viewModel.graphStatType.value = graphTypes[index]
             }
         }
         viewModel.graphStatType.observe(this, Observer { graphType ->
             when(graphType) {
                 GraphStatType.LINE_GRAPH -> {
                     binding.movingAverageLayout.visibility = View.VISIBLE
+                    binding.timePeriodLayout.visibility = View.VISIBLE
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
                     binding.addFeatureButton.visibility = View.VISIBLE
                     binding.lineGraphFeaturesLayout.visibility = View.VISIBLE
                 }
                 GraphStatType.PIE_CHART -> {
                     binding.movingAverageLayout.visibility = View.GONE
+                    binding.timePeriodLayout.visibility = View.VISIBLE
                     binding.pieChartSelectFeatureLayout.visibility = View.VISIBLE
                     binding.addFeatureButton.visibility = View.GONE
                     binding.lineGraphFeaturesLayout.visibility = View.GONE
                 }
                 GraphStatType.AVERAGE_TIME_BETWEEN -> {
                     binding.movingAverageLayout.visibility = View.GONE
+                    binding.timePeriodLayout.visibility = View.VISIBLE
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
                     binding.addFeatureButton.visibility = View.GONE
                     binding.lineGraphFeaturesLayout.visibility = View.GONE
                 }
                 GraphStatType.TIME_SINCE -> {
                     binding.movingAverageLayout.visibility = View.GONE
+                    binding.timePeriodLayout.visibility = View.GONE
                     binding.pieChartSelectFeatureLayout.visibility = View.GONE
                     binding.addFeatureButton.visibility = View.GONE
                     binding.lineGraphFeaturesLayout.visibility = View.GONE
