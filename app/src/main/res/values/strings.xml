@@ -91,4 +91,16 @@
     <string name="from">From:</string>
     <string name="to">To:</string>
     <string name="select_a_value_range">Select a value range:</string>
+    <string name="graph_name_hint">e.g. Exercise: weekly moving average over the last year</string>
+
+    <string name="graph_stat_validation_bad_type">Graph type not set</string>
+    <string name="graph_stat_validation_unknown">An unknown error occurred</string>
+    <string name="graph_stat_validation_no_name">Please provide a name</string>
+    <string name="graph_stat_validation_no_line_graph_features">Please add at least one feature to graph</string>
+    <string name="graph_stat_validation_invalid_value_stat_feature">Please select a valid feature</string>
+    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Please select a valid discrete value</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Please make sure that "From" is smaller than or equal to "To"</string>
+    <string name="graph_stat_validation_invalid_pie_chart_feature">Please select a valid pie chart feature</string>
+    <string name="graph_stat_validation_unrecognised_color">Please make sure all features have a color</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Invalid line graph feature detected</string>
 </resources>

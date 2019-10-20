@@ -7,8 +7,10 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import android.widget.LinearLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat.getColor
+import androidx.core.view.marginBottom
 import androidx.core.widget.addTextChangedListener
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.FeatureAndTrackGroup
@@ -23,6 +25,7 @@ class GraphFeatureListItemView(
     private val lineGraphFeature: LineGraphFeature
 ) : ConstraintLayout(context) {
     private var onRemoveListener: ((GraphFeatureListItemView) -> Unit)? = null
+    private var onUpdatedListener: ((GraphFeatureListItemView) -> Unit)? = null
     private val decimalFormat = DecimalFormat("0.###############")
 
     init {
@@ -37,27 +40,36 @@ class GraphFeatureListItemView(
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                 lineGraphFeature.featureId = features[index].id
+                onUpdatedListener?.invoke(this@GraphFeatureListItemView)
             }
         }
         binding.offsetInput.setText(decimalFormat.format(lineGraphFeature.offset))
         binding.offsetInput.addTextChangedListener { text ->
-            if (text.toString().isEmpty()) lineGraphFeature.offset = 0.toDouble()
-            else lineGraphFeature.offset = text.toString().toDouble()
+            lineGraphFeature.offset = text.toString().toDoubleOrNull() ?: 0.toDouble()
+            onUpdatedListener?.invoke(this@GraphFeatureListItemView)
         }
         binding.scaleInput.setText(decimalFormat.format(lineGraphFeature.scale))
         binding.scaleInput.addTextChangedListener { text ->
-            if (text.toString().isEmpty()) lineGraphFeature.scale = 1.toDouble()
-            else lineGraphFeature.scale = text.toString().toDouble()
+            lineGraphFeature.scale = text.toString().toDoubleOrNull() ?: 1.toDouble()
+            onUpdatedListener?.invoke(this@GraphFeatureListItemView)
         }
-        binding.removeButton.setOnClickListener { onRemoveListener?.invoke(this) }
+        binding.removeButton.setOnClickListener {
+            onRemoveListener?.invoke(this)
+            onUpdatedListener?.invoke(this@GraphFeatureListItemView)
+        }
         binding.colorSpinner.adapter = CustomColorSpinnerAdapter(context, colorsList)
         binding.colorSpinner.setSelection(colorsList.indexOf(lineGraphFeature.colorId))
         binding.colorSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                 lineGraphFeature.colorId = colorsList[index]
+                onUpdatedListener?.invoke(this@GraphFeatureListItemView)
             }
         }
+    }
+
+    fun setOnUpdateListener(onUpdatedListener: (GraphFeatureListItemView) -> Unit) {
+        this.onUpdatedListener = onUpdatedListener
     }
 
     fun setOnRemoveListener(onRemoveListener: (GraphFeatureListItemView) -> Unit) {

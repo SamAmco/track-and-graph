@@ -80,4 +80,19 @@ interface GraphEasyDatabaseDao {
 
     @Query("SELECT * FROM graphs_and_stats_table")
     fun getDataSamplerSpecs(): LiveData<List<GraphOrStat>>
+
+    @Insert
+    fun insertLineGraph(lineGraph: LineGraph): Long
+
+    @Insert
+    fun insertPieChart(pieChart: PieChart): Long
+
+    @Insert
+    fun insertAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat): Long
+
+    @Insert
+    fun insertTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat): Long
+
+    @Insert
+    fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
 }
