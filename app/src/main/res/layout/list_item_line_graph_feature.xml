@@ -12,6 +12,7 @@
         <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:cardCornerRadius="@dimen/card_corner_radius"
                 >
             <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
@@ -50,26 +51,42 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:background="@color/colorShadowButton"
+                        android:spinnerMode="dialog"
                         app:layout_constraintLeft_toRightOf="@id/colorSpinner"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toTopOf="@id/offsetLabel"
+                        app:layout_constraintBottom_toTopOf="@id/modeSpinner"
                         app:layout_constraintHorizontal_weight="3"
                         tools:entries="@array/graph_types"
+                        />
+
+
+                <Spinner
+                        android:id="@+id/modeSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="@dimen/dialog_input_spacing"
+                        android:background="@color/colorShadowButton"
+                        android:entries="@array/line_graph_feature_modes"
+                        android:spinnerMode="dialog"
+                        app:layout_constraintLeft_toRightOf="@id/colorSpinner"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/featureSpinner"
+                        app:layout_constraintBottom_toTopOf="@id/offsetLabel"
+                        app:layout_constraintHorizontal_weight="3"
                         />
 
                 <TextView
                         android:id="@+id/offsetLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
                         android:text="@string/offset"
                         android:textAlignment="center"
                         android:gravity="bottom"
                         android:paddingBottom="8dp"
-                        app:layout_constraintLeft_toLeftOf="@id/featureSpinner"
+                        app:layout_constraintLeft_toLeftOf="@id/modeSpinner"
                         app:layout_constraintRight_toLeftOf="@id/offsetInput"
-                        app:layout_constraintTop_toBottomOf="@id/featureSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/modeSpinner"
                         app:layout_constraintBottom_toBottomOf="parent"
                         />
 
@@ -77,12 +94,11 @@
                         android:id="@+id/offsetInput"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
                         android:inputType="numberSigned|numberDecimal"
                         android:textAlignment="center"
                         android:hint="0"
                         app:layout_constraintLeft_toRightOf="@id/offsetLabel"
-                        app:layout_constraintTop_toBottomOf="@id/featureSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/modeSpinner"
                         app:layout_constraintRight_toLeftOf="@id/scaleLabel"
                         app:layout_constraintHorizontal_weight="1"
                         />
@@ -91,13 +107,12 @@
                         android:id="@+id/scaleLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
                         android:text="@string/scale"
                         android:gravity="bottom"
                         android:paddingBottom="8dp"
                         app:layout_constraintLeft_toRightOf="@id/offsetInput"
                         app:layout_constraintRight_toLeftOf="@id/scaleInput"
-                        app:layout_constraintTop_toBottomOf="@id/featureSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/modeSpinner"
                         app:layout_constraintBottom_toBottomOf="parent"
                         />
 
@@ -105,13 +120,12 @@
                         android:id="@+id/scaleInput"
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
                         android:inputType="numberSigned|numberDecimal"
                         android:textAlignment="center"
                         android:hint="1"
                         app:layout_constraintLeft_toRightOf="@id/scaleLabel"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/featureSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/modeSpinner"
                         app:layout_constraintHorizontal_weight="1"
                         />
 

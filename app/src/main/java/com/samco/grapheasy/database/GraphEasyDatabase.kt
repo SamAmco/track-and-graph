@@ -2,8 +2,8 @@ package com.samco.grapheasy.database
 
 import android.content.Context
 import androidx.room.*
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -15,7 +15,7 @@ val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphOrStat::class, LineGraph::class,
         AverageTimeBetweenStat::class, PieChart::class, TimeSinceLastStat::class],
-    version = 16,
+    version = 18,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -76,22 +76,27 @@ class Converters {
 
     @TypeConverter
     fun lineGraphFeaturesToString(value: List<LineGraphFeature>): String {
-        return value.joinToString(","){ v -> "${v.featureId};${v.colorId};${v.offset};${v.scale}" }
+        return value.joinToString(","){ v -> "${v.featureId};${v.colorId};${v.mode.ordinal};${v.offset};${v.scale}" }
     }
 
     @TypeConverter
     fun stringToLineGraphFeatures(value: String): List<LineGraphFeature> {
         return value.split(",").map {
             val strs = it.split(';')
-            LineGraphFeature(strs[0].toLong(), strs[1].toInt(), strs[2].toDouble(), strs[3].toDouble())
+            LineGraphFeature(
+                strs[0].toLong(),
+                strs[1].toInt(),
+                LineGraphFeatureMode.values()[strs[2].toInt()],
+                strs[3].toDouble(),
+                strs[4].toDouble())
         }
     }
 
     @TypeConverter
-    fun periodToString(value: Period?): String = value?.let { value.toString() } ?: ""
+    fun durationToString(value: Duration?): String = value?.let { value.toString() } ?: ""
 
     @TypeConverter
-    fun stringToPeriod(value: String): Period? = if (value.isEmpty()) null else Period.parse(value)
+    fun stringToDuration(value: String): Duration? = if (value.isEmpty()) null else Duration.parse(value)
 }
 
 

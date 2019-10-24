@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import org.threeten.bp.Period
+import org.threeten.bp.Duration
 
 @Entity(tableName = "pie_chart_table",
     foreignKeys = [
@@ -32,7 +32,6 @@ data class PieChart(
     @ColumnInfo(name = "feature_id")
     val featureId: Long,
 
-    @ColumnInfo(name = "period")
-    val period: Period?
+    @ColumnInfo(name = "duration")
+    val duration: Duration?
 )
-

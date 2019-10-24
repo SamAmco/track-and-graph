@@ -42,17 +42,17 @@
         <item>Average Time Between</item>
         <item>Time Since</item>
     </string-array>
-    <string-array name="moving_average_time_periods">
-        <item>None</item>
-        <item>A Day</item>
-        <item>Three Days</item>
-        <item>A Week</item>
-        <item>A Month</item>
-        <item>Three Months</item>
-        <item>Six Months</item>
-        <item>A Year</item>
+    <string-array name="line_graph_feature_modes">
+        <item>Tracked Values</item>
+        <item>Daily Moving Average</item>
+        <item>Three Day Moving Average</item>
+        <item>Weekly Moving Average</item>
+        <item>Monthly Moving Average</item>
+        <item>Three Month Moving Average</item>
+        <item>Six Month Moving Average</item>
+        <item>Yearly Moving Average</item>
     </string-array>
-    <string-array name="graph_time_periods">
+    <string-array name="graph_time_durations">
         <item>All Data</item>
         <item>A Day</item>
         <item>A Week</item>
@@ -80,9 +80,9 @@
     <string name="track">Track</string>
     <string name="graphs_and_statistics"><![CDATA[Graphs & Statistics]]></string>
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
-    <string name="graph_type_label">Graph Type:</string>
-    <string name="maximum_sample_period">Max sample period:</string>
-    <string name="moving_average_period">Moving average period:</string>
+    <string name="graph_type_label">Graph type:</string>
+    <string name="maximum_sample_duration">Max sample duration:</string>
+    <string name="moving_average_duration">Moving average duration:</string>
     <string name="select_a_discrete_feature">Select a discrete feature:</string>
     <string name="select_a_feature">Select a feature:</string>
     <string name="offset">Offset:</string>

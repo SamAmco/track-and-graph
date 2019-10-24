@@ -3,6 +3,7 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorShadowButton">#E0E0E0</color>
+    <color name="colorGridLines">#66000000</color>
     <color name="colorAccent">#D81B60</color>
     <color name="regularText">@android:color/tab_indicator_text</color>
     <color name="divider">#616161</color>

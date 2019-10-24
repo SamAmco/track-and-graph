@@ -20,9 +20,22 @@ import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
 import com.samco.grapheasy.databinding.FragmentGraphStatInputBinding
 import kotlinx.coroutines.*
-import org.threeten.bp.Period
+import org.threeten.bp.Duration
 import java.lang.Exception
 import java.text.DecimalFormat
+
+private val colorList = listOf(
+    R.color.visColor1,
+    R.color.visColor2,
+    R.color.visColor3,
+    R.color.visColor4,
+    R.color.visColor5,
+    R.color.visColor6,
+    R.color.visColor7,
+    R.color.visColor8,
+    R.color.visColor9,
+    R.color.visColor10
+)
 
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
@@ -30,19 +43,6 @@ class GraphStatInputFragment : Fragment() {
     private lateinit var viewModel: GraphStatInputViewModel
 
     private val decimalFormat = DecimalFormat("0.###############")
-
-    private val colorList = listOf(
-        R.color.visColor1,
-        R.color.visColor2,
-        R.color.visColor3,
-        R.color.visColor4,
-        R.color.visColor5,
-        R.color.visColor6,
-        R.color.visColor7,
-        R.color.visColor8,
-        R.color.visColor9,
-        R.color.visColor10
-    )
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.navController = container?.findNavController()
@@ -52,11 +52,10 @@ class GraphStatInputFragment : Fragment() {
         viewModel.initViewModel(requireActivity())
         listenToGraphName()
         listenToGraphTypeSpinner()
-        listenToMovingAveragePeriod()
-        listenToTimePeriod()
+        listenToTimeDuration()
         listenToAllFeatures()
-        listenToErrorText()
         listenToViewModelState()
+        listenToFormValid()
         return binding.root
     }
 
@@ -66,21 +65,8 @@ class GraphStatInputFragment : Fragment() {
                 GraphStatInputState.INITIALIZING -> binding.progressBar.visibility = View.VISIBLE
                 GraphStatInputState.WAITING -> binding.progressBar.visibility = View.INVISIBLE
                 GraphStatInputState.ADDING -> binding.progressBar.visibility = View.VISIBLE
-                GraphStatInputState.FINISHED -> {
-                    val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.hideSoftInputFromWindow(view?.windowToken, 0)
-                    navController?.popBackStack()
-                }
+                GraphStatInputState.FINISHED -> navController?.popBackStack()
             }
-
-        })
-    }
-
-    private fun listenToErrorText() {
-        viewModel.errorText.observe(this, Observer {
-            binding.errorText.postDelayed({
-                binding.errorText.text = viewModel.errorText.value!!
-            },200)
         })
     }
 
@@ -88,7 +74,7 @@ class GraphStatInputFragment : Fragment() {
         binding.graphStatNameInput.setText(viewModel.graphName.value)
         binding.graphStatNameInput.addTextChangedListener { editText ->
             viewModel.graphName.value = editText.toString()
-            validateForm()
+            onFormUpdate()
         }
     }
 
@@ -118,7 +104,7 @@ class GraphStatInputFragment : Fragment() {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                 viewModel.selectedValueStatFeature.value = features[index]
-                validateForm()
+                onFormUpdate()
             }
         }
         listenToValueStatFeature()
@@ -137,7 +123,7 @@ class GraphStatInputFragment : Fragment() {
                     binding.valueStatDiscreteValueInputLayout.visibility = View.GONE
                     binding.valueStatContinuousValueInputLayout.visibility = View.VISIBLE
                 }
-                validateForm()
+                onFormUpdate()
             }
         })
         listenToValueStatDiscreteValueSpinner()
@@ -158,7 +144,7 @@ class GraphStatInputFragment : Fragment() {
                     override fun onNothingSelected(p0: AdapterView<*>?) { }
                     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                         viewModel.selectedValueStatDiscreteValue.value = it.discreteValues[index]
-                        validateForm()
+                        onFormUpdate()
                     }
                 }
             }
@@ -170,13 +156,13 @@ class GraphStatInputFragment : Fragment() {
             binding.valueStatToInput.setText(decimalFormat.format(viewModel.selectedValueStatToValue.value!!))
         binding.valueStatToInput.addTextChangedListener { editText ->
             viewModel.selectedValueStatToValue.value = editText.toString().toDoubleOrNull() ?: 0.toDouble()
-            validateForm()
+            onFormUpdate()
         }
         if (viewModel.selectedValueStatFromValue.value != null)
             binding.valueStatFromInput.setText(decimalFormat.format(viewModel.selectedValueStatFromValue.value!!))
         binding.valueStatFromInput.addTextChangedListener { editText ->
             viewModel.selectedValueStatFromValue.value = editText.toString().toDoubleOrNull() ?: 0.toDouble()
-            validateForm()
+            onFormUpdate()
         }
     }
 
@@ -184,7 +170,8 @@ class GraphStatInputFragment : Fragment() {
         binding.addFeatureButton.isClickable = true
         binding.addFeatureButton.setOnClickListener {
             val color = colorList[(colorList.size - 1).coerceAtMost(viewModel.lineGraphFeatures.size)]
-            val newLineGraphFeature = LineGraphFeature(-1, color, 0.toDouble(), 1.toDouble())
+            val newLineGraphFeature = LineGraphFeature(-1, color,
+                LineGraphFeatureMode.TRACKED_VALUES, 0.toDouble(), 1.toDouble())
             viewModel.lineGraphFeatures.add(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
         }
@@ -200,7 +187,7 @@ class GraphStatInputFragment : Fragment() {
             viewModel.lineGraphFeatures.remove(lgf)
             binding.lineGraphFeaturesLayout.removeView(view)
         }
-        view.setOnUpdateListener { validateForm() }
+        view.setOnUpdateListener { onFormUpdate() }
         val params = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -222,115 +209,29 @@ class GraphStatInputFragment : Fragment() {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                 viewModel.selectedPieChartFeature.value = discreteFeatures[index]
-                validateForm()
+                onFormUpdate()
             }
         }
     }
 
-    private fun listenToTimePeriod() {
-        val timePeriods = listOf(
+    private fun listenToTimeDuration() {
+        //TODO move these types of declarations into their corresponding data class files
+        val timeDurations = listOf(
             null,
-            Period.ofDays(1),
-            Period.ofWeeks(1),
-            Period.ofMonths(1),
-            Period.ofMonths(3),
-            Period.ofMonths(6),
-            Period.ofYears(1)
+            Duration.ofDays(1),
+            Duration.ofDays(7),
+            Duration.ofDays(31),
+            Duration.ofDays(93),
+            Duration.ofDays(183),
+            Duration.ofDays(365)
         )
-        binding.samplePeriodSpinner.setSelection(timePeriods.indexOf(viewModel.samplePeriod.value))
-        binding.samplePeriodSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+        binding.sampleDurationSpinner.setSelection(timeDurations.indexOf(viewModel.sampleDuration.value))
+        binding.sampleDurationSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                viewModel.samplePeriod.value = timePeriods[index]
-                validateForm()
+                viewModel.sampleDuration.value = timeDurations[index]
+                onFormUpdate()
             }
-        }
-    }
-
-    private fun listenToMovingAveragePeriod() {
-        val timePeriods = listOf(
-            null,
-            Period.ofDays(1),
-            Period.ofDays(3),
-            Period.ofWeeks(1),
-            Period.ofMonths(1),
-            Period.ofMonths(3),
-            Period.ofMonths(6),
-            Period.ofYears(1)
-        )
-        binding.movingAverageSpinner.setSelection(timePeriods.indexOf(viewModel.movingAveragePeriod.value))
-        binding.movingAverageSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) { }
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                viewModel.movingAveragePeriod.value = timePeriods[index]
-                validateForm()
-            }
-        }
-    }
-
-    private fun validateForm() {
-        try {
-            if (viewModel.graphName.value!!.isEmpty()) throw ValidationException(R.string.graph_stat_validation_no_name)
-            when (viewModel.graphStatType.value) {
-                GraphStatType.LINE_GRAPH -> validateLineGraph()
-                GraphStatType.PIE_CHART -> validatePieChart()
-                GraphStatType.TIME_SINCE -> validateTimeSince()
-                GraphStatType.AVERAGE_TIME_BETWEEN -> validateAverageTimeBetween()
-                else -> failValidation(R.string.graph_stat_validation_bad_type)
-            }
-            passValidation()
-        } catch (e: Exception) {
-            if (e is ValidationException) failValidation(e.errorMessageId)
-            else failValidation(R.string.graph_stat_validation_unknown)
-        }
-    }
-
-    private class ValidationException(val errorMessageId: Int): Exception()
-
-    private fun failValidation(errorMessageId: Int) {
-        viewModel.errorText.value = getString(errorMessageId)
-        binding.addButton.isEnabled = false
-    }
-
-    private fun passValidation() {
-        viewModel.errorText.value = ""
-        binding.addButton.isEnabled = true
-    }
-
-    private fun validateAverageTimeBetween() { validateValueStat() }
-
-    private fun validateTimeSince() { validateValueStat() }
-
-    private fun validateValueStat() {
-        if (viewModel.selectedValueStatFeature.value == null)
-            throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        if (viewModel.selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) {
-            if (viewModel.selectedValueStatDiscreteValue.value == null)
-                throw ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
-            if (!viewModel.selectedValueStatFeature.value!!.discreteValues
-                    .contains(viewModel.selectedValueStatDiscreteValue.value!!))
-                throw ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
-        }
-        if (viewModel.selectedValueStatFeature.value!!.featureType == FeatureType.CONTINUOUS) {
-            if (viewModel.selectedValueStatFromValue.value!! > viewModel.selectedValueStatToValue.value!!)
-                throw ValidationException(R.string.graph_stat_validation_invalid_value_stat_from_to)
-        }
-    }
-
-    private fun validatePieChart() {
-        if (viewModel.selectedPieChartFeature.value == null
-            || viewModel.selectedPieChartFeature.value!!.featureType != FeatureType.DISCRETE)
-            throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-    }
-
-    private fun validateLineGraph() {
-        if (viewModel.lineGraphFeatures.size == 0)
-            throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        viewModel.lineGraphFeatures.forEach { f ->
-            if (!colorList.contains(f.colorId))
-                throw ValidationException(R.string.graph_stat_validation_unrecognised_color)
-            if (viewModel.allFeatures.value?.map { feat -> feat.id }?.contains(f.featureId) != true)
-                throw ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)
         }
     }
 
@@ -345,73 +246,117 @@ class GraphStatInputFragment : Fragment() {
         binding.graphTypeSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                viewModel.graphStatType.value = graphTypes[index]
-                validateForm()
+                val graphStatType = graphTypes[index]
+                viewModel.graphStatType.value = graphStatType
+                onFormUpdate()
+                when(graphStatType) {
+                    GraphStatType.LINE_GRAPH -> initLineGraphView()
+                    GraphStatType.PIE_CHART -> initPieChartView()
+                    GraphStatType.AVERAGE_TIME_BETWEEN -> initAverageTimeBetweenView()
+                    GraphStatType.TIME_SINCE -> initTimeSinceView()
+                }
             }
         }
-        viewModel.graphStatType.observe(this, Observer { graphType ->
-            when(graphType) {
-                GraphStatType.LINE_GRAPH -> {
-                    binding.movingAverageLayout.visibility = View.VISIBLE
-                    binding.timePeriodLayout.visibility = View.VISIBLE
-                    binding.pieChartSelectFeatureLayout.visibility = View.GONE
-                    binding.addFeatureButton.visibility = View.VISIBLE
-                    binding.lineGraphFeaturesLayout.visibility = View.VISIBLE
-                    binding.valueStatInputLayout.visibility = View.GONE
-                }
-                GraphStatType.PIE_CHART -> {
-                    binding.movingAverageLayout.visibility = View.GONE
-                    binding.timePeriodLayout.visibility = View.VISIBLE
-                    binding.pieChartSelectFeatureLayout.visibility = View.VISIBLE
-                    binding.addFeatureButton.visibility = View.GONE
-                    binding.lineGraphFeaturesLayout.visibility = View.GONE
-                    binding.valueStatInputLayout.visibility = View.GONE
-                }
-                GraphStatType.AVERAGE_TIME_BETWEEN -> {
-                    binding.movingAverageLayout.visibility = View.GONE
-                    binding.timePeriodLayout.visibility = View.VISIBLE
-                    binding.pieChartSelectFeatureLayout.visibility = View.GONE
-                    binding.addFeatureButton.visibility = View.GONE
-                    binding.lineGraphFeaturesLayout.visibility = View.GONE
-                    binding.valueStatInputLayout.visibility = View.VISIBLE
-                }
-                GraphStatType.TIME_SINCE -> {
-                    binding.movingAverageLayout.visibility = View.GONE
-                    binding.timePeriodLayout.visibility = View.GONE
-                    binding.pieChartSelectFeatureLayout.visibility = View.GONE
-                    binding.addFeatureButton.visibility = View.GONE
-                    binding.lineGraphFeaturesLayout.visibility = View.GONE
-                    binding.valueStatInputLayout.visibility = View.VISIBLE
-                }
-            }
+    }
+
+    private fun initTimeSinceView() {
+        binding.timeDurationLayout.visibility = View.GONE
+        binding.pieChartSelectFeatureLayout.visibility = View.GONE
+        binding.addFeatureButton.visibility = View.GONE
+        binding.lineGraphFeaturesLayout.visibility = View.GONE
+        binding.valueStatInputLayout.visibility = View.VISIBLE
+    }
+
+    private fun initAverageTimeBetweenView() {
+        binding.timeDurationLayout.visibility = View.VISIBLE
+        binding.pieChartSelectFeatureLayout.visibility = View.GONE
+        binding.addFeatureButton.visibility = View.GONE
+        binding.lineGraphFeaturesLayout.visibility = View.GONE
+        binding.valueStatInputLayout.visibility = View.VISIBLE
+    }
+
+    private fun initPieChartView() {
+        binding.timeDurationLayout.visibility = View.VISIBLE
+        binding.pieChartSelectFeatureLayout.visibility = View.VISIBLE
+        binding.addFeatureButton.visibility = View.GONE
+        binding.lineGraphFeaturesLayout.visibility = View.GONE
+        binding.valueStatInputLayout.visibility = View.GONE
+    }
+
+    private fun initLineGraphView() {
+        binding.timeDurationLayout.visibility = View.VISIBLE
+        binding.pieChartSelectFeatureLayout.visibility = View.GONE
+        binding.addFeatureButton.visibility = View.VISIBLE
+        binding.lineGraphFeaturesLayout.visibility = View.VISIBLE
+        binding.valueStatInputLayout.visibility = View.GONE
+    }
+
+    private fun listenToFormValid() {
+        viewModel.formValid.observe(this, Observer { errorNow ->
+            binding.addButton.isEnabled = errorNow == null
+            binding.errorText.postDelayed({
+                val errorThen = viewModel.formValid.value
+                val text = errorThen?.let { getString(it.errorMessageId) } ?: ""
+                binding.errorText.text = text
+            }, 200)
         })
     }
 
-}
+    private fun onFormUpdate() {
+        viewModel.validateForm()
+        updateDemoView()
+    }
 
+    private fun updateDemoView() {
+        if (viewModel.formValid.value != null) {
+            binding.demoGraphStatView.initInvalid()
+        } else {
+            val view = binding.demoGraphStatView
+            val graphOrStat = viewModel.constructGraphOrStat()
+            when (viewModel.graphStatType.value) {
+                GraphStatType.LINE_GRAPH -> view.initFromLineGraph(graphOrStat, viewModel.constructLineGraph(-1))
+                else -> view.initInvalid()
+            }
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding.demoGraphStatView.dispose()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
+    }
+}
 
 enum class GraphStatInputState { INITIALIZING, WAITING, ADDING, FINISHED }
 class GraphStatInputViewModel : ViewModel() {
+    class ValidationException(val errorMessageId: Int): Exception()
+
     private var dataSource: GraphEasyDatabaseDao? = null
 
     private var updateJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
     val state: LiveData<GraphStatInputState> get() { return _state }
-    val _state = MutableLiveData<GraphStatInputState>(GraphStatInputState.INITIALIZING)
-    val errorText = MutableLiveData<String>("")
+    private val _state = MutableLiveData<GraphStatInputState>(GraphStatInputState.INITIALIZING)
     val graphName = MutableLiveData<String>("")
     val graphStatType = MutableLiveData<GraphStatType>(GraphStatType.LINE_GRAPH)
-    val movingAveragePeriod = MutableLiveData<Period?>(null)
-    val samplePeriod = MutableLiveData<Period?>(null)
+    val sampleDuration = MutableLiveData<Duration?>(null)
     val selectedPieChartFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatDiscreteValue = MutableLiveData<DiscreteValue?>(null)
     val selectedValueStatFromValue = MutableLiveData<Double>(0.toDouble())
     val selectedValueStatToValue = MutableLiveData<Double>(0.toDouble())
+    val formValid: LiveData<ValidationException?> get() { return _formValid }
+    private val _formValid = MutableLiveData<ValidationException?>(null)
     val lineGraphFeatures = mutableListOf<LineGraphFeature>()
 
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
+
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return
@@ -421,43 +366,106 @@ class GraphStatInputViewModel : ViewModel() {
         _state.value = GraphStatInputState.WAITING
     }
 
+    fun validateForm() {
+        try {
+            if (graphName.value!!.isEmpty()) throw ValidationException(R.string.graph_stat_validation_no_name)
+            when (graphStatType.value) {
+                GraphStatType.LINE_GRAPH -> validateLineGraph()
+                GraphStatType.PIE_CHART -> validatePieChart()
+                GraphStatType.TIME_SINCE -> validateTimeSince()
+                GraphStatType.AVERAGE_TIME_BETWEEN -> validateAverageTimeBetween()
+                else -> throw Exception("")
+            }
+            _formValid.value = null
+        } catch (e: Exception) {
+            if (e is ValidationException) _formValid.value = e
+            else _formValid.value = ValidationException(R.string.graph_stat_validation_unknown)
+        }
+    }
+
+    private fun validateAverageTimeBetween() { validateValueStat() }
+
+    private fun validateTimeSince() { validateValueStat() }
+
+    private fun validateValueStat() {
+        if (selectedValueStatFeature.value == null)
+            throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+        if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) {
+            if (selectedValueStatDiscreteValue.value == null)
+                throw ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
+            if (!selectedValueStatFeature.value!!.discreteValues
+                    .contains(selectedValueStatDiscreteValue.value!!))
+                throw ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
+        }
+        if (selectedValueStatFeature.value!!.featureType == FeatureType.CONTINUOUS) {
+            if (selectedValueStatFromValue.value!! > selectedValueStatToValue.value!!)
+                throw ValidationException(R.string.graph_stat_validation_invalid_value_stat_from_to)
+        }
+    }
+
+    private fun validatePieChart() {
+        if (selectedPieChartFeature.value == null
+            || selectedPieChartFeature.value!!.featureType != FeatureType.DISCRETE)
+            throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+    }
+
+    private fun validateLineGraph() {
+        if (lineGraphFeatures.size == 0)
+            throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+        lineGraphFeatures.forEach { f ->
+            if (!colorList.contains(f.colorId))
+                throw ValidationException(R.string.graph_stat_validation_unrecognised_color)
+            if (allFeatures.value?.map { feat -> feat.id }?.contains(f.featureId) != true)
+                throw ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)
+        }
+    }
+
     fun createGraphOrStat() {
         if (_state.value != GraphStatInputState.WAITING) return
         _state.value = GraphStatInputState.ADDING
         uiScope.launch {
             withContext(Dispatchers.IO) {
-                val graphStatId = dataSource!!.insertGraphOrStat(GraphOrStat(0,
-                    graphName.value!!, graphStatType.value!!))
+                val graphStatId = dataSource!!.insertGraphOrStat(constructGraphOrStat())
                 when (graphStatType.value) {
-                    GraphStatType.LINE_GRAPH -> addLineGraph(graphStatId)
-                    GraphStatType.PIE_CHART -> addPieChart(graphStatId)
-                    GraphStatType.AVERAGE_TIME_BETWEEN -> addAverageTimeBetweenStat(graphStatId)
-                    GraphStatType.TIME_SINCE -> addTimeSinceStat(graphStatId)
+                    GraphStatType.LINE_GRAPH -> dataSource?.insertLineGraph(constructLineGraph(graphStatId))
+                    GraphStatType.PIE_CHART -> dataSource?.insertPieChart(constructPieChart(graphStatId))
+                    GraphStatType.AVERAGE_TIME_BETWEEN -> dataSource?.insertAverageTimeBetweenStat(constructAverageTimeBetween(graphStatId))
+                    GraphStatType.TIME_SINCE -> dataSource?.insertTimeSinceLastStat(constructTimeSince(graphStatId))
                 }
+                return@withContext null
             }
             _state.value = GraphStatInputState.FINISHED
         }
     }
 
-    private fun addLineGraph(graphStatId: Long) {
-        dataSource?.insertLineGraph(LineGraph(0, graphStatId, lineGraphFeatures,
-            samplePeriod.value, movingAveragePeriod.value))
+    override fun onCleared() {
+        super.onCleared()
+        uiScope.cancel()
     }
 
-    private fun addPieChart(graphStatId: Long) {
-        dataSource?.insertPieChart(PieChart(0, graphStatId,
-            selectedPieChartFeature.value!!.id, samplePeriod.value))
-    }
+    fun constructGraphOrStat() = GraphOrStat(
+        0, graphName.value!!, graphStatType.value!!
+    )
 
-    private fun addAverageTimeBetweenStat(graphStatId: Long) {
-        dataSource?.insertAverageTimeBetweenStat(AverageTimeBetweenStat(0, graphStatId,
-            selectedValueStatFeature.value!!.id, getFromValue(), getToValue(), samplePeriod.value))
-    }
+    fun constructLineGraph(graphStatId: Long) = LineGraph(
+        0, graphStatId, lineGraphFeatures, sampleDuration.value
+    )
 
-    private fun addTimeSinceStat(graphStatId: Long) {
-        dataSource?.insertTimeSinceLastStat(TimeSinceLastStat(0, graphStatId,
-            selectedValueStatFeature.value!!.id, getFromValue(), getToValue()))
-    }
+    fun constructPieChart(graphStatId: Long) = PieChart(
+        0, graphStatId,
+        selectedPieChartFeature.value!!.id, sampleDuration.value
+    )
+
+    fun constructAverageTimeBetween(graphStatId: Long) = AverageTimeBetweenStat(
+        0, graphStatId,
+        selectedValueStatFeature.value!!.id, getFromValue(),
+        getToValue(), sampleDuration.value
+    )
+
+    fun constructTimeSince(graphStatId: Long) = TimeSinceLastStat(
+        0, graphStatId,
+        selectedValueStatFeature.value!!.id, getFromValue(), getToValue()
+    )
 
     private fun getFromValue(): String {
         return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE)

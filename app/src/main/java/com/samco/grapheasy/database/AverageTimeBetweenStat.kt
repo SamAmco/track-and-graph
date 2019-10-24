@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import org.threeten.bp.Period
+import org.threeten.bp.Duration
 
 @Entity(tableName = "average_time_between_stat_table",
     foreignKeys = [
@@ -38,7 +38,7 @@ data class AverageTimeBetweenStat(
     @ColumnInfo(name = "to_value")
     val toValue: String,
 
-    @ColumnInfo(name = "period")
-    val period: Period?
+    @ColumnInfo(name = "duration")
+    val duration: Duration?
 )
 

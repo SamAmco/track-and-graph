@@ -18,11 +18,32 @@
                     android:paddingBottom="50dp"
                     >
 
+                <androidx.cardview.widget.CardView
+                        android:id="@+id/demoCardView"
+                        android:layout_width="match_parent"
+                        android:layout_height="200dp"
+                        android:layout_margin="4dp"
+                        android:padding="@dimen/card_padding"
+                        app:cardCornerRadius="@dimen/card_corner_radius"
+                        >
+                    <com.samco.grapheasy.ui.GraphStatView
+                            android:id="@+id/demoGraphStatView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"/>
+                </androidx.cardview.widget.CardView>
+
+                <ImageView
+                        android:id="@+id/divider0"
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:layout_marginTop="@dimen/input_spacing_large"
+                        android:background="@color/divider"/>
+
                 <TextView
                         android:id="@+id/nameLabel"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
+                        android:layout_marginTop="@dimen/input_spacing_large"
                         android:text="@string/new_name"
                         android:textSize="@dimen/dialog_label_text_size"
                         />
@@ -57,55 +78,31 @@
                 </LinearLayout>
 
                 <LinearLayout
-                        android:id="@+id/movingAverageLayout"
+                        android:id="@+id/timeDurationLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dialog_input_spacing"
                         android:orientation="horizontal">
                     <TextView
-                            android:id="@+id/movingAverageLabel"
+                            android:id="@+id/timeDurationLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dialog_input_spacing"
-                            android:text="@string/moving_average_period"
+                            android:text="@string/maximum_sample_duration"
                             android:textSize="@dimen/dialog_label_text_size"
                             />
                     <Spinner
-                            android:id="@+id/movingAverageSpinner"
+                            android:id="@+id/sampleDurationSpinner"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dialog_input_spacing"
                             android:layout_marginLeft="@dimen/dialog_input_spacing"
-                            android:entries="@array/moving_average_time_periods"
-                            />
-                </LinearLayout>
-
-                <LinearLayout
-                        android:id="@+id/timePeriodLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
-                        android:orientation="horizontal">
-                    <TextView
-                            android:id="@+id/timePeriodLabel"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/dialog_input_spacing"
-                            android:text="@string/maximum_sample_period"
-                            android:textSize="@dimen/dialog_label_text_size"
-                            />
-                    <Spinner
-                            android:id="@+id/samplePeriodSpinner"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/dialog_input_spacing"
-                            android:layout_marginLeft="@dimen/dialog_input_spacing"
-                            android:entries="@array/graph_time_periods"
+                            android:entries="@array/graph_time_durations"
                         />
                 </LinearLayout>
 
                 <ImageView
-                        android:id="@+id/divider0"
+                        android:id="@+id/divider1"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
                         android:layout_marginTop="@dimen/input_spacing_large"

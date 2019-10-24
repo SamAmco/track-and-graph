@@ -15,6 +15,7 @@ import androidx.core.widget.addTextChangedListener
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.FeatureAndTrackGroup
 import com.samco.grapheasy.database.LineGraphFeature
+import com.samco.grapheasy.database.LineGraphFeatureMode
 import com.samco.grapheasy.databinding.ListItemLineGraphFeatureBinding
 import java.text.DecimalFormat
 
@@ -23,7 +24,7 @@ class GraphFeatureListItemView(
     features: List<FeatureAndTrackGroup>,
     colorsList: List<Int>,
     private val lineGraphFeature: LineGraphFeature
-) : ConstraintLayout(context) {
+) : LinearLayout(context) {
     private var onRemoveListener: ((GraphFeatureListItemView) -> Unit)? = null
     private var onUpdatedListener: ((GraphFeatureListItemView) -> Unit)? = null
     private val decimalFormat = DecimalFormat("0.###############")
@@ -33,13 +34,23 @@ class GraphFeatureListItemView(
         val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
         val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.featureSpinner.adapter = adapter
-        var startIndex = features.indexOfFirst { f -> f.id == lineGraphFeature.featureId}
-        if (startIndex == -1) startIndex = 0
-        binding.featureSpinner.setSelection(startIndex)
+        var featureSpinnerStartIndex = features.indexOfFirst { f -> f.id == lineGraphFeature.featureId}
+        if (featureSpinnerStartIndex == -1) featureSpinnerStartIndex = 0
+        binding.featureSpinner.setSelection(featureSpinnerStartIndex)
         binding.featureSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                 lineGraphFeature.featureId = features[index].id
+                onUpdatedListener?.invoke(this@GraphFeatureListItemView)
+            }
+        }
+        var modeSpinnerStartIndex = LineGraphFeatureMode.values().indexOfFirst { m -> m == lineGraphFeature.mode}
+        if (modeSpinnerStartIndex == -1) modeSpinnerStartIndex = 0
+        binding.modeSpinner.setSelection(modeSpinnerStartIndex)
+        binding.modeSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) { }
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                lineGraphFeature.mode = LineGraphFeatureMode.values()[index]
                 onUpdatedListener?.invoke(this@GraphFeatureListItemView)
             }
         }
