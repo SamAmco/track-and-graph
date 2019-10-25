@@ -21,6 +21,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import timber.log.Timber
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
@@ -114,11 +115,11 @@ class GraphStatView(
 
         val duration = Duration.between(minDateTime, maxDateTime)
         val formatter = getDateTimeFormatForDuration(duration)
-        val timeDiff = duration.toHours().toDouble()
+        val timeDiff = duration.toMinutes().toDouble()
         binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format = object : Format() {
             override fun format(obj: Any, toAppendTo: StringBuffer, pos: FieldPosition): StringBuffer {
                 val ratio = (obj as Number).toDouble()
-                val timeStamp = minDateTime.plusHours(round(ratio * timeDiff).toLong())
+                val timeStamp = minDateTime.plusMinutes(round(ratio * timeDiff).toLong())
                 return toAppendTo.append(formatter.format(timeStamp))
             }
             override fun parseObject(source: String, pos: ParsePosition) = null
@@ -127,7 +128,7 @@ class GraphStatView(
 
     private fun getDateTimeFormatForDuration(duration: Duration) = when {
         duration.toDays() >= 304 -> lineGraphMonthsDateFormat
-        duration.toDays() >= 10 -> lineGraphDaysDateFormat
+        duration.toDays() >= 1 -> lineGraphDaysDateFormat
         else -> lineGraphHoursDateFormat
     }
 
