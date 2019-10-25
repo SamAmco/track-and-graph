@@ -81,25 +81,38 @@ class GraphStatView(
         binding.invalidSetupLayout.visibility = View.INVISIBLE
         binding.lineGraph.visibility = View.VISIBLE
         viewScope!!.launch {
-            val minDateTime = drawLineGraphFeatures(lineGraph)
-            setUpLineGraphXAxis(minDateTime)
+            val timeRange = drawLineGraphFeaturesAndCalculateTimeRange(lineGraph)
+            setUpLineGraphXAxis(timeRange)
             binding.lineGraph.redraw()
         }
     }
 
-    private suspend fun drawLineGraphFeatures(lineGraph: LineGraph): OffsetDateTime {
-        var minDateTime = OffsetDateTime.now().minusDays(1)
+    private class TimeRange(val minDateTime: OffsetDateTime?, val maxDateTime: OffsetDateTime?)
+
+    private suspend fun drawLineGraphFeaturesAndCalculateTimeRange(lineGraph: LineGraph): TimeRange {
+        var minDateTime: OffsetDateTime? = null
+        var maxDateTime: OffsetDateTime? = null
         lineGraph.features.forEach {
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(it.featureId) }
-            val minFeatureDate = drawLineGraphFeature(lineGraph, it, feature)
-            minDateTime = if (minFeatureDate.isBefore(minDateTime)) minFeatureDate else minDateTime
+            val timeRange = drawLineGraphFeature(lineGraph, it, feature)
+            minDateTime = listOf(minDateTime, timeRange.minDateTime).minBy { dt ->
+                if (dt == null) return@minBy OffsetDateTime.MAX
+                else return@minBy dt!!
+            }
+            maxDateTime = listOf(maxDateTime, timeRange.maxDateTime).maxBy { dt ->
+                if (dt == null) return@maxBy OffsetDateTime.MIN
+                else return@maxBy dt!!
+            }
             yield()
         }
-        return minDateTime
+        return TimeRange(minDateTime, maxDateTime)
     }
 
-    private fun setUpLineGraphXAxis(minDateTime: OffsetDateTime) {
-        val duration = Duration.between(minDateTime, OffsetDateTime.now())
+    private fun setUpLineGraphXAxis(timeRange: TimeRange) {
+        val minDateTime = timeRange.minDateTime ?: OffsetDateTime.now().minusDays(1)
+        val maxDateTime = timeRange.maxDateTime ?: OffsetDateTime.now()
+
+        val duration = Duration.between(minDateTime, maxDateTime)
         val formatter = getDateTimeFormatForDuration(duration)
         val timeDiff = duration.toHours().toDouble()
         binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format = object : Format() {
@@ -120,11 +133,11 @@ class GraphStatView(
 
     private class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
-    private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature, feature: Feature): OffsetDateTime {
+    private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature, feature: Feature): TimeRange {
         val rawDataSample = sampleData(feature, lineGraph.duration, movingAverageDurations[lineGraphFeature.mode])
         return if (!dataPlottable(rawDataSample)) {
             addSeries(getEmptyXYSeries(feature), lineGraphFeature)
-            OffsetDateTime.now()
+            return TimeRange(null, null)
         } else createAndAddSeries(rawDataSample, feature, lineGraphFeature)
     }
 
@@ -148,13 +161,13 @@ class GraphStatView(
         }
     }
 
-    private fun createAndAddSeries(rawData: RawDataSample, feature: Feature, lineGraphFeature: LineGraphFeature): OffsetDateTime {
+    private fun createAndAddSeries(rawData: RawDataSample, feature: Feature, lineGraphFeature: LineGraphFeature): TimeRange {
         val minX = rawData.dataPoints[rawData.plotFrom].timestamp
         val maxX = rawData.dataPoints.last().timestamp
         val timeDiff = Duration.between(minX, maxX).toHours().toDouble()
         val series = getXYSeriesFromRawDataSample(feature, rawData, lineGraphFeature, minX, timeDiff)
         addSeries(series, lineGraphFeature)
-        return minX
+        return TimeRange(minX, maxX)
     }
 
     private fun addSeries(series: XYSeries, lineGraphFeature: LineGraphFeature) {
