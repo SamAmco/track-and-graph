@@ -139,7 +139,7 @@ class DataPointInputView(context: Context, val state: DataPointInputData)
                         .withYear(year)
                         .withMonth(month+1)
                         .withDayOfMonth(day))
-                }, state.dateTime.year, state.dateTime.monthValue, state.dateTime.dayOfMonth
+                }, state.dateTime.year, state.dateTime.monthValue-1, state.dateTime.dayOfMonth
             )
             picker.show()
         }

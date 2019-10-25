@@ -9,7 +9,7 @@ import org.threeten.bp.format.DateTimeFormatter
 
 val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
-    .ofPattern("dd/MM/YY  HH:mm")
+    .ofPattern("dd/MM/yy  HH:mm")
     .withZone(ZoneId.systemDefault())
 
 @Database(
