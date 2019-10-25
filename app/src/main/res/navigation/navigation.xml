@@ -25,6 +25,9 @@
         <argument
                 android:name="trackGroupName"
                 app:argType="string" />
+        <action
+                android:id="@+id/action_add_feature"
+                app:destination="@id/addFeatureFragment" />
     </fragment>
     <fragment android:id="@+id/featureHistoryFragment"
             android:name="com.samco.grapheasy.featurehistory.FragmentFeatureHistory"
@@ -50,4 +53,15 @@
             android:name="com.samco.grapheasy.graphstatinput.GraphStatInputFragment"
             android:label="@string/add_a_graph_or_stat"
             tools:layout="@layout/fragment_graph_stat_input" />
+    <fragment
+            android:id="@+id/addFeatureFragment"
+            android:name="com.samco.grapheasy.displaytrackgroup.AddFeatureFragment"
+            android:label="AddFeatureFragment">
+        <argument
+                android:name="trackGroupId"
+                app:argType="long" />
+        <argument
+                android:name="existingFeatureNames"
+                app:argType="string[]" />
+    </fragment>
 </navigation>

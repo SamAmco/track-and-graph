@@ -85,15 +85,12 @@ class DisplayTrackGroupFragment : Fragment(),
     }
 
     private fun onAddClicked() {
-        val dialog = AddFeatureDialogFragment()
-        val argsBundle = Bundle()
-        argsBundle.putStringArray(EXISTING_FEATURES_ARG_KEY,
-            viewModel.features.value?.map{f -> f.name}?.toTypedArray() ?: arrayOf())
-        argsBundle.putLong(TRACK_GROUP_ID_KEY, args.trackGroup)
-        dialog.arguments = argsBundle
-        childFragmentManager.let { dialog.show(it, "add_feature_dialog") }
+        val featureNames = viewModel.features.value?.map{f -> f.name}?.toTypedArray() ?: arrayOf()
+        navController?.navigate(
+            DisplayTrackGroupFragmentDirections
+                .actionAddFeature(args.trackGroup, featureNames)
+        )
     }
-
 
     override fun getFeature(): Feature {
         val f = viewModel.currentActionFeature!!

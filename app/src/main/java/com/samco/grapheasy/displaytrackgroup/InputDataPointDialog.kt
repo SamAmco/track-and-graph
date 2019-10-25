@@ -146,7 +146,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
 
         //SHOW/HIDE KEYBOARD
         val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (feature.featureType == FeatureType.CONTINUOUS) imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+        if (feature.featureType == FeatureType.CONTINUOUS) imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
         else imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 

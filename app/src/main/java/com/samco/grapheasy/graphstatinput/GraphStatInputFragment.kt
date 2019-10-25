@@ -89,7 +89,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToAddButton() {
-        binding.addButton.setOnClickListener {
+        binding.addBar.addButton.setOnClickListener {
             viewModel.createGraphOrStat()
         }
     }
@@ -293,11 +293,11 @@ class GraphStatInputFragment : Fragment() {
 
     private fun listenToFormValid() {
         viewModel.formValid.observe(this, Observer { errorNow ->
-            binding.addButton.isEnabled = errorNow == null
-            binding.errorText.postDelayed({
+            binding.addBar.addButton.isEnabled = errorNow == null
+            binding.addBar.errorText.postDelayed({
                 val errorThen = viewModel.formValid.value
                 val text = errorThen?.let { getString(it.errorMessageId) } ?: ""
-                binding.errorText.text = text
+                binding.addBar.errorText.text = text
             }, 200)
         })
     }
