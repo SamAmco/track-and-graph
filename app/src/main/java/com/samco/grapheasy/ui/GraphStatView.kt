@@ -5,10 +5,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.Plot
 import com.androidplot.ui.HorizontalPositioning
 import com.androidplot.ui.Size
+import com.androidplot.ui.SizeMode
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.LineAndPointFormatter
 import com.androidplot.xy.XYGraphWidget
@@ -78,6 +80,7 @@ class GraphStatView(
     fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph) {
         resetJob()
         binding.lineGraph.clear()
+        binding.legendFlexboxLayout.removeAllViews()
         binding.invalidSetupLayout.visibility = View.INVISIBLE
         binding.lineGraph.visibility = View.VISIBLE
         viewScope!!.launch {
@@ -134,11 +137,16 @@ class GraphStatView(
     private class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
     private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature, feature: Feature): TimeRange {
+        inflateLineGraphLegendItem(lineGraphFeature.colorId, feature.name)
         val rawDataSample = sampleData(feature, lineGraph.duration, movingAverageDurations[lineGraphFeature.mode])
         return if (!dataPlottable(rawDataSample)) {
             addSeries(getEmptyXYSeries(feature), lineGraphFeature)
             return TimeRange(null, null)
         } else createAndAddSeries(rawDataSample, feature, lineGraphFeature)
+    }
+
+    private fun inflateLineGraphLegendItem(colorId: Int, label: String) {
+        binding.legendFlexboxLayout.addView(GraphLegendItemView(context, colorId, label))
     }
 
     private fun dataPlottable(rawData: RawDataSample): Boolean {

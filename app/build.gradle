@@ -84,6 +84,7 @@ dependencies {
 
     //Graph drawing
     implementation 'com.androidplot:androidplot-core:1.5.7'
+    implementation 'com.google.android:flexbox:1.1.1'
 
 
     testImplementation 'junit:junit:4.12'

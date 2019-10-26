@@ -21,7 +21,7 @@
                 <androidx.cardview.widget.CardView
                         android:id="@+id/demoCardView"
                         android:layout_width="match_parent"
-                        android:layout_height="200dp"
+                        android:layout_height="wrap_content"
                         android:layout_margin="4dp"
                         android:padding="@dimen/card_padding"
                         app:cardCornerRadius="@dimen/card_corner_radius"
@@ -29,7 +29,7 @@
                     <com.samco.grapheasy.ui.GraphStatView
                             android:id="@+id/demoGraphStatView"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"/>
+                            android:layout_height="wrap_content"/>
                 </androidx.cardview.widget.CardView>
 
                 <ImageView

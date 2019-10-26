@@ -1,26 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        xmlns:app="http://schemas.android.com/apk/res-auto" >
     <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
 
-        <com.androidplot.xy.XYPlot
-                style="@style/APDefacto.Light"
-                android:id="@+id/lineGraph"
+        <LinearLayout
+                android:id="@+id/lineGraphLayout"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_margin="@dimen/card_padding"
-                app:lineLabelRotationBottom="-25"
-                app:graphBackgroundColor="@color/ap_white"
-                app:domainLineColor="@color/colorGridLines"
-                app:rangeLineColor="@color/colorGridLines"
-                app:domainLineThickness="0.1dp"
-                app:rangeLineThickness="0.1dp"
-                app:renderMode="use_background_thread"
-                app:lineLabelTextSizeBottom="10sp"
-                app:lineLabelTextSizeLeft="10sp"
-                />
+                android:layout_height="wrap_content">
+            <com.androidplot.xy.XYPlot
+                    style="@style/APDefacto.Light"
+                    android:id="@+id/lineGraph"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_height"
+                    android:layout_margin="@dimen/card_padding"
+                    app:lineLabelRotationBottom="-25"
+                    app:graphBackgroundColor="@color/ap_white"
+                    app:backgroundColor="@color/ap_white"
+                    app:domainLineColor="@color/colorGridLines"
+                    app:rangeLineColor="@color/colorGridLines"
+                    app:domainLineThickness="0.1dp"
+                    app:rangeLineThickness="0.1dp"
+                    app:renderMode="use_background_thread"
+                    app:lineLabelTextSizeBottom="10sp"
+                    app:lineLabelTextSizeLeft="10sp"
+                    />
+            <com.google.android.flexbox.FlexboxLayout
+                    android:id="@+id/legendFlexboxLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/card_padding"
+                    android:layout_marginRight="@dimen/card_padding"
+                    android:layout_marginLeft="@dimen/card_padding"
+                    app:flexWrap="wrap"
+                    app:alignContent="center"
+                    app:justifyContent="center"
+                    />
+        </LinearLayout>
         <FrameLayout
                 android:id="@+id/invalidSetupLayout"
                 android:layout_width="match_parent"

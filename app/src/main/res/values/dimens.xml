@@ -15,4 +15,5 @@
     <dimen name="list_item_data_point_height">50dp</dimen>
     <dimen name="data_point_input_fragment_height">200dp</dimen>
     <dimen name="spinner_item_color_size">60dp</dimen>
+    <dimen name="graph_height">250dp</dimen>
 </resources>
