@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto" >
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
     <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -10,6 +11,14 @@
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
+            <TextView
+                    android:id="@+id/headerText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:gravity="center"
+                    android:textSize="@dimen/dialog_header_size"
+                    tools:text="The name of the graph"/>
             <com.androidplot.xy.XYPlot
                     style="@style/APDefacto.Light"
                     android:id="@+id/lineGraph"
@@ -51,26 +60,5 @@
                     app:justifyContent="center"
                     />
         </LinearLayout>
-        <FrameLayout
-                android:id="@+id/invalidSetupLayout"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-            <ImageView
-                    android:id="@+id/dummyGraphImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:tint="@color/colorShadowButton"
-                    android:src="@drawable/dummy_graph"
-                    android:scaleType="fitXY"
-                    />
-            <ImageView
-                    android:id="@+id/questionImage"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:tint="@color/colorShadowButton"
-                    android:src="@drawable/question_mark"
-                    android:scaleType="fitCenter"
-                    />
-        </FrameLayout>
     </FrameLayout>
 </layout>

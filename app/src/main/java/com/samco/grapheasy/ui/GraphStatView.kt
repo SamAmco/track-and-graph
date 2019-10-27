@@ -51,7 +51,6 @@ class GraphStatView(
 
     init {
         basicLineGraphSetup()
-        basicPieChartSetup()
         initInvalid()
     }
 
@@ -74,16 +73,13 @@ class GraphStatView(
         binding.lineGraph.graph.setMargins(0f, 20f, 0f, 50f)
     }
 
-    //TODO
-    private fun basicPieChartSetup() { }
-
     private fun cleanAllViews() {
         binding.legendFlexboxLayout.removeAllViews()
         binding.lineGraph.clear()
         binding.pieChart.clear()
-        binding.invalidSetupLayout.visibility = View.GONE
         binding.lineGraph.visibility = View.GONE
         binding.pieChart.visibility = View.GONE
+        binding.headerText.text = ""
     }
 
     fun initInvalid() {
@@ -91,9 +87,14 @@ class GraphStatView(
         cleanAllViews()
     }
 
+    private fun initHeader(graphOrStat: GraphOrStat) {
+        binding.headerText.text = graphOrStat.name
+    }
+
     fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph) {
         resetJob()
         cleanAllViews()
+        initHeader(graphOrStat)
         binding.lineGraph.visibility = View.VISIBLE
         viewScope!!.launch {
             val timeRange = drawLineGraphFeaturesAndCalculateTimeRange(lineGraph)
@@ -105,6 +106,7 @@ class GraphStatView(
     fun initFromPieChart(graphOrStat: GraphOrStat, pieChart: PieChart) {
         resetJob()
         cleanAllViews()
+        initHeader(graphOrStat)
         binding.pieChart.visibility = View.VISIBLE
         viewScope!!.launch {
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
