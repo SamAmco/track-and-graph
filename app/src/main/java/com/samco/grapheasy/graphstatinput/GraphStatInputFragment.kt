@@ -24,18 +24,6 @@ import org.threeten.bp.Duration
 import java.lang.Exception
 import java.text.DecimalFormat
 
-private val colorList = listOf(
-    R.color.visColor1,
-    R.color.visColor2,
-    R.color.visColor3,
-    R.color.visColor4,
-    R.color.visColor5,
-    R.color.visColor6,
-    R.color.visColor7,
-    R.color.visColor8,
-    R.color.visColor9,
-    R.color.visColor10
-)
 
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
@@ -169,7 +157,7 @@ class GraphStatInputFragment : Fragment() {
     private fun listenToAddLineGraphFeatureButton(features: List<FeatureAndTrackGroup>) {
         binding.addFeatureButton.isClickable = true
         binding.addFeatureButton.setOnClickListener {
-            val color = colorList[(colorList.size - 1).coerceAtMost(viewModel.lineGraphFeatures.size)]
+            val color = dataVisColorList[(dataVisColorList.size - 1).coerceAtMost(viewModel.lineGraphFeatures.size)]
             val newLineGraphFeature = LineGraphFeature(-1, color,
                 LineGraphFeatureMode.TRACKED_VALUES, 0.toDouble(), 1.toDouble())
             viewModel.lineGraphFeatures.add(newLineGraphFeature)
@@ -182,7 +170,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun inflateLineGraphFeatureView(lgf: LineGraphFeature, features: List<FeatureAndTrackGroup>) {
-        val view = GraphFeatureListItemView(context!!, features, colorList, lgf)
+        val view = GraphFeatureListItemView(context!!, features, dataVisColorList, lgf)
         view.setOnRemoveListener {
             viewModel.lineGraphFeatures.remove(lgf)
             binding.lineGraphFeaturesLayout.removeView(view)
@@ -311,11 +299,13 @@ class GraphStatInputFragment : Fragment() {
         if (viewModel.formValid.value != null) {
             binding.demoGraphStatView.initInvalid()
         } else {
-            val view = binding.demoGraphStatView
             val graphOrStat = viewModel.constructGraphOrStat()
             when (viewModel.graphStatType.value) {
-                GraphStatType.LINE_GRAPH -> view.initFromLineGraph(graphOrStat, viewModel.constructLineGraph(-1))
-                else -> view.initInvalid()
+                GraphStatType.LINE_GRAPH -> binding.demoGraphStatView
+                    .initFromLineGraph(graphOrStat, viewModel.constructLineGraph(-1))
+                GraphStatType.PIE_CHART -> binding.demoGraphStatView
+                    .initFromPieChart(graphOrStat, viewModel.constructPieChart(-1))
+                else -> binding.demoGraphStatView.initInvalid()
             }
         }
     }
@@ -409,7 +399,7 @@ class GraphStatInputViewModel : ViewModel() {
         if (lineGraphFeatures.size == 0)
             throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         lineGraphFeatures.forEach { f ->
-            if (!colorList.contains(f.colorId))
+            if (!dataVisColorList.contains(f.colorId))
                 throw ValidationException(R.string.graph_stat_validation_unrecognised_color)
             if (allFeatures.value?.map { feat -> feat.id }?.contains(f.featureId) != true)
                 throw ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)

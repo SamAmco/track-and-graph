@@ -1,16 +1,18 @@
 package com.samco.grapheasy.ui
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.Plot
+import com.androidplot.pie.PieRenderer
+import com.androidplot.pie.Segment
+import com.androidplot.pie.SegmentFormatter
 import com.androidplot.ui.HorizontalPositioning
 import com.androidplot.ui.Size
-import com.androidplot.ui.SizeMode
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.LineAndPointFormatter
 import com.androidplot.xy.XYGraphWidget
@@ -49,6 +51,7 @@ class GraphStatView(
 
     init {
         basicLineGraphSetup()
+        basicPieChartSetup()
         initInvalid()
     }
 
@@ -71,22 +74,60 @@ class GraphStatView(
         binding.lineGraph.graph.setMargins(0f, 20f, 0f, 50f)
     }
 
+    //TODO
+    private fun basicPieChartSetup() { }
+
+    private fun cleanAllViews() {
+        binding.legendFlexboxLayout.removeAllViews()
+        binding.lineGraph.clear()
+        binding.pieChart.clear()
+        binding.invalidSetupLayout.visibility = View.GONE
+        binding.lineGraph.visibility = View.GONE
+        binding.pieChart.visibility = View.GONE
+    }
+
     fun initInvalid() {
         resetJob()
-        binding.invalidSetupLayout.visibility = View.VISIBLE
-        binding.lineGraph.visibility = View.INVISIBLE
+        cleanAllViews()
     }
 
     fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph) {
         resetJob()
-        binding.lineGraph.clear()
-        binding.legendFlexboxLayout.removeAllViews()
-        binding.invalidSetupLayout.visibility = View.INVISIBLE
+        cleanAllViews()
         binding.lineGraph.visibility = View.VISIBLE
         viewScope!!.launch {
             val timeRange = drawLineGraphFeaturesAndCalculateTimeRange(lineGraph)
             setUpLineGraphXAxis(timeRange)
             binding.lineGraph.redraw()
+        }
+    }
+
+    fun initFromPieChart(graphOrStat: GraphOrStat, pieChart: PieChart) {
+        resetJob()
+        cleanAllViews()
+        binding.pieChart.visibility = View.VISIBLE
+        viewScope!!.launch {
+            val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
+            val dataSample = sampleData(feature, pieChart.duration, null)
+            if (!dataPlottable(dataSample)) return@launch //TODO we need some graphic to show invalid
+            val segments = dataSample.dataPoints
+                .drop(dataSample.plotFrom)
+                .groupingBy { dp -> dp.label }
+                .eachCount()
+                .map { b -> Segment(b.key, b.value) }
+            val total = segments.sumByDouble { s -> s.value.toDouble() }
+            segments.forEachIndexed { i, s ->
+                val index = (dataVisColorGenerator * i) % dataVisColorList.size
+                val colorId = dataVisColorList[index]
+                val segForm = SegmentFormatter(getColor(context, colorId))
+                segForm.labelPaint.color = Color.TRANSPARENT
+                val percentage = "%.1f".format((s.value.toDouble() / total) * 100f)
+                inflateGraphLegendItem(colorId, "${s.title} ($percentage%)")
+                binding.pieChart.addSegment(s, segForm)
+            }
+
+            binding.pieChart.redraw()
+            binding.pieChart.getRenderer(PieRenderer::class.java).setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
         }
     }
 
@@ -137,7 +178,7 @@ class GraphStatView(
     private class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
     private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature, feature: Feature): TimeRange {
-        inflateLineGraphLegendItem(lineGraphFeature.colorId, feature.name)
+        inflateGraphLegendItem(lineGraphFeature.colorId, feature.name)
         val rawDataSample = sampleData(feature, lineGraph.duration, movingAverageDurations[lineGraphFeature.mode])
         return if (!dataPlottable(rawDataSample)) {
             addSeries(getEmptyXYSeries(feature), lineGraphFeature)
@@ -145,7 +186,7 @@ class GraphStatView(
         } else createAndAddSeries(rawDataSample, feature, lineGraphFeature)
     }
 
-    private fun inflateLineGraphLegendItem(colorId: Int, label: String) {
+    private fun inflateGraphLegendItem(colorId: Int, label: String) {
         binding.legendFlexboxLayout.addView(GraphLegendItemView(context, colorId, label))
     }
 

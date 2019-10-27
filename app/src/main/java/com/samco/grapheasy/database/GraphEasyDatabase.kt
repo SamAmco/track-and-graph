@@ -2,6 +2,7 @@ package com.samco.grapheasy.database
 
 import android.content.Context
 import androidx.room.*
+import com.samco.grapheasy.R
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
@@ -11,6 +12,23 @@ val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIM
 val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
     .ofPattern("dd/MM/yy  HH:mm")
     .withZone(ZoneId.systemDefault())
+
+
+//this is a number coprime to the number of colours used to select them in a pseudo random order for greater contrast
+val dataVisColorGenerator = 7
+val dataVisColorList = listOf(
+    R.color.visColor1,
+    R.color.visColor2,
+    R.color.visColor3,
+    R.color.visColor4,
+    R.color.visColor5,
+    R.color.visColor6,
+    R.color.visColor7,
+    R.color.visColor8,
+    R.color.visColor9,
+    R.color.visColor10
+)
+
 
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphOrStat::class, LineGraph::class,

@@ -6,13 +6,14 @@
             android:layout_height="wrap_content">
 
         <LinearLayout
-                android:id="@+id/lineGraphLayout"
+                android:id="@+id/graphAndLegendLayout"
                 android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
             <com.androidplot.xy.XYPlot
                     style="@style/APDefacto.Light"
                     android:id="@+id/lineGraph"
+                    android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/graph_height"
                     android:layout_margin="@dimen/card_padding"
@@ -26,6 +27,17 @@
                     app:renderMode="use_background_thread"
                     app:lineLabelTextSizeBottom="10sp"
                     app:lineLabelTextSizeLeft="10sp"
+                    />
+            <com.androidplot.pie.PieChart
+                    style="@style/APDefacto.Light"
+                    android:id="@+id/pieChart"
+                    android:visibility="gone"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_height"
+                    android:layout_margin="@dimen/card_padding"
+                    app:graphBackgroundColor="@color/ap_white"
+                    app:backgroundColor="@color/ap_white"
+                    app:renderMode="use_background_thread"
                     />
             <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/legendFlexboxLayout"
