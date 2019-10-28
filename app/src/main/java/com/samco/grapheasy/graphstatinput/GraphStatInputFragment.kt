@@ -2,6 +2,7 @@ package com.samco.grapheasy.graphstatinput
 
 import android.app.Activity
 import android.os.Bundle
+import android.os.Handler
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -10,6 +11,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
+import androidx.core.os.postDelayed
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
@@ -30,6 +32,7 @@ class GraphStatInputFragment : Fragment() {
     private lateinit var binding: FragmentGraphStatInputBinding
     private lateinit var viewModel: GraphStatInputViewModel
 
+    private val updateDemoHandler = Handler()
     private val decimalFormat = DecimalFormat("0.###############")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -296,18 +299,21 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun updateDemoView() {
-        if (viewModel.formValid.value != null) {
-            binding.demoGraphStatView.initInvalid()
-        } else {
-            val graphOrStat = viewModel.constructGraphOrStat()
-            when (viewModel.graphStatType.value) {
-                GraphStatType.LINE_GRAPH -> binding.demoGraphStatView
-                    .initFromLineGraph(graphOrStat, viewModel.constructLineGraph(-1))
-                GraphStatType.PIE_CHART -> binding.demoGraphStatView
-                    .initFromPieChart(graphOrStat, viewModel.constructPieChart(-1))
-                else -> binding.demoGraphStatView.initInvalid()
+        updateDemoHandler.removeCallbacksAndMessages(null)
+        updateDemoHandler.postDelayed(Runnable {
+            if (viewModel.formValid.value != null) {
+                binding.demoGraphStatView.initInvalid()
+            } else {
+                val graphOrStat = viewModel.constructGraphOrStat()
+                when (viewModel.graphStatType.value) {
+                    GraphStatType.LINE_GRAPH -> binding.demoGraphStatView
+                        .initFromLineGraph(graphOrStat, viewModel.constructLineGraph(-1))
+                    GraphStatType.PIE_CHART -> binding.demoGraphStatView
+                        .initFromPieChart(graphOrStat, viewModel.constructPieChart(-1))
+                    else -> binding.demoGraphStatView.initInvalid()
+                }
             }
-        }
+        }, 500)
     }
 
     override fun onDestroyView() {

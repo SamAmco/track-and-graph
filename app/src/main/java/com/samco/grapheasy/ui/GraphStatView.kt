@@ -25,6 +25,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import timber.log.Timber
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
@@ -38,6 +39,26 @@ class GraphStatView(
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
     private val dataSource = GraphEasyDatabase.getInstance(context.applicationContext).graphEasyDatabaseDao
+
+    private class NullableTimeRange(val minDateTime: OffsetDateTime?, val maxDateTime: OffsetDateTime?)
+    private class MutableTimeRange(min: OffsetDateTime, max: OffsetDateTime) {
+        var minDateTime: OffsetDateTime = min
+            set(value) {
+                field = value
+                timeDiffMillis = calculateTimeDiff(minDateTime, maxDateTime)
+            }
+        var maxDateTime: OffsetDateTime = max
+            set(value) {
+                field = value
+                timeDiffMillis = calculateTimeDiff(minDateTime, maxDateTime)
+            }
+        var timeDiffMillis: Long = calculateTimeDiff(min, max)
+            private set
+        fun calculateTimeDiff(min: OffsetDateTime, max: OffsetDateTime) = Duration.between(min, max).toMillis()
+        init { timeDiffMillis = calculateTimeDiff(min, max) }
+    }
+
+    private val currentTimeRange: MutableTimeRange = MutableTimeRange(OffsetDateTime.now(), OffsetDateTime.now())
 
     private val lineGraphHoursDateFormat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm")
@@ -79,12 +100,20 @@ class GraphStatView(
         binding.pieChart.clear()
         binding.lineGraph.visibility = View.GONE
         binding.pieChart.visibility = View.GONE
+        binding.errorMessage.visibility = View.GONE
+        binding.errorMessage.text = ""
         binding.headerText.text = ""
     }
 
     fun initInvalid() {
         resetJob()
+        initError(R.string.graph_stat_view_invalid_setup)
+    }
+
+    private fun initError(errorTextId: Int) {
         cleanAllViews()
+        binding.errorMessage.visibility = View.VISIBLE
+        binding.errorMessage.text = context.getString(errorTextId)
     }
 
     private fun initHeader(graphOrStat: GraphOrStat) {
@@ -97,8 +126,8 @@ class GraphStatView(
         initHeader(graphOrStat)
         binding.lineGraph.visibility = View.VISIBLE
         viewScope!!.launch {
-            val timeRange = drawLineGraphFeaturesAndCalculateTimeRange(lineGraph)
-            setUpLineGraphXAxis(timeRange)
+            drawLineGraphFeaturesAndCalculateTimeRange(lineGraph)
+            setUpLineGraphXAxis()
             binding.lineGraph.redraw()
         }
     }
@@ -133,9 +162,7 @@ class GraphStatView(
         }
     }
 
-    private class TimeRange(val minDateTime: OffsetDateTime?, val maxDateTime: OffsetDateTime?)
-
-    private suspend fun drawLineGraphFeaturesAndCalculateTimeRange(lineGraph: LineGraph): TimeRange {
+    private suspend fun drawLineGraphFeaturesAndCalculateTimeRange(lineGraph: LineGraph) {
         var minDateTime: OffsetDateTime? = null
         var maxDateTime: OffsetDateTime? = null
         lineGraph.features.forEach {
@@ -151,20 +178,18 @@ class GraphStatView(
             }
             yield()
         }
-        return TimeRange(minDateTime, maxDateTime)
+        currentTimeRange.minDateTime = minDateTime ?: OffsetDateTime.now().minusDays(1)
+        currentTimeRange.maxDateTime = maxDateTime ?: OffsetDateTime.now()
     }
 
-    private fun setUpLineGraphXAxis(timeRange: TimeRange) {
-        val minDateTime = timeRange.minDateTime ?: OffsetDateTime.now().minusDays(1)
-        val maxDateTime = timeRange.maxDateTime ?: OffsetDateTime.now()
-
-        val duration = Duration.between(minDateTime, maxDateTime)
+    private fun setUpLineGraphXAxis() {
+        val duration = Duration.between(currentTimeRange.minDateTime, currentTimeRange.maxDateTime)
         val formatter = getDateTimeFormatForDuration(duration)
         val timeDiff = duration.toMinutes().toDouble()
         binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format = object : Format() {
             override fun format(obj: Any, toAppendTo: StringBuffer, pos: FieldPosition): StringBuffer {
                 val ratio = (obj as Number).toDouble()
-                val timeStamp = minDateTime.plusMinutes(round(ratio * timeDiff).toLong())
+                val timeStamp = currentTimeRange.minDateTime.plusMinutes(round(ratio * timeDiff).toLong())
                 return toAppendTo.append(formatter.format(timeStamp))
             }
             override fun parseObject(source: String, pos: ParsePosition) = null
@@ -179,12 +204,12 @@ class GraphStatView(
 
     private class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
-    private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature, feature: Feature): TimeRange {
+    private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature, feature: Feature): NullableTimeRange {
         inflateGraphLegendItem(lineGraphFeature.colorId, feature.name)
         val rawDataSample = sampleData(feature, lineGraph.duration, movingAverageDurations[lineGraphFeature.mode])
         return if (!dataPlottable(rawDataSample)) {
             addSeries(getEmptyXYSeries(feature), lineGraphFeature)
-            return TimeRange(null, null)
+            return NullableTimeRange(null, null)
         } else createAndAddSeries(rawDataSample, feature, lineGraphFeature)
     }
 
@@ -202,23 +227,23 @@ class GraphStatView(
         return withContext(Dispatchers.IO) {
             if (sampleDuration == null) RawDataSample(dataSource.getDataPointsForFeatureAscSync(feature.id), 0)
             else {
-                val startDate = OffsetDateTime.now().minus(sampleDuration)
+                val now = OffsetDateTime.now()
+                val startDate = now.minus(sampleDuration)
                 val maxSampleDuration = averagingDuration?.plus(sampleDuration) ?: sampleDuration
-                val minSampleDate = OffsetDateTime.now().minus(maxSampleDuration)
-                val dataPoints = dataSource.getDataPointsForFeatureAfterAscSync(feature.id, minSampleDate)
+                val minSampleDate = now.minus(maxSampleDuration)
+                val dataPoints = dataSource.getDataPointsForFeatureAfterAscSync(feature.id, minSampleDate, now)
                 val startIndex = dataPoints.indexOfFirst { dp -> dp.timestamp.isAfter(startDate) }
                 RawDataSample(dataPoints, startIndex)
             }
         }
     }
 
-    private fun createAndAddSeries(rawData: RawDataSample, feature: Feature, lineGraphFeature: LineGraphFeature): TimeRange {
+    private fun createAndAddSeries(rawData: RawDataSample, feature: Feature, lineGraphFeature: LineGraphFeature): NullableTimeRange {
         val minX = rawData.dataPoints[rawData.plotFrom].timestamp
         val maxX = rawData.dataPoints.last().timestamp
-        val timeDiff = Duration.between(minX, maxX).toHours().toDouble()
-        val series = getXYSeriesFromRawDataSample(feature, rawData, lineGraphFeature, minX, timeDiff)
+        val series = getXYSeriesFromRawDataSample(feature, rawData, lineGraphFeature, currentTimeRange)
         addSeries(series, lineGraphFeature)
-        return TimeRange(minX, maxX)
+        return NullableTimeRange(minX, maxX)
     }
 
     private fun addSeries(series: XYSeries, lineGraphFeature: LineGraphFeature) {
@@ -234,19 +259,23 @@ class GraphStatView(
         override fun size() = 0
     }
 
-    private fun getXYSeriesFromRawDataSample(feature: Feature, rawData: RawDataSample, lineGraphFeature: LineGraphFeature,
-                                             minX: OffsetDateTime, timeDiff: Double) = object: XYSeries {
+    private fun getXYSeriesFromRawDataSample(feature: Feature, rawData: RawDataSample,
+                                             lineGraphFeature: LineGraphFeature,
+                                             timeRange: MutableTimeRange) = object: XYSeries {
         private val yValues = when (lineGraphFeature.mode) {
             LineGraphFeatureMode.TRACKED_VALUES -> {
                 rawData.dataPoints
                     .drop(rawData.plotFrom)
                     .map { dp -> dp.value.toDouble() }
             }
-            else -> calculateMovingAverage(rawData, movingAverageDurations[lineGraphFeature.mode]!!)
+            else -> {
+                val values = calculateMovingAverage(rawData, movingAverageDurations[lineGraphFeature.mode]!!)
+                values
+            }
         }
         override fun getX(index: Int): Number {
-            return Duration.between(minX, rawData.dataPoints[rawData.plotFrom + index].timestamp)
-                .toHours().toDouble() / timeDiff
+            return Duration.between(timeRange.minDateTime, rawData.dataPoints[rawData.plotFrom + index].timestamp)
+                .toMillis().toDouble() / timeRange.timeDiffMillis.toDouble()
         }
         override fun getY(index: Int): Number = (yValues[index] * lineGraphFeature.scale) + lineGraphFeature.offset
         override fun getTitle() = feature.name

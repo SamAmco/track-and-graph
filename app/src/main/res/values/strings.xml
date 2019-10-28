@@ -81,7 +81,7 @@
     <string name="graphs_and_statistics"><![CDATA[Graphs & Statistics]]></string>
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
     <string name="graph_type_label">Graph type:</string>
-    <string name="maximum_sample_duration">Max sample duration:</string>
+    <string name="maximum_sample_duration">Maximum history:</string>
     <string name="moving_average_duration">Moving average duration:</string>
     <string name="select_a_discrete_feature">Select a discrete feature:</string>
     <string name="select_a_feature">Select a feature:</string>
@@ -103,4 +103,6 @@
     <string name="graph_stat_validation_invalid_pie_chart_feature">Please select a valid pie chart feature</string>
     <string name="graph_stat_validation_unrecognised_color">Please make sure all features have a color</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Invalid line graph feature detected</string>
+
+    <string name="graph_stat_view_invalid_setup">You can see a sample of your graph or statistic here once it\'s set up</string>
 </resources>

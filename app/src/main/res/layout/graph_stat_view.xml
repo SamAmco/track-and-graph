@@ -4,7 +4,8 @@
         xmlns:tools="http://schemas.android.com/tools">
     <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:minHeight="@dimen/graph_height">
 
         <LinearLayout
                 android:id="@+id/graphAndLegendLayout"
@@ -47,6 +48,13 @@
                     app:graphBackgroundColor="@color/ap_white"
                     app:backgroundColor="@color/ap_white"
                     app:renderMode="use_background_thread"
+                    />
+            <TextView
+                    android:id="@+id/errorMessage"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/graph_height"
+                    android:gravity="center"
+                    tools:text="Some error message"
                     />
             <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/legendFlexboxLayout"
