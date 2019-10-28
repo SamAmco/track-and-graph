@@ -101,8 +101,10 @@ class GraphStatView(
         binding.lineGraph.visibility = View.GONE
         binding.pieChart.visibility = View.GONE
         binding.errorMessage.visibility = View.GONE
+        binding.statMessage.visibility = View.GONE
         binding.errorMessage.text = ""
         binding.headerText.text = ""
+        binding.statMessage.text = ""
     }
 
     fun initInvalid() {
@@ -118,6 +120,48 @@ class GraphStatView(
 
     private fun initHeader(graphOrStat: GraphOrStat) {
         binding.headerText.text = graphOrStat.name
+    }
+
+    fun initTimeSinceStat(graphOrStat: GraphOrStat, timeSinceLastStat: TimeSinceLastStat) {
+        resetJob()
+        cleanAllViews()
+        initHeader(graphOrStat)
+        binding.statMessage.visibility = View.VISIBLE
+        viewScope!!.launch {
+            val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeSinceLastStat.featureId) }
+            var lastDataPointTimeStamp: OffsetDateTime? = null
+            if (feature.featureType == FeatureType.CONTINUOUS) {
+                val lastDataPoint = withContext(Dispatchers.IO) {
+                    dataSource.getLastDataPointBetween(feature.id, timeSinceLastStat.fromValue, timeSinceLastStat.toValue)
+                }
+                if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
+            } else {
+                val lastDataPoint = withContext(Dispatchers.IO) {
+                    dataSource.getLastDataPointWithValue(feature.id, timeSinceLastStat.fromValue)
+                }
+                if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
+            }
+            if (lastDataPointTimeStamp == null) { initError(R.string.graph_stat_view_not_enough_data_stat) }
+            else {
+                while (true) {
+                    setTimeSinceStatText(lastDataPointTimeStamp)
+                    delay(1000)
+                    yield()
+                }
+            }
+        }
+    }
+
+    private fun setTimeSinceStatText(timeStamp: OffsetDateTime) {
+        val totalSeconds = Duration.between(timeStamp, OffsetDateTime.now()).toMillis() / 1000.toDouble()
+        val daysNum = (totalSeconds / 86400).toInt()
+        val days = daysNum.toString()
+        val hours = "%02d".format(((totalSeconds % 86400) / 3600).toInt())
+        val minutes = "%02d".format(((totalSeconds % 3600) / 60).toInt())
+        val seconds = "%02d".format((totalSeconds % 60).toInt())
+        binding.statMessage.text =
+            if (daysNum > 0) "$days ${context.getString(R.string.days)}"
+            else "$hours:$minutes:$seconds"
     }
 
     fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph) {
@@ -140,7 +184,10 @@ class GraphStatView(
         viewScope!!.launch {
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
             val dataSample = sampleData(feature, pieChart.duration, null)
-            if (!dataPlottable(dataSample)) return@launch //TODO we need some graphic to show invalid
+            if (!dataPlottable(dataSample)) {
+                initError(R.string.graph_stat_view_not_enough_data_graph)
+                return@launch
+            }
             val segments = dataSample.dataPoints
                 .drop(dataSample.plotFrom)
                 .groupingBy { dp -> dp.label }

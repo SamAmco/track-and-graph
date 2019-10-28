@@ -69,6 +69,12 @@ interface GraphEasyDatabaseDao {
     @Update
     fun updateDataPoint(dataPoint: DataPoint)
 
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp DESC LIMIT 1""")
+    fun getLastDataPointBetween(featureId: Long, min: String, max: String): DataPoint?
+
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value = :value ORDER BY timestamp DESC LIMIT 1""")
+    fun getLastDataPointWithValue(featureId: Long, value: String): DataPoint?
+
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
