@@ -25,7 +25,6 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
-import timber.log.Timber
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
@@ -130,21 +129,14 @@ class GraphStatView(
         viewScope!!.launch {
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeSinceLastStat.featureId) }
             var lastDataPointTimeStamp: OffsetDateTime? = null
-            if (feature.featureType == FeatureType.CONTINUOUS) {
-                val lastDataPoint = withContext(Dispatchers.IO) {
-                    dataSource.getLastDataPointBetween(feature.id, timeSinceLastStat.fromValue, timeSinceLastStat.toValue)
-                }
-                if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
-            } else {
-                val lastDataPoint = withContext(Dispatchers.IO) {
-                    dataSource.getLastDataPointWithValue(feature.id, timeSinceLastStat.fromValue)
-                }
-                if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
+            val lastDataPoint = withContext(Dispatchers.IO) {
+                dataSource.getLastDataPointBetween(feature.id, timeSinceLastStat.fromValue, timeSinceLastStat.toValue)
             }
+            if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
             if (lastDataPointTimeStamp == null) { initError(R.string.graph_stat_view_not_enough_data_stat) }
             else {
                 while (true) {
-                    setTimeSinceStatText(lastDataPointTimeStamp)
+                    setTimeSinceStatText(Duration.between(lastDataPointTimeStamp, OffsetDateTime.now()))
                     delay(1000)
                     yield()
                 }
@@ -152,16 +144,50 @@ class GraphStatView(
         }
     }
 
-    private fun setTimeSinceStatText(timeStamp: OffsetDateTime) {
-        val totalSeconds = Duration.between(timeStamp, OffsetDateTime.now()).toMillis() / 1000.toDouble()
+    fun initAverageTimeBetweenStat(graphOrStat: GraphOrStat, timeBetweenStat: AverageTimeBetweenStat) {
+        resetJob()
+        cleanAllViews()
+        initHeader(graphOrStat)
+        binding.statMessage.visibility = View.VISIBLE
+        viewScope!!.launch {
+            val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeBetweenStat.featureId) }
+            val dataPoints = withContext(Dispatchers.IO) {
+                if (timeBetweenStat.duration == null) {
+                    dataSource.getDataPointsBetween(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue)
+                } else {
+                    val now = OffsetDateTime.now()
+                    val cutOff = now.minus(timeBetweenStat.duration)
+                    dataSource.getDataPointsBetweenInTimeRange(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue, cutOff, now)
+                }
+            }
+            if (dataPoints.size < 2) initError(R.string.graph_stat_view_not_enough_data_stat)
+            else {
+                val totalMillis = Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp).toMillis().toDouble()
+                val averageMillis = totalMillis / dataPoints.size.toDouble()
+                setAverageTimeBetweenStatText(averageMillis)
+            }
+        }
+    }
+
+    private fun setAverageTimeBetweenStatText(millis: Double) {
+        val days = "%.1f".format((millis / 86400000).toFloat())
+        binding.statMessage.text = "$days ${context.getString(R.string.days)}"
+    }
+
+    private fun setTimeSinceStatText(duration: Duration) {
+        val totalSeconds = duration.toMillis() / 1000.toDouble()
         val daysNum = (totalSeconds / 86400).toInt()
         val days = daysNum.toString()
         val hours = "%02d".format(((totalSeconds % 86400) / 3600).toInt())
         val minutes = "%02d".format(((totalSeconds % 3600) / 60).toInt())
         val seconds = "%02d".format((totalSeconds % 60).toInt())
+        val hms = "$hours:$minutes:$seconds"
         binding.statMessage.text =
-            if (daysNum > 0) "$days ${context.getString(R.string.days)}"
-            else "$hours:$minutes:$seconds"
+            when {
+                daysNum == 1 -> "$days ${context.getString(R.string.day)}\n$hms"
+                daysNum > 0 -> "$days ${context.getString(R.string.days)}\n$hms"
+                else -> hms
+            }
     }
 
     fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph) {

@@ -310,6 +310,8 @@ class GraphStatInputFragment : Fragment() {
                         .initFromLineGraph(graphOrStat, viewModel.constructLineGraph(-1))
                     GraphStatType.PIE_CHART -> binding.demoGraphStatView
                         .initFromPieChart(graphOrStat, viewModel.constructPieChart(-1))
+                    GraphStatType.AVERAGE_TIME_BETWEEN -> binding.demoGraphStatView
+                        .initAverageTimeBetweenStat(graphOrStat, viewModel.constructAverageTimeBetween(-1))
                     GraphStatType.TIME_SINCE -> binding.demoGraphStatView
                         .initTimeSinceStat(graphOrStat, viewModel.constructTimeSince(-1))
                     else -> binding.demoGraphStatView.initInvalid()

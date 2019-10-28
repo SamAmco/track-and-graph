@@ -63,7 +63,7 @@
                     android:layout_height="@dimen/graph_height"
                     android:gravity="center"
                     android:textSize="70sp"
-                    tools:text="628 Days"
+                    tools:text="628.7 Days"
                     />
             <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/legendFlexboxLayout"

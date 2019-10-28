@@ -108,4 +108,5 @@
     <string name="graph_stat_view_not_enough_data_stat">There is not enough data tracked to generate this statistic yet</string>
     <string name="graph_stat_view_not_enough_data_graph">There is not enough data tracked to generate this graph yet</string>
     <string name="days">Days</string>
+    <string name="day">Day</string>
 </resources>
