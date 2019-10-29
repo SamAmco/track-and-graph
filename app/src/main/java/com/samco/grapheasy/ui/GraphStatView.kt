@@ -28,6 +28,7 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.WeekFields
+import timber.log.Timber
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
@@ -102,6 +103,7 @@ class GraphStatView(
         binding.legendFlexboxLayout.removeAllViews()
         binding.lineGraph.clear()
         binding.pieChart.clear()
+        binding.progressBar.visibility = View.GONE
         binding.lineGraph.visibility = View.GONE
         binding.pieChart.visibility = View.GONE
         binding.errorMessage.visibility = View.GONE
@@ -113,12 +115,13 @@ class GraphStatView(
 
     fun initInvalid() {
         resetJob()
-        initError(R.string.graph_stat_view_invalid_setup)
+        cleanAllViews()
+        initError(null, R.string.graph_stat_view_invalid_setup)
     }
 
-    private fun initError(errorTextId: Int) {
+    private fun initError(graphOrStat: GraphOrStat?, errorTextId: Int) {
         cleanAllViews()
-        binding.headerText.visibility = View.VISIBLE
+        graphOrStat?.let { initHeader(graphOrStat) }
         binding.errorMessage.visibility = View.VISIBLE
         binding.errorMessage.text = context.getString(errorTextId)
     }
@@ -130,16 +133,19 @@ class GraphStatView(
     fun initTimeSinceStat(graphOrStat: GraphOrStat, timeSinceLastStat: TimeSinceLastStat) {
         resetJob()
         cleanAllViews()
+        binding.statMessage.visibility = View.INVISIBLE
         initHeader(graphOrStat)
-        binding.statMessage.visibility = View.VISIBLE
         viewScope!!.launch {
+            binding.progressBar.visibility = View.VISIBLE
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeSinceLastStat.featureId) }
             var lastDataPointTimeStamp: OffsetDateTime? = null
             val lastDataPoint = withContext(Dispatchers.IO) {
                 dataSource.getLastDataPointBetween(feature.id, timeSinceLastStat.fromValue, timeSinceLastStat.toValue)
             }
             if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
-            if (lastDataPointTimeStamp == null) { initError(R.string.graph_stat_view_not_enough_data_stat) }
+            binding.statMessage.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
+            if (lastDataPointTimeStamp == null) { initError(graphOrStat, R.string.graph_stat_view_not_enough_data_stat) }
             else {
                 while (true) {
                     setTimeSinceStatText(Duration.between(lastDataPointTimeStamp, OffsetDateTime.now()))
@@ -153,9 +159,10 @@ class GraphStatView(
     fun initAverageTimeBetweenStat(graphOrStat: GraphOrStat, timeBetweenStat: AverageTimeBetweenStat) {
         resetJob()
         cleanAllViews()
+        binding.statMessage.visibility = View.INVISIBLE
         initHeader(graphOrStat)
-        binding.statMessage.visibility = View.VISIBLE
         viewScope!!.launch {
+            binding.progressBar.visibility = View.VISIBLE
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeBetweenStat.featureId) }
             val dataPoints = withContext(Dispatchers.IO) {
                 if (timeBetweenStat.duration == null) {
@@ -166,12 +173,15 @@ class GraphStatView(
                     dataSource.getDataPointsBetweenInTimeRange(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue, cutOff, now)
                 }
             }
-            if (dataPoints.size < 2) initError(R.string.graph_stat_view_not_enough_data_stat)
+            if (dataPoints.size < 2) initError(graphOrStat, R.string.graph_stat_view_not_enough_data_stat)
             else {
                 val totalMillis = Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp).toMillis().toDouble()
                 val averageMillis = totalMillis / dataPoints.size.toDouble()
                 setAverageTimeBetweenStatText(averageMillis)
             }
+
+            binding.statMessage.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
         }
     }
 
@@ -199,28 +209,32 @@ class GraphStatView(
     fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph) {
         resetJob()
         cleanAllViews()
+        binding.lineGraph.visibility = View.INVISIBLE
         initHeader(graphOrStat)
-        binding.lineGraph.visibility = View.VISIBLE
         viewScope!!.launch {
+            binding.progressBar.visibility = View.VISIBLE
             if (tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph)) {
                 setUpLineGraphXAxis()
+                binding.lineGraph.redraw()
+                binding.lineGraph.visibility = View.VISIBLE
+                binding.progressBar.visibility = View.GONE
             } else {
-                initError(R.string.graph_stat_view_not_enough_data_graph)
+                initError(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
             }
-            binding.lineGraph.redraw()
         }
     }
 
     fun initFromPieChart(graphOrStat: GraphOrStat, pieChart: PieChart) {
         resetJob()
         cleanAllViews()
+        binding.pieChart.visibility = View.INVISIBLE
         initHeader(graphOrStat)
-        binding.pieChart.visibility = View.VISIBLE
         viewScope!!.launch {
+            binding.progressBar.visibility = View.VISIBLE
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
             val dataSample = sampleData(feature.id, pieChart.duration, null, null)
             if (!dataPlottable(dataSample)) {
-                initError(R.string.graph_stat_view_not_enough_data_graph)
+                initError(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
                 return@launch
             }
             val segments = dataSample.dataPoints
@@ -241,6 +255,8 @@ class GraphStatView(
 
             binding.pieChart.redraw()
             binding.pieChart.getRenderer(PieRenderer::class.java).setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
+            binding.pieChart.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
         }
     }
 
@@ -357,7 +373,8 @@ class GraphStatView(
         return@withContext object: FastXYSeries {
             private val rectRegion: RectRegion by lazy {
                 var yRegion = SeriesUtils.minMax(yValues)
-                if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1) yRegion = Region(0, 1)
+                if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1)
+                    yRegion = Region(yRegion.min, yRegion.min.toDouble() + 0.1)
                 RectRegion(0, 1, yRegion.min, yRegion.max)
             }
             override fun minMax() = rectRegion

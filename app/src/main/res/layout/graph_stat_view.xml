@@ -2,11 +2,18 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
-    <FrameLayout
+
+    <androidx.cardview.widget.CardView
+            android:id="@+id/demoCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="@dimen/graph_height">
-
+            android:layout_marginLeft="@dimen/cart_margin_small"
+            android:layout_marginRight="@dimen/cart_margin_small"
+            android:layout_marginBottom="@dimen/cart_margin_small"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:minHeight="@dimen/graph_height"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            >
         <LinearLayout
                 android:id="@+id/graphAndLegendLayout"
                 android:orientation="vertical"
@@ -16,7 +23,7 @@
                     android:id="@+id/headerText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:layout_margin="@dimen/card_padding"
                     android:gravity="center"
                     android:textSize="@dimen/dialog_header_size"
                     tools:text="The name of the graph"/>
@@ -41,7 +48,7 @@
             <com.androidplot.pie.PieChart
                     style="@style/APDefacto.Light"
                     android:id="@+id/pieChart"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/graph_height"
                     android:layout_margin="@dimen/card_padding"
@@ -54,6 +61,8 @@
                     android:visibility="gone"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/graph_height"
+                    android:layout_marginLeft="@dimen/card_padding"
+                    android:layout_marginRight="@dimen/card_padding"
                     android:gravity="center"
                     tools:text="Some error message"
                     />
@@ -61,6 +70,8 @@
                     android:id="@+id/statMessage"
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/graph_height"
+                    android:layout_marginLeft="@dimen/card_padding"
+                    android:layout_marginRight="@dimen/card_padding"
                     android:gravity="center"
                     android:textSize="70sp"
                     tools:text="628.7 Days"
@@ -77,5 +88,11 @@
                     app:justifyContent="center"
                     />
         </LinearLayout>
-    </FrameLayout>
+        <ProgressBar
+                android:id="@+id/progressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                />
+    </androidx.cardview.widget.CardView>
 </layout>

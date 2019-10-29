@@ -165,7 +165,9 @@ class GraphStatInputFragment : Fragment() {
                 LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED, 0.toDouble(), 1.toDouble())
             viewModel.lineGraphFeatures.add(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
+
         }
+        binding.scrollView.fullScroll(View.FOCUS_DOWN)
     }
 
     private fun createLineGraphFeatureViews(features: List<FeatureAndTrackGroup>) {
@@ -185,6 +187,7 @@ class GraphStatInputFragment : Fragment() {
         )
         view.layoutParams = params
         binding.lineGraphFeaturesLayout.addView(view)
+        binding.lineGraphFeaturesLayout.post { binding.scrollView.fullScroll(View.FOCUS_DOWN) }
     }
 
     private fun initPieChartAdapter(features: List<FeatureAndTrackGroup>) {

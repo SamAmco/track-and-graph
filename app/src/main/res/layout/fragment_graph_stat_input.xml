@@ -6,6 +6,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
         <ScrollView
+                android:id="@+id/scrollView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
             <LinearLayout
@@ -15,22 +16,13 @@
                     android:paddingRight="@dimen/card_padding"
                     android:paddingLeft="@dimen/card_padding"
                     android:paddingTop="@dimen/card_padding"
-                    android:paddingBottom="50dp"
+                    android:paddingBottom="60dp"
                     >
 
-                <androidx.cardview.widget.CardView
-                        android:id="@+id/demoCardView"
+                <com.samco.grapheasy.ui.GraphStatView
+                        android:id="@+id/demoGraphStatView"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="4dp"
-                        android:padding="@dimen/card_padding"
-                        app:cardCornerRadius="@dimen/card_corner_radius"
-                        >
-                    <com.samco.grapheasy.ui.GraphStatView
-                            android:id="@+id/demoGraphStatView"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"/>
-                </androidx.cardview.widget.CardView>
+                        android:layout_height="wrap_content"/>
 
                 <ImageView
                         android:id="@+id/divider0"
