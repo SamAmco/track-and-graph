@@ -23,15 +23,26 @@
                         android:id="@+id/removeButton"
                         android:layout_width="wrap_content"
                         android:layout_height="0dp"
-                        android:src="@drawable/remove_icon"
+                        android:src="@drawable/delete_icon"
                         android:background="@null"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
-                        app:layout_constraintRight_toLeftOf="@id/colorSpinner"
-                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintLeft_toRightOf="@id/lineGraphFeatureName"
                         app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@id/lineGraphFeatureName"
                         app:layout_constraintHorizontal_weight="1"
+                        />
+
+                <EditText
+                        android:id="@+id/lineGraphFeatureName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:digits="@string/standard_name_allowed_digits"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/removeButton"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/colorSpinner"
                         />
 
                 <Spinner
@@ -39,11 +50,13 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:background="@null"
-                        app:layout_constraintLeft_toRightOf="@id/removeButton"
-                        app:layout_constraintRight_toRightOf="@id/featureSpinner"
-                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintLeft_toLeftOf="parent"
+                        app:layout_constraintRight_toLeftOf="@id/featureSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/lineGraphFeatureName"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintHorizontal_weight="0.8"
+                        tools:background="@drawable/filled_circle"
+                        tools:scaleY="0.4"
                         />
 
                 <Spinner
@@ -54,15 +67,14 @@
                         android:spinnerMode="dialog"
                         app:layout_constraintLeft_toRightOf="@id/colorSpinner"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintBottom_toTopOf="@id/modeSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/lineGraphFeatureName"
+                        app:layout_constraintBottom_toTopOf="@id/averagingModeSpinner"
                         app:layout_constraintHorizontal_weight="3"
                         tools:entries="@array/graph_types"
                         />
 
-
                 <Spinner
-                        android:id="@+id/modeSpinner"
+                        android:id="@+id/averagingModeSpinner"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:layout_marginTop="@dimen/dialog_input_spacing"
@@ -72,6 +84,21 @@
                         app:layout_constraintLeft_toRightOf="@id/colorSpinner"
                         app:layout_constraintRight_toRightOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/featureSpinner"
+                        app:layout_constraintBottom_toTopOf="@id/plottingModeSpinner"
+                        app:layout_constraintHorizontal_weight="3"
+                        />
+
+                <Spinner
+                        android:id="@+id/plottingModeSpinner"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_marginTop="@dimen/dialog_input_spacing"
+                        android:background="@color/colorShadowButton"
+                        android:entries="@array/line_graph_generation_modes"
+                        android:spinnerMode="dialog"
+                        app:layout_constraintLeft_toRightOf="@id/colorSpinner"
+                        app:layout_constraintRight_toRightOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/averagingModeSpinner"
                         app:layout_constraintBottom_toTopOf="@id/offsetLabel"
                         app:layout_constraintHorizontal_weight="3"
                         />
@@ -84,9 +111,9 @@
                         android:textAlignment="center"
                         android:gravity="bottom"
                         android:paddingBottom="8dp"
-                        app:layout_constraintLeft_toLeftOf="@id/modeSpinner"
+                        app:layout_constraintLeft_toLeftOf="@id/plottingModeSpinner"
                         app:layout_constraintRight_toLeftOf="@id/offsetInput"
-                        app:layout_constraintTop_toBottomOf="@id/modeSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner"
                         app:layout_constraintBottom_toBottomOf="parent"
                         />
 
@@ -98,7 +125,7 @@
                         android:textAlignment="center"
                         android:hint="0"
                         app:layout_constraintLeft_toRightOf="@id/offsetLabel"
-                        app:layout_constraintTop_toBottomOf="@id/modeSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner"
                         app:layout_constraintRight_toLeftOf="@id/scaleLabel"
                         app:layout_constraintHorizontal_weight="1"
                         />
@@ -112,7 +139,7 @@
                         android:paddingBottom="8dp"
                         app:layout_constraintLeft_toRightOf="@id/offsetInput"
                         app:layout_constraintRight_toLeftOf="@id/scaleInput"
-                        app:layout_constraintTop_toBottomOf="@id/modeSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner"
                         app:layout_constraintBottom_toBottomOf="parent"
                         />
 
@@ -125,7 +152,7 @@
                         android:hint="1"
                         app:layout_constraintLeft_toRightOf="@id/scaleLabel"
                         app:layout_constraintRight_toRightOf="parent"
-                        app:layout_constraintTop_toBottomOf="@id/modeSpinner"
+                        app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner"
                         app:layout_constraintHorizontal_weight="1"
                         />
 

@@ -8,27 +8,32 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.Plot
+import com.androidplot.Region
 import com.androidplot.pie.PieRenderer
 import com.androidplot.pie.Segment
 import com.androidplot.pie.SegmentFormatter
 import com.androidplot.ui.HorizontalPositioning
 import com.androidplot.ui.Size
 import com.androidplot.ui.VerticalPositioning
-import com.androidplot.xy.LineAndPointFormatter
-import com.androidplot.xy.XYGraphWidget
-import com.androidplot.xy.XYSeries
+import com.androidplot.util.SeriesUtils
+import com.androidplot.xy.*
 import com.samco.grapheasy.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.TemporalAdjusters
+import org.threeten.bp.temporal.WeekFields
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
-import kotlin.math.round
+import java.util.*
+import kotlin.math.abs
+import kotlin.math.roundToLong
 
 class GraphStatView(
     context: Context,
@@ -113,6 +118,7 @@ class GraphStatView(
 
     private fun initError(errorTextId: Int) {
         cleanAllViews()
+        binding.headerText.visibility = View.VISIBLE
         binding.errorMessage.visibility = View.VISIBLE
         binding.errorMessage.text = context.getString(errorTextId)
     }
@@ -196,8 +202,11 @@ class GraphStatView(
         initHeader(graphOrStat)
         binding.lineGraph.visibility = View.VISIBLE
         viewScope!!.launch {
-            drawLineGraphFeaturesAndCalculateTimeRange(lineGraph)
-            setUpLineGraphXAxis()
+            if (tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph)) {
+                setUpLineGraphXAxis()
+            } else {
+                initError(R.string.graph_stat_view_not_enough_data_graph)
+            }
             binding.lineGraph.redraw()
         }
     }
@@ -209,7 +218,7 @@ class GraphStatView(
         binding.pieChart.visibility = View.VISIBLE
         viewScope!!.launch {
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
-            val dataSample = sampleData(feature, pieChart.duration, null)
+            val dataSample = sampleData(feature.id, pieChart.duration, null, null)
             if (!dataPlottable(dataSample)) {
                 initError(R.string.graph_stat_view_not_enough_data_graph)
                 return@launch
@@ -235,12 +244,11 @@ class GraphStatView(
         }
     }
 
-    private suspend fun drawLineGraphFeaturesAndCalculateTimeRange(lineGraph: LineGraph) {
+    private suspend fun tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph: LineGraph): Boolean {
         var minDateTime: OffsetDateTime? = null
         var maxDateTime: OffsetDateTime? = null
         lineGraph.features.forEach {
-            val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(it.featureId) }
-            val timeRange = drawLineGraphFeature(lineGraph, it, feature)
+            val timeRange = drawLineGraphFeature(lineGraph, it)
             minDateTime = listOf(minDateTime, timeRange.minDateTime).minBy { dt ->
                 if (dt == null) return@minBy OffsetDateTime.MAX
                 else return@minBy dt!!
@@ -251,8 +259,10 @@ class GraphStatView(
             }
             yield()
         }
-        currentTimeRange.minDateTime = minDateTime ?: OffsetDateTime.now().minusDays(1)
-        currentTimeRange.maxDateTime = maxDateTime ?: OffsetDateTime.now()
+        if (minDateTime == null || maxDateTime == null) return false
+        currentTimeRange.minDateTime = minDateTime!!
+        currentTimeRange.maxDateTime = maxDateTime!!
+        return true
     }
 
     private fun setUpLineGraphXAxis() {
@@ -262,7 +272,7 @@ class GraphStatView(
         binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format = object : Format() {
             override fun format(obj: Any, toAppendTo: StringBuffer, pos: FieldPosition): StringBuffer {
                 val ratio = (obj as Number).toDouble()
-                val timeStamp = currentTimeRange.minDateTime.plusMinutes(round(ratio * timeDiff).toLong())
+                val timeStamp = currentTimeRange.minDateTime.plusMinutes((ratio * timeDiff).roundToLong())
                 return toAppendTo.append(formatter.format(timeStamp))
             }
             override fun parseObject(source: String, pos: ParsePosition) = null
@@ -277,13 +287,20 @@ class GraphStatView(
 
     private class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
-    private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature, feature: Feature): NullableTimeRange {
-        inflateGraphLegendItem(lineGraphFeature.colorId, feature.name)
-        val rawDataSample = sampleData(feature, lineGraph.duration, movingAverageDurations[lineGraphFeature.mode])
-        return if (!dataPlottable(rawDataSample)) {
-            addSeries(getEmptyXYSeries(feature), lineGraphFeature)
-            return NullableTimeRange(null, null)
-        } else createAndAddSeries(rawDataSample, feature, lineGraphFeature)
+    private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature): NullableTimeRange {
+        inflateGraphLegendItem(lineGraphFeature.colorId, lineGraphFeature.name)
+        val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
+        val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
+        val rawDataSample = sampleData(lineGraphFeature.featureId, lineGraph.duration, movingAvDuration, plottingPeriod)
+        val plottingData = withContext(Dispatchers.IO) {
+            when (lineGraphFeature.plottingMode) {
+                LineGraphPlottingModes.WHEN_TRACKED -> rawDataSample
+                else -> calculateDurationAccumulatedValues(rawDataSample, plottingPeriod!!)
+            }
+        }
+        return if (dataPlottable(plottingData)) {
+            createAndAddSeries(plottingData, lineGraphFeature)
+        } else NullableTimeRange(null, null)
     }
 
     private fun inflateGraphLegendItem(colorId: Int, label: String) {
@@ -291,30 +308,36 @@ class GraphStatView(
     }
 
     private fun dataPlottable(rawData: RawDataSample): Boolean {
-        return rawData.dataPoints.size > 2
-                && rawData.plotFrom >= 0
-                && rawData.dataPoints[rawData.plotFrom].timestamp.isBefore(rawData.dataPoints.last().timestamp)
+        return rawData.plotFrom >= 0
+            && rawData.dataPoints.size - rawData.plotFrom > 1
+            && rawData.dataPoints[rawData.plotFrom].timestamp.isBefore(rawData.dataPoints.last().timestamp)
     }
 
-    private suspend fun sampleData(feature: Feature, sampleDuration: Duration?, averagingDuration: Duration?): RawDataSample {
+    private suspend fun sampleData(featureId: Long, sampleDuration: Duration?,
+                                   averagingDuration: Duration?, plottingPeriod: Period?): RawDataSample {
         return withContext(Dispatchers.IO) {
-            if (sampleDuration == null) RawDataSample(dataSource.getDataPointsForFeatureAscSync(feature.id), 0)
+            if (sampleDuration == null) RawDataSample(dataSource.getDataPointsForFeatureAscSync(featureId), 0)
             else {
                 val now = OffsetDateTime.now()
                 val startDate = now.minus(sampleDuration)
-                val maxSampleDuration = averagingDuration?.plus(sampleDuration) ?: sampleDuration
+                val plottingDuration = plottingPeriod?.let { Duration.between(now, now.minus(plottingPeriod)) }
+                val maxSampleDuration = listOf(
+                    sampleDuration,
+                    averagingDuration?.plus(sampleDuration),
+                    plottingDuration
+                ).maxBy { d -> d ?: Duration.ZERO }
                 val minSampleDate = now.minus(maxSampleDuration)
-                val dataPoints = dataSource.getDataPointsForFeatureAfterAscSync(feature.id, minSampleDate, now)
+                val dataPoints = dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, now)
                 val startIndex = dataPoints.indexOfFirst { dp -> dp.timestamp.isAfter(startDate) }
                 RawDataSample(dataPoints, startIndex)
             }
         }
     }
 
-    private fun createAndAddSeries(rawData: RawDataSample, feature: Feature, lineGraphFeature: LineGraphFeature): NullableTimeRange {
+    private suspend fun createAndAddSeries(rawData: RawDataSample, lineGraphFeature: LineGraphFeature): NullableTimeRange {
         val minX = rawData.dataPoints[rawData.plotFrom].timestamp
         val maxX = rawData.dataPoints.last().timestamp
-        val series = getXYSeriesFromRawDataSample(feature, rawData, lineGraphFeature, currentTimeRange)
+        val series = getXYSeriesFromRawDataSample(rawData, lineGraphFeature, currentTimeRange)
         addSeries(series, lineGraphFeature)
         return NullableTimeRange(minX, maxX)
     }
@@ -325,37 +348,75 @@ class GraphStatView(
         binding.lineGraph.addSeries(series, seriesFormat)
     }
 
-    private fun getEmptyXYSeries(feature: Feature) = object: XYSeries {
-        override fun getX(index: Int) = 0
-        override fun getY(index: Int) = 0
-        override fun getTitle() = feature.name
-        override fun size() = 0
+    private suspend fun getXYSeriesFromRawDataSample(rawData: RawDataSample, lineGraphFeature: LineGraphFeature,
+                                             timeRange: MutableTimeRange) = withContext(Dispatchers.IO) {
+        val yValues = when (lineGraphFeature.averagingMode) {
+            LineGraphAveraginModes.NO_AVERAGING -> rawData.dataPoints.drop(rawData.plotFrom).map { dp -> dp.value.toDouble() }
+            else -> calculateMovingAverage(rawData, movingAverageDurations[lineGraphFeature.averagingMode]!!)
+        }.map { v -> (v * lineGraphFeature.scale) + lineGraphFeature.offset }
+        return@withContext object: FastXYSeries {
+            private val rectRegion: RectRegion by lazy {
+                var yRegion = SeriesUtils.minMax(yValues)
+                if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1) yRegion = Region(0, 1)
+                RectRegion(0, 1, yRegion.min, yRegion.max)
+            }
+            override fun minMax() = rectRegion
+            override fun getX(index: Int): Number {
+                //TODO this could be more efficient, we could let android plot worry about x values for us rather than always using
+                //0 and 1 and calculating using expensive duration division
+                return Duration.between(timeRange.minDateTime, rawData.dataPoints[rawData.plotFrom + index].timestamp)
+                    .toMillis().toDouble() / timeRange.timeDiffMillis.toDouble()
+            }
+            override fun getY(index: Int): Number = yValues[index]
+            override fun getTitle() = lineGraphFeature.name
+            override fun size() = rawData.dataPoints.size - rawData.plotFrom
+        }
     }
 
-    private fun getXYSeriesFromRawDataSample(feature: Feature, rawData: RawDataSample,
-                                             lineGraphFeature: LineGraphFeature,
-                                             timeRange: MutableTimeRange) = object: XYSeries {
-        private val yValues = when (lineGraphFeature.mode) {
-            LineGraphFeatureMode.TRACKED_VALUES -> {
-                rawData.dataPoints
-                    .drop(rawData.plotFrom)
-                    .map { dp -> dp.value.toDouble() }
+    private suspend fun calculateDurationAccumulatedValues(rawData: RawDataSample, period: Period): RawDataSample {
+        var plotFrom = 0
+        var foundPlotFrom = false
+        val featureId = rawData.dataPoints[0].featureId
+        val newData = mutableListOf<DataPoint>()
+        var currentTimeStamp = findBeginningOfPeriod(rawData.dataPoints[0].timestamp, period)
+        val now = OffsetDateTime.now()
+        var index = 0
+        while (currentTimeStamp.isBefore(now)) {
+            currentTimeStamp = currentTimeStamp.with {ld -> ld.plus(period)}
+            val points = rawData.dataPoints.drop(index).takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
+            val total = points.sumByDouble { dp -> dp.value.toDouble() }.toString()
+            index += points.size
+            if (index > rawData.plotFrom && !foundPlotFrom) {
+                plotFrom = newData.size
+                foundPlotFrom = true
             }
-            else -> {
-                val values = calculateMovingAverage(rawData, movingAverageDurations[lineGraphFeature.mode]!!)
-                values
-            }
+            newData.add(DataPoint(currentTimeStamp, featureId, total, ""))
+            yield()
         }
-        override fun getX(index: Int): Number {
-            return Duration.between(timeRange.minDateTime, rawData.dataPoints[rawData.plotFrom + index].timestamp)
-                .toMillis().toDouble() / timeRange.timeDiffMillis.toDouble()
-        }
-        override fun getY(index: Int): Number = (yValues[index] * lineGraphFeature.scale) + lineGraphFeature.offset
-        override fun getTitle() = feature.name
-        override fun size() = rawData.dataPoints.size - rawData.plotFrom
+        return RawDataSample(newData, plotFrom)
     }
 
-    private fun calculateMovingAverage(rawData: RawDataSample, movingAvDuration: Duration): List<Double> {
+    private fun findBeginningOfPeriod(startDateTime: OffsetDateTime, period: Period): OffsetDateTime {
+        var dt = startDateTime
+        val minusAWeek = period.minus(Period.ofWeeks(1))
+        val minusAMonth = period.minus(Period.ofMonths(1))
+        val minusAYear = period.minus(Period.ofYears(1))
+        if (minusAYear.days >= 0 && !minusAYear.isNegative) {
+            dt = startDateTime.withDayOfYear(1)
+        }
+        else if (minusAMonth.days >= 0 && !minusAMonth.isNegative) {
+            dt = startDateTime
+                .withDayOfMonth(1)
+        }
+        else if (minusAWeek.days >= 0 && !minusAWeek.isNegative) {
+            dt = startDateTime.with(TemporalAdjusters.previousOrSame(
+                WeekFields.of(Locale.getDefault()).firstDayOfWeek
+            ))
+        }
+        return dt.withHour(0).withMinute(0).withSecond(0).minusSeconds(1)
+    }
+
+    private suspend fun calculateMovingAverage(rawData: RawDataSample, movingAvDuration: Duration): List<Double> {
         return rawData.dataPoints
             .drop(rawData.plotFrom)
             .mapIndexed { index, dataPoint ->
@@ -365,6 +426,7 @@ class GraphStatView(
                     inRange.add(rawData.dataPoints[i])
                     i--
                 }
+                yield()
                 inRange.sumByDouble { dp -> dp.value.toDouble() } / inRange.size.toDouble()
             }
     }

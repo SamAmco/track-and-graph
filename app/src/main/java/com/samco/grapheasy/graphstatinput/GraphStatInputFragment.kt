@@ -11,7 +11,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.LinearLayout
-import androidx.core.os.postDelayed
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
@@ -160,9 +159,10 @@ class GraphStatInputFragment : Fragment() {
     private fun listenToAddLineGraphFeatureButton(features: List<FeatureAndTrackGroup>) {
         binding.addFeatureButton.isClickable = true
         binding.addFeatureButton.setOnClickListener {
-            val color = dataVisColorList[(dataVisColorList.size - 1).coerceAtMost(viewModel.lineGraphFeatures.size)]
-            val newLineGraphFeature = LineGraphFeature(-1, color,
-                LineGraphFeatureMode.TRACKED_VALUES, 0.toDouble(), 1.toDouble())
+            val nextColorIndex = (viewModel.lineGraphFeatures.size * dataVisColorGenerator) % dataVisColorList.size
+            val color = dataVisColorList[nextColorIndex]
+            val newLineGraphFeature = LineGraphFeature(-1, "", color,
+                LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED, 0.toDouble(), 1.toDouble())
             viewModel.lineGraphFeatures.add(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
         }

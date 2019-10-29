@@ -23,7 +23,7 @@
     <string name="discrete_feature_needs_at_least_one_value">Please add at least one discrete value</string>
     <string name="data_points">%d Tracked</string>
     <string name="no_data">No Data</string>
-    <string name="standard_name_allowed_digits">0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.$%£()_-+=!^&amp;/*\|#~@;:?</string>
+    <string name="standard_name_allowed_digits">0123456789 abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.$%£()_-+=!^&amp;/*\|#~@:?</string><!--In particular here we exclude , and ; because they are used as separators in certain special cases-->
     <string name="add_data_point_hint">Enter a value for:</string>
     <string name="skip">Skip</string>
     <string name="exportButton">Export</string>
@@ -43,7 +43,7 @@
         <item>Time Since</item>
     </string-array>
     <string-array name="line_graph_feature_modes">
-        <item>Tracked Values</item>
+        <item>No Averaging</item>
         <item>Daily Moving Average</item>
         <item>Three Day Moving Average</item>
         <item>Weekly Moving Average</item>
@@ -51,6 +51,13 @@
         <item>Three Month Moving Average</item>
         <item>Six Month Moving Average</item>
         <item>Yearly Moving Average</item>
+    </string-array>
+    <string-array name="line_graph_generation_modes">
+        <item>Plot When Tracked</item>
+        <item>Plot Daily Totals</item>
+        <item>Plot Weekly Totals</item>
+        <item>Plot Monthly Totals</item>
+        <item>Plot Yearly Totals</item>
     </string-array>
     <string-array name="graph_time_durations">
         <item>All Data</item>
@@ -104,7 +111,7 @@
     <string name="graph_stat_validation_unrecognised_color">Please make sure all features have a color</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Invalid line graph feature detected</string>
 
-    <string name="graph_stat_view_invalid_setup">You can see a sample of your graph or statistic here once it\'s set up</string>
+    <string name="graph_stat_view_invalid_setup">Complete the setup to see a preview</string>
     <string name="graph_stat_view_not_enough_data_stat">There is not enough data tracked to generate this statistic yet</string>
     <string name="graph_stat_view_not_enough_data_graph">There is not enough data tracked to generate this graph yet</string>
     <string name="days">Days</string>

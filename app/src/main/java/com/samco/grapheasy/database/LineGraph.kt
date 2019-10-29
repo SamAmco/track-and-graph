@@ -4,11 +4,11 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.samco.grapheasy.R
 import org.threeten.bp.Duration
+import org.threeten.bp.Period
 
-enum class LineGraphFeatureMode {
-    TRACKED_VALUES,
+enum class LineGraphAveraginModes {
+    NO_AVERAGING,
     DAILY_MOVING_AVERAGE,
     THREE_DAY_MOVING_AVERAGE,
     WEEKLY_MOVING_AVERAGE,
@@ -18,19 +18,42 @@ enum class LineGraphFeatureMode {
     YEARLY_MOVING_AVERAGE
 }
 
+enum class LineGraphPlottingModes {
+    WHEN_TRACKED,
+    GENERATE_DAILY_TOTALS,
+    GENERATE_WEEKLY_TOTALS,
+    GENERATE_MONTHLY_TOTALS,
+    GENERATE_YEARLY_TOTALS
+}
 
-val movingAverageDurations = mapOf(
-    LineGraphFeatureMode.TRACKED_VALUES to null,
-    LineGraphFeatureMode.DAILY_MOVING_AVERAGE to Duration.ofDays(1),
-    LineGraphFeatureMode.THREE_DAY_MOVING_AVERAGE to Duration.ofDays(3),
-    LineGraphFeatureMode.WEEKLY_MOVING_AVERAGE to Duration.ofDays(7),
-    LineGraphFeatureMode.MONTHLY_MOVING_AVERAGE to Duration.ofDays(31),
-    LineGraphFeatureMode.THREE_MONTH_MOVING_AVERAGE to Duration.ofDays(93),
-    LineGraphFeatureMode.SIX_MONTH_MOVING_AVERAGE to Duration.ofDays(183),
-    LineGraphFeatureMode.YEARLY_MOVING_AVERAGE to Duration.ofDays(365)
+val plottingModePeriods = mapOf(
+    LineGraphPlottingModes.WHEN_TRACKED to null,
+    LineGraphPlottingModes.GENERATE_DAILY_TOTALS to Period.ofDays(1),
+    LineGraphPlottingModes.GENERATE_WEEKLY_TOTALS to Period.ofWeeks(1),
+    LineGraphPlottingModes.GENERATE_MONTHLY_TOTALS to Period.ofMonths(1),
+    LineGraphPlottingModes.GENERATE_YEARLY_TOTALS to Period.ofYears(1)
 )
 
-class LineGraphFeature(var featureId: Long, var colorId: Int, var mode: LineGraphFeatureMode, var offset: Double, var scale: Double)
+val movingAverageDurations = mapOf(
+    LineGraphAveraginModes.NO_AVERAGING to null,
+    LineGraphAveraginModes.DAILY_MOVING_AVERAGE to Duration.ofDays(1),
+    LineGraphAveraginModes.THREE_DAY_MOVING_AVERAGE to Duration.ofDays(3),
+    LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE to Duration.ofDays(7),
+    LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE to Duration.ofDays(31),
+    LineGraphAveraginModes.THREE_MONTH_MOVING_AVERAGE to Duration.ofDays(93),
+    LineGraphAveraginModes.SIX_MONTH_MOVING_AVERAGE to Duration.ofDays(183),
+    LineGraphAveraginModes.YEARLY_MOVING_AVERAGE to Duration.ofDays(365)
+)
+
+class LineGraphFeature(
+    var featureId: Long,
+    var name: String,
+    var colorId: Int,
+    var averagingMode : LineGraphAveraginModes,
+    var plottingMode: LineGraphPlottingModes,
+    var offset: Double,
+    var scale: Double
+)
 
 @Entity(tableName = "line_graphs_table",
     foreignKeys = [ForeignKey(entity = GraphOrStat::class,

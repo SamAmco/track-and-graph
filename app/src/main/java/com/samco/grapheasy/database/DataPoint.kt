@@ -23,6 +23,7 @@ data class DataPoint (
     @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,
 
+    //TODO should we convert this to a number?
     @ColumnInfo(name = "value")
     val value: String,
 

@@ -33,7 +33,7 @@ val dataVisColorList = listOf(
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphOrStat::class, LineGraph::class,
         AverageTimeBetweenStat::class, PieChart::class, TimeSinceLastStat::class],
-    version = 18,
+    version = 19,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -94,7 +94,7 @@ class Converters {
 
     @TypeConverter
     fun lineGraphFeaturesToString(value: List<LineGraphFeature>): String {
-        return value.joinToString(","){ v -> "${v.featureId};${v.colorId};${v.mode.ordinal};${v.offset};${v.scale}" }
+        return value.joinToString(","){ v -> "${v.featureId};${v.name};${v.colorId};${v.averagingMode.ordinal};${v.plottingMode.ordinal}${v.offset};${v.scale}" }
     }
 
     @TypeConverter
@@ -103,10 +103,13 @@ class Converters {
             val strs = it.split(';')
             LineGraphFeature(
                 strs[0].toLong(),
-                strs[1].toInt(),
-                LineGraphFeatureMode.values()[strs[2].toInt()],
-                strs[3].toDouble(),
-                strs[4].toDouble())
+                strs[1],
+                strs[2].toInt(),
+                LineGraphAveraginModes.values()[strs[3].toInt()],
+                LineGraphPlottingModes.values()[strs[4].toInt()],
+                strs[4].toDouble(),
+                strs[5].toDouble()
+            )
         }
     }
 
