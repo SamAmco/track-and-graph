@@ -21,6 +21,7 @@ import com.samco.grapheasy.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
+import com.samco.grapheasy.graphsandstats.GraphStatClickListener
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
@@ -28,7 +29,6 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.WeekFields
-import timber.log.Timber
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
@@ -36,28 +36,32 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.roundToLong
 
-class GraphStatView(
-    context: Context,
-    attrSet: AttributeSet
-) : FrameLayout(context, attrSet) {
+class GraphStatView : FrameLayout {
+    constructor(context: Context) : super(context, null)
+    constructor(context: Context, attrSet: AttributeSet) : super(context, attrSet)
+
     private var binding = GraphStatViewBinding.inflate(LayoutInflater.from(context), this, true)
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
     private val dataSource = GraphEasyDatabase.getInstance(context.applicationContext).graphEasyDatabaseDao
+    var clickListener: GraphStatClickListener? = null
 
     private class NullableTimeRange(val minDateTime: OffsetDateTime?, val maxDateTime: OffsetDateTime?)
     private class MutableTimeRange(min: OffsetDateTime, max: OffsetDateTime) {
         var minDateTime: OffsetDateTime = min
-            set(value) {
+            @Synchronized get
+            @Synchronized set(value) {
                 field = value
                 timeDiffMillis = calculateTimeDiff(minDateTime, maxDateTime)
             }
         var maxDateTime: OffsetDateTime = max
-            set(value) {
+            @Synchronized get
+            @Synchronized set(value) {
                 field = value
                 timeDiffMillis = calculateTimeDiff(minDateTime, maxDateTime)
             }
         var timeDiffMillis: Long = calculateTimeDiff(min, max)
+            @Synchronized get
             private set
         fun calculateTimeDiff(min: OffsetDateTime, max: OffsetDateTime) = Duration.between(min, max).toMillis()
         init { timeDiffMillis = calculateTimeDiff(min, max) }
@@ -116,10 +120,19 @@ class GraphStatView(
     fun initInvalid() {
         resetJob()
         cleanAllViews()
-        initError(null, R.string.graph_stat_view_invalid_setup)
+        initErrorTextView(null, R.string.graph_stat_view_invalid_setup)
     }
 
-    private fun initError(graphOrStat: GraphOrStat?, errorTextId: Int) {
+    fun hideMenuButton() {
+        binding.menuButton.visibility = View.GONE
+    }
+
+    fun initError(graphOrStat: GraphOrStat?, errorTextId: Int) {
+        resetJob()
+        initErrorTextView(graphOrStat, errorTextId)
+    }
+
+    private fun initErrorTextView(graphOrStat: GraphOrStat?, errorTextId: Int) {
         cleanAllViews()
         graphOrStat?.let { initHeader(graphOrStat) }
         binding.errorMessage.visibility = View.VISIBLE
@@ -145,7 +158,7 @@ class GraphStatView(
             if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
             binding.statMessage.visibility = View.VISIBLE
             binding.progressBar.visibility = View.GONE
-            if (lastDataPointTimeStamp == null) { initError(graphOrStat, R.string.graph_stat_view_not_enough_data_stat) }
+            if (lastDataPointTimeStamp == null) { initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_stat) }
             else {
                 while (true) {
                     setTimeSinceStatText(Duration.between(lastDataPointTimeStamp, OffsetDateTime.now()))
@@ -173,7 +186,7 @@ class GraphStatView(
                     dataSource.getDataPointsBetweenInTimeRange(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue, cutOff, now)
                 }
             }
-            if (dataPoints.size < 2) initError(graphOrStat, R.string.graph_stat_view_not_enough_data_stat)
+            if (dataPoints.size < 2) initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_stat)
             else {
                 val totalMillis = Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp).toMillis().toDouble()
                 val averageMillis = totalMillis / dataPoints.size.toDouble()
@@ -219,7 +232,7 @@ class GraphStatView(
                 binding.lineGraph.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
             } else {
-                initError(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
+                initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
             }
         }
     }
@@ -234,7 +247,7 @@ class GraphStatView(
             val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
             val dataSample = sampleData(feature.id, pieChart.duration, null, null)
             if (!dataPlottable(dataSample)) {
-                initError(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
+                initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
                 return@launch
             }
             val segments = dataSample.dataPoints

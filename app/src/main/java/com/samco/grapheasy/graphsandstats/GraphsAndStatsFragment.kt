@@ -33,7 +33,7 @@ class GraphsAndStatsFragment : Fragment() {
 
         viewModel = ViewModelProviders.of(this).get(GraphsAndStatsViewModel::class.java)
         viewModel.initViewModel(requireActivity())
-        val adapter = GraphStatAdapter(GraphStatClickListener())
+        val adapter = GraphStatAdapter(GraphStatClickListener(), activity!!.application)
         binding.graphStatList.adapter = adapter
         binding.graphStatList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         observeGraphStatsAndUpdate(adapter)

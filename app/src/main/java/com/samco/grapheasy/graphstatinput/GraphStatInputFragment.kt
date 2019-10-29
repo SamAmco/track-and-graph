@@ -40,6 +40,7 @@ class GraphStatInputFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel = ViewModelProviders.of(this).get(GraphStatInputViewModel::class.java)
         viewModel.initViewModel(requireActivity())
+        binding.demoGraphStatView.hideMenuButton()
         listenToGraphName()
         listenToGraphTypeSpinner()
         listenToTimeDuration()
@@ -163,7 +164,7 @@ class GraphStatInputFragment : Fragment() {
             val color = dataVisColorList[nextColorIndex]
             val newLineGraphFeature = LineGraphFeature(-1, "", color,
                 LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED, 0.toDouble(), 1.toDouble())
-            viewModel.lineGraphFeatures.add(newLineGraphFeature)
+            viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.plus(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
 
         }
@@ -177,7 +178,7 @@ class GraphStatInputFragment : Fragment() {
     private fun inflateLineGraphFeatureView(lgf: LineGraphFeature, features: List<FeatureAndTrackGroup>) {
         val view = GraphFeatureListItemView(context!!, features, dataVisColorList, lgf)
         view.setOnRemoveListener {
-            viewModel.lineGraphFeatures.remove(lgf)
+            viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.minus(lgf)
             binding.lineGraphFeaturesLayout.removeView(view)
         }
         view.setOnUpdateListener { onFormUpdate() }
@@ -352,7 +353,7 @@ class GraphStatInputViewModel : ViewModel() {
     val selectedValueStatToValue = MutableLiveData<Double>(0.toDouble())
     val formValid: LiveData<ValidationException?> get() { return _formValid }
     private val _formValid = MutableLiveData<ValidationException?>(null)
-    val lineGraphFeatures = mutableListOf<LineGraphFeature>()
+    var lineGraphFeatures = listOf<LineGraphFeature>()
 
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
 
@@ -409,7 +410,7 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     private fun validateLineGraph() {
-        if (lineGraphFeatures.size == 0)
+        if (lineGraphFeatures.isEmpty())
             throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         lineGraphFeatures.forEach { f ->
             if (!dataVisColorList.contains(f.colorId))

@@ -112,6 +112,7 @@
     <string name="graph_stat_validation_invalid_line_graph_feature">Invalid line graph feature detected</string>
 
     <string name="graph_stat_view_invalid_setup">Complete the setup to see a preview</string>
+    <string name="graph_stat_view_not_found">An error occurred while finding this graph</string>
     <string name="graph_stat_view_not_enough_data_stat">There is not enough data tracked to generate this statistic yet</string>
     <string name="graph_stat_view_not_enough_data_graph">There is not enough data tracked to generate this graph yet</string>
     <string name="days">Days</string>

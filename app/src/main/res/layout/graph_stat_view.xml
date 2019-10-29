@@ -2,7 +2,6 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
-
     <androidx.cardview.widget.CardView
             android:id="@+id/demoCardView"
             android:layout_width="match_parent"
@@ -41,7 +40,6 @@
                     app:rangeLineColor="@color/colorGridLines"
                     app:domainLineThickness="0.1dp"
                     app:rangeLineThickness="0.1dp"
-                    app:renderMode="use_background_thread"
                     app:lineLabelTextSizeBottom="10sp"
                     app:lineLabelTextSizeLeft="10sp"
                     />
@@ -54,7 +52,6 @@
                     android:layout_margin="@dimen/card_padding"
                     app:graphBackgroundColor="@color/ap_white"
                     app:backgroundColor="@color/ap_white"
-                    app:renderMode="use_background_thread"
                     />
             <TextView
                     android:id="@+id/errorMessage"
@@ -94,5 +91,14 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 />
+        <ImageButton
+                android:id="@+id/menuButton"
+                android:src="@drawable/list_menu_icon"
+                android:background="#00FFFFFF"
+                android:paddingLeft="12dp"
+                android:paddingBottom="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"/>
     </androidx.cardview.widget.CardView>
 </layout>

@@ -96,6 +96,18 @@ interface GraphEasyDatabaseDao {
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp = :timestamp")
     fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
 
+    @Query("SELECT * FROM line_graphs_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    fun getLineGraphByGraphStatId(graphStatId: Long): LineGraph?
+
+    @Query("SELECT * FROM pie_chart_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    fun getPieChartByGraphStatId(graphStatId: Long): PieChart?
+
+    @Query("SELECT * FROM average_time_between_stat_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
+
+    @Query("SELECT * FROM time_since_last_stat_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
+
     @Query("SELECT * FROM graphs_and_stats_table")
     fun getDataSamplerSpecs(): LiveData<List<GraphOrStat>>
 
