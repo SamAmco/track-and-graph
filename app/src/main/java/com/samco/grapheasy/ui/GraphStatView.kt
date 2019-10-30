@@ -252,33 +252,47 @@ class GraphStatView : FrameLayout {
         initHeader(graphOrStat)
         viewScope!!.launch {
             binding.progressBar.visibility = View.VISIBLE
-            val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
-            val dataSample = sampleData(feature.id, pieChart.duration, null, null)
-            if (!dataPlottable(dataSample)) {
+            val dataSample = tryGetPlottableDataForPieChart(pieChart)
+            if (dataSample == null) {
                 initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
                 return@launch
             }
-            val segments = dataSample.dataPoints
-                .drop(dataSample.plotFrom)
-                .groupingBy { dp -> dp.label }
-                .eachCount()
-                .map { b -> Segment(b.key, b.value) }
-            val total = segments.sumByDouble { s -> s.value.toDouble() }
-            segments.forEachIndexed { i, s ->
-                val index = (dataVisColorGenerator * i) % dataVisColorList.size
-                val colorId = dataVisColorList[index]
-                val segForm = SegmentFormatter(getColor(context, colorId))
-                segForm.labelPaint.color = Color.TRANSPARENT
-                val percentage = "%.1f".format((s.value.toDouble() / total) * 100f)
-                inflateGraphLegendItem(colorId, "${s.title} ($percentage%)")
-                binding.pieChart.addSegment(s, segForm)
+            val segments = getPieChartSegments(dataSample)
+            val total = withContext(Dispatchers.IO) {
+                segments.sumByDouble { s -> s.value.toDouble() }
             }
-
+            plotPieChartSegments(segments, total)
             binding.pieChart.redraw()
             binding.pieChart.getRenderer(PieRenderer::class.java).setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
             binding.pieChart.visibility = View.VISIBLE
             binding.progressBar.visibility = View.GONE
         }
+    }
+
+    private fun plotPieChartSegments(segments: List<Segment>, total: Double) {
+        segments.forEachIndexed { i, s ->
+            val index = (dataVisColorGenerator * i) % dataVisColorList.size
+            val colorId = dataVisColorList[index]
+            val segForm = SegmentFormatter(getColor(context, colorId))
+            segForm.labelPaint.color = Color.TRANSPARENT
+            val percentage = "%.1f".format((s.value.toDouble() / total) * 100f)
+            inflateGraphLegendItem(colorId, "${s.title} ($percentage%)")
+            binding.pieChart.addSegment(s, segForm)
+        }
+    }
+
+    private suspend fun getPieChartSegments(dataSample: RawDataSample) = withContext(Dispatchers.IO) {
+        dataSample.dataPoints
+            .drop(dataSample.plotFrom)
+            .groupingBy { dp -> dp.label }
+            .eachCount()
+            .map { b -> Segment(b.key, b.value) }
+    }
+
+    private suspend fun tryGetPlottableDataForPieChart(pieChart: PieChart): RawDataSample? {
+        val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
+        val dataSample = sampleData(feature.id, pieChart.duration, null, null)
+        return if (dataPlottable(dataSample)) dataSample else null
     }
 
     private suspend fun tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph: LineGraph): Boolean {
