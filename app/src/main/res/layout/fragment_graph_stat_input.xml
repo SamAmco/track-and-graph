@@ -48,6 +48,7 @@
                         />
 
                 <LinearLayout
+                        android:id="@+id/graphStatTypeLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dialog_input_spacing"
@@ -275,11 +276,22 @@
         <include
                 android:id="@+id/addBar"
                 layout="@layout/validate_add_footer"/>
-        <ProgressBar
-                android:id="@+id/progressBar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                />
+        <FrameLayout
+                android:id="@+id/inputProgressBar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+            <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@color/ap_transparent"
+                    android:clickable="true"
+                    android:focusable="true"
+                    />
+            <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    />
+        </FrameLayout>
     </FrameLayout>
 </layout>

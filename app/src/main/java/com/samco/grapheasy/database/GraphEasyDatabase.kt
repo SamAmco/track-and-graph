@@ -33,7 +33,7 @@ val dataVisColorList = listOf(
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphOrStat::class, LineGraph::class,
         AverageTimeBetweenStat::class, PieChart::class, TimeSinceLastStat::class],
-    version = 21,
+    version = 22,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

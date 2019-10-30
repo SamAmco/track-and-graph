@@ -7,6 +7,7 @@
     <string name="delete">Delete</string>
     <string name="rename">Rename</string>
     <string name="edit">Edit</string>
+    <string name="update">Update</string>
     <string name="new_name">New name: </string>
     <string name="feature_name">Feature name: </string>
     <string name="feature_type">Feature type: </string>

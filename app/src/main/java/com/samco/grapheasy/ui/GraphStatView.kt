@@ -296,6 +296,7 @@ class GraphStatView : FrameLayout {
     }
 
     private suspend fun tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph: LineGraph): Boolean {
+        //TODO do you really need this function anymore, don't think we're using this time range
         var minDateTime: OffsetDateTime? = null
         var maxDateTime: OffsetDateTime? = null
         lineGraph.features.forEach {

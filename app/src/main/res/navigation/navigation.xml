@@ -52,7 +52,12 @@
             android:id="@+id/graphStatInputFragment"
             android:name="com.samco.grapheasy.graphstatinput.GraphStatInputFragment"
             android:label="@string/add_a_graph_or_stat"
-            tools:layout="@layout/fragment_graph_stat_input" />
+            tools:layout="@layout/fragment_graph_stat_input" >
+        <argument
+                android:name="graphStatId"
+                app:argType="long"
+                android:defaultValue="-1L" />
+    </fragment>
     <fragment
             android:id="@+id/addFeatureFragment"
             android:name="com.samco.grapheasy.displaytrackgroup.AddFeatureFragment"

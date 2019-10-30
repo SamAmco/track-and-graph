@@ -41,9 +41,12 @@ class GraphFeatureListItemView(
     }
 
     private fun setupGraphFeatureName() {
+        if (lineGraphFeature.name.isNotEmpty()) binding.lineGraphFeatureName.setText(lineGraphFeature.name)
         binding.lineGraphFeatureName.addTextChangedListener { text ->
-            lineGraphFeature.name = text.toString()
-            onUpdatedListener?.invoke(this@GraphFeatureListItemView)
+            if(lineGraphFeature.name != text.toString()) {
+                lineGraphFeature.name = text.toString()
+                onUpdatedListener?.invoke(this@GraphFeatureListItemView)
+            }
         }
     }
 
@@ -118,12 +121,18 @@ class GraphFeatureListItemView(
         binding.featureSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                onFeatureChangeNameUpdate(lineGraphFeature.featureId, lineGraphFeature.name, features[index].name)
                 lineGraphFeature.featureId = features[index].id
-                val name = features[index].name
-                lineGraphFeature.name = name
-                binding.lineGraphFeatureName.setText(name)
                 onUpdatedListener?.invoke(this@GraphFeatureListItemView)
             }
+        }
+    }
+
+    private fun onFeatureChangeNameUpdate(oldFeatureId: Long, oldFeatureName: String, newFeatureName: String) {
+        if (oldFeatureId == -1L || oldFeatureName == "") binding.lineGraphFeatureName.setText(newFeatureName)
+        val oldFeatureDBName = features.firstOrNull { f -> f.id == oldFeatureId }?.name ?: return
+        if (oldFeatureDBName == oldFeatureName || oldFeatureName == "") {
+            binding.lineGraphFeatureName.setText(newFeatureName)
         }
     }
 

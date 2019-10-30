@@ -51,8 +51,11 @@ class GraphsAndStatsFragment : Fragment() {
 
     private fun onDeleteGraphStat(graphOrStat: GraphOrStat) = viewModel.deleteGraphStat(graphOrStat)
 
-    //TODO onEditGraphStat
-    private fun onEditGraphStat(graphOrStat: GraphOrStat) { }
+    private fun onEditGraphStat(graphOrStat: GraphOrStat) {
+        navController?.navigate(
+            GraphsAndStatsFragmentDirections.actionGraphStatInput(graphOrStat.id)
+        )
+    }
 
     private fun observeGraphStatsAndUpdate(adapter: GraphStatAdapter) {
         viewModel.graphStatDataSamplers.observe(viewLifecycleOwner, Observer {

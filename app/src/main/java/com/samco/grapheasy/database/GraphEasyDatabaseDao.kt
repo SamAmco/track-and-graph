@@ -42,6 +42,13 @@ interface GraphEasyDatabaseDao {
         ON features_table.track_group_id = track_groups_table.id""")
     fun getAllFeaturesAndTrackGroups(): LiveData<List<FeatureAndTrackGroup>>
 
+    @Query("""SELECT features_table.*, track_groups_table.name as track_group_name 
+        FROM features_table 
+        LEFT JOIN track_groups_table 
+        ON features_table.track_group_id = track_groups_table.id
+        WHERE features_table.id = :featureId LIMIT 1""")
+    fun getFeatureAndTrackGroupByFeatureId(featureId: Long): FeatureAndTrackGroup?
+
     @Query("""SELECT * from features_table WHERE id IN (:featureIds)""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
 
@@ -99,6 +106,9 @@ interface GraphEasyDatabaseDao {
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp = :timestamp")
     fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
 
+    @Query("SELECT * FROM graphs_and_stats_table WHERE id = :graphStatId LIMIT 1")
+    fun getGraphStatById(graphStatId: Long): GraphOrStat?
+
     @Query("SELECT * FROM line_graphs_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getLineGraphByGraphStatId(graphStatId: Long): LineGraph?
 
@@ -117,15 +127,30 @@ interface GraphEasyDatabaseDao {
     @Insert
     fun insertLineGraph(lineGraph: LineGraph): Long
 
+    @Update
+    fun updateLineGraph(lineGraph: LineGraph)
+
     @Insert
     fun insertPieChart(pieChart: PieChart): Long
+
+    @Update
+    fun updatePieChart(pieChart: PieChart)
 
     @Insert
     fun insertAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat): Long
 
+    @Update
+    fun updateAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat)
+
     @Insert
     fun insertTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat): Long
 
+    @Update
+    fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat)
+
     @Insert
     fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
+
+    @Update
+    fun updateGraphOrStat(graphOrStat: GraphOrStat)
 }

@@ -16,6 +16,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
@@ -28,6 +29,7 @@ import java.text.DecimalFormat
 
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
+    private val args: GraphStatInputFragmentArgs by navArgs()
     private lateinit var binding: FragmentGraphStatInputBinding
     private lateinit var viewModel: GraphStatInputViewModel
 
@@ -39,24 +41,36 @@ class GraphStatInputFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_graph_stat_input, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel = ViewModelProviders.of(this).get(GraphStatInputViewModel::class.java)
-        viewModel.initViewModel(requireActivity())
+        viewModel.initViewModel(requireActivity(), args.graphStatId)
         binding.demoGraphStatView.hideMenuButton()
-        listenToGraphName()
-        listenToGraphTypeSpinner()
-        listenToTimeDuration()
-        listenToAllFeatures()
         listenToViewModelState()
-        listenToFormValid()
         return binding.root
     }
 
     private fun listenToViewModelState() {
         viewModel.state.observe(this, Observer {
             when (it) {
-                GraphStatInputState.INITIALIZING -> binding.progressBar.visibility = View.VISIBLE
-                GraphStatInputState.WAITING -> binding.progressBar.visibility = View.INVISIBLE
-                GraphStatInputState.ADDING -> binding.progressBar.visibility = View.VISIBLE
+                GraphStatInputState.INITIALIZING -> binding.inputProgressBar.visibility = View.VISIBLE
+                GraphStatInputState.WAITING -> {
+                    binding.inputProgressBar.visibility = View.INVISIBLE
+                    listenToUpdateMode()
+                    listenToGraphTypeSpinner()
+                    listenToGraphName()
+                    listenToTimeDuration()
+                    listenToAllFeatures()
+                    listenToFormValid()
+                }
+                GraphStatInputState.ADDING -> binding.inputProgressBar.visibility = View.VISIBLE
                 GraphStatInputState.FINISHED -> navController?.popBackStack()
+            }
+        })
+    }
+
+    private fun listenToUpdateMode() {
+        viewModel.updateMode.observe(this, Observer { b ->
+            if (b) {
+                binding.addBar.addButton.setText(R.string.update)
+                binding.graphStatTypeLayout.visibility = View.GONE
             }
         })
     }
@@ -238,19 +252,24 @@ class GraphStatInputFragment : Fragment() {
             GraphStatType.TIME_SINCE
         )
         binding.graphTypeSpinner.setSelection(graphTypes.indexOf(viewModel.graphStatType.value))
+        updateViewForSelectedGraphStatType(viewModel.graphStatType.value!!)
         binding.graphTypeSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                 val graphStatType = graphTypes[index]
                 viewModel.graphStatType.value = graphStatType
-                onFormUpdate()
-                when(graphStatType) {
-                    GraphStatType.LINE_GRAPH -> initLineGraphView()
-                    GraphStatType.PIE_CHART -> initPieChartView()
-                    GraphStatType.AVERAGE_TIME_BETWEEN -> initAverageTimeBetweenView()
-                    GraphStatType.TIME_SINCE -> initTimeSinceView()
-                }
+                updateViewForSelectedGraphStatType(graphStatType)
             }
+        }
+    }
+
+    private fun updateViewForSelectedGraphStatType(graphStatType: GraphStatType) {
+        onFormUpdate()
+        when(graphStatType) {
+            GraphStatType.LINE_GRAPH -> initLineGraphView()
+            GraphStatType.PIE_CHART -> initPieChartView()
+            GraphStatType.AVERAGE_TIME_BETWEEN -> initAverageTimeBetweenView()
+            GraphStatType.TIME_SINCE -> initTimeSinceView()
         }
     }
 
@@ -311,13 +330,13 @@ class GraphStatInputFragment : Fragment() {
                 val graphOrStat = viewModel.constructGraphOrStat()
                 when (viewModel.graphStatType.value) {
                     GraphStatType.LINE_GRAPH -> binding.demoGraphStatView
-                        .initFromLineGraph(graphOrStat, viewModel.constructLineGraph(-1))
+                        .initFromLineGraph(graphOrStat, viewModel.constructLineGraph(graphOrStat.id))
                     GraphStatType.PIE_CHART -> binding.demoGraphStatView
-                        .initFromPieChart(graphOrStat, viewModel.constructPieChart(-1))
+                        .initFromPieChart(graphOrStat, viewModel.constructPieChart(graphOrStat.id))
                     GraphStatType.AVERAGE_TIME_BETWEEN -> binding.demoGraphStatView
-                        .initAverageTimeBetweenStat(graphOrStat, viewModel.constructAverageTimeBetween(-1))
+                        .initAverageTimeBetweenStat(graphOrStat, viewModel.constructAverageTimeBetween(graphOrStat.id))
                     GraphStatType.TIME_SINCE -> binding.demoGraphStatView
-                        .initTimeSinceStat(graphOrStat, viewModel.constructTimeSince(-1))
+                        .initTimeSinceStat(graphOrStat, viewModel.constructTimeSince(graphOrStat.id))
                     else -> binding.demoGraphStatView.initInvalid()
                 }
             }
@@ -339,10 +358,11 @@ class GraphStatInputViewModel : ViewModel() {
     private var dataSource: GraphEasyDatabaseDao? = null
 
     private var updateJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
+    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    val state: LiveData<GraphStatInputState> get() { return _state }
-    private val _state = MutableLiveData<GraphStatInputState>(GraphStatInputState.INITIALIZING)
+    private var graphStatId: Long? = null
+    private var id: Long? = null
+
     val graphName = MutableLiveData<String>("")
     val graphStatType = MutableLiveData<GraphStatType>(GraphStatType.LINE_GRAPH)
     val sampleDuration = MutableLiveData<Duration?>(null)
@@ -351,19 +371,103 @@ class GraphStatInputViewModel : ViewModel() {
     val selectedValueStatDiscreteValue = MutableLiveData<DiscreteValue?>(null)
     val selectedValueStatFromValue = MutableLiveData<Double>(0.toDouble())
     val selectedValueStatToValue = MutableLiveData<Double>(0.toDouble())
-    val formValid: LiveData<ValidationException?> get() { return _formValid }
-    private val _formValid = MutableLiveData<ValidationException?>(null)
     var lineGraphFeatures = listOf<LineGraphFeature>()
 
+    val updateMode: LiveData<Boolean> get() { return _updateMode }
+    val _updateMode = MutableLiveData<Boolean>(false)
+    val state: LiveData<GraphStatInputState> get() { return _state }
+    private val _state = MutableLiveData<GraphStatInputState>(GraphStatInputState.INITIALIZING)
+    val formValid: LiveData<ValidationException?> get() { return _formValid }
+    private val _formValid = MutableLiveData<ValidationException?>(null)
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
 
 
-    fun initViewModel(activity: Activity) {
+    fun initViewModel(activity: Activity, graphStatId: Long) {
         if (dataSource != null) return
         _state.value = GraphStatInputState.INITIALIZING
         dataSource = GraphEasyDatabase.getInstance(activity.application).graphEasyDatabaseDao
         allFeatures = dataSource!!.getAllFeaturesAndTrackGroups()
-        _state.value = GraphStatInputState.WAITING
+        if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
+        else _state.value = GraphStatInputState.WAITING
+    }
+
+    private fun initFromExistingGraphStat(graphStatId: Long) {
+        ioScope.launch {
+            val graphStat = dataSource!!.getGraphStatById(graphStatId)
+
+            if (graphStat == null) {
+                withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
+                return@launch
+            }
+
+            val existingId = when(graphStat.type) {
+                GraphStatType.LINE_GRAPH -> tryInitLineGraph(graphStat)
+                GraphStatType.PIE_CHART -> tryInitPieChart(graphStat)
+                GraphStatType.TIME_SINCE -> tryInitTimeSinceStat(graphStat)
+                GraphStatType.AVERAGE_TIME_BETWEEN -> tryInitAverageTimeBetween(graphStat)
+            }
+
+            if (existingId != null) withContext(Dispatchers.Main) {
+                this@GraphStatInputViewModel.graphName.value = graphStat.name
+                this@GraphStatInputViewModel.graphStatType.value = graphStat.type
+                this@GraphStatInputViewModel.graphStatId = graphStat.id
+                this@GraphStatInputViewModel.id = existingId
+                this@GraphStatInputViewModel._updateMode.value = true
+            }
+            withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
+        }
+    }
+
+    private suspend fun tryInitPieChart(graphStat: GraphOrStat): Long? {
+        val pieChart = dataSource!!.getPieChartByGraphStatId(graphStat.id) ?: return null
+        val pieChartFeature = dataSource!!.getFeatureAndTrackGroupByFeatureId(pieChart.featureId) ?: return null
+        withContext(Dispatchers.Main) {
+            this@GraphStatInputViewModel.selectedPieChartFeature.value = pieChartFeature
+            this@GraphStatInputViewModel.sampleDuration.value = pieChart.duration
+        }
+        return pieChart.id
+    }
+
+    private suspend fun tryInitAverageTimeBetween(graphStat: GraphOrStat): Long? {
+        val avTimeStat = dataSource!!.getAverageTimeBetweenStatByGraphStatId(graphStat.id) ?: return null
+        val feature = dataSource!!.getFeatureAndTrackGroupByFeatureId(avTimeStat.featureId) ?: return null
+        withContext(Dispatchers.Main) {
+            this@GraphStatInputViewModel.selectedValueStatFeature.value = feature
+            if (feature.featureType == FeatureType.DISCRETE) {
+                this@GraphStatInputViewModel.selectedValueStatDiscreteValue.value =
+                    feature.discreteValues.firstOrNull { dv -> dv.index == avTimeStat.fromValue.toInt() }
+            } else {
+                this@GraphStatInputViewModel.selectedValueStatFromValue.value = avTimeStat.fromValue.toDouble()
+                this@GraphStatInputViewModel.selectedValueStatToValue.value = avTimeStat.toValue.toDouble()
+            }
+            this@GraphStatInputViewModel.sampleDuration.value = avTimeStat.duration
+        }
+        return avTimeStat.id
+    }
+
+    private suspend fun tryInitTimeSinceStat(graphStat: GraphOrStat): Long? {
+        val timeSinceStat = dataSource!!.getTimeSinceLastStatByGraphStatId(graphStat.id) ?: return null
+        val feature = dataSource!!.getFeatureAndTrackGroupByFeatureId(timeSinceStat.featureId) ?: return null
+        withContext(Dispatchers.Main) {
+            this@GraphStatInputViewModel.selectedValueStatFeature.value = feature
+            if (feature.featureType == FeatureType.DISCRETE) {
+                this@GraphStatInputViewModel.selectedValueStatDiscreteValue.value =
+                    feature.discreteValues.firstOrNull { dv -> dv.index == timeSinceStat.fromValue.toInt() }
+            } else {
+                this@GraphStatInputViewModel.selectedValueStatFromValue.value = timeSinceStat.fromValue.toDouble()
+                this@GraphStatInputViewModel.selectedValueStatToValue.value = timeSinceStat.toValue.toDouble()
+            }
+        }
+        return timeSinceStat.id
+    }
+
+    private suspend fun tryInitLineGraph(graphStat: GraphOrStat): Long? {
+        val lineGraph = dataSource!!.getLineGraphByGraphStatId(graphStat.id) ?: return null
+        withContext(Dispatchers.Main) {
+            this@GraphStatInputViewModel.sampleDuration.value = lineGraph.duration
+            this@GraphStatInputViewModel.lineGraphFeatures = lineGraph.features
+        }
+        return lineGraph.id
     }
 
     fun validateForm() {
@@ -423,47 +527,61 @@ class GraphStatInputViewModel : ViewModel() {
     fun createGraphOrStat() {
         if (_state.value != GraphStatInputState.WAITING) return
         _state.value = GraphStatInputState.ADDING
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                val graphStatId = dataSource!!.insertGraphOrStat(constructGraphOrStat())
-                when (graphStatType.value) {
-                    GraphStatType.LINE_GRAPH -> dataSource?.insertLineGraph(constructLineGraph(graphStatId))
-                    GraphStatType.PIE_CHART -> dataSource?.insertPieChart(constructPieChart(graphStatId))
-                    GraphStatType.AVERAGE_TIME_BETWEEN -> dataSource?.insertAverageTimeBetweenStat(constructAverageTimeBetween(graphStatId))
-                    GraphStatType.TIME_SINCE -> dataSource?.insertTimeSinceLastStat(constructTimeSince(graphStatId))
-                }
-                return@withContext null
+        ioScope.launch {
+            val addLineGraph =
+                if (_updateMode.value!!) dataSource!!::updateLineGraph
+                else dataSource!!::insertLineGraph
+            val addPieChart =
+                if (_updateMode.value!!) dataSource!!::updatePieChart
+                else dataSource!!::insertPieChart
+            val addAvTimeBetween =
+                if (_updateMode.value!!) dataSource!!::updateAverageTimeBetweenStat
+                else dataSource!!::insertAverageTimeBetweenStat
+            val addTimeSince =
+                if (_updateMode.value!!) dataSource!!::updateTimeSinceLastStat
+                else dataSource!!::insertTimeSinceLastStat
+
+            val graphStatId = if (_updateMode.value!!) {
+                dataSource!!.updateGraphOrStat(constructGraphOrStat())
+                graphStatId!!
+            } else dataSource!!.insertGraphOrStat(constructGraphOrStat())
+
+            when (graphStatType.value) {
+                GraphStatType.LINE_GRAPH -> addLineGraph(constructLineGraph(graphStatId))
+                GraphStatType.PIE_CHART -> addPieChart(constructPieChart(graphStatId))
+                GraphStatType.AVERAGE_TIME_BETWEEN -> addAvTimeBetween(constructAverageTimeBetween(graphStatId))
+                GraphStatType.TIME_SINCE -> addTimeSince(constructTimeSince(graphStatId))
             }
-            _state.value = GraphStatInputState.FINISHED
+            withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
         }
     }
 
     override fun onCleared() {
         super.onCleared()
-        uiScope.cancel()
+        ioScope.cancel()
     }
 
     fun constructGraphOrStat() = GraphOrStat(
-        0, graphName.value!!, graphStatType.value!!
+        graphStatId ?: 0L, graphName.value!!, graphStatType.value!!
     )
 
     fun constructLineGraph(graphStatId: Long) = LineGraph(
-        0, graphStatId, lineGraphFeatures, sampleDuration.value
+        id ?: 0L, graphStatId, lineGraphFeatures, sampleDuration.value
     )
 
     fun constructPieChart(graphStatId: Long) = PieChart(
-        0, graphStatId,
+        id ?: 0L, graphStatId,
         selectedPieChartFeature.value!!.id, sampleDuration.value
     )
 
     fun constructAverageTimeBetween(graphStatId: Long) = AverageTimeBetweenStat(
-        0, graphStatId,
+        id ?: 0L, graphStatId,
         selectedValueStatFeature.value!!.id, getFromValue(),
         getToValue(), sampleDuration.value
     )
 
     fun constructTimeSince(graphStatId: Long) = TimeSinceLastStat(
-        0, graphStatId,
+        id ?: 0L, graphStatId,
         selectedValueStatFeature.value!!.id, getFromValue(), getToValue()
     )
 
