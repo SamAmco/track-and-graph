@@ -57,6 +57,9 @@ interface GraphEasyDatabaseDao {
     @Delete
     fun deleteDataPoint(dataPoint: DataPoint)
 
+    @Delete
+    fun deleteGraphOrStat(graphOrStat: GraphOrStat)
+
     @Query("DELETE FROM features_table WHERE id = :id")
     fun deleteFeature(id: Long)
 

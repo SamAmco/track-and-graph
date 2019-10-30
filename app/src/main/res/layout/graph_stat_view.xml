@@ -96,6 +96,8 @@
                 android:src="@drawable/list_menu_icon"
                 android:background="#00FFFFFF"
                 android:paddingLeft="12dp"
+                android:paddingRight="6dp"
+                android:paddingTop="6dp"
                 android:paddingBottom="12dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

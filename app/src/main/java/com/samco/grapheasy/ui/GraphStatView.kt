@@ -21,7 +21,6 @@ import com.samco.grapheasy.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.*
-import com.samco.grapheasy.graphsandstats.GraphStatClickListener
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
@@ -34,7 +33,6 @@ import java.text.Format
 import java.text.ParsePosition
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.roundToLong
 
 class GraphStatView : FrameLayout {
     constructor(context: Context) : super(context, null)
@@ -44,7 +42,9 @@ class GraphStatView : FrameLayout {
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
     private val dataSource = GraphEasyDatabase.getInstance(context.applicationContext).graphEasyDatabaseDao
-    var clickListener: GraphStatClickListener? = null
+    private val creationTime = OffsetDateTime.now()
+    private var listViewMode = false
+    var clickListener: ((v: View) -> Unit)? = null
 
     private class NullableTimeRange(val minDateTime: OffsetDateTime?, val maxDateTime: OffsetDateTime?)
     private class MutableTimeRange(min: OffsetDateTime, max: OffsetDateTime) {
@@ -80,8 +80,15 @@ class GraphStatView : FrameLayout {
         .withZone(ZoneId.systemDefault())
 
     init {
+        listenToMenuButton()
         basicLineGraphSetup()
         initInvalid()
+    }
+
+    private fun listenToMenuButton() {
+        binding.menuButton.setOnClickListener {
+            clickListener?.invoke(binding.menuButton)
+        }
     }
 
     private fun resetJob() {
@@ -219,7 +226,8 @@ class GraphStatView : FrameLayout {
             }
     }
 
-    fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph) {
+    fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph, listViewMode: Boolean = false) {
+        this.listViewMode = listViewMode
         resetJob()
         cleanAllViews()
         binding.lineGraph.visibility = View.INVISIBLE
@@ -295,13 +303,13 @@ class GraphStatView : FrameLayout {
     }
 
     private fun setUpLineGraphXAxis() {
-        val duration = Duration.between(currentTimeRange.minDateTime, currentTimeRange.maxDateTime)
-        val formatter = getDateTimeFormatForDuration(duration)
-        val timeDiff = duration.toMinutes().toDouble()
+        //TODO how can we adjust format as the graph is scaled/panned and how can we get it right the first time
+        val formatter = lineGraphDaysDateFormat
         binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format = object : Format() {
             override fun format(obj: Any, toAppendTo: StringBuffer, pos: FieldPosition): StringBuffer {
-                val ratio = (obj as Number).toDouble()
-                val timeStamp = currentTimeRange.minDateTime.plusMinutes((ratio * timeDiff).roundToLong())
+                val millis = (obj as Number).toLong()
+                val duration = Duration.ofMillis(millis)
+                val timeStamp = creationTime.plus(duration)
                 return toAppendTo.append(formatter.format(timeStamp))
             }
             override fun parseObject(source: String, pos: ParsePosition) = null
@@ -366,37 +374,51 @@ class GraphStatView : FrameLayout {
     private suspend fun createAndAddSeries(rawData: RawDataSample, lineGraphFeature: LineGraphFeature): NullableTimeRange {
         val minX = rawData.dataPoints[rawData.plotFrom].timestamp
         val maxX = rawData.dataPoints.last().timestamp
-        val series = getXYSeriesFromRawDataSample(rawData, lineGraphFeature, currentTimeRange)
+        val series = getXYSeriesFromRawDataSample(rawData, lineGraphFeature)
         addSeries(series, lineGraphFeature)
         return NullableTimeRange(minX, maxX)
     }
 
     private fun addSeries(series: XYSeries, lineGraphFeature: LineGraphFeature) {
-        val seriesFormat = LineAndPointFormatter(context, R.xml.line_point_formatter)
-        seriesFormat.linePaint.color = getColor(context, lineGraphFeature.colorId)
+        val seriesFormat =
+            if (listViewMode) {
+                val sf = FastLineAndPointRenderer.Formatter(
+                    getColor(context, lineGraphFeature.colorId),
+                    null,
+                    null
+                )
+                sf.linePaint.isAntiAlias = false
+                sf.linePaint.strokeWidth = 2f * resources.displayMetrics.density
+                sf
+            } else {
+                val sf = LineAndPointFormatter(context, R.xml.line_point_formatter)
+                sf.linePaint.color = getColor(context, lineGraphFeature.colorId)
+                sf
+            }
         binding.lineGraph.addSeries(series, seriesFormat)
     }
 
-    private suspend fun getXYSeriesFromRawDataSample(rawData: RawDataSample, lineGraphFeature: LineGraphFeature,
-                                             timeRange: MutableTimeRange) = withContext(Dispatchers.IO) {
+    private suspend fun getXYSeriesFromRawDataSample(rawData: RawDataSample, lineGraphFeature: LineGraphFeature)
+            = withContext(Dispatchers.IO) {
+
         val yValues = when (lineGraphFeature.averagingMode) {
             LineGraphAveraginModes.NO_AVERAGING -> rawData.dataPoints.drop(rawData.plotFrom).map { dp -> dp.value.toDouble() }
             else -> calculateMovingAverage(rawData, movingAverageDurations[lineGraphFeature.averagingMode]!!)
         }.map { v -> (v * lineGraphFeature.scale) + lineGraphFeature.offset }
+
+        val xValues = rawData.dataPoints.drop(rawData.plotFrom).map {
+            dp -> Duration.between(creationTime, dp.timestamp).toMillis()
+        }
+
+        var yRegion = SeriesUtils.minMax(yValues)
+        if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1)
+            yRegion = Region(yRegion.min, yRegion.min.toDouble() + 0.1)
+        var xRegion = SeriesUtils.minMax(xValues)
+        val rectRegion = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
+
         return@withContext object: FastXYSeries {
-            private val rectRegion: RectRegion by lazy {
-                var yRegion = SeriesUtils.minMax(yValues)
-                if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1)
-                    yRegion = Region(yRegion.min, yRegion.min.toDouble() + 0.1)
-                RectRegion(0, 1, yRegion.min, yRegion.max)
-            }
             override fun minMax() = rectRegion
-            override fun getX(index: Int): Number {
-                //TODO this could be more efficient, we could let android plot worry about x values for us rather than always using
-                //0 and 1 and calculating using expensive duration division
-                return Duration.between(timeRange.minDateTime, rawData.dataPoints[rawData.plotFrom + index].timestamp)
-                    .toMillis().toDouble() / timeRange.timeDiffMillis.toDouble()
-            }
+            override fun getX(index: Int): Number = xValues[index]
             override fun getY(index: Int): Number = yValues[index]
             override fun getTitle() = lineGraphFeature.name
             override fun size() = rawData.dataPoints.size - rawData.plotFrom

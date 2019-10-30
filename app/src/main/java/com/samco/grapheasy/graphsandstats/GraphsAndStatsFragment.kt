@@ -19,6 +19,7 @@ import com.samco.grapheasy.database.GraphOrStat
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.database.GraphEasyDatabaseDao
 import com.samco.grapheasy.databinding.GraphsAndStatsFragmentBinding
+import kotlinx.coroutines.*
 
 class GraphsAndStatsFragment : Fragment() {
     private var navController: NavController? = null
@@ -33,7 +34,13 @@ class GraphsAndStatsFragment : Fragment() {
 
         viewModel = ViewModelProviders.of(this).get(GraphsAndStatsViewModel::class.java)
         viewModel.initViewModel(requireActivity())
-        val adapter = GraphStatAdapter(GraphStatClickListener(), activity!!.application)
+        val adapter = GraphStatAdapter(
+            GraphStatClickListener(
+                this::onDeleteGraphStat,
+                this::onEditGraphStat
+            ),
+            activity!!.application
+        )
         binding.graphStatList.adapter = adapter
         binding.graphStatList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         observeGraphStatsAndUpdate(adapter)
@@ -41,6 +48,11 @@ class GraphsAndStatsFragment : Fragment() {
         setHasOptionsMenu(true)
         return binding.root
     }
+
+    private fun onDeleteGraphStat(graphOrStat: GraphOrStat) = viewModel.deleteGraphStat(graphOrStat)
+
+    //TODO onEditGraphStat
+    private fun onEditGraphStat(graphOrStat: GraphOrStat) { }
 
     private fun observeGraphStatsAndUpdate(adapter: GraphStatAdapter) {
         viewModel.graphStatDataSamplers.observe(viewLifecycleOwner, Observer {
@@ -76,10 +88,16 @@ class GraphsAndStatsFragment : Fragment() {
 class GraphsAndStatsViewModel : ViewModel() {
     private var dataSource: GraphEasyDatabaseDao? = null
     lateinit var graphStatDataSamplers: LiveData<List<GraphOrStat>>
+    private val job = Job()
+    private val ioScope = CoroutineScope(Dispatchers.IO + job)
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return
         dataSource = GraphEasyDatabase.getInstance(activity.application).graphEasyDatabaseDao
         graphStatDataSamplers = dataSource!!.getDataSamplerSpecs()
+    }
+
+    fun deleteGraphStat(graphOrStat: GraphOrStat) {
+        ioScope.launch { dataSource?.deleteGraphOrStat(graphOrStat) }
     }
 }

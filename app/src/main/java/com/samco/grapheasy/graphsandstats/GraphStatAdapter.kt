@@ -1,8 +1,11 @@
 package com.samco.grapheasy.graphsandstats
 
 import android.app.Application
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -29,13 +32,17 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener, applic
     }
 
     class ViewHolder(private val graphStatView: GraphStatView)
-        : RecyclerView.ViewHolder(graphStatView) {
+        : RecyclerView.ViewHolder(graphStatView), PopupMenu.OnMenuItemClickListener {
         private var currJob: Job? = null
+        private var clickListener: GraphStatClickListener? = null
+        private var graphStat: GraphOrStat? = null
 
         fun bind(graphStat: GraphOrStat, clickListener: GraphStatClickListener, dataSouce: GraphEasyDatabaseDao) {
+            this.graphStat = graphStat
+            this.clickListener = clickListener
             currJob?.cancel()
             currJob = Job()
-            graphStatView.clickListener = clickListener
+            graphStatView.clickListener = { v -> createContextMenu(v) }
             CoroutineScope(Dispatchers.Main + currJob!!).launch {
                 if (tryInitLineGraph(dataSouce, graphStat)) return@launch
                 if (tryInitPieChart(dataSouce, graphStat)) return@launch
@@ -43,6 +50,24 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener, applic
                 if (tryInitTimeSinceStat(dataSouce, graphStat)) return@launch
                 else graphStatView.initError(graphStat, R.string.graph_stat_view_not_found)
             }
+        }
+
+        private fun createContextMenu(view: View) {
+            val popup = PopupMenu(view.context, view)
+            popup.menuInflater.inflate(R.menu.edit_graph_stat_context_menu, popup.menu)
+            popup.setOnMenuItemClickListener(this)
+            popup.show()
+        }
+
+        override fun onMenuItemClick(item: MenuItem?): Boolean {
+            graphStat?.let {
+                when (item?.itemId) {
+                    R.id.edit -> clickListener?.onEdit(it)
+                    R.id.delete -> clickListener?.onDelete(it)
+                    else -> {}
+                }
+            }
+            return false
         }
 
         private suspend fun tryInitPieChart(dataSouce: GraphEasyDatabaseDao, graphStat: GraphOrStat): Boolean {
@@ -79,7 +104,7 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener, applic
             val lineGraph = withContext(Dispatchers.IO) { dataSouce.getLineGraphByGraphStatId(graphStat.id) }
             if (lineGraph != null) {
                 Timber.d("Initing line graph")
-                graphStatView.initFromLineGraph(graphStat, lineGraph)
+                graphStatView.initFromLineGraph(graphStat, lineGraph, true)
                 return true
             }
             return false
@@ -107,4 +132,8 @@ class GraphStatDiffCallback() : DiffUtil.ItemCallback<GraphOrStat>() {
     override fun areContentsTheSame(oldItem: GraphOrStat, newItem: GraphOrStat) = false
 }
 
-class GraphStatClickListener
+class GraphStatClickListener(private val onDelete: (graphStat: GraphOrStat) -> Unit,
+                             private val onEdit: (graphStat: GraphOrStat) -> Unit) {
+    fun onDelete(graphStat: GraphOrStat) = onDelete.invoke(graphStat)
+    fun onEdit(graphStat: GraphOrStat) = onEdit.invoke(graphStat)
+}
