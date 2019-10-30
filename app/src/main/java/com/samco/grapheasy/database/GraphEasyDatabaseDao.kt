@@ -36,6 +36,9 @@ interface GraphEasyDatabaseDao {
     @Query("""SELECT * FROM features_table WHERE id = :featureId LIMIT 1""")
     fun getFeatureById(featureId: Long): Feature
 
+    @Query("""SELECT * FROM features_table WHERE id = :featureId LIMIT 1""")
+    fun tryGetFeatureById(featureId: Long): Feature?
+
     @Query("""SELECT features_table.*, track_groups_table.name as track_group_name 
         FROM features_table 
         LEFT JOIN track_groups_table 
@@ -122,7 +125,10 @@ interface GraphEasyDatabaseDao {
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
     @Query("SELECT * FROM graphs_and_stats_table")
-    fun getDataSamplerSpecs(): LiveData<List<GraphOrStat>>
+    fun getAllGraphStats(): LiveData<List<GraphOrStat>>
+
+    @Query("SELECT * FROM graphs_and_stats_table")
+    fun getAllGraphStatsSync(): List<GraphOrStat>
 
     @Insert
     fun insertLineGraph(lineGraph: LineGraph): Long
