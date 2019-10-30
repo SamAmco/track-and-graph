@@ -46,29 +46,9 @@ class GraphStatView : FrameLayout {
     private var listViewMode = false
     var clickListener: ((v: View) -> Unit)? = null
 
-    private class NullableTimeRange(val minDateTime: OffsetDateTime?, val maxDateTime: OffsetDateTime?)
-    private class MutableTimeRange(min: OffsetDateTime, max: OffsetDateTime) {
-        var minDateTime: OffsetDateTime = min
-            @Synchronized get
-            @Synchronized set(value) {
-                field = value
-                timeDiffMillis = calculateTimeDiff(minDateTime, maxDateTime)
-            }
-        var maxDateTime: OffsetDateTime = max
-            @Synchronized get
-            @Synchronized set(value) {
-                field = value
-                timeDiffMillis = calculateTimeDiff(minDateTime, maxDateTime)
-            }
-        var timeDiffMillis: Long = calculateTimeDiff(min, max)
-            @Synchronized get
-            private set
-        fun calculateTimeDiff(min: OffsetDateTime, max: OffsetDateTime) = Duration.between(min, max).toMillis()
-        init { timeDiffMillis = calculateTimeDiff(min, max) }
-    }
-
-    private val currentTimeRange: MutableTimeRange = MutableTimeRange(OffsetDateTime.now(), OffsetDateTime.now())
-
+    private val lineGraphHourMinuteSecondFromat: DateTimeFormatter = DateTimeFormatter
+        .ofPattern("HH:mm:ss")
+        .withZone(ZoneId.systemDefault())
     private val lineGraphHoursDateFormat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm")
         .withZone(ZoneId.systemDefault())
@@ -296,50 +276,42 @@ class GraphStatView : FrameLayout {
     }
 
     private suspend fun tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph: LineGraph): Boolean {
-        //TODO do you really need this function anymore, don't think we're using this time range
-        var minDateTime: OffsetDateTime? = null
-        var maxDateTime: OffsetDateTime? = null
-        lineGraph.features.forEach {
-            val timeRange = drawLineGraphFeature(lineGraph, it)
-            minDateTime = listOf(minDateTime, timeRange.minDateTime).minBy { dt ->
-                if (dt == null) return@minBy OffsetDateTime.MAX
-                else return@minBy dt!!
-            }
-            maxDateTime = listOf(maxDateTime, timeRange.maxDateTime).maxBy { dt ->
-                if (dt == null) return@maxBy OffsetDateTime.MIN
-                else return@maxBy dt!!
-            }
+        return lineGraph.features.any {
             yield()
+            drawLineGraphFeature(lineGraph, it)
         }
-        if (minDateTime == null || maxDateTime == null) return false
-        currentTimeRange.minDateTime = minDateTime!!
-        currentTimeRange.maxDateTime = maxDateTime!!
-        return true
     }
 
     private fun setUpLineGraphXAxis() {
-        //TODO how can we adjust format as the graph is scaled/panned and how can we get it right the first time
-        val formatter = lineGraphDaysDateFormat
         binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format = object : Format() {
             override fun format(obj: Any, toAppendTo: StringBuffer, pos: FieldPosition): StringBuffer {
                 val millis = (obj as Number).toLong()
                 val duration = Duration.ofMillis(millis)
                 val timeStamp = creationTime.plus(duration)
+                val formatter = getDateTimeFormatForDuration(
+                    binding.lineGraph.bounds.minX,
+                    binding.lineGraph.bounds.maxX
+                )
                 return toAppendTo.append(formatter.format(timeStamp))
             }
             override fun parseObject(source: String, pos: ParsePosition) = null
         }
     }
 
-    private fun getDateTimeFormatForDuration(duration: Duration) = when {
-        duration.toDays() >= 304 -> lineGraphMonthsDateFormat
-        duration.toDays() >= 1 -> lineGraphDaysDateFormat
-        else -> lineGraphHoursDateFormat
+    private fun getDateTimeFormatForDuration(minX: Number?, maxX: Number?): DateTimeFormatter {
+        if (minX == null || maxX == null) return lineGraphDaysDateFormat
+        val duration = Duration.ofMillis(abs(maxX.toLong() - minX.toLong()))
+        return when {
+            duration.toMinutes() < 5L -> lineGraphHourMinuteSecondFromat
+            duration.toDays() >= 304 -> lineGraphMonthsDateFormat
+            duration.toDays() >= 1 -> lineGraphDaysDateFormat
+            else -> lineGraphHoursDateFormat
+        }
     }
 
     private class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
-    private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature): NullableTimeRange {
+    private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature): Boolean {
         inflateGraphLegendItem(lineGraphFeature.colorId, lineGraphFeature.name)
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
@@ -352,7 +324,8 @@ class GraphStatView : FrameLayout {
         }
         return if (dataPlottable(plottingData)) {
             createAndAddSeries(plottingData, lineGraphFeature)
-        } else NullableTimeRange(null, null)
+            true
+        } else false
     }
 
     private fun inflateGraphLegendItem(colorId: Int, label: String) {
@@ -386,12 +359,9 @@ class GraphStatView : FrameLayout {
         }
     }
 
-    private suspend fun createAndAddSeries(rawData: RawDataSample, lineGraphFeature: LineGraphFeature): NullableTimeRange {
-        val minX = rawData.dataPoints[rawData.plotFrom].timestamp
-        val maxX = rawData.dataPoints.last().timestamp
+    private suspend fun createAndAddSeries(rawData: RawDataSample, lineGraphFeature: LineGraphFeature) {
         val series = getXYSeriesFromRawDataSample(rawData, lineGraphFeature)
         addSeries(series, lineGraphFeature)
-        return NullableTimeRange(minX, maxX)
     }
 
     private fun addSeries(series: XYSeries, lineGraphFeature: LineGraphFeature) {
