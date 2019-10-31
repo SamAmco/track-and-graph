@@ -47,6 +47,9 @@
         <action
                 android:id="@+id/action_graph_stat_input"
                 app:destination="@id/graphStatInputFragment" />
+        <action
+                android:id="@+id/action_view_graph_stat"
+                app:destination="@id/viewGraphStatFragment" />
     </fragment>
     <fragment
             android:id="@+id/graphStatInputFragment"
@@ -68,5 +71,13 @@
         <argument
                 android:name="existingFeatureNames"
                 app:argType="string[]" />
+    </fragment>
+    <fragment
+            android:id="@+id/viewGraphStatFragment"
+            android:name="com.samco.grapheasy.graphsandstats.ViewGraphStatFragment"
+            android:label="ViewGraphStatFragment" >
+        <argument
+                android:name="graphStatId"
+                app:argType="long" />
     </fragment>
 </navigation>

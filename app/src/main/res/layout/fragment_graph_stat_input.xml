@@ -19,7 +19,7 @@
                     android:paddingBottom="60dp"
                     >
 
-                <com.samco.grapheasy.ui.GraphStatView
+                <com.samco.grapheasy.ui.GraphStatCardView
                         android:id="@+id/demoGraphStatView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>

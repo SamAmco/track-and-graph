@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+    <androidx.cardview.widget.CardView
+            android:id="@+id/demoCardView"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/graph_height"
+            android:layout_marginLeft="@dimen/cart_margin_small"
+            android:layout_marginRight="@dimen/cart_margin_small"
+            android:layout_marginBottom="@dimen/cart_margin_small"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            >
+        <include
+                android:id="@+id/graphStatView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                layout="@layout/graph_stat_view"/>
+        <ImageButton
+                android:id="@+id/menuButton"
+                android:src="@drawable/list_menu_icon"
+                android:background="#00FFFFFF"
+                android:paddingLeft="12dp"
+                android:paddingRight="6dp"
+                android:paddingTop="6dp"
+                android:paddingBottom="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|right"/>
+    </androidx.cardview.widget.CardView>
+</layout>

@@ -3,7 +3,6 @@ package com.samco.grapheasy.ui
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getColor
@@ -34,17 +33,16 @@ import java.text.ParsePosition
 import java.util.*
 import kotlin.math.abs
 
-class GraphStatView : FrameLayout {
+abstract class GraphStatViewBase : FrameLayout {
     constructor(context: Context) : super(context, null)
     constructor(context: Context, attrSet: AttributeSet) : super(context, attrSet)
 
-    private var binding = GraphStatViewBinding.inflate(LayoutInflater.from(context), this, true)
+    private var binding = getBinding()
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
     private val dataSource = GraphEasyDatabase.getInstance(context.applicationContext).graphEasyDatabaseDao
     private val creationTime = OffsetDateTime.now()
     private var listViewMode = false
-    var clickListener: ((v: View) -> Unit)? = null
 
     private val lineGraphHourMinuteSecondFromat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm:ss")
@@ -59,16 +57,11 @@ class GraphStatView : FrameLayout {
         .ofPattern("MM/yy")
         .withZone(ZoneId.systemDefault())
 
+    protected abstract fun getBinding(): GraphStatViewBinding
+
     init {
-        listenToMenuButton()
         basicLineGraphSetup()
         initInvalid()
-    }
-
-    private fun listenToMenuButton() {
-        binding.menuButton.setOnClickListener {
-            clickListener?.invoke(binding.menuButton)
-        }
     }
 
     private fun resetJob() {
@@ -90,6 +83,10 @@ class GraphStatView : FrameLayout {
         binding.lineGraph.graph.setMargins(0f, 20f, 0f, 50f)
     }
 
+    fun addLineGraphPanAndZoom() {
+        PanZoom.attach(binding.lineGraph, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.STRETCH_HORIZONTAL)
+    }
+
     private fun cleanAllViews() {
         binding.legendFlexboxLayout.removeAllViews()
         binding.lineGraph.clear()
@@ -104,14 +101,16 @@ class GraphStatView : FrameLayout {
         binding.statMessage.text = ""
     }
 
+    fun initLoading() {
+        resetJob()
+        cleanAllViews()
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
     fun initInvalid() {
         resetJob()
         cleanAllViews()
         initErrorTextView(null, R.string.graph_stat_view_invalid_setup)
-    }
-
-    fun hideMenuButton() {
-        binding.menuButton.visibility = View.GONE
     }
 
     fun initError(graphOrStat: GraphOrStat?, errorTextId: Int) {
@@ -216,6 +215,9 @@ class GraphStatView : FrameLayout {
             binding.progressBar.visibility = View.VISIBLE
             if (tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph)) {
                 setUpLineGraphXAxis()
+                binding.lineGraph.calculateMinMaxVals()
+                val bounds = binding.lineGraph.bounds
+                binding.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
                 binding.lineGraph.redraw()
                 binding.lineGraph.visibility = View.VISIBLE
                 binding.progressBar.visibility = View.GONE
@@ -276,10 +278,10 @@ class GraphStatView : FrameLayout {
     }
 
     private suspend fun tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph: LineGraph): Boolean {
-        return lineGraph.features.any {
+        return lineGraph.features.map {
             yield()
             drawLineGraphFeature(lineGraph, it)
-        }
+        }.toList().any()
     }
 
     private fun setUpLineGraphXAxis() {
@@ -334,8 +336,8 @@ class GraphStatView : FrameLayout {
 
     private fun dataPlottable(rawData: RawDataSample): Boolean {
         return rawData.plotFrom >= 0
-            && rawData.dataPoints.size - rawData.plotFrom > 1
-            && rawData.dataPoints[rawData.plotFrom].timestamp.isBefore(rawData.dataPoints.last().timestamp)
+                && rawData.dataPoints.size - rawData.plotFrom > 1
+                && rawData.dataPoints[rawData.plotFrom].timestamp.isBefore(rawData.dataPoints.last().timestamp)
     }
 
     private suspend fun sampleData(featureId: Long, sampleDuration: Duration?,
@@ -392,7 +394,7 @@ class GraphStatView : FrameLayout {
         }.map { v -> (v * lineGraphFeature.scale) + lineGraphFeature.offset }
 
         val xValues = rawData.dataPoints.drop(rawData.plotFrom).map {
-            dp -> Duration.between(creationTime, dp.timestamp).toMillis()
+                dp -> Duration.between(creationTime, dp.timestamp).toMillis()
         }
 
         var yRegion = SeriesUtils.minMax(yValues)
@@ -470,4 +472,5 @@ class GraphStatView : FrameLayout {
 
     fun dispose() { currJob?.cancel() }
 }
+
 

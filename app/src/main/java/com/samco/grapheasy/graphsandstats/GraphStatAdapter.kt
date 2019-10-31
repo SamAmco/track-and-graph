@@ -14,7 +14,7 @@ import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.database.GraphEasyDatabaseDao
 import com.samco.grapheasy.database.GraphOrStat
 import com.samco.grapheasy.database.GraphStatType
-import com.samco.grapheasy.ui.GraphStatView
+import com.samco.grapheasy.ui.GraphStatCardView
 import kotlinx.coroutines.*
 
 class GraphStatAdapter(private val clickListener: GraphStatClickListener, application: Application)
@@ -30,7 +30,7 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener, applic
         return ViewHolder.from(parent)
     }
 
-    class ViewHolder(private val graphStatView: GraphStatView)
+    class ViewHolder(private val graphStatView: GraphStatCardView)
         : RecyclerView.ViewHolder(graphStatView), PopupMenu.OnMenuItemClickListener {
         private var currJob: Job? = null
         private var clickListener: GraphStatClickListener? = null
@@ -41,7 +41,8 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener, applic
             this.clickListener = clickListener
             currJob?.cancel()
             currJob = Job()
-            graphStatView.clickListener = { v -> createContextMenu(v) }
+            graphStatView.menuButtonClickListener = { v -> createContextMenu(v) }
+            graphStatView.setOnClickListener { clickListener.onClick(graphStat) }
             CoroutineScope(Dispatchers.Main + currJob!!).launch {
                 if (!when (graphStat.type) {
                     GraphStatType.LINE_GRAPH -> tryInitLineGraph(dataSource, graphStat)
@@ -104,7 +105,7 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener, applic
 
         companion object {
             fun from(parent: ViewGroup): ViewHolder {
-                val graphStat = GraphStatView(parent.context)
+                val graphStat = GraphStatCardView(parent.context)
                 graphStat.layoutParams = FrameLayout.LayoutParams(
                     FrameLayout.LayoutParams.MATCH_PARENT,
                     FrameLayout.LayoutParams.WRAP_CONTENT
@@ -124,7 +125,10 @@ class GraphStatDiffCallback() : DiffUtil.ItemCallback<GraphOrStat>() {
 }
 
 class GraphStatClickListener(private val onDelete: (graphStat: GraphOrStat) -> Unit,
-                             private val onEdit: (graphStat: GraphOrStat) -> Unit) {
+                             private val onEdit: (graphStat: GraphOrStat) -> Unit,
+                             private val onClick: (graphStat: GraphOrStat) -> Unit
+                             ) {
     fun onDelete(graphStat: GraphOrStat) = onDelete.invoke(graphStat)
     fun onEdit(graphStat: GraphOrStat) = onEdit.invoke(graphStat)
+    fun onClick(graphStat: GraphOrStat) = onClick.invoke(graphStat)
 }

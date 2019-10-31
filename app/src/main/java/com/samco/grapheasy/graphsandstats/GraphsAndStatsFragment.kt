@@ -37,7 +37,8 @@ class GraphsAndStatsFragment : Fragment() {
         adapter = GraphStatAdapter(
             GraphStatClickListener(
                 viewModel::deleteGraphStat,
-                this::onEditGraphStat
+                this::onEditGraphStat,
+                this::onGraphStatClicked
             ),
             activity!!.application
         )
@@ -47,6 +48,10 @@ class GraphsAndStatsFragment : Fragment() {
 
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    private fun onGraphStatClicked(graphOrStat: GraphOrStat) {
+        navController?.navigate(GraphsAndStatsFragmentDirections.actionViewGraphStat(graphOrStat.id))
     }
 
     private fun listenToViewModelState() {
