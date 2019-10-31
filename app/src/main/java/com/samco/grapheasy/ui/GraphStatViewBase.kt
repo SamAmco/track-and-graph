@@ -281,7 +281,7 @@ abstract class GraphStatViewBase : FrameLayout {
         return lineGraph.features.map {
             yield()
             drawLineGraphFeature(lineGraph, it)
-        }.toList().any()
+        }.any()
     }
 
     private fun setUpLineGraphXAxis() {
