@@ -8,6 +8,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -21,6 +22,7 @@ import kotlinx.coroutines.*
 
 class GraphsAndStatsFragment : Fragment() {
     private var navController: NavController? = null
+    private val args: GraphsAndStatsFragmentArgs by navArgs()
     private lateinit var viewModel: GraphsAndStatsViewModel
     private lateinit var binding: GraphsAndStatsFragmentBinding
     private lateinit var adapter: GraphStatAdapter
@@ -32,7 +34,7 @@ class GraphsAndStatsFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel = ViewModelProviders.of(this).get(GraphsAndStatsViewModel::class.java)
-        viewModel.initViewModel(requireActivity())
+        viewModel.initViewModel(requireActivity(), args.graphStatGroupId)
 
         adapter = GraphStatAdapter(
             GraphStatClickListener(
@@ -70,7 +72,10 @@ class GraphsAndStatsFragment : Fragment() {
 
     private fun onEditGraphStat(graphOrStat: GraphOrStat) {
         navController?.navigate(
-            GraphsAndStatsFragmentDirections.actionGraphStatInput(graphOrStat.id)
+            GraphsAndStatsFragmentDirections.actionGraphStatInput(
+                graphStatGroupId = args.graphStatGroupId,
+                graphStatId = graphOrStat.id
+            )
         )
     }
 
@@ -82,7 +87,7 @@ class GraphsAndStatsFragment : Fragment() {
 
     private fun onAddClicked() {
         navController?.navigate(
-            GraphsAndStatsFragmentDirections.actionGraphStatInput()
+            GraphsAndStatsFragmentDirections.actionGraphStatInput(graphStatGroupId = args.graphStatGroupId)
         )
     }
 
@@ -112,11 +117,11 @@ class GraphsAndStatsViewModel : ViewModel() {
     private val _state = MutableLiveData<GraphsAndStatsViewState>(GraphsAndStatsViewState.INITIALIZING)
 
 
-    fun initViewModel(activity: Activity) {
+    fun initViewModel(activity: Activity, graphStatGroupId: Long) {
         if (dataSource != null) return
         _state.value = GraphsAndStatsViewState.INITIALIZING
         dataSource = GraphEasyDatabase.getInstance(activity.application).graphEasyDatabaseDao
-        graphStats = dataSource!!.getAllGraphStats()
+        graphStats = dataSource!!.getGraphsAndStatsByGroupId(graphStatGroupId)
         preenGraphStats()
     }
 

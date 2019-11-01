@@ -1,4 +1,4 @@
-package com.samco.grapheasy.selecttrackgroup
+package com.samco.grapheasy.selectgraphstatgroup
 
 import android.app.Activity
 import android.os.Bundle
@@ -16,32 +16,34 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.grapheasy.R
 import com.samco.grapheasy.database.GraphEasyDatabase
 import com.samco.grapheasy.database.GraphEasyDatabaseDao
-import com.samco.grapheasy.database.TrackGroup
+import com.samco.grapheasy.database.GraphStatGroup
 import com.samco.grapheasy.databinding.FragmentSelectGroupBinding
 import com.samco.grapheasy.ui.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
-class SelectTrackGroupFragment : Fragment(),
+class SelectGraphStatGroupFragment : Fragment(),
     YesCancelDialogFragment.YesCancelDialogListener,
     AddGroupDialogFragment.AddGroupDialogListener,
     RenameGroupDialogFragment.RenameGroupDialogListener
 {
     private var navController: NavController? = null
     private lateinit var binding: FragmentSelectGroupBinding
-    private lateinit var viewModel: SelectTrackGroupViewModel
+    private lateinit var viewModel: SelectGraphStatGroupViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.navController = container?.findNavController()
-        binding = DataBindingUtil.inflate(inflater,
-            R.layout.fragment_select_group, container, false)
+        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_select_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel = ViewModelProviders.of(this).get(SelectTrackGroupViewModel::class.java)
+        viewModel = ViewModelProviders.of(this).get(SelectGraphStatGroupViewModel::class.java)
         viewModel.initViewModel(requireActivity())
 
         val adapter = GroupListAdapter(
             GroupClickListener(
-                this::onTrackGroupSelected,
+                this::onGraphStatGroupSelected,
                 this::onRenameClicked,
                 this::onDeleteClicked
             )
@@ -50,16 +52,15 @@ class SelectTrackGroupFragment : Fragment(),
         binding.groupList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         registerForContextMenu(binding.groupList)
 
-        observeTrackGroupDataAndUpdate(viewModel, adapter)
+        observeGraphStatGroupDataAndUpdate(adapter)
         setHasOptionsMenu(true)
         return binding.root
     }
 
-    private fun observeTrackGroupDataAndUpdate(selectTrackGroupViewModel: SelectTrackGroupViewModel,
-                                               adapter: GroupListAdapter) {
-        selectTrackGroupViewModel.trackGroups.observe(viewLifecycleOwner, Observer {
+    private fun observeGraphStatGroupDataAndUpdate(adapter: GroupListAdapter) {
+        viewModel.graphStatGroups.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.submitList(it.map { tg -> GroupItem(tg.id, tg.name) })
+                adapter.submitList(it.map { gsg -> GroupItem(gsg.id, gsg.name) })
             }
         })
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
@@ -69,45 +70,55 @@ class SelectTrackGroupFragment : Fragment(),
         })
     }
 
-    private fun onRenameClicked(groupItem: GroupItem) {
-        viewModel.currentActionGroupItem = groupItem
-        val dialog = RenameGroupDialogFragment()
-        childFragmentManager.let { dialog.show(it, "rename_track_group_dialog") }
+    private fun groupItemToGraphStatGroup(groupItem: GroupItem) = GraphStatGroup(groupItem.id, groupItem.name)
+
+    private fun onGraphStatGroupSelected(groupItem: GroupItem) {
+        navController?.navigate(
+            SelectGraphStatGroupFragmentDirections.actionSelectGraphStatGroup(groupItem.id)
+        )
     }
 
     override fun getGroupItem() = viewModel.currentActionGroupItem!!
 
-    override fun onRenameGroupItem(groupItem: GroupItem) {
-        viewModel.updateTrackGroup(groupItemToTrackGroup(groupItem))
+    private fun onRenameClicked(groupItem: GroupItem) {
+        viewModel.currentActionGroupItem = groupItem
+        val dialog = RenameGroupDialogFragment()
+        childFragmentManager.let { dialog.show(it, "rename_graph_stat_group_dialog") }
     }
 
-    override fun getRenameDialogHintText() = getString(R.string.track_group_name)
+    override fun onRenameGroupItem(groupItem: GroupItem) {
+        viewModel.updateGraphStatGroup(groupItemToGraphStatGroup(groupItem))
+    }
 
-    private fun groupItemToTrackGroup(groupItem: GroupItem) = TrackGroup(groupItem.id, groupItem.name)
+    override fun getRenameDialogHintText() = getString(R.string.graph_stat_group_name)
+
+    override fun onDialogYes(dialog: YesCancelDialogFragment) {
+        when (dialog.title) {
+            getString(R.string.ru_sure_del_graph_stat_group) -> viewModel.currentActionGroupItem?.let {
+                viewModel.deleteGraphStatGroup(groupItemToGraphStatGroup(it))
+            }
+        }
+    }
 
     private fun onDeleteClicked(groupItem: GroupItem) {
         viewModel.currentActionGroupItem = groupItem
         val dialog = YesCancelDialogFragment()
         var args = Bundle()
-        args.putString("title", getString(R.string.ru_sure_del_track_group))
+        args.putString("title", getString(R.string.ru_sure_del_graph_stat_group))
         dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "ru_sure_del_track_group_fragment") }
+        childFragmentManager.let { dialog.show(it, "ru_sure_del_graph_stat_group_fragment") }
     }
 
-    override fun onDialogYes(dialog: YesCancelDialogFragment) {
-        when (dialog.title) {
-            getString(R.string.ru_sure_del_track_group) -> viewModel.currentActionGroupItem?.let {
-                viewModel.deleteTrackGroup(groupItemToTrackGroup(it))
-            }
-        }
+    private fun onAddClicked() {
+        val dialog = AddGroupDialogFragment()
+        childFragmentManager.let { dialog.show(it, "add_graph_stat_group_dialog") }
     }
 
-    private fun onTrackGroupSelected(groupItem: GroupItem) {
-        navController?.navigate(
-            SelectTrackGroupFragmentDirections
-                .actionSelectTackGroup(groupItem.id, groupItem.name)
-        )
-    }
+    override fun onAddGroup(name: String) { viewModel.addGraphStatGroup(GraphStatGroup(0L, name)) }
+
+    override fun getAddGroupHintText() = getString(R.string.graph_stat_group_name)
+
+    override fun getAddGroupTitleText() = getString(R.string.add_graph_stat_group)
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.select_group_menu, menu)
@@ -120,50 +131,32 @@ class SelectTrackGroupFragment : Fragment(),
         }
         return super.onOptionsItemSelected(item)
     }
-
-    private fun onAddClicked() {
-        val dialog = AddGroupDialogFragment()
-        childFragmentManager.let { dialog.show(it, "add_track_group_dialog") }
-    }
-
-    override fun getAddGroupHintText() = getString(R.string.track_group_name)
-
-    override fun getAddGroupTitleText() = getString(R.string.add_track_group)
-
-    override fun onAddGroup(name: String) {
-        viewModel.addTrackGroup(TrackGroup(0, name))
-    }
 }
 
-class SelectTrackGroupViewModel : ViewModel() {
+class SelectGraphStatGroupViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
     private var dataSource: GraphEasyDatabaseDao? = null
+    lateinit var graphStatGroups: LiveData<List<GraphStatGroup>>
+
     var currentActionGroupItem: GroupItem? = null
-    lateinit var trackGroups: LiveData<List<TrackGroup>>
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return
         dataSource = GraphEasyDatabase.getInstance(activity.application).graphEasyDatabaseDao
-        trackGroups = dataSource!!.getTrackGroups()
+        graphStatGroups = dataSource!!.getGraphStatGroups()
     }
 
-    //TODO check all view models to make sure they do this
-    override fun onCleared() {
-        super.onCleared()
-        ioScope.cancel()
+    fun deleteGraphStatGroup(graphStatGroup: GraphStatGroup) = ioScope.launch {
+        dataSource!!.deleteGraphStatGroup(graphStatGroup)
     }
 
-    fun deleteTrackGroup(trackGroup: TrackGroup) = ioScope.launch {
-        dataSource!!.deleteTrackGroup(trackGroup)
+    fun updateGraphStatGroup(graphStatGroup: GraphStatGroup) = ioScope.launch {
+        dataSource!!.updateGraphStatGroup(graphStatGroup)
     }
 
-    fun addTrackGroup(trackGroup: TrackGroup) = ioScope.launch {
-        dataSource!!.insertTrackGroup(trackGroup)
-    }
-
-    fun updateTrackGroup(trackGroup: TrackGroup) = ioScope.launch {
-        dataSource!!.updateTrackGroup(trackGroup)
+    fun addGraphStatGroup(graphStatGroup: GraphStatGroup) = ioScope.launch {
+        dataSource!!.insertGraphStatGroup(graphStatGroup)
     }
 }

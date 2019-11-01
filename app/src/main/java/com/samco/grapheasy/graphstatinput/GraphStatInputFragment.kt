@@ -26,7 +26,6 @@ import org.threeten.bp.Duration
 import java.lang.Exception
 import java.text.DecimalFormat
 
-
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
     private val args: GraphStatInputFragmentArgs by navArgs()
@@ -41,7 +40,7 @@ class GraphStatInputFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_graph_stat_input, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel = ViewModelProviders.of(this).get(GraphStatInputViewModel::class.java)
-        viewModel.initViewModel(requireActivity(), args.graphStatId)
+        viewModel.initViewModel(requireActivity(), args.graphStatGroupId, args.graphStatId)
         binding.demoGraphStatView.hideMenuButton()
         listenToViewModelState()
         return binding.root
@@ -360,6 +359,7 @@ class GraphStatInputViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
+    private var graphStatGroupId: Long = -1L
     private var graphStatId: Long? = null
     private var id: Long? = null
 
@@ -372,9 +372,8 @@ class GraphStatInputViewModel : ViewModel() {
     val selectedValueStatFromValue = MutableLiveData<Double>(0.toDouble())
     val selectedValueStatToValue = MutableLiveData<Double>(0.toDouble())
     var lineGraphFeatures = listOf<LineGraphFeature>()
-
     val updateMode: LiveData<Boolean> get() { return _updateMode }
-    val _updateMode = MutableLiveData<Boolean>(false)
+    private val _updateMode = MutableLiveData<Boolean>(false)
     val state: LiveData<GraphStatInputState> get() { return _state }
     private val _state = MutableLiveData<GraphStatInputState>(GraphStatInputState.INITIALIZING)
     val formValid: LiveData<ValidationException?> get() { return _formValid }
@@ -382,8 +381,9 @@ class GraphStatInputViewModel : ViewModel() {
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
 
 
-    fun initViewModel(activity: Activity, graphStatId: Long) {
+    fun initViewModel(activity: Activity, graphStatGroupId: Long, graphStatId: Long) {
         if (dataSource != null) return
+        this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
         dataSource = GraphEasyDatabase.getInstance(activity.application).graphEasyDatabaseDao
         allFeatures = dataSource!!.getAllFeaturesAndTrackGroups()
@@ -562,7 +562,7 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     fun constructGraphOrStat() = GraphOrStat(
-        graphStatId ?: 0L, graphName.value!!, graphStatType.value!!
+        graphStatId ?: 0L, graphStatGroupId, graphName.value!!, graphStatType.value!!
     )
 
     fun constructLineGraph(graphStatId: Long) = LineGraph(

@@ -24,7 +24,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dialog_input_spacing"
                         android:text="@string/feature_name"
-                        android:labelFor="@id/featureNameText"
+                        android:labelFor="@id/trackGroupNameText"
                         android:textSize="@dimen/dialog_label_text_size"/>
                 <EditText
                         android:id="@+id/featureNameText"

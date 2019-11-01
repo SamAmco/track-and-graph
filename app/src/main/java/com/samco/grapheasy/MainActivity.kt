@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navController = findNavController(R.id.nav_fragment)
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.selectTrackGroupFragment, R.id.graphsAndStatsFragment), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(setOf(R.id.selectTrackGroupFragment, R.id.selectGraphStatGroupFragment), drawerLayout)
         navView = findViewById(R.id.nav_view)
 
         setSupportActionBar(findViewById(R.id.toolbar))

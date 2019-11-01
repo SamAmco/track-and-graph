@@ -25,10 +25,10 @@ data class TimeSinceLastStat(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
-    @ColumnInfo(name = "graph_stat_id")
+    @ColumnInfo(name = "graph_stat_id", index = true)
     val graphStatId: Long,
 
-    @ColumnInfo(name = "feature_id")
+    @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,
 
     @ColumnInfo(name = "from_value")

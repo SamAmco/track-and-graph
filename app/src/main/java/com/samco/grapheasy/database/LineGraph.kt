@@ -66,7 +66,7 @@ data class LineGraph(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
-    @ColumnInfo(name = "graph_stat_id")
+    @ColumnInfo(name = "graph_stat_id", index = true)
     val graphStatId: Long,
 
     @ColumnInfo(name = "features")

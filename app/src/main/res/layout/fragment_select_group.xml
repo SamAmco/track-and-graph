@@ -14,7 +14,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                tools:listitem="@layout/list_item_track_group"/>
+                tools:listitem="@layout/list_item_group"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

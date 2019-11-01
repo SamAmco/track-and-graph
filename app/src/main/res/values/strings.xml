@@ -3,6 +3,8 @@
     <string name="add_track_group">Add Track Group: </string>
     <string name="add">Add</string>
     <string name="track_group_name">Track Group Name</string>
+    <string name="add_graph_stat_group">Add Graph Group: </string>
+    <string name="graph_stat_group_name">Graph Group Name</string>
     <string name="feature_name_hint">Feature Name</string>
     <string name="delete">Delete</string>
     <string name="rename">Rename</string>
@@ -15,6 +17,7 @@
     <string name="cancel">Cancel</string>
     <string name="select_file">Select File</string>
     <string name="ru_sure_del_track_group">Are you sure you want to delete this track group and all of it\'s tracked data?</string>
+    <string name="ru_sure_del_graph_stat_group">Are you sure you want to delete this graph group and all of it\'s graphs and statistics?</string>
     <string name="ru_sure_del_feature">Are you sure you want to delete this feature and all of it\'s tracked data?</string>
     <string name="ru_sure_del_data_point">Are you sure you want to delete this data point?</string>
     <string name="export_file_name_suffix">%s-%s-%04d%02d%02d-%02d%02d%02d.csv</string>

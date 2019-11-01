@@ -31,9 +31,10 @@ val dataVisColorList = listOf(
 
 
 @Database(
-    entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphOrStat::class, LineGraph::class,
-        AverageTimeBetweenStat::class, PieChart::class, TimeSinceLastStat::class],
-    version = 22,
+    entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
+        GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
+        TimeSinceLastStat::class],
+    version = 24,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -48,7 +49,7 @@ abstract class GraphEasyDatabase : RoomDatabase() {
                 var instance = INSTANCE
                 if (instance == null) {
                     instance = Room.databaseBuilder(context.applicationContext, GraphEasyDatabase::class.java, "graph_easy_database")
-                        .fallbackToDestructiveMigration()//TODO consider migration
+                        .fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance
                 }

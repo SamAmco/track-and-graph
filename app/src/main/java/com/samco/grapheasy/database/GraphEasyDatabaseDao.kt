@@ -15,6 +15,18 @@ interface GraphEasyDatabaseDao {
     @Query("SELECT * FROM track_groups_table ORDER BY id DESC")
     fun getTrackGroups() : LiveData<List<TrackGroup>>
 
+    @Query("SELECT * FROM graph_stat_groups_table ORDER BY id DESC")
+    fun getGraphStatGroups() : LiveData<List<GraphStatGroup>>
+
+    @Delete
+    fun deleteGraphStatGroup(graphStatGroup: GraphStatGroup)
+
+    @Update
+    fun updateGraphStatGroup(graphStatGroup: GraphStatGroup)
+
+    @Insert
+    fun insertGraphStatGroup(graphStatGroup: GraphStatGroup)
+
     @Query("SELECT * FROM track_groups_table WHERE id = :id LIMIT 1")
     fun getTrackGroupById(id: Int) : TrackGroup
 
@@ -124,8 +136,8 @@ interface GraphEasyDatabaseDao {
     @Query("SELECT * FROM time_since_last_stat_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
-    @Query("SELECT * FROM graphs_and_stats_table")
-    fun getAllGraphStats(): LiveData<List<GraphOrStat>>
+    @Query("SELECT * FROM graphs_and_stats_table WHERE graph_stat_group_id = :graphStatGroupId")
+    fun getGraphsAndStatsByGroupId(graphStatGroupId: Long): LiveData<List<GraphOrStat>>
 
     @Query("SELECT * FROM graphs_and_stats_table")
     fun getAllGraphStatsSync(): List<GraphOrStat>

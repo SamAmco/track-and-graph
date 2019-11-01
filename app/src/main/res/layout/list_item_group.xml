@@ -2,22 +2,10 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools">
-
-    <data>
-        <variable
-                name="clickListener"
-                type="com.samco.grapheasy.selecttrackgroup.TrackGroupListener"/>
-        <variable
-                name="trackGroup"
-                type="com.samco.grapheasy.database.TrackGroup"/>
-    </data>
-
-
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="90dp"
             android:layout_margin="5dp"
-            android:onClick="@{() -> clickListener.onClick(trackGroup)}"
             android:layout_gravity="center"
             android:id="@+id/cardView"
             app:cardCornerRadius="@dimen/card_corner_radius"
@@ -32,13 +20,12 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"/>
         <TextView
-                android:id="@+id/featureNameText"
-                android:text="@{trackGroup.name}"
+                android:id="@+id/graphStatGroupNameText"
                 android:textSize="20sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp"
-                tools:text="Track Group Name"/>
+                tools:text="Group Name that spans over two lines eventually"/>
     </androidx.cardview.widget.CardView>
 </layout>

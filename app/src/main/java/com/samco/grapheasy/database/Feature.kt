@@ -20,7 +20,7 @@ data class Feature (
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "track_group_id")
+    @ColumnInfo(name = "track_group_id", index = true)
     val trackGroupId: Long,
 
     @ColumnInfo(name = "type")
