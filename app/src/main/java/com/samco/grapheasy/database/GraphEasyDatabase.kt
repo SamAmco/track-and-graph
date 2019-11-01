@@ -61,12 +61,6 @@ abstract class GraphEasyDatabase : RoomDatabase() {
 
 class Converters {
     @TypeConverter
-    fun stringToListOfStrings(value: String): List<String> = value.split(",").toList()
-
-    @TypeConverter
-    fun listOfStringsToString(value: List<String>): String = value.joinToString(",")
-
-    @TypeConverter
     fun stringToListOfDiscreteValues(value: String): List<DiscreteValue> {
         return if (value.isEmpty()) listOf()
         else value.split(",").map { s -> DiscreteValue.fromString(s) }.toList()
