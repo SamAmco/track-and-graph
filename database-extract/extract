@@ -2,9 +2,9 @@
 set -e 
 
 #extract db files
-adb -d shell "run-as com.samco.grapheasy cat databases/graph_easy_database" > ge_database.db
-adb -d shell "run-as com.samco.grapheasy cat databases/graph_easy_database-wal" > ge_database.db-wal
-adb -d shell "run-as com.samco.grapheasy cat databases/graph_easy_database-shm" > ge_database.db-shm
+adb -d shell "run-as com.samco.trackandgraph cat databases/trackandgraph_database" > ge_database.db
+adb -d shell "run-as com.samco.trackandgraph cat databases/trackandgraph_database-wal" > ge_database.db-wal
+adb -d shell "run-as com.samco.trackandgraph cat databases/trackandgraph_database-shm" > ge_database.db-shm
 
 #commit changes from write ahead logging
 sqlite3 ge_database.db "PRAGMA wal_checkpoint"

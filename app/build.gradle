@@ -18,7 +18,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.samco.grapheasy"
+        applicationId "com.samco.trackandgraph"
         minSdkVersion 19
         targetSdkVersion 29
         versionCode 1

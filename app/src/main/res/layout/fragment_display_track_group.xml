@@ -5,10 +5,10 @@
     <data>
         <variable
                 name="trackGroup"
-                type="com.samco.grapheasy.database.TrackGroup" />
+                type="com.samco.trackandgraph.database.TrackGroup" />
         <variable
                 name="displayTrackGroupViewModel"
-                type="com.samco.grapheasy.displaytrackgroup.DisplayTrackGroupViewModel" />
+                type="com.samco.trackandgraph.displaytrackgroup.DisplayTrackGroupViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

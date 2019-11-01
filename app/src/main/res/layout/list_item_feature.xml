@@ -5,10 +5,10 @@
     <data>
         <variable
                 name="clickListener"
-                type="com.samco.grapheasy.displaytrackgroup.FeatureClickListener"/>
+                type="com.samco.trackandgraph.displaytrackgroup.FeatureClickListener"/>
         <variable
                 name="feature"
-                type="com.samco.grapheasy.database.DisplayFeature"/>
+                type="com.samco.trackandgraph.database.DisplayFeature"/>
     </data>
     <FrameLayout
             android:layout_width="wrap_content"

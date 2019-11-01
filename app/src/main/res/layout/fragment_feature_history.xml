@@ -4,7 +4,7 @@
     <data>
         <variable
                 name="feature"
-                type="com.samco.grapheasy.database.Feature" />
+                type="com.samco.trackandgraph.database.Feature" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

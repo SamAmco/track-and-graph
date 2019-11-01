@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.samco.grapheasy">
+          package="com.samco.trackandgraph">
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
@@ -10,11 +10,11 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:name=".GraphEasyApplication"
+            android:name="com.samco.trackandgraph.TrackAndGraphApplication"
             android:theme="@style/AppTheme">
         <activity
                 android:theme="@style/AppTheme.NoActionBar"
-                android:name=".MainActivity"
+                android:name="com.samco.trackandgraph.MainActivity"
                 android:windowSoftInputMode="adjustPan"
                 >
             <intent-filter>

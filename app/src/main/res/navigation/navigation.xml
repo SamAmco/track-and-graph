@@ -6,7 +6,7 @@
             app:startDestination="@id/selectTrackGroupFragment">
 
     <fragment android:id="@+id/selectTrackGroupFragment"
-              android:name="com.samco.grapheasy.selecttrackgroup.SelectTrackGroupFragment"
+              android:name="com.samco.trackandgraph.selecttrackgroup.SelectTrackGroupFragment"
               android:label="@string/app_name"
               tools:layout="@layout/fragment_select_group">
         <action
@@ -14,7 +14,7 @@
                 app:destination="@id/displayTrackGroupFragment" />
     </fragment>
     <fragment android:id="@+id/displayTrackGroupFragment"
-            android:name="com.samco.grapheasy.displaytrackgroup.DisplayTrackGroupFragment"
+            android:name="com.samco.trackandgraph.displaytrackgroup.DisplayTrackGroupFragment"
             tools:layout="@layout/fragment_display_track_group">
         <argument
                 android:name="trackGroup"
@@ -30,7 +30,7 @@
                 app:destination="@id/addFeatureFragment" />
     </fragment>
     <fragment android:id="@+id/featureHistoryFragment"
-            android:name="com.samco.grapheasy.featurehistory.FragmentFeatureHistory"
+            android:name="com.samco.trackandgraph.featurehistory.FragmentFeatureHistory"
             tools:layout="@layout/fragment_feature_history">
         <argument
                 android:name="feature"
@@ -41,7 +41,7 @@
     </fragment>
     <fragment
             android:id="@+id/graphsAndStatsFragment"
-            android:name="com.samco.grapheasy.graphsandstats.GraphsAndStatsFragment"
+            android:name="com.samco.trackandgraph.graphsandstats.GraphsAndStatsFragment"
             android:label="@string/graphs_and_statistics"
             tools:layout="@layout/graphs_and_stats_fragment" >
         <action
@@ -55,7 +55,7 @@
     </fragment>
     <fragment
             android:id="@+id/graphStatInputFragment"
-            android:name="com.samco.grapheasy.graphstatinput.GraphStatInputFragment"
+            android:name="com.samco.trackandgraph.graphstatinput.GraphStatInputFragment"
             android:label="@string/add_a_graph_or_stat"
             tools:layout="@layout/fragment_graph_stat_input" >
         <argument
@@ -68,7 +68,7 @@
     </fragment>
     <fragment
             android:id="@+id/addFeatureFragment"
-            android:name="com.samco.grapheasy.displaytrackgroup.AddFeatureFragment"
+            android:name="com.samco.trackandgraph.displaytrackgroup.AddFeatureFragment"
             android:label="AddFeatureFragment">
         <argument
                 android:name="trackGroupId"
@@ -79,7 +79,7 @@
     </fragment>
     <fragment
             android:id="@+id/viewGraphStatFragment"
-            android:name="com.samco.grapheasy.graphsandstats.ViewGraphStatFragment"
+            android:name="com.samco.trackandgraph.graphsandstats.ViewGraphStatFragment"
             android:label="ViewGraphStatFragment" >
         <argument
                 android:name="graphStatId"
@@ -87,7 +87,7 @@
     </fragment>
     <fragment
             android:id="@+id/selectGraphStatGroupFragment"
-            android:name="com.samco.grapheasy.selectgraphstatgroup.SelectGraphStatGroupFragment"
+            android:name="com.samco.trackandgraph.selectgraphstatgroup.SelectGraphStatGroupFragment"
             android:label="@string/graphs_and_statistics" >
         <action
                 android:id="@+id/action_select_graph_stat_group"
