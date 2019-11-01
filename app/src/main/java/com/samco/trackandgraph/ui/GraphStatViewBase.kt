@@ -44,6 +44,8 @@ abstract class GraphStatViewBase : FrameLayout {
     private val creationTime = OffsetDateTime.now()
     private var listViewMode = false
 
+    private val currentXYRegions = mutableListOf<RectRegion>()
+
     private val lineGraphHourMinuteSecondFromat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm:ss")
         .withZone(ZoneId.systemDefault())
@@ -89,6 +91,7 @@ abstract class GraphStatViewBase : FrameLayout {
 
     private fun cleanAllViews() {
         binding.legendFlexboxLayout.removeAllViews()
+        currentXYRegions.clear()
         binding.lineGraph.clear()
         binding.pieChart.clear()
         binding.progressBar.visibility = View.GONE
@@ -215,8 +218,8 @@ abstract class GraphStatViewBase : FrameLayout {
             binding.progressBar.visibility = View.VISIBLE
             if (tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph)) {
                 setUpLineGraphXAxis()
-                binding.lineGraph.calculateMinMaxVals()
-                val bounds = binding.lineGraph.bounds
+                val bounds = RectRegion()
+                currentXYRegions.forEach { r -> bounds.union(r) }
                 binding.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
                 binding.lineGraph.redraw()
                 binding.lineGraph.visibility = View.VISIBLE
@@ -366,7 +369,7 @@ abstract class GraphStatViewBase : FrameLayout {
         addSeries(series, lineGraphFeature)
     }
 
-    private fun addSeries(series: XYSeries, lineGraphFeature: LineGraphFeature) {
+    private fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
         val seriesFormat =
             if (listViewMode) {
                 val sf = FastLineAndPointRenderer.Formatter(
@@ -382,6 +385,7 @@ abstract class GraphStatViewBase : FrameLayout {
                 sf.linePaint.color = getColor(context, lineGraphFeature.colorId)
                 sf
             }
+        currentXYRegions.add(series.minMax())
         binding.lineGraph.addSeries(series, seriesFormat)
     }
 
