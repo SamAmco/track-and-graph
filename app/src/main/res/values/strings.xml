@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Track&amp;Graph</string>
+    <string name="app_name">Track &amp; Graph</string>
     <string name="add_track_group">Add Track Group: </string>
     <string name="add">Add</string>
     <string name="track_group_name">Track Group Name</string>
@@ -35,7 +35,7 @@
     <string name="importButton">Import</string>
     <string name="export_to">Export to:</string>
     <string name="import_from">Import from:</string>
-    <string name="import_warning">Warning: Importing is irreversible. Track&amp;Graph will try to merge any imported feature data with existing features in this track group by name.</string>
+    <string name="import_warning">Warning: Importing is irreversible. Track &amp; Graph will try to merge any imported feature data with existing features in this track group by name.</string>
     <string name="features_colon">Features:</string>
     <string-array name="feature_types">
         <item>Continuous</item>
