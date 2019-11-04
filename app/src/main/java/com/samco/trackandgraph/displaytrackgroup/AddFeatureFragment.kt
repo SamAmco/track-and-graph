@@ -132,14 +132,16 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
     private fun validateForm() {
         var errorSet = false
         var discreteValueStrings = viewModel.discreteValues
-        if (viewModel.featureType.value!! == FeatureType.DISCRETE && discreteValueStrings.isNullOrEmpty()) {
-            setErrorText(getString(R.string.discrete_feature_needs_at_least_one_value))
-            errorSet = true
-        }
-        for (s in discreteValueStrings) {
-            if (s.isEmpty()) {
-                setErrorText(getString(R.string.discrete_value_must_have_name))
+        if (viewModel.featureType.value!! == FeatureType.DISCRETE) {
+            if (discreteValueStrings.isNullOrEmpty()) {
+                setErrorText(getString(R.string.discrete_feature_needs_at_least_one_value))
                 errorSet = true
+            }
+            for (s in discreteValueStrings) {
+                if (s.isEmpty()) {
+                    setErrorText(getString(R.string.discrete_value_must_have_name))
+                    errorSet = true
+                }
             }
         }
         binding.featureNameText.text.let {

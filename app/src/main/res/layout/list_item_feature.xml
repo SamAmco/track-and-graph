@@ -83,7 +83,7 @@
                             android:layout_height="1dp"
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="5dp"
-                            android:src="@color/colorAccent"
+                            android:src="@color/secondaryColor"
                             app:layout_constraintBottom_toTopOf="@id/addButton"
                             />
                     <TextView

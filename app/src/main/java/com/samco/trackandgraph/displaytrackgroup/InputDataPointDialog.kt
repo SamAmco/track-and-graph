@@ -93,7 +93,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
             viewPager.adapter = ViewPagerAdapter(
                 context!!,
                 features,
-                DataPointInputView.DataPointInputClickListener(this::onSubmitResult),
+                DataPointInputView.DataPointInputClickListener(this::onAddClicked),
                 viewModel.uiStates,
                 inputViews
             )
@@ -161,7 +161,11 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private fun onAddClicked() {
         val currIndex = viewModel.currentFeatureIndex.value!!
         val currFeature = viewModel.features.value!![currIndex]
-        onSubmitResult(viewModel.uiStates[currFeature]!!)
+        onAddClicked(currFeature)
+    }
+
+    private fun onAddClicked(feature: Feature) {
+        onSubmitResult(viewModel.uiStates[feature]!!)
     }
 
     override fun onCancel(dialog: DialogInterface) {

@@ -52,11 +52,11 @@ class GraphFeatureListItemView(
 
     private fun setupColorSpinner(context: Context) {
         binding.colorSpinner.adapter = CustomColorSpinnerAdapter(context, colorsList)
-        binding.colorSpinner.setSelection(colorsList.indexOf(lineGraphFeature.colorId))
+        binding.colorSpinner.setSelection(lineGraphFeature.colorIndex)
         binding.colorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                lineGraphFeature.colorId = colorsList[index]
+                lineGraphFeature.colorIndex = index
                 onUpdatedListener?.invoke(this@GraphFeatureListItemView)
             }
         }
@@ -144,15 +144,15 @@ class GraphFeatureListItemView(
         this.onRemoveListener = onRemoveListener
     }
 
-    private class CustomColorSpinnerAdapter(context: Context, val imageIds: List<Int>)
+    private class CustomColorSpinnerAdapter(context: Context, val colorIds: List<Int>)
         : ArrayAdapter<Int>(context, R.layout.spinner_item_color) {
 
-        override fun getCount() = imageIds.size
+        override fun getCount() = colorIds.size
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             var view = convertView ?: LayoutInflater.from(context)
                 .inflate(R.layout.spinner_item_color, parent, false)
-            view.findViewById<ImageView>(R.id.image).setColorFilter(getColor(context, imageIds[position]))
+            view.findViewById<ImageView>(R.id.image).setColorFilter(getColor(context, colorIds[position]))
             return view
         }
 

@@ -89,7 +89,7 @@ class Converters {
 
     @TypeConverter
     fun lineGraphFeaturesToString(value: List<LineGraphFeature>): String {
-        return value.joinToString(","){ v -> "${v.featureId};${v.name};${v.colorId};${v.averagingMode.ordinal};${v.plottingMode.ordinal};${v.offset};${v.scale}" }
+        return value.joinToString(","){ v -> "${v.featureId};${v.name};${v.colorIndex};${v.averagingMode.ordinal};${v.plottingMode.ordinal};${v.offset};${v.scale}" }
     }
 
     @TypeConverter

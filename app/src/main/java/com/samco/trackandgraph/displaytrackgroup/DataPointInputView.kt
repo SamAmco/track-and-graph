@@ -7,6 +7,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
@@ -17,7 +18,6 @@ import com.samco.trackandgraph.database.FeatureType
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
-import timber.log.Timber
 
 class DataPointInputView(context: Context, val state: DataPointInputData)
     : ConstraintLayout(context), TextWatcher {
@@ -66,6 +66,12 @@ class DataPointInputView(context: Context, val state: DataPointInputData)
             numberInput.visibility = View.VISIBLE
             numberInput.requestFocus()
             numberInput.addTextChangedListener(this)
+            numberInput.setOnEditorActionListener { v, i, e ->
+                return@setOnEditorActionListener if ((i and EditorInfo.IME_MASK_ACTION) != 0) {
+                    clickListener?.onClick?.invoke(state.feature)
+                    true
+                } else false
+            }
         } else {
             buttonsScroll.visibility = View.VISIBLE
             numberInput.visibility = View.GONE
@@ -98,7 +104,7 @@ class DataPointInputView(context: Context, val state: DataPointInputData)
         var label: String,
         var dateModifiable: Boolean
     )
-    class DataPointInputClickListener(val onClick: (DataPointInputData) -> Unit)
+    class DataPointInputClickListener(val onClick: (Feature) -> Unit)
     fun setOnClickListener(clickListener: DataPointInputClickListener) { this.clickListener = clickListener }
 
     private fun createButtons() {
@@ -106,7 +112,6 @@ class DataPointInputView(context: Context, val state: DataPointInputData)
         val inflater = LayoutInflater.from(context)
         for (discreteValue in state.feature.discreteValues.sortedBy { f -> f.index }) {
             val item = inflater.inflate(R.layout.discrete_value_input_button, buttonsLayout, false) as CheckBox
-            Timber.d(discreteValue.label)
             item.text = discreteValue.label
             item.setOnClickListener { onDiscreteValueClicked(discreteValue) }
             discreteValueCheckBoxes[discreteValue] = item
@@ -119,8 +124,7 @@ class DataPointInputView(context: Context, val state: DataPointInputData)
             state.value = discreteValue.index.toString()
             state.label = discreteValue.label
             discreteValueCheckBoxes.filter { kvp -> kvp.key != discreteValue }.forEach { kvp -> kvp.value.isChecked = false }
-            clickListener!!.onClick(DataPointInputData(state.feature, state.dateTime,
-                discreteValue.index.toString(), discreteValue.label, state.dateModifiable))
+            clickListener!!.onClick(state.feature)
         }
     }
 

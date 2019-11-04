@@ -8,6 +8,7 @@
             android:layout_height="wrap_content"
             android:padding="5dp"
             android:clipToPadding="false"
+            android:focusable="true"
             >
         <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"

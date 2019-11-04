@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
-    <color name="colorPrimaryDark">#00574B</color>
+    <color name="primaryColor">#74add1</color>
+    <color name="primaryLightColor">#a6dfff</color>
+    <color name="primaryDarkColor">#427ea0</color>
+    <color name="secondaryColor">#f46d43</color>
+    <color name="secondaryLightColor">#ff9e70</color>
+    <color name="secondaryDarkColor">#bb3d18</color>
+    <color name="primaryTextColor">#000000</color>
+    <color name="secondaryTextColor">#000000</color>
+
+    <color name="backgroundColor">#FFFFFF</color>
     <color name="colorShadowButton">#E0E0E0</color>
     <color name="colorGridLines">#66000000</color>
-    <color name="colorAccent">#D81B60</color>
     <color name="regularText">@android:color/tab_indicator_text</color>
     <color name="divider">#616161</color>
-    <color name="errorText">#FF0000</color>
-    <color name="backgroundColor">#FFFFFF</color>
+    <color name="errorText">#bb3d18</color>
 
     <color name="visColor1">#a50026</color>
     <color name="visColor2">#d73027</color>

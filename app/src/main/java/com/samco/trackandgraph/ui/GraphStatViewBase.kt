@@ -261,7 +261,7 @@ abstract class GraphStatViewBase : FrameLayout {
             val segForm = SegmentFormatter(getColor(context, colorId))
             segForm.labelPaint.color = Color.TRANSPARENT
             val percentage = "%.1f".format((s.value.toDouble() / total) * 100f)
-            inflateGraphLegendItem(colorId, "${s.title} ($percentage%)")
+            inflateGraphLegendItem(index, "${s.title} ($percentage%)")
             binding.pieChart.addSegment(s, segForm)
         }
     }
@@ -317,7 +317,7 @@ abstract class GraphStatViewBase : FrameLayout {
     private class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
     private suspend fun drawLineGraphFeature(lineGraph: LineGraph, lineGraphFeature: LineGraphFeature): Boolean {
-        inflateGraphLegendItem(lineGraphFeature.colorId, lineGraphFeature.name)
+        inflateGraphLegendItem(lineGraphFeature.colorIndex, lineGraphFeature.name)
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
         val rawDataSample = sampleData(lineGraphFeature.featureId, lineGraph.duration, movingAvDuration, plottingPeriod)
@@ -333,7 +333,8 @@ abstract class GraphStatViewBase : FrameLayout {
         } else false
     }
 
-    private fun inflateGraphLegendItem(colorId: Int, label: String) {
+    private fun inflateGraphLegendItem(colorIndex: Int, label: String) {
+        val colorId = dataVisColorList[colorIndex]
         binding.legendFlexboxLayout.addView(GraphLegendItemView(context, colorId, label))
     }
 
@@ -373,7 +374,7 @@ abstract class GraphStatViewBase : FrameLayout {
         val seriesFormat =
             if (listViewMode) {
                 val sf = FastLineAndPointRenderer.Formatter(
-                    getColor(context, lineGraphFeature.colorId),
+                    getColor(context, dataVisColorList[lineGraphFeature.colorIndex]),
                     null,
                     null
                 )
@@ -382,7 +383,7 @@ abstract class GraphStatViewBase : FrameLayout {
                 sf
             } else {
                 val sf = LineAndPointFormatter(context, R.xml.line_point_formatter)
-                sf.linePaint.color = getColor(context, lineGraphFeature.colorId)
+                sf.linePaint.color = getColor(context, dataVisColorList[lineGraphFeature.colorIndex])
                 sf
             }
         currentXYRegions.add(series.minMax())

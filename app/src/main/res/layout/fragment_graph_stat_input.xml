@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto">
-    <FrameLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent" >
         <ScrollView
                 android:id="@+id/scrollView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/addBar"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                >
             <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingRight="@dimen/card_padding"
-                    android:paddingLeft="@dimen/card_padding"
-                    android:paddingTop="@dimen/card_padding"
-                    android:paddingBottom="60dp"
+                    android:layout_gravity="top"
+                    android:padding="@dimen/card_padding"
                     >
 
                 <com.samco.trackandgraph.ui.GraphStatCardView
@@ -44,6 +46,7 @@
                         android:id="@+id/graphStatNameInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:inputType="text"
                         android:hint="@string/graph_name_hint"
                         />
 
@@ -65,6 +68,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dialog_input_spacing"
+                            android:focusable="true"
                             android:layout_marginLeft="@dimen/dialog_input_spacing"
                             android:entries="@array/graph_types"
                             />
@@ -275,11 +279,23 @@
         </ScrollView>
         <include
                 android:id="@+id/addBar"
-                layout="@layout/validate_add_footer"/>
+                layout="@layout/validate_add_footer"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                app:layout_constraintTop_toBottomOf="@+id/scrollView"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+            />
         <FrameLayout
                 android:id="@+id/inputProgressBar"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+            >
             <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -293,5 +309,5 @@
                     android:layout_gravity="center"
                     />
         </FrameLayout>
-    </FrameLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

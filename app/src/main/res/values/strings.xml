@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Track &amp; Graph</string>
     <string name="add_track_group">Add Track Group: </string>
+    <string name="add_feature">Add A Feature: </string>
     <string name="add">Add</string>
     <string name="track_group_name">Track Group Name</string>
     <string name="add_graph_stat_group">Add Graph Group: </string>
@@ -108,7 +109,7 @@
     <string name="graph_stat_validation_bad_type">Graph type not set</string>
     <string name="graph_stat_validation_unknown">An unknown error occurred</string>
     <string name="graph_stat_validation_no_name">Please provide a name</string>
-    <string name="graph_stat_validation_no_line_graph_features">Please add at least one feature to graph</string>
+    <string name="graph_stat_validation_no_line_graph_features">Please add at least one feature to a line graph</string>
     <string name="graph_stat_validation_invalid_value_stat_feature">Please select a valid feature</string>
     <string name="graph_stat_validation_invalid_value_stat_discrete_value">Please select a valid discrete value</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Please make sure that "From" is smaller than or equal to "To"</string>

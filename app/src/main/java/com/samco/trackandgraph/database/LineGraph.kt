@@ -48,7 +48,7 @@ val movingAverageDurations = mapOf(
 class LineGraphFeature(
     var featureId: Long,
     var name: String,
-    var colorId: Int,
+    var colorIndex: Int,
     var averagingMode : LineGraphAveraginModes,
     var plottingMode: LineGraphPlottingModes,
     var offset: Double,

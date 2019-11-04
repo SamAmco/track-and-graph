@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:text="@string/app_name"
         android:gravity="center"
-        android:textColor="@color/colorPrimary"
+        android:textColor="@color/primaryDarkColor"
         android:textSize="18sp"
         />
 </LinearLayout>

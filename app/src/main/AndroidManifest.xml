@@ -13,9 +13,9 @@
             android:name="com.samco.trackandgraph.TrackAndGraphApplication"
             android:theme="@style/AppTheme">
         <activity
-                android:theme="@style/AppTheme.NoActionBar"
+                android:theme="@style/AppTheme"
                 android:name="com.samco.trackandgraph.MainActivity"
-                android:windowSoftInputMode="adjustPan"
+                android:windowSoftInputMode="adjustResize"
                 >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

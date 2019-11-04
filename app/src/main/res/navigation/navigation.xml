@@ -69,7 +69,7 @@
     <fragment
             android:id="@+id/addFeatureFragment"
             android:name="com.samco.trackandgraph.displaytrackgroup.AddFeatureFragment"
-            android:label="AddFeatureFragment">
+            android:label="@string/add_feature">
         <argument
                 android:name="trackGroupId"
                 app:argType="long" />

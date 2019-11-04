@@ -174,8 +174,7 @@ class GraphStatInputFragment : Fragment() {
         binding.addFeatureButton.isClickable = true
         binding.addFeatureButton.setOnClickListener {
             val nextColorIndex = (viewModel.lineGraphFeatures.size * dataVisColorGenerator) % dataVisColorList.size
-            val color = dataVisColorList[nextColorIndex]
-            val newLineGraphFeature = LineGraphFeature(-1, "", color,
+            val newLineGraphFeature = LineGraphFeature(-1, "", nextColorIndex,
                 LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED, 0.toDouble(), 1.toDouble())
             viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.plus(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
@@ -201,7 +200,10 @@ class GraphStatInputFragment : Fragment() {
         )
         view.layoutParams = params
         binding.lineGraphFeaturesLayout.addView(view)
-        binding.lineGraphFeaturesLayout.post { binding.scrollView.fullScroll(View.FOCUS_DOWN) }
+        binding.lineGraphFeaturesLayout.post {
+            binding.scrollView.fullScroll(View.FOCUS_DOWN)
+            view.requestFocus()
+        }
     }
 
     private fun initPieChartAdapter(features: List<FeatureAndTrackGroup>) {
@@ -517,7 +519,7 @@ class GraphStatInputViewModel : ViewModel() {
         if (lineGraphFeatures.isEmpty())
             throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         lineGraphFeatures.forEach { f ->
-            if (!dataVisColorList.contains(f.colorId))
+            if (f.colorIndex !in dataVisColorList.indices)
                 throw ValidationException(R.string.graph_stat_validation_unrecognised_color)
             if (allFeatures.value?.map { feat -> feat.id }?.contains(f.featureId) != true)
                 throw ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)

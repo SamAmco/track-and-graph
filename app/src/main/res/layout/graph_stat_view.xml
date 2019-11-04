@@ -94,6 +94,8 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintHeight_max="140dp"
+                app:layout_constrainedHeight="true"
                 app:layout_constraintVertical_weight="0"
                 app:flexWrap="wrap"
                 app:alignContent="center"
