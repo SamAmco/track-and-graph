@@ -27,7 +27,10 @@ data class Feature (
     val featureType: FeatureType,
 
     @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<DiscreteValue>
+    val discreteValues: List<DiscreteValue>,
+
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int
 )
 
 enum class FeatureType { DISCRETE, CONTINUOUS }

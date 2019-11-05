@@ -12,59 +12,71 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
+import com.samco.trackandgraph.ui.OrderedListAdapter
 
-class FeatureAdapter(
-    private val clickListener: FeatureClickListener
-) : ListAdapter<DisplayFeature, FeatureAdapter.ViewHolder>(DisplayFeatureDiffCallback()) {
+class FeatureAdapter(private val clickListener: FeatureClickListener)
+    : OrderedListAdapter<DisplayFeature, FeatureViewHolder>(DisplayFeatureDiffCallback()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeatureViewHolder {
+        return FeatureViewHolder.from(parent)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: FeatureViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
     }
+}
 
-    class ViewHolder private constructor(private val binding: ListItemFeatureBinding)
-        : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+class FeatureViewHolder private constructor(private val binding: ListItemFeatureBinding)
+    : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
-        private var clickListener: FeatureClickListener? = null
-        private var feature: DisplayFeature? = null
+    private var clickListener: FeatureClickListener? = null
+    private var feature: DisplayFeature? = null
+    private var dropElevation = 0f
 
-        fun bind(feature: DisplayFeature, clickListener: FeatureClickListener) {
-            this.feature = feature
-            this.clickListener = clickListener
-            binding.feature = feature
-            binding.clickListener = clickListener
-            binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
-            binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
-            binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
-        }
+    fun bind(feature: DisplayFeature, clickListener: FeatureClickListener) {
+        this.feature = feature
+        this.clickListener = clickListener
+        this.dropElevation = binding.cardView.cardElevation
+        binding.feature = feature
+        binding.clickListener = clickListener
+        binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
+        binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
+        binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
+    }
 
-        private fun createContextMenu(view: View) {
-            val popup = PopupMenu(view.context, view)
-            popup.menuInflater.inflate(R.menu.edit_feature_context_menu, popup.menu)
-            popup.setOnMenuItemClickListener(this)
-            popup.show()
-        }
+    fun elevateCard() {
+        binding.cardView.postDelayed({
+            binding.cardView.cardElevation = binding.cardView.cardElevation * 3f
+        }, 10)
+    }
 
-        override fun onMenuItemClick(item: MenuItem?): Boolean {
-            feature?.let {
-                when (item?.itemId) {
-                    R.id.rename -> clickListener?.onRename(it)
-                    R.id.delete -> clickListener?.onDelete(it)
-                    else -> {}
-                }
+    fun dropCard() {
+        binding.cardView.cardElevation = dropElevation
+    }
+
+    private fun createContextMenu(view: View) {
+        val popup = PopupMenu(view.context, view)
+        popup.menuInflater.inflate(R.menu.edit_feature_context_menu, popup.menu)
+        popup.setOnMenuItemClickListener(this)
+        popup.show()
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        feature?.let {
+            when (item?.itemId) {
+                R.id.rename -> clickListener?.onRename(it)
+                R.id.delete -> clickListener?.onDelete(it)
+                else -> {}
             }
-            return false
         }
+        return false
+    }
 
-        companion object {
-            fun from(parent: ViewGroup): ViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ListItemFeatureBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding)
-            }
+    companion object {
+        fun from(parent: ViewGroup): FeatureViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val binding = ListItemFeatureBinding.inflate(layoutInflater, parent, false)
+            return FeatureViewHolder(binding)
         }
     }
 }

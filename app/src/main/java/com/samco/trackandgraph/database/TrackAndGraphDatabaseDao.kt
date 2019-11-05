@@ -39,16 +39,20 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateTrackGroups(trackGroups: List<TrackGroup>)
 
+    @Update
+    fun updateFeatures(features: List<Feature>)
+
     @Query("""SELECT features_table.*, num_data_points, last_timestamp from features_table 
         LEFT JOIN (
             SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
             FROM data_points_table GROUP BY feature_id
         ) as feature_data 
         ON feature_data.id = features_table.id
-		WHERE track_group_id = :trackGroupId""")
+		WHERE track_group_id = :trackGroupId
+        ORDER BY features_table.display_index ASC, id DESC""")
     fun getDisplayFeaturesForTrackGroup(trackGroupId: Long): LiveData<List<DisplayFeature>>
 
-    @Query("SELECT features_table.* FROM features_table WHERE track_group_id = :trackGroupId")
+    @Query("SELECT features_table.* FROM features_table WHERE track_group_id = :trackGroupId ORDER BY features_table.display_index ASC")
     fun getFeaturesForTrackGroupSync(trackGroupId: Long): List<Feature>
 
     @Query("""SELECT * FROM features_table WHERE id = :featureId LIMIT 1""")
@@ -60,7 +64,8 @@ interface TrackAndGraphDatabaseDao {
     @Query("""SELECT features_table.*, track_groups_table.name as track_group_name 
         FROM features_table 
         LEFT JOIN track_groups_table 
-        ON features_table.track_group_id = track_groups_table.id""")
+        ON features_table.track_group_id = track_groups_table.id
+        ORDER BY track_groups_table.display_index ASC, features_table.display_index ASC, features_table.id ASC""")
     fun getAllFeaturesAndTrackGroups(): LiveData<List<FeatureAndTrackGroup>>
 
     @Query("""SELECT features_table.*, track_groups_table.name as track_group_name 
@@ -70,7 +75,7 @@ interface TrackAndGraphDatabaseDao {
         WHERE features_table.id = :featureId LIMIT 1""")
     fun getFeatureAndTrackGroupByFeatureId(featureId: Long): FeatureAndTrackGroup?
 
-    @Query("""SELECT * from features_table WHERE id IN (:featureIds)""")
+    @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
 
     @Insert

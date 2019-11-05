@@ -1,18 +1,18 @@
 package com.samco.trackandgraph.displaytrackgroup
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentDisplayTrackGroupBinding
@@ -25,25 +25,22 @@ const val TRACK_GROUP_NAME_KEY = "TRACK_GROUP_NAME_KEY"
 class DisplayTrackGroupFragment : Fragment(),
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener {
-
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
     private lateinit var binding: FragmentDisplayTrackGroupBinding
+    private lateinit var adapter: FeatureAdapter
     private lateinit var viewModel: DisplayTrackGroupViewModel
-
-    private var updateJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.navController = container?.findNavController()
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_display_track_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        viewModel = createViewModel()
-        binding.displayTrackGroupViewModel = viewModel
+        viewModel = ViewModelProviders.of(this).get(DisplayTrackGroupViewModel::class.java)
+        viewModel.initViewModel(activity!!, args.trackGroup)
 
-        val adapter = FeatureAdapter(FeatureClickListener(
+        adapter = FeatureAdapter(FeatureClickListener(
             this::onFeatureRenameClicked,
             this::onFeatureDeleteClicked,
             this::onFeatureAddClicked,
@@ -51,6 +48,7 @@ class DisplayTrackGroupFragment : Fragment(),
         ))
         observeFeatureDataAndUpdate(viewModel, adapter)
         binding.featureList.adapter = adapter
+        ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.featureList)
         registerForContextMenu(binding.featureList)
         initializeGridLayout()
 
@@ -61,6 +59,34 @@ class DisplayTrackGroupFragment : Fragment(),
         return binding.root
     }
 
+    private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
+        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+            return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG,
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                        or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT)
+        }
+
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            adapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
+            return true
+        }
+
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            super.onSelectedChanged(viewHolder, actionState)
+            if (viewHolder != null && viewHolder is FeatureViewHolder && actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                viewHolder.elevateCard()
+            }
+        }
+
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            super.clearView(recyclerView, viewHolder)
+            (viewHolder as FeatureViewHolder).dropCard()
+            viewModel.adjustDisplayIndexes(adapter.getItems())
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { }
+    }
+
     private fun initializeGridLayout() {
         val dm = resources.displayMetrics
         val screenWidth = dm.widthPixels / dm.density
@@ -69,17 +95,15 @@ class DisplayTrackGroupFragment : Fragment(),
         binding.featureList.layoutManager = gridLayout
     }
 
-    private fun createViewModel(): DisplayTrackGroupViewModel {
-        val application = requireNotNull(this.activity).application
-        val dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        val viewModelFactory = DisplayTrackGroupViewModelFactory(args.trackGroup, dataSource)
-        return ViewModelProviders.of(this, viewModelFactory).get(DisplayTrackGroupViewModel::class.java)
-    }
-
     private fun observeFeatureDataAndUpdate(displayTrackGroupViewModel: DisplayTrackGroupViewModel, adapter: FeatureAdapter) {
         displayTrackGroupViewModel.features.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.submitList(it)
+                adapter.submitList(it.toMutableList())
+            }
+        })
+        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                binding.featureList.smoothScrollToPosition(0)
             }
         })
     }
@@ -94,7 +118,7 @@ class DisplayTrackGroupFragment : Fragment(),
 
     override fun getFeature(): Feature {
         val f = viewModel.currentActionFeature!!
-        return Feature(f.id, f.name, f.trackGroupId, f.featureType, f.discreteValues)
+        return Feature(f.id, f.name, f.trackGroupId, f.featureType, f.discreteValues, f.displayIndex)
     }
 
     private fun onFeatureDeleteClicked(feature: DisplayFeature) {
@@ -112,16 +136,6 @@ class DisplayTrackGroupFragment : Fragment(),
         }
     }
 
-    private fun onDeleteFeature(feature: DisplayFeature) {
-        val application = requireActivity().application
-        val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                dao.deleteFeature(feature.id)
-            }
-        }
-    }
-
     //TODO allow people to rename the discrete values if it is a discrete feature
     private fun onFeatureRenameClicked(feature: DisplayFeature) {
         viewModel.currentActionFeature = feature
@@ -129,15 +143,9 @@ class DisplayTrackGroupFragment : Fragment(),
         childFragmentManager.let { dialog.show(it, "rename_feature_dialog") }
     }
 
-    override fun onRenameFeature(feature: Feature) {
-        val application = requireActivity().application
-        val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                dao.updateFeature(feature)
-            }
-        }
-    }
+    private fun onDeleteFeature(feature: DisplayFeature) { viewModel.deleteFeature(feature) }
+
+    override fun onRenameFeature(feature: Feature) { viewModel.updateFeature(feature) }
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
         val argBundle = Bundle()
@@ -198,26 +206,50 @@ class DisplayTrackGroupFragment : Fragment(),
         inflater.inflate(R.menu.display_track_group_menu, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
+}
 
-    override fun onDestroy() {
-        super.onDestroy()
+class DisplayTrackGroupViewModel : ViewModel() {
+    private var dataSource: TrackAndGraphDatabaseDao? = null
+    private var trackGroupId: Long = -1
+
+    var currentActionFeature: DisplayFeature? = null
+    lateinit var features: LiveData<List<DisplayFeature>>
+        private set
+
+    private var updateJob = Job()
+    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
+
+    fun initViewModel(activity: Activity, trackGroupId: Long) {
+        if (dataSource != null) return
+        this.trackGroupId = trackGroupId
+        dataSource = TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
+        features = dataSource!!.getDisplayFeaturesForTrackGroup(trackGroupId)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
         updateJob.cancel()
     }
-}
 
-class DisplayTrackGroupViewModelFactory(
-    private val trackGroupId: Long,
-    private val dataSource: TrackAndGraphDatabaseDao
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(DisplayTrackGroupViewModel::class.java)) {
-            return DisplayTrackGroupViewModel(trackGroupId, dataSource) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
+    fun deleteFeature(feature: DisplayFeature) = ioScope.launch {
+        dataSource?.deleteFeature(feature.id)
     }
-}
 
-class DisplayTrackGroupViewModel(trackGroupId: Long, dataSource: TrackAndGraphDatabaseDao) : ViewModel() {
-    var currentActionFeature: DisplayFeature? = null
-    val features = dataSource.getDisplayFeaturesForTrackGroup(trackGroupId)
+    fun updateFeature(feature: Feature) = ioScope.launch {
+        dataSource?.updateFeature(feature)
+    }
+
+    fun adjustDisplayIndexes(displayFeatures: List<DisplayFeature>) {
+        ioScope.launch {
+            features.value?.let { oldList ->
+                val newList = displayFeatures.mapIndexed { i, df ->
+                    toFeature(oldList.first { f -> f.id == df.id }.copy(displayIndex = i))
+                }
+                dataSource!!.updateFeatures(newList)
+            }
+        }
+    }
+
+    private fun toFeature(df: DisplayFeature) = Feature(df.id, df.name, df.trackGroupId,
+        df.featureType, df.discreteValues, df.displayIndex)
 }

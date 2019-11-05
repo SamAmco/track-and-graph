@@ -15,7 +15,7 @@
         <activity
                 android:theme="@style/AppTheme"
                 android:name="com.samco.trackandgraph.MainActivity"
-                android:windowSoftInputMode="adjustResize"
+                android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
                 >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>

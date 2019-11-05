@@ -23,7 +23,6 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import kotlinx.android.synthetic.main.data_point_input_dialog.*
 import kotlinx.coroutines.*
-import timber.log.Timber
 
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
@@ -49,7 +48,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
             addButton = view.findViewById(R.id.addButton)
             indexText = view.findViewById(R.id.indexText)
 
-            cancelButton.setOnClickListener { onCancelClicked() }
+            cancelButton.setOnClickListener { dismiss() }
             skipButton.setOnClickListener { skip() }
             addButton.setOnClickListener { onAddClicked() }
 
@@ -58,6 +57,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
             listenToState()
 
             viewPager.addOnPageChangeListener(this)
+            dialog?.setCanceledOnTouchOutside(true)
 
             view
         } ?: throw IllegalStateException("Activity cannot be null")
@@ -75,7 +75,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
                         skip()
                         viewModel.onFinishedTransition()
                     }
-                    else closeDialog()
+                    else dismiss()
                 }
             }
         })
@@ -148,6 +148,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
         val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         if (feature.featureType == FeatureType.CONTINUOUS) imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
         else imm.hideSoftInputFromWindow(view?.windowToken, 0)
+        activity!!.currentFocus?.clearFocus()
     }
 
 
@@ -155,8 +156,6 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
         super.onResume()
         dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
-
-    private fun onCancelClicked() { closeDialog() }
 
     private fun onAddClicked() {
         val currIndex = viewModel.currentFeatureIndex.value!!
@@ -168,9 +167,11 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
         onSubmitResult(viewModel.uiStates[feature]!!)
     }
 
-    override fun onCancel(dialog: DialogInterface) {
-        super.onCancel(dialog)
-        closeDialog()
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        activity!!.currentFocus?.clearFocus()
+        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(activity!!.window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
@@ -181,12 +182,6 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     }
 
     private fun skip() = viewPager.setCurrentItem(viewPager.currentItem + 1, true)
-
-    private fun closeDialog() {
-        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view?.windowToken, 0)
-        dismiss()
-    }
 }
 
 enum class InputDataPointDialogState { LOADING, WAITING, ADDING, ADDED }
@@ -251,7 +246,6 @@ class InputDataPointDialogViewModel : ViewModel() {
         uiScope.launch {
             _state.value = InputDataPointDialogState.ADDING
             withContext(Dispatchers.IO) {
-                Timber.d("adding data point: ${dataPoint.value} to feature ${dataPoint.featureId}")
                 dao.insertDataPoint(dataPoint)
             }
             _state.value = InputDataPointDialogState.ADDED

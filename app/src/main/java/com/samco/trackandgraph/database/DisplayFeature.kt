@@ -23,7 +23,10 @@ data class DisplayFeature(
     val timestamp: OffsetDateTime?,
 
     @ColumnInfo(name = "num_data_points")
-    val numDataPoints: Long?
+    val numDataPoints: Long?,
+
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int
 ) {
     fun getDisplayTimestamp() = timestamp?.let { displayFeatureDateFormat.format(timestamp) }
 }

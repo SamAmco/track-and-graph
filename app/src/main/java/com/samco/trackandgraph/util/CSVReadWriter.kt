@@ -123,7 +123,7 @@ object CSVReadWriter {
         val discreteValues =
             if (featureType == FeatureType.DISCRETE) listOf(tryGetDiscreteValueFromString(rec.value, lineNumber, validationCharacters))
             else listOf()
-        val newFeature = Feature(0, rec.featureName, trackGroupId, featureType, discreteValues)
+        val newFeature = Feature(0, rec.featureName, trackGroupId, featureType, discreteValues, 0)
         val featureId = dataSource.insertFeature(newFeature)
         newFeature.id = featureId
         return newFeature
