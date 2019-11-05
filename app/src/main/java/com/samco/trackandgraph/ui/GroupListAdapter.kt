@@ -3,17 +3,12 @@ package com.samco.trackandgraph.ui
 import android.view.*
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
-import java.util.*
 
 class GroupListAdapter(private val clickListener: GroupClickListener)
-    : ListAdapter<GroupItem, GroupViewHolder>(GroupItemDiffCallback()) {
-
-    private var list: MutableList<GroupItem> = mutableListOf()
-
+    : OrderedListAdapter<GroupItem, GroupViewHolder>(GroupItemDiffCallback()) {
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
     }
@@ -21,19 +16,6 @@ class GroupListAdapter(private val clickListener: GroupClickListener)
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {
         return GroupViewHolder.from(parent)
     }
-
-    fun moveItem(fromPosition: Int, toPosition: Int) {
-        val item = list.removeAt(fromPosition)
-        list.add(toPosition, item)
-        super.notifyItemMoved(fromPosition, toPosition)
-    }
-
-    override fun submitList(list: MutableList<GroupItem>?) {
-        list?.let { this.list = list }
-        super.submitList(list)
-    }
-
-    fun getItems() = list
 }
 
 class GroupViewHolder private constructor(private val binding: ListItemGroupBinding)

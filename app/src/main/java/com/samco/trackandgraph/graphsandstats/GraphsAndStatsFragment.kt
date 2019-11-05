@@ -9,6 +9,7 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -18,7 +19,9 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.GraphStatType
 import com.samco.trackandgraph.databinding.GraphsAndStatsFragmentBinding
+import com.samco.trackandgraph.ui.GroupViewHolder
 import kotlinx.coroutines.*
+import timber.log.Timber
 
 class GraphsAndStatsFragment : Fragment() {
     private var navController: NavController? = null
@@ -45,11 +48,38 @@ class GraphsAndStatsFragment : Fragment() {
             activity!!.application
         )
         binding.graphStatList.adapter = adapter
+        ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.graphStatList)
         binding.graphStatList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         listenToViewModelState()
 
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
+        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+            return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.UP or ItemTouchHelper.DOWN)
+        }
+
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            adapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
+            return true
+        }
+
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            super.onSelectedChanged(viewHolder, actionState)
+            if (viewHolder != null && viewHolder is GraphStatViewHolder && actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
+                viewHolder.elevateCard()
+            }
+        }
+
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            super.clearView(recyclerView, viewHolder)
+            (viewHolder as GraphStatViewHolder).dropCard()
+            viewModel.adjustDisplayIndexes(adapter.getItems())
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { }
     }
 
     private fun onGraphStatClicked(graphOrStat: GraphOrStat) {
@@ -80,8 +110,13 @@ class GraphsAndStatsFragment : Fragment() {
     }
 
     private fun observeGraphStatsAndUpdate(adapter: GraphStatAdapter) {
+        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                binding.graphStatList.smoothScrollToPosition(0)
+            }
+        })
         viewModel.graphStats.observe(viewLifecycleOwner, Observer {
-            it?.let { adapter.submitList(it) }
+            it?.let { adapter.submitList(it.toMutableList()) }
         })
     }
 
@@ -159,5 +194,11 @@ class GraphsAndStatsViewModel : ViewModel() {
 
     fun deleteGraphStat(graphOrStat: GraphOrStat) {
         ioScope.launch { dataSource?.deleteGraphOrStat(graphOrStat) }
+    }
+
+    fun adjustDisplayIndexes(graphStats: List<GraphOrStat>) = ioScope.launch {
+        val newGraphStats = graphStats.mapIndexed { i, gs -> gs.copy(displayIndex = i) }
+        Timber.d(newGraphStats.joinToString { g -> "${g.displayIndex}" })
+        dataSource?.updateGraphStats(newGraphStats)
     }
 }

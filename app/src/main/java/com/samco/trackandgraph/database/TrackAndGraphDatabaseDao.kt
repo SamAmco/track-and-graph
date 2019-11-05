@@ -142,10 +142,10 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM time_since_last_stat_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
-    @Query("SELECT * FROM graphs_and_stats_table WHERE graph_stat_group_id = :graphStatGroupId")
+    @Query("SELECT * FROM graphs_and_stats_table WHERE graph_stat_group_id = :graphStatGroupId ORDER BY display_index ASC")
     fun getGraphsAndStatsByGroupId(graphStatGroupId: Long): LiveData<List<GraphOrStat>>
 
-    @Query("SELECT * FROM graphs_and_stats_table")
+    @Query("SELECT * FROM graphs_and_stats_table ORDER BY display_index ASC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
 
     @Insert
@@ -177,4 +177,7 @@ interface TrackAndGraphDatabaseDao {
 
     @Update
     fun updateGraphOrStat(graphOrStat: GraphOrStat)
+
+    @Update
+    fun updateGraphStats(graphStat: List<GraphOrStat>)
 }

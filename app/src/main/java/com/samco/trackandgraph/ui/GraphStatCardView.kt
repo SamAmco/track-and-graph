@@ -4,11 +4,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import androidx.cardview.widget.CardView
 import com.samco.trackandgraph.databinding.GraphStatCardViewBinding
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 
 class GraphStatCardView : GraphStatViewBase {
     private lateinit var binding: GraphStatCardViewBinding
+    lateinit var cardView: CardView
+        private set
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrSet: AttributeSet) : super(context, attrSet)
@@ -31,6 +34,7 @@ class GraphStatCardView : GraphStatViewBase {
 
     override fun getBinding(): GraphStatViewBinding {
         binding = GraphStatCardViewBinding.inflate(LayoutInflater.from(context), this, true)
+        cardView = binding.demoCardView
         return binding.graphStatView
     }
 }

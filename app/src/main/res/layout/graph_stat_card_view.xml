@@ -5,10 +5,10 @@
             android:id="@+id/demoCardView"
             android:layout_width="match_parent"
             android:layout_height="@dimen/graph_height"
-            android:layout_marginLeft="@dimen/cart_margin_small"
-            android:layout_marginRight="@dimen/cart_margin_small"
-            android:layout_marginBottom="@dimen/cart_margin_small"
-            android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:layout_marginLeft="@dimen/card_margin_small"
+            android:layout_marginRight="@dimen/card_margin_small"
+            android:layout_marginTop="@dimen/card_margin_small"
+            android:layout_marginBottom="@dimen/dialog_input_spacing"
             app:cardCornerRadius="@dimen/card_corner_radius"
             >
         <include

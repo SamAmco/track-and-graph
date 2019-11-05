@@ -23,6 +23,7 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
+import timber.log.Timber
 import java.lang.Exception
 import java.text.DecimalFormat
 
@@ -530,23 +531,13 @@ class GraphStatInputViewModel : ViewModel() {
         if (_state.value != GraphStatInputState.WAITING) return
         _state.value = GraphStatInputState.ADDING
         ioScope.launch {
-            val addLineGraph =
-                if (_updateMode.value!!) dataSource!!::updateLineGraph
-                else dataSource!!::insertLineGraph
-            val addPieChart =
-                if (_updateMode.value!!) dataSource!!::updatePieChart
-                else dataSource!!::insertPieChart
-            val addAvTimeBetween =
-                if (_updateMode.value!!) dataSource!!::updateAverageTimeBetweenStat
-                else dataSource!!::insertAverageTimeBetweenStat
-            val addTimeSince =
-                if (_updateMode.value!!) dataSource!!::updateTimeSinceLastStat
-                else dataSource!!::insertTimeSinceLastStat
-
             val graphStatId = if (_updateMode.value!!) {
                 dataSource!!.updateGraphOrStat(constructGraphOrStat())
                 graphStatId!!
-            } else dataSource!!.insertGraphOrStat(constructGraphOrStat())
+            } else {
+                shiftUpGraphStatViewIndexes()
+                dataSource!!.insertGraphOrStat(constructGraphOrStat())
+            }
 
             when (graphStatType.value) {
                 GraphStatType.LINE_GRAPH -> addLineGraph(constructLineGraph(graphStatId))
@@ -558,13 +549,41 @@ class GraphStatInputViewModel : ViewModel() {
         }
     }
 
+    private fun shiftUpGraphStatViewIndexes() {
+        val newList = dataSource!!.getAllGraphStatsSync().map {
+            it.copy(displayIndex = it.displayIndex + 1)
+        }
+        Timber.d(newList.joinToString { g -> "${g.displayIndex}" })
+        dataSource!!.updateGraphStats(newList)
+    }
+
+    private fun addLineGraph(lineGraph: LineGraph) {
+        if (_updateMode.value!!) dataSource!!.updateLineGraph(lineGraph)
+        else dataSource!!.insertLineGraph(lineGraph)
+    }
+
+    private fun addPieChart(pieChart: PieChart) {
+        if (_updateMode.value!!) dataSource!!.updatePieChart(pieChart)
+        else dataSource!!.insertPieChart(pieChart)
+    }
+
+    private fun addAvTimeBetween(averageTimeBetweenStat: AverageTimeBetweenStat) {
+        if (_updateMode.value!!) dataSource!!.updateAverageTimeBetweenStat(averageTimeBetweenStat)
+        else dataSource!!.insertAverageTimeBetweenStat(averageTimeBetweenStat)
+    }
+
+    private fun addTimeSince(timeSinceLastStat: TimeSinceLastStat) {
+        if (_updateMode.value!!) dataSource!!.updateTimeSinceLastStat(timeSinceLastStat)
+        else dataSource!!.insertTimeSinceLastStat(timeSinceLastStat)
+    }
+
     override fun onCleared() {
         super.onCleared()
         ioScope.cancel()
     }
 
     fun constructGraphOrStat() = GraphOrStat(
-        graphStatId ?: 0L, graphStatGroupId, graphName.value!!, graphStatType.value!!
+        graphStatId ?: 0L, graphStatGroupId, graphName.value!!, graphStatType.value!!, 0
     )
 
     fun constructLineGraph(graphStatId: Long) = LineGraph(
