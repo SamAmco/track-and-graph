@@ -7,9 +7,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
+import java.util.*
 
 class GroupListAdapter(private val clickListener: GroupClickListener)
     : ListAdapter<GroupItem, GroupViewHolder>(GroupItemDiffCallback()) {
+
+    private var list: MutableList<GroupItem> = mutableListOf()
+
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
     }
@@ -18,7 +22,18 @@ class GroupListAdapter(private val clickListener: GroupClickListener)
         return GroupViewHolder.from(parent)
     }
 
-    fun getItems() = (0 until itemCount).map { getItem(it) }
+    fun moveItem(fromPosition: Int, toPosition: Int) {
+        val item = list.removeAt(fromPosition)
+        list.add(toPosition, item)
+        super.notifyItemMoved(fromPosition, toPosition)
+    }
+
+    override fun submitList(list: MutableList<GroupItem>?) {
+        list?.let { this.list = list }
+        super.submitList(list)
+    }
+
+    fun getItems() = list
 }
 
 class GroupViewHolder private constructor(private val binding: ListItemGroupBinding)

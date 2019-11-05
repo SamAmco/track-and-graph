@@ -15,7 +15,7 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM track_groups_table ORDER BY display_index ASC")
     fun getTrackGroups() : LiveData<List<TrackGroup>>
 
-    @Query("SELECT * FROM graph_stat_groups_table ORDER BY id DESC")
+    @Query("SELECT * FROM graph_stat_groups_table ORDER BY display_index ASC")
     fun getGraphStatGroups() : LiveData<List<GraphStatGroup>>
 
     @Delete
@@ -23,6 +23,9 @@ interface TrackAndGraphDatabaseDao {
 
     @Update
     fun updateGraphStatGroup(graphStatGroup: GraphStatGroup)
+
+    @Update
+    fun updateGraphStatGroups(graphStatGroups: List<GraphStatGroup>)
 
     @Insert
     fun insertGraphStatGroup(graphStatGroup: GraphStatGroup)
