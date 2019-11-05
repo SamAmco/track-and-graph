@@ -60,7 +60,8 @@ class SelectGraphStatGroupFragment : Fragment(),
     private fun observeGraphStatGroupDataAndUpdate(adapter: GroupListAdapter) {
         viewModel.graphStatGroups.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.submitList(it.map { gsg -> GroupItem(gsg.id, gsg.name) })
+                //TODO implement display index here
+                adapter.submitList(it.map { gsg -> GroupItem(gsg.id, gsg.name, 0) })
             }
         })
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {

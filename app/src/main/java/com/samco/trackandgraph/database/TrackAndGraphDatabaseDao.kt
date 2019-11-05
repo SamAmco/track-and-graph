@@ -12,7 +12,7 @@ interface TrackAndGraphDatabaseDao {
     @Delete
     fun deleteTrackGroup(trackGroup: TrackGroup)
 
-    @Query("SELECT * FROM track_groups_table ORDER BY id DESC")
+    @Query("SELECT * FROM track_groups_table ORDER BY display_index ASC")
     fun getTrackGroups() : LiveData<List<TrackGroup>>
 
     @Query("SELECT * FROM graph_stat_groups_table ORDER BY id DESC")
@@ -32,6 +32,9 @@ interface TrackAndGraphDatabaseDao {
 
     @Update
     fun updateTrackGroup(trackGroup: TrackGroup)
+
+    @Update
+    fun updateTrackGroups(trackGroups: List<TrackGroup>)
 
     @Query("""SELECT features_table.*, num_data_points, last_timestamp from features_table 
         LEFT JOIN (

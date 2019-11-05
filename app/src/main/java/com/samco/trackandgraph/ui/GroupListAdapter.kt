@@ -9,53 +9,67 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 
 class GroupListAdapter(private val clickListener: GroupClickListener)
-    : ListAdapter<GroupItem, GroupListAdapter.ViewHolder>(GroupItemDiffCallback()) {
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+    : ListAdapter<GroupItem, GroupViewHolder>(GroupItemDiffCallback()) {
+    override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {
+        return GroupViewHolder.from(parent)
     }
 
-    class ViewHolder private constructor(private val binding: ListItemGroupBinding)
-        : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
-        var clickListener: GroupClickListener? = null
-        var groupItem: GroupItem? = null
+    fun getItems() = (0 until itemCount).map { getItem(it) }
+}
 
-        fun bind(groupItem: GroupItem, clickListener: GroupClickListener) {
-            this.groupItem = groupItem
-            this.clickListener = clickListener
-            binding.graphStatGroupNameText.text = groupItem.name
-            binding.cardView.setOnClickListener { clickListener.onClick(groupItem) }
-            binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
-        }
+class GroupViewHolder private constructor(private val binding: ListItemGroupBinding)
+    : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+    private var clickListener: GroupClickListener? = null
+    private var dropElevation = 0f
+    var groupItem: GroupItem? = null
+        private set
 
-        private fun createContextMenu(view: View) {
-            val popup = PopupMenu(view.context, view)
-            popup.menuInflater.inflate(R.menu.edit_group_context_menu, popup.menu)
-            popup.setOnMenuItemClickListener(this)
-            popup.show()
-        }
+    fun bind(groupItem: GroupItem, clickListener: GroupClickListener) {
+        this.groupItem = groupItem
+        this.clickListener = clickListener
+        dropElevation = binding.cardView.cardElevation
+        binding.graphStatGroupNameText.text = groupItem.name
+        binding.cardView.setOnClickListener { clickListener.onClick(groupItem) }
+        binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
+    }
 
-        override fun onMenuItemClick(item: MenuItem?): Boolean {
-            groupItem?.let {
-                when (item?.itemId) {
-                    R.id.rename -> clickListener?.onRename(it)
-                    R.id.delete -> clickListener?.onDelete(it)
-                    else -> {}
-                }
+    fun elevateCard() {
+        binding.cardView.postDelayed({
+            binding.cardView.cardElevation = binding.cardView.cardElevation * 3f
+        }, 10)
+    }
+
+    fun dropCard() {
+        binding.cardView.cardElevation = dropElevation
+    }
+
+    private fun createContextMenu(view: View) {
+        val popup = PopupMenu(view.context, view)
+        popup.menuInflater.inflate(R.menu.edit_group_context_menu, popup.menu)
+        popup.setOnMenuItemClickListener(this)
+        popup.show()
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        groupItem?.let {
+            when (item?.itemId) {
+                R.id.rename -> clickListener?.onRename(it)
+                R.id.delete -> clickListener?.onDelete(it)
+                else -> {}
             }
-            return false
         }
+        return false
+    }
 
-        companion object {
-            fun from(parent: ViewGroup): ViewHolder {
-                val layoutInflater = LayoutInflater.from(parent.context)
-                val binding = ListItemGroupBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding)
-            }
+    companion object {
+        fun from(parent: ViewGroup): GroupViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val binding = ListItemGroupBinding.inflate(layoutInflater, parent, false)
+            return GroupViewHolder(binding)
         }
     }
 }
@@ -69,7 +83,7 @@ class GroupItemDiffCallback : DiffUtil.ItemCallback<GroupItem>() {
     }
 }
 
-data class GroupItem (val id: Long, val name: String)
+data class GroupItem (val id: Long, val name: String, val displayIndex: Int)
 
 class GroupClickListener(val clickListener: (groupItem: GroupItem) -> Unit,
                          val onRenameListener: (groupItem: GroupItem) -> Unit,

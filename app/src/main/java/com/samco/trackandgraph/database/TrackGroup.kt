@@ -5,11 +5,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "track_groups_table")
-class TrackGroup(
+data class TrackGroup(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
-    var id: Long = -1L,
+    var id: Long,
 
     @ColumnInfo(name = "name")
-    val name: String = ""
+    val name: String,
+
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int
 )

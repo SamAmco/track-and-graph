@@ -24,7 +24,7 @@ class RenameGroupDialogFragment : NameInputDialogFragment() {
     }
 
     override fun onPositiveClicked(name: String) {
-        val newGroupItem = GroupItem(groupItem.id, name)
+        val newGroupItem = GroupItem(groupItem.id, name, groupItem.displayIndex)
         listener.onRenameGroupItem(newGroupItem)
     }
 

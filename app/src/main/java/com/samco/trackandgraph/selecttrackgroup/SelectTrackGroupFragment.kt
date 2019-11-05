@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ItemTouchHelper.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
@@ -29,6 +31,7 @@ class SelectTrackGroupFragment : Fragment(),
     private var navController: NavController? = null
     private lateinit var binding: FragmentSelectGroupBinding
     private lateinit var viewModel: SelectTrackGroupViewModel
+    private lateinit var adapter: GroupListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.navController = container?.findNavController()
@@ -39,7 +42,7 @@ class SelectTrackGroupFragment : Fragment(),
         viewModel = ViewModelProviders.of(this).get(SelectTrackGroupViewModel::class.java)
         viewModel.initViewModel(requireActivity())
 
-        val adapter = GroupListAdapter(
+        adapter = GroupListAdapter(
             GroupClickListener(
                 this::onTrackGroupSelected,
                 this::onRenameClicked,
@@ -47,6 +50,7 @@ class SelectTrackGroupFragment : Fragment(),
             )
         )
         binding.groupList.adapter = adapter
+        ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.groupList)
         binding.groupList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         registerForContextMenu(binding.groupList)
 
@@ -55,11 +59,37 @@ class SelectTrackGroupFragment : Fragment(),
         return binding.root
     }
 
+    private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
+        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+            return makeFlag(ACTION_STATE_DRAG, UP or DOWN)
+        }
+
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+            adapter.notifyItemMoved(viewHolder.adapterPosition, target.adapterPosition)
+            return true
+        }
+
+        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
+            super.onSelectedChanged(viewHolder, actionState)
+            if (viewHolder != null && viewHolder is GroupViewHolder && actionState == ACTION_STATE_DRAG) {
+                viewHolder.elevateCard()
+            }
+        }
+
+        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
+            super.clearView(recyclerView, viewHolder)
+            (viewHolder as GroupViewHolder).dropCard()
+            viewModel.adjustDisplayIndexes(adapter.getItems())
+        }
+
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { }
+    }
+
     private fun observeTrackGroupDataAndUpdate(selectTrackGroupViewModel: SelectTrackGroupViewModel,
                                                adapter: GroupListAdapter) {
         selectTrackGroupViewModel.trackGroups.observe(viewLifecycleOwner, Observer {
             it?.let {
-                adapter.submitList(it.map { tg -> GroupItem(tg.id, tg.name) })
+                adapter.submitList(it.map { tg -> GroupItem(tg.id, tg.name, tg.displayIndex) })
             }
         })
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
@@ -83,7 +113,9 @@ class SelectTrackGroupFragment : Fragment(),
 
     override fun getRenameDialogHintText() = getString(R.string.track_group_name)
 
-    private fun groupItemToTrackGroup(groupItem: GroupItem) = TrackGroup(groupItem.id, groupItem.name)
+    private fun groupItemToTrackGroup(groupItem: GroupItem): TrackGroup {
+        return TrackGroup(groupItem.id, groupItem.name, groupItem.displayIndex)
+    }
 
     private fun onDeleteClicked(groupItem: GroupItem) {
         viewModel.currentActionGroupItem = groupItem
@@ -131,7 +163,9 @@ class SelectTrackGroupFragment : Fragment(),
     override fun getAddGroupTitleText() = getString(R.string.add_track_group)
 
     override fun onAddGroup(name: String) {
-        viewModel.addTrackGroup(TrackGroup(0, name))
+        viewModel.addTrackGroup(
+            TrackGroup(0, name, viewModel.trackGroups.value?.size ?: 0)
+        )
     }
 }
 
@@ -165,5 +199,14 @@ class SelectTrackGroupViewModel : ViewModel() {
 
     fun updateTrackGroup(trackGroup: TrackGroup) = ioScope.launch {
         dataSource!!.updateTrackGroup(trackGroup)
+    }
+
+    fun adjustDisplayIndexes(groupItems: List<GroupItem>) = ioScope.launch {
+        trackGroups.value?.let { oldList ->
+            val newList = groupItems.mapIndexed { i, gi ->
+                oldList.first { tg -> tg.id == gi.id }.copy(displayIndex = i)
+            }
+            dataSource!!.updateTrackGroups(newList)
+        }
     }
 }
