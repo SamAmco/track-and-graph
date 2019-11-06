@@ -10,8 +10,6 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.TextView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -19,8 +17,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import kotlinx.android.synthetic.main.data_point_input_dialog.*
 import kotlinx.coroutines.*
 
@@ -30,47 +28,37 @@ const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private lateinit var viewModel: InputDataPointDialogViewModel
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
-
-    private lateinit var cancelButton: Button
-    private lateinit var skipButton: Button
-    private lateinit var addButton: Button
-    private lateinit var indexText: TextView
+    private lateinit var binding: DataPointInputDialogBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return activity?.let {
             viewModel = ViewModelProviders.of(this).get(InputDataPointDialogViewModel::class.java)
             initViewModel()
-            val view = it.layoutInflater.inflate(R.layout.data_point_input_dialog, null)
-            val viewPager = view.findViewById<ViewPager>(R.id.viewPager)
+            binding = DataPointInputDialogBinding.inflate(inflater, container, false)
 
-            cancelButton = view.findViewById(R.id.cancelButton)
-            skipButton = view.findViewById(R.id.skipButton)
-            addButton = view.findViewById(R.id.addButton)
-            indexText = view.findViewById(R.id.indexText)
-
-            cancelButton.setOnClickListener { dismiss() }
-            skipButton.setOnClickListener { skip() }
-            addButton.setOnClickListener { onAddClicked() }
+            binding.cancelButton.setOnClickListener { dismiss() }
+            binding.skipButton.setOnClickListener { skip() }
+            binding.addButton.setOnClickListener { onAddClicked() }
 
             listenToFeatures()
             listenToIndex()
             listenToState()
 
-            viewPager.addOnPageChangeListener(this)
+            binding.viewPager.addOnPageChangeListener(this)
             dialog?.setCanceledOnTouchOutside(true)
 
-            view
+            binding.root
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
     private fun listenToState() {
         viewModel.state.observe(this, Observer { state ->
             when (state) {
-                InputDataPointDialogState.LOADING -> { addButton.isEnabled = false }
-                InputDataPointDialogState.WAITING -> { addButton.isEnabled = true }
-                InputDataPointDialogState.ADDING -> { addButton.isEnabled = false }
+                InputDataPointDialogState.LOADING -> { binding.addButton.isEnabled = false }
+                InputDataPointDialogState.WAITING -> { binding.addButton.isEnabled = true }
+                InputDataPointDialogState.ADDING -> { binding.addButton.isEnabled = false }
                 InputDataPointDialogState.ADDED -> {
-                    addButton.isEnabled = true
+                    binding.addButton.isEnabled = true
                     if (viewModel.currentFeatureIndex.value!! < viewModel.features.value!!.size-1) {
                         skip()
                         viewModel.onFinishedTransition()
@@ -90,7 +78,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private fun listenToFeatures() {
         viewModel.features.observe(this, Observer { features ->
             if (features.isEmpty()) return@Observer
-            viewPager.adapter = ViewPagerAdapter(
+            binding.viewPager.adapter = ViewPagerAdapter(
                 context!!,
                 features,
                 DataPointInputView.DataPointInputClickListener(this::onAddClicked),
@@ -138,10 +126,10 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     override fun onPageSelected(position: Int) { viewModel.currentFeatureIndex.value = position }
 
     private fun setupViewFeature(feature: Feature, index: Int) {
-        if (feature.featureType == FeatureType.DISCRETE) addButton.visibility = View.GONE
-        else addButton.visibility = View.VISIBLE
-        if (index == viewModel.features.value!!.size-1) skipButton.visibility = View.GONE
-        else skipButton.visibility = View.VISIBLE
+        if (feature.featureType == FeatureType.DISCRETE) binding.addButton.visibility = View.GONE
+        else binding.addButton.visibility = View.VISIBLE
+        if (index == viewModel.features.value!!.size-1) binding.skipButton.visibility = View.GONE
+        else binding.skipButton.visibility = View.VISIBLE
         indexText.text = "${index+1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
@@ -154,7 +142,10 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
 
     override fun onResume() {
         super.onResume()
-        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+        dialog?.window?.setLayout(
+            ViewGroup.LayoutParams.MATCH_PARENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
     }
 
     private fun onAddClicked() {
@@ -181,7 +172,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
         )
     }
 
-    private fun skip() = viewPager.setCurrentItem(viewPager.currentItem + 1, true)
+    private fun skip() = binding.viewPager.setCurrentItem(binding.viewPager.currentItem + 1, true)
 }
 
 enum class InputDataPointDialogState { LOADING, WAITING, ADDING, ADDED }

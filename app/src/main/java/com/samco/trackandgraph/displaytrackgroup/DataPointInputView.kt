@@ -19,7 +19,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
-class DataPointInputView(context: Context, val state: DataPointInputData)
+class DataPointInputView(context: Context, private val state: DataPointInputData)
     : ConstraintLayout(context), TextWatcher {
 
     private val titleText: TextView
