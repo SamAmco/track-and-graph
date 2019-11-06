@@ -8,6 +8,15 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
+const val MAX_FEATURE_NAME_LENGTH = 40
+const val MAX_LABEL_LENGTH = 30
+const val MAX_DISCRETE_VALUES_PER_FEATURE = 10
+const val MAX_GRAPH_STAT_NAME_LENGTH = 100
+const val MAX_GRAPH_STAT_GROUP_NAME_LENGTH = 40
+const val MAX_TRACK_GROUP_NAME_LENGTH = 40
+const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
+const val MAX_LINE_GRAPH_FEATURES = 10
+
 val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
     .ofPattern("dd/MM/yy  HH:mm")
@@ -15,7 +24,7 @@ val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
 
 
 //this is a number coprime to the number of colours used to select them in a pseudo random order for greater contrast
-val dataVisColorGenerator = 7
+const val dataVisColorGenerator = 7
 val dataVisColorList = listOf(
     R.color.visColor1,
     R.color.visColor2,
@@ -29,6 +38,8 @@ val dataVisColorList = listOf(
     R.color.visColor10
 )
 
+const val splitChars1 = "||"
+const val splitChars2 = "!!"
 
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
@@ -63,11 +74,11 @@ class Converters {
     @TypeConverter
     fun stringToListOfDiscreteValues(value: String): List<DiscreteValue> {
         return if (value.isEmpty()) listOf()
-        else value.split(",").map { s -> DiscreteValue.fromString(s) }.toList()
+        else value.split(splitChars1).map { s -> DiscreteValue.fromString(s) }.toList()
     }
 
     @TypeConverter
-    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String = values.joinToString(",") { v -> v.toString() }
+    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String = values.joinToString(splitChars1) { v -> v.toString() }
 
     @TypeConverter
     fun intToFeatureType(i: Int): FeatureType = FeatureType.values()[i]
@@ -89,13 +100,22 @@ class Converters {
 
     @TypeConverter
     fun lineGraphFeaturesToString(value: List<LineGraphFeature>): String {
-        return value.joinToString(","){ v -> "${v.featureId};${v.name};${v.colorIndex};${v.averagingMode.ordinal};${v.plottingMode.ordinal};${v.offset};${v.scale}" }
+        return value.joinToString(splitChars1){ v ->
+            listOf("${v.featureId}",
+                v.name,
+                "${v.colorIndex}",
+                "${v.averagingMode.ordinal}",
+                "${v.plottingMode.ordinal}",
+                "${v.offset}",
+                "${v.scale}"
+            ).joinToString(splitChars2)
+        }
     }
 
     @TypeConverter
     fun stringToLineGraphFeatures(value: String): List<LineGraphFeature> {
-        return value.split(",").map {
-            val strs = it.split(';')
+        return value.split(splitChars1).map {
+            val strs = it.split(splitChars2)
             LineGraphFeature(
                 strs[0].toLong(),
                 strs[1],

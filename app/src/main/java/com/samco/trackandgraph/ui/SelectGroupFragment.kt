@@ -98,10 +98,7 @@ abstract class SelectGroupFragment : Fragment(),
 
     override fun getGroupItem() = viewModel.currentActionGroupItem!!
 
-    override fun onRenameGroupItem(groupItem: GroupItem) {
-        viewModel.updateGroup(groupItem)
-    }
-
+    override fun onRenameGroupItem(groupItem: GroupItem) = viewModel.updateGroup(groupItem)
     override fun getRenameDialogHintText() = getRenameDialogHint()
     abstract fun getRenameDialogHint(): String
 

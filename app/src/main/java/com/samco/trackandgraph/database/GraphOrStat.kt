@@ -16,7 +16,7 @@ enum class GraphStatType { LINE_GRAPH, PIE_CHART, AVERAGE_TIME_BETWEEN, TIME_SIN
 data class GraphOrStat(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
-    var id: Long = -1L,
+    val id: Long,
 
     @ColumnInfo(name = "graph_stat_group_id", index = true)
     val graphStatGroupId: Long,
@@ -29,4 +29,14 @@ data class GraphOrStat(
 
     @ColumnInfo(name = "display_index")
     val displayIndex: Int
-)
+) {
+    companion object {
+        fun create(id: Long, graphStatGroupId: Long, name: String,
+                   type: GraphStatType, displayIndex: Int): GraphOrStat {
+            val validName = name.take(MAX_GRAPH_STAT_NAME_LENGTH)
+                .replace(splitChars1, " ")
+                .replace(splitChars2, " ")
+            return GraphOrStat(id, graphStatGroupId, validName, type, displayIndex)
+        }
+    }
+}

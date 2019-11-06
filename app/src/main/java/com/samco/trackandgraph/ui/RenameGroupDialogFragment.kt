@@ -4,7 +4,6 @@ import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
 
 class RenameGroupDialogFragment : NameInputDialogFragment() {
-
     private lateinit var listener: RenameGroupDialogListener
     private lateinit var groupItem: GroupItem
 
@@ -12,7 +11,10 @@ class RenameGroupDialogFragment : NameInputDialogFragment() {
         fun getGroupItem() : GroupItem
         fun onRenameGroupItem(groupItem: GroupItem)
         fun getRenameDialogHintText(): String
+        fun getGroupNameMaxLength(): Int
     }
+
+    override fun getMaxChars(): Int = listener.getGroupNameMaxLength()
 
     override fun registerListener(parentFragment: Fragment?) {
         listener = parentFragment as RenameGroupDialogListener

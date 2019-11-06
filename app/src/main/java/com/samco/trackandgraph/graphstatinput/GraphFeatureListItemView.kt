@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.graphstatinput
 
 import android.content.Context
+import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,10 +12,7 @@ import android.widget.LinearLayout
 import androidx.core.content.ContextCompat.getColor
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.FeatureAndTrackGroup
-import com.samco.trackandgraph.database.LineGraphFeature
-import com.samco.trackandgraph.database.LineGraphAveraginModes
-import com.samco.trackandgraph.database.LineGraphPlottingModes
+import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
 import java.text.DecimalFormat
 
@@ -41,6 +39,7 @@ class GraphFeatureListItemView(
     }
 
     private fun setupGraphFeatureName() {
+        binding.lineGraphFeatureName.filters = arrayOf(InputFilter.LengthFilter(MAX_LINE_GRAPH_FEATURE_NAME_LENGTH))
         if (lineGraphFeature.name.isNotEmpty()) binding.lineGraphFeatureName.setText(lineGraphFeature.name)
         binding.lineGraphFeatureName.addTextChangedListener { text ->
             if(lineGraphFeature.name != text.toString()) {

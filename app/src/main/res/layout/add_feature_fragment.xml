@@ -30,7 +30,6 @@
                         android:id="@+id/featureNameText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:digits="@string/standard_name_allowed_digits"
                         />
 
                 <TextView

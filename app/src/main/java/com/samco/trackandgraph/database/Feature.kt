@@ -15,7 +15,7 @@ import java.lang.Exception
 data class Feature (
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
-    var id: Long,
+    val id: Long,
 
     @ColumnInfo(name = "name")
     val name: String,
@@ -31,15 +31,21 @@ data class Feature (
 
     @ColumnInfo(name = "display_index")
     val displayIndex: Int
-)
+) {
+    companion object {
+        fun create(id: Long, name: String, trackGroupId: Long, featureType: FeatureType,
+                   discreteValues: List<DiscreteValue>, displayIndex: Int): Feature {
+            discreteValues.forEach { dv -> validateDiscreteValue(dv) }
+            val validName = name
+                .take(MAX_FEATURE_NAME_LENGTH)
+                .replace(splitChars1, " ")
+                .replace(splitChars2, " ")
+            return Feature(id, validName, trackGroupId, featureType, discreteValues, displayIndex)
+        }
+    }
+}
 
 enum class FeatureType { DISCRETE, CONTINUOUS }
-
-const val MAX_FEATURE_NAME_LENGTH = 20
-const val MAX_LABEL_LENGTH = 20
-const val MAX_DISCRETE_VALUES_PER_FEATURE = 10
-//TODO add a max length for a track group name
-//TODO add a max length for a graph name
 
 data class DiscreteValue (val index: Int, val label: String) {
     override fun toString() = "$index:$label"
@@ -47,11 +53,18 @@ data class DiscreteValue (val index: Int, val label: String) {
         fun fromString(value: String): DiscreteValue {
             if (!value.contains(':')) throw Exception("value did not contain a colon")
             val label = value.substring(value.indexOf(':')+1).trim()
-            if (label.length > MAX_LABEL_LENGTH) throw Exception("label size exceeded the maximum size allowed")
-            val index = value.substring(0, value.indexOf(':')).trim().toIntOrNull()
-                ?: throw Exception("could not get index from value")
-            return DiscreteValue(index, label)
+            val index = value.substring(0, value.indexOf(':')).trim().toInt()
+            val discreteValue = DiscreteValue(index, label)
+            validateDiscreteValue(discreteValue)
+            return discreteValue
         }
         fun fromDataPoint(dataPoint: DataPoint) = DiscreteValue(dataPoint.value.toInt(), dataPoint.label)
     }
+}
+
+fun validateDiscreteValue(discreteValue: DiscreteValue) {
+    if (discreteValue.label.contains(splitChars1) || discreteValue.label.contains(splitChars2))
+        throw Exception("Illegal discrete value name")
+    if (discreteValue.label.length > MAX_LABEL_LENGTH)
+        throw Exception("label size exceeded the maximum size allowed")
 }

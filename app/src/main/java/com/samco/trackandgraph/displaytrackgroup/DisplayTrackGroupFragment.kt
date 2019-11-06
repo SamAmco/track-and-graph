@@ -25,6 +25,7 @@ const val TRACK_GROUP_NAME_KEY = "TRACK_GROUP_NAME_KEY"
 class DisplayTrackGroupFragment : Fragment(),
     RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener {
+
     private var navController: NavController? = null
     private val args: DisplayTrackGroupFragmentArgs by navArgs()
 
@@ -118,7 +119,7 @@ class DisplayTrackGroupFragment : Fragment(),
 
     override fun getFeature(): Feature {
         val f = viewModel.currentActionFeature!!
-        return Feature(f.id, f.name, f.trackGroupId, f.featureType, f.discreteValues, f.displayIndex)
+        return Feature.create(f.id, f.name, f.trackGroupId, f.featureType, f.discreteValues, f.displayIndex)
     }
 
     private fun onFeatureDeleteClicked(feature: DisplayFeature) {
@@ -143,9 +144,16 @@ class DisplayTrackGroupFragment : Fragment(),
         childFragmentManager.let { dialog.show(it, "rename_feature_dialog") }
     }
 
+    override fun getMaxFeatureNameChars(): Int = MAX_FEATURE_NAME_LENGTH
+
     private fun onDeleteFeature(feature: DisplayFeature) { viewModel.deleteFeature(feature) }
 
-    override fun onRenameFeature(feature: Feature) { viewModel.updateFeature(feature) }
+    override fun onRenameFeature(newName: String) {
+        val f = viewModel.currentActionFeature!!
+        val newFeature = Feature.create(f.id, newName, f.trackGroupId,
+            f.featureType, f.discreteValues, f.displayIndex)
+        viewModel.updateFeature(newFeature)
+    }
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
         val argBundle = Bundle()
@@ -250,6 +258,6 @@ class DisplayTrackGroupViewModel : ViewModel() {
         }
     }
 
-    private fun toFeature(df: DisplayFeature) = Feature(df.id, df.name, df.trackGroupId,
+    private fun toFeature(df: DisplayFeature) = Feature.create(df.id, df.name, df.trackGroupId,
         df.featureType, df.discreteValues, df.displayIndex)
 }

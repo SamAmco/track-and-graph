@@ -45,7 +45,7 @@ val movingAverageDurations = mapOf(
     LineGraphAveraginModes.YEARLY_MOVING_AVERAGE to Duration.ofDays(365)
 )
 
-class LineGraphFeature(
+data class LineGraphFeature(
     var featureId: Long,
     var name: String,
     var colorIndex: Int,
@@ -74,4 +74,21 @@ data class LineGraph(
 
     @ColumnInfo(name = "duration")
     val duration: Duration?
-)
+) {
+    companion object {
+        fun create(id: Long, graphStatId: Long, features: List<LineGraphFeature>, duration: Duration? ): LineGraph {
+            val validFeatures = features
+                .take(MAX_LINE_GRAPH_FEATURES)
+                .map { f -> validateLineGraphFeature(f) }
+            return LineGraph(id, graphStatId, validFeatures, duration)
+        }
+
+        private fun validateLineGraphFeature(f: LineGraphFeature): LineGraphFeature {
+            return f.copy(name = f.name
+                .take(MAX_LINE_GRAPH_FEATURE_NAME_LENGTH)
+                .replace(splitChars1, " ")
+                .replace(splitChars2, " ")
+            )
+        }
+    }
+}

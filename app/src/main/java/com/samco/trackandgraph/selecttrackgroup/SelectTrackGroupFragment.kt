@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.MAX_TRACK_GROUP_NAME_LENGTH
 import com.samco.trackandgraph.database.TrackGroup
 import com.samco.trackandgraph.ui.*
 import kotlinx.coroutines.*
@@ -21,6 +22,8 @@ class SelectTrackGroupFragment : SelectGroupFragment() {
     override fun getAddGroupHint() = getString(R.string.track_group_name)
 
     override fun getAddGroupTitle() = getString(R.string.add_track_group)
+
+    override fun getGroupNameMaxLength() = MAX_TRACK_GROUP_NAME_LENGTH
 
     override fun observeGroupDataAndUpdate(selectGroupViewModel: SelectGroupViewModel,
                                                adapter: GroupListAdapter) {
@@ -82,5 +85,5 @@ class SelectTrackGroupViewModel : SelectGroupViewModel() {
         }
     }
 
-    private fun toTG(gi: GroupItem) = TrackGroup(gi.id, gi.name, gi.displayIndex)
+    private fun toTG(gi: GroupItem) = TrackGroup.create(gi.id, gi.name, gi.displayIndex)
 }

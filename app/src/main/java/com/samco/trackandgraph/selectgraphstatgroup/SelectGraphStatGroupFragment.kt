@@ -6,6 +6,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.GraphStatGroup
+import com.samco.trackandgraph.database.MAX_GRAPH_STAT_GROUP_NAME_LENGTH
 import com.samco.trackandgraph.ui.*
 import kotlinx.coroutines.launch
 
@@ -23,6 +24,8 @@ class SelectGraphStatGroupFragment : SelectGroupFragment() {
             SelectGraphStatGroupFragmentDirections.actionSelectGraphStatGroup(groupItem.id)
         )
     }
+
+    override fun getGroupNameMaxLength(): Int = MAX_GRAPH_STAT_GROUP_NAME_LENGTH
 
     override fun getAddGroupHint() = getString(R.string.graph_stat_group_name)
 
@@ -80,5 +83,5 @@ class SelectGraphStatGroupViewModel : SelectGroupViewModel() {
         }
     }
 
-    private fun toGSG(gi: GroupItem) = GraphStatGroup(gi.id, gi.name, gi.displayIndex)
+    private fun toGSG(gi: GroupItem) = GraphStatGroup.create(gi.id, gi.name, gi.displayIndex)
 }

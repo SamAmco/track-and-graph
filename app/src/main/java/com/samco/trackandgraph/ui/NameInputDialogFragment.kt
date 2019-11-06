@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.WindowManager
 import android.widget.EditText
@@ -22,6 +23,7 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
     abstract fun getNameInputHint() : String
     abstract fun getTitleText() : String
     abstract fun getNameInputText() : String
+    abstract fun getMaxChars() : Int
 
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
@@ -32,6 +34,7 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
             editText.setText(getNameInputText())
             editText.setSelection(editText.text.length)
             editText.addTextChangedListener(this)
+            editText.filters = arrayOf(InputFilter.LengthFilter(getMaxChars()))
             view.findViewById<TextView>(R.id.prompt_text).text = getTitleText()
             var builder = AlertDialog.Builder(it)
             builder.setView(view)

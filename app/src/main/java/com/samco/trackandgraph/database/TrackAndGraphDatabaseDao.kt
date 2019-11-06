@@ -61,14 +61,14 @@ interface TrackAndGraphDatabaseDao {
     @Query("""SELECT * FROM features_table WHERE id = :featureId LIMIT 1""")
     fun tryGetFeatureById(featureId: Long): Feature?
 
-    @Query("""SELECT features_table.*, track_groups_table.name as track_group_name 
+    @Query("""SELECT features_table.*, track_groups_table.id as track_group_id, track_groups_table.name as track_group_name 
         FROM features_table 
         LEFT JOIN track_groups_table 
         ON features_table.track_group_id = track_groups_table.id
         ORDER BY track_groups_table.display_index ASC, features_table.display_index ASC, features_table.id ASC""")
     fun getAllFeaturesAndTrackGroups(): LiveData<List<FeatureAndTrackGroup>>
 
-    @Query("""SELECT features_table.*, track_groups_table.name as track_group_name 
+    @Query("""SELECT features_table.*, track_groups_table.id as track_group_id, track_groups_table.name as track_group_name 
         FROM features_table 
         LEFT JOIN track_groups_table 
         ON features_table.track_group_id = track_groups_table.id

@@ -130,7 +130,7 @@ class ImportFeaturesDialog : DialogFragment() {
 
     private fun onImportClicked() {
         progressBar.visibility = View.VISIBLE
-        viewModel.beginImport(activity!!, trackGroupId!!, getString(R.string.standard_name_allowed_digits))
+        viewModel.beginImport(activity!!, trackGroupId!!)
     }
 
     override fun onCancel(dialog: DialogInterface) {
@@ -163,7 +163,7 @@ class ImportFeaturesViewModel : ViewModel() {
         return@lazy exception
     }
 
-    fun beginImport(activity: Activity, trackGroupId: Long, validationCharacters: String) {
+    fun beginImport(activity: Activity, trackGroupId: Long) {
         if (_importState.value == ImportState.IMPORTING) return
         selectedFileUri.value?.let {
             _importState.value = ImportState.IMPORTING
@@ -176,7 +176,7 @@ class ImportFeaturesViewModel : ViewModel() {
                             val database = TrackAndGraphDatabase.getInstance(application)
                             val dao = database.trackAndGraphDatabaseDao
                             database.withTransaction {
-                                CSVReadWriter.readFeaturesFromCSV(dao, inputStream, trackGroupId, validationCharacters)
+                                CSVReadWriter.readFeaturesFromCSV(dao, inputStream, trackGroupId)
                             }
                         }
                     }

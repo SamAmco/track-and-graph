@@ -198,7 +198,6 @@ class GraphsAndStatsViewModel : ViewModel() {
 
     fun adjustDisplayIndexes(graphStats: List<GraphOrStat>) = ioScope.launch {
         val newGraphStats = graphStats.mapIndexed { i, gs -> gs.copy(displayIndex = i) }
-        Timber.d(newGraphStats.joinToString { g -> "${g.displayIndex}" })
         dataSource?.updateGraphStats(newGraphStats)
     }
 }

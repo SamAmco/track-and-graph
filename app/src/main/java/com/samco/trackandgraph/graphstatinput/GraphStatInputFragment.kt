@@ -3,6 +3,7 @@ package com.samco.trackandgraph.graphstatinput
 import android.app.Activity
 import android.os.Bundle
 import android.os.Handler
+import android.text.InputFilter
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -23,7 +24,6 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
-import timber.log.Timber
 import java.lang.Exception
 import java.text.DecimalFormat
 
@@ -40,6 +40,7 @@ class GraphStatInputFragment : Fragment() {
         this.navController = container?.findNavController()
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_graph_stat_input, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
+        binding.graphStatNameInput.filters = arrayOf(InputFilter.LengthFilter(MAX_GRAPH_STAT_NAME_LENGTH))
         viewModel = ViewModelProviders.of(this).get(GraphStatInputViewModel::class.java)
         viewModel.initViewModel(requireActivity(), args.graphStatGroupId, args.graphStatId)
         binding.demoGraphStatView.hideMenuButton()
@@ -61,7 +62,7 @@ class GraphStatInputFragment : Fragment() {
                     listenToFormValid()
                 }
                 GraphStatInputState.ADDING -> binding.inputProgressBar.visibility = View.VISIBLE
-                GraphStatInputState.FINISHED -> navController?.popBackStack()
+                else -> navController?.popBackStack()
             }
         })
     }
@@ -179,7 +180,6 @@ class GraphStatInputFragment : Fragment() {
                 LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED, 0.toDouble(), 1.toDouble())
             viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.plus(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
-
         }
         binding.scrollView.fullScroll(View.FOCUS_DOWN)
     }
@@ -193,6 +193,7 @@ class GraphStatInputFragment : Fragment() {
         view.setOnRemoveListener {
             viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.minus(lgf)
             binding.lineGraphFeaturesLayout.removeView(view)
+            binding.addFeatureButton.isEnabled = true
         }
         view.setOnUpdateListener { onFormUpdate() }
         val params = LinearLayout.LayoutParams(
@@ -204,6 +205,9 @@ class GraphStatInputFragment : Fragment() {
         binding.lineGraphFeaturesLayout.post {
             binding.scrollView.fullScroll(View.FOCUS_DOWN)
             view.requestFocus()
+        }
+        if (viewModel.lineGraphFeatures.size == MAX_LINE_GRAPH_FEATURES) {
+            binding.addFeatureButton.isEnabled = false
         }
     }
 
@@ -553,7 +557,6 @@ class GraphStatInputViewModel : ViewModel() {
         val newList = dataSource!!.getAllGraphStatsSync().map {
             it.copy(displayIndex = it.displayIndex + 1)
         }
-        Timber.d(newList.joinToString { g -> "${g.displayIndex}" })
         dataSource!!.updateGraphStats(newList)
     }
 
@@ -582,11 +585,11 @@ class GraphStatInputViewModel : ViewModel() {
         ioScope.cancel()
     }
 
-    fun constructGraphOrStat() = GraphOrStat(
+    fun constructGraphOrStat() = GraphOrStat.create(
         graphStatId ?: 0L, graphStatGroupId, graphName.value!!, graphStatType.value!!, 0
     )
 
-    fun constructLineGraph(graphStatId: Long) = LineGraph(
+    fun constructLineGraph(graphStatId: Long) = LineGraph.create(
         id ?: 0L, graphStatId, lineGraphFeatures, sampleDuration.value
     )
 

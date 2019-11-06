@@ -44,7 +44,6 @@
                     app:layout_constraintLeft_toRightOf="@id/indexText"
                     app:layout_constraintRight_toLeftOf="@+id/upButton"
                     app:layout_constraintHorizontal_weight="6"
-                    android:digits="@string/standard_name_allowed_digits"
                     />
             <ImageButton
                     android:id="@+id/upButton"

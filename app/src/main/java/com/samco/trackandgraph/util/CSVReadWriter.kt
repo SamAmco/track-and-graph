@@ -36,7 +36,7 @@ object CSVReadWriter {
         }
     }
 
-    suspend fun readFeaturesFromCSV(dataSource: TrackAndGraphDatabaseDao, inputStream: InputStream, trackGroupId: Long, validationCharacters: String) {
+    suspend fun readFeaturesFromCSV(dataSource: TrackAndGraphDatabaseDao, inputStream: InputStream, trackGroupId: Long) {
         try {
             inputStream.reader().use {
                 val records = CSVFormat.DEFAULT
@@ -45,7 +45,7 @@ object CSVReadWriter {
                     .parse(it)
                 val headerMap = records.headerMap
                 validateHeaderMap(headerMap)
-                ingestRecords(dataSource, records, trackGroupId, validationCharacters)
+                ingestRecords(dataSource, records, trackGroupId)
             }
         } catch (e: Exception) {
             if (e is ImportFeaturesException) throw e
@@ -53,7 +53,7 @@ object CSVReadWriter {
         }
     }
 
-    private suspend fun ingestRecords(dataSource: TrackAndGraphDatabaseDao, records: Iterable<CSVRecord>, trackGroupId: Long, validationCharacters: String) {
+    private suspend fun ingestRecords(dataSource: TrackAndGraphDatabaseDao, records: Iterable<CSVRecord>, trackGroupId: Long) {
         val existingFeatures = dataSource.getFeaturesForTrackGroupSync(trackGroupId).toMutableList()
         val existingFeaturesByName = existingFeatures.map { it.name to it }.toMap().toMutableMap()
         val newDataPoints = mutableListOf<DataPoint>()
@@ -83,7 +83,7 @@ object CSVReadWriter {
         }
 
         val addDiscreteDataPoint = { value: String, timestamp: OffsetDateTime, feature: Feature, lineNumber: Int ->
-            val discreteValue = tryGetDiscreteValueFromString(value, lineNumber, validationCharacters)
+            val discreteValue = tryGetDiscreteValueFromString(value, lineNumber)
             newDataPoints.add(DataPoint(timestamp, feature.id, discreteValue.index.toString(), discreteValue.label))
             discreteValue
         }
@@ -102,8 +102,7 @@ object CSVReadWriter {
                     addContinuousDataPoint(rec.value, rec.timestamp, feature.id, lineNumber)
                 }
             } else {
-                validateInputString(rec.featureName, validationCharacters)
-                val newFeature = createNewFeature(dataSource, rec, trackGroupId, lineNumber, validationCharacters)
+                val newFeature = createNewFeature(dataSource, rec, trackGroupId, lineNumber)
                 insertFeature(newFeature)
                 if (newFeature.featureType == FeatureType.DISCRETE) addDiscreteDataPoint(rec.value, rec.timestamp, newFeature, lineNumber)
                 else addContinuousDataPoint(rec.value, rec.timestamp, newFeature.id, lineNumber)
@@ -117,28 +116,23 @@ object CSVReadWriter {
         if (newDataPoints.isNotEmpty()) dataSource.insertDataPoints(newDataPoints)
     }
 
-    private fun createNewFeature(dataSource: TrackAndGraphDatabaseDao, rec: RecordData, trackGroupId: Long, lineNumber: Int, validationCharacters: String): Feature {
+    private fun createNewFeature(dataSource: TrackAndGraphDatabaseDao, rec: RecordData, trackGroupId: Long, lineNumber: Int): Feature {
         if (rec.featureName.length > MAX_FEATURE_NAME_LENGTH) throw ImportFeaturesException(R.string.import_exception_feature_name_too_long, listOf(lineNumber.toString()))
         val featureType = getFeatureTypeForValue(rec.value)
         val discreteValues =
-            if (featureType == FeatureType.DISCRETE) listOf(tryGetDiscreteValueFromString(rec.value, lineNumber, validationCharacters))
+            if (featureType == FeatureType.DISCRETE) listOf(tryGetDiscreteValueFromString(rec.value, lineNumber))
             else listOf()
-        val newFeature = Feature(0, rec.featureName, trackGroupId, featureType, discreteValues, 0)
+        val newFeature = Feature.create(0, rec.featureName, trackGroupId, featureType, discreteValues, 0)
         val featureId = dataSource.insertFeature(newFeature)
-        newFeature.id = featureId
-        return newFeature
+        return newFeature.copy(id = featureId)
     }
 
     private fun validateValueContinuous(value: String, lineNumber: Int) {
         if (value.toDoubleOrNull() == null) throw ImportFeaturesException(R.string.import_exception_not_a_valid_number, listOf(lineNumber.toString()))
     }
 
-    private fun tryGetDiscreteValueFromString(string: String, lineNumber: Int, validationCharacters: String): DiscreteValue {
-        try {
-            val discreteValue = DiscreteValue.fromString(string)
-            validateInputString(discreteValue.label, validationCharacters)
-            return discreteValue
-        }
+    private fun tryGetDiscreteValueFromString(string: String, lineNumber: Int): DiscreteValue {
+        try { return DiscreteValue.fromString(string) }
         catch (e: Exception) { throw ImportFeaturesException(R.string.import_exception_bad_discrete_value, listOf(lineNumber.toString())) }
     }
 
@@ -167,11 +161,6 @@ object CSVReadWriter {
 
     private fun getFeatureTypeForValue(value: String): FeatureType {
         return if (value.contains(':')) FeatureType.DISCRETE else FeatureType.CONTINUOUS
-    }
-
-    private fun validateInputString(input: String, validationCharacters: String) {
-        val invalidChar = input.firstOrNull { c -> !validationCharacters.contains(c) }
-        if (invalidChar != null) throw ImportFeaturesException(R.string.import_exception_invalid_character, listOf(invalidChar.toString()))
     }
 
     class ImportFeaturesException(val stringId: Int, val stringArgs: List<String>? = null) : Exception()

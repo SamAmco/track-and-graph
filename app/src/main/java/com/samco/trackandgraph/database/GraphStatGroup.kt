@@ -8,11 +8,18 @@ import androidx.room.PrimaryKey
 data class GraphStatGroup(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
-    var id: Long = -1L,
+    val id: Long,
 
     @ColumnInfo(name = "name")
-    val name: String = "",
+    val name: String,
 
     @ColumnInfo(name = "display_index")
     val displayIndex: Int
-)
+) {
+    companion object {
+        fun create(id: Long, name: String, displayIndex: Int): GraphStatGroup {
+            val validName = name.take(MAX_GRAPH_STAT_GROUP_NAME_LENGTH)
+            return GraphStatGroup(id, validName, displayIndex)
+        }
+    }
+}

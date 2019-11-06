@@ -6,13 +6,17 @@ import com.samco.trackandgraph.database.Feature
 import com.samco.trackandgraph.ui.NameInputDialogFragment
 
 class RenameFeatureDialogFragment : NameInputDialogFragment() {
+
     private lateinit var listener: RenameFeatureDialogListener
     private lateinit var feature: Feature
 
     interface RenameFeatureDialogListener {
         fun getFeature() : Feature
-        fun onRenameFeature(feature: Feature)
+        fun onRenameFeature(newName: String)
+        fun getMaxFeatureNameChars(): Int
     }
+
+    override fun getMaxChars(): Int = listener.getMaxFeatureNameChars()
 
     override fun registerListener(parentFragment: Fragment?) {
         listener = parentFragment as RenameFeatureDialogListener
@@ -23,10 +27,7 @@ class RenameFeatureDialogFragment : NameInputDialogFragment() {
         return getString(R.string.rename)
     }
 
-    override fun onPositiveClicked(name: String) {
-        val newFeature = feature.copy(name = name)
-        listener.onRenameFeature(newFeature)
-    }
+    override fun onPositiveClicked(name: String) = listener.onRenameFeature(name)
 
     override fun getNameInputHint(): String = getString(R.string.feature_name_hint)
 

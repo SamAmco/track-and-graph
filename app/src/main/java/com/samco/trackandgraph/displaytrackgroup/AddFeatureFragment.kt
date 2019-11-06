@@ -241,7 +241,7 @@ class AddFeatureViewModel : ViewModel() {
             _isAdding.value = AddFeatureState.ADDING
             withContext(Dispatchers.IO) {
                 val discVals = discreteValues.mapIndexed { i, s -> DiscreteValue(i, s) }
-                val feature = Feature(0, name, trackGroupId, featureType.value!!, discVals, 0)
+                val feature = Feature.create(0, name, trackGroupId, featureType.value!!, discVals, 0)
                 database.withTransaction { dao.insertFeature(feature) }
             }
             _isAdding.value = AddFeatureState.DONE

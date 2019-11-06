@@ -12,6 +12,9 @@ data class FeatureAndTrackGroup(
     @ColumnInfo(name = "track_group_id")
     val trackGroupId: Long,
 
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int,
+
     @ColumnInfo(name = "type")
     val featureType: FeatureType = FeatureType.CONTINUOUS,
 
