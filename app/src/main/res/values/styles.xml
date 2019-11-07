@@ -17,5 +17,12 @@
         <item name="backgroundTint">@color/secondaryColor</item>
     </style>
 
+    <style name="EmptyPageHintTextStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:layout_width">250dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:alpha">0.6</item>
+        <item name="android:textAlignment">center</item>item>
+    </style>
 
 </resources>

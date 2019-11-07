@@ -53,6 +53,7 @@ class DisplayTrackGroupFragment : Fragment(),
         registerForContextMenu(binding.featureList)
         initializeGridLayout()
 
+        binding.queueAddAllButton.hide()
         binding.queueAddAllButton.setOnClickListener { onQueueAddAllClicked() }
 
         setHasOptionsMenu(true)
@@ -100,6 +101,14 @@ class DisplayTrackGroupFragment : Fragment(),
         displayTrackGroupViewModel.features.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it.toMutableList())
+            }
+            if (it.isNullOrEmpty()) {
+                binding.noFeaturesHintText.text = getString(R.string.no_features_hint)
+                binding.noFeaturesHintText.visibility = View.VISIBLE
+                binding.queueAddAllButton.hide()
+            } else {
+                binding.queueAddAllButton.show()
+                binding.noFeaturesHintText.visibility = View.INVISIBLE
             }
         })
         adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {

@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.selecttrackgroup
 
 import android.app.Activity
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -33,6 +34,10 @@ class SelectTrackGroupFragment : SelectGroupFragment() {
             it?.let {
                 adapter.submitList(it.map { tg -> GroupItem(tg.id, tg.name, tg.displayIndex) }.toMutableList())
             }
+            if (it.isNullOrEmpty()) {
+                binding.noGroupsHintText.text = getString(R.string.no_track_groups_hint)
+                binding.noGroupsHintText.visibility = View.VISIBLE
+            } else binding.noGroupsHintText.visibility = View.INVISIBLE
         })
     }
 

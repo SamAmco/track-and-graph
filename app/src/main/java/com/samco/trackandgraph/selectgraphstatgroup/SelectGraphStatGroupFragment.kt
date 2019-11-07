@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.selectgraphstatgroup
 
 import android.app.Activity
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -38,6 +39,10 @@ class SelectGraphStatGroupFragment : SelectGroupFragment() {
             it?.let {
                 adapter.submitList(it.map { gsg -> GroupItem(gsg.id, gsg.name, gsg.displayIndex) }.toMutableList())
             }
+            if (it.isNullOrEmpty()) {
+                binding.noGroupsHintText.text = getString(R.string.no_graph_stat_groups_hint)
+                binding.noGroupsHintText.visibility = View.VISIBLE
+            } else binding.noGroupsHintText.visibility = View.INVISIBLE
         })
     }
 }

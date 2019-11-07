@@ -16,6 +16,16 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 tools:listitem="@layout/list_item_group"/>
 
+        <TextView
+            android:id="@+id/noGroupsHintText"
+            style="@style/EmptyPageHintTextStyle"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            tools:text="some hint text to tell you what to do next"
+            />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

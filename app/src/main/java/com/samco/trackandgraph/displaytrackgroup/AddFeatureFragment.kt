@@ -39,6 +39,10 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
         binding = DataBindingUtil.inflate(inflater, R.layout.add_feature_fragment, container, false)
         navController = container?.findNavController()
 
+        binding.discreteValuesTextView.visibility = View.INVISIBLE
+        binding.discreteValues.visibility = View.INVISIBLE
+        binding.addDiscreteValueButton.visibility = View.INVISIBLE
+        binding.discreteValuesTipText.visibility = View.INVISIBLE
         binding.featureNameText.setSelection(binding.featureNameText.text.length)
         binding.featureNameText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
         binding.featureNameText.addTextChangedListener {
@@ -210,6 +214,7 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
         binding.discreteValuesTextView.visibility = vis
         binding.discreteValues.visibility = vis
         binding.addDiscreteValueButton.visibility = vis
+        binding.discreteValuesTipText.visibility = vis
         validateForm()
     }
 
