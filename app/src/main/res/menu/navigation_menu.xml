@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item android:id="@+id/selectTrackGroupFragment"
-            android:title="@string/track"
+            android:title="@string/track_data"
             />
     <item android:id="@+id/selectGraphStatGroupFragment"
             android:title="@string/graphs_and_statistics"

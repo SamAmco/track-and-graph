@@ -54,23 +54,21 @@ class ImportFeaturesDialog : DialogFragment() {
                 .setNegativeButton(R.string.cancel) { _, _ -> null }
             alertDialog = builder.create()
             alertDialog.setCanceledOnTouchOutside(true)
-            setAlertDialogShowListeners()
+            alertDialog.setOnShowListener { setAlertDialogShowListeners() }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
     private fun setAlertDialogShowListeners() {
-        alertDialog.setOnShowListener {
-            val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            positiveButton.isEnabled = false
-            positiveButton.setOnClickListener { onImportClicked() }
-            listenToUri()
-            listenToImportState()
-            listenToException()
-            val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            negativeButton.setOnClickListener { dismiss() }
-            alertDialog.setOnCancelListener { null }
-        }
+        val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton.isEnabled = false
+        positiveButton.setOnClickListener { onImportClicked() }
+        listenToUri()
+        listenToImportState()
+        listenToException()
+        val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        negativeButton.setOnClickListener { dismiss() }
+        alertDialog.setOnCancelListener { null }
     }
 
     private fun listenToUri() {

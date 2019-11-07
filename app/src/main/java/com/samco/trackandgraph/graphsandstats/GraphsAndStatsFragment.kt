@@ -117,6 +117,12 @@ class GraphsAndStatsFragment : Fragment() {
         })
         viewModel.graphStats.observe(viewLifecycleOwner, Observer {
             it?.let { adapter.submitList(it.toMutableList()) }
+            if (it.isNullOrEmpty()) {
+                binding.noGraphsHintText.text = getString(R.string.no_graph_stats_hint)
+                binding.noGraphsHintText.visibility = View.VISIBLE
+            } else {
+                binding.noGraphsHintText.visibility = View.INVISIBLE
+            }
         })
     }
 

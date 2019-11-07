@@ -68,6 +68,7 @@ class ExportFeaturesDialog : DialogFragment() {
 
     private fun setAlertDialogShowListeners() {
         positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton.isEnabled = false
         viewModel.loadFeatures(activity!!, trackGroupId!!)
         listenToState()
         setUriListeners()
@@ -82,10 +83,7 @@ class ExportFeaturesDialog : DialogFragment() {
                     progressBar.visibility = View.VISIBLE
                     positiveButton.isEnabled = false
                 }
-                ExportState.WAITING -> {
-                    progressBar.visibility = View.INVISIBLE
-                    positiveButton.isEnabled = true
-                }
+                ExportState.WAITING -> { progressBar.visibility = View.INVISIBLE }
                 ExportState.EXPORTING -> {
                     progressBar.visibility = View.VISIBLE
                     positiveButton.isEnabled = false
@@ -107,9 +105,7 @@ class ExportFeaturesDialog : DialogFragment() {
 
     private fun listenToFeatures() {
         viewModel.featuresLoaded.observe(this, Observer { loaded ->
-            if (loaded) {
-                createFeatureCheckboxes()
-            }
+            if (loaded) { createFeatureCheckboxes() }
         })
     }
 

@@ -74,6 +74,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/add_discrete_values_tip"
+                    android:layout_marginBottom="30dp"
                     />
             </LinearLayout>
         </ScrollView>
