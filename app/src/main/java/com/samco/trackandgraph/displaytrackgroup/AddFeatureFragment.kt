@@ -24,6 +24,7 @@ import com.samco.trackandgraph.databinding.FeatureDiscreteValueListItemBinding
 import kotlinx.coroutines.*
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.forEachIndexed
+import androidx.core.view.size
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 
@@ -86,7 +87,7 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
         super.onViewStateRestored(savedInstanceState)
         binding.featureNameText.setText(viewModel.featureName.value)
         binding.featureTypeSpinner.setSelection(spinnerIndexOf(viewModel.featureType.value!!))
-        viewModel.discreteValues.forEachIndexed { i, v -> inflateDiscreteValue(i, v) }
+        viewModel.discreteValues.forEach { v -> inflateDiscreteValue(v) }
         if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
             binding.addDiscreteValueButton.isEnabled = false
     }
@@ -96,15 +97,15 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
         else -> 1
     }
 
-    private fun inflateDiscreteValue(viewModelIndex: Int, initialText: String) {
+    private fun inflateDiscreteValue(label: AddFeatureViewModel.MutableLabel) {
         val item = FeatureDiscreteValueListItemBinding.inflate(layoutInflater, binding.discreteValues, false)
         val inputText = item.discreteValueNameText
         inputText.filters = arrayOf(InputFilter.LengthFilter(MAX_LABEL_LENGTH))
         inputText.addTextChangedListener {
-            viewModel.discreteValues[viewModelIndex] = it.toString().trim()
+            label.value = it.toString().trim()
             validateForm()
         }
-        inputText.setText(initialText)
+        inputText.setText(label.value)
         item.deleteButton.setOnClickListener {
             onDeleteDiscreteValue(item)
             validateForm()
@@ -127,8 +128,9 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
     }
 
     private fun onAddDiscreteValue() {
-        viewModel.discreteValues.add("")
-        inflateDiscreteValue(viewModel.discreteValues.size-1, "")
+        val label = AddFeatureViewModel.MutableLabel()
+        viewModel.discreteValues.add(label)
+        inflateDiscreteValue(label)
         if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
             binding.addDiscreteValueButton.isEnabled = false
     }
@@ -142,7 +144,7 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 errorSet = true
             }
             for (s in discreteValueStrings) {
-                if (s.isEmpty()) {
+                if (s.value.isEmpty()) {
                     setErrorText(getString(R.string.discrete_value_must_have_name))
                     errorSet = true
                 }
@@ -193,11 +195,13 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
         viewModel.discreteValues.removeAt(currIndex)
         binding.discreteValues.removeView(item.root)
         binding.addDiscreteValueButton.isEnabled = true
+        reIndexDiscreteValueViews()
     }
 
     private fun reIndexDiscreteValueViews() {
         binding.discreteValues.forEachIndexed{ i, v ->
-            v.findViewById<TextView>(R.id.indexText).text = "$i : "
+            val index = if (binding.discreteValues.size == 1) 1 else i
+            v.findViewById<TextView>(R.id.indexText).text = "$index : "
         }
     }
 
@@ -228,9 +232,11 @@ class AddFeatureViewModel : ViewModel() {
     private var updateJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
+    class MutableLabel(var value: String = "")
+
     var featureName = MutableLiveData<String>("")
     var featureType = MutableLiveData<FeatureType>(FeatureType.CONTINUOUS)
-    var discreteValues = mutableListOf<String>()
+    var discreteValues = mutableListOf<MutableLabel>()
     val addFeatureState: LiveData<AddFeatureState> get() { return _isAdding }
     private val _isAdding by lazy {
         val adding = MutableLiveData<AddFeatureState>()
@@ -245,7 +251,10 @@ class AddFeatureViewModel : ViewModel() {
         uiScope.launch {
             _isAdding.value = AddFeatureState.ADDING
             withContext(Dispatchers.IO) {
-                val discVals = discreteValues.mapIndexed { i, s -> DiscreteValue(i, s) }
+                val discVals = discreteValues.mapIndexed { i, s ->
+                    val index = if (discreteValues.size == 1) 1 else i
+                    DiscreteValue(index, s.value)
+                }
                 val feature = Feature.create(0, name, trackGroupId, featureType.value!!, discVals, 0)
                 database.withTransaction { dao.insertFeature(feature) }
             }
