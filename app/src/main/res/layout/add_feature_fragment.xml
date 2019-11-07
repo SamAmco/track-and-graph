@@ -30,6 +30,8 @@
                         android:id="@+id/featureNameText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:maxLines="1"
+                        android:inputType="text"
                         android:hint="@string/feature_name_hint"
                         />
 

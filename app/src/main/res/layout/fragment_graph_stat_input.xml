@@ -41,11 +41,11 @@
                         android:text="@string/new_name"
                         android:textSize="@dimen/dialog_label_text_size"
                         />
-                <!--TODO add a max size in here, do we need any validation char set-->
                 <EditText
                         android:id="@+id/graphStatNameInput"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:maxLines="2"
                         android:inputType="text"
                         android:hint="@string/graph_name_hint"
                         />

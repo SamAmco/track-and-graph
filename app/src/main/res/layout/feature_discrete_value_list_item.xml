@@ -41,6 +41,8 @@
                     android:id="@+id/discreteValueNameText"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:maxLines="1"
+                    android:inputType="text"
                     app:layout_constraintLeft_toRightOf="@id/indexText"
                     app:layout_constraintRight_toLeftOf="@+id/upButton"
                     app:layout_constraintHorizontal_weight="6"
