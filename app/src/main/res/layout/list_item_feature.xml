@@ -17,7 +17,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
 
-            <!--TODO we will need a max title size for features to prevent layout issues-->
             <androidx.cardview.widget.CardView
                     android:id="@+id/cardView"
                     android:layout_marginStart="5dp"
