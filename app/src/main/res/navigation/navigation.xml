@@ -11,7 +11,11 @@
               tools:layout="@layout/fragment_select_group">
         <action
                 android:id="@+id/action_select_tack_group"
-                app:destination="@id/displayTrackGroupFragment" />
+                app:destination="@id/displayTrackGroupFragment"
+                app:enterAnim="@anim/slide_in_left"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_right"
+                app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment android:id="@+id/displayTrackGroupFragment"
             android:name="com.samco.trackandgraph.displaytrackgroup.DisplayTrackGroupFragment"
@@ -21,13 +25,21 @@
                 app:argType="long" />
         <action
                 android:id="@+id/action_feature_history"
-                app:destination="@id/featureHistoryFragment" />
+                app:destination="@id/featureHistoryFragment"
+                app:enterAnim="@anim/slide_in_left"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_right"
+                app:popExitAnim="@anim/slide_out_right" />
         <argument
                 android:name="trackGroupName"
                 app:argType="string" />
         <action
                 android:id="@+id/action_add_feature"
-                app:destination="@id/addFeatureFragment" />
+                app:destination="@id/addFeatureFragment"
+                app:enterAnim="@anim/slide_in_left"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_right"
+                app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment android:id="@+id/featureHistoryFragment"
             android:name="com.samco.trackandgraph.featurehistory.FragmentFeatureHistory"
@@ -46,10 +58,18 @@
             tools:layout="@layout/graphs_and_stats_fragment" >
         <action
                 android:id="@+id/action_graph_stat_input"
-                app:destination="@id/graphStatInputFragment" />
+                app:destination="@id/graphStatInputFragment"
+                app:enterAnim="@anim/slide_in_left"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_right"
+                app:popExitAnim="@anim/slide_out_right" />
         <action
                 android:id="@+id/action_view_graph_stat"
-                app:destination="@id/viewGraphStatFragment" />
+                app:destination="@id/viewGraphStatFragment"
+                app:enterAnim="@anim/slide_in_left"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_right"
+                app:popExitAnim="@anim/slide_out_right" />
         <argument android:name="graphStatGroupId"
                 app:argType="long" />
     </fragment>
@@ -91,6 +111,10 @@
             android:label="@string/graphs_and_statistics" >
         <action
                 android:id="@+id/action_select_graph_stat_group"
-                app:destination="@id/graphsAndStatsFragment" />
+                app:destination="@id/graphsAndStatsFragment"
+                app:enterAnim="@anim/slide_in_left"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_right"
+                app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 </navigation>
