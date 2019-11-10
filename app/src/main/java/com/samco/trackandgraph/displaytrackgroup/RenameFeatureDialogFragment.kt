@@ -29,7 +29,7 @@ class RenameFeatureDialogFragment : NameInputDialogFragment() {
 
     override fun onPositiveClicked(name: String) = listener.onRenameFeature(name)
 
-    override fun getNameInputHint(): String = getString(R.string.feature_name_hint)
+    override fun getNameInputHint(): String = ""
 
     override fun getTitleText(): String = getString(R.string.new_name)
 

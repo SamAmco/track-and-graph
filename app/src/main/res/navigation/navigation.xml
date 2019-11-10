@@ -7,7 +7,7 @@
 
     <fragment android:id="@+id/selectTrackGroupFragment"
               android:name="com.samco.trackandgraph.selecttrackgroup.SelectTrackGroupFragment"
-              android:label="@string/track_data"
+              android:label="@string/track_groups"
               tools:layout="@layout/fragment_select_group">
         <action
                 android:id="@+id/action_select_tack_group"

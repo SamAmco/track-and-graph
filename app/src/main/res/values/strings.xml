@@ -1,13 +1,12 @@
 <resources>
     <string name="app_name">Track &amp; Graph</string>
-    <string name="track_data">Track Data</string>
+    <string name="track_groups">Track Groups</string>
     <string name="add_track_group">Add Track Group: </string>
     <string name="add_feature">Track something:</string>
     <string name="add">Add</string>
     <string name="track_group_name">Track Group Name</string>
     <string name="add_graph_stat_group">Add Graph Group: </string>
     <string name="graph_stat_group_name">Graph Group Name</string>
-    <string name="feature_name_hint"></string>
     <string name="delete">Delete</string>
     <string name="rename">Rename</string>
     <string name="edit">Edit</string>

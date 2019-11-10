@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
-       xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
     <androidx.drawerlayout.widget.DrawerLayout
             android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
@@ -22,6 +23,7 @@
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
                         android:layout_height="?attr/actionBarSize"
+                        app:titleTextColor="@color/toolBarTextColor"
                         />
 
             </com.google.android.material.appbar.AppBarLayout>
@@ -44,7 +46,8 @@
                 android:fitsSystemWindows="true"
                 app:headerLayout="@layout/nav_header"
                 app:menu="@menu/navigation_menu"
-                />
+                app:itemTextColor="@color/toolBarTextColor"
+            />
 
     </androidx.drawerlayout.widget.DrawerLayout>
 </merge>

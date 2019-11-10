@@ -4,5 +4,6 @@
     <item android:id="@+id/add"
           android:title="@string/add"
           android:icon="@drawable/add_icon"
-          app:showAsAction="ifRoom" />
+            app:iconTint="@color/toolBarTextColor"
+            app:showAsAction="ifRoom" />
 </menu>
