@@ -1,15 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
-
+    android:layout_height="wrap_content"
+    >
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/app_name"
-        android:gravity="center"
-        android:textColor="@color/primaryDarkColor"
-        android:textSize="18sp"
+        android:layout_height="wrap_content"
+        android:paddingLeft="20dp"
+        android:text="@string/nav_header_title"
+        android:autoSizeTextType="uniform"
+        android:textSize="20sp"
         />
-</LinearLayout>
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/left_to_right_gradient"
+        android:layout_gravity="bottom"
+        />
+</FrameLayout>
