@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <item android:id="@+id/selectTrackGroupFragment"
-            android:title="@string/track_groups"
+    <group android:id="@+id/graphAndTrack">
+        <item android:id="@+id/selectTrackGroupFragment"
+                android:title="@string/track_groups"
+                />
+        <item android:id="@+id/selectGraphStatGroupFragment"
+                android:title="@string/graphs_and_statistics"
+                />
+    </group>
+    <group android:id="@+id/about">
+        <item android:id="@+id/aboutPageFragment"
+            android:title="@string/about"
             />
-    <item android:id="@+id/selectGraphStatGroupFragment"
-            android:title="@string/graphs_and_statistics"
-            />
+    </group>
 
 </menu>

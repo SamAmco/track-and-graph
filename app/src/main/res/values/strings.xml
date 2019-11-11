@@ -126,4 +126,14 @@
     <string name="graph_stat_view_not_enough_data_stat">There is not enough data tracked to generate this statistic yet</string>
     <string name="graph_stat_view_not_enough_data_graph">There is not enough data tracked to generate this graph yet</string>
     <string name="finish">Finish</string>
+    <string name="about_description"><![CDATA[Track & Graph is free and open source software under the Apache 2.0 License.]]></string>
+    <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="about_libraries_message">The following open source libraries were used:</string>
+    <string name="androidplot">Androidplot</string>
+    <string name="apache_2_0">Apache 2.0</string>
+    <string name="apache_commons_csv">Apache Commons CSV</string>
+    <string name="three_ten_android_backport">Three Ten Android Backport</string>
+    <string name="timber">Timber</string>
+    <string name="about">About</string>
 </resources>

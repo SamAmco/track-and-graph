@@ -117,4 +117,8 @@
                 app:popEnterAnim="@anim/slide_in_right"
                 app:popExitAnim="@anim/slide_out_right" />
     </fragment>
+    <fragment
+        android:id="@+id/aboutPageFragment"
+        android:name="com.samco.trackandgraph.aboutpage.AboutPageFragment"
+        android:label="@string/about" />
 </navigation>

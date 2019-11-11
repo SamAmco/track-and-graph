@@ -19,13 +19,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private lateinit var navView: NavigationView
 
+    private val navFragments = setOf(
+        R.id.selectTrackGroupFragment,
+        R.id.selectGraphStatGroupFragment,
+        R.id.aboutPageFragment
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         drawerLayout = findViewById(R.id.drawer_layout)
         navController = findNavController(R.id.nav_fragment)
-        appBarConfiguration = AppBarConfiguration(setOf(R.id.selectTrackGroupFragment, R.id.selectGraphStatGroupFragment), drawerLayout)
+        appBarConfiguration = AppBarConfiguration(navFragments, drawerLayout)
         navView = findViewById(R.id.nav_view)
 
         setSupportActionBar(findViewById(R.id.toolbar))
