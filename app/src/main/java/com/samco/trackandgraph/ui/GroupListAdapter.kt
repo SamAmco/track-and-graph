@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 
-class GroupListAdapter(private val clickListener: GroupClickListener)
+class GroupListAdapter(private val clickListener: GroupClickListener, private val cornerTabColor: Int)
     : OrderedListAdapter<GroupItem, GroupViewHolder>(GroupItemDiffCallback()) {
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
-        holder.bind(getItem(position), clickListener)
+        holder.bind(getItem(position), clickListener, cornerTabColor)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {
@@ -25,13 +25,14 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
     var groupItem: GroupItem? = null
         private set
 
-    fun bind(groupItem: GroupItem, clickListener: GroupClickListener) {
+    fun bind(groupItem: GroupItem, clickListener: GroupClickListener, cornerTabColor: Int) {
         this.groupItem = groupItem
         this.clickListener = clickListener
         dropElevation = binding.cardView.cardElevation
         binding.graphStatGroupNameText.text = groupItem.name
         binding.cardView.setOnClickListener { clickListener.onClick(groupItem) }
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
+        binding.cornerTabImage.setColorFilter(cornerTabColor)
     }
 
     fun elevateCard() {

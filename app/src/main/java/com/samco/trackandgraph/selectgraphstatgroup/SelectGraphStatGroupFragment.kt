@@ -2,6 +2,7 @@ package com.samco.trackandgraph.selectgraphstatgroup
 
 import android.app.Activity
 import android.view.View
+import androidx.core.content.ContextCompat.getColor
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -12,6 +13,8 @@ import com.samco.trackandgraph.ui.*
 import kotlinx.coroutines.launch
 
 class SelectGraphStatGroupFragment : SelectGroupFragment() {
+    override fun getCornerTabColor(): Int = getColor(context!!, R.color.secondaryColor)
+
     override fun getViewModelImpl(): SelectGroupViewModel {
         return ViewModelProviders.of(this).get(SelectGraphStatGroupViewModel::class.java)
     }

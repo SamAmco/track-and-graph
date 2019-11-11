@@ -41,7 +41,8 @@ abstract class SelectGroupFragment : Fragment(),
                 this::onGroupSelected,
                 this::onRenameClicked,
                 this::onDeleteClicked
-            )
+            ),
+            getCornerTabColor()
         )
         binding.groupList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.groupList)
@@ -52,6 +53,8 @@ abstract class SelectGroupFragment : Fragment(),
         setHasOptionsMenu(true)
         return binding.root
     }
+
+    abstract fun getCornerTabColor(): Int
 
     abstract fun getViewModelImpl(): SelectGroupViewModel
 
