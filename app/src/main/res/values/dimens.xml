@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="card_margin_small">4dp</dimen>
     <dimen name="card_padding">10dp</dimen>
     <dimen name="card_corner_radius">4dp</dimen>
@@ -17,4 +17,5 @@
     <dimen name="data_point_input_fragment_height">210dp</dimen>
     <dimen name="spinner_item_color_size">60dp</dimen>
     <dimen name="graph_height">300dp</dimen>
+    <dimen name="design_navigation_icon_size" tools:override="true">15dp</dimen>
 </resources>

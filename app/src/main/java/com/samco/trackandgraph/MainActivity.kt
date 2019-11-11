@@ -33,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         navController = findNavController(R.id.nav_fragment)
         appBarConfiguration = AppBarConfiguration(navFragments, drawerLayout)
         navView = findViewById(R.id.nav_view)
+        navView.itemIconTintList = null
 
         setSupportActionBar(findViewById(R.id.toolbar))
         setupActionBarWithNavController(navController, appBarConfiguration)
