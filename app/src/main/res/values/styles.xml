@@ -4,8 +4,9 @@
         <!-- Customize your theme here. -->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
-        <item name="colorPrimary">@color/primaryColor</item>
-        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="android:textColor">@color/toolBarTextColor</item>
+        <item name="colorPrimary">@color/toolbarColor</item>
+        <item name="colorPrimaryDark">@color/toolbarColorDark</item>
         <item name="colorAccent">@color/secondaryColor</item>
         <item name="editTextStyle">@style/EditTextStyle</item>
         <item name="windowActionBar">false</item>

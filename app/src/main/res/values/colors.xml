@@ -6,6 +6,8 @@
     <color name="secondaryColor">#f46d43</color>
     <color name="secondaryLightColor">#ff9e70</color>
     <color name="secondaryDarkColor">#bb3d18</color>
+    <color name="toolbarColor">#d3dade</color>
+    <color name="toolbarColorDark">#8f979c</color>
 
     <color name="toolBarTextColor">#2B3B45</color>
     <color name="backgroundColor">#FFFFFF</color>
