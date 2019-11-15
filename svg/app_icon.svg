@@ -15,7 +15,10 @@
    version="1.1"
    viewBox="0 0 100 100"
    height="100mm"
-   width="100mm">
+   width="100mm"
+   inkscape:export-filename="/home/sam/Documents/Android/track-and-graph/svg/app_icon.svg.png"
+   inkscape:export-xdpi="260.10001"
+   inkscape:export-ydpi="260.10001">
   <sodipodi:namedview
      inkscape:window-maximized="1"
      inkscape:window-y="0"
@@ -23,10 +26,10 @@
      inkscape:window-height="1012"
      inkscape:window-width="1920"
      showgrid="false"
-     inkscape:current-layer="layer4"
+     inkscape:current-layer="layer2"
      inkscape:document-units="mm"
-     inkscape:cy="211.32934"
-     inkscape:cx="236.72961"
+     inkscape:cy="302.63958"
+     inkscape:cx="108.77892"
      inkscape:zoom="1"
      inkscape:pageshadow="2"
      inkscape:pageopacity="0.0"
@@ -46,7 +49,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -61,7 +64,7 @@
        height="100"
        width="100"
        id="rect857"
-       style="fill:#74add1;fill-opacity:0.99481865;stroke:none;stroke-width:11.99695492;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
+       style="fill:#74add1;fill-opacity:0.99507391;stroke:none;stroke-width:11.99695492;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
     <path
        inkscape:transform-center-y="-0.17992729"
        inkscape:transform-center-x="-0.31184434"

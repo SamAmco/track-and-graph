@@ -16,6 +16,7 @@
     <color name="regularText">@android:color/tab_indicator_text</color>
     <color name="divider">#616161</color>
     <color name="errorText">#bb3d18</color>
+    <color name="warningTextColor">#bb3d18</color>
 
     <color name="visColor1">#a50026</color>
     <color name="visColor2">#d73027</color>
