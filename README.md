@@ -2,7 +2,7 @@
 An android app for tracking personal data and creating custom graphs
 
 # License
-    Copyright 2019 Samuel Amantea-Collins
+    Copyright 2019 SamAmco
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
