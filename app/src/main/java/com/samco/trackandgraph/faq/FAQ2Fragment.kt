@@ -5,10 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.samco.trackandgraph.databinding.Faq1Binding
+import com.samco.trackandgraph.databinding.Faq2Binding
 
-class FAQ1Fragment : Fragment() {
+class FAQ2Fragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return Faq1Binding.inflate(inflater, container, false).root
+        return Faq2Binding.inflate(inflater, container, false).root
     }
 }
