@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     private val navFragments = setOf(
         R.id.selectTrackGroupFragment,
         R.id.selectGraphStatGroupFragment,
+        R.id.FAQFragment,
         R.id.aboutPageFragment
     )
 

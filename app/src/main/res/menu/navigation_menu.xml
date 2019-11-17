@@ -15,7 +15,12 @@
             android:title="@string/graphs_and_statistics"
             />
     </group>
-    <group android:id="@+id/about">
+
+    <group android:id="@+id/aboutAndFAQ">
+        <item
+            android:id="@+id/FAQFragment"
+            android:title="@string/faq"
+            />
         <item
             android:id="@+id/aboutPageFragment"
             android:title="@string/about"

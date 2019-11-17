@@ -121,4 +121,20 @@
         android:id="@+id/aboutPageFragment"
         android:name="com.samco.trackandgraph.aboutpage.AboutPageFragment"
         android:label="@string/about" />
+    <fragment
+        android:id="@+id/FAQFragment"
+        android:name="com.samco.trackandgraph.faq.FAQFragment"
+        android:label="@string/faq" >
+        <action
+            android:id="@+id/action_faq1"
+            app:destination="@id/FAQ1Fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+    <fragment
+        android:id="@+id/FAQ1Fragment"
+        android:name="com.samco.trackandgraph.faq.FAQ1Fragment"
+        android:label="@string/faq_1" />
 </navigation>
