@@ -13,7 +13,7 @@ class FAQFragment : Fragment() {
         val binding = FaqPageBinding.inflate(inflater, container, false)
         val navController = container?.findNavController()
         binding.faq1.setOnClickListener { navController?.navigate(FAQFragmentDirections.actionFaq1()) }
-        binding.faq2.setOnClickListener { }
+        binding.faq2.setOnClickListener { navController?.navigate(FAQFragmentDirections.actionFaq2()) }
         binding.faq3.setOnClickListener { }
         binding.faq4.setOnClickListener { }
         binding.faq5.setOnClickListener { }

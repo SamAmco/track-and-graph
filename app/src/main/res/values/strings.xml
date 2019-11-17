@@ -154,4 +154,7 @@
     <string name="faq_text_1_9">You should now see cards in your track group. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_1_10">You can track things individually by using their + buttons or track everything in the group quickly by using the action button:</string>
     <string name="faq_text_1_11">Don\'t worry if you make a mistake you can always see review and edit your tracking history by simply tapping on the card.</string>
+    <string name="faq_text_2_1">To import/export your tracked data first select a track group and notice the menu buttons at the top:</string>
+    <string name="faq_text_2_2">Use this button to import a csv into this track group.</string>
+    <string name="faq_text_2_3">Use this button to export this track group to a csv.</string>
 </resources>
