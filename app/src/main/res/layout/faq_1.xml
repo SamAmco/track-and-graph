@@ -189,6 +189,24 @@
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:scaleType="fitStart"
+                android:adjustViewBounds="true"
+                android:src="@drawable/faq_image_1_9"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:scaleType="fitStart"
+                android:adjustViewBounds="true"
+                android:src="@drawable/faq_image_1_10"
+                />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -197,6 +215,14 @@
                 android:padding="20dp"
                 />
 
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:scaleType="fitStart"
+                android:adjustViewBounds="true"
+                android:src="@drawable/faq_image_1_11"
+                />
         </LinearLayout>
     </ScrollView>
 </layout>
