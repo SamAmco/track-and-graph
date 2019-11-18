@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" >
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/ap_white"
+        >
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/ap_white"
+            android:paddingBottom="40dp"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/faq_3"
+                android:padding="20dp"
+                android:textStyle="bold"
+                android:textSize="17sp"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Using the multiple choice input type is recommended wherever possible. If you ever want to draw a pie chart from your data you will need it to be in multiple choice form. You can also draw a line graph of your data over time if your predefined answers have a natural order, however you will need to make sure that the answers are in the correct order during setup as you can not change this later. For example say you were to setup the following:"
+                android:textSize="15sp"
+                android:padding="20dp"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:scaleType="fitStart"
+                android:adjustViewBounds="true"
+                android:src="@drawable/faq_image_3_1"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="And then you tracked some data as follows: "
+                android:textSize="15sp"
+                android:padding="20dp"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:scaleType="fitStart"
+                android:adjustViewBounds="true"
+                android:src="@drawable/faq_image_3_2"
+                />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="You could then visualise that data using either a line graph over time or using a pie chart as below: "
+                android:textSize="15sp"
+                android:padding="20dp"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:scaleType="fitStart"
+                android:adjustViewBounds="true"
+                android:src="@drawable/faq_image_3_3"
+                />
+        </LinearLayout>
+    </ScrollView>
+</layout>
