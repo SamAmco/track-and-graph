@@ -133,58 +133,68 @@ abstract class GraphStatViewBase : FrameLayout {
     }
 
     fun initTimeSinceStat(graphOrStat: GraphOrStat, timeSinceLastStat: TimeSinceLastStat) {
-        resetJob()
-        cleanAllViews()
-        binding.statMessage.visibility = View.INVISIBLE
-        initHeader(graphOrStat)
-        viewScope!!.launch {
-            binding.progressBar.visibility = View.VISIBLE
-            val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeSinceLastStat.featureId) }
-            var lastDataPointTimeStamp: OffsetDateTime? = null
-            val lastDataPoint = withContext(Dispatchers.IO) {
-                dataSource.getLastDataPointBetween(feature.id, timeSinceLastStat.fromValue, timeSinceLastStat.toValue)
-            }
-            if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
-            binding.statMessage.visibility = View.VISIBLE
-            binding.progressBar.visibility = View.GONE
-            if (lastDataPointTimeStamp == null) { initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_stat) }
-            else {
-                while (true) {
-                    setTimeSinceStatText(Duration.between(lastDataPointTimeStamp, OffsetDateTime.now()))
-                    delay(1000)
-                    yield()
-                }
+        try {
+            resetJob()
+            cleanAllViews()
+            binding.statMessage.visibility = View.INVISIBLE
+            initHeader(graphOrStat)
+            viewScope!!.launch { initTimeSinceStatBody(graphOrStat, timeSinceLastStat) }
+        } catch (e: Exception) {
+            initError(graphOrStat, R.string.graph_stat_view_unkown_error)
+        }
+    }
+
+    private suspend fun initTimeSinceStatBody(graphOrStat: GraphOrStat, timeSinceLastStat: TimeSinceLastStat) {
+        binding.progressBar.visibility = View.VISIBLE
+        val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeSinceLastStat.featureId) }
+        var lastDataPointTimeStamp: OffsetDateTime? = null
+        val lastDataPoint = withContext(Dispatchers.IO) {
+            dataSource.getLastDataPointBetween(feature.id, timeSinceLastStat.fromValue, timeSinceLastStat.toValue)
+        }
+        if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
+        binding.statMessage.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
+        if (lastDataPointTimeStamp == null) { initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_stat) }
+        else {
+            while (true) {
+                setTimeSinceStatText(Duration.between(lastDataPointTimeStamp, OffsetDateTime.now()))
+                delay(1000)
+                yield()
             }
         }
     }
 
     fun initAverageTimeBetweenStat(graphOrStat: GraphOrStat, timeBetweenStat: AverageTimeBetweenStat) {
-        resetJob()
-        cleanAllViews()
-        binding.statMessage.visibility = View.INVISIBLE
-        initHeader(graphOrStat)
-        viewScope!!.launch {
-            binding.progressBar.visibility = View.VISIBLE
-            val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeBetweenStat.featureId) }
-            val dataPoints = withContext(Dispatchers.IO) {
-                if (timeBetweenStat.duration == null) {
-                    dataSource.getDataPointsBetween(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue)
-                } else {
-                    val now = OffsetDateTime.now()
-                    val cutOff = now.minus(timeBetweenStat.duration)
-                    dataSource.getDataPointsBetweenInTimeRange(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue, cutOff, now)
-                }
-            }
-            if (dataPoints.size < 2) initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_stat)
-            else {
-                val totalMillis = Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp).toMillis().toDouble()
-                val averageMillis = totalMillis / dataPoints.size.toDouble()
-                setAverageTimeBetweenStatText(averageMillis)
-            }
+        try {
+            resetJob()
+            cleanAllViews()
+            binding.statMessage.visibility = View.INVISIBLE
+            initHeader(graphOrStat)
+            viewScope!!.launch { initAverageTimeBetweenStatBody(graphOrStat, timeBetweenStat) }
+        } catch (e: Exception) { initError(graphOrStat, R.string.graph_stat_view_unkown_error) }
+    }
 
-            binding.statMessage.visibility = View.VISIBLE
-            binding.progressBar.visibility = View.GONE
+    private suspend fun initAverageTimeBetweenStatBody(graphOrStat: GraphOrStat, timeBetweenStat: AverageTimeBetweenStat) {
+        binding.progressBar.visibility = View.VISIBLE
+        val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeBetweenStat.featureId) }
+        val dataPoints = withContext(Dispatchers.IO) {
+            if (timeBetweenStat.duration == null) {
+                dataSource.getDataPointsBetween(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue)
+            } else {
+                val now = OffsetDateTime.now()
+                val cutOff = now.minus(timeBetweenStat.duration)
+                dataSource.getDataPointsBetweenInTimeRange(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue, cutOff, now)
+            }
         }
+        if (dataPoints.size < 2) initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_stat)
+        else {
+            val totalMillis = Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp).toMillis().toDouble()
+            val averageMillis = totalMillis / dataPoints.size.toDouble()
+            setAverageTimeBetweenStatText(averageMillis)
+        }
+
+        binding.statMessage.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun setAverageTimeBetweenStatText(millis: Double) {
@@ -209,49 +219,57 @@ abstract class GraphStatViewBase : FrameLayout {
     }
 
     fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph, listViewMode: Boolean = false) {
-        this.listViewMode = listViewMode
-        resetJob()
-        cleanAllViews()
-        binding.lineGraph.visibility = View.INVISIBLE
-        initHeader(graphOrStat)
-        viewScope!!.launch {
-            binding.progressBar.visibility = View.VISIBLE
-            if (tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph)) {
-                setUpLineGraphXAxis()
-                val bounds = RectRegion()
-                currentXYRegions.forEach { r -> bounds.union(r) }
-                binding.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
-                binding.lineGraph.redraw()
-                binding.lineGraph.visibility = View.VISIBLE
-                binding.progressBar.visibility = View.GONE
-            } else {
-                initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
-            }
+        try {
+            this.listViewMode = listViewMode
+            resetJob()
+            cleanAllViews()
+            binding.lineGraph.visibility = View.INVISIBLE
+            initHeader(graphOrStat)
+            viewScope!!.launch { initFromLineGraphBody(graphOrStat, lineGraph, listViewMode) }
+        } catch (e: Exception) { initError(graphOrStat, R.string.graph_stat_view_unkown_error) }
+    }
+
+    private suspend fun initFromLineGraphBody(graphOrStat: GraphOrStat, lineGraph: LineGraph, listViewMode: Boolean = false) {
+        binding.progressBar.visibility = View.VISIBLE
+        if (tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph)) {
+            setUpLineGraphXAxis()
+            val bounds = RectRegion()
+            currentXYRegions.forEach { r -> bounds.union(r) }
+            binding.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+            binding.lineGraph.redraw()
+            binding.lineGraph.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
+        } else {
+            initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
         }
     }
 
     fun initFromPieChart(graphOrStat: GraphOrStat, pieChart: PieChart) {
-        resetJob()
-        cleanAllViews()
-        binding.pieChart.visibility = View.INVISIBLE
-        initHeader(graphOrStat)
-        viewScope!!.launch {
-            binding.progressBar.visibility = View.VISIBLE
-            val dataSample = tryGetPlottableDataForPieChart(pieChart)
-            if (dataSample == null) {
-                initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
-                return@launch
-            }
-            val segments = getPieChartSegments(dataSample)
-            val total = withContext(Dispatchers.IO) {
-                segments.sumByDouble { s -> s.value.toDouble() }
-            }
-            plotPieChartSegments(segments, total)
-            binding.pieChart.redraw()
-            binding.pieChart.getRenderer(PieRenderer::class.java).setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
-            binding.pieChart.visibility = View.VISIBLE
-            binding.progressBar.visibility = View.GONE
+        try {
+            resetJob()
+            cleanAllViews()
+            binding.pieChart.visibility = View.INVISIBLE
+            initHeader(graphOrStat)
+            viewScope!!.launch { initFromPieChartBody(graphOrStat, pieChart) }
+        } catch (e: Exception) { initError(graphOrStat, R.string.graph_stat_view_unkown_error) }
+    }
+
+    private suspend fun initFromPieChartBody(graphOrStat: GraphOrStat, pieChart: PieChart) {
+        binding.progressBar.visibility = View.VISIBLE
+        val dataSample = tryGetPlottableDataForPieChart(pieChart)
+        if (dataSample == null) {
+            initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
+            return
         }
+        val segments = getPieChartSegments(dataSample)
+        val total = withContext(Dispatchers.IO) {
+            segments.sumByDouble { s -> s.value.toDouble() }
+        }
+        plotPieChartSegments(segments, total)
+        binding.pieChart.redraw()
+        binding.pieChart.getRenderer(PieRenderer::class.java).setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
+        binding.pieChart.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun plotPieChartSegments(segments: List<Segment>, total: Double) {
