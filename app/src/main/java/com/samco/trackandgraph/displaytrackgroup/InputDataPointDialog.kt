@@ -166,9 +166,9 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     }
 
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
-        val value = if (dataPointInputData.value.isEmpty()) "0" else dataPointInputData.value
         viewModel.onDataPointInput(activity!!,
-            DataPoint(dataPointInputData.dateTime, dataPointInputData.feature.id, value, dataPointInputData.label)
+            DataPoint(dataPointInputData.dateTime, dataPointInputData.feature.id,
+                dataPointInputData.value, dataPointInputData.label)
         )
     }
 
@@ -217,7 +217,7 @@ class InputDataPointDialogViewModel : ViewModel() {
                 }
             }
 
-            val defaultValue = if (dataPointData != null) dataPointData!!.value else ""
+            val defaultValue = if (dataPointData != null) dataPointData!!.value else 0.toDouble()
             val defaultLabel = if (dataPointData != null) dataPointData!!.label else ""
             val timestamp = if (dataPointData != null) dataPointData!!.timestamp else OffsetDateTime.now()
             val timeModifiable = dataPointData == null

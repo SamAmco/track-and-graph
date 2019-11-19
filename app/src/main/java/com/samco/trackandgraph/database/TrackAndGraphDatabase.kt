@@ -7,6 +7,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import java.text.DecimalFormat
 
 const val MAX_FEATURE_NAME_LENGTH = 40
 const val MAX_LABEL_LENGTH = 30
@@ -21,6 +22,7 @@ val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIM
 val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
     .ofPattern("dd/MM/yy  HH:mm")
     .withZone(ZoneId.systemDefault())
+val doubleFormatter = DecimalFormat("#.#")
 
 
 //this is a number coprime to the number of colours used to select them in a pseudo random order for greater contrast
@@ -45,7 +47,7 @@ const val splitChars2 = "!!"
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class],
-    version = 28,
+    version = 29,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

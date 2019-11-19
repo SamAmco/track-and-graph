@@ -428,7 +428,7 @@ abstract class GraphStatViewBase : FrameLayout {
         while (currentTimeStamp.isBefore(now)) {
             currentTimeStamp = currentTimeStamp.with {ld -> ld.plus(period)}
             val points = rawData.dataPoints.drop(index).takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
-            val total = points.sumByDouble { dp -> dp.value.toDouble() }.toString()
+            val total = points.sumByDouble { dp -> dp.value }
             index += points.size
             if (index > rawData.plotFrom && !foundPlotFrom) {
                 plotFrom = newData.size

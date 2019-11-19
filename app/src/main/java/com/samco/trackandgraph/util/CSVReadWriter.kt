@@ -23,12 +23,17 @@ object CSVReadWriter {
             val csvWriter = CSVPrinter(it, CSVFormat.DEFAULT.withHeader(HEADERS::class.java))
             for (feature in features) {
                 val dataPoints = dataSource.getDataPointsForFeatureSync(feature.id)
+
+                val dataPointToString = if (feature.featureType == FeatureType.DISCRETE) { dp: DataPoint ->
+                    DiscreteValue.fromDataPoint(dp).toString()
+                } else { dp: DataPoint -> dp.value.toString() }
+
                 dataPoints.forEach { dp ->
-                    var value = dp.value
-                    if (feature.featureType == FeatureType.DISCRETE) {
-                        value = DiscreteValue.fromDataPoint(dp).toString()
-                    }
-                    csvWriter.printRecord(feature.name, dp.timestamp.toString(), value)
+                    csvWriter.printRecord(
+                        feature.name,
+                        dp.timestamp.toString(),
+                        dataPointToString(dp)
+                    )
                     yield()
                 }
             }
@@ -77,14 +82,14 @@ object CSVReadWriter {
             existingFeaturesByName[newFeature.name] = newFeature
         }
 
-        val addContinuousDataPoint = { value: String, timestamp: OffsetDateTime, featureId: Long, lineNumber: Int ->
+        val addContinuousDataPoint = { value: Double?, timestamp: OffsetDateTime, featureId: Long, lineNumber: Int ->
             validateValueContinuous(value, lineNumber)
-            newDataPoints.add(DataPoint(timestamp, featureId, value, ""))
+            newDataPoints.add(DataPoint(timestamp, featureId, value!!, ""))
         }
 
         val addDiscreteDataPoint = { value: String, timestamp: OffsetDateTime, feature: Feature, lineNumber: Int ->
             val discreteValue = tryGetDiscreteValueFromString(value, lineNumber)
-            newDataPoints.add(DataPoint(timestamp, feature.id, discreteValue.index.toString(), discreteValue.label))
+            newDataPoints.add(DataPoint(timestamp, feature.id, discreteValue.index.toDouble(), discreteValue.label))
             discreteValue
         }
 
@@ -99,13 +104,13 @@ object CSVReadWriter {
                     if (!feature.discreteValues.contains(discreteValue)) addDiscreteValueToFeature(feature, discreteValue, lineNumber)
                 } else {
                     validateFeatureContinuous(feature, lineNumber)
-                    addContinuousDataPoint(rec.value, rec.timestamp, feature.id, lineNumber)
+                    addContinuousDataPoint(rec.value.toDoubleOrNull(), rec.timestamp, feature.id, lineNumber)
                 }
             } else {
                 val newFeature = createNewFeature(dataSource, rec, trackGroupId, lineNumber)
                 insertFeature(newFeature)
                 if (newFeature.featureType == FeatureType.DISCRETE) addDiscreteDataPoint(rec.value, rec.timestamp, newFeature, lineNumber)
-                else addContinuousDataPoint(rec.value, rec.timestamp, newFeature.id, lineNumber)
+                else addContinuousDataPoint(rec.value.toDoubleOrNull(), rec.timestamp, newFeature.id, lineNumber)
             }
             if (lineNumber % 1000 == 0) {
                 dataSource.insertDataPoints(newDataPoints)
@@ -127,8 +132,8 @@ object CSVReadWriter {
         return newFeature.copy(id = featureId)
     }
 
-    private fun validateValueContinuous(value: String, lineNumber: Int) {
-        if (value.toDoubleOrNull() == null) throw ImportFeaturesException(R.string.import_exception_not_a_valid_number, listOf(lineNumber.toString()))
+    private fun validateValueContinuous(value: Double?, lineNumber: Int) {
+        if (value == null) throw ImportFeaturesException(R.string.import_exception_not_a_valid_number, listOf(lineNumber.toString()))
     }
 
     private fun tryGetDiscreteValueFromString(string: String, lineNumber: Int): DiscreteValue {
