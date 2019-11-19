@@ -34,7 +34,6 @@ class GraphStatInputFragment : Fragment() {
     private lateinit var viewModel: GraphStatInputViewModel
 
     private val updateDemoHandler = Handler()
-    private val decimalFormat = DecimalFormat("0.###############")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.navController = container?.findNavController()
@@ -159,13 +158,13 @@ class GraphStatInputFragment : Fragment() {
 
     private fun listenToValueStatContinuousRange() {
         if (viewModel.selectedValueStatToValue.value != null)
-            binding.valueStatToInput.setText(decimalFormat.format(viewModel.selectedValueStatToValue.value!!))
+            binding.valueStatToInput.setText(doubleFormatter.format(viewModel.selectedValueStatToValue.value!!))
         binding.valueStatToInput.addTextChangedListener { editText ->
             viewModel.selectedValueStatToValue.value = editText.toString().toDoubleOrNull() ?: 0.toDouble()
             onFormUpdate()
         }
         if (viewModel.selectedValueStatFromValue.value != null)
-            binding.valueStatFromInput.setText(decimalFormat.format(viewModel.selectedValueStatFromValue.value!!))
+            binding.valueStatFromInput.setText(doubleFormatter.format(viewModel.selectedValueStatFromValue.value!!))
         binding.valueStatFromInput.addTextChangedListener { editText ->
             viewModel.selectedValueStatFromValue.value = editText.toString().toDoubleOrNull() ?: 0.toDouble()
             onFormUpdate()
@@ -230,33 +229,18 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToTimeDuration() {
-        //TODO move these types of declarations into their corresponding data class files
-        val timeDurations = listOf(
-            null,
-            Duration.ofDays(1),
-            Duration.ofDays(7),
-            Duration.ofDays(31),
-            Duration.ofDays(93),
-            Duration.ofDays(183),
-            Duration.ofDays(365)
-        )
-        binding.sampleDurationSpinner.setSelection(timeDurations.indexOf(viewModel.sampleDuration.value))
+        binding.sampleDurationSpinner.setSelection(maxGraphPeriodDurations.indexOf(viewModel.sampleDuration.value))
         binding.sampleDurationSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) { }
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                viewModel.sampleDuration.value = timeDurations[index]
+                viewModel.sampleDuration.value = maxGraphPeriodDurations[index]
                 onFormUpdate()
             }
         }
     }
 
     private fun listenToGraphTypeSpinner() {
-        val graphTypes = listOf(
-            GraphStatType.LINE_GRAPH,
-            GraphStatType.PIE_CHART,
-            GraphStatType.AVERAGE_TIME_BETWEEN,
-            GraphStatType.TIME_SINCE
-        )
+        val graphTypes = GraphStatType.values()
         binding.graphTypeSpinner.setSelection(graphTypes.indexOf(viewModel.graphStatType.value))
         updateViewForSelectedGraphStatType(viewModel.graphStatType.value!!)
         binding.graphTypeSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
