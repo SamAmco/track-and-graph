@@ -25,7 +25,7 @@ class SelectGraphStatGroupFragment : SelectGroupFragment() {
 
     override fun onGroupSelected(groupItem: GroupItem) {
         navController?.navigate(
-            SelectGraphStatGroupFragmentDirections.actionSelectGraphStatGroup(groupItem.id)
+            SelectGraphStatGroupFragmentDirections.actionSelectGraphStatGroup(groupItem.id, groupItem.name)
         )
     }
 
