@@ -126,4 +126,9 @@ class ViewGraphStatViewModel : ViewModel() {
     private fun initAverageTimeBetween() {
         graphStatInnerObject = dataSource!!.getAverageTimeBetweenStatByGraphStatId(graphStatObject!!.id)
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        ioScope.cancel()
+    }
 }

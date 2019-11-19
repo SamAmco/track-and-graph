@@ -157,7 +157,6 @@ class GraphsAndStatsViewModel : ViewModel() {
     val state: LiveData<GraphsAndStatsViewState> get() { return _state }
     private val _state = MutableLiveData<GraphsAndStatsViewState>(GraphsAndStatsViewState.INITIALIZING)
 
-
     fun initViewModel(activity: Activity, graphStatGroupId: Long) {
         if (dataSource != null) return
         _state.value = GraphsAndStatsViewState.INITIALIZING
@@ -205,5 +204,10 @@ class GraphsAndStatsViewModel : ViewModel() {
     fun adjustDisplayIndexes(graphStats: List<GraphOrStat>) = ioScope.launch {
         val newGraphStats = graphStats.mapIndexed { i, gs -> gs.copy(displayIndex = i) }
         dataSource?.updateGraphStats(newGraphStats)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        ioScope.cancel()
     }
 }
