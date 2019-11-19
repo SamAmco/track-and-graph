@@ -168,7 +168,6 @@ abstract class SelectGroupViewModel : ViewModel() {
         dataSource = TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
     }
 
-    //TODO check all view models to make sure they do this
     override fun onCleared() {
         super.onCleared()
         ioScope.cancel()
