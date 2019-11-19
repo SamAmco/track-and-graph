@@ -125,6 +125,7 @@
     <string name="graph_stat_view_not_found">An error occurred while finding this graph</string>
     <string name="graph_stat_view_not_enough_data_stat">There is not enough data tracked to generate this statistic yet</string>
     <string name="graph_stat_view_not_enough_data_graph">There is not enough data tracked to generate this graph yet</string>
+    <string name="graph_stat_view_unkown_error">There is not enough data tracked to generate this graph yet</string>
     <string name="finish">Finish</string>
     <string name="about_description"><![CDATA[Track & Graph is free and open source software under the Apache 2.0 License.]]></string>
     <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
