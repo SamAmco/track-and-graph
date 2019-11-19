@@ -4,8 +4,19 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import org.threeten.bp.Duration
 
 enum class GraphStatType { LINE_GRAPH, PIE_CHART, AVERAGE_TIME_BETWEEN, TIME_SINCE }
+
+val maxGraphPeriodDurations = listOf(
+    null,
+    Duration.ofDays(1),
+    Duration.ofDays(7),
+    Duration.ofDays(31),
+    Duration.ofDays(93),
+    Duration.ofDays(183),
+    Duration.ofDays(365)
+)
 
 @Entity(tableName = "graphs_and_stats_table",
     foreignKeys = [ForeignKey(entity = GraphStatGroup::class,

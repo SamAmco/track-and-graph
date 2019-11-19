@@ -22,7 +22,7 @@ val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIM
 val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
     .ofPattern("dd/MM/yy  HH:mm")
     .withZone(ZoneId.systemDefault())
-val doubleFormatter = DecimalFormat("#.#")
+val doubleFormatter = DecimalFormat("#.##################")
 
 
 //this is a number coprime to the number of colours used to select them in a pseudo random order for greater contrast
