@@ -15,6 +15,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DiscreteValue
 import com.samco.trackandgraph.database.Feature
 import com.samco.trackandgraph.database.FeatureType
+import com.samco.trackandgraph.database.doubleFormatter
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
@@ -81,7 +82,8 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         }
 
         if (state.feature.featureType == FeatureType.CONTINUOUS) {
-            numberInput.setText(state.value)
+            val text = if (state.value == 0.toDouble()) "" else doubleFormatter.format(state.value)
+            numberInput.setText(text)
         } else if (state.label.isNotEmpty()) {
             buttonsLayout.children
                 .map{ v -> v.findViewById<CheckBox>(R.id.checkbox) }
@@ -93,14 +95,13 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     override fun afterTextChanged(p0: Editable?) {
-        val double = numberInput.text.toString().toDoubleOrNull() ?: 0
-        state.value = double.toString()
+        state.value = numberInput.text.toString().toDoubleOrNull() ?: 0.toDouble()
     }
 
     class DataPointInputData(
         var feature: Feature,
         var dateTime: OffsetDateTime,
-        var value: String,
+        var value: Double,
         var label: String,
         var dateModifiable: Boolean
     )
@@ -121,7 +122,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
 
     private fun onDiscreteValueClicked(discreteValue: DiscreteValue) {
         if (clickListener != null) {
-            state.value = discreteValue.index.toString()
+            state.value = discreteValue.index.toDouble()
             state.label = discreteValue.label
             discreteValueCheckBoxes.filter { kvp -> kvp.key != discreteValue }.forEach { kvp -> kvp.value.isChecked = false }
             clickListener!!.onClick(state.feature)

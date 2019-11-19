@@ -23,9 +23,8 @@ data class DataPoint (
     @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,
 
-    //TODO should we convert this to a number?
     @ColumnInfo(name = "value")
-    val value: String,
+    val value: Double,
 
     @ColumnInfo(name = "label")
     val label: String
@@ -33,8 +32,7 @@ data class DataPoint (
 ) {
     fun getDisplayTimestamp(): String = displayFeatureDateFormat.format(timestamp)
     fun getDisplayValue(): String {
-        var ans = value
-        if (label.isNotEmpty()) ans += " : $label"
-        return ans
+        return if (label.isNotEmpty()) doubleFormatter.format(value) + " : $label"
+            else doubleFormatter.format(value)
     }
 }

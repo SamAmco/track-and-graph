@@ -24,7 +24,8 @@ class DataPointAdapter(private val clickListener: DataPointClickListener)
         : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(dataPoint: DataPoint) {
-            binding.dataPoint = dataPoint
+            binding.valueText.text = dataPoint.getDisplayValue()
+            binding.timestampText.text = dataPoint.getDisplayTimestamp()
             binding.editButton.setOnClickListener { clickListener.editClicked(dataPoint) }
             binding.deleteButton.setOnClickListener { clickListener.deleteClicked(dataPoint) }
         }

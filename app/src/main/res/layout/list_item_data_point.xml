@@ -4,12 +4,6 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
     >
-    <data>
-        <variable
-                name="dataPoint"
-                type="com.samco.trackandgraph.database.DataPoint" />
-    </data>
-
     <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="@dimen/list_item_data_point_height"
@@ -29,7 +23,6 @@
                     android:gravity="center"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="@{dataPoint.getDisplayTimestamp()}"
                     app:layout_constraintLeft_toLeftOf="parent"
                     tools:text="01/02/19  08:16"
                 />
@@ -42,7 +35,6 @@
                     android:textSize="16sp"
                     android:singleLine="true"
                     android:gravity="center"
-                    android:text="@{dataPoint.getDisplayValue()}"
                     app:layout_constraintLeft_toRightOf="@id/timestampText"
                     app:layout_constraintRight_toLeftOf="@id/editButton"
                     tools:text="Some value that goes on for a really long time"
