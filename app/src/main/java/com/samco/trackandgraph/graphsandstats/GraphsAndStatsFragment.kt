@@ -3,6 +3,7 @@ package com.samco.trackandgraph.graphsandstats
 import android.app.Activity
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
@@ -19,9 +20,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.GraphStatType
 import com.samco.trackandgraph.databinding.GraphsAndStatsFragmentBinding
-import com.samco.trackandgraph.ui.GroupViewHolder
 import kotlinx.coroutines.*
-import timber.log.Timber
 
 class GraphsAndStatsFragment : Fragment() {
     private var navController: NavController? = null
@@ -53,6 +52,7 @@ class GraphsAndStatsFragment : Fragment() {
         listenToViewModelState()
 
         setHasOptionsMenu(true)
+        (activity as AppCompatActivity).supportActionBar?.title = args.graphStatGroupName
         return binding.root
     }
 

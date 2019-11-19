@@ -70,8 +70,12 @@
                 app:exitAnim="@anim/slide_out_left"
                 app:popEnterAnim="@anim/slide_in_right"
                 app:popExitAnim="@anim/slide_out_right" />
-        <argument android:name="graphStatGroupId"
+        <argument
+                android:name="graphStatGroupId"
                 app:argType="long" />
+        <argument
+                android:name="graphStatGroupName"
+                app:argType="string" />
     </fragment>
     <fragment
             android:id="@+id/graphStatInputFragment"
