@@ -150,6 +150,13 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_right"
             app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_faq4"
+            app:destination="@id/FAQ4Fragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/FAQ1Fragment"
@@ -163,4 +170,8 @@
         android:id="@+id/FAQ3Fragment"
         android:name="com.samco.trackandgraph.faq.FAQ3Fragment"
         android:label="@string/faq_3" />
+    <fragment
+        android:id="@+id/FAQ4Fragment"
+        android:name="com.samco.trackandgraph.faq.FAQ4Fragment"
+        android:label="@string/faq_4" />
 </navigation>
