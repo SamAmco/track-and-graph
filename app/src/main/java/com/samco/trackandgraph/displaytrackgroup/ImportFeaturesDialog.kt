@@ -20,6 +20,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.util.CSVReadWriter
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
 import kotlinx.coroutines.*
+import timber.log.Timber
 
 const val OPEN_FILE_REQUEST_CODE = 124
 
@@ -108,9 +109,13 @@ class ImportFeaturesDialog : DialogFragment() {
     }
 
     private fun onFileButtonClicked() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "text/csv"
+            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                "application/csv",
+                "application/comma-separated-values",
+                "text/comma-separated-values"
+            ))
         }
         startActivityForResult(intent, OPEN_FILE_REQUEST_CODE)
     }
