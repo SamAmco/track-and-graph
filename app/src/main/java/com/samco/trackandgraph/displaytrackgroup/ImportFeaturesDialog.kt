@@ -12,6 +12,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.*
 import androidx.room.withTransaction
@@ -62,12 +63,14 @@ class ImportFeaturesDialog : DialogFragment() {
 
     private fun setAlertDialogShowListeners() {
         val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton.setTextColor(getColor(context!!, R.color.secondaryColor))
         positiveButton.isEnabled = false
         positiveButton.setOnClickListener { onImportClicked() }
         listenToUri()
         listenToImportState()
         listenToException()
         val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+        negativeButton.setTextColor(getColor(context!!, R.color.toolBarTextColor))
         negativeButton.setOnClickListener { dismiss() }
         alertDialog.setOnCancelListener { null }
     }

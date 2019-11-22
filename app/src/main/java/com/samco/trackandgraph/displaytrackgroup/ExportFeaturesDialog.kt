@@ -68,6 +68,9 @@ class ExportFeaturesDialog : DialogFragment() {
 
     private fun setAlertDialogShowListeners() {
         positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+        positiveButton.setTextColor(ContextCompat.getColor(context!!, R.color.secondaryColor))
+        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+            .setTextColor(ContextCompat.getColor(context!!, R.color.toolBarTextColor))
         positiveButton.isEnabled = false
         viewModel.loadFeatures(activity!!, trackGroupId!!)
         listenToState()

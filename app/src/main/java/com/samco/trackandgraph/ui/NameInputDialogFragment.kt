@@ -9,6 +9,7 @@ import android.text.TextWatcher
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
@@ -41,6 +42,10 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
                 .setPositiveButton(getPositiveButtonName()) { _, _ -> onPositiveClicked(editText.text.toString()) }
                 .setNegativeButton(R.string.cancel) { _, _ -> {} }
             alertDialog = builder.create()
+            alertDialog.setOnShowListener {
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(context!!, R.color.secondaryColor))
+                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(context!!, R.color.toolBarTextColor))
+            }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
