@@ -3,6 +3,8 @@ package com.samco.trackandgraph.ui
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import com.samco.trackandgraph.R
 
@@ -22,8 +24,12 @@ class YesCancelDialogFragment : DialogFragment() {
             builder.setMessage(title)
                 .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this) }
                 .setNegativeButton(R.string.cancel) { _, _ -> {} }
-            builder.create()
-
+            val alertDialog = builder.create()
+            alertDialog.setOnShowListener {
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(context!!, R.color.secondaryColor))
+                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(context!!, R.color.toolBarTextColor ))
+            }
+            alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 }
