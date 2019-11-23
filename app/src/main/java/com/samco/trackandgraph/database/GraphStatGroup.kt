@@ -18,7 +18,7 @@ data class GraphStatGroup(
 ) {
     companion object {
         fun create(id: Long, name: String, displayIndex: Int): GraphStatGroup {
-            val validName = name.take(MAX_GRAPH_STAT_GROUP_NAME_LENGTH)
+            val validName = name.take(MAX_GROUP_NAME_LENGTH)
             return GraphStatGroup(id, validName, displayIndex)
         }
     }

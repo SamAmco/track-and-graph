@@ -18,7 +18,7 @@ data class TrackGroup(
 ) {
     companion object {
         fun create(id: Long, name: String, displayIndex: Int): TrackGroup {
-            val validName = name.take(MAX_TRACK_GROUP_NAME_LENGTH)
+            val validName = name.take(MAX_GROUP_NAME_LENGTH)
                 .replace(splitChars1, " ")
                 .replace(splitChars2, " ")
             return TrackGroup(id, validName, displayIndex)

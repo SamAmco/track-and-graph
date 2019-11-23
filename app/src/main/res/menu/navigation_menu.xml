@@ -3,16 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/graphAndTrack">
         <item
-            android:id="@+id/selectTrackGroupFragment"
+            android:id="@+id/selectGroupFragment"
             android:icon="@drawable/dash"
             app:iconTint="@color/primaryColor"
-            android:title="@string/track_groups"
-            />
-        <item
-            android:id="@+id/selectGraphStatGroupFragment"
-            android:icon="@drawable/dash"
-            app:iconTint="@color/secondaryColor"
-            android:title="@string/graphs_and_statistics"
+            android:title="@string/home"
             />
     </group>
 

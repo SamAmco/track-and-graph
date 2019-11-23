@@ -20,8 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
 
     private val navFragments = setOf(
-        R.id.selectTrackGroupFragment,
-        R.id.selectGraphStatGroupFragment,
+        R.id.selectGroupFragment,
         R.id.FAQFragment,
         R.id.aboutPageFragment
     )

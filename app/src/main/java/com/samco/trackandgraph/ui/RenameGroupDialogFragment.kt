@@ -2,6 +2,7 @@ package com.samco.trackandgraph.ui
 
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.selectgroup.GroupItem
 
 class RenameGroupDialogFragment : NameInputDialogFragment() {
     private lateinit var listener: RenameGroupDialogListener
@@ -26,7 +27,12 @@ class RenameGroupDialogFragment : NameInputDialogFragment() {
     }
 
     override fun onPositiveClicked(name: String) {
-        val newGroupItem = GroupItem(groupItem.id, name, groupItem.displayIndex)
+        val newGroupItem = GroupItem(
+            groupItem.id,
+            name,
+            groupItem.displayIndex,
+            groupItem.type
+        )
         listener.onRenameGroupItem(newGroupItem)
     }
 
