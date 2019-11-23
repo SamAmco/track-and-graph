@@ -3,15 +3,22 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/navigation"
-            app:startDestination="@id/selectTrackGroupFragment">
+            app:startDestination="@id/selectGroupFragment">
 
-    <fragment android:id="@+id/selectTrackGroupFragment"
-              android:name="com.samco.trackandgraph.selecttrackgroup.SelectTrackGroupFragment"
-              android:label="@string/track_groups"
+    <fragment android:id="@+id/selectGroupFragment"
+              android:name="com.samco.trackandgraph.selectgroup.SelectGroupFragment"
+              android:label="@string/app_name"
               tools:layout="@layout/fragment_select_group">
         <action
                 android:id="@+id/action_select_tack_group"
                 app:destination="@id/displayTrackGroupFragment"
+                app:enterAnim="@anim/slide_in_left"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_right"
+                app:popExitAnim="@anim/slide_out_right" />
+        <action
+                android:id="@+id/action_select_graph_stat_group"
+                app:destination="@id/graphsAndStatsFragment"
                 app:enterAnim="@anim/slide_in_left"
                 app:exitAnim="@anim/slide_out_left"
                 app:popEnterAnim="@anim/slide_in_right"
@@ -108,18 +115,6 @@
         <argument
                 android:name="graphStatId"
                 app:argType="long" />
-    </fragment>
-    <fragment
-            android:id="@+id/selectGraphStatGroupFragment"
-            android:name="com.samco.trackandgraph.selectgraphstatgroup.SelectGraphStatGroupFragment"
-            android:label="@string/graphs_and_statistics" >
-        <action
-                android:id="@+id/action_select_graph_stat_group"
-                app:destination="@id/graphsAndStatsFragment"
-                app:enterAnim="@anim/slide_in_left"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_right"
-                app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/aboutPageFragment"

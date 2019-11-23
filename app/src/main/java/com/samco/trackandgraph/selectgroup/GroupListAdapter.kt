@@ -1,16 +1,22 @@
-package com.samco.trackandgraph.ui
+package com.samco.trackandgraph.selectgroup
 
 import android.view.*
 import android.widget.PopupMenu
+import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
+import com.samco.trackandgraph.ui.OrderedListAdapter
 
-class GroupListAdapter(private val clickListener: GroupClickListener, private val cornerTabColor: Int)
-    : OrderedListAdapter<GroupItem, GroupViewHolder>(GroupItemDiffCallback()) {
+class GroupListAdapter(private val clickListener: GroupClickListener,
+                       private val trackColor: Int,
+                       private val graphStatColor: Int)
+    : OrderedListAdapter<GroupItem, GroupViewHolder>(
+    GroupItemDiffCallback()
+) {
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
-        holder.bind(getItem(position), clickListener, cornerTabColor)
+        holder.bind(getItem(position), clickListener, trackColor, graphStatColor)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupViewHolder {
@@ -22,17 +28,31 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
     : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
     private var clickListener: GroupClickListener? = null
     private var dropElevation = 0f
-    var groupItem: GroupItem? = null
-        private set
+    private var groupItem: GroupItem? = null
 
-    fun bind(groupItem: GroupItem, clickListener: GroupClickListener, cornerTabColor: Int) {
+    fun bind(groupItem: GroupItem, clickListener: GroupClickListener, trackColor: Int, graphStatColor: Int) {
         this.groupItem = groupItem
         this.clickListener = clickListener
         dropElevation = binding.cardView.cardElevation
         binding.graphStatGroupNameText.text = groupItem.name
         binding.cardView.setOnClickListener { clickListener.onClick(groupItem) }
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
-        binding.cornerTabImage.setColorFilter(cornerTabColor)
+        initCorner(trackColor, graphStatColor)
+    }
+
+    private fun initCorner(trackColor: Int, graphStatColor: Int) {
+        when(groupItem!!.type) {
+            GroupItemType.TRACK -> {
+                binding.cornerTabImage.setColorFilter(trackColor)
+                binding.trackIcon.visibility = View.VISIBLE
+                binding.graphIcon.visibility = View.INVISIBLE
+            }
+            GroupItemType.GRAPH -> {
+                binding.cornerTabImage.setColorFilter(graphStatColor)
+                binding.graphIcon.visibility = View.VISIBLE
+                binding.trackIcon.visibility = View.INVISIBLE
+            }
+        }
     }
 
     fun elevateCard() {
@@ -74,14 +94,13 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
 
 class GroupItemDiffCallback : DiffUtil.ItemCallback<GroupItem>() {
     override fun areItemsTheSame(oldItem: GroupItem, newItem: GroupItem): Boolean {
-        return oldItem.id == newItem.id
+        return oldItem.id == newItem.id && oldItem.type == newItem.type
     }
     override fun areContentsTheSame(oldItem: GroupItem, newItem: GroupItem): Boolean {
         return oldItem == newItem
     }
 }
 
-data class GroupItem (val id: Long, val name: String, val displayIndex: Int)
 
 class GroupClickListener(val clickListener: (groupItem: GroupItem) -> Unit,
                          val onRenameListener: (groupItem: GroupItem) -> Unit,

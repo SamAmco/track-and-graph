@@ -27,11 +27,29 @@
                         tools:text="Group Name that spans over two lines eventually"/>
                 <ImageView
                     android:id="@+id/cornerTabImage"
-                    android:layout_width="100dp"
-                    android:layout_height="50dp"
+                    android:layout_width="140dp"
+                    android:layout_height="70dp"
                     android:src="@drawable/group_tab_corner"
                     android:layout_gravity="bottom|right"
                     android:tint="@color/primaryColor"
+                    />
+                <ImageView
+                    android:id="@+id/trackIcon"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:paddingBottom="3dp"
+                    android:src="@drawable/add_box"
+                    android:layout_gravity="bottom|right"
+                    android:tint="@color/ap_white"
+                    />
+                <ImageView
+                    android:id="@+id/graphIcon"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:paddingBottom="3dp"
+                    android:src="@drawable/graph_icon"
+                    android:layout_gravity="bottom|right"
+                    android:tint="@color/ap_white"
                     />
             </androidx.cardview.widget.CardView>
         </FrameLayout>

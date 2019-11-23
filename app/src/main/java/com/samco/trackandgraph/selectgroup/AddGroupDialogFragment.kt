@@ -1,7 +1,8 @@
-package com.samco.trackandgraph.ui
+package com.samco.trackandgraph.selectgroup
 
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.NameInputDialogFragment
 
 
 class AddGroupDialogFragment : NameInputDialogFragment() {
