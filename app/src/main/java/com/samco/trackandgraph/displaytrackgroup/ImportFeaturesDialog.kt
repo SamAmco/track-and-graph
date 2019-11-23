@@ -115,6 +115,7 @@ class ImportFeaturesDialog : DialogFragment() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "text/csv"
             putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                "text/csv",
                 "application/csv",
                 "application/comma-separated-values",
                 "text/comma-separated-values"
