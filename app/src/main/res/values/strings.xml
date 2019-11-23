@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Track &amp; Graph</string>
     <string name="track_groups">Track Groups</string>
     <string name="add_track_group">Add Track Group: </string>
     <string name="add_feature">Track something:</string>
