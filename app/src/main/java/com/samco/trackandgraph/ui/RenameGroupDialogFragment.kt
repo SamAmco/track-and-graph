@@ -2,7 +2,7 @@ package com.samco.trackandgraph.ui
 
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.selectgroup.GroupItem
+import com.samco.trackandgraph.database.GroupItem
 
 class RenameGroupDialogFragment : NameInputDialogFragment() {
     private lateinit var listener: RenameGroupDialogListener

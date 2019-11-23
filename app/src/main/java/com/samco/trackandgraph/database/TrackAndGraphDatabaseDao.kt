@@ -12,6 +12,11 @@ interface TrackAndGraphDatabaseDao {
     @Delete
     fun deleteTrackGroup(trackGroup: TrackGroup)
 
+    @Query("""SELECT track_groups_table.*, 0 as type FROM track_groups_table 
+        UNION SELECT graph_stat_groups_table.*, 1 as type FROM graph_stat_groups_table
+        ORDER BY display_index ASC""")
+    fun getAllGroups() : LiveData<List<GroupItem>>
+
     @Query("SELECT * FROM track_groups_table ORDER BY display_index ASC")
     fun getTrackGroups() : LiveData<List<TrackGroup>>
 

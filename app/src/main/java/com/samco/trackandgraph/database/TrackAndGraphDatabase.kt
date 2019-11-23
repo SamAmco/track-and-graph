@@ -134,6 +134,12 @@ class Converters {
 
     @TypeConverter
     fun stringToDuration(value: String): Duration? = if (value.isEmpty()) null else Duration.parse(value)
+
+    @TypeConverter
+    fun intToGroupItemType(i: Int) = GroupItemType.values()[i]
+
+    @TypeConverter
+    fun groupItemTypeToInt(groupItemType: GroupItemType) = groupItemType.ordinal
 }
 
 
