@@ -4,8 +4,7 @@
     <group android:id="@+id/graphAndTrack">
         <item
             android:id="@+id/selectGroupFragment"
-            android:icon="@drawable/dash"
-            app:iconTint="@color/primaryColor"
+            android:icon="@drawable/home_menu_icon"
             android:title="@string/home"
             />
     </group>
