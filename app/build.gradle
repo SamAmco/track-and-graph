@@ -30,7 +30,7 @@ android {
     }
     buildTypes {
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             applicationIdSuffix = ".debug"
             resValue "string", "app_name", "Debug Track & Graph"

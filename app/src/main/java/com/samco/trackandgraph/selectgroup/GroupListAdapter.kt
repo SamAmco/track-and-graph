@@ -2,10 +2,11 @@ package com.samco.trackandgraph.selectgroup
 
 import android.view.*
 import android.widget.PopupMenu
-import androidx.core.content.ContextCompat.getColor
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.GroupItem
+import com.samco.trackandgraph.database.GroupItemType
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 

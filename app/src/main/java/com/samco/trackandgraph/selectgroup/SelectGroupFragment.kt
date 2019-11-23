@@ -20,11 +20,7 @@ import com.samco.trackandgraph.ui.RenameGroupDialogFragment
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import timber.log.Timber
-
-enum class GroupItemType { TRACK, GRAPH }
-
-data class GroupItem (val id: Long, val name: String, val displayIndex: Int, val type: GroupItemType)
+import java.security.acl.Group
 
 class SelectGroupFragment : Fragment(),
     YesCancelDialogFragment.YesCancelDialogListener,
@@ -63,14 +59,16 @@ class SelectGroupFragment : Fragment(),
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         activity!!.toolbar.overflowIcon = getDrawable(context!!, R.drawable.add_icon)
     }
 
-    override fun onPause() {
-        super.onPause()
-        activity!!.toolbar.overflowIcon = getDrawable(context!!, R.drawable.list_menu_icon)
+    override fun onStop() {
+        super.onStop()
+        if (navController?.currentDestination?.id != R.id.selectGroupFragment) {
+            activity!!.toolbar.overflowIcon = getDrawable(context!!, R.drawable.list_menu_icon)
+        }
     }
 
     private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
@@ -201,44 +199,29 @@ class SelectGroupFragment : Fragment(),
     }
 }
 
+enum class SelectGroupViewModelState { INITIALIZING, WAITING, CREATED_DEFAULT_GROUP }
 class SelectGroupViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
-
     private var dataSource: TrackAndGraphDatabaseDao? = null
+
     var currentActionGroupItem: GroupItem? = null
     var currentActionGroupType: GroupItemType = GroupItemType.TRACK
+    var defaultTrackGroup: GroupItem? = null
+        private set
 
-    private lateinit var trackGroups: LiveData<List<TrackGroup>>
-    private lateinit var graphGroups: LiveData<List<GraphStatGroup>>
-    val allGroups: LiveData<List<GroupItem>> get() { return _allGroups }
-    private var _allGroups = MediatorLiveData<List<GroupItem>>()
+    lateinit var allGroups: LiveData<List<GroupItem>>
+        private set
+
+    val state: LiveData<SelectGroupViewModelState> get() { return _state }
+    private val _state = MutableLiveData<SelectGroupViewModelState>(SelectGroupViewModelState.INITIALIZING)
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return
         dataSource = TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
-        trackGroups = dataSource!!.getTrackGroups()
-        graphGroups = dataSource!!.getGraphStatGroups()
-        _allGroups.addSource(trackGroups, this::onNewTrackGroupList)
-        _allGroups.addSource(graphGroups, this::onNewGraphGroups)
+        allGroups = dataSource!!.getAllGroups()
+        _state.value = SelectGroupViewModelState.WAITING
     }
-
-    private fun onNewGraphGroups(graphGroups: List<GraphStatGroup>) {
-        val newList = _allGroups.value?.toMutableList() ?: mutableListOf()
-        newList.removeAll { g -> g.type == GroupItemType.GRAPH }
-        newList.addAll(graphGroups.map { gg -> GroupItem(gg.id, gg.name, gg.displayIndex, GroupItemType.GRAPH) })
-        _allGroups.value = sortGroups(newList)
-    }
-
-    private fun onNewTrackGroupList(trackGroups: List<TrackGroup>) {
-        val newList = _allGroups.value?.toMutableList() ?: mutableListOf()
-        newList.removeAll { g -> g.type == GroupItemType.TRACK }
-        newList.addAll(trackGroups.map { tg -> GroupItem(tg.id, tg.name, tg.displayIndex, GroupItemType.TRACK) })
-        _allGroups.value = sortGroups(newList)
-    }
-
-    private fun sortGroups(groupItems: List<GroupItem>) =
-        groupItems.sortedWith(Comparator { a, b -> a.displayIndex - b.displayIndex })
 
     override fun onCleared() {
         super.onCleared()
@@ -273,7 +256,6 @@ class SelectGroupViewModel : ViewModel() {
     }
 
     fun adjustDisplayIndexes(groupItems: List<GroupItem>) {
-        Timber.d(groupItems.joinToString { gi -> gi.name + gi.displayIndex })
         val newTrackGroups = mutableListOf<TrackGroup>()
         val newGraphGroups = mutableListOf<GraphStatGroup>()
         groupItems.forEachIndexed { i, groupItem ->
@@ -282,10 +264,6 @@ class SelectGroupViewModel : ViewModel() {
                 GroupItemType.GRAPH -> newGraphGroups.add(toGSG(groupItem, i))
             }
         }
-
-        Timber.d(newTrackGroups.joinToString { tg -> tg.name + tg.displayIndex })
-        Timber.d(newGraphGroups.joinToString { gg -> gg.name + gg.displayIndex })
-
         ioScope.launch {
             dataSource!!.updateTrackGroups(newTrackGroups)
             dataSource!!.updateGraphStatGroups(newGraphGroups)
