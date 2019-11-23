@@ -26,7 +26,7 @@
     <string name="ru_sure_del_data_point">Are you sure you want to delete this data point?</string>
     <string name="export_file_name_suffix">%s-%s-%04d%02d%02d-%02d%02d%02d.csv</string>
     <string name="discrete_values">Add some choices below.</string>
-    <string name="add_discrete_values_tip">Warning: When graphed over time the index of the choice (on the left) will be used as the Y axis value so make sure you order the choices correctly.</string>
+    <string name="add_discrete_values_tip">Caution: When graphed over time the index of the choice (on the left) will be used as the Y axis value so make sure you order the choices correctly.</string>
     <string name="feature_name_cannot_be_null">Please add a name</string>
     <string name="feature_with_that_name_exists">You are already tracking something with that name</string>
     <string name="discrete_value_must_have_name">Please make sure all your choices have names</string>
