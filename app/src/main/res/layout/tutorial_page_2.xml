@@ -15,6 +15,7 @@
         android:paddingBottom="30dp"
         android:textAlignment="center"
         android:text="@string/tutorial_text_2"
+        android:textColor="@color/toolBarTextColor"
         android:lineSpacingExtra="5dp"
         android:textSize="20sp"
         app:layout_constraintLeft_toLeftOf="parent"
