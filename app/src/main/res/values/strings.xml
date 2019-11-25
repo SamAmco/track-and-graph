@@ -162,7 +162,6 @@
     <string name="faq_text_3_2">And then you tracked some data as follows:</string>
     <string name="faq_text_3_3">You could then visualise that data using either a line graph over time or using a pie chart as below:</string>
     <string name="faq_text_4_1"><![CDATA[To begin creating graphs you will need to first have some data tracked. Then go to the home page and create a new graph group. Your graph groups do not have to align in any way with your track groups, you can organise them how you want.]]></string>
-    <string name="faq_text_4_2">Tap the + button and create a new graph group:</string>
     <string name="faq_text_4_3">Your graph groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_4_4">Once you’ve created your graph group select it and then click the + icon to set up a new graph or statistic.</string>
     <string name="faq_text_4_5">Begin by entering a name for your new graph and then select a graph type. Here we will demonstrate the line graph since other graph types are relatively trivial to set up. One caveat to note however is that you can only create pie charts from multiple choice data.</string>
