@@ -18,7 +18,7 @@
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="select_file">Select File</string>
-    <string name="no_groups_hint">Welcome to Track &amp; Graph!\n\n First tap the + icon and create a new track group to start.</string>
+    <string name="no_groups_hint">Welcome to Track &amp; Graph!\n\n First tap the + icon and create a new track group. You can always rename it later.</string>
     <string name="no_features_hint">Tap the + icon to start tracking something in this group.</string>
     <string name="no_graph_stats_hint">Tap the + icon to create a new graph or statistic in this group.</string>
     <string name="ru_sure_del_group">Are you sure you want to delete this group and everything in it? You can not reverse this.</string>
@@ -186,4 +186,8 @@
     <string name="faq_text_5_13">Notice a point is plotted at the end of each month representing the total of all tracked values in that month.</string>
     <string name="faq_text_5_14">You can use scale, offset, averaging and totals all at once. The order of precedence is as follows:</string>
     <string name="faq_text_5_15">• First your data is converted to totals\n• Then each point is converted to its moving average\n• Then your points are multiplied by the scale value\n• Finally the offset is added to each point</string>
+    <string name="tutorial_text_1"><![CDATA[Everything in Track & Graph is organised into blue track groups and orange graph groups.]]></string>
+    <string name="tutorial_text_2">Use track groups to quickly track lots of things at the same time.</string>
+    <string name="tutorial_text_3">Use graph groups to investigate data from multiple track groups.</string>
+    <string name="got_it">Got it</string>
 </resources>
