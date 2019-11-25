@@ -145,7 +145,7 @@
     <string name="faq_5">How are moving averages and plot totals calculated?</string>
     <string name="faq">FAQ</string>
     <string name="faq_text_1_1">To begin tracking you will need to create at least one track group. Track groups allow you to separate out groups of things you might want to track at the same time. For example you may wish to create one group for your exercise routine and another for food types.</string>
-    <string name="faq_text_1_2">Your track groups should appear as a list of cards. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
+    <string name="faq_text_1_2">Your track groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_1_3">Once you’ve created your track group select it and then click the + icon to set up something new to track.</string>
     <string name="faq_text_1_4">Type in the name of what you want to track and select an input style:</string>
     <string name="faq_text_1_5">There are two types of input you can choose. Numerical will allow you to simply enter any number when tracking.</string>
@@ -161,9 +161,9 @@
     <string name="faq_text_3_1">Using the multiple choice input type is recommended wherever possible. If you ever want to draw a pie chart from your data you will need it to be in multiple choice form. You can also draw a line graph of your data over time if your predefined answers have a natural order, however you will need to make sure that the answers are in the correct order during setup as you can not change this later. For example say you were to setup the following:</string>
     <string name="faq_text_3_2">And then you tracked some data as follows:</string>
     <string name="faq_text_3_3">You could then visualise that data using either a line graph over time or using a pie chart as below:</string>
-    <string name="faq_text_4_1"><![CDATA[To begin creating graphs you will need to first have some data tracked. Then go to the Graphs & Statistics page and create a new graph group. Your graph groups do not have to align in any way with your track groups, you can organise them how you want.]]></string>
-    <string name="faq_text_4_2">To create a new graph group tap the + button:</string>
-    <string name="faq_text_4_3">Your graph groups will appear as a list of cards. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
+    <string name="faq_text_4_1"><![CDATA[To begin creating graphs you will need to first have some data tracked. Then go to the home page and create a new graph group. Your graph groups do not have to align in any way with your track groups, you can organise them how you want.]]></string>
+    <string name="faq_text_4_2">Tap the + button and create a new graph group:</string>
+    <string name="faq_text_4_3">Your graph groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_4_4">Once you’ve created your graph group select it and then click the + icon to set up a new graph or statistic.</string>
     <string name="faq_text_4_5">Begin by entering a name for your new graph and then select a graph type. Here we will demonstrate the line graph since other graph types are relatively trivial to set up. One caveat to note however is that you can only create pie charts from multiple choice data.</string>
     <string name="faq_text_4_6">Now we will add some lines to our graph by using the + button at the bottom:</string>
