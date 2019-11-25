@@ -117,7 +117,7 @@ class ExportFeaturesDialog : DialogFragment() {
             addCategory(Intent.CATEGORY_OPENABLE)
             val now = OffsetDateTime.now()
             val generatedName = getString( R.string.export_file_name_suffix,
-                getString(R.string.app_name), trackGroupName, now.year, now.monthValue + 1,
+                "TrackAndGraph", trackGroupName, now.year, now.monthValue + 1,
                 now.dayOfMonth, now.hour, now.minute, now.second)
             putExtra(Intent.EXTRA_TITLE, generatedName)
             type = "text/csv"
