@@ -2,7 +2,9 @@ package com.samco.trackandgraph
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
@@ -11,7 +13,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
+import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -38,7 +42,40 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        if (isFirstRun()) showTutorial()
+        else destroyTutorial()
     }
+
+    private fun destroyTutorial() {
+        val tutorialLayout = findViewById<ViewGroup>(R.id.tutorialOverlay)
+        tutorialLayout.removeAllViews()
+        getPrefs().edit().putBoolean("firstrun", false).apply()
+    }
+
+    private fun showTutorial() {
+        val pips = listOf(
+            findViewById<ImageView>(R.id.pip1),
+            findViewById(R.id.pip2),
+            findViewById(R.id.pip3)
+        )
+        val viewPager = findViewById<ViewPager>(R.id.tutorialViewPager)
+        val refreshPips = { position: Int ->
+            pips.forEachIndexed { i, p -> p.alpha = if (i == position) 1f else 0.5f }
+        }
+        refreshPips.invoke(0)
+        viewPager.visibility = View.VISIBLE
+        viewPager.adapter = TutorialPagerAdapter(applicationContext, this::destroyTutorial)
+        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) { }
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
+            override fun onPageSelected(position: Int) { refreshPips.invoke(position) }
+        })
+    }
+
+    private fun getPrefs() = getSharedPreferences("com.samco.trackandgraph", MODE_PRIVATE)
+
+    private fun isFirstRun() = getPrefs().getBoolean("firstrun", true)
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration) || super.onNavigateUp()
