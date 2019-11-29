@@ -32,6 +32,8 @@ import java.text.Format
 import java.text.ParsePosition
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.log10
+import kotlin.math.max
 
 abstract class GraphStatViewBase : FrameLayout {
     constructor(context: Context) : super(context, null)
@@ -93,6 +95,8 @@ abstract class GraphStatViewBase : FrameLayout {
         binding.legendFlexboxLayout.removeAllViews()
         currentXYRegions.clear()
         binding.lineGraph.clear()
+        binding.lineGraph.graph.paddingLeft = 0f
+        binding.lineGraph.graph.refreshLayout()
         binding.pieChart.clear()
         binding.progressBar.visibility = View.GONE
         binding.lineGraph.visibility = View.GONE
@@ -225,23 +229,31 @@ abstract class GraphStatViewBase : FrameLayout {
             cleanAllViews()
             binding.lineGraph.visibility = View.INVISIBLE
             initHeader(graphOrStat)
-            viewScope!!.launch { initFromLineGraphBody(graphOrStat, lineGraph, listViewMode) }
+            viewScope!!.launch { initFromLineGraphBody(graphOrStat, lineGraph) }
         } catch (e: Exception) { initError(graphOrStat, R.string.graph_stat_view_unkown_error) }
     }
 
-    private suspend fun initFromLineGraphBody(graphOrStat: GraphOrStat, lineGraph: LineGraph, listViewMode: Boolean = false) {
+    private suspend fun initFromLineGraphBody(graphOrStat: GraphOrStat, lineGraph: LineGraph) {
         binding.progressBar.visibility = View.VISIBLE
         if (tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph)) {
             setUpLineGraphXAxis()
             val bounds = RectRegion()
             currentXYRegions.forEach { r -> bounds.union(r) }
             binding.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+            setLineGraphPaddingFromBounds(bounds.minY.toDouble(), bounds.maxY.toDouble())
             binding.lineGraph.redraw()
             binding.lineGraph.visibility = View.VISIBLE
             binding.progressBar.visibility = View.GONE
         } else {
             initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
         }
+    }
+
+    private fun setLineGraphPaddingFromBounds(minY: Double, maxY: Double) {
+        val maxBound = max(abs(minY), abs(maxY))
+        val numDigits = log10(maxBound).toFloat() + 3
+        binding.lineGraph.graph.paddingLeft = numDigits * 5f
+        binding.lineGraph.graph.refreshLayout()
     }
 
     fun initFromPieChart(graphOrStat: GraphOrStat, pieChart: PieChart) {
@@ -423,7 +435,7 @@ abstract class GraphStatViewBase : FrameLayout {
         var yRegion = SeriesUtils.minMax(yValues)
         if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1)
             yRegion = Region(yRegion.min, yRegion.min.toDouble() + 0.1)
-        var xRegion = SeriesUtils.minMax(xValues)
+        val xRegion = SeriesUtils.minMax(xValues)
         val rectRegion = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
 
         return@withContext object: FastXYSeries {
