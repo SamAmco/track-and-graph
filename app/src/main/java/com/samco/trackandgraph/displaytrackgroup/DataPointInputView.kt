@@ -12,10 +12,7 @@ import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.DiscreteValue
-import com.samco.trackandgraph.database.Feature
-import com.samco.trackandgraph.database.FeatureType
-import com.samco.trackandgraph.database.doubleFormatter
+import com.samco.trackandgraph.database.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
@@ -53,14 +50,9 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
 
         titleText.text = state.feature.name
 
-        if (state.dateModifiable) {
-            initDateButton()
-            initTimeButton()
-            setSelectedDateTime(state.dateTime)
-        } else {
-            dateButton.visibility = View.INVISIBLE
-            timeButton.visibility = View.INVISIBLE
-        }
+        initDateButton()
+        initTimeButton()
+        setSelectedDateTime(state.dateTime)
 
         if (state.feature.featureType == FeatureType.CONTINUOUS) {
             buttonsScroll.visibility = View.GONE
@@ -103,7 +95,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         var dateTime: OffsetDateTime,
         var value: Double,
         var label: String,
-        var dateModifiable: Boolean
+        val oldDataPoint: DataPoint?
     )
     class DataPointInputClickListener(val onClick: (Feature) -> Unit)
     fun setOnClickListener(clickListener: DataPointInputClickListener) { this.clickListener = clickListener }
