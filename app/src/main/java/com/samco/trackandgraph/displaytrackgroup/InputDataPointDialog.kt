@@ -92,7 +92,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private fun initViewModel() {
         val timestampStr = arguments!!.getString(DATA_POINT_TIMESTAMP_KEY)
         val timestamp = if (timestampStr != null) odtFromString(timestampStr) else null
-        viewModel.loadData(activity!!, arguments!!.getLongArray(FEATURE_LIST_KEY)!!.toList(), timestamp)
+        viewModel.init(activity!!, arguments!!.getLongArray(FEATURE_LIST_KEY)!!.toList(), timestamp)
     }
 
     private class ViewPagerAdapter(val context: Context,
@@ -166,9 +166,10 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     }
 
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
-        viewModel.onDataPointInput(activity!!,
+        viewModel.onDataPointInput(
             DataPoint(dataPointInputData.dateTime, dataPointInputData.feature.id,
-                dataPointInputData.value, dataPointInputData.label)
+                dataPointInputData.value, dataPointInputData.label),
+            dataPointInputData.oldDataPoint
         )
     }
 
@@ -177,8 +178,9 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
 
 enum class InputDataPointDialogState { LOADING, WAITING, ADDING, ADDED }
 class InputDataPointDialogViewModel : ViewModel() {
+    private lateinit var dao: TrackAndGraphDatabaseDao
     private var updateJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
+    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
     val state: LiveData<InputDataPointDialogState> get() { return _state }
     private val _state by lazy {
@@ -202,44 +204,39 @@ class InputDataPointDialogViewModel : ViewModel() {
         return@lazy index
     }
 
-    fun loadData(activity: Activity, featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?) {
+    fun init(activity: Activity, featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?) {
         if (features.value!!.isNotEmpty()) return
         val application = activity.application
-        val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        uiScope.launch {
-            _state.value = InputDataPointDialogState.LOADING
-            lateinit var featureData: List<Feature>
-            var dataPointData: DataPoint? = null
-            withContext(Dispatchers.IO) {
-                featureData = dao.getFeaturesByIdsSync(featureIds)
-                if (dataPointTimestamp != null) {
-                    dataPointData = dao.getDataPointByTimestampAndFeatureSync(featureData[0].id, dataPointTimestamp)
-                }
-            }
+        dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
+        _state.value = InputDataPointDialogState.LOADING
+        ioScope.launch {
+            val featureData = dao.getFeaturesByIdsSync(featureIds)
+            val dataPointData = if (dataPointTimestamp != null) {
+                dao.getDataPointByTimestampAndFeatureSync(featureData[0].id, dataPointTimestamp)
+            } else null
 
-            val defaultValue = if (dataPointData != null) dataPointData!!.value else 0.toDouble()
-            val defaultLabel = if (dataPointData != null) dataPointData!!.label else ""
-            val timestamp = if (dataPointData != null) dataPointData!!.timestamp else OffsetDateTime.now()
-            val timeModifiable = dataPointData == null
+            val defaultValue = dataPointData?.value ?: 0.toDouble()
+            val defaultLabel = dataPointData?.label ?: ""
+            val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
             uiStates = featureData.map { f ->
-                f to DataPointInputView.DataPointInputData(f, timestamp, defaultValue, defaultLabel, timeModifiable)
+                f to DataPointInputView.DataPointInputData(f, timestamp, defaultValue, defaultLabel, dataPointData)
             }.toMap()
-            _features.value = featureData
-            _currentFeatureIndex.value = 0
-            _state.value = InputDataPointDialogState.WAITING
+
+            withContext(Dispatchers.Main) {
+                _features.value = featureData
+                _currentFeatureIndex.value = 0
+                _state.value = InputDataPointDialogState.WAITING
+            }
         }
     }
 
-    fun onDataPointInput(activity: Activity, dataPoint: DataPoint) {
+    fun onDataPointInput(newDataPoint: DataPoint, oldDataPoint: DataPoint?) {
         if (state.value != InputDataPointDialogState.WAITING) return
-        val application = activity.application
-        val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        uiScope.launch {
-            _state.value = InputDataPointDialogState.ADDING
-            withContext(Dispatchers.IO) {
-                dao.insertDataPoint(dataPoint)
-            }
-            _state.value = InputDataPointDialogState.ADDED
+        _state.value = InputDataPointDialogState.ADDING
+        ioScope.launch {
+            if (oldDataPoint != null) dao.deleteDataPoint(oldDataPoint)
+            dao.insertDataPoint(newDataPoint)
+            withContext(Dispatchers.Main) { _state.value = InputDataPointDialogState.ADDED }
         }
     }
 
@@ -249,6 +246,6 @@ class InputDataPointDialogViewModel : ViewModel() {
 
     override fun onCleared() {
         super.onCleared()
-        uiScope.cancel()
+        ioScope.cancel()
     }
 }
