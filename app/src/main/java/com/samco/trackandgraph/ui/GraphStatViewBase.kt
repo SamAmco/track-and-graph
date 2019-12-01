@@ -381,11 +381,11 @@ abstract class GraphStatViewBase : FrameLayout {
             else {
                 val now = OffsetDateTime.now()
                 val startDate = now.minus(sampleDuration)
-                val plottingDuration = plottingPeriod?.let { Duration.between(now, now.minus(plottingPeriod)) }
+                val plottingDuration = plottingPeriod?.let { Duration.between(now, now.plus(plottingPeriod)) }
                 val maxSampleDuration = listOf(
                     sampleDuration,
                     averagingDuration?.plus(sampleDuration),
-                    plottingDuration
+                    plottingDuration?.plus(sampleDuration)
                 ).maxBy { d -> d ?: Duration.ZERO }
                 val minSampleDate = now.minus(maxSampleDuration)
                 val dataPoints = dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, now)
