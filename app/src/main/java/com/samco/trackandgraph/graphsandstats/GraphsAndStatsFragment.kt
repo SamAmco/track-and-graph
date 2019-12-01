@@ -20,6 +20,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.GraphStatType
 import com.samco.trackandgraph.databinding.GraphsAndStatsFragmentBinding
+import com.samco.trackandgraph.ui.*
 import kotlinx.coroutines.*
 
 class GraphsAndStatsFragment : Fragment() {
@@ -42,7 +43,8 @@ class GraphsAndStatsFragment : Fragment() {
             GraphStatClickListener(
                 viewModel::deleteGraphStat,
                 this::onEditGraphStat,
-                this::onGraphStatClicked
+                this::onGraphStatClicked,
+                this::onMoveGraphStatClicked
             ),
             activity!!.application
         )
@@ -80,6 +82,15 @@ class GraphsAndStatsFragment : Fragment() {
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { }
+    }
+
+    private fun onMoveGraphStatClicked(graphOrStat: GraphOrStat) {
+        val dialog = MoveToDialogFragment()
+        var args = Bundle()
+        args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_GRAPH)
+        args.putLong(MOVE_DIALOG_GROUP_KEY, graphOrStat.id)
+        dialog.arguments = args
+        childFragmentManager.let { dialog.show(it, "move_graph_group_dialog") }
     }
 
     private fun onGraphStatClicked(graphOrStat: GraphOrStat) {

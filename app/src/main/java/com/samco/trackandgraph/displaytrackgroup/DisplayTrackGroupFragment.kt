@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentDisplayTrackGroupBinding
-import com.samco.trackandgraph.ui.YesCancelDialogFragment
+import com.samco.trackandgraph.ui.*
 import kotlinx.coroutines.*
 
 const val TRACK_GROUP_ID_KEY = "TRACK_GROUP_ID_KEY"
@@ -44,6 +44,7 @@ class DisplayTrackGroupFragment : Fragment(),
         adapter = FeatureAdapter(FeatureClickListener(
             this::onFeatureRenameClicked,
             this::onFeatureDeleteClicked,
+            this::onFeatureMoveToClicked,
             this::onFeatureAddClicked,
             this::onFeatureHistoryClicked
         ))
@@ -129,6 +130,15 @@ class DisplayTrackGroupFragment : Fragment(),
     override fun getFeature(): Feature {
         val f = viewModel.currentActionFeature!!
         return Feature.create(f.id, f.name, f.trackGroupId, f.featureType, f.discreteValues, f.displayIndex)
+    }
+
+    private fun onFeatureMoveToClicked(feature: DisplayFeature) {
+        val dialog = MoveToDialogFragment()
+        var args = Bundle()
+        args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_TRACK)
+        args.putLong(MOVE_DIALOG_GROUP_KEY, feature.id)
+        dialog.arguments = args
+        childFragmentManager.let { dialog.show(it, "move_track_group_dialog") }
     }
 
     private fun onFeatureDeleteClicked(feature: DisplayFeature) {
