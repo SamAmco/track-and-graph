@@ -15,6 +15,9 @@
     <dimen name="dialog_header_top_margin">16dp</dimen>
     <dimen name="list_item_data_point_height">50dp</dimen>
     <dimen name="data_point_input_fragment_height">210dp</dimen>
+    <dimen name="move_to_dialog_base_height">150dp</dimen>
+    <dimen name="move_to_dialog_max_height">400dp</dimen>
+    <dimen name="list_item_group_item_height">45dp</dimen>
     <dimen name="spinner_item_color_size">60dp</dimen>
     <dimen name="graph_height">300dp</dimen>
     <dimen name="design_navigation_icon_size" tools:override="true">20dp</dimen>

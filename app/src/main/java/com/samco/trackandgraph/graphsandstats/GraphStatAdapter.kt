@@ -78,6 +78,7 @@ class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
             when (item?.itemId) {
                 R.id.edit -> clickListener?.onEdit(it)
                 R.id.delete -> clickListener?.onDelete(it)
+                R.id.moveTo -> clickListener?.onMoveGraphStat(it)
                 else -> {}
             }
         }
@@ -136,9 +137,11 @@ class GraphStatDiffCallback : DiffUtil.ItemCallback<GraphOrStat>() {
 
 class GraphStatClickListener(private val onDelete: (graphStat: GraphOrStat) -> Unit,
                              private val onEdit: (graphStat: GraphOrStat) -> Unit,
-                             private val onClick: (graphStat: GraphOrStat) -> Unit
+                             private val onClick: (graphStat: GraphOrStat) -> Unit,
+                             private val onMoveGraphStat: (graphStat: GraphOrStat) -> Unit
                              ) {
     fun onDelete(graphStat: GraphOrStat) = onDelete.invoke(graphStat)
     fun onEdit(graphStat: GraphOrStat) = onEdit.invoke(graphStat)
     fun onClick(graphStat: GraphOrStat) = onClick.invoke(graphStat)
+    fun onMoveGraphStat(graphStat: GraphOrStat) = onMoveGraphStat.invoke(graphStat)
 }

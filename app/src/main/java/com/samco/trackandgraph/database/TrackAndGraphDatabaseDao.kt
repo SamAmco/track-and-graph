@@ -17,6 +17,11 @@ interface TrackAndGraphDatabaseDao {
         ORDER BY display_index ASC""")
     fun getAllGroups() : LiveData<List<GroupItem>>
 
+    @Query("""SELECT track_groups_table.*, 0 as type FROM track_groups_table 
+        UNION SELECT graph_stat_groups_table.*, 1 as type FROM graph_stat_groups_table
+        ORDER BY display_index ASC""")
+    fun getAllGroupsSync() : List<GroupItem>
+
     @Query("SELECT * FROM track_groups_table ORDER BY display_index ASC")
     fun getTrackGroups() : LiveData<List<TrackGroup>>
 
@@ -138,7 +143,10 @@ interface TrackAndGraphDatabaseDao {
     fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
 
     @Query("SELECT * FROM graphs_and_stats_table WHERE id = :graphStatId LIMIT 1")
-    fun getGraphStatById(graphStatId: Long): GraphOrStat?
+    fun getGraphStatById(graphStatId: Long): GraphOrStat
+
+    @Query("SELECT * FROM graphs_and_stats_table WHERE id = :graphStatId LIMIT 1")
+    fun tryGetGraphStatById(graphStatId: Long): GraphOrStat?
 
     @Query("SELECT * FROM line_graphs_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getLineGraphByGraphStatId(graphStatId: Long): LineGraph?

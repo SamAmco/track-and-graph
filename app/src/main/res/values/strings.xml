@@ -189,4 +189,6 @@
     <string name="tutorial_text_2">Use track groups to quickly track lots of things at the same time.</string>
     <string name="tutorial_text_3">Use graph groups to investigate data from multiple track groups.</string>
     <string name="got_it">Got it</string>
+    <string name="move_to_colon">Move to:</string>
+    <string name="move_to">Move to</string>
 </resources>

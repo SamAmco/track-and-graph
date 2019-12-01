@@ -384,7 +384,7 @@ class GraphStatInputViewModel : ViewModel() {
 
     private fun initFromExistingGraphStat(graphStatId: Long) {
         ioScope.launch {
-            val graphStat = dataSource!!.getGraphStatById(graphStatId)
+            val graphStat = dataSource!!.tryGetGraphStatById(graphStatId)
 
             if (graphStat == null) {
                 withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
