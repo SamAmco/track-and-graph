@@ -191,4 +191,12 @@
     <string name="got_it">Got it</string>
     <string name="move_to_colon">Move to:</string>
     <string name="move_to">Move to</string>
+
+    <string name="feature_add_or_update_error_occurred">An error occurred, your changes could not be made.</string>
+    <string name="ru_sure_update_feature">This update may irreversibly modify the data you have already tracked. It is highly recommended that you backup existing data before continuing.\n\n Would you like to continue?</string>
+    <string name="warning">Warning</string>
+    <string name="ok">OK</string>
+    <string name="on_feature_type_change_warning">Once you change your input type to numerical your existing tracked data will lose its labels and you won\'t be able to change it back.</string>
+    <string name="on_feature_delete_discrete_value_warning">Deleting multiple choice answers will delete all existing tracked data points for that value.</string>
+
 </resources>

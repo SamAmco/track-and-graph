@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.displaytrackgroup
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.os.Bundle
 import android.text.InputFilter
 import android.view.LayoutInflater
@@ -27,33 +28,30 @@ import androidx.core.view.forEachIndexed
 import androidx.core.view.size
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.YesCancelDialogFragment
+import java.lang.Exception
 
 
-class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
+class AddFeatureFragment : Fragment(),
+    AdapterView.OnItemSelectedListener,
+    YesCancelDialogFragment.YesCancelDialogListener {
+
     private val args: AddFeatureFragmentArgs by navArgs()
     private lateinit var binding: AddFeatureFragmentBinding
     private lateinit var viewModel: AddFeatureViewModel
     private var navController: NavController? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        viewModel = ViewModelProviders.of(this).get(AddFeatureViewModel::class.java)
         binding = DataBindingUtil.inflate(inflater, R.layout.add_feature_fragment, container, false)
         navController = container?.findNavController()
+
+        viewModel = ViewModelProviders.of(this).get(AddFeatureViewModel::class.java)
+        viewModel.init(activity!!, args.trackGroupId, args.existingFeatureNames.toList(), args.editFeatureId)
 
         binding.discreteValuesTextView.visibility = View.INVISIBLE
         binding.discreteValues.visibility = View.INVISIBLE
         binding.addDiscreteValueButton.visibility = View.INVISIBLE
-        binding.discreteValuesTipText.visibility = View.INVISIBLE
-        binding.featureNameText.setSelection(binding.featureNameText.text.length)
         binding.featureNameText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
-        binding.featureNameText.addTextChangedListener {
-            viewModel.featureName.value = binding.featureNameText.text.toString()
-            validateForm()
-        }
-        binding.featureNameText.requestFocus()
-        binding.featureTypeSpinner.onItemSelectedListener = this
-        binding.addDiscreteValueButton.setOnClickListener { onAddDiscreteValue() }
-        binding.addBar.addButton.setOnClickListener { onAddClicked() }
         listenToViewModelState()
         return binding.root
     }
@@ -71,25 +69,57 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
     }
 
     private fun listenToViewModelState() {
-        viewModel.addFeatureState.observe(this, Observer { state ->
+        viewModel.state.observe(this, Observer { state ->
             when (state) {
-                AddFeatureState.WAITING -> binding.progressBar.visibility = View.INVISIBLE
+                AddFeatureState.WAITING -> {
+                    initViews()
+                    binding.progressBar.visibility = View.GONE
+                }
                 AddFeatureState.ADDING -> {
                     binding.addBar.addButton.isEnabled = false
                     binding.progressBar.visibility = View.VISIBLE
                 }
                 AddFeatureState.DONE -> navController?.popBackStack()
+                AddFeatureState.ERROR -> {
+                    val errorMsg = getString(R.string.feature_add_or_update_error_occurred)
+                    Toast.makeText(activity!!, errorMsg, Toast.LENGTH_LONG).show()
+                    navController?.popBackStack()
+                }
             }
         })
     }
 
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
+    private fun initViews() {
         binding.featureNameText.setText(viewModel.featureName.value)
         binding.featureTypeSpinner.setSelection(spinnerIndexOf(viewModel.featureType.value!!))
         viewModel.discreteValues.forEach { v -> inflateDiscreteValue(v) }
         if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
             binding.addDiscreteValueButton.isEnabled = false
+        if (viewModel.updateMode && viewModel.existingFeature.featureType == FeatureType.CONTINUOUS) {
+            binding.featureTypeSpinner.visibility = View.GONE
+            binding.featureTypeLabel.visibility = View.GONE
+        }
+
+        binding.featureTypeSpinner.onItemSelectedListener = this
+        binding.featureNameText.setSelection(binding.featureNameText.text.length)
+        binding.featureNameText.requestFocus()
+        binding.featureNameText.addTextChangedListener {
+            viewModel.featureName.value = binding.featureNameText.text.toString()
+            validateForm()
+        }
+        binding.addDiscreteValueButton.setOnClickListener { onAddDiscreteValue() }
+        binding.addBar.addButton.setOnClickListener { onAddOrUpdateClicked() }
+    }
+
+    private fun onAddOrUpdateClicked() {
+        if (!viewModel.updateMode) viewModel.onAddOrUpdate()
+        else {
+            val dialog = YesCancelDialogFragment()
+            val args = Bundle()
+            args.putString("title", getString(R.string.ru_sure_update_feature))
+            dialog.arguments = args
+            childFragmentManager.let { dialog.show(it, "ru_sure_update_feature_fragment") }
+        }
     }
 
     private fun spinnerIndexOf(featureType: FeatureType): Int = when(featureType) {
@@ -137,7 +167,7 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     private fun validateForm() {
         var errorSet = false
-        var discreteValueStrings = viewModel.discreteValues
+        val discreteValueStrings = viewModel.discreteValues
         if (viewModel.featureType.value!! == FeatureType.DISCRETE) {
             if (discreteValueStrings.isNullOrEmpty()) {
                 setErrorText(getString(R.string.discrete_feature_needs_at_least_one_value))
@@ -155,7 +185,7 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 setErrorText(getString(R.string.feature_name_cannot_be_null))
                 errorSet = true
             }
-            else if (args.existingFeatureNames.contains(it.toString())) {
+            else if (viewModel.existingFeatureNames.contains(it.toString())) {
                 setErrorText(getString(R.string.feature_with_that_name_exists))
                 errorSet = true
             }
@@ -191,6 +221,14 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
     }
 
     private fun onDeleteDiscreteValue(item: FeatureDiscreteValueListItemBinding) {
+        if (viewModel.updateMode && !viewModel.haveWarnedAboutDeletingDiscreteValues) {
+            AlertDialog.Builder(context)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.on_feature_delete_discrete_value_warning)
+                .setPositiveButton(R.string.ok, null)
+                .show()
+            viewModel.haveWarnedAboutDeletingDiscreteValues = true
+        }
         val currIndex = binding.discreteValues.indexOfChild(item.root)
         viewModel.discreteValues.removeAt(currIndex)
         binding.discreteValues.removeView(item.root)
@@ -213,57 +251,163 @@ class AddFeatureFragment : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(p0: AdapterView<*>?) { }
 
     private fun onFeatureTypeSelected(discrete: Boolean) {
+        if (viewModel.updateMode && discrete != (viewModel.existingFeature.featureType == FeatureType.DISCRETE)) {
+            AlertDialog.Builder(context)
+                .setTitle(R.string.warning)
+                .setMessage(R.string.on_feature_type_change_warning)
+                .setPositiveButton(R.string.ok, null)
+                .show()
+        }
         viewModel.featureType.value = if (discrete) FeatureType.DISCRETE else FeatureType.CONTINUOUS
         val vis = if (discrete) View.VISIBLE else View.GONE
         binding.discreteValuesTextView.visibility = vis
         binding.discreteValues.visibility = vis
         binding.addDiscreteValueButton.visibility = vis
-        binding.discreteValuesTipText.visibility = vis
         validateForm()
     }
 
-    private fun onAddClicked() {
-        viewModel.onAddFeature(activity!!, binding.featureNameText.text.toString(), args.trackGroupId)
+    override fun onDialogYes(dialog: YesCancelDialogFragment) {
+        when (dialog.title) {
+            getString(R.string.ru_sure_update_feature) -> viewModel.onAddOrUpdate()
+        }
     }
 }
 
-enum class AddFeatureState { WAITING, ADDING, DONE }
+enum class AddFeatureState { INITIALIZING, WAITING, ADDING, DONE, ERROR }
 class AddFeatureViewModel : ViewModel() {
     private var updateJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
+    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
+    private lateinit var database: TrackAndGraphDatabase
+    private lateinit var dao: TrackAndGraphDatabaseDao
 
-    class MutableLabel(var value: String = "")
+    class MutableLabel(var value: String = "", val updateIndex: Int = -1)
 
     var featureName = MutableLiveData<String>("")
     var featureType = MutableLiveData<FeatureType>(FeatureType.CONTINUOUS)
     var discreteValues = mutableListOf<MutableLabel>()
-    val addFeatureState: LiveData<AddFeatureState> get() { return _isAdding }
-    private val _isAdding by lazy {
-        val adding = MutableLiveData<AddFeatureState>()
-        adding.value = AddFeatureState.WAITING
-        return@lazy adding
+    lateinit var existingFeatureNames: List<String?>
+        private set
+
+    val state: LiveData<AddFeatureState> get() { return _state }
+    private val _state = MutableLiveData<AddFeatureState>(AddFeatureState.INITIALIZING)
+
+    var updateMode: Boolean = false
+        private set
+    var haveWarnedAboutDeletingDiscreteValues = false
+    private var trackGroupId: Long = -1
+    lateinit var existingFeature: Feature
+        private set
+
+    fun init(activity: Activity, trackGroupId: Long, existingFeatureNames: List<String>, existingFeatureId: Long) {
+        if (_state.value != AddFeatureState.INITIALIZING) return
+
+        val application = activity.application
+        database = TrackAndGraphDatabase.getInstance(application)
+        dao = database.trackAndGraphDatabaseDao
+        this.trackGroupId = trackGroupId
+        this.existingFeatureNames = existingFeatureNames
+        ioScope.launch {
+            if (existingFeatureId > -1) {
+                updateMode = true
+                existingFeature = dao.getFeatureById(existingFeatureId)
+                val existingDiscreteValues = existingFeature.discreteValues
+                    .sortedBy { f -> f.index }
+                    .map { f -> MutableLabel(f.label, f.index) }
+                withContext(Dispatchers.Main) {
+                    featureName.value = existingFeature.name
+                    featureType.value = existingFeature.featureType
+                    this@AddFeatureViewModel.existingFeatureNames = existingFeatureNames.minus(featureName.value)
+                    discreteValues.addAll(existingDiscreteValues)
+                }
+            }
+            withContext(Dispatchers.Main) { _state.value = AddFeatureState.WAITING }
+        }
     }
 
-    fun onAddFeature(activity: Activity, name: String, trackGroupId: Long) {
-        val application = activity.application
-        val database = TrackAndGraphDatabase.getInstance(application)
-        val dao = database.trackAndGraphDatabaseDao
-        uiScope.launch {
-            _isAdding.value = AddFeatureState.ADDING
-            withContext(Dispatchers.IO) {
-                val discVals = discreteValues.mapIndexed { i, s ->
-                    val index = if (discreteValues.size == 1) 1 else i
-                    DiscreteValue(index, s.value)
+    fun onAddOrUpdate() {
+        _state.value = AddFeatureState.ADDING
+        ioScope.launch {
+            try {
+                database.withTransaction {
+                    if (updateMode) updateFeature()
+                    else addFeature()
                 }
-                val feature = Feature.create(0, name, trackGroupId, featureType.value!!, discVals, 0)
-                database.withTransaction { dao.insertFeature(feature) }
+                withContext(Dispatchers.Main) { _state.value = AddFeatureState.DONE }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) { _state.value = AddFeatureState.ERROR }
             }
-            _isAdding.value = AddFeatureState.DONE
         }
+    }
+
+    private suspend fun updateFeature() {
+        val valOfDiscVal = { v: MutableLabel ->
+            if (discreteValues.size == 1) 1 else discreteValues.indexOf(v)
+        }
+
+        if (existingFeature.featureType != featureType.value) updateDataPointsForNewFeatureType()
+        else updateDiscreteValueDataPoints(valOfDiscVal)
+
+        val discVals = discreteValues
+            .map { s -> DiscreteValue(valOfDiscVal(s), s.value) }
+        val feature = Feature.create(existingFeature.id,
+            featureName.value!!, trackGroupId,
+            featureType.value!!, discVals,
+            existingFeature.displayIndex)
+        dao.updateFeature(feature)
+    }
+
+    private suspend fun updateDiscreteValueDataPoints(valOfDiscVal: (MutableLabel) -> Int) {
+        existingFeature.discreteValues.map { dv -> dv.index }
+            .filter { i -> !discreteValues.map { dv -> dv.updateIndex }.contains(i) }
+            .forEach { i -> removeExistingDataPointsForDiscreteValue(i) }
+
+        if (discreteValues.any { dv -> dv.updateIndex > -1 }) {
+            val valMap = discreteValues
+                .filter { dv -> dv.updateIndex > -1 }
+                .map { dv -> dv.updateIndex to Pair(valOfDiscVal(dv), dv.value) }
+                .toMap()
+            updateExistingDataPointsForDiscreteValue(valMap)
+        }
+    }
+
+    private suspend fun updateDataPointsForNewFeatureType() {
+        if (featureType.value == FeatureType.CONTINUOUS) {
+            val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature.id)
+            val newDataPoints = oldDataPoints.map {
+                DataPoint(it.timestamp, it.featureId, it.value, "")
+            }
+            dao.updateDataPoints(newDataPoints)
+        }
+    }
+
+    private suspend fun removeExistingDataPointsForDiscreteValue(index: Int) {
+        dao.deleteAllDataPointsForDiscreteValue(existingFeature.id, index.toDouble())
+    }
+
+    private suspend fun updateExistingDataPointsForDiscreteValue(valMap: Map<Int, Pair<Int, String>>) {
+        val oldValues = dao.getDataPointsForFeatureSync(existingFeature.id)
+        val newValues = oldValues.map { v ->
+            DataPoint(v.timestamp, v.featureId,
+                valMap[v.value.toInt()]!!.first.toDouble(),
+                valMap[v.value.toInt()]!!.second
+            )
+        }
+        dao.updateDataPoints(newValues)
+    }
+
+    private suspend fun addFeature() {
+        val discVals = discreteValues.mapIndexed { i, s ->
+            val index = if (discreteValues.size == 1) 1 else i
+            DiscreteValue(index, s.value)
+        }
+        val feature = Feature.create(0,
+            featureName.value!!, trackGroupId,
+            featureType.value!!, discVals, 0)
+        dao.insertFeature(feature)
     }
 
     override fun onCleared() {
         super.onCleared()
-        uiScope.cancel()
+        ioScope.cancel()
     }
 }

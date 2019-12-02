@@ -23,7 +23,6 @@ const val TRACK_GROUP_ID_KEY = "TRACK_GROUP_ID_KEY"
 const val TRACK_GROUP_NAME_KEY = "TRACK_GROUP_NAME_KEY"
 
 class DisplayTrackGroupFragment : Fragment(),
-    RenameFeatureDialogFragment.RenameFeatureDialogListener,
     YesCancelDialogFragment.YesCancelDialogListener {
 
     private var navController: NavController? = null
@@ -42,7 +41,7 @@ class DisplayTrackGroupFragment : Fragment(),
         viewModel.initViewModel(activity!!, args.trackGroup)
 
         adapter = FeatureAdapter(FeatureClickListener(
-            this::onFeatureRenameClicked,
+            this::onFeatureEditClicked,
             this::onFeatureDeleteClicked,
             this::onFeatureMoveToClicked,
             this::onFeatureAddClicked,
@@ -127,11 +126,6 @@ class DisplayTrackGroupFragment : Fragment(),
         )
     }
 
-    override fun getFeature(): Feature {
-        val f = viewModel.currentActionFeature!!
-        return Feature.create(f.id, f.name, f.trackGroupId, f.featureType, f.discreteValues, f.displayIndex)
-    }
-
     private fun onFeatureMoveToClicked(feature: DisplayFeature) {
         val dialog = MoveToDialogFragment()
         var args = Bundle()
@@ -156,23 +150,15 @@ class DisplayTrackGroupFragment : Fragment(),
         }
     }
 
-    //TODO allow people to rename the discrete values if it is a discrete feature
-    private fun onFeatureRenameClicked(feature: DisplayFeature) {
-        viewModel.currentActionFeature = feature
-        val dialog = RenameFeatureDialogFragment()
-        childFragmentManager.let { dialog.show(it, "rename_feature_dialog") }
+    private fun onFeatureEditClicked(feature: DisplayFeature) {
+        val featureNames = viewModel.features.value?.map{f -> f.name}?.toTypedArray() ?: arrayOf()
+        navController?.navigate(
+            DisplayTrackGroupFragmentDirections
+                .actionAddFeature(args.trackGroup, featureNames, feature.id)
+        )
     }
-
-    override fun getMaxFeatureNameChars(): Int = MAX_FEATURE_NAME_LENGTH
 
     private fun onDeleteFeature(feature: DisplayFeature) { viewModel.deleteFeature(feature) }
-
-    override fun onRenameFeature(newName: String) {
-        val f = viewModel.currentActionFeature!!
-        val newFeature = Feature.create(f.id, newName, f.trackGroupId,
-            f.featureType, f.discreteValues, f.displayIndex)
-        viewModel.updateFeature(newFeature)
-    }
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
         val argBundle = Bundle()
@@ -261,10 +247,6 @@ class DisplayTrackGroupViewModel : ViewModel() {
 
     fun deleteFeature(feature: DisplayFeature) = ioScope.launch {
         dataSource?.deleteFeature(feature.id)
-    }
-
-    fun updateFeature(feature: Feature) = ioScope.launch {
-        dataSource?.updateFeature(feature)
     }
 
     fun adjustDisplayIndexes(displayFeatures: List<DisplayFeature>) {
