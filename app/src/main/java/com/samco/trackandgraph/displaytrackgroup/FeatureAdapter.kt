@@ -64,7 +64,7 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
     override fun onMenuItemClick(item: MenuItem?): Boolean {
         feature?.let {
             when (item?.itemId) {
-                R.id.rename -> clickListener?.onRename(it)
+                R.id.edit -> clickListener?.onEdit(it)
                 R.id.delete -> clickListener?.onDelete(it)
                 R.id.moveTo -> clickListener?.onMoveTo(it)
                 else -> {}
@@ -92,12 +92,12 @@ class DisplayFeatureDiffCallback : DiffUtil.ItemCallback<DisplayFeature>() {
     }
 }
 
-class FeatureClickListener(private val onRenameListener: (feature: DisplayFeature) -> Unit,
+class FeatureClickListener(private val onEditListener: (feature: DisplayFeature) -> Unit,
                            private val onDeleteListener: (feature: DisplayFeature) -> Unit,
                            private val onMoveToListener: (feature: DisplayFeature) -> Unit,
                            private val onAddListener: (feature: DisplayFeature) -> Unit,
                            private val onHistoryListener: (feature: DisplayFeature) -> Unit) {
-    fun onRename(feature: DisplayFeature) = onRenameListener(feature)
+    fun onEdit(feature: DisplayFeature) = onEditListener(feature)
     fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
     fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
     fun onAdd(feature: DisplayFeature) = onAddListener(feature)

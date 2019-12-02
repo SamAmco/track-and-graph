@@ -107,6 +107,10 @@
         <argument
                 android:name="existingFeatureNames"
                 app:argType="string[]" />
+        <argument
+            android:name="editFeatureId"
+            app:argType="long"
+            android:defaultValue="-1L" />
     </fragment>
     <fragment
             android:id="@+id/viewGraphStatFragment"

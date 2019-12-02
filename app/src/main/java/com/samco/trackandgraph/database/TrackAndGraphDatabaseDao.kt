@@ -100,6 +100,9 @@ interface TrackAndGraphDatabaseDao {
     @Delete
     fun deleteDataPoint(dataPoint: DataPoint)
 
+    @Query("DELETE FROM data_points_table WHERE feature_id = :featureId AND value = :index")
+    fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double)
+
     @Delete
     fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
@@ -114,6 +117,9 @@ interface TrackAndGraphDatabaseDao {
 
     @Update
     fun updateDataPoint(dataPoint: DataPoint)
+
+    @Update
+    fun updateDataPoints(dataPoint: List<DataPoint>)
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp""")
     fun getDataPointsBetween(featureId: Long, min: String, max: String): List<DataPoint>
