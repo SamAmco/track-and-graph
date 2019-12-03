@@ -20,7 +20,6 @@ import com.samco.trackandgraph.ui.RenameGroupDialogFragment
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
-import java.security.acl.Group
 
 class SelectGroupFragment : Fragment(),
     YesCancelDialogFragment.YesCancelDialogListener,
@@ -39,6 +38,12 @@ class SelectGroupFragment : Fragment(),
 
         viewModel = ViewModelProviders.of(this).get(SelectGroupViewModel::class.java)
         viewModel.initViewModel(requireActivity())
+        listenToViewModel()
+
+        binding.noGroupsHintText.visibility = View.INVISIBLE
+        binding.noGroupsHintText.setOnClickListener {
+            viewModel.addFirstTrackGroup(getString(R.string.my_first_track_group))
+        }
 
         adapter = GroupListAdapter(
             GroupClickListener(
@@ -57,6 +62,16 @@ class SelectGroupFragment : Fragment(),
         observeGroupDataAndUpdate(adapter)
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    private fun listenToViewModel() {
+        viewModel.state.observe(this, Observer { when (it) {
+            SelectGroupViewModelState.CREATED_FIRST_GROUP -> navController?.navigate(
+                SelectGroupFragmentDirections.actionSelectTackGroup(
+                    viewModel.firstTrackGroupId, getString(R.string.my_first_track_group)
+                )
+            )
+        }})
     }
 
     override fun onStart() {
@@ -106,7 +121,7 @@ class SelectGroupFragment : Fragment(),
         viewModel.allGroups.observe(viewLifecycleOwner, Observer {
             it?.let { adapter.submitList(it.toMutableList()) }
             if (it.isNullOrEmpty()) {
-                binding.noGroupsHintText.text = getString(R.string.no_groups_hint)
+                setHasOptionsMenu(false)
                 binding.noGroupsHintText.visibility = View.VISIBLE
             } else binding.noGroupsHintText.visibility = View.INVISIBLE
         })
@@ -199,7 +214,7 @@ class SelectGroupFragment : Fragment(),
     }
 }
 
-enum class SelectGroupViewModelState { INITIALIZING, WAITING, CREATED_DEFAULT_GROUP }
+enum class SelectGroupViewModelState { INITIALIZING, WAITING, CREATED_FIRST_GROUP }
 class SelectGroupViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -207,7 +222,8 @@ class SelectGroupViewModel : ViewModel() {
 
     var currentActionGroupItem: GroupItem? = null
     var currentActionGroupType: GroupItemType = GroupItemType.TRACK
-    var defaultTrackGroup: GroupItem? = null
+
+    var firstTrackGroupId: Long = -1
         private set
 
     lateinit var allGroups: LiveData<List<GroupItem>>
@@ -234,6 +250,15 @@ class SelectGroupViewModel : ViewModel() {
         }
         GroupItemType.GRAPH -> ioScope.launch {
             dataSource!!.deleteGraphStatGroup(toGSG(groupItem))
+        }
+    }
+
+    fun addFirstTrackGroup(name: String) = ioScope.launch {
+        firstTrackGroupId = dataSource!!.insertTrackGroup(TrackGroup.create(0, name, 0))
+        delay(1800)
+        withContext(Dispatchers.Main) {
+            _state.value = SelectGroupViewModelState.CREATED_FIRST_GROUP
+            _state.value = SelectGroupViewModelState.WAITING
         }
     }
 
