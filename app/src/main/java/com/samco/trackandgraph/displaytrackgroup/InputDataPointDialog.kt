@@ -100,6 +100,8 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
                                    val clickListener: DataPointInputView.DataPointInputClickListener,
                                    val uiStates: Map<Feature, DataPointInputView.DataPointInputData>,
                                    val inputViews: MutableMap<Int, DataPointInputView>) : PagerAdapter() {
+        private val existingViews = mutableListOf<DataPointInputView>()
+
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
             return view == `object`
         }
@@ -111,11 +113,17 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
             view.setOnClickListener(clickListener)
             inputViews[position] = view
             container.addView(view)
+            existingViews.add(view)
             return view
         }
 
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
+            if (existingViews.contains(`object`)) existingViews.remove(`object`)
             container.removeView(`object` as View)
+        }
+
+        fun updateAllDateTimes() {
+            existingViews.forEach { dpiv -> dpiv.updateDateTimes() }
         }
 
         override fun getCount() = features.size
@@ -123,7 +131,10 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
 
     override fun onPageScrollStateChanged(state: Int) { }
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
-    override fun onPageSelected(position: Int) { viewModel.currentFeatureIndex.value = position }
+    override fun onPageSelected(position: Int) {
+        (binding.viewPager.adapter as ViewPagerAdapter).updateAllDateTimes()
+        viewModel.currentFeatureIndex.value = position
+    }
 
     private fun setupViewFeature(feature: Feature, index: Int) {
         if (feature.featureType == FeatureType.DISCRETE) binding.addButton.visibility = View.GONE
@@ -218,8 +229,10 @@ class InputDataPointDialogViewModel : ViewModel() {
             val defaultValue = dataPointData?.value ?: 0.toDouble()
             val defaultLabel = dataPointData?.label ?: ""
             val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
+            val timeFixed = dataPointTimestamp != null
             uiStates = featureData.map { f ->
-                f to DataPointInputView.DataPointInputData(f, timestamp, defaultValue, defaultLabel, dataPointData)
+                f to DataPointInputView.DataPointInputData(f, timestamp, defaultValue, defaultLabel,
+                    timeFixed, this@InputDataPointDialogViewModel::onDateTimeSelected, dataPointData)
             }.toMap()
 
             withContext(Dispatchers.Main) {
@@ -228,6 +241,10 @@ class InputDataPointDialogViewModel : ViewModel() {
                 _state.value = InputDataPointDialogState.WAITING
             }
         }
+    }
+
+    private fun onDateTimeSelected(dateTime: OffsetDateTime) {
+        uiStates.values.forEach { dp -> if(!dp.timeFixed) { dp.dateTime = dateTime } }
     }
 
     fun onDataPointInput(newDataPoint: DataPoint, oldDataPoint: DataPoint?) {
