@@ -61,6 +61,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
             numberInput.addTextChangedListener(this)
             numberInput.setOnEditorActionListener { v, i, e ->
                 return@setOnEditorActionListener if ((i and EditorInfo.IME_MASK_ACTION) != 0) {
+                    state.timeFixed = true
                     clickListener?.onClick?.invoke(state.feature)
                     true
                 } else false
@@ -95,6 +96,8 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         var dateTime: OffsetDateTime,
         var value: Double,
         var label: String,
+        var timeFixed: Boolean,
+        val onDateTimeChanged: (OffsetDateTime) -> Unit,
         val oldDataPoint: DataPoint?
     )
     class DataPointInputClickListener(val onClick: (Feature) -> Unit)
@@ -116,10 +119,13 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         if (clickListener != null) {
             state.value = discreteValue.index.toDouble()
             state.label = discreteValue.label
+            state.timeFixed = true
             discreteValueCheckBoxes.filter { kvp -> kvp.key != discreteValue }.forEach { kvp -> kvp.value.isChecked = false }
             clickListener!!.onClick(state.feature)
         }
     }
+
+    fun updateDateTimes() = setSelectedDateTime(state.dateTime)
 
     private fun setSelectedDateTime(dateTime: OffsetDateTime) {
         state.dateTime = dateTime
@@ -135,6 +141,8 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
                         .withYear(year)
                         .withMonth(month+1)
                         .withDayOfMonth(day))
+                    state.timeFixed = true
+                    state.onDateTimeChanged(state.dateTime)
                 }, state.dateTime.year, state.dateTime.monthValue-1, state.dateTime.dayOfMonth
             )
             picker.show()
@@ -148,6 +156,8 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
                     setSelectedDateTime(state.dateTime
                         .withHour(hour)
                         .withMinute(minute))
+                    state.timeFixed = true
+                    state.onDateTimeChanged(state.dateTime)
                 }, state.dateTime.hour, state.dateTime.minute, true
             )
             picker.show()
