@@ -128,6 +128,7 @@
     <string name="finish">Finish</string>
     <string name="about_description"><![CDATA[Track & Graph is free and open source software under the Apache 2.0 License.]]></string>
     <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
+    <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">The following open source libraries were used:</string>
     <string name="androidplot">Androidplot</string>
@@ -199,5 +200,6 @@
     <string name="on_feature_delete_discrete_value_warning">Deleting multiple choice answers will delete all existing tracked data points for that value.</string>
 
     <string name="my_first_track_group">My first track group</string>
+    <string name="rate_the_app">Rate the app</string>
 
 </resources>

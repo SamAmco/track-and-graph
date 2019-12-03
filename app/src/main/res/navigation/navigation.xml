@@ -184,4 +184,8 @@
         android:id="@+id/FAQ5Fragment"
         android:name="com.samco.trackandgraph.faq.FAQ5Fragment"
         android:label="@string/faq_5" />
+    <fragment
+        android:id="@+id/rateAppRedirectFragment"
+        android:name="com.samco.trackandgraph.rateapp.RateAppRedirectFragment"
+        android:label="RateAppRedirectFragment" />
 </navigation>
