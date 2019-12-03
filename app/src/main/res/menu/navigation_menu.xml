@@ -13,10 +13,17 @@
         <item
             android:id="@+id/FAQFragment"
             android:title="@string/faq"
+            android:icon="@drawable/faq_icon"
+            />
+        <item
+            android:id="@+id/rateAppRedirectFragment"
+            android:title="@string/rate_the_app"
+            android:icon="@drawable/rate_icon"
             />
         <item
             android:id="@+id/aboutPageFragment"
             android:title="@string/about"
+            android:icon="@drawable/about_icon"
             />
     </group>
 
