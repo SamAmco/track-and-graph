@@ -368,6 +368,7 @@ class GraphStatInputViewModel : ViewModel() {
 
     private var graphStatGroupId: Long = -1L
     private var graphStatId: Long? = null
+    private var graphStatDisplayIndex: Int? = null
     private var id: Long? = null
 
     val graphName = MutableLiveData<String>("")
@@ -418,6 +419,7 @@ class GraphStatInputViewModel : ViewModel() {
                 this@GraphStatInputViewModel.graphName.value = graphStat.name
                 this@GraphStatInputViewModel.graphStatType.value = graphStat.type
                 this@GraphStatInputViewModel.graphStatId = graphStat.id
+                this@GraphStatInputViewModel.graphStatDisplayIndex = graphStat.displayIndex
                 this@GraphStatInputViewModel.id = existingId
                 this@GraphStatInputViewModel._updateMode.value = true
             }
@@ -586,7 +588,8 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     fun constructGraphOrStat() = GraphOrStat.create(
-        graphStatId ?: 0L, graphStatGroupId, graphName.value!!, graphStatType.value!!, 0
+        graphStatId ?: 0L, graphStatGroupId, graphName.value!!,
+        graphStatType.value!!, graphStatDisplayIndex ?: 0
     )
 
     fun constructLineGraph(graphStatId: Long) = LineGraph.create(
