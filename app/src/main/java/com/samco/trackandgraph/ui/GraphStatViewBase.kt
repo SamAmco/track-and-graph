@@ -256,7 +256,7 @@ abstract class GraphStatViewBase : FrameLayout {
             val bounds = RectRegion()
             currentXYRegions.forEach { r -> bounds.union(r) }
             binding.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
-            setLineGraphPaddingFromBounds(bounds.minY.toDouble(), bounds.maxY.toDouble())
+            setLineGraphPaddingFromBounds(bounds)
             binding.lineGraph.redraw()
             binding.lineGraph.visibility = View.VISIBLE
             binding.progressBar.visibility = View.GONE
@@ -265,7 +265,9 @@ abstract class GraphStatViewBase : FrameLayout {
         }
     }
 
-    private fun setLineGraphPaddingFromBounds(minY: Double, maxY: Double) {
+    private fun setLineGraphPaddingFromBounds(bounds: RectRegion) {
+        val minY = bounds.minY?.toDouble() ?: 0.toDouble()
+        val maxY = bounds.maxY?.toDouble() ?: 0.toDouble()
         val maxBound = max(abs(minY), abs(maxY))
         val numDigits = log10(maxBound).toFloat() + 3
         binding.lineGraph.graph.paddingLeft = numDigits * 5f
@@ -329,7 +331,7 @@ abstract class GraphStatViewBase : FrameLayout {
     private suspend fun tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph: LineGraph): Boolean {
         return lineGraph.features.map {
             yield()
-            drawLineGraphFeature(lineGraph, it)
+            return drawLineGraphFeature(lineGraph, it)
         }.any()
     }
 
