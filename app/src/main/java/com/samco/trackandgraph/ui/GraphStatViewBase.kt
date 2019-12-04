@@ -43,6 +43,7 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.WeekFields
+import timber.log.Timber
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
@@ -329,10 +330,11 @@ abstract class GraphStatViewBase : FrameLayout {
     }
 
     private suspend fun tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph: LineGraph): Boolean {
-        return lineGraph.features.map {
+        val bools = lineGraph.features.map {
             yield()
-            return drawLineGraphFeature(lineGraph, it)
-        }.any()
+            drawLineGraphFeature(lineGraph, it)
+        }
+        return bools.any { b -> b }
     }
 
     private fun setUpLineGraphXAxis() {
