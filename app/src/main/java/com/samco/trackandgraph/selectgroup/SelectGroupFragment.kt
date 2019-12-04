@@ -81,13 +81,17 @@ class SelectGroupFragment : Fragment(),
     }
 
     private fun listenToViewModel() {
-        viewModel.state.observe(this, Observer { when (it) {
-            SelectGroupViewModelState.CREATED_FIRST_GROUP -> navController?.navigate(
-                SelectGroupFragmentDirections.actionSelectTackGroup(
-                    viewModel.firstTrackGroupId, getString(R.string.my_first_track_group)
-                )
-            )
-        }})
+        viewModel.state.observe(this, Observer {
+            if (it == SelectGroupViewModelState.CREATED_FIRST_GROUP) {
+                try {
+                    navController?.navigate(
+                        SelectGroupFragmentDirections.actionSelectTackGroup(
+                            viewModel.firstTrackGroupId, getString(R.string.my_first_track_group)
+                        )
+                    )
+                } catch (e: Exception) {}
+            }
+        })
     }
 
     override fun onStart() {
@@ -271,7 +275,6 @@ class SelectGroupViewModel : ViewModel() {
 
     fun addFirstTrackGroup(name: String) = ioScope.launch {
         firstTrackGroupId = dataSource!!.insertTrackGroup(TrackGroup.create(0, name, 0))
-        delay(1800)
         withContext(Dispatchers.Main) {
             _state.value = SelectGroupViewModelState.CREATED_FIRST_GROUP
             _state.value = SelectGroupViewModelState.WAITING
