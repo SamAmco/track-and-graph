@@ -137,17 +137,16 @@ class GraphsAndStatsFragment : Fragment() {
     }
 
     private fun observeGraphStatsAndUpdate(adapter: GraphStatAdapter) {
-        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                binding.graphStatList.smoothScrollToPosition(0)
-            }
-        })
         viewModel.graphStats.observe(viewLifecycleOwner, Observer {
-            it?.let { adapter.submitList(it.toMutableList()) }
             if (it.isNullOrEmpty()) {
                 binding.noGraphsHintText.text = getString(R.string.no_graph_stats_hint)
                 binding.noGraphsHintText.visibility = View.VISIBLE
             } else {
+                adapter.submitList(it.toMutableList())
+                if (viewModel.numGraphsStats < it.size) {
+                    binding.graphStatList.post { binding.graphStatList.scrollToPosition(0) }
+                }
+                viewModel.numGraphsStats = it.size
                 binding.noGraphsHintText.visibility = View.INVISIBLE
             }
         })
@@ -177,6 +176,8 @@ enum class GraphsAndStatsViewState { INITIALIZING, WAITING }
 class GraphsAndStatsViewModel : ViewModel() {
     private var dataSource: TrackAndGraphDatabaseDao? = null
     lateinit var graphStats: LiveData<List<GraphOrStat>>
+
+    var numGraphsStats = -1
 
     private val job = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + job)
