@@ -138,11 +138,11 @@ class GraphsAndStatsFragment : Fragment() {
 
     private fun observeGraphStatsAndUpdate(adapter: GraphStatAdapter) {
         viewModel.graphStats.observe(viewLifecycleOwner, Observer {
+            it?.let { adapter.submitList(it.toMutableList()) }
             if (it.isNullOrEmpty()) {
                 binding.noGraphsHintText.text = getString(R.string.no_graph_stats_hint)
                 binding.noGraphsHintText.visibility = View.VISIBLE
             } else {
-                adapter.submitList(it.toMutableList())
                 if (viewModel.numGraphsStats < it.size) {
                     binding.graphStatList.post { binding.graphStatList.scrollToPosition(0) }
                 }

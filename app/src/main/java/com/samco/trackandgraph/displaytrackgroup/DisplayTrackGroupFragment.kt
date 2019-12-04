@@ -115,12 +115,12 @@ class DisplayTrackGroupFragment : Fragment(),
 
     private fun observeFeatureDataAndUpdate(displayTrackGroupViewModel: DisplayTrackGroupViewModel, adapter: FeatureAdapter) {
         displayTrackGroupViewModel.features.observe(viewLifecycleOwner, Observer {
+            it?.let { adapter.submitList(it.toMutableList()) }
             if (it.isNullOrEmpty()) {
                 binding.noFeaturesHintText.text = getString(R.string.no_features_hint)
                 binding.noFeaturesHintText.visibility = View.VISIBLE
                 binding.queueAddAllButton.hide()
             } else {
-                adapter.submitList(it.toMutableList())
                 if (it.size > viewModel.numFeatures) {
                     binding.featureList.post { binding.featureList.scrollToPosition(0) }
                 }
