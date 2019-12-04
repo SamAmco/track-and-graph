@@ -178,6 +178,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private fun onAddClicked() {
         val currIndex = viewModel.currentFeatureIndex.value!!
         val currFeature = viewModel.features.value!![currIndex]
+        viewModel.uiStates[currFeature]?.timeFixed = true
         onAddClicked(currFeature)
     }
 
