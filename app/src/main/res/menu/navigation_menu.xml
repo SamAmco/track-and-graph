@@ -23,6 +23,11 @@
             android:icon="@drawable/home_menu_icon"
             android:title="@string/home"
             />
+        <item
+            android:id="@+id/remindersFragment"
+            android:icon="@drawable/reminders_icon"
+            android:title="@string/reminders"
+            />
     </group>
 
     <group android:id="@+id/aboutAndFAQ">
