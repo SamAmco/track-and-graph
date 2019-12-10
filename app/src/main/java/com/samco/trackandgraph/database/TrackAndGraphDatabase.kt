@@ -18,8 +18,11 @@ package com.samco.trackandgraph.database
 
 import android.content.Context
 import androidx.room.*
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.R
 import org.threeten.bp.Duration
+import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
@@ -61,9 +64,8 @@ const val splitChars2 = "!!"
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
-        TimeSinceLastStat::class],
-    version = 29,
-    exportSchema = false
+        TimeSinceLastStat::class, Reminder::class],
+    version = 30
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -77,6 +79,7 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 var instance = INSTANCE
                 if (instance == null) {
                     instance = Room.databaseBuilder(context.applicationContext, TrackAndGraphDatabase::class.java, "trackandgraph_database")
+                        .addMigrations(MIGRATION_29_30)
                         .fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance
@@ -84,6 +87,19 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 return instance
             }
         }
+    }
+}
+
+val MIGRATION_29_30 = object : Migration(29, 30) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("""
+            CREATE TABLE IF NOT EXISTS `reminders_table` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                `name` TEXT NOT NULL,
+                `time` TEXT NOT NULL,
+                `checked_days` TEXT NOT NULL
+            )""".trimMargin())
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `reminders_table` (`id`)")
     }
 }
 
@@ -156,6 +172,23 @@ class Converters {
 
     @TypeConverter
     fun groupItemTypeToInt(groupItemType: GroupItemType) = groupItemType.ordinal
+
+    @TypeConverter
+    fun localTimeToString(value: LocalTime) = value.toString()
+
+    @TypeConverter
+    fun localTimeFromString(value: String) = LocalTime.parse(value)
+
+    @TypeConverter
+    fun checkedDaysToString(value: CheckedDays) = value.toList().joinToString(splitChars1)
+
+    @TypeConverter
+    fun checkedDaysFromString(value: String): CheckedDays {
+        return CheckedDays.fromList(
+            value.split(splitChars1)
+                .map { s -> s.toBoolean() }
+        )
+    }
 }
 
 
