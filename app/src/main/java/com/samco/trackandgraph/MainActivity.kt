@@ -42,7 +42,8 @@ class MainActivity : AppCompatActivity() {
     private val navFragments = setOf(
         R.id.selectGroupFragment,
         R.id.FAQFragment,
-        R.id.aboutPageFragment
+        R.id.aboutPageFragment,
+        R.id.remindersFragment
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

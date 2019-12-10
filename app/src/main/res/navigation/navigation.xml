@@ -204,4 +204,8 @@
         android:id="@+id/rateAppRedirectFragment"
         android:name="com.samco.trackandgraph.rateapp.RateAppRedirectFragment"
         android:label="RateAppRedirectFragment" />
+    <fragment
+        android:id="@+id/remindersFragment"
+        android:name="com.samco.trackandgraph.RemindersFragment"
+        android:label="@string/reminders" />
 </navigation>

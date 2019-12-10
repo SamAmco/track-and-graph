@@ -218,5 +218,6 @@
 
     <string name="my_first_track_group">My first track group</string>
     <string name="rate_the_app">Rate the app</string>
+    <string name="reminders">Reminders</string>
 
 </resources>
