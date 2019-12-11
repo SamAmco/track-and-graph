@@ -36,7 +36,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:background="@null"
-                    android:src="@drawable/remove_icon"
+                    android:src="@drawable/delete_icon"
                     android:scaleType="fitCenter"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintRight_toLeftOf="@id/indexText"
