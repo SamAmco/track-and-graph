@@ -219,5 +219,13 @@
     <string name="my_first_track_group">My first track group</string>
     <string name="rate_the_app">Rate the app</string>
     <string name="reminders">Reminders</string>
+    <string name="no_reminders_hint">Tap the + icon to create a new tracking reminder notification.</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun">Sun</string>
 
 </resources>

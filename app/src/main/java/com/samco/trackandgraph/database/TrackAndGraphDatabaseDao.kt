@@ -28,6 +28,9 @@ interface TrackAndGraphDatabaseDao {
     @Delete
     fun deleteTrackGroup(trackGroup: TrackGroup)
 
+    @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
+    fun getAllReminders() : LiveData<List<Reminder>>
+
     @Query("""SELECT track_groups_table.*, 0 as type FROM track_groups_table 
         UNION SELECT graph_stat_groups_table.*, 1 as type FROM graph_stat_groups_table
         ORDER BY display_index ASC""")
@@ -55,6 +58,9 @@ interface TrackAndGraphDatabaseDao {
 
     @Insert
     fun insertGraphStatGroup(graphStatGroup: GraphStatGroup)
+
+    @Insert
+    fun insertReminder(reminder: Reminder)
 
     @Query("SELECT * FROM track_groups_table WHERE id = :id LIMIT 1")
     fun getTrackGroupById(id: Int) : TrackGroup

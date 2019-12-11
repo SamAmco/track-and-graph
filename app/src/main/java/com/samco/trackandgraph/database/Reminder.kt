@@ -28,6 +28,9 @@ data class Reminder(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int,
+
     @ColumnInfo(name = "name")
     val alarmName: String,
 
@@ -53,5 +56,8 @@ data class CheckedDays (
             assert(bools.size == 7)
             return CheckedDays(bools[0], bools[1], bools[2], bools[3], bools[4], bools[5], bools[6])
         }
+
+        fun none() = CheckedDays(false, false, false,
+            false, false, false, false)
     }
 }
