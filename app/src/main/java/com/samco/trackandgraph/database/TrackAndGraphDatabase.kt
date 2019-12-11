@@ -95,6 +95,7 @@ val MIGRATION_29_30 = object : Migration(29, 30) {
         database.execSQL("""
             CREATE TABLE IF NOT EXISTS `reminders_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
+                `display_index` INTEGER NOT NULL, 
                 `name` TEXT NOT NULL,
                 `time` TEXT NOT NULL,
                 `checked_days` TEXT NOT NULL
