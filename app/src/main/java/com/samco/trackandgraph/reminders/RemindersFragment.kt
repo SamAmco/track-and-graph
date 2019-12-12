@@ -20,6 +20,7 @@ package com.samco.trackandgraph.reminders
 import android.app.Activity
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -45,10 +46,16 @@ class RemindersFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel = ViewModelProviders.of(this).get(RemindersViewModel::class.java)
-        viewModel.initViewModel(requireActivity())
-        listenToViewModel()
 
-        adapter = ReminderListAdapter(ReminderClickListener())
+        adapter = ReminderListAdapter(
+            ReminderClickListener(
+                this::onDeleteClicked,
+                this::onDaysChanged,
+                this::onTimeChanged,
+                this::onNameChanged,
+                this::onHideKeyboard
+            ), context!!
+        )
         binding.remindersList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.remindersList)
         binding.remindersList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
@@ -57,6 +64,25 @@ class RemindersFragment : Fragment() {
         setHasOptionsMenu(true)
         return binding.root
     }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.initViewModel(requireActivity())
+        listenToViewModel()
+    }
+
+    private fun onHideKeyboard() {
+        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(activity!!.window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+    }
+
+    private fun onDeleteClicked(reminder: Reminder) { viewModel.deleteReminder(reminder) }
+
+    private fun onDaysChanged(reminder: Reminder, checkedDays: CheckedDays) { viewModel.daysChanged(reminder, checkedDays) }
+
+    private fun onTimeChanged(reminder: Reminder, localTime: LocalTime) { viewModel.onTimeChanged(reminder, localTime) }
+
+    private fun onNameChanged(reminder: Reminder, name: String) { viewModel.onNameChanged(reminder, name) }
 
     private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
         override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -112,6 +138,11 @@ class RemindersFragment : Fragment() {
     private fun onAddClicked() {
         viewModel.addReminder()
     }
+
+    override fun onPause() {
+        onHideKeyboard()
+        super.onPause()
+    }
 }
 
 enum class RemindersViewModelState { INITIALIZING, WAITING }
@@ -144,5 +175,32 @@ class RemindersViewModel : ViewModel() {
         ioScope.cancel()
     }
 
-    fun adjustDisplayIndexes(reminders: List<Reminder>) {}
+    fun adjustDisplayIndexes(reminders: List<Reminder>) = ioScope.launch {
+        allReminders.value?.let { oldList ->
+            val newList = reminders.mapIndexed { i, r ->
+                oldList.first { or -> or.id == r.id }.copy(displayIndex = i)
+            }
+            dataSource!!.updateReminders(newList)
+        }
+    }
+
+    fun deleteReminder(reminder: Reminder) = ioScope.launch {
+        dataSource?.deleteReminder(reminder)
+    }
+
+    fun daysChanged(reminder: Reminder, checkedDays: CheckedDays) = ioScope.launch {
+        val newReminder = reminder.copy(checkedDays = checkedDays)
+        dataSource?.updateReminder(newReminder)
+    }
+
+    fun onTimeChanged(reminder: Reminder, localTime: LocalTime) = ioScope.launch {
+        val newReminder = reminder.copy(time = localTime)
+        dataSource?.updateReminder(newReminder)
+    }
+
+    //TODO add a maximum name size
+    fun onNameChanged(reminder: Reminder, name: String) = ioScope.launch {
+        val newReminder = reminder.copy(alarmName = name)
+        dataSource?.updateReminder(newReminder)
+    }
 }

@@ -17,36 +17,109 @@
 
 package com.samco.trackandgraph.reminders
 
+import android.app.TimePickerDialog
+import android.content.Context
+import android.text.TextWatcher
+import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.trackandgraph.database.CheckedDays
 import com.samco.trackandgraph.database.Reminder
 import com.samco.trackandgraph.databinding.ListItemReminderBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
+import org.threeten.bp.LocalTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.format.DateTimeFormatter
 
-class ReminderListAdapter(private val clickListener: ReminderClickListener)
+class ReminderListAdapter(private val clickListener: ReminderClickListener, private val context: Context)
     : OrderedListAdapter<Reminder, ReminderViewHolder>(ReminderDiffCallback()) {
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReminderViewHolder {
-        return ReminderViewHolder.from(parent)
+        return ReminderViewHolder.from(parent, context)
     }
 }
 
-class ReminderViewHolder private constructor(private val binding: ListItemReminderBinding)
-    : RecyclerView.ViewHolder(binding.root) {
+class ReminderViewHolder private constructor(
+    private val binding: ListItemReminderBinding,
+    private val context: Context) : RecyclerView.ViewHolder(binding.root) {
+
+    private val timeDisplayFormatter: DateTimeFormatter = DateTimeFormatter
+        .ofPattern("HH:mm")
+        .withZone(ZoneId.systemDefault())
+
     private var clickListener: ReminderClickListener? = null
     private var dropElevation = 0f
     private var reminder: Reminder? = null
+    private var textWatcher: TextWatcher? = null
 
     fun bind(reminder: Reminder, clickListener: ReminderClickListener) {
         this.reminder = reminder
         this.clickListener = clickListener
         dropElevation = binding.cardView.cardElevation
-        //TODO set click listeners
+
+        binding.deleteButton.setOnClickListener { clickListener.delete(reminder) }
+        listenToCheckboxes()
+        listenToTimeButton()
+        listenToName()
+    }
+
+    private fun listenToName() {
+        if (textWatcher != null) {
+            binding.reminderNameText.removeTextChangedListener(textWatcher)
+        }
+        textWatcher = binding.reminderNameText.addTextChangedListener {
+            if (reminder!!.alarmName != it.toString()) {
+                clickListener?.nameChanged(reminder!!, it.toString())
+            }
+        }
+        binding.reminderNameText.setOnKeyListener { _, keyCode, _ ->
+            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                binding.cardView.requestFocus()
+                clickListener?.hideKeyboard()
+                return@setOnKeyListener true
+            }
+            return@setOnKeyListener false
+        }
+        binding.reminderNameText.setText(reminder!!.alarmName)
+    }
+
+    private fun listenToTimeButton() {
+        val setTimeText = {t: LocalTime ->
+            binding.timeText.text = t.format(timeDisplayFormatter)
+        }
+        binding.timeText.setOnClickListener {
+            val picker = TimePickerDialog(context,
+                TimePickerDialog.OnTimeSetListener { _, hour, minute ->
+                    val time = LocalTime.of(hour, minute)
+                    clickListener?.timeChanged(reminder!!, time)
+                    setTimeText(time)
+                }, reminder!!.time.hour, reminder!!.time.minute, true
+            )
+            picker.show()
+        }
+        setTimeText(reminder!!.time)
+    }
+
+    private fun listenToCheckboxes() {
+        val checkboxes = listOf(binding.monBox, binding.tueBox, binding.wedBox,
+            binding.thuBox, binding.friBox, binding.satBox, binding.sunBox)
+        checkboxes.forEachIndexed { i, cb ->
+            cb.setOnCheckedChangeListener(null)
+            cb.isChecked = reminder!!.checkedDays.toList()[i]
+            cb.setOnCheckedChangeListener { _, _ ->
+                val boolList = checkboxes.map { x -> x.isChecked }
+                val newCheckedDays = CheckedDays.fromList(boolList)
+                if (reminder!!.checkedDays != newCheckedDays) {
+                    clickListener?.daysChanged(reminder!!, newCheckedDays)
+                }
+            }
+        }
     }
 
     fun elevateCard() {
@@ -60,10 +133,10 @@ class ReminderViewHolder private constructor(private val binding: ListItemRemind
     }
 
     companion object {
-        fun from(parent: ViewGroup): ReminderViewHolder {
+        fun from(parent: ViewGroup, context: Context): ReminderViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ListItemReminderBinding.inflate(layoutInflater, parent, false)
-            return ReminderViewHolder(binding)
+            return ReminderViewHolder(binding, context)
         }
     }
 }
@@ -73,9 +146,21 @@ class ReminderDiffCallback : DiffUtil.ItemCallback<Reminder>() {
         return oldItem.id == newItem.id
     }
     override fun areContentsTheSame(oldItem: Reminder, newItem: Reminder): Boolean {
-        return oldItem == newItem
+        return oldItem.id == newItem.id
     }
 }
 
 
-class ReminderClickListener() { }
+class ReminderClickListener(
+    private val onDelete: (Reminder) -> Unit,
+    private val onDaysChanged: (Reminder, CheckedDays) -> Unit,
+    private val onTimeChanged: (Reminder, LocalTime) -> Unit,
+    private val onNameChanged: (Reminder, String) -> Unit,
+    private val onHideKeyboard: () -> Unit
+) {
+    fun delete(reminder: Reminder) = onDelete(reminder)
+    fun daysChanged(reminder: Reminder, checkedDays: CheckedDays) = onDaysChanged(reminder, checkedDays)
+    fun timeChanged(reminder: Reminder, localTime: LocalTime) = onTimeChanged(reminder, localTime)
+    fun nameChanged(reminder: Reminder, name: String) = onNameChanged(reminder, name)
+    fun hideKeyboard() = onHideKeyboard()
+}

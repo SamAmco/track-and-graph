@@ -30,6 +30,8 @@
             android:id="@+id/cardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             app:cardCornerRadius="@dimen/card_corner_radius"
             >
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -80,7 +82,7 @@
 
                 <View
                     android:id="@+id/nameCheckboxDivider"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     app:layout_constraintLeft_toLeftOf="parent"
@@ -164,7 +166,7 @@
 
                 <View
                     android:id="@+id/checkboxLabelDivider"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="1dp"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
@@ -174,7 +176,7 @@
 
                 <TextView
                     android:id="@+id/monLabel"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/mon"
                     android:textAlignment="center"
@@ -186,7 +188,7 @@
 
                 <TextView
                     android:id="@+id/tueLabel"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/tue"
                     android:textAlignment="center"
@@ -198,7 +200,7 @@
 
                 <TextView
                     android:id="@+id/wedLabel"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/wed"
                     android:textAlignment="center"
@@ -210,7 +212,7 @@
 
                 <TextView
                     android:id="@+id/thuLabel"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/thu"
                     android:textAlignment="center"
@@ -222,7 +224,7 @@
 
                 <TextView
                     android:id="@+id/friLabel"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/fri"
                     android:textAlignment="center"
@@ -234,7 +236,7 @@
 
                 <TextView
                     android:id="@+id/satLabel"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/sat"
                     android:textAlignment="center"
@@ -246,7 +248,7 @@
 
                 <TextView
                     android:id="@+id/sunLabel"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/sun"
                     android:textAlignment="center"
@@ -258,7 +260,7 @@
 
                 <View
                     android:id="@+id/labelBottomDivider"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="1dp"
                     android:layout_marginBottom="@dimen/card_padding"
                     app:layout_constraintTop_toBottomOf="@id/monLabel"
