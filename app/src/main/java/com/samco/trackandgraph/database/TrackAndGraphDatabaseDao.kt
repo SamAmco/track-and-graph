@@ -62,6 +62,15 @@ interface TrackAndGraphDatabaseDao {
     @Insert
     fun insertReminder(reminder: Reminder)
 
+    @Delete
+    fun deleteReminder(reminder: Reminder)
+
+    @Update
+    fun updateReminder(reminder: Reminder)
+
+    @Update
+    fun updateReminders(reminders: List<Reminder>)
+
     @Query("SELECT * FROM track_groups_table WHERE id = :id LIMIT 1")
     fun getTrackGroupById(id: Int) : TrackGroup
 

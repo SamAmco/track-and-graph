@@ -51,6 +51,18 @@ data class CheckedDays (
     val sunday: Boolean
 ) {
     fun toList() = listOf(monday, tuesday, wednesday, thursday, friday, saturday, sunday)
+
+    override fun equals(other: Any?): Boolean {
+        return other is CheckedDays
+                && other.monday == monday
+                && other.tuesday == tuesday
+                && other.wednesday == wednesday
+                && other.thursday == thursday
+                && other.friday == friday
+                && other.saturday == saturday
+                && other.sunday == sunday
+    }
+
     companion object {
         fun fromList(bools: List<Boolean>): CheckedDays {
             assert(bools.size == 7)
