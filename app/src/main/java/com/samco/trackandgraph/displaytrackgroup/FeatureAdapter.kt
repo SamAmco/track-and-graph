@@ -30,8 +30,10 @@ import com.samco.trackandgraph.database.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 
+private val getIdForDisplayFeature = { df: DisplayFeature -> df.id }
+
 class FeatureAdapter(private val clickListener: FeatureClickListener)
-    : OrderedListAdapter<DisplayFeature, FeatureViewHolder>(DisplayFeatureDiffCallback()) {
+    : OrderedListAdapter<DisplayFeature, FeatureViewHolder>(getIdForDisplayFeature, DisplayFeatureDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeatureViewHolder {
         return FeatureViewHolder.from(parent)

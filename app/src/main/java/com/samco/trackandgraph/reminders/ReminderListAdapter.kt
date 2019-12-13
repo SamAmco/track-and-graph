@@ -19,11 +19,9 @@ package com.samco.trackandgraph.reminders
 
 import android.app.TimePickerDialog
 import android.content.Context
-import android.text.TextWatcher
-import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
+import android.view.inputmethod.EditorInfo
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.CheckedDays
@@ -34,8 +32,10 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
+private val getIdForReminder = { r: Reminder -> r.id }
+
 class ReminderListAdapter(private val clickListener: ReminderClickListener, private val context: Context)
-    : OrderedListAdapter<Reminder, ReminderViewHolder>(ReminderDiffCallback()) {
+    : OrderedListAdapter<Reminder, ReminderViewHolder>(getIdForReminder, ReminderDiffCallback()) {
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
     }
@@ -56,7 +56,6 @@ class ReminderViewHolder private constructor(
     private var clickListener: ReminderClickListener? = null
     private var dropElevation = 0f
     private var reminder: Reminder? = null
-    private var textWatcher: TextWatcher? = null
 
     fun bind(reminder: Reminder, clickListener: ReminderClickListener) {
         this.reminder = reminder
@@ -70,29 +69,24 @@ class ReminderViewHolder private constructor(
     }
 
     private fun listenToName() {
-        if (textWatcher != null) {
-            binding.reminderNameText.removeTextChangedListener(textWatcher)
-        }
-        textWatcher = binding.reminderNameText.addTextChangedListener {
-            if (reminder!!.alarmName != it.toString()) {
-                clickListener?.nameChanged(reminder!!, it.toString())
-            }
-        }
-        binding.reminderNameText.setOnKeyListener { _, keyCode, _ ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER) {
+        binding.reminderNameText.setText(reminder!!.alarmName)
+        binding.reminderNameText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                val newName = binding.reminderNameText.text.toString()
+                clickListener?.nameChanged(reminder!!, newName)
                 binding.cardView.requestFocus()
                 clickListener?.hideKeyboard()
-                return@setOnKeyListener true
+                return@setOnEditorActionListener true
             }
-            return@setOnKeyListener false
+            return@setOnEditorActionListener false
         }
-        binding.reminderNameText.setText(reminder!!.alarmName)
     }
 
     private fun listenToTimeButton() {
         val setTimeText = {t: LocalTime ->
             binding.timeText.text = t.format(timeDisplayFormatter)
         }
+        setTimeText(reminder!!.time)
         binding.timeText.setOnClickListener {
             val picker = TimePickerDialog(context,
                 TimePickerDialog.OnTimeSetListener { _, hour, minute ->
@@ -103,7 +97,6 @@ class ReminderViewHolder private constructor(
             )
             picker.show()
         }
-        setTimeText(reminder!!.time)
     }
 
     private fun listenToCheckboxes() {
@@ -115,9 +108,7 @@ class ReminderViewHolder private constructor(
             cb.setOnCheckedChangeListener { _, _ ->
                 val boolList = checkboxes.map { x -> x.isChecked }
                 val newCheckedDays = CheckedDays.fromList(boolList)
-                if (reminder!!.checkedDays != newCheckedDays) {
-                    clickListener?.daysChanged(reminder!!, newCheckedDays)
-                }
+                clickListener?.daysChanged(reminder!!, newCheckedDays)
             }
         }
     }
@@ -146,7 +137,7 @@ class ReminderDiffCallback : DiffUtil.ItemCallback<Reminder>() {
         return oldItem.id == newItem.id
     }
     override fun areContentsTheSame(oldItem: Reminder, newItem: Reminder): Boolean {
-        return oldItem.id == newItem.id
+        return oldItem == newItem
     }
 }
 

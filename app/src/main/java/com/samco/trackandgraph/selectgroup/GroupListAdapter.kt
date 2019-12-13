@@ -26,12 +26,12 @@ import com.samco.trackandgraph.database.GroupItemType
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 
+private val getIdForGroupItem = { gi: GroupItem -> gi.id }
+
 class GroupListAdapter(private val clickListener: GroupClickListener,
                        private val trackColor: Int,
                        private val graphStatColor: Int)
-    : OrderedListAdapter<GroupItem, GroupViewHolder>(
-    GroupItemDiffCallback()
-) {
+    : OrderedListAdapter<GroupItem, GroupViewHolder>(getIdForGroupItem, GroupItemDiffCallback()) {
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener, trackColor, graphStatColor)
     }
