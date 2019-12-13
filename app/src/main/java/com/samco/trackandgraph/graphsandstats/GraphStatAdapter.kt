@@ -34,8 +34,10 @@ import com.samco.trackandgraph.ui.GraphStatCardView
 import com.samco.trackandgraph.ui.OrderedListAdapter
 import kotlinx.coroutines.*
 
+private val getIdForGraphStat = { gs: GraphOrStat -> gs.id }
+
 class GraphStatAdapter(private val clickListener: GraphStatClickListener, application: Application)
-    : OrderedListAdapter<GraphOrStat, GraphStatViewHolder>(GraphStatDiffCallback()) {
+    : OrderedListAdapter<GraphOrStat, GraphStatViewHolder>(getIdForGraphStat, GraphStatDiffCallback()) {
     private val dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
 
     override fun onBindViewHolder(holder: GraphStatViewHolder, position: Int) {

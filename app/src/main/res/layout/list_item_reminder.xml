@@ -50,6 +50,7 @@
                         android:id="@+id/reminderNameText"
                         android:maxLines="1"
                         android:inputType="text"
+                        android:imeOptions="actionDone"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"

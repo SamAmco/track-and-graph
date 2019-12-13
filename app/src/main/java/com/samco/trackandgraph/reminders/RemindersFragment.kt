@@ -17,7 +17,10 @@
 
 package com.samco.trackandgraph.reminders
 
-import android.app.Activity
+import android.app.*
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
@@ -35,6 +38,9 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
 import kotlinx.coroutines.*
 import org.threeten.bp.LocalTime
+import java.util.*
+
+const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
 
 class RemindersFragment : Fragment() {
     private lateinit var binding: RemindersFragmentBinding
@@ -62,7 +68,26 @@ class RemindersFragment : Fragment() {
         registerForContextMenu(binding.remindersList)
 
         setHasOptionsMenu(true)
+
+        createNotificationChannel()
         return binding.root
+    }
+
+    private fun createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.reminders_notifications_channel_name)
+            val descriptionText = getString(R.string.reminders_notifications_channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(REMINDERS_CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
     }
 
     override fun onStart() {
@@ -76,13 +101,13 @@ class RemindersFragment : Fragment() {
         imm.hideSoftInputFromWindow(activity!!.window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    private fun onDeleteClicked(reminder: Reminder) { viewModel.deleteReminder(reminder) }
+    private fun onDeleteClicked(reminder: Reminder) { viewModel.deleteReminder(reminder, context!!) }
 
-    private fun onDaysChanged(reminder: Reminder, checkedDays: CheckedDays) { viewModel.daysChanged(reminder, checkedDays) }
+    private fun onDaysChanged(reminder: Reminder, checkedDays: CheckedDays) { viewModel.daysChanged(reminder, checkedDays, context!!) }
 
-    private fun onTimeChanged(reminder: Reminder, localTime: LocalTime) { viewModel.onTimeChanged(reminder, localTime) }
+    private fun onTimeChanged(reminder: Reminder, localTime: LocalTime) { viewModel.onTimeChanged(reminder, localTime, context!!) }
 
-    private fun onNameChanged(reminder: Reminder, name: String) { viewModel.onNameChanged(reminder, name) }
+    private fun onNameChanged(reminder: Reminder, name: String) { viewModel.onNameChanged(reminder, name, context!!) }
 
     private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
         override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -184,23 +209,88 @@ class RemindersViewModel : ViewModel() {
         }
     }
 
-    fun deleteReminder(reminder: Reminder) = ioScope.launch {
+    fun deleteReminder(reminder: Reminder, context: Context) = ioScope.launch {
+        deleteAlarms(reminder, context)
         dataSource?.deleteReminder(reminder)
     }
 
-    fun daysChanged(reminder: Reminder, checkedDays: CheckedDays) = ioScope.launch {
+    fun daysChanged(reminder: Reminder, checkedDays: CheckedDays, context: Context) = ioScope.launch {
         val newReminder = reminder.copy(checkedDays = checkedDays)
+        deleteAlarms(reminder, context)
+        createAlarms(newReminder, context)
         dataSource?.updateReminder(newReminder)
     }
 
-    fun onTimeChanged(reminder: Reminder, localTime: LocalTime) = ioScope.launch {
+    fun onTimeChanged(reminder: Reminder, localTime: LocalTime, context: Context) = ioScope.launch {
         val newReminder = reminder.copy(time = localTime)
+        deleteAlarms(reminder, context)
+        createAlarms(newReminder, context)
         dataSource?.updateReminder(newReminder)
     }
 
+    private fun getAllAlarmIntents(reminder: Reminder, context: Context, filterUnchecked: Boolean): Map<Int, PendingIntent> {
+        val days = reminder.checkedDays.toList()
+            .mapIndexed { i, checked -> i + 1 to checked}.toMap()
+        return days
+            .filter { kvp -> !filterUnchecked || kvp.value }
+            .map { day -> day.key to
+                Intent(context, AlarmReceiver::class.java)
+                    .putExtra("Message", reminder.alarmName)
+                    .let { intent ->
+                        val id = ((reminder.id * 10) + day.key).toInt()
+                        PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    }
+            }.toMap()
+    }
+
+    private fun deleteAlarms(reminder: Reminder, context: Context) {
+        val allIntents = getAllAlarmIntents(reminder, context, false)
+        val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        allIntents.forEach { kvp -> alarmMgr.cancel(kvp.value) }
+    }
+
+    //TODO re-create reminders on device restart
+    private fun createAlarms(reminder: Reminder, context: Context) {
+        val allIntents = getAllAlarmIntents(reminder, context, true)
+        val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        allIntents.forEach { kvp ->
+            val calendar = getNextReminderTime(reminder.time, kvp.key)
+            alarmMgr.setRepeating(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                AlarmManager.INTERVAL_DAY * 7L,
+                kvp.value
+            )
+        }
+    }
+
+    private fun getNextReminderTime(time: LocalTime, dayOfWeek: Int) = Calendar.getInstance().apply {
+        timeInMillis = System.currentTimeMillis()
+        val orderedDays = listOf(Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY,
+            Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY, Calendar.SUNDAY)
+        val currentDay = (orderedDays.indexOf(get(Calendar.DAY_OF_WEEK)) + 1)
+        var dayDiff = dayOfWeek - currentDay
+        if (dayDiff < 0) dayDiff += 7
+        else if (dayDiff == 0) {
+            val currentHour = get(Calendar.HOUR_OF_DAY)
+            val reminderHour = time.hour
+            val currentMin = get(Calendar.MINUTE)
+            val reminderMin = time.minute
+
+            if (currentHour > reminderHour) dayDiff += 7
+            else if (currentHour == reminderHour && currentMin >= reminderMin) dayDiff += 7
+        }
+        add(Calendar.DAY_OF_MONTH, dayDiff)
+        set(Calendar.HOUR_OF_DAY, time.hour)
+        set(Calendar.MINUTE, time.minute)
+    }
+
+    //TODO give reminders a default name
     //TODO add a maximum name size
-    fun onNameChanged(reminder: Reminder, name: String) = ioScope.launch {
+    fun onNameChanged(reminder: Reminder, name: String, context: Context) = ioScope.launch {
         val newReminder = reminder.copy(alarmName = name)
+        deleteAlarms(reminder, context)
+        createAlarms(newReminder, context)
         dataSource?.updateReminder(newReminder)
     }
 }
