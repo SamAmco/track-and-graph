@@ -144,7 +144,7 @@ class GraphsAndStatsFragment : Fragment() {
                 binding.noGraphsHintText.visibility = View.VISIBLE
             } else {
                 if (viewModel.numGraphsStats < it.size) {
-                    binding.graphStatList.post { binding.graphStatList.scrollToPosition(0) }
+                    binding.graphStatList.postDelayed({ binding.graphStatList.scrollToPosition(0) }, 100)
                 }
                 viewModel.numGraphsStats = it.size
                 binding.noGraphsHintText.visibility = View.INVISIBLE
