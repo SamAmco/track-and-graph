@@ -25,17 +25,14 @@ import android.content.Intent
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.DEFAULT_ALL
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.R
-import timber.log.Timber
-
+import kotlinx.coroutines.*
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
-        Timber.tag("RemindersFragment").d("Received onReceive event")
         if (context == null) return
         val message = (intent?.extras?.get("Message") as String?) ?: return
 
@@ -58,5 +55,12 @@ class AlarmReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(250, 250, 250, 250), -1))
         } else vibrator.vibrate(longArrayOf(250, 250, 250, 250), -1)
+    }
+}
+
+class RecreateAlarms : BroadcastReceiver() {
+    override fun onReceive(context: Context?, intent: Intent?) {
+        if (context == null) return
+        runBlocking { RemindersHelper.syncAlarms(context) }
     }
 }

@@ -229,5 +229,6 @@
     <string name="sun">Sun</string>
     <string name="reminders_notifications_channel_name">Reminders</string>
     <string name="reminders_notifications_channel_description">User created notifications to remind you when to track</string>
+    <string name="default_reminder_name">Time to track!</string>
 
 </resources>
