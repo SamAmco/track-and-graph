@@ -33,6 +33,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
+import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 
 class MainActivity : AppCompatActivity() {
@@ -63,6 +64,7 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         onDrawerHideKeyboard()
+        RemindersHelper.syncAlarms(this)
 
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
