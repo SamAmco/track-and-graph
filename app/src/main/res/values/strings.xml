@@ -175,7 +175,7 @@
     <string name="faq_text_2_1">To import/export your tracked data first select a track group and notice the menu buttons at the top:</string>
     <string name="faq_text_2_2">Use this button to import a csv into this track group.</string>
     <string name="faq_text_2_3">Use this button to export this track group to a csv.</string>
-    <string name="faq_text_3_1">Using the multiple choice input type is recommended wherever possible. If you ever want to draw a pie chart from your data you will need it to be in multiple choice form. You can also draw a line graph of your data over time if your predefined answers have a natural order, however you will need to make sure that the answers are in the correct order during setup as you can not change this later. For example say you were to setup the following:</string>
+    <string name="faq_text_3_1">Using the multiple choice input type is recommended wherever possible. If you ever want to draw a pie chart from your data you will need it to be in multiple choice form. You can also draw a line graph of your data over time if your predefined answers have a natural order. For example say you were to setup the following:</string>
     <string name="faq_text_3_2">And then you tracked some data as follows:</string>
     <string name="faq_text_3_3">You could then visualise that data using either a line graph over time or using a pie chart as below:</string>
     <string name="faq_text_4_1"><![CDATA[To begin creating graphs you will need to first have some data tracked. Then go to the home page and create a new graph group. Your graph groups do not have to align in any way with your track groups, you can organise them how you want.]]></string>
