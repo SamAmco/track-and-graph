@@ -10,7 +10,7 @@
       android:strokeWidth="11.99695492"
       android:fillColor="#74add1"
       android:strokeColor="#00000000"
-      android:fillAlpha="0.99481865"
+      android:fillAlpha="1"
       android:strokeLineCap="round"/>
   <path
       android:pathData="m-13.494,14.275 l-2.621,-2.135 -3.245,0.949 1.221,-3.153 -1.905,-2.793 3.376,0.187 2.067,-2.675 0.866,3.268 3.183,1.14 -2.841,1.833z"
