@@ -42,7 +42,8 @@ class AlarmReceiver : BroadcastReceiver() {
 
         val notification = NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
             .setContentTitle(message)
-            .setSmallIcon(R.drawable.app_icon)
+            .setSmallIcon(R.drawable.notification_icon)
+            .setContentText("")
             .setContentIntent(pendingIntent)
             .setDefaults(DEFAULT_ALL)
             .setAutoCancel(true)
