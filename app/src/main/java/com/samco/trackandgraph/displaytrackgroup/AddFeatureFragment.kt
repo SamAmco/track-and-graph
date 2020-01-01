@@ -40,6 +40,7 @@ import com.samco.trackandgraph.databinding.AddFeatureFragmentBinding
 import com.samco.trackandgraph.databinding.FeatureDiscreteValueListItemBinding
 import kotlinx.coroutines.*
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
 import androidx.core.view.size
 import androidx.core.widget.addTextChangedListener
@@ -56,6 +57,7 @@ class AddFeatureFragment : Fragment(),
     private lateinit var binding: AddFeatureFragmentBinding
     private lateinit var viewModel: AddFeatureViewModel
     private var navController: NavController? = null
+    private val featureTypeList = listOf(FeatureType.TIMESTAMP, FeatureType.CONTINUOUS, FeatureType.DISCRETE)
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(inflater, R.layout.add_feature_fragment, container, false)
@@ -107,15 +109,14 @@ class AddFeatureFragment : Fragment(),
 
     private fun initViews() {
         binding.featureNameText.setText(viewModel.featureName.value)
-        binding.featureTypeSpinner.setSelection(spinnerIndexOf(viewModel.featureType.value!!))
         viewModel.discreteValues.forEach { v -> inflateDiscreteValue(v) }
+
         if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
             binding.addDiscreteValueButton.isEnabled = false
-        if (viewModel.updateMode && viewModel.existingFeature.featureType == FeatureType.CONTINUOUS) {
-            binding.featureTypeSpinner.visibility = View.GONE
-            binding.featureTypeLabel.visibility = View.GONE
-        }
 
+        if (viewModel.updateMode) initSpinnerInUpdateMode()
+
+        binding.featureTypeSpinner.setSelection(featureTypeList.indexOf(viewModel.featureType.value!!))
         binding.featureTypeSpinner.onItemSelectedListener = this
         binding.featureNameText.setSelection(binding.featureNameText.text.length)
         binding.featureNameText.requestFocus()
@@ -127,6 +128,28 @@ class AddFeatureFragment : Fragment(),
         binding.addBar.addButton.setOnClickListener { onAddOrUpdateClicked() }
     }
 
+    private fun initSpinnerInUpdateMode() {
+        val itemList = resources.getStringArray(R.array.feature_types)
+            .map { s -> s as CharSequence }.toTypedArray()
+        binding.featureTypeSpinner.adapter = object: ArrayAdapter<CharSequence>(context!!,
+            android.R.layout.simple_spinner_dropdown_item, itemList) {
+            override fun isEnabled(position: Int): Boolean {
+                return viewModel.isFeatureTypeEnabled(featureTypeList[position])
+            }
+
+            override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+                val view = super.getDropDownView(position, convertView, parent)
+                val textView = view as TextView
+                val enabled = viewModel.isFeatureTypeEnabled(featureTypeList[position])
+                val color =
+                    if (enabled) ContextCompat.getColor(context, R.color.toolBarTextColor)
+                    else ContextCompat.getColor(context, R.color.disabledTextColor)
+                textView.setTextColor(color)
+                return view
+            }
+        }
+    }
+
     private fun onAddOrUpdateClicked() {
         if (!viewModel.updateMode) viewModel.onAddOrUpdate()
         else {
@@ -136,11 +159,6 @@ class AddFeatureFragment : Fragment(),
             dialog.arguments = args
             childFragmentManager.let { dialog.show(it, "ru_sure_update_feature_fragment") }
         }
-    }
-
-    private fun spinnerIndexOf(featureType: FeatureType): Int = when(featureType) {
-        FeatureType.CONTINUOUS -> 0
-        else -> 1
     }
 
     private fun inflateDiscreteValue(label: AddFeatureViewModel.MutableLabel) {
@@ -185,8 +203,8 @@ class AddFeatureFragment : Fragment(),
         var errorSet = false
         val discreteValueStrings = viewModel.discreteValues
         if (viewModel.featureType.value!! == FeatureType.DISCRETE) {
-            if (discreteValueStrings.isNullOrEmpty()) {
-                setErrorText(getString(R.string.discrete_feature_needs_at_least_one_value))
+            if (discreteValueStrings.isNullOrEmpty() || discreteValueStrings.size < 2) {
+                setErrorText(getString(R.string.discrete_feature_needs_at_least_two_values))
                 errorSet = true
             }
             for (s in discreteValueStrings) {
@@ -259,23 +277,29 @@ class AddFeatureFragment : Fragment(),
         }
     }
 
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) = when(position) {
-        0 -> onFeatureTypeSelected(false)
-        1 -> onFeatureTypeSelected(true)
-        else -> {}
+    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+        onFeatureTypeSelected(featureTypeList[position])
     }
     override fun onNothingSelected(p0: AdapterView<*>?) { }
 
-    private fun onFeatureTypeSelected(discrete: Boolean) {
-        if (viewModel.updateMode && discrete != (viewModel.existingFeature.featureType == FeatureType.DISCRETE)) {
-            AlertDialog.Builder(context)
-                .setTitle(R.string.warning)
-                .setMessage(R.string.on_feature_type_change_warning)
-                .setPositiveButton(R.string.ok, null)
-                .show()
+    private fun onFeatureTypeSelected(newType: FeatureType) {
+        if (viewModel.updateMode && viewModel.existingFeature.featureType != newType) {
+            val message = when (newType) {
+                FeatureType.DISCRETE -> null
+                FeatureType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
+                FeatureType.TIMESTAMP -> getString(R.string.on_feature_type_change_timestamp_warning)
+            }
+
+            message?.let {
+                AlertDialog.Builder(context)
+                    .setTitle(R.string.warning)
+                    .setMessage(it)
+                    .setPositiveButton(R.string.ok, null)
+                    .show()
+            }
         }
-        viewModel.featureType.value = if (discrete) FeatureType.DISCRETE else FeatureType.CONTINUOUS
-        val vis = if (discrete) View.VISIBLE else View.GONE
+        viewModel.featureType.value = newType
+        val vis = if (newType == FeatureType.DISCRETE) View.VISIBLE else View.GONE
         binding.discreteValuesTextView.visibility = vis
         binding.discreteValues.visibility = vis
         binding.addDiscreteValueButton.visibility = vis
@@ -299,7 +323,7 @@ class AddFeatureViewModel : ViewModel() {
     class MutableLabel(var value: String = "", val updateIndex: Int = -1)
 
     var featureName = MutableLiveData<String>("")
-    var featureType = MutableLiveData<FeatureType>(FeatureType.CONTINUOUS)
+    var featureType = MutableLiveData<FeatureType>(FeatureType.TIMESTAMP)
     var discreteValues = mutableListOf<MutableLabel>()
     lateinit var existingFeatureNames: List<String?>
         private set
@@ -340,6 +364,22 @@ class AddFeatureViewModel : ViewModel() {
         }
     }
 
+    fun isFeatureTypeEnabled(type: FeatureType): Boolean {
+        if (!updateMode) return true
+        // disc -> cont Y
+        // cont -> time Y
+        // disc -> time Y
+        // time -> disc N
+        // time -> cont N
+        // cont -> disc N
+        return when (type) {
+            FeatureType.CONTINUOUS -> existingFeature.featureType == FeatureType.CONTINUOUS
+                        || existingFeature.featureType == FeatureType.DISCRETE
+            FeatureType.DISCRETE -> existingFeature.featureType == FeatureType.DISCRETE
+            FeatureType.TIMESTAMP -> true
+        }
+    }
+
     fun onAddOrUpdate() {
         _state.value = AddFeatureState.ADDING
         ioScope.launch {
@@ -360,8 +400,16 @@ class AddFeatureViewModel : ViewModel() {
             if (discreteValues.size == 1) 1 else discreteValues.indexOf(v)
         }
 
-        if (existingFeature.featureType != featureType.value) updateDataPointsForNewFeatureType()
-        else updateDiscreteValueDataPoints(valOfDiscVal)
+        when (existingFeature.featureType) {
+            FeatureType.DISCRETE -> when (featureType.value) {
+                FeatureType.CONTINUOUS -> stripDataPointsToValue()
+                FeatureType.TIMESTAMP -> stripDataPointsToTimestamp()
+                FeatureType.DISCRETE -> updateDiscreteValueDataPoints(valOfDiscVal)
+            }
+            FeatureType.CONTINUOUS -> when (featureType.value) {
+                FeatureType.TIMESTAMP -> stripDataPointsToTimestamp()
+            }
+        }
 
         val discVals = discreteValues
             .map { s -> DiscreteValue(valOfDiscVal(s), s.value) }
@@ -370,6 +418,14 @@ class AddFeatureViewModel : ViewModel() {
             featureType.value!!, discVals,
             existingFeature.displayIndex)
         dao.updateFeature(feature)
+    }
+
+    private suspend fun stripDataPointsToTimestamp() {
+        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature.id)
+        val newDataPoints = oldDataPoints.map {
+            DataPoint(it.timestamp, it.featureId, 1.0, "")
+        }
+        dao.updateDataPoints(newDataPoints)
     }
 
     private suspend fun updateDiscreteValueDataPoints(valOfDiscVal: (MutableLabel) -> Int) {
@@ -386,14 +442,12 @@ class AddFeatureViewModel : ViewModel() {
         }
     }
 
-    private suspend fun updateDataPointsForNewFeatureType() {
-        if (featureType.value == FeatureType.CONTINUOUS) {
-            val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature.id)
-            val newDataPoints = oldDataPoints.map {
-                DataPoint(it.timestamp, it.featureId, it.value, "")
-            }
-            dao.updateDataPoints(newDataPoints)
+    private suspend fun stripDataPointsToValue() {
+        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature.id)
+        val newDataPoints = oldDataPoints.map {
+            DataPoint(it.timestamp, it.featureId, it.value, "")
         }
+        dao.updateDataPoints(newDataPoints)
     }
 
     private suspend fun removeExistingDataPointsForDiscreteValue(index: Int) {

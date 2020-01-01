@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.displaytrackgroup
 
 import android.annotation.SuppressLint
+import android.graphics.ColorFilter
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -27,6 +28,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DisplayFeature
+import com.samco.trackandgraph.database.FeatureType
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 
@@ -59,6 +61,14 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         binding.clickListener = clickListener
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
+        binding.quickAddButton.setOnClickListener { clickListener.onAdd(feature) }
+        if (feature.featureType == FeatureType.TIMESTAMP) {
+            binding.addButton.visibility = View.INVISIBLE
+            binding.quickAddButton.visibility = View.VISIBLE
+        } else {
+            binding.addButton.visibility = View.VISIBLE
+            binding.quickAddButton.visibility = View.INVISIBLE
+        }
         binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
     }
 

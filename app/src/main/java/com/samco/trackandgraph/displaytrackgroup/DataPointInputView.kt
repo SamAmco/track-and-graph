@@ -70,35 +70,50 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         initTimeButton()
         setSelectedDateTime(state.dateTime)
 
-        if (state.feature.featureType == FeatureType.CONTINUOUS) {
-            buttonsScroll.visibility = View.GONE
-            numberInput.visibility = View.VISIBLE
-            numberInput.requestFocus()
-            numberInput.addTextChangedListener(this)
-            numberInput.setOnEditorActionListener { v, i, e ->
-                return@setOnEditorActionListener if ((i and EditorInfo.IME_MASK_ACTION) != 0) {
-                    state.timeFixed = true
-                    clickListener?.onClick?.invoke(state.feature)
-                    true
-                } else false
-            }
-        } else {
-            buttonsScroll.visibility = View.VISIBLE
-            numberInput.visibility = View.GONE
+        when (state.feature.featureType) {
+            FeatureType.CONTINUOUS -> initContinuous()
+            FeatureType.DISCRETE -> initDiscrete()
+            FeatureType.TIMESTAMP -> initTimestamp()
         }
-        if (state.feature.featureType == FeatureType.DISCRETE) {
-            createButtons()
-        }
+    }
 
-        if (state.feature.featureType == FeatureType.CONTINUOUS) {
-            val text = if (state.value == 0.toDouble()) "" else doubleFormatter.format(state.value)
-            numberInput.setText(text)
-        } else if (state.label.isNotEmpty()) {
+    private fun initTimestamp() {
+        buttonsScroll.visibility = View.VISIBLE
+        numberInput.visibility = View.GONE
+        createTimestampButton()
+        if (state.label.isNotEmpty()) {
+            buttonsLayout.children
+                .map{ v -> v.findViewById<CheckBox>(R.id.checkbox) }
+                .first().isChecked = true
+        }
+    }
+
+    private fun initDiscrete() {
+        buttonsScroll.visibility = View.VISIBLE
+        numberInput.visibility = View.GONE
+        createButtons()
+        if (state.label.isNotEmpty()) {
             buttonsLayout.children
                 .map{ v -> v.findViewById<CheckBox>(R.id.checkbox) }
                 .first { cb -> cb.text == state.label }
                 .isChecked = true
         }
+    }
+
+    private fun initContinuous() {
+        buttonsScroll.visibility = View.GONE
+        numberInput.visibility = View.VISIBLE
+        numberInput.requestFocus()
+        numberInput.addTextChangedListener(this)
+        numberInput.setOnEditorActionListener { v, i, e ->
+            return@setOnEditorActionListener if ((i and EditorInfo.IME_MASK_ACTION) != 0) {
+                state.timeFixed = true
+                clickListener?.onClick?.invoke(state.feature)
+                true
+            } else false
+        }
+        val text = if (state.value == 0.toDouble()) "" else doubleFormatter.format(state.value)
+        numberInput.setText(text)
     }
 
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
@@ -119,6 +134,14 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
     class DataPointInputClickListener(val onClick: (Feature) -> Unit)
     fun setOnClickListener(clickListener: DataPointInputClickListener) { this.clickListener = clickListener }
 
+    private fun createTimestampButton() {
+        val inflater = LayoutInflater.from(context)
+        val item = inflater.inflate(R.layout.discrete_value_input_button, buttonsLayout, false) as CheckBox
+        item.text = context.getString(R.string.track)
+        item.setOnClickListener { onTimestampTrackClicked() }
+        buttonsLayout.addView(item)
+    }
+
     private fun createButtons() {
         discreteValueCheckBoxes = mutableMapOf()
         val inflater = LayoutInflater.from(context)
@@ -129,6 +152,13 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
             discreteValueCheckBoxes[discreteValue] = item
             buttonsLayout.addView(item)
         }
+    }
+
+    private fun onTimestampTrackClicked() {
+        state.value = 1.0
+        state.label = ""
+        state.timeFixed = true
+        clickListener!!.onClick(state.feature)
     }
 
     private fun onDiscreteValueClicked(discreteValue: DiscreteValue) {

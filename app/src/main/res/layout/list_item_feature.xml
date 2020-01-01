@@ -99,30 +99,20 @@
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="5dp"
                             android:src="@color/secondaryColor"
-                            app:layout_constraintBottom_toTopOf="@id/addButton"
+                            app:layout_constraintBottom_toTopOf="@id/numEntriesText"
                             />
                     <TextView
                             android:id="@+id/numEntriesText"
                             android:layout_width="0dp"
-                            android:layout_height="@dimen/feature_add_box_button_size"
+                            android:layout_height="35dp"
                             android:textSize="14sp"
                             app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@id/addButton"
                             app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintRight_toRightOf="parent"
                             android:gravity="center|left"
+                            android:lines="1"
                             android:text="@{feature.numDataPoints != null ? String.format(@string/data_points, feature.numDataPoints) : @string/no_data}"
                             tools:text="1324 Tracked"/>
-
-                    <ImageButton
-                            android:id="@+id/addButton"
-                            android:layout_width="@dimen/feature_add_box_button_size"
-                            android:layout_height="@dimen/feature_add_box_button_size"
-                            app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintBottom_toBottomOf="parent"
-                            android:tint="@color/toolBarTextColor"
-                            android:scaleType="fitXY"
-                            android:background="@null"
-                            android:src="@drawable/add_box" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
@@ -139,5 +129,33 @@
                 android:scaleType="fitCenter"
                 android:layout_gravity="top|right"
                 />
+
+        <ImageButton
+                android:id="@+id/addButton"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:paddingTop="3dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp"
+                android:layout_gravity="bottom|right"
+                android:tint="@color/toolBarTextColor"
+                android:scaleType="fitXY"
+                android:background="@null"
+                android:src="@drawable/add_box" />
+
+        <ImageButton
+                android:id="@+id/quickAddButton"
+                android:layout_width="55dp"
+                android:layout_height="55dp"
+                android:paddingTop="3dp"
+                android:paddingLeft="3dp"
+                android:paddingRight="10dp"
+                android:paddingBottom="10dp"
+                android:layout_gravity="bottom|right"
+                android:tint="@color/primaryColor"
+                android:scaleType="fitXY"
+                android:background="@null"
+                android:src="@drawable/add_box" />
     </FrameLayout>
 </layout>
