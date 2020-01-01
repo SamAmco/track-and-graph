@@ -61,7 +61,7 @@ data class Feature (
     }
 }
 
-enum class FeatureType { DISCRETE, CONTINUOUS }
+enum class FeatureType { DISCRETE, CONTINUOUS, TIMESTAMP }
 
 data class DiscreteValue (val index: Int, val label: String) {
     override fun toString() = "$index:$label"

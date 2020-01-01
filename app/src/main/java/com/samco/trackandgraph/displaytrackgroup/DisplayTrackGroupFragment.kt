@@ -34,6 +34,7 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.trackandgraph.ui.*
 import kotlinx.coroutines.*
+import org.threeten.bp.OffsetDateTime
 
 const val TRACK_GROUP_ID_KEY = "TRACK_GROUP_ID_KEY"
 const val TRACK_GROUP_NAME_KEY = "TRACK_GROUP_NAME_KEY"
@@ -175,9 +176,13 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun onDeleteFeature(feature: DisplayFeature) { viewModel.deleteFeature(feature) }
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
-        val argBundle = Bundle()
-        argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(feature.id))
-        showAddDataPoint(argBundle)
+        if (feature.featureType == FeatureType.TIMESTAMP) {
+            viewModel.addTimestampDataPoint(feature)
+        } else {
+            val argBundle = Bundle()
+            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(feature.id))
+            showAddDataPoint(argBundle)
+        }
     }
 
     private fun onQueueAddAllClicked() {
@@ -263,6 +268,12 @@ class DisplayTrackGroupViewModel : ViewModel() {
 
     fun deleteFeature(feature: DisplayFeature) = ioScope.launch {
         dataSource?.deleteFeature(feature.id)
+    }
+
+
+    fun addTimestampDataPoint(feature: DisplayFeature) = ioScope.launch {
+        val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, 1.0, "")
+        dataSource?.insertDataPoint(newDataPoint)
     }
 
     fun adjustDisplayIndexes(displayFeatures: List<DisplayFeature>) {
