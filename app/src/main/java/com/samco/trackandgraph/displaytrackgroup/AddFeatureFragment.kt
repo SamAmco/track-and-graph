@@ -272,8 +272,7 @@ class AddFeatureFragment : Fragment(),
 
     private fun reIndexDiscreteValueViews() {
         binding.discreteValues.forEachIndexed{ i, v ->
-            val index = if (binding.discreteValues.size == 1) 1 else i
-            v.findViewById<TextView>(R.id.indexText).text = "$index : "
+            v.findViewById<TextView>(R.id.indexText).text = "$i : "
         }
     }
 
