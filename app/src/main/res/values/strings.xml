@@ -167,8 +167,8 @@
     <string name="faq_text_1_2">Your track groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_1_3">Once you’ve created your track group select it and then click the + icon to set up something new to track.</string>
     <string name="faq_text_1_4">Type in the name of what you want to track and select an input style:</string>
-    <string name="faq_text_1_5">There are two types of input you can choose. Numerical will allow you to simply enter any number when tracking.</string>
-    <string name="faq_text_1_6">Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking. Click the + button at the bottom to enter some answers.</string>
+    <string name="faq_text_1_5">There are three styles of input you can choose: \n\n• Date and time only is the quickest and simplest. It will not ask you for any additional information and will simply record the date and time each time you tap the plus button. \n\n• Numerical will ask you to enter a number when tracking. \n\n• Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.</string>
+    <string name="faq_text_1_6">To create multiple choice answers click the + button at the bottom.</string>
     <string name="faq_text_1_8">When you are happy with the setup click the FINISH button.</string>
     <string name="faq_text_1_9">You should now see cards in your track group. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_1_10">You can track things individually by using their + buttons or track everything in the group quickly by using the action button:</string>
