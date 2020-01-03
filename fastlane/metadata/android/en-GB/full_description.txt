@@ -1,0 +1,25 @@
+Track & Graph is a tool for self awareness and reflection. Assign a numerical value to something, or just track when it happened and easily create insightful graphs. Use Track & Graph to:
+
+• Track your habits. Overcome bad habits or encourage good ones.
+
+• Track your symptoms. Find the cause of problems like pains by looking for hidden correlations with other factors in your life.
+
+• Track your behaviours. See changes in the frequency of behaviours over long periods of time and how they correlate.
+
+
+Track & Graph is packed with useful features:
+
+• Designed to make frequent tracking as quick and easy as possible. Set up multiple choice answers to make the tracking process super quick, track everything in seconds!
+
+• Set up powerful line graphs that allow you to visualise data whether tracked occasionally or consistently. See moving averages over various time periods from various data sources on the same graph.
+
+• Set up pie charts to clearly show the proportions of data.
+
+• Set up statistics to report useful information like the time since something was tracked or the average time between tracking something. 
+
+• Separate everything into groups to take full advantage of the flexibility of the app. Track habits, symptoms and a workout routine all in different groups. Then create groups for any graphs and statistics too.
+
+• Organise any page to your liking by simply holding down and dragging items around.
+
+
+Track & Graph is completely free and open source. There is no authentication, no ads and no in-app purchases. None of your personal information, nothing you track and nothing you do in the app is recorded or stored anywhere online by this app or any third party, hence there is no need of a privacy policy. You can however easily backup your data at any time to your own device or cloud storage service from within the app.
