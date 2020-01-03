@@ -4,10 +4,6 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
-def versionMajor = 1
-def versionMinor = 4
-def versionPatch = 0
-
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.2"
@@ -24,8 +20,8 @@ android {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 19
         targetSdkVersion 29
-        versionCode versionMajor * 10000 + versionMinor * 100 + versionPatch
-        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+        versionCode 10400
+        versionName "1.4.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {
