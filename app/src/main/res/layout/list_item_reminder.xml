@@ -66,6 +66,8 @@
                         android:paddingLeft="@dimen/dialog_input_spacing"
                         android:paddingRight="@dimen/dialog_input_spacing"
                         android:layout_marginTop="@dimen/card_padding"
+                        android:background="?android:attr/selectableItemBackground"
+                        android:clickable="true"
                         android:text="00:00"
                         tools:text="17:35"
                         />
@@ -78,7 +80,7 @@
                         android:paddingRight="@dimen/card_padding"
                         android:src="@drawable/delete_icon"
                         android:scaleType="fitCenter"
-                        android:background="@color/ap_transparent"
+                        android:background="?selectableItemBackgroundBorderless"
                         />
                 </LinearLayout>
 

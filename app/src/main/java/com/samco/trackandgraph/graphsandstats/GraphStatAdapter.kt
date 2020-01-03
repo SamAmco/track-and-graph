@@ -63,7 +63,7 @@ class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
         currJob?.cancel()
         currJob = Job()
         graphStatView.menuButtonClickListener = { v -> createContextMenu(v) }
-        graphStatView.setOnClickListener { clickListener.onClick(graphStat) }
+        graphStatView.cardView.setOnClickListener { clickListener.onClick(graphStat) }
         CoroutineScope(Dispatchers.Main + currJob!!).launch {
             if (!when (graphStat.type) {
                     GraphStatType.LINE_GRAPH -> tryInitLineGraph(dataSource, graphStat)

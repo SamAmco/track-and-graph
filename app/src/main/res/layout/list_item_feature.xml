@@ -42,6 +42,8 @@
                     android:layout_width="170dp"
                     android:layout_height="170dp"
                     android:layout_gravity="center"
+                    android:foreground="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     app:contentPadding="@dimen/card_padding"
                     app:cardCornerRadius="@dimen/card_corner_radius"
                     tools:layout_width="170dp">
@@ -139,9 +141,9 @@
                 android:paddingRight="10dp"
                 android:paddingBottom="10dp"
                 android:layout_gravity="bottom|right"
+                android:background="@null"
                 android:tint="@color/toolBarTextColor"
                 android:scaleType="fitXY"
-                android:background="@null"
                 android:src="@drawable/add_box" />
 
         <ImageButton
@@ -153,9 +155,9 @@
                 android:paddingRight="10dp"
                 android:paddingBottom="10dp"
                 android:layout_gravity="bottom|right"
+                android:background="@null"
                 android:tint="@color/primaryColor"
                 android:scaleType="fitXY"
-                android:background="@null"
                 android:src="@drawable/add_box" />
     </FrameLayout>
 </layout>

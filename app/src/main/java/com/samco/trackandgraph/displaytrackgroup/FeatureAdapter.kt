@@ -17,20 +17,21 @@
 package com.samco.trackandgraph.displaytrackgroup
 
 import android.annotation.SuppressLint
-import android.graphics.ColorFilter
+import android.graphics.drawable.RippleDrawable
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DisplayFeature
 import com.samco.trackandgraph.database.FeatureType
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
+
 
 private val getIdForDisplayFeature = { df: DisplayFeature -> df.id }
 
@@ -61,7 +62,7 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         binding.clickListener = clickListener
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
-        binding.quickAddButton.setOnClickListener { clickListener.onAdd(feature) }
+        binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
         if (feature.featureType == FeatureType.TIMESTAMP) {
             binding.addButton.visibility = View.INVISIBLE
             binding.quickAddButton.visibility = View.VISIBLE
@@ -70,6 +71,16 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
             binding.quickAddButton.visibility = View.INVISIBLE
         }
         binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
+    }
+
+    private fun onQuickAddClicked() {
+        if (Build.VERSION.SDK_INT >= 21) {
+            val ripple = binding.cardView.foreground as RippleDrawable
+            ripple.setHotspot(ripple.bounds.right.toFloat(), ripple.bounds.bottom.toFloat())
+            ripple.state = intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
+            ripple.state = intArrayOf()
+        }
+        feature?.let { clickListener?.onAdd(it) }
     }
 
     fun elevateCard() {
