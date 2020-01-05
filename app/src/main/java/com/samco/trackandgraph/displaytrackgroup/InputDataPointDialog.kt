@@ -153,10 +153,8 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     }
 
     private fun setupViewFeature(feature: Feature, index: Int) {
-        if (feature.featureType == FeatureType.DISCRETE) binding.addButton.visibility = View.GONE
+        if (feature.featureType != FeatureType.CONTINUOUS) binding.addButton.visibility = View.GONE
         else binding.addButton.visibility = View.VISIBLE
-        if (index == viewModel.features.value!!.size-1) binding.skipButton.visibility = View.GONE
-        else binding.skipButton.visibility = View.VISIBLE
         indexText.text = "${index+1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
@@ -201,7 +199,10 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
         )
     }
 
-    private fun skip() = binding.viewPager.setCurrentItem(binding.viewPager.currentItem + 1, true)
+    private fun skip() {
+        if (binding.viewPager.currentItem == viewModel.features.value!!.size-1) dismiss()
+        else binding.viewPager.setCurrentItem(binding.viewPager.currentItem + 1, true)
+    }
 }
 
 enum class InputDataPointDialogState { LOADING, WAITING, ADDING, ADDED }
