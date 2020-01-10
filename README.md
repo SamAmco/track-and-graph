@@ -8,13 +8,14 @@ An android app for tracking personal data and creating custom graphs
 </p>
 
 # Screenshots
-<p>
-	<img src="./screenshots/screenshot1.jpg" width="220px" />
-	<img src="./screenshots/screenshot2.jpg" width="220px" />
-	<img src="./screenshots/screenshot3.jpg" width="220px" />
-	<img src="./screenshots/screenshot4.jpg" width="220px" />
-	<img src="./screenshots/screenshot5.jpg" width="220px" />
-	<img src="./screenshots/screenshot6.jpg" width="220px" />
+<p align="center">
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/1_en-GB.jpeg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/2_en-GB.jpeg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/3_en-GB.jpeg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/4_en-GB.jpeg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/5_en-GB.jpeg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/6_en-GB.jpeg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/7_en-GB.jpeg" width="200px" />
 </p>
 
 # Privacy Policy
