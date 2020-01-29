@@ -1,0 +1,21 @@
+1. Update the build.gradle version code and name
+
+2. Copy and paste a fastlane changelog file and add the changelog there e.g. 
+
+	# cp fastlane/metadata/android/en-GB/changelogs/10403.txt fastlane/metadata/android/en-GB/changelogs/10404.txt
+
+also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.
+
+3. Build an apk and an aab for the release (using Android Studio)
+
+4. Commit everything and tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release
+
+5. On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
+
+6. Use fastlane to upload the new aab to the play store e.g.
+
+	# fastlane supply --aab app/release/app-release.aab --track beta
+
+or for release
+
+	# fastlane supply --aab app/release/app-release.aab

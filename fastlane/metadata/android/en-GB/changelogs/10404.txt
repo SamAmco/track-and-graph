@@ -1,0 +1,3 @@
+Bug fixes:
+- Y padding on line graphs improved
+- Crash on creating graph using plot totals from empty data fixed
