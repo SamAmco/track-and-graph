@@ -270,7 +270,7 @@ abstract class GraphStatViewBase : FrameLayout {
         val maxY = bounds.maxY?.toDouble() ?: 0.toDouble()
         val maxBound = max(abs(minY), abs(maxY))
         val numDigits = log10(maxBound).toFloat() + 3
-        binding.lineGraph.graph.paddingLeft = numDigits * 5f
+        binding.lineGraph.graph.paddingLeft = (numDigits-1) * (context.resources.displayMetrics.scaledDensity) * 3.5f
         binding.lineGraph.graph.refreshLayout()
     }
 
@@ -467,6 +467,7 @@ abstract class GraphStatViewBase : FrameLayout {
     }
 
     private suspend fun calculateDurationAccumulatedValues(rawData: RawDataSample, period: Period): RawDataSample {
+        if (rawData.dataPoints.isEmpty()) return rawData
         var plotFrom = 0
         var foundPlotFrom = false
         val featureId = rawData.dataPoints[0].featureId
