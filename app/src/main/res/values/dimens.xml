@@ -36,4 +36,5 @@
     <dimen name="spinner_item_color_size">60dp</dimen>
     <dimen name="graph_height">300dp</dimen>
     <dimen name="design_navigation_icon_size" tools:override="true">20dp</dimen>
+    <dimen name="widget_margin">8dp</dimen>
 </resources>
