@@ -26,7 +26,10 @@ import com.samco.trackandgraph.database.GroupItemType
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 
-private val getIdForGroupItem = { gi: GroupItem -> gi.id }
+private val getIdForGroupItem = { gi: GroupItem ->
+    if (gi.type == GroupItemType.TRACK) gi.id * 2
+    else (gi.id * 2) + 1
+}
 
 class GroupListAdapter(private val clickListener: GroupClickListener,
                        private val trackColor: Int,
