@@ -38,10 +38,10 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
+import com.samco.trackandgraph.util.getDoubleFromText
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
 import java.lang.Exception
-import java.text.DecimalFormat
 
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
@@ -176,13 +176,13 @@ class GraphStatInputFragment : Fragment() {
         if (viewModel.selectedValueStatToValue.value != null)
             binding.valueStatToInput.setText(doubleFormatter.format(viewModel.selectedValueStatToValue.value!!))
         binding.valueStatToInput.addTextChangedListener { editText ->
-            viewModel.selectedValueStatToValue.value = editText.toString().toDoubleOrNull() ?: 0.toDouble()
+            viewModel.selectedValueStatToValue.value = getDoubleFromText(context!!, editText.toString())
             onFormUpdate()
         }
         if (viewModel.selectedValueStatFromValue.value != null)
             binding.valueStatFromInput.setText(doubleFormatter.format(viewModel.selectedValueStatFromValue.value!!))
         binding.valueStatFromInput.addTextChangedListener { editText ->
-            viewModel.selectedValueStatFromValue.value = editText.toString().toDoubleOrNull() ?: 0.toDouble()
+            viewModel.selectedValueStatFromValue.value = getDoubleFromText(context!!, editText.toString())
             onFormUpdate()
         }
     }
