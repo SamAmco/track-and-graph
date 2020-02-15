@@ -21,9 +21,13 @@ class TrackWidgetProvider : AppWidgetProvider() {
         appWidgetIds?.forEach { id ->
             val remoteViews = RemoteViews(context.packageName, R.layout.track_widget)
             val intent = Intent(context, TrackWidgetInputDataPoint::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.addCategory(Intent.CATEGORY_LAUNCHER)
+
             // Temp id; let the user choose on widget construction in the future.
             val featureId: Long = 2
             intent.putExtra(FEATURE_KEY, featureId)
+
             remoteViews.setOnClickPendingIntent(R.id.track_widget_button,
                 PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
 
