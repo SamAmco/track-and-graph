@@ -112,6 +112,8 @@ abstract class GraphStatViewBase : FrameLayout {
         currentXYRegions.clear()
         binding.lineGraph.clear()
         binding.lineGraph.graph.paddingLeft = 0f
+        binding.lineGraph.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
+        binding.lineGraph.setDomainBoundaries(0, 1, BoundaryMode.GROW)
         binding.lineGraph.graph.refreshLayout()
         binding.pieChart.clear()
         binding.progressBar.visibility = View.GONE
@@ -253,16 +255,26 @@ abstract class GraphStatViewBase : FrameLayout {
         binding.progressBar.visibility = View.VISIBLE
         if (tryDrawLineGraphFeaturesAndCacheTimeRange(lineGraph)) {
             setUpLineGraphXAxis()
-            val bounds = RectRegion()
-            currentXYRegions.forEach { r -> bounds.union(r) }
-            binding.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
-            setLineGraphPaddingFromBounds(bounds)
+            setLineGraphBounds(lineGraph)
             binding.lineGraph.redraw()
             binding.lineGraph.visibility = View.VISIBLE
             binding.progressBar.visibility = View.GONE
         } else {
             initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
         }
+    }
+
+    private fun setLineGraphBounds(lineGraph: LineGraph) {
+        val bounds = RectRegion()
+        currentXYRegions.forEach { r -> bounds.union(r) }
+        if (lineGraph.yRangeType == YRangeType.FIXED) {
+            bounds.minY = lineGraph.yFrom
+            bounds.maxY = lineGraph.yTo
+            binding.lineGraph.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
+        }
+        binding.lineGraph.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+        binding.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+        setLineGraphPaddingFromBounds(bounds)
     }
 
     private fun setLineGraphPaddingFromBounds(bounds: RectRegion) {

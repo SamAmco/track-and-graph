@@ -111,6 +111,10 @@
         <item>Six Months</item>
         <item>A Year</item>
     </string-array>
+    <string-array name="y_range_styles">
+        <item>Dynamic</item>
+        <item>Fixed</item>
+    </string-array>
 
 
     <string name="import_exception_unknown">Import failed: An unknown error occurred</string>
@@ -137,6 +141,7 @@
     <string name="graph_stat_validation_invalid_pie_chart_feature">Please select a valid pie chart data set</string>
     <string name="graph_stat_validation_unrecognised_color">Please make sure all data sets have a color</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Invalid line graph data set detected</string>
+    <string name="graph_stat_validation_bad_fixed_range">Please make sure that "From" is smaller than "To"</string>
 
     <string name="graph_stat_view_invalid_setup">Complete the setup to see a preview</string>
     <string name="graph_stat_view_not_found">An error occurred while finding this graph</string>
@@ -233,4 +238,5 @@
     <string name="reminders_notifications_channel_description">User created notifications to remind you when to track</string>
     <string name="default_reminder_name">Time to track!</string>
     <string name="track">Track</string>
+    <string name="range_style">Range style:</string>
 </resources>
