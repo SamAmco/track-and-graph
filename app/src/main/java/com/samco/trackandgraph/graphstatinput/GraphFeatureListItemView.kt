@@ -30,6 +30,7 @@ import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
+import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
 
 class GraphFeatureListItemView(
@@ -87,7 +88,7 @@ class GraphFeatureListItemView(
     private fun setupScaleInput() {
         binding.scaleInput.setText(decimalFormat.format(lineGraphFeature.scale))
         binding.scaleInput.addTextChangedListener { text ->
-            lineGraphFeature.scale = text.toString().toDoubleOrNull() ?: 1.toDouble()
+            lineGraphFeature.scale = getDoubleFromText(context, text.toString())
             onUpdatedListener?.invoke(this@GraphFeatureListItemView)
         }
     }
@@ -95,7 +96,7 @@ class GraphFeatureListItemView(
     private fun setupOffsetInput() {
         binding.offsetInput.setText(decimalFormat.format(lineGraphFeature.offset))
         binding.offsetInput.addTextChangedListener { text ->
-            lineGraphFeature.offset = text.toString().toDoubleOrNull() ?: 0.toDouble()
+            lineGraphFeature.offset = getDoubleFromText(context, text.toString())
             onUpdatedListener?.invoke(this@GraphFeatureListItemView)
         }
     }

@@ -29,6 +29,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.util.getDoubleFromText
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
@@ -119,7 +120,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     override fun afterTextChanged(p0: Editable?) {
-        state.value = numberInput.text.toString().toDoubleOrNull() ?: 0.toDouble()
+        state.value = getDoubleFromText(context, numberInput.text.toString())
     }
 
     class DataPointInputData(
