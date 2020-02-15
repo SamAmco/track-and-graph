@@ -398,20 +398,29 @@ abstract class GraphStatViewBase : FrameLayout {
         return withContext(Dispatchers.IO) {
             if (sampleDuration == null) RawDataSample(dataSource.getDataPointsForFeatureAscSync(featureId), 0)
             else {
-                val now = OffsetDateTime.now()
-                val startDate = now.minus(sampleDuration)
-                val plottingDuration = plottingPeriod?.let { Duration.between(now, now.plus(plottingPeriod)) }
+                val latest = getLatestTimeOrNowForFeature(featureId)
+                val startDate = latest.minus(sampleDuration)
+                val plottingDuration = plottingPeriod?.let { Duration.between(latest, latest.plus(plottingPeriod)) }
                 val maxSampleDuration = listOf(
                     sampleDuration,
                     averagingDuration?.plus(sampleDuration),
                     plottingDuration?.plus(sampleDuration)
                 ).maxBy { d -> d ?: Duration.ZERO }
-                val minSampleDate = now.minus(maxSampleDuration)
-                val dataPoints = dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, now)
+                val minSampleDate = latest.minus(maxSampleDuration)
+                val dataPoints = dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
                 val startIndex = dataPoints.indexOfFirst { dp -> dp.timestamp.isAfter(startDate) }
                 RawDataSample(dataPoints, startIndex)
             }
         }
+    }
+
+    private suspend fun getLatestTimeOrNowForFeature(featureId: Long): OffsetDateTime {
+        val lastDataPointList = dataSource.getLastDataPointForFeatureSync(featureId)
+        val now = OffsetDateTime.now()
+        val latest = lastDataPointList.firstOrNull()?.let {
+            it.timestamp.plusSeconds(1)
+        }
+        return listOfNotNull(now, latest).max()!!
     }
 
     private suspend fun createAndAddSeries(rawData: RawDataSample, lineGraphFeature: LineGraphFeature) {
@@ -473,9 +482,9 @@ abstract class GraphStatViewBase : FrameLayout {
         val featureId = rawData.dataPoints[0].featureId
         val newData = mutableListOf<DataPoint>()
         var currentTimeStamp = findBeginningOfPeriod(rawData.dataPoints[0].timestamp, period)
-        val now = OffsetDateTime.now()
+        val latest = getNowOrLatest(rawData)
         var index = 0
-        while (currentTimeStamp.isBefore(now)) {
+        while (currentTimeStamp.isBefore(latest)) {
             currentTimeStamp = currentTimeStamp.with {ld -> ld.plus(period)}
             val points = rawData.dataPoints.drop(index).takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
             val total = points.sumByDouble { dp -> dp.value }
@@ -488,6 +497,13 @@ abstract class GraphStatViewBase : FrameLayout {
             yield()
         }
         return RawDataSample(newData, plotFrom)
+    }
+
+    private fun getNowOrLatest(rawData: RawDataSample): OffsetDateTime {
+        val now = OffsetDateTime.now()
+        if (rawData.dataPoints.isEmpty()) return now
+        val latest = rawData.dataPoints.last().timestamp
+        return if (latest > now) latest else now
     }
 
     private fun findBeginningOfPeriod(startDateTime: OffsetDateTime, period: Period): OffsetDateTime {
