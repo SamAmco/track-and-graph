@@ -5,7 +5,7 @@
     android:updatePeriodMillis="86400000"
     android:initialLayout="@layout/track_widget"
     android:resizeMode="horizontal|vertical"
-    android:widgetCategory="home_screen">
+    android:widgetCategory="home_screen"
+    android:configure="com.samco.trackandgraph.widgets.TrackWidgetConfigure">
 </appwidget-provider>
 <!--    android:previewImage="@drawable/preview"-->
-<!--    android:configure="com.example.android.ExampleAppWidgetConfigure"-->
