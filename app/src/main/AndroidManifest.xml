@@ -25,7 +25,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".widgets.TrackWidgetInputDataPoint" />
+        <activity
+            android:name=".widgets.TrackWidgetInputDataPoint"
+            android:theme="@style/TransparentTheme"
+            android:launchMode="singleTask"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+        </activity>
 
         <receiver android:name=".reminders.AlarmReceiver" />
         <receiver android:name=".reminders.RecreateAlarms">
