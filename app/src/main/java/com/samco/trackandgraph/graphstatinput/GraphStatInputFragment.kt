@@ -71,6 +71,8 @@ class GraphStatInputFragment : Fragment() {
                     binding.inputProgressBar.visibility = View.INVISIBLE
                     listenToUpdateMode()
                     listenToGraphTypeSpinner()
+                    listenToYRangeTypeSpinner()
+                    listenToYRangeFixedFromTo()
                     listenToGraphName()
                     listenToTimeDuration()
                     listenToAllFeatures()
@@ -80,6 +82,45 @@ class GraphStatInputFragment : Fragment() {
                 else -> navController?.popBackStack()
             }
         })
+    }
+
+    private fun listenToYRangeTypeSpinner() {
+        viewModel.yRangeType.value?.let {
+            binding.yRangeStyleSpinner.setSelection(it.ordinal)
+        }
+        binding.yRangeStyleSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) { }
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                viewModel.yRangeType.value = YRangeType.values()[index]
+            }
+        }
+        viewModel.yRangeType.observe(this, Observer {
+            when (it) {
+                YRangeType.DYNAMIC -> {
+                    binding.yRangeFromToLayout.visibility = View.GONE
+                    onFormUpdate()
+                }
+                YRangeType.FIXED -> {
+                    binding.yRangeFromToLayout.visibility = View.VISIBLE
+                    onFormUpdate()
+                }
+            }
+        })
+    }
+
+    private fun listenToYRangeFixedFromTo() {
+        if (viewModel.yRangeFrom.value != null)
+            binding.yRangeFrom.setText(doubleFormatter.format(viewModel.yRangeFrom.value!!))
+        binding.yRangeFrom.addTextChangedListener { editText ->
+            viewModel.yRangeFrom.value = getDoubleFromText(context!!, editText.toString())
+            onFormUpdate()
+        }
+        if (viewModel.yRangeTo.value != null)
+            binding.yRangeTo.setText(doubleFormatter.format(viewModel.yRangeTo.value!!))
+        binding.yRangeTo.addTextChangedListener { editText ->
+            viewModel.yRangeTo.value = getDoubleFromText(context!!, editText.toString())
+            onFormUpdate()
+        }
     }
 
     private fun listenToUpdateMode() {
@@ -280,6 +321,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initTimeSinceView() {
+        binding.yRangeLayout.visibility = View.GONE
         binding.timeDurationLayout.visibility = View.GONE
         binding.pieChartSelectFeatureLayout.visibility = View.GONE
         binding.addFeatureButton.visibility = View.GONE
@@ -288,6 +330,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initAverageTimeBetweenView() {
+        binding.yRangeLayout.visibility = View.GONE
         binding.timeDurationLayout.visibility = View.VISIBLE
         binding.pieChartSelectFeatureLayout.visibility = View.GONE
         binding.addFeatureButton.visibility = View.GONE
@@ -296,6 +339,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initPieChartView() {
+        binding.yRangeLayout.visibility = View.GONE
         binding.timeDurationLayout.visibility = View.VISIBLE
         binding.pieChartSelectFeatureLayout.visibility = View.VISIBLE
         binding.addFeatureButton.visibility = View.GONE
@@ -304,6 +348,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initLineGraphView() {
+        binding.yRangeLayout.visibility = View.VISIBLE
         binding.timeDurationLayout.visibility = View.VISIBLE
         binding.pieChartSelectFeatureLayout.visibility = View.GONE
         binding.addFeatureButton.visibility = View.VISIBLE
@@ -374,6 +419,9 @@ class GraphStatInputViewModel : ViewModel() {
     val graphName = MutableLiveData<String>("")
     val graphStatType = MutableLiveData<GraphStatType>(GraphStatType.LINE_GRAPH)
     val sampleDuration = MutableLiveData<Duration?>(null)
+    val yRangeType = MutableLiveData<YRangeType>(YRangeType.DYNAMIC)
+    val yRangeFrom = MutableLiveData<Double>(0.0)
+    val yRangeTo = MutableLiveData<Double>(1.0)
     val selectedPieChartFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatDiscreteValue = MutableLiveData<DiscreteValue?>(null)
@@ -475,6 +523,9 @@ class GraphStatInputViewModel : ViewModel() {
         withContext(Dispatchers.Main) {
             this@GraphStatInputViewModel.sampleDuration.value = lineGraph.duration
             this@GraphStatInputViewModel.lineGraphFeatures = lineGraph.features
+            this@GraphStatInputViewModel.yRangeType.value = lineGraph.yRangeType
+            this@GraphStatInputViewModel.yRangeFrom.value = lineGraph.yFrom
+            this@GraphStatInputViewModel.yRangeTo.value = lineGraph.yTo
         }
         return lineGraph.id
     }
@@ -530,6 +581,10 @@ class GraphStatInputViewModel : ViewModel() {
                 throw ValidationException(R.string.graph_stat_validation_unrecognised_color)
             if (allFeatures.value?.map { feat -> feat.id }?.contains(f.featureId) != true)
                 throw ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)
+        }
+        if (yRangeType.value == YRangeType.FIXED) {
+            if (yRangeFrom.value!! >= yRangeTo.value!!)
+                throw ValidationException(R.string.graph_stat_validation_bad_fixed_range)
         }
     }
 
@@ -593,7 +648,8 @@ class GraphStatInputViewModel : ViewModel() {
     )
 
     fun constructLineGraph(graphStatId: Long) = LineGraph.create(
-        id ?: 0L, graphStatId, lineGraphFeatures, sampleDuration.value
+        id ?: 0L, graphStatId, lineGraphFeatures, sampleDuration.value,
+        yRangeType.value!!, yRangeFrom.value!!, yRangeTo.value!!
     )
 
     fun constructPieChart(graphStatId: Long) = PieChart(
