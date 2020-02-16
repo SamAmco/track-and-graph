@@ -2,15 +2,15 @@ package com.samco.trackandgraph.widgets
 
 import android.app.Activity
 import android.appwidget.AppWidgetManager
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.RemoteViews
 import com.samco.trackandgraph.R
 
 class TrackWidgetConfigure : Activity() {
-    var appWidgetId = 0
+
+    private var appWidgetId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,21 +18,29 @@ class TrackWidgetConfigure : Activity() {
         setContentView(R.layout.track_widget_configure)
 
         appWidgetId = intent?.extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
-        Log.d("widget", "saved app widget id as")
-        Log.d("widget", appWidgetId.toString())
         setResult(RESULT_CANCELED)
     }
 
     fun onConfirm(view: View) {
-        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE, null, this, TrackWidgetProvider::class.java)
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, arrayOf(appWidgetId))
-        sendBroadcast(intent)
+        appWidgetId?.let { id ->
+            if (appWidgetId == null) {
+                return
+            }
 
-        val resultValue = Intent().apply {
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            val featureId: Long = 2
+            val sharedPref = getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).edit()
+            sharedPref.putLong(TrackWidgetProvider.getFeatureIdPref(id), featureId)
+            sharedPref.apply()
+
+            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE, null, this, TrackWidgetProvider::class.java)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, intArrayOf(id))
+            sendBroadcast(intent)
+
+            val resultValue = Intent().apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+            }
+            setResult(RESULT_OK, resultValue)
+            finish()
         }
-        setResult(RESULT_OK, resultValue)
-        finish()
-
     }
 }

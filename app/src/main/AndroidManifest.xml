@@ -29,7 +29,6 @@
         <activity
             android:name=".widgets.TrackWidgetInputDataPoint"
             android:theme="@style/TransparentTheme"
-            android:launchMode="singleTask"
             android:excludeFromRecents="true"
             android:noHistory="true">
         </activity>
@@ -37,6 +36,7 @@
         <activity android:name=".widgets.TrackWidgetConfigure">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
+                <action android:name="android.appwidget.action.ACTION_APPWIDGET_DELETED" />
             </intent-filter>
         </activity>
 
