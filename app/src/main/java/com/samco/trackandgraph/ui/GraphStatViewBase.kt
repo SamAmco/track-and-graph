@@ -388,7 +388,7 @@ abstract class GraphStatViewBase : FrameLayout {
                 else -> calculateDurationAccumulatedValues(rawDataSample, plottingPeriod!!)
             }
         }
-        return if (dataPlottable(plottingData)) {
+        return if (dataPlottable(plottingData, 2)) {
             createAndAddSeries(plottingData, lineGraphFeature)
             true
         } else false
@@ -399,10 +399,9 @@ abstract class GraphStatViewBase : FrameLayout {
         binding.legendFlexboxLayout.addView(GraphLegendItemView(context, colorId, label))
     }
 
-    private fun dataPlottable(rawData: RawDataSample): Boolean {
+    private fun dataPlottable(rawData: RawDataSample, minDataPoints: Int = 1): Boolean {
         return rawData.plotFrom >= 0
-                && rawData.dataPoints.size - rawData.plotFrom > 1
-                && rawData.dataPoints[rawData.plotFrom].timestamp.isBefore(rawData.dataPoints.last().timestamp)
+                && rawData.dataPoints.size - rawData.plotFrom >= minDataPoints
     }
 
     private suspend fun sampleData(featureId: Long, sampleDuration: Duration?,
