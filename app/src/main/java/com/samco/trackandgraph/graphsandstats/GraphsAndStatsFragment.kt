@@ -119,6 +119,11 @@ class GraphsAndStatsFragment : Fragment() {
                 GraphsAndStatsViewState.INITIALIZING -> {
                     binding.graphStatsProgressBar.visibility = View.VISIBLE
                 }
+                GraphsAndStatsViewState.NO_FEATURES -> {
+                    setHasOptionsMenu(false)
+                    binding.graphStatsProgressBar.visibility = View.GONE
+                    binding.noGraphsHintText.text = getString(R.string.no_features_graph_stats_hint)
+                }
                 GraphsAndStatsViewState.WAITING -> {
                     binding.graphStatsProgressBar.visibility = View.GONE
                     observeGraphStatsAndUpdate(adapter)
@@ -172,7 +177,7 @@ class GraphsAndStatsFragment : Fragment() {
 
 }
 
-enum class GraphsAndStatsViewState { INITIALIZING, WAITING }
+enum class GraphsAndStatsViewState { INITIALIZING, NO_FEATURES, WAITING }
 class GraphsAndStatsViewModel : ViewModel() {
     private var dataSource: TrackAndGraphDatabaseDao? = null
     lateinit var graphStats: LiveData<List<GraphOrStat>>
@@ -204,7 +209,11 @@ class GraphsAndStatsViewModel : ViewModel() {
                     GraphStatType.TIME_SINCE -> if (preenTimeSince(it)) dataSource!!.deleteGraphOrStat(it)
                 }
             }
-            withContext(Dispatchers.Main) { _state.value = GraphsAndStatsViewState.WAITING }
+            val numFeatures = dataSource!!.getNumFeatures()
+            withContext(Dispatchers.Main) {
+                if (numFeatures <= 0) _state.value = GraphsAndStatsViewState.NO_FEATURES
+                else _state.value = GraphsAndStatsViewState.WAITING
+            }
         }
     }
 
