@@ -88,6 +88,7 @@
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:gravity="center"
                     android:inputType="numberDecimal|numberSigned"
+                    android:singleLine="true"
                     android:digits="0123456789.,-"
                     android:hint="0"
                     tools:text="33"
