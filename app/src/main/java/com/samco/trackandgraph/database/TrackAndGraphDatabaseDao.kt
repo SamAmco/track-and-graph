@@ -28,6 +28,9 @@ interface TrackAndGraphDatabaseDao {
     @Delete
     fun deleteTrackGroup(trackGroup: TrackGroup)
 
+    @Query("""SELECT COUNT(*) FROM features_table""")
+    fun getNumFeatures(): Long
+
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
     fun getAllReminders() : LiveData<List<Reminder>>
 
