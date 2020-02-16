@@ -64,6 +64,7 @@
     <string name="maximum_sample_duration">Maximum history:</string>
     <string name="moving_average_duration">Moving average duration:</string>
     <string name="select_a_discrete_feature">Select a multiple choice data set: </string>
+    <string name="no_discrete_features_pie_chart">You can not currently create a pie chart because you are not tracking anything multiple choice.</string>
     <string name="select_a_feature">Select a data set:</string>
     <string name="offset">Offset:</string>
     <string name="scale">Scale:</string>

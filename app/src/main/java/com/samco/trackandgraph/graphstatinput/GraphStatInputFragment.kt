@@ -270,6 +270,11 @@ class GraphStatInputFragment : Fragment() {
     private fun initPieChartAdapter(features: List<FeatureAndTrackGroup>) {
         val discreteFeatures = features
             .filter { f -> f.featureType == FeatureType.DISCRETE }
+        if (discreteFeatures.isEmpty()) {
+            binding.pieChartSingleFeatureSelectLabel.visibility = View.GONE
+            binding.pieChartFeatureSpinner.visibility = View.GONE
+            return
+        }
         val itemNames = discreteFeatures
             .map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
         val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
@@ -568,9 +573,13 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     private fun validatePieChart() {
+        if (allFeatures.value?.filter { ftg -> ftg.featureType == FeatureType.DISCRETE }.isNullOrEmpty()) {
+            throw ValidationException(R.string.no_discrete_features_pie_chart)
+        }
         if (selectedPieChartFeature.value == null
-            || selectedPieChartFeature.value!!.featureType != FeatureType.DISCRETE)
+            || selectedPieChartFeature.value!!.featureType != FeatureType.DISCRETE) {
             throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+        }
     }
 
     private fun validateLineGraph() {

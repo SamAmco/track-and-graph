@@ -334,7 +334,7 @@
                         android:layout_marginTop="@dimen/input_spacing_large"
                         android:orientation="vertical">
                     <TextView
-                            android:id="@+id/singleFeatureSelectLabel"
+                            android:id="@+id/pieChartSingleFeatureSelectLabel"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/select_a_discrete_feature"
