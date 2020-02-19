@@ -30,6 +30,7 @@ import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
+import timber.log.Timber
 import java.text.DecimalFormat
 
 class GraphFeatureListItemView(
