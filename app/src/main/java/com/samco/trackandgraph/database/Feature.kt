@@ -42,6 +42,9 @@ data class Feature (
     @ColumnInfo(name = "type")
     val featureType: FeatureType,
 
+    @ColumnInfo(name = "default_value")
+    val defaultValue: Double?,
+
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
 

@@ -32,6 +32,7 @@
     <string name="new_name">New name: </string>
     <string name="feature_name">What would you like to track?</string>
     <string name="feature_type">Input style: </string>
+    <string name="default_value">Default value: </string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="select_file">Select File</string>

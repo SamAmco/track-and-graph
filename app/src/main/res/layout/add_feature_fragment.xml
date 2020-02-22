@@ -50,20 +50,47 @@
                         android:inputType="text"
                         />
 
-                <TextView
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/input_spacing_large"
+                    android:orientation="horizontal">
+
+                    <TextView
                         android:id="@+id/featureTypeLabel"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/feature_type"
-                        android:layout_marginTop="@dimen/input_spacing_large"
-                        android:textSize="@dimen/dialog_label_text_size"/>
-                <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/featureTypeSpinner"
+                        android:textSize="@dimen/dialog_label_text_size" />
+
+                    <androidx.appcompat.widget.AppCompatSpinner
+                            android:id="@+id/featureTypeSpinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:entries="@array/feature_types"
+                            android:spinnerMode="dropdown" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="@dimen/input_spacing_large"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/defaultValueLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/default_value"
+                        android:textSize="@dimen/dialog_label_text_size" />
+
+                    <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/defaultValueSpinner"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
-                        android:spinnerMode="dropdown"
-                        android:entries="@array/feature_types"/>
+                        android:spinnerMode="dropdown" />
+                </LinearLayout>
 
                 <TextView
                         android:id="@+id/discreteValuesTextView"

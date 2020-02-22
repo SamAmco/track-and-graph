@@ -32,6 +32,9 @@ data class DisplayFeature(
     @ColumnInfo(name = "type")
     val featureType: FeatureType = FeatureType.CONTINUOUS,
 
+    @ColumnInfo(name = "default_value")
+    val defaultValue: Double?,
+
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
 

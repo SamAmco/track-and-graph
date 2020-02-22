@@ -272,7 +272,9 @@ class DisplayTrackGroupViewModel : ViewModel() {
 
 
     fun addTimestampDataPoint(feature: DisplayFeature) = ioScope.launch {
-        val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, 1.0, "")
+        val default = feature.defaultValue
+        val defaultInt = default?.toInt()
+        val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, default ?: 1.0, feature.discreteValues.find { it.index == defaultInt }?.label ?: "")
         dataSource?.insertDataPoint(newDataPoint)
     }
 
