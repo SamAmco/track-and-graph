@@ -42,7 +42,6 @@ import kotlinx.coroutines.*
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
-import androidx.core.view.size
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
@@ -457,8 +456,8 @@ class AddFeatureViewModel : ViewModel() {
         val oldValues = dao.getDataPointsForFeatureSync(existingFeature.id)
         val newValues = oldValues.map { v ->
             DataPoint(v.timestamp, v.featureId,
-                valMap[v.value.toInt()]!!.first.toDouble(),
-                valMap[v.value.toInt()]!!.second
+                valMap.getValue(v.value.toInt()).first.toDouble(),
+                valMap.getValue(v.value.toInt()).second
             )
         }
         dao.updateDataPoints(newValues)
