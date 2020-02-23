@@ -6,23 +6,19 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.AttributeSet
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.FeatureAndTrackGroup
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureBinding
 import timber.log.Timber
-import java.lang.Exception
 
 class TrackWidgetConfigure : FragmentActivity() {
 
@@ -34,22 +30,22 @@ class TrackWidgetConfigure : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.track_widget_configure)
-
         binding = TrackWidgetConfigureBinding.inflate(layoutInflater)
-        appWidgetId = intent?.extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
+        setContentView(binding.root)
+        initViewModel()
 
+        appWidgetId = intent?.extras?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID) ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
         setResult(RESULT_CANCELED)
     }
 
-    override fun onCreateView(name: String, context: Context, attrs: AttributeSet): View? {
+    private fun initViewModel() {
         viewModel = ViewModelProviders.of(this).get(TrackWidgetConfigureViewModel::class.java)
         viewModel.initViewModel(this)
         viewModel.allFeatures.observe(this, Observer { features ->
             val itemNames = features.map {ft -> "${ft.trackGroupName} -> ${ft.name}"}
             Timber.d(itemNames.toString())
-            val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
+            val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, itemNames)
             binding.featureSpinner.adapter = adapter
             binding.featureSpinner.setSelection(0)
             binding.featureSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -64,8 +60,6 @@ class TrackWidgetConfigure : FragmentActivity() {
                 }
             }
         })
-
-        return null
     }
 
     fun onConfirm(view: View) {
