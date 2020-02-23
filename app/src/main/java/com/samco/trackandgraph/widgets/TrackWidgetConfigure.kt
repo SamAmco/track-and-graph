@@ -5,10 +5,10 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.AttributeSet
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -25,7 +25,6 @@ class TrackWidgetConfigure : FragmentActivity() {
     private var appWidgetId: Int? = null
     private lateinit var viewModel: TrackWidgetConfigureViewModel
     private lateinit var binding: TrackWidgetConfigureBinding
-    private var featureId: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,6 +42,10 @@ class TrackWidgetConfigure : FragmentActivity() {
         viewModel = ViewModelProviders.of(this).get(TrackWidgetConfigureViewModel::class.java)
         viewModel.initViewModel(this)
         viewModel.allFeatures.observe(this, Observer { features ->
+            if (features.isEmpty()) {
+                Toast.makeText(applicationContext, "Create a data set first!", Toast.LENGTH_SHORT).show()
+                finish()
+            }
             val itemNames = features.map {ft -> "${ft.trackGroupName} -> ${ft.name}"}
             Timber.d(itemNames.toString())
             val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, itemNames)
@@ -56,7 +59,7 @@ class TrackWidgetConfigure : FragmentActivity() {
                     position: Int,
                     id: Long
                 ) {
-                    featureId = features[position].id
+                    viewModel.featureId = features[position].id
                 }
             }
         })
@@ -64,11 +67,15 @@ class TrackWidgetConfigure : FragmentActivity() {
 
     fun onConfirm(view: View) {
         appWidgetId?.let { id ->
-            if (appWidgetId == null) {
+            if (appWidgetId == null)
+                return
+
+            val featureId = viewModel.featureId
+            if (featureId == null) {
+                Toast.makeText(applicationContext, "Select a data set", Toast.LENGTH_SHORT).show()
                 return
             }
 
-            val featureId: Long = 2 // temp
             val sharedPref = getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).edit()
             sharedPref.putLong(TrackWidgetProvider.getFeatureIdPref(id), featureId)
             sharedPref.apply()
@@ -89,6 +96,7 @@ class TrackWidgetConfigure : FragmentActivity() {
 class TrackWidgetConfigureViewModel : ViewModel() {
     private var dataSource: TrackAndGraphDatabaseDao? = null
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
+    var featureId: Long? = null
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return
