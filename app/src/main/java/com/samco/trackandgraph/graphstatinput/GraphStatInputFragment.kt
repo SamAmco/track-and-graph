@@ -112,13 +112,13 @@ class GraphStatInputFragment : Fragment() {
         if (viewModel.yRangeFrom.value != null)
             binding.yRangeFrom.setText(doubleFormatter.format(viewModel.yRangeFrom.value!!))
         binding.yRangeFrom.addTextChangedListener { editText ->
-            viewModel.yRangeFrom.value = getDoubleFromText(context!!, editText.toString())
+            viewModel.yRangeFrom.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
         if (viewModel.yRangeTo.value != null)
             binding.yRangeTo.setText(doubleFormatter.format(viewModel.yRangeTo.value!!))
         binding.yRangeTo.addTextChangedListener { editText ->
-            viewModel.yRangeTo.value = getDoubleFromText(context!!, editText.toString())
+            viewModel.yRangeTo.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
     }
@@ -217,13 +217,13 @@ class GraphStatInputFragment : Fragment() {
         if (viewModel.selectedValueStatToValue.value != null)
             binding.valueStatToInput.setText(doubleFormatter.format(viewModel.selectedValueStatToValue.value!!))
         binding.valueStatToInput.addTextChangedListener { editText ->
-            viewModel.selectedValueStatToValue.value = getDoubleFromText(context!!, editText.toString())
+            viewModel.selectedValueStatToValue.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
         if (viewModel.selectedValueStatFromValue.value != null)
             binding.valueStatFromInput.setText(doubleFormatter.format(viewModel.selectedValueStatFromValue.value!!))
         binding.valueStatFromInput.addTextChangedListener { editText ->
-            viewModel.selectedValueStatFromValue.value = getDoubleFromText(context!!, editText.toString())
+            viewModel.selectedValueStatFromValue.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
     }

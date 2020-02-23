@@ -120,7 +120,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
     override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
     override fun afterTextChanged(p0: Editable?) {
-        state.value = getDoubleFromText(context, numberInput.text.toString())
+        state.value = getDoubleFromText(numberInput.text.toString())
     }
 
     class DataPointInputData(
