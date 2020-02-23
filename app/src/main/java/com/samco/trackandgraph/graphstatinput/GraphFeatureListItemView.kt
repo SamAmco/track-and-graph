@@ -12,7 +12,7 @@
 * GNU General Public License for more details.
 * 
 * You should have received a copy of the GNU General Public License
-* along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
 package com.samco.trackandgraph.graphstatinput
 
@@ -30,7 +30,7 @@ import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
-import timber.log.Timber
+import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
 
 class GraphFeatureListItemView(
@@ -88,7 +88,7 @@ class GraphFeatureListItemView(
     private fun setupScaleInput() {
         binding.scaleInput.setText(decimalFormat.format(lineGraphFeature.scale))
         binding.scaleInput.addTextChangedListener { text ->
-            lineGraphFeature.scale = text.toString().toDoubleOrNull() ?: 1.toDouble()
+            lineGraphFeature.scale = getDoubleFromText(text.toString())
             onUpdatedListener?.invoke(this@GraphFeatureListItemView)
         }
     }
@@ -96,7 +96,7 @@ class GraphFeatureListItemView(
     private fun setupOffsetInput() {
         binding.offsetInput.setText(decimalFormat.format(lineGraphFeature.offset))
         binding.offsetInput.addTextChangedListener { text ->
-            lineGraphFeature.offset = text.toString().toDoubleOrNull() ?: 0.toDouble()
+            lineGraphFeature.offset = getDoubleFromText(text.toString())
             onUpdatedListener?.invoke(this@GraphFeatureListItemView)
         }
     }

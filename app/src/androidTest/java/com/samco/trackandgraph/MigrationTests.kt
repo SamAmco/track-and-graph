@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package com.samco.trackandgraph
@@ -23,6 +23,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.room.testing.MigrationTestHelper
 import com.samco.trackandgraph.database.MIGRATION_29_30
+import com.samco.trackandgraph.database.MIGRATION_30_31
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import org.junit.Rule
 import org.junit.Test
@@ -34,7 +35,7 @@ class MigrationTest {
     private val TEST_DB = "migration-test"
 
     // Array of all migrations
-    private val ALL_MIGRATIONS = arrayOf(MIGRATION_29_30)
+    private val ALL_MIGRATIONS = arrayOf(MIGRATION_29_30, MIGRATION_30_31)
 
     @Rule @JvmField
     val helper: MigrationTestHelper = MigrationTestHelper(

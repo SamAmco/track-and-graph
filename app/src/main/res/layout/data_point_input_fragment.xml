@@ -13,7 +13,7 @@
   ~ GNU General Public License for more details.
   ~ 
   ~ You should have received a copy of the GNU General Public License
-  ~ along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <layout>
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -88,6 +88,8 @@
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:gravity="center"
                     android:inputType="numberDecimal|numberSigned"
+                    android:singleLine="true"
+                    android:digits="0123456789.,-"
                     android:hint="0"
                     tools:text="33"
                     />

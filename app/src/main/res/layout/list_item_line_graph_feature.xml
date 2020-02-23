@@ -13,7 +13,7 @@
   ~ GNU General Public License for more details.
   ~ 
   ~ You should have received a copy of the GNU General Public License
-  ~ along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -140,7 +140,9 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:inputType="numberSigned|numberDecimal"
+                        android:digits="0123456789.,-"
                         android:textAlignment="center"
+                        android:singleLine="true"
                         android:hint="0"
                         app:layout_constraintLeft_toRightOf="@id/offsetLabel"
                         app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner"
@@ -166,7 +168,9 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:inputType="numberSigned|numberDecimal"
+                        android:digits="0123456789.,-"
                         android:textAlignment="center"
+                        android:singleLine="true"
                         android:hint="1"
                         app:layout_constraintLeft_toRightOf="@id/scaleLabel"
                         app:layout_constraintRight_toRightOf="parent"

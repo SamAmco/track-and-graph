@@ -12,7 +12,7 @@
 * GNU General Public License for more details.
 * 
 * You should have received a copy of the GNU General Public License
-* along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
 package com.samco.trackandgraph.database
 
@@ -27,6 +27,9 @@ interface TrackAndGraphDatabaseDao {
 
     @Delete
     fun deleteTrackGroup(trackGroup: TrackGroup)
+
+    @Query("""SELECT COUNT(*) FROM features_table""")
+    fun getNumFeatures(): Long
 
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
     fun getAllReminders() : LiveData<List<Reminder>>
@@ -172,6 +175,9 @@ interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp > :cutOff AND timestamp < :now ORDER BY timestamp ASC")
     fun getDataPointsForFeatureBetweenAscSync(featureId: Long, cutOff: OffsetDateTime, now: OffsetDateTime): List<DataPoint>
+
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT 1")
+    fun getLastDataPointForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp ASC")
     fun getDataPointsForFeatureAscSync(featureId: Long): List<DataPoint>

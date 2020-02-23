@@ -12,7 +12,7 @@
 * GNU General Public License for more details.
 * 
 * You should have received a copy of the GNU General Public License
-* along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
 package com.samco.trackandgraph.selectgroup
 
@@ -26,7 +26,10 @@ import com.samco.trackandgraph.database.GroupItemType
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 
-private val getIdForGroupItem = { gi: GroupItem -> gi.id }
+private val getIdForGroupItem = { gi: GroupItem ->
+    if (gi.type == GroupItemType.TRACK) gi.id * 2
+    else (gi.id * 2) + 1
+}
 
 class GroupListAdapter(private val clickListener: GroupClickListener,
                        private val trackColor: Int,
