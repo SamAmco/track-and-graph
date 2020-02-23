@@ -12,7 +12,7 @@
 * GNU General Public License for more details.
 * 
 * You should have received a copy of the GNU General Public License
-* along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
 package com.samco.trackandgraph.database
 
@@ -65,7 +65,7 @@ const val splitChars2 = "!!"
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class],
-    version = 30
+    version = 31
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -80,6 +80,7 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 if (instance == null) {
                     instance = Room.databaseBuilder(context.applicationContext, TrackAndGraphDatabase::class.java, "trackandgraph_database")
                         .addMigrations(MIGRATION_29_30)
+                        .addMigrations(MIGRATION_30_31)
                         .fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance
@@ -101,6 +102,14 @@ val MIGRATION_29_30 = object : Migration(29, 30) {
                 `checked_days` TEXT NOT NULL
             )""".trimMargin())
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `reminders_table` (`id`)")
+    }
+}
+
+val MIGRATION_30_31 = object : Migration(30, 31) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE line_graphs_table ADD y_range_type INTEGER NOT NULL DEFAULT  0")
+        database.execSQL("ALTER TABLE line_graphs_table ADD y_from REAL NOT NULL DEFAULT  0")
+        database.execSQL("ALTER TABLE line_graphs_table ADD y_to REAL NOT NULL DEFAULT  1")
     }
 }
 
@@ -190,6 +199,12 @@ class Converters {
                 .map { s -> s.toBoolean() }
         )
     }
+
+    @TypeConverter
+    fun yRangeTypeToInt(yRangeType: YRangeType) = yRangeType.ordinal
+
+    @TypeConverter
+    fun intToYRangeType(index: Int) = YRangeType.values()[index]
 }
 
 

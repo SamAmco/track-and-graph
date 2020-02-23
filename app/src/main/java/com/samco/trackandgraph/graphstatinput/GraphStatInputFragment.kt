@@ -12,7 +12,7 @@
 * GNU General Public License for more details.
 * 
 * You should have received a copy of the GNU General Public License
-* along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
 package com.samco.trackandgraph.graphstatinput
 
@@ -38,10 +38,10 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
+import com.samco.trackandgraph.util.getDoubleFromText
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
 import java.lang.Exception
-import java.text.DecimalFormat
 
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
@@ -71,6 +71,8 @@ class GraphStatInputFragment : Fragment() {
                     binding.inputProgressBar.visibility = View.INVISIBLE
                     listenToUpdateMode()
                     listenToGraphTypeSpinner()
+                    listenToYRangeTypeSpinner()
+                    listenToYRangeFixedFromTo()
                     listenToGraphName()
                     listenToTimeDuration()
                     listenToAllFeatures()
@@ -80,6 +82,45 @@ class GraphStatInputFragment : Fragment() {
                 else -> navController?.popBackStack()
             }
         })
+    }
+
+    private fun listenToYRangeTypeSpinner() {
+        viewModel.yRangeType.value?.let {
+            binding.yRangeStyleSpinner.setSelection(it.ordinal)
+        }
+        binding.yRangeStyleSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) { }
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                viewModel.yRangeType.value = YRangeType.values()[index]
+            }
+        }
+        viewModel.yRangeType.observe(this, Observer {
+            when (it) {
+                YRangeType.DYNAMIC -> {
+                    binding.yRangeFromToLayout.visibility = View.GONE
+                    onFormUpdate()
+                }
+                YRangeType.FIXED -> {
+                    binding.yRangeFromToLayout.visibility = View.VISIBLE
+                    onFormUpdate()
+                }
+            }
+        })
+    }
+
+    private fun listenToYRangeFixedFromTo() {
+        if (viewModel.yRangeFrom.value != null)
+            binding.yRangeFrom.setText(doubleFormatter.format(viewModel.yRangeFrom.value!!))
+        binding.yRangeFrom.addTextChangedListener { editText ->
+            viewModel.yRangeFrom.value = getDoubleFromText(editText.toString())
+            onFormUpdate()
+        }
+        if (viewModel.yRangeTo.value != null)
+            binding.yRangeTo.setText(doubleFormatter.format(viewModel.yRangeTo.value!!))
+        binding.yRangeTo.addTextChangedListener { editText ->
+            viewModel.yRangeTo.value = getDoubleFromText(editText.toString())
+            onFormUpdate()
+        }
     }
 
     private fun listenToUpdateMode() {
@@ -176,13 +217,13 @@ class GraphStatInputFragment : Fragment() {
         if (viewModel.selectedValueStatToValue.value != null)
             binding.valueStatToInput.setText(doubleFormatter.format(viewModel.selectedValueStatToValue.value!!))
         binding.valueStatToInput.addTextChangedListener { editText ->
-            viewModel.selectedValueStatToValue.value = editText.toString().toDoubleOrNull() ?: 0.toDouble()
+            viewModel.selectedValueStatToValue.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
         if (viewModel.selectedValueStatFromValue.value != null)
             binding.valueStatFromInput.setText(doubleFormatter.format(viewModel.selectedValueStatFromValue.value!!))
         binding.valueStatFromInput.addTextChangedListener { editText ->
-            viewModel.selectedValueStatFromValue.value = editText.toString().toDoubleOrNull() ?: 0.toDouble()
+            viewModel.selectedValueStatFromValue.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
     }
@@ -229,6 +270,11 @@ class GraphStatInputFragment : Fragment() {
     private fun initPieChartAdapter(features: List<FeatureAndTrackGroup>) {
         val discreteFeatures = features
             .filter { f -> f.featureType == FeatureType.DISCRETE }
+        if (discreteFeatures.isEmpty()) {
+            binding.pieChartSingleFeatureSelectLabel.visibility = View.GONE
+            binding.pieChartFeatureSpinner.visibility = View.GONE
+            return
+        }
         val itemNames = discreteFeatures
             .map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
         val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
@@ -280,6 +326,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initTimeSinceView() {
+        binding.yRangeLayout.visibility = View.GONE
         binding.timeDurationLayout.visibility = View.GONE
         binding.pieChartSelectFeatureLayout.visibility = View.GONE
         binding.addFeatureButton.visibility = View.GONE
@@ -288,6 +335,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initAverageTimeBetweenView() {
+        binding.yRangeLayout.visibility = View.GONE
         binding.timeDurationLayout.visibility = View.VISIBLE
         binding.pieChartSelectFeatureLayout.visibility = View.GONE
         binding.addFeatureButton.visibility = View.GONE
@@ -296,6 +344,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initPieChartView() {
+        binding.yRangeLayout.visibility = View.GONE
         binding.timeDurationLayout.visibility = View.VISIBLE
         binding.pieChartSelectFeatureLayout.visibility = View.VISIBLE
         binding.addFeatureButton.visibility = View.GONE
@@ -304,6 +353,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun initLineGraphView() {
+        binding.yRangeLayout.visibility = View.VISIBLE
         binding.timeDurationLayout.visibility = View.VISIBLE
         binding.pieChartSelectFeatureLayout.visibility = View.GONE
         binding.addFeatureButton.visibility = View.VISIBLE
@@ -374,6 +424,9 @@ class GraphStatInputViewModel : ViewModel() {
     val graphName = MutableLiveData<String>("")
     val graphStatType = MutableLiveData<GraphStatType>(GraphStatType.LINE_GRAPH)
     val sampleDuration = MutableLiveData<Duration?>(null)
+    val yRangeType = MutableLiveData<YRangeType>(YRangeType.DYNAMIC)
+    val yRangeFrom = MutableLiveData<Double>(0.0)
+    val yRangeTo = MutableLiveData<Double>(1.0)
     val selectedPieChartFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatDiscreteValue = MutableLiveData<DiscreteValue?>(null)
@@ -475,6 +528,9 @@ class GraphStatInputViewModel : ViewModel() {
         withContext(Dispatchers.Main) {
             this@GraphStatInputViewModel.sampleDuration.value = lineGraph.duration
             this@GraphStatInputViewModel.lineGraphFeatures = lineGraph.features
+            this@GraphStatInputViewModel.yRangeType.value = lineGraph.yRangeType
+            this@GraphStatInputViewModel.yRangeFrom.value = lineGraph.yFrom
+            this@GraphStatInputViewModel.yRangeTo.value = lineGraph.yTo
         }
         return lineGraph.id
     }
@@ -517,9 +573,13 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     private fun validatePieChart() {
+        if (allFeatures.value?.filter { ftg -> ftg.featureType == FeatureType.DISCRETE }.isNullOrEmpty()) {
+            throw ValidationException(R.string.no_discrete_features_pie_chart)
+        }
         if (selectedPieChartFeature.value == null
-            || selectedPieChartFeature.value!!.featureType != FeatureType.DISCRETE)
+            || selectedPieChartFeature.value!!.featureType != FeatureType.DISCRETE) {
             throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+        }
     }
 
     private fun validateLineGraph() {
@@ -530,6 +590,10 @@ class GraphStatInputViewModel : ViewModel() {
                 throw ValidationException(R.string.graph_stat_validation_unrecognised_color)
             if (allFeatures.value?.map { feat -> feat.id }?.contains(f.featureId) != true)
                 throw ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)
+        }
+        if (yRangeType.value == YRangeType.FIXED) {
+            if (yRangeFrom.value!! >= yRangeTo.value!!)
+                throw ValidationException(R.string.graph_stat_validation_bad_fixed_range)
         }
     }
 
@@ -593,7 +657,8 @@ class GraphStatInputViewModel : ViewModel() {
     )
 
     fun constructLineGraph(graphStatId: Long) = LineGraph.create(
-        id ?: 0L, graphStatId, lineGraphFeatures, sampleDuration.value
+        id ?: 0L, graphStatId, lineGraphFeatures, sampleDuration.value,
+        yRangeType.value!!, yRangeFrom.value!!, yRangeTo.value!!
     )
 
     fun constructPieChart(graphStatId: Long) = PieChart(

@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 30,
-    "identityHash": "cd44f5d0001604650e265148a44d3146",
+    "version": 31,
+    "identityHash": "46d8fc2dead382285a9fab831e072f23",
     "entities": [
       {
         "tableName": "track_groups_table",
@@ -300,7 +300,7 @@
       },
       {
         "tableName": "line_graphs_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `features` TEXT NOT NULL, `duration` TEXT, `y_range_type` TEXT NOT NULL, `y_from` REAL NOT NULL, `y_to` REAL NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `features` TEXT NOT NULL, `duration` TEXT, `y_range_type` INTEGER NOT NULL, `y_from` REAL NOT NULL, `y_to` REAL NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -329,7 +329,7 @@
           {
             "fieldPath": "yRangeType",
             "columnName": "y_range_type",
-            "affinity": "TEXT",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -716,7 +716,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'cd44f5d0001604650e265148a44d3146')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '46d8fc2dead382285a9fab831e072f23')"
     ]
   }
 }
