@@ -88,7 +88,7 @@ class GraphFeatureListItemView(
     private fun setupScaleInput() {
         binding.scaleInput.setText(decimalFormat.format(lineGraphFeature.scale))
         binding.scaleInput.addTextChangedListener { text ->
-            lineGraphFeature.scale = getDoubleFromText(context, text.toString())
+            lineGraphFeature.scale = getDoubleFromText(text.toString())
             onUpdatedListener?.invoke(this@GraphFeatureListItemView)
         }
     }
@@ -96,7 +96,7 @@ class GraphFeatureListItemView(
     private fun setupOffsetInput() {
         binding.offsetInput.setText(decimalFormat.format(lineGraphFeature.offset))
         binding.offsetInput.addTextChangedListener { text ->
-            lineGraphFeature.offset = getDoubleFromText(context, text.toString())
+            lineGraphFeature.offset = getDoubleFromText(text.toString())
             onUpdatedListener?.invoke(this@GraphFeatureListItemView)
         }
     }

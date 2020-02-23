@@ -17,20 +17,36 @@
 
 package com.samco.trackandgraph.util
 
-import android.content.Context
-import android.os.Build
-import java.text.NumberFormat
-import java.util.*
+import java.lang.NumberFormatException
 
-fun getLocale(context: Context): Locale {
-    val cfg = context.resources.configuration
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) cfg.locales.get(0) else cfg.locale
-}
+/**
+ * Return a number given a string by attempting to parse it as a double
+ *
+ * This function should account for different langauge punctuation formats. e.g.
+ * French: 1.345.6,04
+ * English: 1,345,6.04
+ * Both of these inputs will return 13456.04
+ *
+ * This function will always return a number rather than throw an exception. If the number
+ * couldn't be parsed then the returned value will default to 0
+ */
+fun getDoubleFromText(text: String): Double {
+    try {
+        //first account for values like 1,345,100 or French: 1.345.100
+        val commaCount = text.count { c -> c == ',' }
+        val dotCount = text.count { c -> c == '.' }
+        if ((commaCount == 0 && dotCount > 1) || (dotCount == 0 && commaCount > 1))
+            return text.replace(",", "").replace(".", "").toDouble()
 
-fun getDoubleFromText(context: Context, text: String): Double {
-    return try {
-        val format: NumberFormat = NumberFormat.getInstance(getLocale(context))
-        val number: Number = format.parse(text)!!
-        number.toDouble()
-    } catch (_: Exception) { 0.0 }
+        //If there is a mixture of commas and dots convert all commas to dots
+        val dotsOnly = text.replace(",", ".")
+        val lastDot = dotsOnly.indexOfLast { c -> c == '.' }
+        //If there are no commas or dots then there is no decimal place
+        if (lastDot < 0) return dotsOnly.toDouble()
+
+        //If there is at least one comma or dot then the last one represents the decimal place
+        val before = dotsOnly.substring(0, lastDot).replace(".", "")
+        val after = dotsOnly.substring(lastDot)
+        return "$before$after".toDouble()
+    } catch (e: NumberFormatException) { return 0.0 }
 }
