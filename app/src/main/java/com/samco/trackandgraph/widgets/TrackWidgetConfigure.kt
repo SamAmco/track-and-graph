@@ -18,7 +18,6 @@ import com.samco.trackandgraph.database.FeatureAndTrackGroup
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureBinding
-import timber.log.Timber
 
 class TrackWidgetConfigure : FragmentActivity() {
 
@@ -47,7 +46,6 @@ class TrackWidgetConfigure : FragmentActivity() {
                 finish()
             }
             val itemNames = features.map {ft -> "${ft.trackGroupName} -> ${ft.name}"}
-            Timber.d(itemNames.toString())
             val adapter = ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, itemNames)
             binding.featureSpinner.adapter = adapter
             binding.featureSpinner.setSelection(0)
@@ -67,9 +65,6 @@ class TrackWidgetConfigure : FragmentActivity() {
 
     fun onConfirm(view: View) {
         appWidgetId?.let { id ->
-            if (appWidgetId == null)
-                return
-
             val featureId = viewModel.featureId
             if (featureId == null) {
                 Toast.makeText(applicationContext, "Select a data set", Toast.LENGTH_SHORT).show()
