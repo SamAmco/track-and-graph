@@ -23,22 +23,14 @@ class TrackWidgetProvider : AppWidgetProvider() {
         fun getFeatureIdPref(widgetId: Int) : String {
             return "widget_feature_id_$widgetId"
         }
-    }
 
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray?
-    ) {
-        super.onUpdate(context, appWidgetManager, appWidgetIds)
-
-        appWidgetIds?.forEach { id ->
+        fun createRemoteViews(context: Context, appWidgetId: Int, title: String?) : RemoteViews {
             val remoteViews = RemoteViews(context.packageName, R.layout.track_widget)
+
             val intent = Intent(context, TrackWidgetInputDataPoint::class.java)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             intent.addCategory(Intent.CATEGORY_LAUNCHER)
-
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
 
             remoteViews.setOnClickPendingIntent(R.id.track_widget_button,
                 PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
@@ -57,7 +49,29 @@ class TrackWidgetProvider : AppWidgetProvider() {
                 }
             }
 
+            title?.let {
+                remoteViews.setTextViewText(R.id.track_widget_title, it)
+            }
+
+            return remoteViews
+        }
+    }
+
+    override fun onUpdate(
+        context: Context,
+        appWidgetManager: AppWidgetManager,
+        appWidgetIds: IntArray?
+    ) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+
+        appWidgetIds?.forEach { id ->
+            val remoteViews = createRemoteViews(context, id, null)
             appWidgetManager.updateAppWidget(id, remoteViews)
+
+            // Fire a background job to load the feature name.
+            val workIntent = Intent(context, WidgetJobIntentService::class.java)
+            workIntent.putExtra("appWidgetIdExtra", id)
+            WidgetJobIntentService.enqueueWork(context, workIntent)
         }
     }
 
