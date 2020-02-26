@@ -7,7 +7,11 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.os.Build
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.R
 import timber.log.Timber
 
@@ -38,6 +42,20 @@ class TrackWidgetProvider : AppWidgetProvider() {
 
             remoteViews.setOnClickPendingIntent(R.id.track_widget_button,
                 PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+
+            // Vector graphics in appwidgets need to be programmatically added.
+            // Pre-Lollipop, these vectors need to be converted to a bitmap first.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                remoteViews.setImageViewResource(R.id.track_widget_button, R.drawable.add_box)
+            } else {
+                ContextCompat.getDrawable(context, R.drawable.add_box)?.let { d ->
+                    val b = Bitmap.createBitmap(d.intrinsicWidth, d.intrinsicHeight, Bitmap.Config.ARGB_8888)
+                    val c = Canvas(b)
+                    d.setBounds(0, 0, c.width, c.height)
+                    d.draw(c)
+                    remoteViews.setImageViewBitmap(R.id.track_widget_button, b)
+                }
+            }
 
             appWidgetManager.updateAppWidget(id, remoteViews)
         }
