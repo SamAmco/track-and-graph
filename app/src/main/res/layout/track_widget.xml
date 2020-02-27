@@ -6,9 +6,12 @@
     android:orientation="horizontal">
 
     <RelativeLayout
+        android:id="@+id/widget_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/card">
+        android:background="@drawable/card"
+        android:clickable="true"
+        android:focusable="auto">
 
         <TextView
             android:id="@+id/track_widget_title"
@@ -26,8 +29,8 @@
             android:textSize="18sp"
             android:textStyle="bold" />
 
-        <ImageButton
-            android:id="@+id/track_widget_button"
+        <ImageView
+            android:id="@+id/track_widget_icon"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_alignParentRight="true"

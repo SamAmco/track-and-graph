@@ -13,7 +13,6 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.R
-import timber.log.Timber
 
 const val WIDGET_PREFS_NAME = "TrackWidget"
 const val DELETE_FEATURE_ID = "DELETE_FEATURE_ID"
@@ -32,20 +31,20 @@ class TrackWidgetProvider : AppWidgetProvider() {
             intent.addCategory(Intent.CATEGORY_LAUNCHER)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
 
-            remoteViews.setOnClickPendingIntent(R.id.track_widget_button,
+            remoteViews.setOnClickPendingIntent(R.id.widget_container,
                 PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
 
             // Vector graphics in appwidgets need to be programmatically added.
             // Pre-Lollipop, these vectors need to be converted to a bitmap first.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                remoteViews.setImageViewResource(R.id.track_widget_button, R.drawable.add_box)
+                remoteViews.setImageViewResource(R.id.track_widget_icon, R.drawable.add_box)
             } else {
                 ContextCompat.getDrawable(context, R.drawable.add_box)?.let { d ->
                     val b = Bitmap.createBitmap(d.intrinsicWidth, d.intrinsicHeight, Bitmap.Config.ARGB_8888)
                     val c = Canvas(b)
                     d.setBounds(0, 0, c.width, c.height)
                     d.draw(c)
-                    remoteViews.setImageViewBitmap(R.id.track_widget_button, b)
+                    remoteViews.setImageViewBitmap(R.id.track_widget_icon, b)
                 }
             }
 
