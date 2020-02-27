@@ -1,7 +1,6 @@
 package com.samco.trackandgraph.widgets
 
 import android.app.PendingIntent
-import android.appwidget.AppWidgetHost
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
@@ -23,33 +22,43 @@ class TrackWidgetProvider : AppWidgetProvider() {
             return "widget_feature_id_$widgetId"
         }
 
-        fun createRemoteViews(context: Context, appWidgetId: Int, title: String?) : RemoteViews {
+        fun createRemoteViews(context: Context, appWidgetId: Int, title: String?, disable: Boolean = false) : RemoteViews {
             val remoteViews = RemoteViews(context.packageName, R.layout.track_widget)
+            var drawable = 0
 
-            val intent = Intent(context, TrackWidgetInputDataPoint::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            intent.addCategory(Intent.CATEGORY_LAUNCHER)
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            if (disable) {
+                drawable = R.drawable.warning_icon
 
-            remoteViews.setOnClickPendingIntent(R.id.widget_container,
-                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+                remoteViews.setTextViewText(R.id.track_widget_title, "Removed")
+                remoteViews.setOnClickPendingIntent(R.id.widget_container, PendingIntent.getActivity(context, 0, Intent(), 0))
+            } else {
+                drawable = R.drawable.add_box
+
+                val intent = Intent(context, TrackWidgetInputDataPoint::class.java)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                intent.addCategory(Intent.CATEGORY_LAUNCHER)
+                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+
+                remoteViews.setOnClickPendingIntent(R.id.widget_container,
+                    PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+
+                title?.let {
+                    remoteViews.setTextViewText(R.id.track_widget_title, it)
+                }
+            }
 
             // Vector graphics in appwidgets need to be programmatically added.
             // Pre-Lollipop, these vectors need to be converted to a bitmap first.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                remoteViews.setImageViewResource(R.id.track_widget_icon, R.drawable.add_box)
+                remoteViews.setImageViewResource(R.id.track_widget_icon, drawable)
             } else {
-                ContextCompat.getDrawable(context, R.drawable.add_box)?.let { d ->
+                ContextCompat.getDrawable(context, drawable)?.let { d ->
                     val b = Bitmap.createBitmap(d.intrinsicWidth, d.intrinsicHeight, Bitmap.Config.ARGB_8888)
                     val c = Canvas(b)
                     d.setBounds(0, 0, c.width, c.height)
                     d.draw(c)
                     remoteViews.setImageViewBitmap(R.id.track_widget_icon, b)
                 }
-            }
-
-            title?.let {
-                remoteViews.setTextViewText(R.id.track_widget_title, it)
             }
 
             return remoteViews
@@ -97,9 +106,11 @@ class TrackWidgetProvider : AppWidgetProvider() {
                     )) {
                         // Lookup the feature id for this widget and compare it to the deleted feature.
                         if (sharedPref.getLong(getFeatureIdPref(appWidgetId), -1) == removeFeatureId) {
-                            // Disable updates to app widget.
-                            AppWidgetHost(context, 0).deleteAppWidgetId(appWidgetId)
-                            // TODO: change layout to indicate widget is no longer valid
+                            // Update the widget one last time to show it has been disabled.
+                            val workIntent = Intent(context, WidgetJobIntentService::class.java)
+                            workIntent.putExtra("appWidgetIdExtra", appWidgetId)
+                            workIntent.putExtra("disableWidgetExtra", true)
+                            WidgetJobIntentService.enqueueWork(context, workIntent)
                         }
                     }
                 }
