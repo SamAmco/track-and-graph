@@ -18,6 +18,8 @@ package com.samco.trackandgraph.displaytrackgroup
 
 import android.app.Activity
 import android.app.AlertDialog
+import android.appwidget.AppWidgetManager
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputFilter
 import android.view.LayoutInflater
@@ -46,6 +48,7 @@ import androidx.core.view.size
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
+import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import java.lang.Exception
 
 
@@ -97,7 +100,13 @@ class AddFeatureFragment : Fragment(),
                     binding.addBar.addButton.isEnabled = false
                     binding.progressBar.visibility = View.VISIBLE
                 }
-                AddFeatureState.DONE -> navController?.popBackStack()
+                AddFeatureState.DONE -> {
+                    val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE,
+                        null, context, TrackWidgetProvider::class.java)
+                    intent.putExtra(com.samco.trackandgraph.widgets.UPDATE_FEATURE_ID, args.editFeatureId)
+                    activity?.sendBroadcast(intent)
+                    navController?.popBackStack()
+                }
                 AddFeatureState.ERROR -> {
                     val errorMsg = getString(R.string.feature_add_or_update_error_occurred)
                     Toast.makeText(activity!!, errorMsg, Toast.LENGTH_LONG).show()
