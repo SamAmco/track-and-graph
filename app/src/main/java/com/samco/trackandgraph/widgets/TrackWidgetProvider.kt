@@ -15,6 +15,7 @@ import com.samco.trackandgraph.R
 
 const val WIDGET_PREFS_NAME = "TrackWidget"
 const val DELETE_FEATURE_ID = "DELETE_FEATURE_ID"
+const val UPDATE_FEATURE_ID = "UPDATE_FEATURE_ID"
 
 class TrackWidgetProvider : AppWidgetProvider() {
     companion object {
@@ -63,6 +64,32 @@ class TrackWidgetProvider : AppWidgetProvider() {
 
             return remoteViews
         }
+
+        fun updateWidgetsWithFeatureId(context: Context, featureId: Long) {
+            getWidgetIdsForFeatureId(context, featureId).forEach { id ->
+                val workIntent = Intent(context, WidgetJobIntentService::class.java)
+                workIntent.putExtra("appWidgetIdExtra", id)
+                WidgetJobIntentService.enqueueWork(context, workIntent)
+            }
+        }
+
+        fun deleteWidgetsWithFeatureId(context: Context, featureId: Long) {
+            getWidgetIdsForFeatureId(context, featureId).forEach { id ->
+                val workIntent = Intent(context, WidgetJobIntentService::class.java)
+                workIntent.putExtra("appWidgetIdExtra", id)
+                workIntent.putExtra("disableWidgetExtra", true)
+                WidgetJobIntentService.enqueueWork(context, workIntent)
+            }
+        }
+
+        private fun getWidgetIdsForFeatureId(context: Context, featureId: Long) : List<Int> {
+            return context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).let { sharedPrefs ->
+                AppWidgetManager.getInstance(context)
+                    .getAppWidgetIds(ComponentName(context, TrackWidgetProvider::class.java)).let { ids ->
+                        ids.filter { sharedPrefs.getLong(getFeatureIdPref(it), -1) == featureId }
+                    }
+            }
+        }
     }
 
     override fun onUpdate(
@@ -71,7 +98,6 @@ class TrackWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray?
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-
         appWidgetIds?.forEach { id ->
             val remoteViews = createRemoteViews(context, id, null)
             appWidgetManager.updateAppWidget(id, remoteViews)
@@ -94,30 +120,17 @@ class TrackWidgetProvider : AppWidgetProvider() {
         }
     }
 
-    override fun onReceive(context: Context?, intent: Intent?) {
-        val extras = intent?.extras
-        if (extras?.containsKey(DELETE_FEATURE_ID) == true) {
-            // Disable the widget if the feature is deleted.
-            extras.getLong(DELETE_FEATURE_ID).let { removeFeatureId ->
-                context?.let{ context ->
-                    val sharedPref = context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
-                    for (appWidgetId in AppWidgetManager.getInstance(context).getAppWidgetIds(
-                        ComponentName(context, this::class.java)
-                    )) {
-                        // Lookup the feature id for this widget and compare it to the deleted feature.
-                        if (sharedPref.getLong(getFeatureIdPref(appWidgetId), -1) == removeFeatureId) {
-                            // Update the widget one last time to show it has been disabled.
-                            val workIntent = Intent(context, WidgetJobIntentService::class.java)
-                            workIntent.putExtra("appWidgetIdExtra", appWidgetId)
-                            workIntent.putExtra("disableWidgetExtra", true)
-                            WidgetJobIntentService.enqueueWork(context, workIntent)
-                        }
-                    }
+    override fun onReceive(context: Context, intent: Intent) {
+        intent.extras?.let { extras ->
+            when {
+                extras.containsKey(UPDATE_FEATURE_ID) -> {
+                    updateWidgetsWithFeatureId(context, extras.getLong(UPDATE_FEATURE_ID))
                 }
+                extras.containsKey(DELETE_FEATURE_ID) -> {
+                    deleteWidgetsWithFeatureId(context, extras.getLong(DELETE_FEATURE_ID))
+                }
+                else -> super.onReceive(context, intent)
             }
-        } else {
-            super.onReceive(context, intent)
-        }
-
+        } ?: super.onReceive(context, intent)
     }
 }
