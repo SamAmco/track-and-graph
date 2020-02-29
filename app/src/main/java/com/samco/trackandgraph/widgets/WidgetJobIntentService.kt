@@ -9,7 +9,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 class WidgetJobIntentService : JobIntentService() {
     companion object {
         fun enqueueWork(context: Context, work: Intent) {
-            enqueueWork(context, WidgetJobIntentService::class.java, 123, work)
+            enqueueWork(context, WidgetJobIntentService::class.java, 0, work)
         }
     }
 
@@ -23,7 +23,6 @@ class WidgetJobIntentService : JobIntentService() {
             TrackWidgetProvider.getFeatureIdPref(appWidgetId), -1)
         val title = TrackAndGraphDatabase.getInstance(this).trackAndGraphDatabaseDao.tryGetFeatureById(featureId)?.name
         val remoteViews = TrackWidgetProvider.createRemoteViews(this, appWidgetId, title, disableWidget)
-
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
     }
 
