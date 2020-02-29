@@ -39,7 +39,6 @@ import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
-import timber.log.Timber
 
 const val TRACK_GROUP_ID_KEY = "TRACK_GROUP_ID_KEY"
 const val TRACK_GROUP_NAME_KEY = "TRACK_GROUP_NAME_KEY"

@@ -17,21 +17,35 @@ const val WIDGET_PREFS_NAME = "TrackWidget"
 const val DELETE_FEATURE_ID = "DELETE_FEATURE_ID"
 const val UPDATE_FEATURE_ID = "UPDATE_FEATURE_ID"
 
+/**
+ * Class for managing the track widgets.
+ *
+ * Besides normally updating widgets by widget id, this class can also be used to update or delete
+ * widgets of a particular track feature.
+ * In these cases, send a broadcast with a field in the extras of the intent.
+ * Updating of the UI is done in the background in WidgetJobIntentService.
+ */
 class TrackWidgetProvider : AppWidgetProvider() {
     companion object {
+        /**
+         * Return key to get the feature id for the widget id from shared preferences.
+         */
         fun getFeatureIdPref(widgetId: Int) : String {
             return "widget_feature_id_$widgetId"
         }
 
+        /**
+         * Construct the RemoteViews for a widget.
+         */
         fun createRemoteViews(context: Context, appWidgetId: Int, title: String?, disable: Boolean = false) : RemoteViews {
             val remoteViews = RemoteViews(context.packageName, R.layout.track_widget)
-            var drawable = 0
+            val drawable: Int
 
             if (disable) {
                 drawable = R.drawable.warning_icon
 
                 remoteViews.setTextViewText(R.id.track_widget_title, "Removed")
-                remoteViews.setOnClickPendingIntent(R.id.widget_container, PendingIntent.getActivity(context, 0, Intent(), 0))
+                remoteViews.setOnClickPendingIntent(R.id.widget_container, PendingIntent.getActivity(context, appWidgetId, Intent(), 0))
             } else {
                 drawable = R.drawable.add_box
 
@@ -41,7 +55,7 @@ class TrackWidgetProvider : AppWidgetProvider() {
                 intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
 
                 remoteViews.setOnClickPendingIntent(R.id.widget_container,
-                    PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+                    PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT))
 
                 title?.let {
                     remoteViews.setTextViewText(R.id.track_widget_title, it)
@@ -65,6 +79,9 @@ class TrackWidgetProvider : AppWidgetProvider() {
             return remoteViews
         }
 
+        /**
+         * Update all widgets for the given feature id.
+         */
         fun updateWidgetsWithFeatureId(context: Context, featureId: Long) {
             getWidgetIdsForFeatureId(context, featureId).forEach { id ->
                 val workIntent = Intent(context, WidgetJobIntentService::class.java)
@@ -73,6 +90,9 @@ class TrackWidgetProvider : AppWidgetProvider() {
             }
         }
 
+        /**
+         * Delete all widgets for the given feature id.
+         */
         fun deleteWidgetsWithFeatureId(context: Context, featureId: Long) {
             getWidgetIdsForFeatureId(context, featureId).forEach { id ->
                 val workIntent = Intent(context, WidgetJobIntentService::class.java)
@@ -82,6 +102,9 @@ class TrackWidgetProvider : AppWidgetProvider() {
             }
         }
 
+        /**
+         * Return a list of all widget ids for the given feature id.
+         */
         private fun getWidgetIdsForFeatureId(context: Context, featureId: Long) : List<Int> {
             return context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).let { sharedPrefs ->
                 AppWidgetManager.getInstance(context)
