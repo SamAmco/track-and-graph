@@ -243,4 +243,5 @@
     <string name="range_style">Range style:</string>
 
     <string name="track_widget_title">Track</string>
+    <string name="track_widget_configure_button">Create widget</string>
 </resources>

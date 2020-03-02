@@ -30,37 +30,65 @@ class TrackWidgetProvider : AppWidgetProvider() {
         /**
          * Return key to get the feature id for the widget id from shared preferences.
          */
-        fun getFeatureIdPref(widgetId: Int) : String {
+        fun getFeatureIdPref(widgetId: Int): String {
             return "widget_feature_id_$widgetId"
         }
 
         /**
          * Construct the RemoteViews for a widget.
          */
-        fun createRemoteViews(context: Context, appWidgetId: Int, title: String?, disable: Boolean = false) : RemoteViews {
+        fun createRemoteViews(
+            context: Context,
+            appWidgetId: Int,
+            title: String?,
+            disable: Boolean = false
+        ): RemoteViews {
             val remoteViews = RemoteViews(context.packageName, R.layout.track_widget)
-            val drawable: Int
 
             if (disable) {
-                drawable = R.drawable.warning_icon
-
                 remoteViews.setTextViewText(R.id.track_widget_title, "Removed")
-                remoteViews.setOnClickPendingIntent(R.id.widget_container, PendingIntent.getActivity(context, appWidgetId, Intent(), 0))
+                remoteViews.setOnClickPendingIntent(
+                    R.id.widget_container,
+                    PendingIntent.getActivity(context, appWidgetId, Intent(), 0)
+                )
             } else {
-                drawable = R.drawable.add_box
-
-                val intent = Intent(context, TrackWidgetInputDataPoint::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                intent.addCategory(Intent.CATEGORY_LAUNCHER)
-                intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
-
-                remoteViews.setOnClickPendingIntent(R.id.widget_container,
-                    PendingIntent.getActivity(context, appWidgetId, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+                remoteViews.setOnClickPendingIntent(
+                    R.id.widget_container,
+                    getOnClickPendingIntent(context, appWidgetId)
+                )
 
                 title?.let {
                     remoteViews.setTextViewText(R.id.track_widget_title, it)
                 }
             }
+
+            setWidgetDrawable(context, disable, remoteViews)
+
+            return remoteViews
+        }
+
+        /**
+         * Return the PendingIntent for an app widget that starts the feature input dialog.
+         */
+        private fun getOnClickPendingIntent(context: Context, appWidgetId: Int): PendingIntent =
+            Intent(context, TrackWidgetInputDataPoint::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
+            }.let {
+                PendingIntent.getActivity(
+                    context,
+                    appWidgetId,
+                    it,
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                )
+            }
+
+        /**
+         * Set the appropriate drawable for the widget according to the status of the widget.
+         * Pre-Lollipop, construct a bitmap for the drawable.
+         */
+        private fun setWidgetDrawable(context: Context, disable: Boolean, remoteViews: RemoteViews) {
+            val drawable = if (disable) R.drawable.warning_icon else R.drawable.add_box
 
             // Vector graphics in appwidgets need to be programmatically added.
             // Pre-Lollipop, these vectors need to be converted to a bitmap first.
@@ -68,15 +96,17 @@ class TrackWidgetProvider : AppWidgetProvider() {
                 remoteViews.setImageViewResource(R.id.track_widget_icon, drawable)
             } else {
                 ContextCompat.getDrawable(context, drawable)?.let { d ->
-                    val b = Bitmap.createBitmap(d.intrinsicWidth, d.intrinsicHeight, Bitmap.Config.ARGB_8888)
+                    val b = Bitmap.createBitmap(
+                        d.intrinsicWidth,
+                        d.intrinsicHeight,
+                        Bitmap.Config.ARGB_8888
+                    )
                     val c = Canvas(b)
                     d.setBounds(0, 0, c.width, c.height)
                     d.draw(c)
                     remoteViews.setImageViewBitmap(R.id.track_widget_icon, b)
                 }
             }
-
-            return remoteViews
         }
 
         /**
@@ -105,13 +135,20 @@ class TrackWidgetProvider : AppWidgetProvider() {
         /**
          * Return a list of all widget ids for the given feature id.
          */
-        private fun getWidgetIdsForFeatureId(context: Context, featureId: Long) : List<Int> {
-            return context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).let { sharedPrefs ->
-                AppWidgetManager.getInstance(context)
-                    .getAppWidgetIds(ComponentName(context, TrackWidgetProvider::class.java)).let { ids ->
-                        ids.filter { sharedPrefs.getLong(getFeatureIdPref(it), -1) == featureId }
-                    }
-            }
+        private fun getWidgetIdsForFeatureId(context: Context, featureId: Long): List<Int> {
+            return context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+                .let { sharedPrefs ->
+                    AppWidgetManager.getInstance(context)
+                        .getAppWidgetIds(ComponentName(context, TrackWidgetProvider::class.java))
+                        .let { ids ->
+                            ids.filter {
+                                sharedPrefs.getLong(
+                                    getFeatureIdPref(it),
+                                    -1
+                                ) == featureId
+                            }
+                        }
+                }
         }
     }
 
