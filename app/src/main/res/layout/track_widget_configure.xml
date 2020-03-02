@@ -22,6 +22,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="onConfirm"
-            android:text="Button" />
+            android:text="@string/track_widget_configure_button" />
     </LinearLayout>
 </layout>
