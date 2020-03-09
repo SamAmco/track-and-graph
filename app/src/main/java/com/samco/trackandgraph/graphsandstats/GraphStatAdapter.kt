@@ -65,12 +65,13 @@ class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
         graphStatView.menuButtonClickListener = { v -> createContextMenu(v) }
         graphStatView.cardView.setOnClickListener { clickListener.onClick(graphStat) }
         CoroutineScope(Dispatchers.Main + currJob!!).launch {
-            if (!when (graphStat.type) {
-                    GraphStatType.LINE_GRAPH -> tryInitLineGraph(dataSource, graphStat)
-                    GraphStatType.PIE_CHART -> tryInitPieChart(dataSource, graphStat)
-                    GraphStatType.TIME_SINCE -> tryInitTimeSinceStat(dataSource, graphStat)
-                    GraphStatType.AVERAGE_TIME_BETWEEN -> tryInitAverageTimeBetween(dataSource, graphStat)
-                }) graphStatView.initError(graphStat, R.string.graph_stat_view_not_found)
+            val foundGraphStat = when (graphStat.type) {
+                GraphStatType.LINE_GRAPH -> tryInitLineGraph(dataSource, graphStat)
+                GraphStatType.PIE_CHART -> tryInitPieChart(dataSource, graphStat)
+                GraphStatType.TIME_SINCE -> tryInitTimeSinceStat(dataSource, graphStat)
+                GraphStatType.AVERAGE_TIME_BETWEEN -> tryInitAverageTimeBetween(dataSource, graphStat)
+            }
+            if (!foundGraphStat) graphStatView.initError(graphStat, R.string.graph_stat_view_not_found)
         }
     }
 
