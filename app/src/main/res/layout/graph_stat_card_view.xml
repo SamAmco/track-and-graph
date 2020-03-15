@@ -29,21 +29,21 @@
             android:clickable="true"
             app:cardCornerRadius="@dimen/card_corner_radius"
             >
-        <include
-                android:id="@+id/graphStatView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                layout="@layout/graph_stat_view"/>
+        <com.samco.trackandgraph.graphstatview.GraphStatView
+            android:id="@+id/graphStatView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
         <ImageButton
-                android:id="@+id/menuButton"
-                android:src="@drawable/list_menu_icon"
-                android:background="#00FFFFFF"
-                android:paddingLeft="12dp"
-                android:paddingRight="6dp"
-                android:paddingTop="6dp"
-                android:paddingBottom="12dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top|right"/>
+            android:id="@+id/menuButton"
+            android:src="@drawable/list_menu_icon"
+            android:background="#00FFFFFF"
+            android:paddingLeft="12dp"
+            android:paddingRight="6dp"
+            android:paddingTop="6dp"
+            android:paddingBottom="12dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|right"/>
     </androidx.cardview.widget.CardView>
 </layout>

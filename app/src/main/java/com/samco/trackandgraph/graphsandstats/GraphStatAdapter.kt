@@ -23,14 +23,13 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.GraphOrStat
 import com.samco.trackandgraph.database.GraphStatType
-import com.samco.trackandgraph.ui.GraphStatCardView
+import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.ui.OrderedListAdapter
 import kotlinx.coroutines.*
 
@@ -49,21 +48,21 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener, applic
     }
 }
 
-class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
-    : RecyclerView.ViewHolder(graphStatView), PopupMenu.OnMenuItemClickListener {
+class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView)
+    : RecyclerView.ViewHolder(graphStatCardView), PopupMenu.OnMenuItemClickListener {
     private var currJob: Job? = null
     private var clickListener: GraphStatClickListener? = null
     private var graphStat: GraphOrStat? = null
     private var dropElevation = 0f
 
     fun bind(graphStat: GraphOrStat, clickListener: GraphStatClickListener, dataSource: TrackAndGraphDatabaseDao) {
-        this.dropElevation = graphStatView.cardView.cardElevation
+        this.dropElevation = graphStatCardView.cardView.cardElevation
         this.graphStat = graphStat
         this.clickListener = clickListener
         currJob?.cancel()
         currJob = Job()
-        graphStatView.menuButtonClickListener = { v -> createContextMenu(v) }
-        graphStatView.cardView.setOnClickListener { clickListener.onClick(graphStat) }
+        graphStatCardView.menuButtonClickListener = { v -> createContextMenu(v) }
+        graphStatCardView.cardView.setOnClickListener { clickListener.onClick(graphStat) }
         CoroutineScope(Dispatchers.Main + currJob!!).launch {
             val foundGraphStat = when (graphStat.type) {
                 GraphStatType.LINE_GRAPH -> tryInitLineGraph(dataSource, graphStat)
@@ -71,18 +70,18 @@ class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
                 GraphStatType.TIME_SINCE -> tryInitTimeSinceStat(dataSource, graphStat)
                 GraphStatType.AVERAGE_TIME_BETWEEN -> tryInitAverageTimeBetween(dataSource, graphStat)
             }
-            if (!foundGraphStat) graphStatView.initError(graphStat, R.string.graph_stat_view_not_found)
+            if (!foundGraphStat) graphStatCardView.graphStatView.initError(graphStat, R.string.graph_stat_view_not_found)
         }
     }
 
     fun elevateCard() {
-        graphStatView.cardView.postDelayed({
-            graphStatView.cardView.cardElevation = graphStatView.cardView.cardElevation * 3f
+        graphStatCardView.cardView.postDelayed({
+            graphStatCardView.cardView.cardElevation = graphStatCardView.cardView.cardElevation * 3f
         }, 10)
     }
 
     fun dropCard() {
-        graphStatView.cardView.cardElevation = dropElevation
+        graphStatCardView.cardView.cardElevation = dropElevation
     }
 
     private fun createContextMenu(view: View) {
@@ -108,7 +107,7 @@ class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
         val pieChart = withContext(Dispatchers.IO) {
             dataSource.getPieChartByGraphStatId(graphStat.id)
         } ?: return false
-        graphStatView.initFromPieChart(graphStat, pieChart)
+        graphStatCardView.graphStatView.initFromPieChart(graphStat, pieChart)
         return true
     }
 
@@ -116,7 +115,7 @@ class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
         val avTimeStat = withContext(Dispatchers.IO) {
             dataSource.getAverageTimeBetweenStatByGraphStatId(graphStat.id)
         } ?: return false
-        graphStatView.initAverageTimeBetweenStat(graphStat, avTimeStat)
+        graphStatCardView.graphStatView.initAverageTimeBetweenStat(graphStat, avTimeStat)
         return true
     }
 
@@ -124,7 +123,7 @@ class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
         val timeSinceStat = withContext(Dispatchers.IO) {
             dataSource.getTimeSinceLastStatByGraphStatId(graphStat.id)
         } ?: return false
-        graphStatView.initTimeSinceStat(graphStat, timeSinceStat)
+        graphStatCardView.graphStatView.initTimeSinceStat(graphStat, timeSinceStat)
         return true
     }
 
@@ -132,7 +131,7 @@ class GraphStatViewHolder(private val graphStatView: GraphStatCardView)
         val lineGraph = withContext(Dispatchers.IO) {
             dataSource.getLineGraphByGraphStatId(graphStat.id)
         } ?: return false
-        graphStatView.initFromLineGraph(graphStat, lineGraph, true)
+        graphStatCardView.graphStatView.initFromLineGraph(graphStat, lineGraph, true)
         return true
     }
 

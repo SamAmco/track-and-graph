@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -33,29 +33,32 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.ui.GraphStatScrollView
 import kotlinx.coroutines.*
 import androidx.appcompat.app.AppCompatActivity
-
+import androidx.databinding.DataBindingUtil
+import com.samco.trackandgraph.graphstatview.GraphStatView
+import com.samco.trackandgraph.databinding.GraphStatScrollViewBinding
 
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
     private lateinit var viewModel: ViewGraphStatViewModel
-    private lateinit var graphStatView: GraphStatScrollView
+    private lateinit var graphStatView: GraphStatView
     private val args: ViewGraphStatFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.navController = container?.findNavController()
         viewModel = ViewModelProviders.of(this).get(ViewGraphStatViewModel::class.java)
         viewModel.init(activity!!, args.graphStatId)
-        graphStatView = GraphStatScrollView(context!!)
+        val graphStatScrollView: GraphStatScrollViewBinding = DataBindingUtil
+            .inflate(inflater, R.layout.graph_stat_scroll_view, container, false)
+        graphStatView = graphStatScrollView.graphStatView
         graphStatView.layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
         )
         graphStatView.addLineGraphPanAndZoom()
         listenToState()
-        return graphStatView
+        return graphStatScrollView.root
     }
 
     private fun listenToState() {

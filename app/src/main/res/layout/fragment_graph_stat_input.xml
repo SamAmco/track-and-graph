@@ -37,8 +37,8 @@
                     android:padding="@dimen/card_padding"
                     >
 
-                <com.samco.trackandgraph.ui.GraphStatCardView
-                        android:id="@+id/demoGraphStatView"
+                <com.samco.trackandgraph.graphstatview.GraphStatCardView
+                        android:id="@+id/demoGraphStatCardView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
 

@@ -1,24 +1,25 @@
-/* 
-* This file is part of Track & Graph
-* 
-* Track & Graph is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Track & Graph is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-*/
-package com.samco.trackandgraph.ui
+/*
+ * This file is part of Track & Graph
+ *
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Track & Graph is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.samco.trackandgraph.graphstatview
 
 import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.content.ContextCompat.getColor
@@ -36,6 +37,7 @@ import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.ui.GraphLegendItemView
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
@@ -51,11 +53,11 @@ import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.max
 
-abstract class GraphStatViewBase : FrameLayout {
+class GraphStatView : FrameLayout {
     constructor(context: Context) : super(context, null)
     constructor(context: Context, attrSet: AttributeSet) : super(context, attrSet)
 
-    private var binding = getBinding()
+    private var binding = GraphStatViewBinding.inflate(LayoutInflater.from(context), this, true)
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
     private val dataSource = TrackAndGraphDatabase.getInstance(context.applicationContext).trackAndGraphDatabaseDao
@@ -76,8 +78,6 @@ abstract class GraphStatViewBase : FrameLayout {
     private val lineGraphMonthsDateFormat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("MM/yy")
         .withZone(ZoneId.systemDefault())
-
-    protected abstract fun getBinding(): GraphStatViewBinding
 
     init {
         basicLineGraphSetup()
@@ -396,7 +396,13 @@ abstract class GraphStatViewBase : FrameLayout {
 
     private fun inflateGraphLegendItem(colorIndex: Int, label: String) {
         val colorId = dataVisColorList[colorIndex]
-        binding.legendFlexboxLayout.addView(GraphLegendItemView(context, colorId, label))
+        binding.legendFlexboxLayout.addView(
+            GraphLegendItemView(
+                context,
+                colorId,
+                label
+            )
+        )
     }
 
     private fun dataPlottable(rawData: RawDataSample, minDataPoints: Int = 1): Boolean {
@@ -407,7 +413,10 @@ abstract class GraphStatViewBase : FrameLayout {
     private suspend fun sampleData(featureId: Long, sampleDuration: Duration?,
                                    averagingDuration: Duration?, plottingPeriod: Period?): RawDataSample {
         return withContext(Dispatchers.IO) {
-            if (sampleDuration == null) RawDataSample(dataSource.getDataPointsForFeatureAscSync(featureId), 0)
+            if (sampleDuration == null) RawDataSample(
+                dataSource.getDataPointsForFeatureAscSync(featureId),
+                0
+            )
             else {
                 val latest = getLatestTimeOrNowForFeature(featureId)
                 val startDate = latest.minus(sampleDuration)
@@ -420,7 +429,10 @@ abstract class GraphStatViewBase : FrameLayout {
                 val minSampleDate = latest.minus(maxSampleDuration)
                 val dataPoints = dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
                 val startIndex = dataPoints.indexOfFirst { dp -> dp.timestamp.isAfter(startDate) }
-                RawDataSample(dataPoints, startIndex)
+                RawDataSample(
+                    dataPoints,
+                    startIndex
+                )
             }
         }
     }
@@ -507,7 +519,10 @@ abstract class GraphStatViewBase : FrameLayout {
             newData.add(DataPoint(currentTimeStamp, featureId, total, ""))
             yield()
         }
-        return RawDataSample(newData, plotFrom)
+        return RawDataSample(
+            newData,
+            plotFrom
+        )
     }
 
     private fun getNowOrLatest(rawData: RawDataSample): OffsetDateTime {
