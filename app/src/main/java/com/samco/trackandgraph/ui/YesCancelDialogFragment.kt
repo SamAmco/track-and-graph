@@ -39,7 +39,7 @@ class YesCancelDialogFragment : DialogFragment() {
             var builder = AlertDialog.Builder(it)
             builder.setMessage(title)
                 .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this) }
-                .setNegativeButton(R.string.cancel) { _, _ -> {} }
+                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             val alertDialog = builder.create()
             alertDialog.setOnShowListener {
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(context!!, R.color.secondaryColor))

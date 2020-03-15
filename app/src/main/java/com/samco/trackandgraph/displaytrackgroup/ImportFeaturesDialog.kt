@@ -68,8 +68,8 @@ class ImportFeaturesDialog : DialogFragment() {
 
             val builder = AlertDialog.Builder(it)
             builder.setView(view)
-                .setPositiveButton(R.string.importButton) { _, _ -> null }
-                .setNegativeButton(R.string.cancel) { _, _ -> null }
+                .setPositiveButton(R.string.importButton) { _, _ -> run {} }
+                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             alertDialog = builder.create()
             alertDialog.setCanceledOnTouchOutside(true)
             alertDialog.setOnShowListener { setAlertDialogShowListeners() }
@@ -88,7 +88,7 @@ class ImportFeaturesDialog : DialogFragment() {
         val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
         negativeButton.setTextColor(getColor(context!!, R.color.toolBarTextColor))
         negativeButton.setOnClickListener { dismiss() }
-        alertDialog.setOnCancelListener { null }
+        alertDialog.setOnCancelListener { run {} }
     }
 
     private fun listenToUri() {
@@ -112,6 +112,7 @@ class ImportFeaturesDialog : DialogFragment() {
                     fileButton.isEnabled = false
                 }
                 ImportState.DONE -> dismiss()
+                else -> {}
             }
         })
     }
