@@ -104,6 +104,7 @@ class GraphStatInputFragment : Fragment() {
                     binding.yRangeFromToLayout.visibility = View.VISIBLE
                     onFormUpdate()
                 }
+                else -> {}
             }
         })
     }

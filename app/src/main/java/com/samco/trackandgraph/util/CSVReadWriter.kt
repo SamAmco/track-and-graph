@@ -43,7 +43,7 @@ object CSVReadWriter {
                 val dataPointToString = when (feature.featureType) {
                     FeatureType.DISCRETE -> { dp: DataPoint -> DiscreteValue.fromDataPoint(dp).toString() }
                     FeatureType.CONTINUOUS -> { dp: DataPoint -> dp.value.toString() }
-                    FeatureType.TIMESTAMP -> {dp: DataPoint -> ""}
+                    FeatureType.TIMESTAMP -> {_: DataPoint -> ""}
                 }
 
                 dataPoints.forEach { dp ->
@@ -100,7 +100,7 @@ object CSVReadWriter {
             existingFeaturesByName[newFeature.name] = newFeature
         }
 
-        val addTimestampDataPoint = { timestamp: OffsetDateTime, featureId: Long, lineNumber: Int ->
+        val addTimestampDataPoint = { timestamp: OffsetDateTime, featureId: Long ->
             newDataPoints.add(DataPoint(timestamp, featureId, 1.0, ""))
         }
 
@@ -132,7 +132,7 @@ object CSVReadWriter {
                     }
                     FeatureType.TIMESTAMP -> {
                         validateFeatureType(feature, FeatureType.TIMESTAMP, lineNumber)
-                        addTimestampDataPoint(rec.timestamp, feature.id, lineNumber)
+                        addTimestampDataPoint(rec.timestamp, feature.id)
                     }
                 }
             } else {
@@ -141,7 +141,7 @@ object CSVReadWriter {
                 when (newFeature.featureType) {
                     FeatureType.DISCRETE -> addDiscreteDataPoint(rec.value, rec.timestamp, newFeature, lineNumber)
                     FeatureType.CONTINUOUS -> addContinuousDataPoint(rec.value.toDoubleOrNull(), rec.timestamp, newFeature.id, lineNumber)
-                    FeatureType.TIMESTAMP -> addTimestampDataPoint(rec.timestamp, newFeature.id, lineNumber)
+                    FeatureType.TIMESTAMP -> addTimestampDataPoint(rec.timestamp, newFeature.id)
                 }
             }
             if (lineNumber % 1000 == 0) {

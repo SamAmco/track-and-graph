@@ -56,7 +56,7 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
             var builder = AlertDialog.Builder(it)
             builder.setView(view)
                 .setPositiveButton(getPositiveButtonName()) { _, _ -> onPositiveClicked(editText.text.toString()) }
-                .setNegativeButton(R.string.cancel) { _, _ -> {} }
+                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             alertDialog = builder.create()
             alertDialog.setOnShowListener {
                 alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(context!!, R.color.secondaryColor))

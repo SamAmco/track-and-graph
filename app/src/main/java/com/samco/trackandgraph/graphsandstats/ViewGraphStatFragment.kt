@@ -36,8 +36,8 @@ import com.samco.trackandgraph.database.*
 import kotlinx.coroutines.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatview.GraphStatView
-import com.samco.trackandgraph.databinding.GraphStatScrollViewBinding
 
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
@@ -49,8 +49,8 @@ class ViewGraphStatFragment : Fragment() {
         this.navController = container?.findNavController()
         viewModel = ViewModelProviders.of(this).get(ViewGraphStatViewModel::class.java)
         viewModel.init(activity!!, args.graphStatId)
-        val graphStatScrollView: GraphStatScrollViewBinding = DataBindingUtil
-            .inflate(inflater, R.layout.graph_stat_scroll_view, container, false)
+        val graphStatScrollView: FragmentViewGraphStatBinding = DataBindingUtil
+            .inflate(inflater, R.layout.fragment_view_graph_stat, container, false)
         graphStatView = graphStatScrollView.graphStatView
         graphStatView.layoutParams = FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
@@ -66,6 +66,7 @@ class ViewGraphStatFragment : Fragment() {
             when (it) {
                 ViewGraphStatViewModelState.INITIALIZING -> graphStatView.initLoading()
                 ViewGraphStatViewModelState.WAITING -> initGraphStatViewFromViewModel()
+                else -> {}
             }
         })
     }

@@ -128,6 +128,7 @@ class GraphsAndStatsFragment : Fragment() {
                     binding.graphStatsProgressBar.visibility = View.GONE
                     observeGraphStatsAndUpdate(adapter)
                 }
+                else -> {}
             }
         })
     }

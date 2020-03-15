@@ -106,7 +106,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         numberInput.visibility = View.VISIBLE
         numberInput.requestFocus()
         numberInput.addTextChangedListener(this)
-        numberInput.setOnEditorActionListener { v, i, e ->
+        numberInput.setOnEditorActionListener { _, i, _ ->
             return@setOnEditorActionListener if ((i and EditorInfo.IME_MASK_ACTION) != 0) {
                 state.timeFixed = true
                 clickListener?.onClick?.invoke(state.feature)

@@ -73,8 +73,8 @@ class ExportFeaturesDialog : DialogFragment() {
 
             val builder = AlertDialog.Builder(it)
             builder.setView(view)
-                .setPositiveButton(R.string.exportButton) { _, _ -> null }
-                .setNegativeButton(R.string.cancel) { _, _ -> null }
+                .setPositiveButton(R.string.exportButton) { _, _ -> run {} }
+                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             alertDialog = builder.create()
             alertDialog.setCanceledOnTouchOutside(true)
             alertDialog.setOnShowListener { setAlertDialogShowListeners() }
@@ -110,6 +110,7 @@ class ExportFeaturesDialog : DialogFragment() {
                 ExportState.DONE -> {
                     dismiss()
                 }
+                else -> {}
             }
         })
     }

@@ -81,6 +81,7 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
                     }
                     else dismiss()
                 }
+                else -> {}
             }
         })
     }

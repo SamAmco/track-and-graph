@@ -26,6 +26,7 @@ class FeatureHistoryViewModelFactory(
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(FeatureHistoryViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
             return FeatureHistoryViewModel(featureId, dataSource) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
