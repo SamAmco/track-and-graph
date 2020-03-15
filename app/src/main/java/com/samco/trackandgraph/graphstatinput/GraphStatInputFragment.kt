@@ -58,7 +58,7 @@ class GraphStatInputFragment : Fragment() {
         binding.graphStatNameInput.filters = arrayOf(InputFilter.LengthFilter(MAX_GRAPH_STAT_NAME_LENGTH))
         viewModel = ViewModelProviders.of(this).get(GraphStatInputViewModel::class.java)
         viewModel.initViewModel(requireActivity(), args.graphStatGroupId, args.graphStatId)
-        binding.demoGraphStatView.hideMenuButton()
+        binding.demoGraphStatCardView.hideMenuButton()
         listenToViewModelState()
         return binding.root
     }
@@ -381,26 +381,26 @@ class GraphStatInputFragment : Fragment() {
         updateDemoHandler.removeCallbacksAndMessages(null)
         updateDemoHandler.postDelayed(Runnable {
             if (viewModel.formValid.value != null) {
-                binding.demoGraphStatView.initInvalid()
+                binding.demoGraphStatCardView.graphStatView.initInvalid()
             } else {
                 val graphOrStat = viewModel.constructGraphOrStat()
                 when (viewModel.graphStatType.value) {
-                    GraphStatType.LINE_GRAPH -> binding.demoGraphStatView
+                    GraphStatType.LINE_GRAPH -> binding.demoGraphStatCardView.graphStatView
                         .initFromLineGraph(graphOrStat, viewModel.constructLineGraph(graphOrStat.id))
-                    GraphStatType.PIE_CHART -> binding.demoGraphStatView
+                    GraphStatType.PIE_CHART -> binding.demoGraphStatCardView.graphStatView
                         .initFromPieChart(graphOrStat, viewModel.constructPieChart(graphOrStat.id))
-                    GraphStatType.AVERAGE_TIME_BETWEEN -> binding.demoGraphStatView
+                    GraphStatType.AVERAGE_TIME_BETWEEN -> binding.demoGraphStatCardView.graphStatView
                         .initAverageTimeBetweenStat(graphOrStat, viewModel.constructAverageTimeBetween(graphOrStat.id))
-                    GraphStatType.TIME_SINCE -> binding.demoGraphStatView
+                    GraphStatType.TIME_SINCE -> binding.demoGraphStatCardView.graphStatView
                         .initTimeSinceStat(graphOrStat, viewModel.constructTimeSince(graphOrStat.id))
-                    else -> binding.demoGraphStatView.initInvalid()
+                    else -> binding.demoGraphStatCardView.graphStatView.initInvalid()
                 }
             }
         }, 500)
     }
 
     override fun onDestroyView() {
-        binding.demoGraphStatView.dispose()
+        binding.demoGraphStatCardView.graphStatView.dispose()
         super.onDestroyView()
         val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
