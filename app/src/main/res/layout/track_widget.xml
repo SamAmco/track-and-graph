@@ -15,7 +15,7 @@
 
         <TextView
             android:id="@+id/track_widget_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerVertical="true"
             android:layout_marginStart="8dp"
@@ -27,7 +27,9 @@
             android:text="@string/track_widget_title"
             android:textColor="@android:color/black"
             android:textSize="18sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_toLeftOf="@id/track_widget_icon"
+            android:layout_alignParentLeft="true" />
 
         <ImageView
             android:id="@+id/track_widget_icon"
