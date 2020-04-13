@@ -2,7 +2,7 @@
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:minWidth="@dimen/widget_width"
     android:minHeight="@dimen/widget_height"
-    android:minResizeWidth="@dimen/widget_width"
+    android:minResizeWidth="@dimen/widget_resize_width"
     android:minResizeHeight="@dimen/widget_height"
     android:updatePeriodMillis="86400000"
     android:initialLayout="@layout/track_widget"
