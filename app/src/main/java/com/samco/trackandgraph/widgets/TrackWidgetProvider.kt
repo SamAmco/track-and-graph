@@ -104,7 +104,7 @@ class TrackWidgetProvider : AppWidgetProvider() {
          * Pre-Lollipop, construct a bitmap for the drawable.
          */
         private fun setWidgetDrawable(context: Context, disable: Boolean, remoteViews: RemoteViews) {
-            val drawable = if (disable) R.drawable.warning_icon else R.drawable.add_box
+            val drawable = if (disable) R.drawable.warning_icon else R.drawable.add_box_tint
 
             // Vector graphics in appwidgets need to be programmatically added.
             // Pre-Lollipop, these vectors need to be converted to a bitmap first.
