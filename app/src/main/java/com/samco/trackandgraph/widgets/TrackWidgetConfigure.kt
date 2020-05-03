@@ -21,21 +21,23 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.fragment.app.FragmentActivity
+import android.widget.*
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.FeatureAndTrackGroup
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureBinding
+import kotlinx.android.synthetic.main.activity_main.*
+import timber.log.Timber
 
-class TrackWidgetConfigure : FragmentActivity() {
+class TrackWidgetConfigure : AppCompatActivity() {
 
     private var appWidgetId: Int? = null
     private lateinit var viewModel: TrackWidgetConfigureViewModel
@@ -43,6 +45,9 @@ class TrackWidgetConfigure : FragmentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        setSupportActionBar(findViewById(R.id.toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         binding = TrackWidgetConfigureBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -101,6 +106,10 @@ class TrackWidgetConfigure : FragmentActivity() {
             setResult(RESULT_OK, resultValue)
             finish()
         }
+    }
+
+    fun onCancel(view: View) {
+        finish()
     }
 }
 

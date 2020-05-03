@@ -34,7 +34,9 @@
             android:noHistory="true">
         </activity>
         
-        <activity android:name=".widgets.TrackWidgetConfigure">
+        <activity android:name=".widgets.TrackWidgetConfigure"
+            android:label="Configure widget"
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
                 <action android:name="android.appwidget.action.ACTION_APPWIDGET_DELETED" />
