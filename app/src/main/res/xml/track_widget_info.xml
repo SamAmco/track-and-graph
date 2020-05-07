@@ -8,5 +8,6 @@
     android:initialLayout="@layout/track_widget"
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
-    android:configure="com.samco.trackandgraph.widgets.TrackWidgetConfigure">
+    android:configure="com.samco.trackandgraph.widgets.TrackWidgetConfigure"
+    android:previewImage="@drawable/widget">
 </appwidget-provider>
