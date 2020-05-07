@@ -53,16 +53,18 @@ import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.max
 
-class GraphStatView : FrameLayout {
+class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
     constructor(context: Context, attrSet: AttributeSet) : super(context, attrSet)
 
     private var binding = GraphStatViewBinding.inflate(LayoutInflater.from(context), this, true)
+    override fun getBinding() = binding
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
     private val dataSource = TrackAndGraphDatabase.getInstance(context.applicationContext).trackAndGraphDatabaseDao
     private val creationTime = OffsetDateTime.now()
     private var listViewMode = false
+    private var currentDecorator: IGraphStatViewDecorator? = null
 
     private val currentXYRegions = mutableListOf<RectRegion>()
 
@@ -81,7 +83,7 @@ class GraphStatView : FrameLayout {
 
     init {
         basicLineGraphSetup()
-        initInvalid()
+        initError(null, R.string.graph_stat_view_invalid_setup)
     }
 
     private fun resetJob() {
@@ -132,22 +134,19 @@ class GraphStatView : FrameLayout {
         binding.progressBar.visibility = View.VISIBLE
     }
 
-    fun initInvalid() {
+    private fun setDecorator(decorator: IGraphStatViewDecorator) {
         resetJob()
         cleanAllViews()
-        initErrorTextView(null, R.string.graph_stat_view_invalid_setup)
+        this.currentDecorator = decorator
+        decorator.decorate(this)
     }
 
     fun initError(graphOrStat: GraphOrStat?, errorTextId: Int) {
-        resetJob()
-        initErrorTextView(graphOrStat, errorTextId)
+        setDecorator(GraphStatErrorDecorator(this, graphOrStat, errorTextId))
     }
 
-    private fun initErrorTextView(graphOrStat: GraphOrStat?, errorTextId: Int) {
-        cleanAllViews()
-        graphOrStat?.let { initHeader(graphOrStat) }
-        binding.errorMessage.visibility = View.VISIBLE
-        binding.errorMessage.text = context.getString(errorTextId)
+    fun initInvalid() {
+        initError(null, R.string.graph_stat_view_invalid_setup)
     }
 
     private fun initHeader(graphOrStat: GraphOrStat) {
@@ -176,7 +175,7 @@ class GraphStatView : FrameLayout {
         if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
         binding.statMessage.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
-        if (lastDataPointTimeStamp == null) { initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_stat) }
+        if (lastDataPointTimeStamp == null) { initError(graphOrStat, R.string.graph_stat_view_not_enough_data_stat) }
         else {
             while (true) {
                 setTimeSinceStatText(Duration.between(lastDataPointTimeStamp, OffsetDateTime.now()))
@@ -208,7 +207,7 @@ class GraphStatView : FrameLayout {
                 dataSource.getDataPointsBetweenInTimeRange(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue, cutOff, now)
             }
         }
-        if (dataPoints.size < 2) initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_stat)
+        if (dataPoints.size < 2) initError(graphOrStat, R.string.graph_stat_view_not_enough_data_stat)
         else {
             val totalMillis = Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp).toMillis().toDouble()
             val averageMillis = totalMillis / dataPoints.size.toDouble()
@@ -260,7 +259,7 @@ class GraphStatView : FrameLayout {
             binding.lineGraph.visibility = View.VISIBLE
             binding.progressBar.visibility = View.GONE
         } else {
-            initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
+            initError(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
         }
     }
 
@@ -300,7 +299,7 @@ class GraphStatView : FrameLayout {
         binding.progressBar.visibility = View.VISIBLE
         val dataSample = tryGetPlottableDataForPieChart(pieChart)
         if (dataSample == null) {
-            initErrorTextView(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
+            initError(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
             return
         }
         val segments = getPieChartSegments(dataSample)
