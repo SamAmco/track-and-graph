@@ -21,16 +21,15 @@ import android.view.View
 import com.samco.trackandgraph.database.GraphOrStat
 
 class GraphStatErrorDecorator(
-    private val decoratable: IDecoratableGraphStatView,
     private val graphOrStat: GraphOrStat?,
     private val errorTextId: Int
 ) : IGraphStatViewDecorator {
 
-    override fun decorate(view: IDecoratableGraphStatView) {
-        val binding = decoratable.getBinding()
+    override suspend fun decorate(view: IDecoratableGraphStatView) {
+        val binding = view.getBinding()
         graphOrStat?.let { binding.headerText.text = graphOrStat.name }
         binding.errorMessage.visibility = View.VISIBLE
-        binding.errorMessage.text = decoratable.getContext().getString(errorTextId)
+        binding.errorMessage.text = view.getContext().getString(errorTextId)
     }
 }
 

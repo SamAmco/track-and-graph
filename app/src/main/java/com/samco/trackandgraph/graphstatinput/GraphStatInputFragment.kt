@@ -382,7 +382,7 @@ class GraphStatInputFragment : Fragment() {
         updateDemoHandler.removeCallbacksAndMessages(null)
         updateDemoHandler.postDelayed(Runnable {
             if (viewModel.formValid.value != null) {
-                binding.demoGraphStatCardView.graphStatView.initInvalid()
+                binding.demoGraphStatCardView.graphStatView.initError(null, R.string.graph_stat_view_invalid_setup)
             } else {
                 val graphOrStat = viewModel.constructGraphOrStat()
                 when (viewModel.graphStatType.value) {
@@ -394,7 +394,7 @@ class GraphStatInputFragment : Fragment() {
                         .initAverageTimeBetweenStat(graphOrStat, viewModel.constructAverageTimeBetween(graphOrStat.id))
                     GraphStatType.TIME_SINCE -> binding.demoGraphStatCardView.graphStatView
                         .initTimeSinceStat(graphOrStat, viewModel.constructTimeSince(graphOrStat.id))
-                    else -> binding.demoGraphStatCardView.graphStatView.initInvalid()
+                    else -> binding.demoGraphStatCardView.graphStatView.initError(null, R.string.graph_stat_view_invalid_setup)
                 }
             }
         }, 500)

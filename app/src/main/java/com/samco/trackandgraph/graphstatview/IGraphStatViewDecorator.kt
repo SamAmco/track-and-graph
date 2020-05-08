@@ -18,5 +18,5 @@
 package com.samco.trackandgraph.graphstatview
 
 interface IGraphStatViewDecorator {
-    fun decorate(view: IDecoratableGraphStatView)
+    suspend fun decorate(view: IDecoratableGraphStatView)
 }

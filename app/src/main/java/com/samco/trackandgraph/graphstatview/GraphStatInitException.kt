@@ -17,21 +17,6 @@
 
 package com.samco.trackandgraph.graphstatview
 
-import android.content.Context
-import com.samco.trackandgraph.database.DataPoint
-import com.samco.trackandgraph.databinding.GraphStatViewBinding
-import org.threeten.bp.Duration
-import org.threeten.bp.Period
+import java.lang.Exception
 
-interface IDecoratableGraphStatView {
-    class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
-
-    fun getBinding(): GraphStatViewBinding
-    fun getContext(): Context
-    suspend fun sampleData(
-        featureId: Long,
-        sampleDuration: Duration?,
-        averagingDuration: Duration?,
-        plottingPeriod: Period?
-    ): RawDataSample
-}
+class GraphStatInitException(val errorTextId: Int) : Exception()
