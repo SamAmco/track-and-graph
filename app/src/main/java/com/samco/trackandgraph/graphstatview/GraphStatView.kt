@@ -17,16 +17,11 @@
 package com.samco.trackandgraph.graphstatview
 
 import android.content.Context
-import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat.getColor
 import com.androidplot.Plot
-import com.androidplot.pie.PieRenderer
-import com.androidplot.pie.Segment
-import com.androidplot.pie.SegmentFormatter
 import com.androidplot.ui.HorizontalPositioning
 import com.androidplot.ui.Size
 import com.androidplot.ui.VerticalPositioning
@@ -37,9 +32,6 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
-import com.samco.trackandgraph.graphstatview.IDecoratableGraphStatView.RawDataSample
-import com.samco.trackandgraph.ui.GraphLegendItemView
 
 class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
@@ -50,6 +42,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
     private val dataSource = TrackAndGraphDatabase.getInstance(context.applicationContext).trackAndGraphDatabaseDao
+    override fun getDataSource() = dataSource
     private var currentDecorator: IGraphStatViewDecorator? = null
 
     init {
@@ -130,16 +123,12 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         }
     }
 
-    private fun initHeader(graphOrStat: GraphOrStat) {
-        binding.headerText.text = graphOrStat.name
-    }
-
     fun initTimeSinceStat(graphOrStat: GraphOrStat, timeSinceLastStat: TimeSinceLastStat) {
         try {
             resetJob()
             cleanAllViews()
             binding.statMessage.visibility = View.INVISIBLE
-            initHeader(graphOrStat)
+            initHeader(binding, graphOrStat)
             viewScope!!.launch { initTimeSinceStatBody(graphOrStat, timeSinceLastStat) }
         } catch (e: Exception) {
             initError(graphOrStat, R.string.graph_stat_view_unkown_error)
@@ -171,7 +160,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
             resetJob()
             cleanAllViews()
             binding.statMessage.visibility = View.INVISIBLE
-            initHeader(graphOrStat)
+            initHeader(binding, graphOrStat)
             viewScope!!.launch { initAverageTimeBetweenStatBody(graphOrStat, timeBetweenStat) }
         } catch (e: Exception) { initError(graphOrStat, R.string.graph_stat_view_unkown_error) }
     }
@@ -228,108 +217,10 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     }
 
     fun initFromPieChart(graphOrStat: GraphOrStat, pieChart: PieChart) {
-        try {
-            resetJob()
-            cleanAllViews()
-            binding.pieChart.visibility = View.INVISIBLE
-            initHeader(graphOrStat)
-            viewScope!!.launch { initFromPieChartBody(graphOrStat, pieChart) }
-        } catch (e: Exception) { initError(graphOrStat, R.string.graph_stat_view_unkown_error) }
-    }
-
-    private suspend fun initFromPieChartBody(graphOrStat: GraphOrStat, pieChart: PieChart) {
-        binding.progressBar.visibility = View.VISIBLE
-        val dataSample = tryGetPlottableDataForPieChart(pieChart)
-        if (dataSample == null) {
-            initError(graphOrStat, R.string.graph_stat_view_not_enough_data_graph)
-            return
-        }
-        val segments = getPieChartSegments(dataSample)
-        val total = withContext(Dispatchers.IO) {
-            segments.sumByDouble { s -> s.value.toDouble() }
-        }
-        plotPieChartSegments(segments, total)
-        binding.pieChart.redraw()
-        binding.pieChart.getRenderer(PieRenderer::class.java).setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
-        binding.pieChart.visibility = View.VISIBLE
-        binding.progressBar.visibility = View.GONE
-    }
-
-    private fun plotPieChartSegments(segments: List<Segment>, total: Double) {
-        segments.forEachIndexed { i, s ->
-            val index = (dataVisColorGenerator * i) % dataVisColorList.size
-            val colorId = dataVisColorList[index]
-            val segForm = SegmentFormatter(getColor(context, colorId))
-            segForm.labelPaint.color = Color.TRANSPARENT
-            val percentage = "%.1f".format((s.value.toDouble() / total) * 100f)
-            inflateGraphLegendItem(index, "${s.title} ($percentage%)")
-            binding.pieChart.addSegment(s, segForm)
-        }
-    }
-
-    private fun inflateGraphLegendItem(colorIndex: Int, label: String) {
-        val colorId = dataVisColorList[colorIndex]
-        binding?.legendFlexboxLayout.addView(
-            GraphLegendItemView(
-                context!!,
-                colorId,
-                label
-            )
+        trySetDecorator(
+            graphOrStat,
+            GraphStatPieChartDecorator(graphOrStat, pieChart)
         )
-    }
-
-    private suspend fun getPieChartSegments(dataSample: RawDataSample) = withContext(Dispatchers.IO) {
-        dataSample.dataPoints
-            .drop(dataSample.plotFrom)
-            .groupingBy { dp -> dp.label }
-            .eachCount()
-            .map { b -> Segment(b.key, b.value) }
-    }
-
-    private suspend fun tryGetPlottableDataForPieChart(pieChart: PieChart): RawDataSample? {
-        val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(pieChart.featureId) }
-        val dataSample = sampleData(feature.id, pieChart.duration, null, null)
-        return if (dataPlottable(dataSample)) dataSample else null
-    }
-
-    private fun dataPlottable(rawData: RawDataSample, minDataPoints: Int = 1): Boolean {
-        return rawData.plotFrom >= 0 && rawData.dataPoints.size - rawData.plotFrom >= minDataPoints
-    }
-
-    override suspend fun sampleData(featureId: Long, sampleDuration: Duration?,
-                                   averagingDuration: Duration?, plottingPeriod: Period?): RawDataSample {
-        return withContext(Dispatchers.IO) {
-            if (sampleDuration == null) RawDataSample(
-                dataSource.getDataPointsForFeatureAscSync(featureId),
-                0
-            )
-            else {
-                val latest = getLatestTimeOrNowForFeature(featureId)
-                val startDate = latest.minus(sampleDuration)
-                val plottingDuration = plottingPeriod?.let { Duration.between(latest, latest.plus(plottingPeriod)) }
-                val maxSampleDuration = listOf(
-                    sampleDuration,
-                    averagingDuration?.plus(sampleDuration),
-                    plottingDuration?.plus(sampleDuration)
-                ).maxBy { d -> d ?: Duration.ZERO }
-                val minSampleDate = latest.minus(maxSampleDuration)
-                val dataPoints = dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
-                val startIndex = dataPoints.indexOfFirst { dp -> dp.timestamp.isAfter(startDate) }
-                RawDataSample(
-                    dataPoints,
-                    startIndex
-                )
-            }
-        }
-    }
-
-    private fun getLatestTimeOrNowForFeature(featureId: Long): OffsetDateTime {
-        val lastDataPointList = dataSource.getLastDataPointForFeatureSync(featureId)
-        val now = OffsetDateTime.now()
-        val latest = lastDataPointList.firstOrNull()?.let {
-            it.timestamp.plusSeconds(1)
-        }
-        return listOfNotNull(now, latest).max()!!
     }
 
     fun dispose() { currJob?.cancel() }
