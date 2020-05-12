@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.graphstatview
 
 import android.content.Context
-import com.samco.trackandgraph.database.DataPoint
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 
