@@ -77,7 +77,7 @@ class GraphStatLineGraphDecorator(
         context = view.getContext()
 
         binding!!.lineGraph.visibility = View.INVISIBLE
-        initHeader()
+        initHeader(binding, graphOrStat)
         initFromLineGraphBody()
     }
 
@@ -159,12 +159,14 @@ class GraphStatLineGraphDecorator(
     }
 
     private suspend fun drawLineGraphFeature(lineGraphFeature: LineGraphFeature): Boolean {
-        inflateGraphLegendItem(lineGraphFeature.colorIndex, lineGraphFeature.name)
+        inflateGraphLegendItem(
+            binding!!, context!!,
+            lineGraphFeature.colorIndex, lineGraphFeature.name
+        )
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
-        //TODO I don't like the fact we use a view to sample data, why don't we just spin up the db
-        // here our self?
-        val rawDataSample = graphStatView!!.sampleData(
+        val rawDataSample = sampleData(
+            graphStatView!!.getDataSource(),
             lineGraphFeature.featureId,
             lineGraph.duration,
             movingAvDuration,
@@ -182,15 +184,8 @@ class GraphStatLineGraphDecorator(
         } else false
     }
 
-    private fun dataPlottable(
-        rawData: IDecoratableGraphStatView.RawDataSample,
-        minDataPoints: Int = 1
-    ): Boolean {
-        return rawData.plotFrom >= 0 && rawData.dataPoints.size - rawData.plotFrom >= minDataPoints
-    }
-
     private suspend fun createAndAddSeries(
-        rawData: IDecoratableGraphStatView.RawDataSample,
+        rawData: RawDataSample,
         lineGraphFeature: LineGraphFeature
     ) {
         val series = getXYSeriesFromRawDataSample(rawData, lineGraphFeature)
@@ -198,7 +193,7 @@ class GraphStatLineGraphDecorator(
     }
 
     private suspend fun getXYSeriesFromRawDataSample(
-        rawData: IDecoratableGraphStatView.RawDataSample,
+        rawData: RawDataSample,
         lineGraphFeature: LineGraphFeature
     ) = withContext(Dispatchers.IO) {
 
@@ -231,7 +226,7 @@ class GraphStatLineGraphDecorator(
     }
 
     private suspend fun calculateMovingAverage(
-        rawData: IDecoratableGraphStatView.RawDataSample,
+        rawData: RawDataSample,
         movingAvDuration: Duration
     ): List<Double> {
         return rawData.dataPoints
@@ -253,9 +248,9 @@ class GraphStatLineGraphDecorator(
     }
 
     private suspend fun calculateDurationAccumulatedValues(
-        rawData: IDecoratableGraphStatView.RawDataSample,
+        rawData: RawDataSample,
         period: Period
-    ): IDecoratableGraphStatView.RawDataSample {
+    ): RawDataSample {
         if (rawData.dataPoints.isEmpty()) return rawData
         var plotFrom = 0
         var foundPlotFrom = false
@@ -277,13 +272,13 @@ class GraphStatLineGraphDecorator(
             newData.add(DataPoint(currentTimeStamp, featureId, total, ""))
             yield()
         }
-        return IDecoratableGraphStatView.RawDataSample(
+        return RawDataSample(
             newData,
             plotFrom
         )
     }
 
-    private fun getNowOrLatest(rawData: IDecoratableGraphStatView.RawDataSample): OffsetDateTime {
+    private fun getNowOrLatest(rawData: RawDataSample): OffsetDateTime {
         val now = OffsetDateTime.now()
         if (rawData.dataPoints.isEmpty()) return now
         val latest = rawData.dataPoints.last().timestamp
@@ -313,17 +308,6 @@ class GraphStatLineGraphDecorator(
         return dt.withHour(0).withMinute(0).withSecond(0).minusSeconds(1)
     }
 
-    private fun inflateGraphLegendItem(colorIndex: Int, label: String) {
-        val colorId = dataVisColorList[colorIndex]
-        binding!!.legendFlexboxLayout.addView(
-            GraphLegendItemView(
-                context!!,
-                colorId,
-                label
-            )
-        )
-    }
-
     private fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
         val seriesFormat =
             if (listViewMode) {
@@ -350,9 +334,5 @@ class GraphStatLineGraphDecorator(
             }
         currentXYRegions.add(series.minMax())
         binding!!.lineGraph.addSeries(series, seriesFormat)
-    }
-
-    private fun initHeader() {
-        binding!!.headerText.text = graphOrStat.name
     }
 }

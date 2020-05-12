@@ -27,6 +27,7 @@ class GraphStatErrorDecorator(
 
     override suspend fun decorate(view: IDecoratableGraphStatView) {
         val binding = view.getBinding()
+        initHeader(binding, graphOrStat)
         graphOrStat?.let { binding.headerText.text = graphOrStat.name }
         binding.errorMessage.visibility = View.VISIBLE
         binding.errorMessage.text = view.getContext().getString(errorTextId)
