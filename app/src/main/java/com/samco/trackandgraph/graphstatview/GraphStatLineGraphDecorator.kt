@@ -26,7 +26,6 @@ import com.androidplot.xy.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
-import com.samco.trackandgraph.ui.GraphLegendItemView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
