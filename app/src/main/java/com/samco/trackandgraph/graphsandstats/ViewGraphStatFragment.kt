@@ -120,7 +120,7 @@ class ViewGraphStatViewModel : ViewModel() {
         }
     }
 
-    private suspend fun initFromGraphStatId(graphStatId: Long) {
+    private fun initFromGraphStatId(graphStatId: Long) {
         graphStatObject = dataSource!!.getGraphStatById(graphStatId)
         when (graphStatObject!!.type) {
             GraphStatType.LINE_GRAPH -> initLineGraph()
@@ -128,7 +128,6 @@ class ViewGraphStatViewModel : ViewModel() {
             GraphStatType.TIME_SINCE -> initTimeSince()
             GraphStatType.AVERAGE_TIME_BETWEEN -> initAverageTimeBetween()
         }
-        withContext(Dispatchers.Main) { _state.value = ViewGraphStatViewModelState.WAITING }
     }
 
     private fun initLineGraph() {
