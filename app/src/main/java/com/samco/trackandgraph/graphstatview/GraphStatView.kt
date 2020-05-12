@@ -30,8 +30,6 @@ import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
 
 class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
