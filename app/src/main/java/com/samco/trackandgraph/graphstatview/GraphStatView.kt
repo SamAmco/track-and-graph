@@ -156,41 +156,10 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     }
 
     fun initAverageTimeBetweenStat(graphOrStat: GraphOrStat, timeBetweenStat: AverageTimeBetweenStat) {
-        try {
-            resetJob()
-            cleanAllViews()
-            binding.statMessage.visibility = View.INVISIBLE
-            initHeader(binding, graphOrStat)
-            viewScope!!.launch { initAverageTimeBetweenStatBody(graphOrStat, timeBetweenStat) }
-        } catch (e: Exception) { initError(graphOrStat, R.string.graph_stat_view_unkown_error) }
-    }
-
-    private suspend fun initAverageTimeBetweenStatBody(graphOrStat: GraphOrStat, timeBetweenStat: AverageTimeBetweenStat) {
-        binding.progressBar.visibility = View.VISIBLE
-        val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeBetweenStat.featureId) }
-        val dataPoints = withContext(Dispatchers.IO) {
-            if (timeBetweenStat.duration == null) {
-                dataSource.getDataPointsBetween(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue)
-            } else {
-                val now = OffsetDateTime.now()
-                val cutOff = now.minus(timeBetweenStat.duration)
-                dataSource.getDataPointsBetweenInTimeRange(feature.id, timeBetweenStat.fromValue, timeBetweenStat.toValue, cutOff, now)
-            }
-        }
-        if (dataPoints.size < 2) initError(graphOrStat, R.string.graph_stat_view_not_enough_data_stat)
-        else {
-            val totalMillis = Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp).toMillis().toDouble()
-            val averageMillis = totalMillis / dataPoints.size.toDouble()
-            setAverageTimeBetweenStatText(averageMillis)
-        }
-
-        binding.statMessage.visibility = View.VISIBLE
-        binding.progressBar.visibility = View.GONE
-    }
-
-    private fun setAverageTimeBetweenStatText(millis: Double) {
-        val days = "%.1f".format((millis / 86400000).toFloat())
-        binding.statMessage.text = "$days ${context.getString(R.string.days)}"
+        trySetDecorator(
+            graphOrStat,
+            GraphStatAverageTimeBetweenDecorator(graphOrStat, timeBetweenStat)
+        )
     }
 
     private fun setTimeSinceStatText(duration: Duration) {
