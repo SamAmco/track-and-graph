@@ -124,35 +124,10 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     }
 
     fun initTimeSinceStat(graphOrStat: GraphOrStat, timeSinceLastStat: TimeSinceLastStat) {
-        try {
-            resetJob()
-            cleanAllViews()
-            binding.statMessage.visibility = View.INVISIBLE
-            initHeader(binding, graphOrStat)
-            viewScope!!.launch { initTimeSinceStatBody(graphOrStat, timeSinceLastStat) }
-        } catch (e: Exception) {
-            initError(graphOrStat, R.string.graph_stat_view_unkown_error)
-        }
-    }
-
-    private suspend fun initTimeSinceStatBody(graphOrStat: GraphOrStat, timeSinceLastStat: TimeSinceLastStat) {
-        binding.progressBar.visibility = View.VISIBLE
-        val feature = withContext(Dispatchers.IO) { dataSource.getFeatureById(timeSinceLastStat.featureId) }
-        var lastDataPointTimeStamp: OffsetDateTime? = null
-        val lastDataPoint = withContext(Dispatchers.IO) {
-            dataSource.getLastDataPointBetween(feature.id, timeSinceLastStat.fromValue, timeSinceLastStat.toValue)
-        }
-        if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
-        binding.statMessage.visibility = View.VISIBLE
-        binding.progressBar.visibility = View.GONE
-        if (lastDataPointTimeStamp == null) { initError(graphOrStat, R.string.graph_stat_view_not_enough_data_stat) }
-        else {
-            while (true) {
-                setTimeSinceStatText(Duration.between(lastDataPointTimeStamp, OffsetDateTime.now()))
-                delay(1000)
-                yield()
-            }
-        }
+        trySetDecorator(
+            graphOrStat,
+            GraphStatTimeSinceDecorator(graphOrStat, timeSinceLastStat)
+        )
     }
 
     fun initAverageTimeBetweenStat(graphOrStat: GraphOrStat, timeBetweenStat: AverageTimeBetweenStat) {
@@ -160,22 +135,6 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
             graphOrStat,
             GraphStatAverageTimeBetweenDecorator(graphOrStat, timeBetweenStat)
         )
-    }
-
-    private fun setTimeSinceStatText(duration: Duration) {
-        val totalSeconds = duration.toMillis() / 1000.toDouble()
-        val daysNum = (totalSeconds / 86400).toInt()
-        val days = daysNum.toString()
-        val hours = "%02d".format(((totalSeconds % 86400) / 3600).toInt())
-        val minutes = "%02d".format(((totalSeconds % 3600) / 60).toInt())
-        val seconds = "%02d".format((totalSeconds % 60).toInt())
-        val hms = "$hours:$minutes:$seconds"
-        binding.statMessage.text =
-            when {
-                daysNum == 1 -> "$days ${context.getString(R.string.day)}\n$hms"
-                daysNum > 0 -> "$days ${context.getString(R.string.days)}\n$hms"
-                else -> hms
-            }
     }
 
     fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph, listViewMode: Boolean = false) {
@@ -194,5 +153,3 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
 
     fun dispose() { currJob?.cancel() }
 }
-
-
