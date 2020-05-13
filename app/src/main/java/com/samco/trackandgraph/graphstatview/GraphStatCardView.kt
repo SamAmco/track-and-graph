@@ -52,4 +52,6 @@ class GraphStatCardView : FrameLayout {
     fun hideMenuButton() {
         binding.menuButton.visibility = View.GONE
     }
+
+    fun dispose() = graphStatView.dispose()
 }

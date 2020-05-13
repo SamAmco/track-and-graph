@@ -36,6 +36,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.GraphStatType
 import com.samco.trackandgraph.databinding.GraphsAndStatsFragmentBinding
+import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.ui.*
 import kotlinx.coroutines.*
 
@@ -176,6 +177,13 @@ class GraphsAndStatsFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        for (i in 0..(binding.graphStatList.layoutManager?.childCount ?: 0)) {
+            val child = binding.graphStatList.getChildAt(i)
+            if (child is GraphStatCardView?) child?.dispose()
+        }
+    }
 }
 
 enum class GraphsAndStatsViewState { INITIALIZING, NO_FEATURES, WAITING }
@@ -189,7 +197,7 @@ class GraphsAndStatsViewModel : ViewModel() {
     private val ioScope = CoroutineScope(Dispatchers.IO + job)
 
     val state: LiveData<GraphsAndStatsViewState> get() { return _state }
-    private val _state = MutableLiveData<GraphsAndStatsViewState>(GraphsAndStatsViewState.INITIALIZING)
+    private val _state = MutableLiveData(GraphsAndStatsViewState.INITIALIZING)
 
     fun initViewModel(activity: Activity, graphStatGroupId: Long) {
         if (dataSource != null) return

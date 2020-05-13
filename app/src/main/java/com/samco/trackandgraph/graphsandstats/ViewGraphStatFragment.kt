@@ -81,6 +81,11 @@ class ViewGraphStatFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar!!.show()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        graphStatView.dispose()
+    }
+
     private fun initGraphStatViewFromViewModel() {
         val graphStat = viewModel.graphStatObject
         if (graphStat == null) graphStatView.initError(null, R.string.graph_stat_view_not_found)
@@ -103,7 +108,7 @@ class ViewGraphStatViewModel : ViewModel() {
         private set
 
     val state: LiveData<ViewGraphStatViewModelState> get() { return _state }
-    private val _state = MutableLiveData<ViewGraphStatViewModelState>(ViewGraphStatViewModelState.INITIALIZING)
+    private val _state = MutableLiveData(ViewGraphStatViewModelState.INITIALIZING)
 
     private val currJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + currJob)

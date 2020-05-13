@@ -20,6 +20,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
+//TODO we're keeping a duplicate list here with the parent list adapter, this could
+// cause bugs.
 abstract class OrderedListAdapter<T, G : RecyclerView.ViewHolder>(
     private val getId: (T) -> Long,
     diffCallback: DiffUtil.ItemCallback<T>
