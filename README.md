@@ -1,4 +1,7 @@
 # Track & Graph
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 An android app for tracking personal data and creating custom graphs
 
 <p align="center">
@@ -40,3 +43,22 @@ Contributers are welcome. Please raise an issue through GitHub for bug fix or fe
     
     You should have received a copy of the GNU General Public License along
     with this program. If not, see <http://www.gnu.org/licenses/>.
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/pizzapim"><img src="https://avatars3.githubusercontent.com/u/23135512?v=4" width="100px;" alt=""/><br /><sub><b>pizzapim</b></sub></a><br /><a href="#infra-pizzapim" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/SamAmco/track-and-graph/commits?author=pizzapim" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
