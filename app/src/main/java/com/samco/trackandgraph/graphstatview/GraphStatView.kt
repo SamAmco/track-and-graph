@@ -39,9 +39,10 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     override fun getBinding() = binding
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
+    //TODO should this data source come from somewhere else? Seems a bit weird to get a database ref
+    // in a view
     private val dataSource = TrackAndGraphDatabase.getInstance(context.applicationContext).trackAndGraphDatabaseDao
     override fun getDataSource() = dataSource
-    private var currentDecorator: IGraphStatViewDecorator? = null
 
     init {
         basicLineGraphSetup()
@@ -100,14 +101,12 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         viewScope?.launch {
             try {
                 cleanAllViews()
-                this@GraphStatView.currentDecorator = decorator
-                currentDecorator?.decorate(this@GraphStatView)
+                decorator.decorate(this@GraphStatView)
             } catch (exception: Exception) {
                 cleanAllViews()
                 val initException = if (exception is GraphStatInitException) exception else null
                 val errorTextId = initException?.errorTextId ?: R.string.graph_stat_view_unkown_error
-                this@GraphStatView.currentDecorator = GraphStatErrorDecorator(graphOrStat, errorTextId)
-                currentDecorator?.decorate(this@GraphStatView)
+                GraphStatErrorDecorator(graphOrStat, errorTextId).decorate(this@GraphStatView)
             }
         }
     }
@@ -116,8 +115,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         resetJob()
         viewScope?.launch {
             cleanAllViews()
-            currentDecorator = GraphStatErrorDecorator(graphOrStat, errorTextId)
-            currentDecorator?.decorate(this@GraphStatView)
+            GraphStatErrorDecorator(graphOrStat, errorTextId).decorate(this@GraphStatView)
         }
     }
 
@@ -149,5 +147,5 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         )
     }
 
-    fun dispose() { currJob?.cancel() }
+    fun dispose() = currJob?.cancel()
 }
