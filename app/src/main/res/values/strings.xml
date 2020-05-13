@@ -241,4 +241,7 @@
     <string name="default_reminder_name">Time to track!</string>
     <string name="track">Track</string>
     <string name="range_style">Range style:</string>
+
+    <string name="track_widget_title">Track</string>
+    <string name="track_widget_configure_button">Create widget</string>
 </resources>

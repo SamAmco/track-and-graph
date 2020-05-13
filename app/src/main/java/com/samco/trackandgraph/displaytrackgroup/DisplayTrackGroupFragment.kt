@@ -17,6 +17,9 @@
 package com.samco.trackandgraph.displaytrackgroup
 
 import android.app.Activity
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -33,6 +36,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.trackandgraph.ui.*
+import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 
@@ -173,7 +177,14 @@ class DisplayTrackGroupFragment : Fragment(),
         )
     }
 
-    private fun onDeleteFeature(feature: DisplayFeature) { viewModel.deleteFeature(feature) }
+    private fun onDeleteFeature(feature: DisplayFeature) {
+        viewModel.deleteFeature(feature)
+
+        // Since the app has no data repository (yet?), notify the widgets here...
+        val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE, null, context, TrackWidgetProvider::class.java)
+        intent.putExtra(com.samco.trackandgraph.widgets.DELETE_FEATURE_ID, feature.id)
+        activity?.sendBroadcast(intent)
+    }
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
         if (feature.featureType == FeatureType.TIMESTAMP) {
