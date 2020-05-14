@@ -9,5 +9,5 @@
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
     android:configure="com.samco.trackandgraph.widgets.TrackWidgetConfigure"
-    android:previewImage="@drawable/widget">
+    android:previewImage="@drawable/track_widget_preview">
 </appwidget-provider>
