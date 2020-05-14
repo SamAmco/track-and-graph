@@ -30,7 +30,7 @@
             android:textColor="@android:color/black"
             android:textSize="@dimen/track_card_title_size"
             android:textStyle="bold"
-            tools:text="@string/track_widget_title" />
+            tools:text="Track" />
 
         <ImageView
             android:id="@+id/track_widget_icon"

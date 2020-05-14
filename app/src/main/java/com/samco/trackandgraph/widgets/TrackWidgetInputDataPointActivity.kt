@@ -27,7 +27,7 @@ import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 
-class TrackWidgetInputDataPoint : FragmentActivity() {
+class TrackWidgetInputDataPointActivity : FragmentActivity() {
     private lateinit var viewModel: TrackWidgetDialogViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +62,7 @@ class TrackWidgetInputDataPoint : FragmentActivity() {
 class TrackWidgetDialogViewModel : ViewModel() {
     private lateinit var dao: TrackAndGraphDatabaseDao
 
-    fun init(activity: TrackWidgetInputDataPoint, featureId: Long) {
+    fun init(activity: TrackWidgetInputDataPointActivity, featureId: Long) {
         val application = activity.application
         dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
         CoroutineScope(Dispatchers.IO).launch {
