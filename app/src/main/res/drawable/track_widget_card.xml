@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+Title: android drawable to imitate google cards.
+Author: MarsVard
+Date: Jan 7, 2014
+Code Version: Revision 2
+Availability: https://gist.github.com/MarsVard/8297976
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape>
+            <padding
+                android:bottom="@dimen/card_margin_small"
+                android:left="@dimen/card_margin_small"
+                android:right="@dimen/card_margin_small"
+                android:top="@dimen/card_margin_small" />
+            <solid android:color="@color/ap_transparent" />
+        </shape>
+    </item>
+
+    <item>
+        <shape>
+            <padding
+                android:bottom="2dp"
+                android:left="0dp"
+                android:right="2dp"
+                android:top="0dp" />
+            <solid android:color="@color/shadow_drop" />
+            <corners android:radius="@dimen/card_corner_radius" />
+        </shape>
+    </item>
+    <item>
+        <shape>
+            <padding
+                android:bottom="4dp"
+                android:left="-4dp"
+                android:right="4dp"
+                android:top="-4dp" />
+            <solid android:color="@color/primaryColor" />
+            <corners android:radius="@dimen/card_corner_radius" />
+        </shape>
+    </item>
+    <!-- Background -->
+    <item>
+        <shape>
+            <solid android:color="@color/backgroundColor" />
+            <corners android:radius="@dimen/card_corner_radius" />
+        </shape>
+    </item>
+
+</layer-list>

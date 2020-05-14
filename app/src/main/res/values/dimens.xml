@@ -39,4 +39,5 @@
     <dimen name="widget_width">180dp</dimen>
     <dimen name="widget_resize_width">110dp</dimen>
     <dimen name="widget_height">40dp</dimen>
+    <dimen name="track_card_title_size">22sp</dimen>
 </resources>

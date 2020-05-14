@@ -58,7 +58,7 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/track_widget_info" />
         </receiver>
-        <service android:name=".widgets.WidgetJobIntentService"
+        <service android:name=".widgets.TrackWidgetJobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
