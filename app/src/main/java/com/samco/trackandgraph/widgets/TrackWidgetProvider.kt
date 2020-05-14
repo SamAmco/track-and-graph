@@ -88,7 +88,7 @@ class TrackWidgetProvider : AppWidgetProvider() {
          * Return the PendingIntent for an app widget that starts the feature input dialog.
          */
         private fun getOnClickPendingIntent(context: Context, appWidgetId: Int): PendingIntent =
-            Intent(context, TrackWidgetInputDataPoint::class.java).apply {
+            Intent(context, TrackWidgetInputDataPointActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId)
             }.let {

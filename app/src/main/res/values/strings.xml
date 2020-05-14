@@ -242,6 +242,9 @@
     <string name="track">Track</string>
     <string name="range_style">Range style:</string>
 
-    <string name="track_widget_title">Track</string>
     <string name="track_widget_configure_button">Create widget</string>
+    <string name="track_widget_configure_no_data_error">Please create a track group and track some data first.</string>
+    <string name="track_widget_configure_no_data_selected_error">You must select a valid data set to create a tracking widget.</string>
+    <string name="create">Create</string>
+
 </resources>

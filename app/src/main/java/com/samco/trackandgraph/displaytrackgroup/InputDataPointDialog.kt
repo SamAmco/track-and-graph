@@ -165,7 +165,6 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         activity!!.currentFocus?.clearFocus()
     }
 
-
     override fun onResume() {
         super.onResume()
         dialog?.window?.setLayout(
