@@ -20,26 +20,38 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.JobIntentService
+import com.samco.trackandgraph.database.FeatureType
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 
-class WidgetJobIntentService : JobIntentService() {
+class TrackWidgetJobIntentService : JobIntentService() {
     companion object {
         fun enqueueWork(context: Context, work: Intent) {
-            enqueueWork(context, WidgetJobIntentService::class.java, 0, work)
+            enqueueWork(context, TrackWidgetJobIntentService::class.java, 0, work)
         }
     }
 
     override fun onHandleWork(intent: Intent) {
         val appWidgetManager = AppWidgetManager.getInstance(this)
 
-        val appWidgetId = intent.getIntExtra("appWidgetIdExtra", -1)
-        val disableWidget = intent.getBooleanExtra("disableWidgetExtra", false)
+        val appWidgetId = intent.getIntExtra(APP_WIDGET_ID_EXTRA, -1)
+        val disableWidget = intent.getBooleanExtra(DISABLE_WIDGET_EXTRA, false)
 
         val featureId = this.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).getLong(
-            TrackWidgetProvider.getFeatureIdPref(appWidgetId), -1)
-        val title = TrackAndGraphDatabase.getInstance(this).trackAndGraphDatabaseDao.tryGetFeatureById(featureId)?.name
-        val remoteViews = TrackWidgetProvider.createRemoteViews(this, appWidgetId, title, disableWidget)
+            TrackWidgetProvider.getFeatureIdPref(appWidgetId), -1
+        )
+
+        val dao = TrackAndGraphDatabase.getInstance(this).trackAndGraphDatabaseDao
+
+        val feature = dao.tryGetFeatureById(featureId)
+        val title = feature?.name
+        val requireInput = feature?.featureType != FeatureType.TIMESTAMP
+        val remoteViews = TrackWidgetProvider.createRemoteViews(
+            this,
+            appWidgetId,
+            title,
+            requireInput,
+            disableWidget
+        )
         appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
     }
-
 }

@@ -16,11 +16,9 @@
 */
 package com.samco.trackandgraph.widgets
 
-import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
@@ -28,7 +26,6 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
-import timber.log.Timber
 
 class TrackWidgetInputDataPoint : FragmentActivity() {
     private lateinit var viewModel: TrackWidgetDialogViewModel
@@ -59,10 +56,6 @@ class TrackWidgetInputDataPoint : FragmentActivity() {
         supportFragmentManager.let {
             dialog.show(it, "input_data_points_dialog")
         }
-    }
-
-    suspend fun testje() {
-        Timber.d("test in suspend function")
     }
 }
 

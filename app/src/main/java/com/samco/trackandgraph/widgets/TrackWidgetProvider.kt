@@ -32,6 +32,8 @@ import com.samco.trackandgraph.R
 const val WIDGET_PREFS_NAME = "TrackWidget"
 const val DELETE_FEATURE_ID = "DELETE_FEATURE_ID"
 const val UPDATE_FEATURE_ID = "UPDATE_FEATURE_ID"
+const val APP_WIDGET_ID_EXTRA = "appWidgetIdExtra"
+const val DISABLE_WIDGET_EXTRA = "disableWidgetExtra"
 
 /**
  * Class for managing the track widgets.
@@ -54,15 +56,14 @@ class TrackWidgetProvider : AppWidgetProvider() {
          * Construct the RemoteViews for a widget.
          */
         fun createRemoteViews(
-            context: Context,
-            appWidgetId: Int,
-            title: String?,
+            context: Context, appWidgetId: Int,
+            title: String?, requireInput: Boolean? = true,
             disable: Boolean = false
         ): RemoteViews {
             val remoteViews = RemoteViews(context.packageName, R.layout.track_widget)
 
             if (disable) {
-                remoteViews.setTextViewText(R.id.track_widget_title, "Removed")
+                remoteViews.setTextViewText(R.id.track_widget_title, "")
                 remoteViews.setOnClickPendingIntent(
                     R.id.widget_container,
                     PendingIntent.getActivity(context, appWidgetId, Intent(), 0)
@@ -78,7 +79,7 @@ class TrackWidgetProvider : AppWidgetProvider() {
                 }
             }
 
-            setWidgetDrawable(context, disable, remoteViews)
+            setWidgetDrawable(context, disable, requireInput, remoteViews)
 
             return remoteViews
         }
@@ -103,8 +104,17 @@ class TrackWidgetProvider : AppWidgetProvider() {
          * Set the appropriate drawable for the widget according to the status of the widget.
          * Pre-Lollipop, construct a bitmap for the drawable.
          */
-        private fun setWidgetDrawable(context: Context, disable: Boolean, remoteViews: RemoteViews) {
-            val drawable = if (disable) R.drawable.warning_icon else R.drawable.add_box
+        private fun setWidgetDrawable(
+            context: Context,
+            disable: Boolean,
+            requireInput: Boolean?,
+            remoteViews: RemoteViews
+        ) {
+            val drawable = when {
+                disable -> R.drawable.warning_icon
+                requireInput == false -> R.drawable.add_box_tint
+                else -> R.drawable.add_box
+            }
 
             // Vector graphics in appwidgets need to be programmatically added.
             // Pre-Lollipop, these vectors need to be converted to a bitmap first.
@@ -130,9 +140,9 @@ class TrackWidgetProvider : AppWidgetProvider() {
          */
         fun updateWidgetsWithFeatureId(context: Context, featureId: Long) {
             getWidgetIdsForFeatureId(context, featureId).forEach { id ->
-                val workIntent = Intent(context, WidgetJobIntentService::class.java)
+                val workIntent = Intent(context, TrackWidgetJobIntentService::class.java)
                 workIntent.putExtra("appWidgetIdExtra", id)
-                WidgetJobIntentService.enqueueWork(context, workIntent)
+                TrackWidgetJobIntentService.enqueueWork(context, workIntent)
             }
         }
 
@@ -141,10 +151,10 @@ class TrackWidgetProvider : AppWidgetProvider() {
          */
         fun deleteWidgetsWithFeatureId(context: Context, featureId: Long) {
             getWidgetIdsForFeatureId(context, featureId).forEach { id ->
-                val workIntent = Intent(context, WidgetJobIntentService::class.java)
-                workIntent.putExtra("appWidgetIdExtra", id)
-                workIntent.putExtra("disableWidgetExtra", true)
-                WidgetJobIntentService.enqueueWork(context, workIntent)
+                val workIntent = Intent(context, TrackWidgetJobIntentService::class.java)
+                workIntent.putExtra(APP_WIDGET_ID_EXTRA, id)
+                workIntent.putExtra(DISABLE_WIDGET_EXTRA, true)
+                TrackWidgetJobIntentService.enqueueWork(context, workIntent)
             }
         }
 
@@ -158,10 +168,7 @@ class TrackWidgetProvider : AppWidgetProvider() {
                         .getAppWidgetIds(ComponentName(context, TrackWidgetProvider::class.java))
                         .let { ids ->
                             ids.filter {
-                                sharedPrefs.getLong(
-                                    getFeatureIdPref(it),
-                                    -1
-                                ) == featureId
+                                sharedPrefs.getLong(getFeatureIdPref(it), -1) == featureId
                             }
                         }
                 }
@@ -175,13 +182,10 @@ class TrackWidgetProvider : AppWidgetProvider() {
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
         appWidgetIds?.forEach { id ->
-            val remoteViews = createRemoteViews(context, id, null)
-            appWidgetManager.updateAppWidget(id, remoteViews)
-
             // Fire a background job to load the feature name.
-            val workIntent = Intent(context, WidgetJobIntentService::class.java)
-            workIntent.putExtra("appWidgetIdExtra", id)
-            WidgetJobIntentService.enqueueWork(context, workIntent)
+            val workIntent = Intent(context, TrackWidgetJobIntentService::class.java)
+            workIntent.putExtra(APP_WIDGET_ID_EXTRA, id)
+            TrackWidgetJobIntentService.enqueueWork(context, workIntent)
         }
     }
 
