@@ -104,23 +104,23 @@ class TrackWidgetProvider : AppWidgetProvider() {
          * Pre-Lollipop, construct a bitmap for the drawable.
          */
         private fun setWidgetDrawable(context: Context, disable: Boolean, remoteViews: RemoteViews) {
-            val drawable = if (disable) R.drawable.warning_icon else R.drawable.add_box_tint
+            val drawable = if (disable) R.drawable.warning_icon else R.drawable.add_box
 
             // Vector graphics in appwidgets need to be programmatically added.
             // Pre-Lollipop, these vectors need to be converted to a bitmap first.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 remoteViews.setImageViewResource(R.id.track_widget_icon, drawable)
             } else {
-                ContextCompat.getDrawable(context, drawable)?.let { d ->
-                    val b = Bitmap.createBitmap(
-                        d.intrinsicWidth,
-                        d.intrinsicHeight,
+                ContextCompat.getDrawable(context, drawable)?.let { drawable ->
+                    val bitmap = Bitmap.createBitmap(
+                        drawable.intrinsicWidth,
+                        drawable.intrinsicHeight,
                         Bitmap.Config.ARGB_8888
                     )
-                    val c = Canvas(b)
-                    d.setBounds(0, 0, c.width, c.height)
-                    d.draw(c)
-                    remoteViews.setImageViewBitmap(R.id.track_widget_icon, b)
+                    val canvas = Canvas(bitmap)
+                    drawable.setBounds(0, 0, canvas.width, canvas.height)
+                    drawable.draw(canvas)
+                    remoteViews.setImageViewBitmap(R.id.track_widget_icon, bitmap)
                 }
             }
         }
