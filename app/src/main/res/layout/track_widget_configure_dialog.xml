@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="@dimen/card_padding">
+
+        <TextView
+            android:id="@+id/featureTypeLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/input_spacing_large"
+            android:text="@string/select_a_feature"
+            android:textSize="@dimen/dialog_header_size" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/featureSpinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:spinnerMode="dialog" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_input_spacing">
+
+            <Button
+                android:id="@+id/cancelButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|left"
+                android:layout_marginStart="16dp"
+                android:background="@null"
+                android:text="@string/cancel"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/createButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:background="@null"
+                android:text="@string/create"
+                android:textColor="@color/secondaryColor"
+                android:textStyle="bold" />
+
+        </FrameLayout>
+    </LinearLayout>
+</layout>

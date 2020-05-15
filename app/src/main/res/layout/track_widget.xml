@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/track_widget_card"
+    >
+
+    <RelativeLayout
+        android:id="@+id/widget_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        >
+        <TextView
+            android:id="@+id/track_widget_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="@dimen/card_margin_small"
+            android:layout_marginTop="@dimen/card_margin_small"
+            android:layout_marginEnd="@dimen/card_margin_small"
+            android:layout_marginBottom="@dimen/card_margin_small"
+            android:layout_toStartOf="@id/track_widget_icon"
+            android:gravity="center"
+            android:maxHeight="40dp"
+            android:textColor="@android:color/black"
+            android:textSize="@dimen/track_card_title_size"
+            android:textStyle="bold"
+            tools:text="Track" />
+
+        <ImageView
+            android:id="@+id/track_widget_icon"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="@dimen/card_margin_small"
+            android:layout_marginEnd="@dimen/card_margin_small"
+            android:layout_marginBottom="@dimen/card_margin_small"
+            tools:src="@drawable/add_box" />
+    </RelativeLayout>
+</FrameLayout>

@@ -41,7 +41,7 @@ import kotlinx.coroutines.*
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 
-class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
+open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private lateinit var viewModel: InputDataPointDialogViewModel
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private lateinit var binding: DataPointInputDialogBinding
@@ -164,7 +164,6 @@ class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
         else imm.hideSoftInputFromWindow(view?.windowToken, 0)
         activity!!.currentFocus?.clearFocus()
     }
-
 
     override fun onResume() {
         super.onResume()

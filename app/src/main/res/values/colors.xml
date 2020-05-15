@@ -45,4 +45,6 @@
     <color name="visColor8">#74add1</color>
     <color name="visColor9">#4575b4</color>
     <color name="visColor10">#313695</color>
+
+    <color name="shadow_drop">#03000000</color>
 </resources>

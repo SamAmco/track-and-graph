@@ -44,7 +44,7 @@
                             app:layout_constraintTop_toTopOf="parent"
                             android:maxHeight="70dp"
                             android:textStyle="bold"
-                            android:textSize="22sp"
+                            android:textSize="@dimen/track_card_title_size"
                             android:gravity="center"
                             android:text="@{feature.name}"
                             tools:text="Some name"
@@ -107,7 +107,7 @@
         </FrameLayout>
         <ImageButton
                 android:id="@+id/menuButton"
-                android:src="@drawable/list_menu_icon"
+                app:srcCompat="@drawable/list_menu_icon"
                 android:background="#00FFFFFF"
                 android:padding="8dp"
                 android:layout_width="40dp"
@@ -128,7 +128,7 @@
                 android:background="@null"
                 android:tint="@color/toolBarTextColor"
                 android:scaleType="fitXY"
-                android:src="@drawable/add_box" />
+                app:srcCompat="@drawable/add_box" />
 
         <ImageButton
                 android:id="@+id/quickAddButton"
@@ -142,6 +142,6 @@
                 android:background="@null"
                 android:tint="@color/primaryColor"
                 android:scaleType="fitXY"
-                android:src="@drawable/add_box" />
+                app:srcCompat="@drawable/add_box" />
     </FrameLayout>
 </layout>

@@ -228,7 +228,7 @@ class GraphsAndStatsViewModel : ViewModel() {
 
     private fun preenLineGraph(graphOrStat: GraphOrStat): Boolean {
         val lineGraph = dataSource!!.getLineGraphByGraphStatId(graphOrStat.id) ?: return true
-        return lineGraph.features.any { dataSource!!.tryGetFeatureById(it.featureId) == null }
+        return lineGraph.features.any { dataSource!!.tryGetFeatureByIdSync(it.featureId) == null }
     }
 
     private fun preenPieChart(graphOrStat: GraphOrStat): Boolean {
