@@ -20,8 +20,15 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.R
 import org.threeten.bp.Duration
 import org.threeten.bp.Period
+
+val pointStyleDrawableResources = listOf(
+    R.drawable.point_style_none_icon,
+    R.drawable.point_style_circles_icon,
+    R.drawable.point_style_circles_and_numbers_icon
+)
 
 enum class LineGraphAveraginModes {
     NO_AVERAGING,
@@ -40,6 +47,12 @@ enum class LineGraphPlottingModes {
     GENERATE_WEEKLY_TOTALS,
     GENERATE_MONTHLY_TOTALS,
     GENERATE_YEARLY_TOTALS
+}
+
+enum class LineGraphPointStyle {
+    NONE,
+    CIRCLES,
+    CIRCLES_AND_NUMBERS
 }
 
 val plottingModePeriods = mapOf(
@@ -72,6 +85,7 @@ data class LineGraphFeature(
     var colorIndex: Int,
     var averagingMode : LineGraphAveraginModes,
     var plottingMode: LineGraphPlottingModes,
+    var pointStyle: LineGraphPointStyle,
     var offset: Double,
     var scale: Double
 )
