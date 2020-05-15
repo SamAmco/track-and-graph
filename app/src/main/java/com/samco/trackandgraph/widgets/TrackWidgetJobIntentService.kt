@@ -42,7 +42,7 @@ class TrackWidgetJobIntentService : JobIntentService() {
 
         val dao = TrackAndGraphDatabase.getInstance(this).trackAndGraphDatabaseDao
 
-        val feature = dao.tryGetFeatureById(featureId)
+        val feature = dao.tryGetFeatureByIdSync(featureId)
         val title = feature?.name
         val requireInput = feature?.featureType != FeatureType.TIMESTAMP
         val remoteViews = TrackWidgetProvider.createRemoteViews(
