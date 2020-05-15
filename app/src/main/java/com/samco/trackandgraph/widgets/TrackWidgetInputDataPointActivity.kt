@@ -16,19 +16,21 @@
 */
 package com.samco.trackandgraph.widgets
 
+import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
-import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 
 class TrackWidgetInputDataPointActivity : FragmentActivity() {
-    private lateinit var viewModel: TrackWidgetDialogViewModel
+    private lateinit var viewModel: TrackWidgetInputDataPointViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,12 +45,25 @@ class TrackWidgetInputDataPointActivity : FragmentActivity() {
                 return
             }
 
-            viewModel = ViewModelProviders.of(this).get(TrackWidgetDialogViewModel::class.java)
-            viewModel.init(this, featureId)
-        }
+            viewModel = ViewModelProviders.of(this)
+                .get(TrackWidgetInputDataPointViewModel::class.java)
+            viewModel.init(this.application, featureId)
+            observeFeature()
+        } ?: finish()
     }
 
-    fun showDialog(featureId: Long) {
+    private fun observeFeature() = viewModel.feature.observe(this, Observer { feature ->
+        if (feature == null) finish()
+        else when (feature.featureType) {
+            FeatureType.TIMESTAMP -> {
+                viewModel.addDataPoint(feature.id)
+                finish()
+            }
+            else -> showDialog(feature.id)
+        }
+    })
+
+    private fun showDialog(featureId: Long) {
         val dialog = TrackWidgetInputDataPointDialog()
         val args = Bundle()
         args.putLongArray(FEATURE_LIST_KEY, longArrayOf(featureId))
@@ -59,25 +74,17 @@ class TrackWidgetInputDataPointActivity : FragmentActivity() {
     }
 }
 
-class TrackWidgetDialogViewModel : ViewModel() {
+class TrackWidgetInputDataPointViewModel : ViewModel() {
     private lateinit var dao: TrackAndGraphDatabaseDao
+    lateinit var feature: LiveData<Feature?> private set
 
-    fun init(activity: TrackWidgetInputDataPointActivity, featureId: Long) {
-        val application = activity.application
+    fun init(application: Application, featureId: Long) {
         dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        CoroutineScope(Dispatchers.IO).launch {
-            val feature: Feature? = dao.tryGetFeatureById(featureId)
-            if (feature != null) {
-                if (feature.featureType != FeatureType.TIMESTAMP) {
-                    activity.showDialog(featureId)
-                } else {
-                    val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, 1.0, "")
-                    dao.insertDataPoint(newDataPoint)
-                    activity.finish()
-                }
-            } else {
-                activity.finish()
-            }
-        }
+        feature = dao.tryGetFeatureById(featureId)
+    }
+
+    fun addDataPoint(featureId: Long) {
+        val newDataPoint = DataPoint(OffsetDateTime.now(), featureId, 1.0, "")
+        dao.insertDataPoint(newDataPoint)
     }
 }
