@@ -18,6 +18,7 @@ package com.samco.trackandgraph.graphstatinput
 
 import android.content.Context
 import android.text.InputFilter
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,8 @@ class LineGraphFeatureConfigListItemView(
     private val features: List<FeatureAndTrackGroup>,
     private val lineGraphFeature: LineGraphFeature
 ) : LinearLayout(context) {
-    private val binding = ListItemLineGraphFeatureBinding.inflate(LayoutInflater.from(context), this, true)
+    private val binding =
+        ListItemLineGraphFeatureBinding.inflate(LayoutInflater.from(context), this, true)
     private var onRemoveListener: ((LineGraphFeatureConfigListItemView) -> Unit)? = null
     private var onUpdatedListener: ((LineGraphFeatureConfigListItemView) -> Unit)? = null
     private val decimalFormat = DecimalFormat("0.###############")
@@ -56,10 +58,13 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupGraphFeatureName() {
-        binding.lineGraphFeatureName.filters = arrayOf(InputFilter.LengthFilter(MAX_LINE_GRAPH_FEATURE_NAME_LENGTH))
-        if (lineGraphFeature.name.isNotEmpty()) binding.lineGraphFeatureName.setText(lineGraphFeature.name)
+        binding.lineGraphFeatureName.filters =
+            arrayOf(InputFilter.LengthFilter(MAX_LINE_GRAPH_FEATURE_NAME_LENGTH))
+        if (lineGraphFeature.name.isNotEmpty()) binding.lineGraphFeatureName.setText(
+            lineGraphFeature.name
+        )
         binding.lineGraphFeatureName.addTextChangedListener { text ->
-            if(lineGraphFeature.name != text.toString()) {
+            if (lineGraphFeature.name != text.toString()) {
                 lineGraphFeature.name = text.toString()
                 onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
             }
@@ -79,15 +84,17 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupPointStyleSpinner(context: Context) {
-        binding.pointStyleSpinner.adapter = PointStyleSpinnerAdapter(context, pointStyleDrawableResources)
+        binding.pointStyleSpinner.adapter =
+            PointStyleSpinnerAdapter(context, pointStyleDrawableResources)
         binding.pointStyleSpinner.setSelection(lineGraphFeature.pointStyle.ordinal)
-        binding.pointStyleSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {}
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                lineGraphFeature.pointStyle = LineGraphPointStyle.values()[index]
-                onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+        binding.pointStyleSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                    lineGraphFeature.pointStyle = LineGraphPointStyle.values()[index]
+                    onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                }
             }
-        }
     }
 
     private fun setupRemoveButton() {
@@ -114,50 +121,67 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupPlottingModeSpinner() {
-        var modeSpinnerIndex = LineGraphPlottingModes.values().indexOfFirst { m -> m == lineGraphFeature.plottingMode }
+        var modeSpinnerIndex =
+            LineGraphPlottingModes.values().indexOfFirst { m -> m == lineGraphFeature.plottingMode }
         if (modeSpinnerIndex == -1) modeSpinnerIndex = 0
         binding.plottingModeSpinner.setSelection(modeSpinnerIndex)
-        binding.plottingModeSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) { }
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                lineGraphFeature.plottingMode = LineGraphPlottingModes.values()[index]
-                onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+        binding.plottingModeSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                    lineGraphFeature.plottingMode = LineGraphPlottingModes.values()[index]
+                    onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                }
             }
-        }
     }
 
     private fun setupAveragingModeSpinner() {
-        var modeSpinnerStartIndex = LineGraphAveraginModes.values().indexOfFirst { m -> m == lineGraphFeature.averagingMode}
+        var modeSpinnerStartIndex = LineGraphAveraginModes.values()
+            .indexOfFirst { m -> m == lineGraphFeature.averagingMode }
         if (modeSpinnerStartIndex == -1) modeSpinnerStartIndex = 0
         binding.averagingModeSpinner.setSelection(modeSpinnerStartIndex)
-        binding.averagingModeSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) { }
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                lineGraphFeature.averagingMode = LineGraphAveraginModes.values()[index]
-                onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+        binding.averagingModeSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                    lineGraphFeature.averagingMode = LineGraphAveraginModes.values()[index]
+                    onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                }
             }
-        }
     }
 
     private fun setupFeatureSpinner() {
         val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
-        val adapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
+        val adapter =
+            ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.featureSpinner.adapter = adapter
-        var featureSpinnerStartIndex = features.indexOfFirst { f -> f.id == lineGraphFeature.featureId}
+        var featureSpinnerStartIndex =
+            features.indexOfFirst { f -> f.id == lineGraphFeature.featureId }
         if (featureSpinnerStartIndex == -1) featureSpinnerStartIndex = 0
         binding.featureSpinner.setSelection(featureSpinnerStartIndex)
-        binding.featureSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) { }
-            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                onFeatureChangeNameUpdate(lineGraphFeature.featureId, lineGraphFeature.name, features[index].name)
-                lineGraphFeature.featureId = features[index].id
-                onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+        binding.featureSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                    onFeatureChangeNameUpdate(
+                        lineGraphFeature.featureId,
+                        lineGraphFeature.name,
+                        features[index].name
+                    )
+                    lineGraphFeature.featureId = features[index].id
+                    onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                }
             }
-        }
     }
 
-    private fun onFeatureChangeNameUpdate(oldFeatureId: Long, oldFeatureName: String, newFeatureName: String) {
-        if (oldFeatureId == -1L || oldFeatureName == "") binding.lineGraphFeatureName.setText(newFeatureName)
+    private fun onFeatureChangeNameUpdate(
+        oldFeatureId: Long,
+        oldFeatureName: String,
+        newFeatureName: String
+    ) {
+        if (oldFeatureId == -1L || oldFeatureName == "") binding.lineGraphFeatureName.setText(
+            newFeatureName
+        )
         val oldFeatureDBName = features.firstOrNull { f -> f.id == oldFeatureId }?.name ?: return
         if (oldFeatureDBName == oldFeatureName || oldFeatureName == "") {
             binding.lineGraphFeatureName.setText(newFeatureName)
@@ -172,15 +196,16 @@ class LineGraphFeatureConfigListItemView(
         this.onRemoveListener = onRemoveListener
     }
 
-    private class ColorSpinnerAdapter(context: Context, val colorIds: List<Int>)
-        : ArrayAdapter<Int>(context, R.layout.circular_spinner_item) {
+    private class ColorSpinnerAdapter(context: Context, val colorIds: List<Int>) :
+        ArrayAdapter<Int>(context, R.layout.circular_spinner_item) {
 
         override fun getCount() = colorIds.size
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: LayoutInflater.from(context)
                 .inflate(R.layout.circular_spinner_item, parent, false)
-            view.findViewById<ImageView>(R.id.image).setColorFilter(getColor(context, colorIds[position]))
+            view.findViewById<ImageView>(R.id.image)
+                .setColorFilter(getColor(context, colorIds[position]))
             return view
         }
 
@@ -189,8 +214,8 @@ class LineGraphFeatureConfigListItemView(
         }
     }
 
-    private class PointStyleSpinnerAdapter(context: Context, val imageIds: List<Int>)
-        : ArrayAdapter<Int>(context, R.layout.circular_spinner_item){
+    private class PointStyleSpinnerAdapter(context: Context, val imageIds: List<Int>) :
+        ArrayAdapter<Int>(context, R.layout.circular_spinner_item) {
 
         override fun getCount(): Int = imageIds.size
 
