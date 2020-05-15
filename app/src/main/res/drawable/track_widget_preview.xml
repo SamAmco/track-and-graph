@@ -1,32 +1,24 @@
-<!--
-  ~ This file is part of Track & Graph
-  ~
-  ~ Track & Graph is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ Track & Graph is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-  -->
-
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="100dp"
     android:height="35dp"
     android:viewportWidth="100"
     android:viewportHeight="35">
   <path
-      android:pathData="M5.288,6.322h89.235v23.941h-89.235z"
-      android:strokeAlpha="0.94527366"
+      android:pathData="M6.749,7.069h89.235v23.941h-89.235z"
+      android:strokeAlpha="0.26027395"
       android:strokeLineJoin="round"
       android:strokeWidth="2.64583325"
       android:fillColor="#00000000"
-      android:strokeColor="#d3d3d3"
+      android:strokeColor="#000000"
+      android:fillAlpha="1"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M6.557,6.88h89.235v23.941h-89.235z"
+      android:strokeAlpha="1"
+      android:strokeLineJoin="round"
+      android:strokeWidth="2.64583325"
+      android:fillColor="#00000000"
+      android:strokeColor="#74add1"
       android:fillAlpha="1"
       android:strokeLineCap="round"/>
   <path
@@ -39,9 +31,9 @@
       android:fillAlpha="1"
       android:strokeLineCap="round"/>
   <path
-      android:pathData="M88.804,10.857L78.552,10.857C77.739,10.857 77.087,11.516 77.087,12.322l0,10.252c0,0.806 0.652,1.465 1.465,1.465l10.252,0c0.806,0 1.465,-0.659 1.465,-1.465L90.269,12.322C90.269,11.516 89.61,10.857 88.804,10.857ZM88.804,22.574L78.552,22.574L78.552,12.322l10.252,0zM82.946,21.11l1.465,0l0,-2.929l2.929,0L87.339,16.716L84.41,16.716L84.41,13.787l-1.465,0l0,2.929L80.016,16.716l0,1.465l2.929,0z"
+      android:pathData="M90.862,14.24L80.61,14.24C79.797,14.24 79.145,14.899 79.145,15.704l0,10.252c0,0.806 0.652,1.465 1.465,1.465l10.252,0c0.806,0 1.465,-0.659 1.465,-1.465L92.327,15.704C92.327,14.899 91.668,14.24 90.862,14.24ZM90.862,25.957L80.61,25.957L80.61,15.704l10.252,0zM85.004,24.492l1.465,0l0,-2.929l2.929,0L89.397,20.098L86.468,20.098L86.468,17.169l-1.465,0l0,2.929L82.074,20.098l0,1.465l2.929,0z"
       android:strokeAlpha="0.98507463"
-      android:fillColor="#74add1"
+      android:fillColor="#000000"
       android:strokeColor="#00000000"
       android:fillAlpha="1"/>
   <path
