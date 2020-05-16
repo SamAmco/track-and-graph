@@ -33,11 +33,15 @@
     <dimen name="move_to_dialog_base_height">150dp</dimen>
     <dimen name="move_to_dialog_max_height">400dp</dimen>
     <dimen name="list_item_group_item_height">45dp</dimen>
-    <dimen name="spinner_item_color_size">60dp</dimen>
+    <dimen name="spinner_circle_item_size">65dp</dimen>
     <dimen name="graph_height">300dp</dimen>
     <dimen name="design_navigation_icon_size" tools:override="true">20dp</dimen>
     <dimen name="widget_width">180dp</dimen>
     <dimen name="widget_resize_width">110dp</dimen>
     <dimen name="widget_height">40dp</dimen>
     <dimen name="track_card_title_size">22sp</dimen>
+    <dimen name="line_graph_line_thickness">2dp</dimen>
+    <dimen name="line_graph_vertex_thickness">6dp</dimen>
+    <dimen name="line_graph_point_label_h_offset">-3dp</dimen>
+    <dimen name="line_graph_point_label_v_offset">10dp</dimen>
 </resources>

@@ -65,7 +65,7 @@ const val splitChars2 = "!!"
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class],
-    version = 31
+    version = 32
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -79,8 +79,7 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 var instance = INSTANCE
                 if (instance == null) {
                     instance = Room.databaseBuilder(context.applicationContext, TrackAndGraphDatabase::class.java, "trackandgraph_database")
-                        .addMigrations(MIGRATION_29_30)
-                        .addMigrations(MIGRATION_30_31)
+                        .addMigrations(MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32)
                         .fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance
@@ -88,28 +87,6 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 return instance
             }
         }
-    }
-}
-
-val MIGRATION_29_30 = object : Migration(29, 30) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
-            CREATE TABLE IF NOT EXISTS `reminders_table` (
-                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
-                `display_index` INTEGER NOT NULL, 
-                `name` TEXT NOT NULL,
-                `time` TEXT NOT NULL,
-                `checked_days` TEXT NOT NULL
-            )""".trimMargin())
-        database.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `reminders_table` (`id`)")
-    }
-}
-
-val MIGRATION_30_31 = object : Migration(30, 31) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("ALTER TABLE line_graphs_table ADD y_range_type INTEGER NOT NULL DEFAULT  0")
-        database.execSQL("ALTER TABLE line_graphs_table ADD y_from REAL NOT NULL DEFAULT  0")
-        database.execSQL("ALTER TABLE line_graphs_table ADD y_to REAL NOT NULL DEFAULT  1")
     }
 }
 
@@ -149,6 +126,7 @@ class Converters {
                 "${v.colorIndex}",
                 "${v.averagingMode.ordinal}",
                 "${v.plottingMode.ordinal}",
+                "${v.pointStyle.ordinal}",
                 "${v.offset}",
                 "${v.scale}"
             ).joinToString(splitChars2)
@@ -165,8 +143,9 @@ class Converters {
                 strs[2].toInt(),
                 LineGraphAveraginModes.values()[strs[3].toInt()],
                 LineGraphPlottingModes.values()[strs[4].toInt()],
-                strs[5].toDouble(),
-                strs[6].toDouble()
+                LineGraphPointStyle.values()[strs[5].toInt()],
+                strs[6].toDouble(),
+                strs[7].toDouble()
             )
         }
     }

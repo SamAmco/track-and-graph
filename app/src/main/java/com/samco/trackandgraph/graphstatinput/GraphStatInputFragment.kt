@@ -234,7 +234,8 @@ class GraphStatInputFragment : Fragment() {
         binding.addFeatureButton.setOnClickListener {
             val nextColorIndex = (viewModel.lineGraphFeatures.size * dataVisColorGenerator) % dataVisColorList.size
             val newLineGraphFeature = LineGraphFeature(-1, "", nextColorIndex,
-                LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED, 0.toDouble(), 1.toDouble())
+                LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED,
+                LineGraphPointStyle.NONE, 0.toDouble(), 1.toDouble())
             viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.plus(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
         }
@@ -246,7 +247,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun inflateLineGraphFeatureView(lgf: LineGraphFeature, features: List<FeatureAndTrackGroup>) {
-        val view = GraphFeatureListItemView(context!!, features, dataVisColorList, lgf)
+        val view = LineGraphFeatureConfigListItemView(context!!, features, lgf)
         view.setOnRemoveListener {
             viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.minus(lgf)
             binding.lineGraphFeaturesLayout.removeView(view)
@@ -422,22 +423,22 @@ class GraphStatInputViewModel : ViewModel() {
     private var graphStatDisplayIndex: Int? = null
     private var id: Long? = null
 
-    val graphName = MutableLiveData<String>("")
-    val graphStatType = MutableLiveData<GraphStatType>(GraphStatType.LINE_GRAPH)
+    val graphName = MutableLiveData("")
+    val graphStatType = MutableLiveData(GraphStatType.LINE_GRAPH)
     val sampleDuration = MutableLiveData<Duration?>(null)
-    val yRangeType = MutableLiveData<YRangeType>(YRangeType.DYNAMIC)
-    val yRangeFrom = MutableLiveData<Double>(0.0)
-    val yRangeTo = MutableLiveData<Double>(1.0)
+    val yRangeType = MutableLiveData(YRangeType.DYNAMIC)
+    val yRangeFrom = MutableLiveData(0.0)
+    val yRangeTo = MutableLiveData(1.0)
     val selectedPieChartFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatDiscreteValue = MutableLiveData<DiscreteValue?>(null)
-    val selectedValueStatFromValue = MutableLiveData<Double>(0.toDouble())
-    val selectedValueStatToValue = MutableLiveData<Double>(0.toDouble())
+    val selectedValueStatFromValue = MutableLiveData(0.toDouble())
+    val selectedValueStatToValue = MutableLiveData(0.toDouble())
     var lineGraphFeatures = listOf<LineGraphFeature>()
     val updateMode: LiveData<Boolean> get() { return _updateMode }
-    private val _updateMode = MutableLiveData<Boolean>(false)
+    private val _updateMode = MutableLiveData(false)
     val state: LiveData<GraphStatInputState> get() { return _state }
-    private val _state = MutableLiveData<GraphStatInputState>(GraphStatInputState.INITIALIZING)
+    private val _state = MutableLiveData(GraphStatInputState.INITIALIZING)
     val formValid: LiveData<ValidationException?> get() { return _formValid }
     private val _formValid = MutableLiveData<ValidationException?>(null)
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
