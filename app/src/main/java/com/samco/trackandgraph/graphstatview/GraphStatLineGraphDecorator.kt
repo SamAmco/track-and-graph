@@ -18,6 +18,8 @@
 package com.samco.trackandgraph.graphstatview
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.Paint
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.androidplot.Region
@@ -36,6 +38,7 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.WeekFields
+import java.text.DecimalFormat
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
@@ -309,29 +312,75 @@ class GraphStatLineGraphDecorator(
 
     private fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
         val seriesFormat =
-            if (listViewMode) {
-                val sf = FastLineAndPointRenderer.Formatter(
-                    ContextCompat.getColor(
-                        context!!,
-                        dataVisColorList[lineGraphFeature.colorIndex]
-                    ),
-                    null,
-                    null
-                )
-                sf.linePaint.isAntiAlias = false
-
-                sf.linePaint.strokeWidth = 2f * context!!.resources.displayMetrics.density
-                sf
-            } else {
-                val sf = LineAndPointFormatter(context, R.xml.line_point_formatter)
-                sf.linePaint.color =
-                    ContextCompat.getColor(
-                        context!!,
-                        dataVisColorList[lineGraphFeature.colorIndex]
-                    )
-                sf
-            }
+            if (listViewMode && lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
+                getFastLineAndPointFormatter(lineGraphFeature)
+            else getLineAndPointFormatter(lineGraphFeature)
         currentXYRegions.add(series.minMax())
         binding!!.lineGraph.addSeries(series, seriesFormat)
     }
+
+    private fun getLineAndPointFormatter(lineGraphFeature: LineGraphFeature): LineAndPointFormatter {
+        val formatter = LineAndPointFormatter()
+        formatter.linePaint.apply {
+            color = getLinePaintColor(lineGraphFeature)
+            strokeWidth = getLinePaintWidth()
+        }
+        getVertexPaintColor(lineGraphFeature)?.let {
+            formatter.vertexPaint.color = it
+            formatter.vertexPaint.strokeWidth = getVertexPaintWidth()
+        } ?: run {
+            formatter.vertexPaint = null
+        }
+        getPointLabelFormatter(lineGraphFeature)?.let {
+            formatter.pointLabelFormatter = it
+            formatter.setPointLabeler { series, index ->
+                DecimalFormat("#.#").format(series.getY(index))
+            }
+        } ?: run {
+            formatter.pointLabelFormatter = null
+        }
+        formatter.fillPaint = null
+        return formatter
+    }
+
+    private fun getFastLineAndPointFormatter(lineGraphFeature: LineGraphFeature): LineAndPointFormatter {
+        val formatter = FastLineAndPointRenderer.Formatter(
+            getLinePaintColor(lineGraphFeature),
+            getVertexPaintColor(lineGraphFeature),
+            getPointLabelFormatter(lineGraphFeature)
+        )
+        formatter.linePaint?.apply { isAntiAlias = false }
+        formatter.linePaint?.apply { strokeWidth = getLinePaintWidth() }
+        formatter.vertexPaint?.apply { strokeWidth = getVertexPaintWidth() }
+        return formatter
+    }
+
+    private fun getLinePaintWidth() =
+        context!!.resources.getDimension(R.dimen.line_graph_line_thickness)
+
+    private fun getVertexPaintWidth() =
+        context!!.resources.getDimension(R.dimen.line_graph_vertex_thickness)
+
+    private fun getLinePaintColor(lineGraphFeature: LineGraphFeature): Int {
+        return getPaintColor(lineGraphFeature)
+    }
+
+    private fun getVertexPaintColor(lineGraphFeature: LineGraphFeature): Int? {
+        return if (lineGraphFeature.pointStyle == LineGraphPointStyle.NONE) null
+        else getPaintColor(lineGraphFeature)
+    }
+
+    private fun getPointLabelFormatter(lineGraphFeature: LineGraphFeature): PointLabelFormatter? {
+        if (lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS) return null
+        val pointLabelFormatter = PointLabelFormatter(
+            Color.BLACK,
+            context!!.resources.getDimension(R.dimen.line_graph_point_label_h_offset),
+            context!!.resources.getDimension(R.dimen.line_graph_point_label_v_offset)
+        )
+        pointLabelFormatter.textPaint.textAlign = Paint.Align.RIGHT
+        return pointLabelFormatter
+    }
+
+    private fun getPaintColor(lineGraphFeature: LineGraphFeature) =
+        ContextCompat.getColor(context!!, dataVisColorList[lineGraphFeature.colorIndex])
 }
