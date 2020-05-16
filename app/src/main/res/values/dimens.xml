@@ -40,4 +40,8 @@
     <dimen name="widget_resize_width">110dp</dimen>
     <dimen name="widget_height">40dp</dimen>
     <dimen name="track_card_title_size">22sp</dimen>
+    <dimen name="line_graph_line_thickness">2dp</dimen>
+    <dimen name="line_graph_vertex_thickness">6dp</dimen>
+    <dimen name="line_graph_point_label_h_offset">-3dp</dimen>
+    <dimen name="line_graph_point_label_v_offset">10dp</dimen>
 </resources>
