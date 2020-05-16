@@ -75,16 +75,17 @@ class TrackWidgetInputDataPointActivity : FragmentActivity() {
 }
 
 class TrackWidgetInputDataPointViewModel : ViewModel() {
-    private lateinit var dao: TrackAndGraphDatabaseDao
+    private var dataSource: TrackAndGraphDatabaseDao? = null
     lateinit var feature: LiveData<Feature?> private set
 
     fun init(application: Application, featureId: Long) {
-        dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        feature = dao.tryGetFeatureById(featureId)
+        if (dataSource != null) return
+        dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
+        feature = dataSource!!.tryGetFeatureById(featureId)
     }
 
     fun addDataPoint(featureId: Long) {
         val newDataPoint = DataPoint(OffsetDateTime.now(), featureId, 1.0, "")
-        dao.insertDataPoint(newDataPoint)
+        dataSource!!.insertDataPoint(newDataPoint)
     }
 }
