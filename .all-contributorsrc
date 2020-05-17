@@ -32,6 +32,15 @@
         "ideas",
         "bug"
       ]
+    },
+    {
+      "login": "IzzySoft",
+      "name": "Izzy",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/6781438?v=4",
+      "profile": "https://android.izzysoft.de/",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
