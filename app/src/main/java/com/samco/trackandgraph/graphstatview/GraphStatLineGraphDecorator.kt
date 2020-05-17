@@ -37,6 +37,7 @@ import org.threeten.bp.Period
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
+import org.threeten.bp.temporal.TemporalAmount
 import org.threeten.bp.temporal.WeekFields
 import java.text.DecimalFormat
 import java.text.FieldPosition
@@ -201,7 +202,7 @@ class GraphStatLineGraphDecorator(
 
         val yValues = when (lineGraphFeature.averagingMode) {
             LineGraphAveraginModes.NO_AVERAGING -> rawData.dataPoints.drop(rawData.plotFrom)
-                .map { dp -> dp.value.toDouble() }
+                .map { dp -> dp.value }
             else -> calculateMovingAverage(
                 rawData,
                 movingAverageDurations[lineGraphFeature.averagingMode]!!
@@ -245,24 +246,24 @@ class GraphStatLineGraphDecorator(
                     i--
                 }
                 yield()
-                inRange.sumByDouble { dp -> dp.value.toDouble() } / inRange.size.toDouble()
+                inRange.sumByDouble { dp -> dp.value } / inRange.size.toDouble()
             }
     }
 
     private suspend fun calculateDurationAccumulatedValues(
         rawData: RawDataSample,
-        period: Period
+        plotTotalTime: TemporalAmount
     ): RawDataSample {
         if (rawData.dataPoints.isEmpty()) return rawData
         var plotFrom = 0
         var foundPlotFrom = false
         val featureId = rawData.dataPoints[0].featureId
         val newData = mutableListOf<DataPoint>()
-        var currentTimeStamp = findBeginningOfPeriod(rawData.dataPoints[0].timestamp, period)
+        var currentTimeStamp = findFirstPlotDateTime(rawData.dataPoints[0].timestamp, plotTotalTime)
         val latest = getNowOrLatest(rawData)
         var index = 0
         while (currentTimeStamp.isBefore(latest)) {
-            currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(period) }
+            currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(plotTotalTime) }
             val points = rawData.dataPoints.drop(index)
                 .takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
             val total = points.sumByDouble { dp -> dp.value }
@@ -274,10 +275,7 @@ class GraphStatLineGraphDecorator(
             newData.add(DataPoint(currentTimeStamp, featureId, total, ""))
             yield()
         }
-        return RawDataSample(
-            newData,
-            plotFrom
-        )
+        return RawDataSample(newData, plotFrom)
     }
 
     private fun getNowOrLatest(rawData: RawDataSample): OffsetDateTime {
@@ -287,27 +285,36 @@ class GraphStatLineGraphDecorator(
         return if (latest > now) latest else now
     }
 
-    private fun findBeginningOfPeriod(
+    private fun findFirstPlotDateTime(
         startDateTime: OffsetDateTime,
-        period: Period
+        plotTotalTime: TemporalAmount
     ): OffsetDateTime {
-        var dt = startDateTime
-        val minusAWeek = period.minus(Period.ofWeeks(1))
-        val minusAMonth = period.minus(Period.ofMonths(1))
-        val minusAYear = period.minus(Period.ofYears(1))
-        if (minusAYear.days >= 0 && !minusAYear.isNegative) {
-            dt = startDateTime.withDayOfYear(1)
-        } else if (minusAMonth.days >= 0 && !minusAMonth.isNegative) {
-            dt = startDateTime
-                .withDayOfMonth(1)
-        } else if (minusAWeek.days >= 0 && !minusAWeek.isNegative) {
-            dt = startDateTime.with(
-                TemporalAdjusters.previousOrSame(
-                    WeekFields.of(Locale.getDefault()).firstDayOfWeek
-                )
-            )
+        return when (plotTotalTime) {
+            is Duration -> {
+                //For now we assume the duration is 1 hour for simplicity since this is the
+                // only available duration option anyway
+                startDateTime.withMinute(0).withSecond(0).minusSeconds(1)
+            }
+            is Period -> {
+                var dt = startDateTime
+                val minusAWeek = plotTotalTime.minus(Period.ofWeeks(1))
+                val minusAMonth = plotTotalTime.minus(Period.ofMonths(1))
+                val minusAYear = plotTotalTime.minus(Period.ofYears(1))
+                if (minusAYear.days >= 0 && !minusAYear.isNegative) {
+                    dt = startDateTime.withDayOfYear(1)
+                } else if (minusAMonth.days >= 0 && !minusAMonth.isNegative) {
+                    dt = startDateTime.withDayOfMonth(1)
+                } else if (minusAWeek.days >= 0 && !minusAWeek.isNegative) {
+                    dt = startDateTime.with(
+                        TemporalAdjusters.previousOrSame(
+                            WeekFields.of(Locale.getDefault()).firstDayOfWeek
+                        )
+                    )
+                }
+                dt.withHour(0).withMinute(0).withSecond(0).minusSeconds(1)
+            }
+            else -> startDateTime
         }
-        return dt.withHour(0).withMinute(0).withSecond(0).minusSeconds(1)
     }
 
     private fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {

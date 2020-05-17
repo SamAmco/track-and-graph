@@ -22,10 +22,7 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.room.testing.MigrationTestHelper
-import com.samco.trackandgraph.database.MIGRATION_29_30
-import com.samco.trackandgraph.database.MIGRATION_30_31
-import com.samco.trackandgraph.database.MIGRATION_31_32
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.database.*
 import junit.framework.Assert.assertTrue
 import org.junit.After
 import org.junit.Rule
@@ -38,7 +35,7 @@ class MigrationTest {
     companion object {
         private const val FIRST_DATABASE_RELEASE_VERSION = 29
         private const val TEST_DB = "migration-test"
-        private val ALL_MIGRATIONS = arrayOf(MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32)
+        private val ALL_MIGRATIONS = arrayOf(MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33)
     }
 
     @Rule @JvmField
@@ -78,6 +75,27 @@ class MigrationTest {
         }
         assertTrue(featureStrings.contains("10!!Anxiety!!4!!6!!3!!0!!9.0!!1.01||11!!Stress!!7!!3!!0!!0!!10.0!!0.255"))
         assertTrue(featureStrings.contains("4!!Weather!!0!!0!!0!!0!!0.0!!1.0"))
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testMigrateLineGraphFeatures_32_33() {
+        helper.createDatabase(TEST_DB, 32).apply {
+            this.execSQL("INSERT INTO features_table (id, name, track_group_id, type, discrete_values, display_index) VALUES ('4', 'Weather', '1', '0', '2:Meh||5:Great||3:Ok||4:Good||0:Very Poor||1:Poor', '0');")
+            this.execSQL("INSERT INTO graphs_and_stats_table (id, graph_stat_group_id, name, graph_stat_type, display_index) VALUES ('1', '1', 'l1', '0', '1');")
+            this.execSQL("INSERT INTO graphs_and_stats_table (id, graph_stat_group_id, name, graph_stat_type, display_index) VALUES ('2', '1', 'l2', '0', '0');")
+            this.execSQL("INSERT INTO line_graphs_table (id, graph_stat_id, features, duration, y_range_type, y_from, y_to) VALUES ('2', '2', '4!!Weather!!4!!6!!4!!0!!9.0!!1.01||4!!Weather!!7!!3!!0!!1!!10.0!!0.255', 'PT744H', '1', '-10.0', '10.0');")
+            this.execSQL("INSERT INTO line_graphs_table (id, graph_stat_id, features, duration, y_range_type, y_from, y_to) VALUES ('1', '1', '4!!Weather!!0!!0!!0!!0!!0.0!!1.0||4!!Weather!!7!!3!!1!!1!!10.0!!0.255', '', '0', '0.0', '1.0');")
+            close()
+        }
+        val db = helper.runMigrationsAndValidate(TEST_DB, 33, true, *ALL_MIGRATIONS)
+        val featuresCursor = db.query("SELECT features FROM line_graphs_table")
+        val featureStrings = mutableListOf<String>()
+        while (featuresCursor.moveToNext()) {
+            featureStrings.add(featuresCursor.getString(0))
+        }
+        assertTrue(featureStrings.contains("4!!Weather!!4!!6!!5!!0!!9.0!!1.01||4!!Weather!!7!!3!!0!!1!!10.0!!0.255"))
+        assertTrue(featureStrings.contains("4!!Weather!!0!!0!!0!!0!!0.0!!1.0||4!!Weather!!7!!3!!2!!1!!10.0!!0.255"))
     }
 
     private fun tryOpenDatabase() {

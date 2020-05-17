@@ -26,15 +26,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.ui.GraphLegendItemView
+import org.threeten.bp.temporal.TemporalAmount
 
 class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
 internal suspend fun sampleData(
     dataSource: TrackAndGraphDatabaseDao, featureId: Long, sampleDuration: Duration?,
-    averagingDuration: Duration?, plottingPeriod: Period?
+    averagingDuration: Duration?, plotTotalTime: TemporalAmount?
 ): RawDataSample {
     return withContext(Dispatchers.IO) {
         if (sampleDuration == null) RawDataSample(
@@ -45,7 +45,7 @@ internal suspend fun sampleData(
             val latest = getLatestTimeOrNowForFeature(dataSource, featureId)
             val startDate = latest.minus(sampleDuration)
             val plottingDuration =
-                plottingPeriod?.let { Duration.between(latest, latest.plus(plottingPeriod)) }
+                plotTotalTime?.let { Duration.between(latest, latest.plus(plotTotalTime)) }
             val maxSampleDuration = listOf(
                 sampleDuration,
                 averagingDuration?.plus(sampleDuration),
@@ -66,9 +66,7 @@ private fun getLatestTimeOrNowForFeature(
 ): OffsetDateTime {
     val lastDataPointList = dataSource.getLastDataPointForFeatureSync(featureId)
     val now = OffsetDateTime.now()
-    val latest = lastDataPointList.firstOrNull()?.let {
-        it.timestamp.plusSeconds(1)
-    }
+    val latest = lastDataPointList.firstOrNull()?.timestamp?.plusSeconds(1)
     return listOfNotNull(now, latest).max()!!
 }
 
