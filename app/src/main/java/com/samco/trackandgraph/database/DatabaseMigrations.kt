@@ -45,4 +45,24 @@ val MIGRATION_31_32 = object : Migration(31, 32) {
     }
 }
 
-//TODO create a migration to add in the new hourly plot totals value
+val MIGRATION_32_33 = object : Migration(32, 33) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        val lineGraphsCursor = database.query("SELECT * FROM line_graphs_table")
+        val updates = mutableListOf<String>()
+        while (lineGraphsCursor.moveToNext()) {
+            val id = lineGraphsCursor.getLong(0)
+            val oldFeaturesString = lineGraphsCursor.getString(2)
+            val oldFeatures = oldFeaturesString.split(splitChars1)
+            val newFeatures = oldFeatures.map { f ->
+                val params = f.split(splitChars2).toMutableList()
+                var plottingMode = params[4].toInt()
+                if (plottingMode > 0) plottingMode += 1
+                params[4] = plottingMode.toString()
+                params.joinToString(splitChars2)
+            }
+            val newFeaturesString = newFeatures.joinToString(splitChars1)
+            updates.add("UPDATE line_graphs_table SET features='$newFeaturesString' WHERE id=$id")
+        }
+        if (updates.size > 0) updates.forEach { database.execSQL(it) }
+    }
+}

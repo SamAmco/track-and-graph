@@ -1,0 +1,722 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 33,
+    "identityHash": "46d8fc2dead382285a9fab831e072f23",
+    "entities": [
+      {
+        "tableName": "track_groups_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `display_index` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayIndex",
+            "columnName": "display_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_track_groups_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_track_groups_table_id` ON `${TABLE_NAME}` (`id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "features_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `track_group_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, `display_index` INTEGER NOT NULL, FOREIGN KEY(`track_group_id`) REFERENCES `track_groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "trackGroupId",
+            "columnName": "track_group_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureType",
+            "columnName": "type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "discreteValues",
+            "columnName": "discrete_values",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayIndex",
+            "columnName": "display_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_features_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_features_table_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_features_table_track_group_id",
+            "unique": false,
+            "columnNames": [
+              "track_group_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_features_table_track_group_id` ON `${TABLE_NAME}` (`track_group_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "track_groups_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "track_group_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "data_points_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` TEXT NOT NULL, `feature_id` INTEGER NOT NULL, `value` REAL NOT NULL, `label` TEXT NOT NULL, PRIMARY KEY(`timestamp`, `feature_id`), FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "timestamp",
+            "columnName": "timestamp",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureId",
+            "columnName": "feature_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "value",
+            "columnName": "value",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "label",
+            "columnName": "label",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "timestamp",
+            "feature_id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_data_points_table_feature_id",
+            "unique": false,
+            "columnNames": [
+              "feature_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_data_points_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "features_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "feature_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "graph_stat_groups_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `display_index` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayIndex",
+            "columnName": "display_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_graph_stat_groups_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_graph_stat_groups_table_id` ON `${TABLE_NAME}` (`id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "graphs_and_stats_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_group_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `graph_stat_type` INTEGER NOT NULL, `display_index` INTEGER NOT NULL, FOREIGN KEY(`graph_stat_group_id`) REFERENCES `graph_stat_groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "graphStatGroupId",
+            "columnName": "graph_stat_group_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "graph_stat_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayIndex",
+            "columnName": "display_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_graphs_and_stats_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_graphs_and_stats_table_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_graphs_and_stats_table_graph_stat_group_id",
+            "unique": false,
+            "columnNames": [
+              "graph_stat_group_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_graphs_and_stats_table_graph_stat_group_id` ON `${TABLE_NAME}` (`graph_stat_group_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "graph_stat_groups_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "graph_stat_group_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "line_graphs_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `features` TEXT NOT NULL, `duration` TEXT, `y_range_type` INTEGER NOT NULL, `y_from` REAL NOT NULL, `y_to` REAL NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "graphStatId",
+            "columnName": "graph_stat_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "features",
+            "columnName": "features",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "yRangeType",
+            "columnName": "y_range_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yFrom",
+            "columnName": "y_from",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yTo",
+            "columnName": "y_to",
+            "affinity": "REAL",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_line_graphs_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_line_graphs_table_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_line_graphs_table_graph_stat_id",
+            "unique": false,
+            "columnNames": [
+              "graph_stat_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_line_graphs_table_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "graphs_and_stats_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "graph_stat_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "average_time_between_stat_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` TEXT NOT NULL, `to_value` TEXT NOT NULL, `duration` TEXT, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "graphStatId",
+            "columnName": "graph_stat_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureId",
+            "columnName": "feature_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fromValue",
+            "columnName": "from_value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toValue",
+            "columnName": "to_value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_average_time_between_stat_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_average_time_between_stat_table_graph_stat_id",
+            "unique": false,
+            "columnNames": [
+              "graph_stat_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
+          },
+          {
+            "name": "index_average_time_between_stat_table_feature_id",
+            "unique": false,
+            "columnNames": [
+              "feature_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "graphs_and_stats_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "graph_stat_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "features_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "feature_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "pie_chart_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `duration` TEXT, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "graphStatId",
+            "columnName": "graph_stat_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureId",
+            "columnName": "feature_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duration",
+            "columnName": "duration",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_pie_chart_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pie_chart_table_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_pie_chart_table_graph_stat_id",
+            "unique": false,
+            "columnNames": [
+              "graph_stat_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pie_chart_table_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
+          },
+          {
+            "name": "index_pie_chart_table_feature_id",
+            "unique": false,
+            "columnNames": [
+              "feature_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_pie_chart_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "graphs_and_stats_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "graph_stat_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "features_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "feature_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "time_since_last_stat_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` TEXT NOT NULL, `to_value` TEXT NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "graphStatId",
+            "columnName": "graph_stat_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "featureId",
+            "columnName": "feature_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fromValue",
+            "columnName": "from_value",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "toValue",
+            "columnName": "to_value",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_time_since_last_stat_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table_id` ON `${TABLE_NAME}` (`id`)"
+          },
+          {
+            "name": "index_time_since_last_stat_table_graph_stat_id",
+            "unique": false,
+            "columnNames": [
+              "graph_stat_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
+          },
+          {
+            "name": "index_time_since_last_stat_table_feature_id",
+            "unique": false,
+            "columnNames": [
+              "feature_id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "graphs_and_stats_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "graph_stat_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "features_table",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "feature_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "reminders_table",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `display_index` INTEGER NOT NULL, `name` TEXT NOT NULL, `time` TEXT NOT NULL, `checked_days` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "displayIndex",
+            "columnName": "display_index",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alarmName",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "checkedDays",
+            "columnName": "checked_days",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "id"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [
+          {
+            "name": "index_reminders_table_id",
+            "unique": false,
+            "columnNames": [
+              "id"
+            ],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `${TABLE_NAME}` (`id`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '46d8fc2dead382285a9fab831e072f23')"
+    ]
+  }
+}
