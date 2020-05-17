@@ -79,7 +79,7 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
                 var instance = INSTANCE
                 if (instance == null) {
                     instance = Room.databaseBuilder(context.applicationContext, TrackAndGraphDatabase::class.java, "trackandgraph_database")
-                        .addMigrations(MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33)
+                        .addMigrations(*allMigrations)
                         .fallbackToDestructiveMigration()
                         .build()
                     INSTANCE = instance

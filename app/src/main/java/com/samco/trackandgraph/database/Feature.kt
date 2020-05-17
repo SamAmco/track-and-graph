@@ -48,14 +48,15 @@ data class Feature(
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
 
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int,
+
     @ColumnInfo(name = "has_default_value")
     val hasDefaultValue: Boolean,
 
     @ColumnInfo(name = "default_value")
-    val defaultValue: Double,
+    val defaultValue: Double
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int
 ) {
     companion object {
         fun create(
@@ -70,7 +71,7 @@ data class Feature(
                 .replace(splitChars2, " ")
             return Feature(
                 id, validName, trackGroupId, featureType, discreteValues,
-                hasDefaultValue, defaultValue, displayIndex
+                displayIndex, hasDefaultValue, defaultValue
             )
         }
     }
