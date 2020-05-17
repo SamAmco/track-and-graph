@@ -1,90 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" >
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <FrameLayout
-            android:layout_height="match_parent"
-            android:layout_width="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
         <ScrollView
-                android:id="@+id/scrollView"
-                android:layout_height="match_parent"
-                android:layout_width="match_parent">
+            android:id="@+id/scrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
             <LinearLayout
-                    android:id="@+id/baseLinearLayout"
-                    android:orientation="vertical"
+                android:id="@+id/baseLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/card_padding"
+                android:layout_marginTop="@dimen/card_padding"
+                android:layout_marginEnd="@dimen/card_padding"
+                android:orientation="vertical"
+                android:paddingBottom="60dp">
+
+                <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/card_padding"
-                    android:layout_marginEnd="@dimen/card_padding"
-                    android:layout_marginTop="@dimen/card_padding"
-                    android:paddingBottom="60dp"
-                    >
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:labelFor="@id/trackGroupNameText"
+                    android:text="@string/feature_name"
+                    android:textSize="@dimen/dialog_label_text_size" />
 
-                <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
-                        android:text="@string/feature_name"
-                        android:labelFor="@id/trackGroupNameText"
-                        android:textSize="@dimen/dialog_label_text_size"/>
                 <EditText
-                        android:id="@+id/featureNameText"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:inputType="text"
-                        />
+                    android:id="@+id/featureNameText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"
+                    android:maxLines="1" />
 
                 <TextView
-                        android:id="@+id/featureTypeLabel"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@string/feature_type"
-                        android:layout_marginTop="@dimen/input_spacing_large"
-                        android:textSize="@dimen/dialog_label_text_size"/>
+                    android:id="@+id/featureTypeLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/input_spacing_large"
+                    android:text="@string/feature_type"
+                    android:textSize="@dimen/dialog_label_text_size" />
+
                 <androidx.appcompat.widget.AppCompatSpinner
-                        android:id="@+id/featureTypeSpinner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
-                        android:spinnerMode="dropdown"
-                        android:entries="@array/feature_types"/>
+                    android:id="@+id/featureTypeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:entries="@array/feature_types"
+                    android:spinnerMode="dropdown" />
 
                 <TextView
-                        android:id="@+id/discreteValuesTextView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/input_spacing_large"
-                        android:textSize="@dimen/dialog_label_text_size"
-                        android:text="@string/discrete_values"/>
+                    android:id="@+id/discreteValuesTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/input_spacing_large"
+                    android:text="@string/discrete_values"
+                    android:textSize="@dimen/dialog_label_text_size" />
+
                 <LinearLayout
-                        android:id="@+id/discreteValues"
-                        android:orientation="vertical"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                    android:id="@+id/discreteValues"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:orientation="vertical" />
+
                 <ImageButton
-                        android:id="@+id/addDiscreteValueButton"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/dialog_input_spacing"
-                        android:layout_marginBottom="@dimen/dialog_input_spacing"
-                        android:src="@drawable/add_icon" />
+                    android:id="@+id/addDiscreteValueButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:layout_marginBottom="@dimen/dialog_input_spacing"
+                    app:srcCompat="@drawable/add_icon" />
+
+                <CheckBox
+                    android:id="@+id/hasDefaultValueCheckbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:text="@string/use_default_value" />
+
+                <TextView
+                    android:id="@+id/defaultValueHint"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/default_value_description_hint"
+                    android:textColor="@color/disabledTextColor" />
+
+                <EditText
+                    android:id="@+id/defaultNumericalInput"
+                    style="@style/DataPointInputNumberStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    tools:text="33" />
+
+                <HorizontalScrollView
+                    android:id="@+id/defaultDiscreteScrollView"
+                    style="@style/DiscreteValueButtonsScrollViewStyle"
+                    android:layout_marginTop="@dimen/dialog_input_spacing">
+
+                    <LinearLayout
+                        android:id="@+id/defaultDiscreteButtonsLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
             </LinearLayout>
         </ScrollView>
+
         <include
             android:id="@+id/addBar"
-            layout="@layout/validate_add_footer"/>
+            layout="@layout/validate_add_footer" />
+
         <FrameLayout
             android:id="@+id/progressBar"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
-            android:focusable="true"
-            >
-        <ProgressBar
+            android:focusable="true">
+
+            <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"/>
+                android:layout_gravity="center" />
         </FrameLayout>
     </FrameLayout>
 

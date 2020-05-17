@@ -60,4 +60,19 @@
         <item name="android:alpha">0.6</item>
         <item name="android:textAlignment">center</item>item>
     </style>
+
+    <style name="DataPointInputNumberStyle">
+        <item name="android:gravity">center</item>
+        <item name="android:inputType">numberDecimal|numberSigned</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:digits">0123456789.,-</item>
+        <item name="android:hint">0</item>
+    </style>
+
+    <style name="DiscreteValueButtonsScrollViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">80dp</item>
+        <item name="android:scrollbars">none</item>
+        <item name="android:layout_gravity">center_horizontal</item>item>
+    </style>
 </resources>

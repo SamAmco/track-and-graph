@@ -35,7 +35,6 @@ class MigrationTest {
     companion object {
         private const val FIRST_DATABASE_RELEASE_VERSION = 29
         private const val TEST_DB = "migration-test"
-        private val ALL_MIGRATIONS = arrayOf(MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33)
     }
 
     @Rule @JvmField
@@ -67,7 +66,7 @@ class MigrationTest {
             this.execSQL("INSERT INTO line_graphs_table (id, graph_stat_id, features, duration, y_range_type, y_from, y_to) VALUES ('1', '1', '4!!Weather!!0!!0!!0!!0.0!!1.0', '', '0', '0.0', '1.0');")
             close()
         }
-        val db = helper.runMigrationsAndValidate(TEST_DB, 32, true, *ALL_MIGRATIONS)
+        val db = helper.runMigrationsAndValidate(TEST_DB, 32, true, *allMigrations)
         val featuresCursor = db.query("SELECT features FROM line_graphs_table")
         val featureStrings = mutableListOf<String>()
         while (featuresCursor.moveToNext()) {
@@ -88,7 +87,7 @@ class MigrationTest {
             this.execSQL("INSERT INTO line_graphs_table (id, graph_stat_id, features, duration, y_range_type, y_from, y_to) VALUES ('1', '1', '4!!Weather!!0!!0!!0!!0!!0.0!!1.0||4!!Weather!!7!!3!!1!!1!!10.0!!0.255', '', '0', '0.0', '1.0');")
             close()
         }
-        val db = helper.runMigrationsAndValidate(TEST_DB, 33, true, *ALL_MIGRATIONS)
+        val db = helper.runMigrationsAndValidate(TEST_DB, 33, true, *allMigrations)
         val featuresCursor = db.query("SELECT features FROM line_graphs_table")
         val featureStrings = mutableListOf<String>()
         while (featuresCursor.moveToNext()) {
@@ -105,7 +104,7 @@ class MigrationTest {
             InstrumentationRegistry.getInstrumentation().targetContext,
             TrackAndGraphDatabase::class.java,
             TEST_DB
-        ).addMigrations(*ALL_MIGRATIONS).build().apply {
+        ).addMigrations(*allMigrations).build().apply {
             openHelper.writableDatabase
             close()
         }

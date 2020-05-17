@@ -63,7 +63,7 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
-        if (feature.featureType == FeatureType.TIMESTAMP) {
+        if (feature.hasDefaultValue) {
             binding.addButton.visibility = View.INVISIBLE
             binding.quickAddButton.visibility = View.VISIBLE
         } else {

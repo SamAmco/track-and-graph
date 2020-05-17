@@ -71,5 +71,8 @@ lint/outputs/
 lint/tmp/
 # lint/reports/
 database-extract/ge_database.db
+database-extract/ge_database.db-shm
+database-extract/ge_database.db-wal
+
 
 local-scripts/
