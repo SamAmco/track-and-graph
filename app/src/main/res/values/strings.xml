@@ -221,8 +221,8 @@
     <string name="ru_sure_update_feature">This update may irreversibly modify the data you have already tracked. It is highly recommended that you backup existing data before continuing.\n\n Would you like to continue?</string>
     <string name="warning">Warning</string>
     <string name="ok">OK</string>
-    <string name="on_feature_type_change_numerical_warning">If you update your input type to numerical your existing tracked data will lose its labels and you won\'t be able to change this back.</string>
-    <string name="on_feature_type_change_timestamp_warning">If you update your input type to date and time only your existing tracked data will lose its labels and all numerical values will become 1. You won\'t be able to change this back.</string>
+    <string name="on_feature_type_change_numerical_warning">If you update your input type to numerical your existing tracked data will lose its labels.</string>
+    <string name="on_feature_type_change_timestamp_warning">If you update your input type to date and time only your existing tracked data will lose its labels and all numerical values will become 1.</string>
     <string name="on_feature_delete_discrete_value_warning">Deleting multiple choice answers will delete all existing tracked data points for that value.</string>
 
     <string name="my_first_track_group">My first track group</string>
