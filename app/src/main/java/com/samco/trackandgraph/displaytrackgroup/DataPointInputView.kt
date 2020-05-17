@@ -102,7 +102,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
                 true
             } else false
         }
-        val text = if (state.value == 0.toDouble()) "" else doubleFormatter.format(state.value)
+        val text = if (state.value == 0.0) "" else doubleFormatter.format(state.value)
         numberInput.setText(text)
     }
 
