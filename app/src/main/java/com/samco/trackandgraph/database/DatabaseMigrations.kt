@@ -44,3 +44,5 @@ val MIGRATION_31_32 = object : Migration(31, 32) {
         if (updates.size > 0) updates.forEach { database.execSQL(it) }
     }
 }
+
+//TODO create a migration to add in the new hourly plot totals value
