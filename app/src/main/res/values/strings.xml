@@ -99,6 +99,7 @@
     </string-array>
     <string-array name="line_graph_generation_modes">
         <item>Plot When Tracked</item>
+        <item>Plot Hourly Totals</item>
         <item>Plot Daily Totals</item>
         <item>Plot Weekly Totals</item>
         <item>Plot Monthly Totals</item>

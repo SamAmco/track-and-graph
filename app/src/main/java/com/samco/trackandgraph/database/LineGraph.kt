@@ -23,6 +23,7 @@ import androidx.room.PrimaryKey
 import com.samco.trackandgraph.R
 import org.threeten.bp.Duration
 import org.threeten.bp.Period
+import org.threeten.bp.temporal.TemporalAmount
 
 val pointStyleDrawableResources = listOf(
     R.drawable.point_style_none_icon,
@@ -43,6 +44,7 @@ enum class LineGraphAveraginModes {
 
 enum class LineGraphPlottingModes {
     WHEN_TRACKED,
+    GENERATE_HOURLY_TOTALS,
     GENERATE_DAILY_TOTALS,
     GENERATE_WEEKLY_TOTALS,
     GENERATE_MONTHLY_TOTALS,
@@ -55,8 +57,9 @@ enum class LineGraphPointStyle {
     CIRCLES_AND_NUMBERS
 }
 
-val plottingModePeriods = mapOf(
+val plottingModePeriods: Map<LineGraphPlottingModes, TemporalAmount?> = mapOf(
     LineGraphPlottingModes.WHEN_TRACKED to null,
+    LineGraphPlottingModes.GENERATE_HOURLY_TOTALS to Duration.ofHours(1),
     LineGraphPlottingModes.GENERATE_DAILY_TOTALS to Period.ofDays(1),
     LineGraphPlottingModes.GENERATE_WEEKLY_TOTALS to Period.ofWeeks(1),
     LineGraphPlottingModes.GENERATE_MONTHLY_TOTALS to Period.ofMonths(1),
