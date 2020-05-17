@@ -84,7 +84,6 @@ class TrackWidgetInputDataPointViewModel : ViewModel() {
         feature = dataSource!!.tryGetFeatureById(featureId)
     }
 
-    //TODO fix this crash, you can not add data points on the main thread
     fun addDataPoint(featureId: Long) {
         val newDataPoint = DataPoint(OffsetDateTime.now(), featureId, 1.0, "")
         dataSource!!.insertDataPoint(newDataPoint)
