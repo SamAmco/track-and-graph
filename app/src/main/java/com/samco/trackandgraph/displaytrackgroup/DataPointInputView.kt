@@ -34,6 +34,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
+//TODO if a feature has a default value we should pre-populate with that value
 class DataPointInputView(context: Context, private val state: DataPointInputData)
     : ConstraintLayout(context), TextWatcher {
 
@@ -74,18 +75,6 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         when (state.feature.featureType) {
             FeatureType.CONTINUOUS -> initContinuous()
             FeatureType.DISCRETE -> initDiscrete()
-            FeatureType.TIMESTAMP -> initTimestamp()
-        }
-    }
-
-    private fun initTimestamp() {
-        buttonsScroll.visibility = View.VISIBLE
-        numberInput.visibility = View.GONE
-        createTimestampButton()
-        if (state.label.isNotEmpty()) {
-            buttonsLayout.children
-                .map{ v -> v.findViewById<CheckBox>(R.id.checkbox) }
-                .first().isChecked = true
         }
     }
 
@@ -135,14 +124,6 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
     class DataPointInputClickListener(val onClick: (Feature) -> Unit)
     fun setOnClickListener(clickListener: DataPointInputClickListener) { this.clickListener = clickListener }
 
-    private fun createTimestampButton() {
-        val inflater = LayoutInflater.from(context)
-        val item = inflater.inflate(R.layout.discrete_value_input_button, buttonsLayout, false) as CheckBox
-        item.text = context.getString(R.string.track)
-        item.setOnClickListener { onTimestampTrackClicked() }
-        buttonsLayout.addView(item)
-    }
-
     private fun createButtons() {
         discreteValueCheckBoxes = mutableMapOf()
         val inflater = LayoutInflater.from(context)
@@ -153,13 +134,6 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
             discreteValueCheckBoxes[discreteValue] = item
             buttonsLayout.addView(item)
         }
-    }
-
-    private fun onTimestampTrackClicked() {
-        state.value = 1.0
-        state.label = ""
-        state.timeFixed = true
-        clickListener!!.onClick(state.feature)
     }
 
     private fun onDiscreteValueClicked(discreteValue: DiscreteValue) {

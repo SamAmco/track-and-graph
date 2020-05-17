@@ -44,7 +44,6 @@ import kotlinx.coroutines.*
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
-import androidx.core.view.size
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
