@@ -291,12 +291,19 @@ class AddFeatureFragment : Fragment(),
     override fun onNothingSelected(p0: AdapterView<*>?) { }
 
     private fun onFeatureTypeSelected(newType: FeatureType) {
-        if (viewModel.updateMode && viewModel.existingFeature.featureType != newType) {
-            val message = when (newType) {
-                FeatureType.DISCRETE -> null
-                FeatureType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
-                FeatureType.TIMESTAMP -> getString(R.string.on_feature_type_change_timestamp_warning)
-            }
+        showOnFeatureTypeUpdatedMessage(newType)
+        viewModel.featureType.value = newType
+        val vis = if (newType == FeatureType.DISCRETE) View.VISIBLE else View.GONE
+        binding.discreteValuesTextView.visibility = vis
+        binding.discreteValues.visibility = vis
+        binding.addDiscreteValueButton.visibility = vis
+        validateForm()
+    }
+
+    private fun showOnFeatureTypeUpdatedMessage(newType: FeatureType) {
+        val oldType = viewModel.existingFeature?.featureType
+        if (viewModel.updateMode && oldType != null && oldType != newType) {
+            val message = getOnDataTypeChangedMessage(oldType, newType)
 
             message?.let {
                 AlertDialog.Builder(context)
@@ -306,12 +313,21 @@ class AddFeatureFragment : Fragment(),
                     .show()
             }
         }
-        viewModel.featureType.value = newType
-        val vis = if (newType == FeatureType.DISCRETE) View.VISIBLE else View.GONE
-        binding.discreteValuesTextView.visibility = vis
-        binding.discreteValues.visibility = vis
-        binding.addDiscreteValueButton.visibility = vis
-        validateForm()
+    }
+
+    private fun getOnDataTypeChangedMessage(oldType: FeatureType, newType: FeatureType): String? {
+        return when (oldType) {
+            FeatureType.DISCRETE -> when (newType) {
+                FeatureType.DISCRETE -> null
+                FeatureType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
+                FeatureType.TIMESTAMP -> getString(R.string.on_feature_type_change_timestamp_warning)
+            }
+            FeatureType.CONTINUOUS -> when (newType) {
+                FeatureType.TIMESTAMP -> getString(R.string.on_feature_type_change_timestamp_warning)
+                else -> null
+            }
+            else -> null
+        }
     }
 
     override fun onDialogYes(dialog: YesCancelDialogFragment) {
@@ -343,7 +359,7 @@ class AddFeatureViewModel : ViewModel() {
         private set
     var haveWarnedAboutDeletingDiscreteValues = false
     private var trackGroupId: Long = -1
-    lateinit var existingFeature: Feature
+    var existingFeature: Feature? = null
         private set
 
     fun init(activity: Activity, trackGroupId: Long, existingFeatureNames: List<String>, existingFeatureId: Long) {
@@ -358,12 +374,12 @@ class AddFeatureViewModel : ViewModel() {
             if (existingFeatureId > -1) {
                 updateMode = true
                 existingFeature = dao.getFeatureById(existingFeatureId)
-                val existingDiscreteValues = existingFeature.discreteValues
+                val existingDiscreteValues = existingFeature!!.discreteValues
                     .sortedBy { f -> f.index }
                     .map { f -> MutableLabel(f.label, f.index) }
                 withContext(Dispatchers.Main) {
-                    featureName.value = existingFeature.name
-                    featureType.value = existingFeature.featureType
+                    featureName.value = existingFeature!!.name
+                    featureType.value = existingFeature!!.featureType
                     this@AddFeatureViewModel.existingFeatureNames = existingFeatureNames.minus(featureName.value)
                     discreteValues.addAll(existingDiscreteValues)
                 }
@@ -378,12 +394,11 @@ class AddFeatureViewModel : ViewModel() {
         // cont -> time Y
         // disc -> time Y
         // time -> disc N
-        // time -> cont N
+        // time -> cont Y
         // cont -> disc N
         return when (type) {
-            FeatureType.CONTINUOUS -> existingFeature.featureType == FeatureType.CONTINUOUS
-                        || existingFeature.featureType == FeatureType.DISCRETE
-            FeatureType.DISCRETE -> existingFeature.featureType == FeatureType.DISCRETE
+            FeatureType.CONTINUOUS -> true
+            FeatureType.DISCRETE -> existingFeature!!.featureType == FeatureType.DISCRETE
             FeatureType.TIMESTAMP -> true
         }
     }
@@ -403,12 +418,12 @@ class AddFeatureViewModel : ViewModel() {
         }
     }
 
-    private suspend fun updateFeature() {
+    private fun updateFeature() {
         val valOfDiscVal = { v: MutableLabel ->
             if (discreteValues.size == 1) 1 else discreteValues.indexOf(v)
         }
 
-        when (existingFeature.featureType) {
+        when (existingFeature!!.featureType) {
             FeatureType.DISCRETE -> when (featureType.value) {
                 FeatureType.CONTINUOUS -> stripDataPointsToValue()
                 FeatureType.TIMESTAMP -> stripDataPointsToTimestamp()
@@ -416,28 +431,30 @@ class AddFeatureViewModel : ViewModel() {
             }
             FeatureType.CONTINUOUS -> when (featureType.value) {
                 FeatureType.TIMESTAMP -> stripDataPointsToTimestamp()
+                else -> {}
             }
+            else -> {}
         }
 
         val discVals = discreteValues
             .map { s -> DiscreteValue(valOfDiscVal(s), s.value) }
-        val feature = Feature.create(existingFeature.id,
+        val feature = Feature.create(existingFeature!!.id,
             featureName.value!!, trackGroupId,
             featureType.value!!, discVals,
-            existingFeature.displayIndex)
+            existingFeature!!.displayIndex)
         dao.updateFeature(feature)
     }
 
-    private suspend fun stripDataPointsToTimestamp() {
-        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature.id)
+    private fun stripDataPointsToTimestamp() {
+        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature!!.id)
         val newDataPoints = oldDataPoints.map {
             DataPoint(it.timestamp, it.featureId, 1.0, "")
         }
         dao.updateDataPoints(newDataPoints)
     }
 
-    private suspend fun updateDiscreteValueDataPoints(valOfDiscVal: (MutableLabel) -> Int) {
-        existingFeature.discreteValues.map { dv -> dv.index }
+    private fun updateDiscreteValueDataPoints(valOfDiscVal: (MutableLabel) -> Int) {
+        existingFeature!!.discreteValues.map { dv -> dv.index }
             .filter { i -> !discreteValues.map { dv -> dv.updateIndex }.contains(i) }
             .forEach { i -> removeExistingDataPointsForDiscreteValue(i) }
 
@@ -450,20 +467,20 @@ class AddFeatureViewModel : ViewModel() {
         }
     }
 
-    private suspend fun stripDataPointsToValue() {
-        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature.id)
+    private fun stripDataPointsToValue() {
+        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature!!.id)
         val newDataPoints = oldDataPoints.map {
             DataPoint(it.timestamp, it.featureId, it.value, "")
         }
         dao.updateDataPoints(newDataPoints)
     }
 
-    private suspend fun removeExistingDataPointsForDiscreteValue(index: Int) {
-        dao.deleteAllDataPointsForDiscreteValue(existingFeature.id, index.toDouble())
+    private fun removeExistingDataPointsForDiscreteValue(index: Int) {
+        dao.deleteAllDataPointsForDiscreteValue(existingFeature!!.id, index.toDouble())
     }
 
-    private suspend fun updateExistingDataPointsForDiscreteValue(valMap: Map<Int, Pair<Int, String>>) {
-        val oldValues = dao.getDataPointsForFeatureSync(existingFeature.id)
+    private fun updateExistingDataPointsForDiscreteValue(valMap: Map<Int, Pair<Int, String>>) {
+        val oldValues = dao.getDataPointsForFeatureSync(existingFeature!!.id)
         val newValues = oldValues.map { v ->
             DataPoint(v.timestamp, v.featureId,
                 valMap[v.value.toInt()]!!.first.toDouble(),
@@ -473,7 +490,7 @@ class AddFeatureViewModel : ViewModel() {
         dao.updateDataPoints(newValues)
     }
 
-    private suspend fun addFeature() {
+    private fun addFeature() {
         val discVals = discreteValues.mapIndexed { i, s ->
             val index = if (discreteValues.size == 1) 1 else i
             DiscreteValue(index, s.value)
