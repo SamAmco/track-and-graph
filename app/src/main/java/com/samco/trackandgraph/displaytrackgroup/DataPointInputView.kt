@@ -57,7 +57,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         .withZone(ZoneId.systemDefault())
 
     init {
-        val view = inflate(context, R.layout.data_point_input_fragment, this)
+        val view = inflate(context, R.layout.data_point_input_view, this)
 
         numberInput = view.findViewById(R.id.numberInput)
         titleText = view.findViewById(R.id.titleText)
