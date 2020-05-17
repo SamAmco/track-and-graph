@@ -27,6 +27,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
 class TrackWidgetInputDataPointActivity : FragmentActivity() {
@@ -78,13 +82,16 @@ class TrackWidgetInputDataPointViewModel : ViewModel() {
     private var dataSource: TrackAndGraphDatabaseDao? = null
     lateinit var feature: LiveData<Feature?> private set
 
+    private var updateJob = Job()
+    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
+
     fun init(application: Application, featureId: Long) {
         if (dataSource != null) return
         dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
         feature = dataSource!!.tryGetFeatureById(featureId)
     }
 
-    fun addDataPoint(featureId: Long) {
+    fun addDataPoint(featureId: Long) = ioScope.launch {
         val newDataPoint = DataPoint(OffsetDateTime.now(), featureId, 1.0, "")
         dataSource!!.insertDataPoint(newDataPoint)
     }
