@@ -22,6 +22,16 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "xerus2000",
+      "name": "Janek",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/13354331?v=4",
+      "profile": "https://github.com/xerus2000",
+      "contributions": [
+        "ideas",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
