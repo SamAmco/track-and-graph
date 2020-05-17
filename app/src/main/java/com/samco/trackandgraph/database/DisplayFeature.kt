@@ -35,6 +35,12 @@ data class DisplayFeature(
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
 
+    @ColumnInfo(name = "has_default_value")
+    val hasDefaultValue: Boolean,
+
+    @ColumnInfo(name = "default_value")
+    val defaultValue: Double,
+
     @ColumnInfo(name = "last_timestamp")
     val timestamp: OffsetDateTime?,
 

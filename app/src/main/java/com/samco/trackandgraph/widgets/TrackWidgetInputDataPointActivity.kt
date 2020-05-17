@@ -58,8 +58,8 @@ class TrackWidgetInputDataPointActivity : FragmentActivity() {
 
     private fun observeFeature() = viewModel.feature.observe(this, Observer { feature ->
         if (feature == null) finish()
-        else when (feature.featureType) {
-            FeatureType.TIMESTAMP -> {
+        else when (feature.hasDefaultValue) {
+            true -> {
                 viewModel.addDataPoint(feature.id)
                 finish()
             }

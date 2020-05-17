@@ -22,13 +22,16 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import java.lang.Exception
 
-@Entity(tableName = "features_table",
-    foreignKeys = [ForeignKey(entity = TrackGroup::class,
+@Entity(
+    tableName = "features_table",
+    foreignKeys = [ForeignKey(
+        entity = TrackGroup::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("track_group_id"),
-        onDelete = ForeignKey.CASCADE)]
+        onDelete = ForeignKey.CASCADE
+    )]
 )
-data class Feature (
+data class Feature(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
@@ -45,36 +48,51 @@ data class Feature (
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
 
+    @ColumnInfo(name = "has_default_value")
+    val hasDefaultValue: Boolean,
+
+    @ColumnInfo(name = "default_value")
+    val defaultValue: Double,
+
     @ColumnInfo(name = "display_index")
     val displayIndex: Int
 ) {
     companion object {
-        fun create(id: Long, name: String, trackGroupId: Long, featureType: FeatureType,
-                   discreteValues: List<DiscreteValue>, displayIndex: Int): Feature {
+        fun create(
+            id: Long, name: String, trackGroupId: Long, featureType: FeatureType,
+            discreteValues: List<DiscreteValue>, hasDefaultValue: Boolean, defaultValue: Double,
+            displayIndex: Int
+        ): Feature {
             discreteValues.forEach { dv -> validateDiscreteValue(dv) }
             val validName = name
                 .take(MAX_FEATURE_NAME_LENGTH)
                 .replace(splitChars1, " ")
                 .replace(splitChars2, " ")
-            return Feature(id, validName, trackGroupId, featureType, discreteValues, displayIndex)
+            return Feature(
+                id, validName, trackGroupId, featureType, discreteValues,
+                hasDefaultValue, defaultValue, displayIndex
+            )
         }
     }
 }
 
-enum class FeatureType { DISCRETE, CONTINUOUS, TIMESTAMP }
+enum class FeatureType { DISCRETE, CONTINUOUS }
 
-data class DiscreteValue (val index: Int, val label: String) {
+data class DiscreteValue(val index: Int, val label: String) {
     override fun toString() = "$index:$label"
+
     companion object {
         fun fromString(value: String): DiscreteValue {
             if (!value.contains(':')) throw Exception("value did not contain a colon")
-            val label = value.substring(value.indexOf(':')+1).trim()
+            val label = value.substring(value.indexOf(':') + 1).trim()
             val index = value.substring(0, value.indexOf(':')).trim().toInt()
             val discreteValue = DiscreteValue(index, label)
             validateDiscreteValue(discreteValue)
             return discreteValue
         }
-        fun fromDataPoint(dataPoint: DataPoint) = DiscreteValue(dataPoint.value.toInt(), dataPoint.label)
+
+        fun fromDataPoint(dataPoint: DataPoint) =
+            DiscreteValue(dataPoint.value.toInt(), dataPoint.label)
     }
 }
 
