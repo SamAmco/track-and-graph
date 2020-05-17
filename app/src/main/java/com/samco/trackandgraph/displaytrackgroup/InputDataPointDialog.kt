@@ -244,11 +244,15 @@ class InputDataPointDialogViewModel : ViewModel() {
                 dao.getDataPointByTimestampAndFeatureSync(featureData[0].id, dataPointTimestamp)
             } else null
 
-            val defaultValue = dataPointData?.value ?: 0.toDouble()
-            val defaultLabel = dataPointData?.label ?: ""
             val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
             val timeFixed = dataPointTimestamp != null
             uiStates = featureData.map { f ->
+                val defaultValue = dataPointData?.value ?: if (f.hasDefaultValue)
+                    f.defaultValue else 0.toDouble()
+                val defaultLabel = dataPointData?.label
+                    ?: if (f.hasDefaultValue && f.featureType == FeatureType.DISCRETE) {
+                        f.discreteValues.first { dv -> dv.index == f.defaultValue.toInt() }.label
+                    } else ""
                 f to DataPointInputView.DataPointInputData(f, timestamp, defaultValue, defaultLabel,
                     timeFixed, this@InputDataPointDialogViewModel::onDateTimeSelected, dataPointData)
             }.toMap()
