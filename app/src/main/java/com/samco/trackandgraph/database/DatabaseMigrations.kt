@@ -3,6 +3,7 @@ package com.samco.trackandgraph.database
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+
 val MIGRATION_29_30 = object : Migration(29, 30) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("""
@@ -66,3 +67,19 @@ val MIGRATION_32_33 = object : Migration(32, 33) {
         if (updates.size > 0) updates.forEach { database.execSQL(it) }
     }
 }
+
+val MIGRATION_33_34 = object : Migration(33, 34) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE features_table ADD has_default_value INTEGER NOT NULL DEFAULT 0")
+        database.execSQL("ALTER TABLE features_table ADD default_value REAL NOT NULL DEFAULT 0")
+        database.execSQL("UPDATE features_table SET type=1, has_default_value=1, default_value=1.0 WHERE type=2")
+    }
+}
+
+val allMigrations = arrayOf(
+    MIGRATION_29_30,
+    MIGRATION_30_31,
+    MIGRATION_31_32,
+    MIGRATION_32_33,
+    MIGRATION_33_34
+)

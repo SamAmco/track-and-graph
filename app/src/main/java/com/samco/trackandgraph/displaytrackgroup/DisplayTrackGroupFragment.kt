@@ -187,8 +187,8 @@ class DisplayTrackGroupFragment : Fragment(),
     }
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
-        if (feature.featureType == FeatureType.TIMESTAMP) {
-            viewModel.addTimestampDataPoint(feature)
+        if (feature.hasDefaultValue) {
+            viewModel.addDefaultValue(feature)
         } else {
             val argBundle = Bundle()
             argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(feature.id))
@@ -282,8 +282,11 @@ class DisplayTrackGroupViewModel : ViewModel() {
     }
 
 
-    fun addTimestampDataPoint(feature: DisplayFeature) = ioScope.launch {
-        val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, 1.0, "")
+    fun addDefaultValue(feature: DisplayFeature) = ioScope.launch {
+        val label = if (feature.featureType == FeatureType.DISCRETE) {
+            feature.discreteValues[feature.defaultValue.toInt()].label
+        } else ""
+        val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, feature.defaultValue, label)
         dataSource?.insertDataPoint(newDataPoint)
     }
 
@@ -299,5 +302,5 @@ class DisplayTrackGroupViewModel : ViewModel() {
     }
 
     private fun toFeature(df: DisplayFeature) = Feature.create(df.id, df.name, df.trackGroupId,
-        df.featureType, df.discreteValues, df.displayIndex)
+        df.featureType, df.discreteValues, df.hasDefaultValue, df.defaultValue, df.displayIndex)
 }
