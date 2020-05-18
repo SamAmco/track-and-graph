@@ -138,7 +138,7 @@
     <string name="graph_stat_validation_no_name">Please provide a name</string>
     <string name="graph_stat_validation_no_line_graph_features">Please add something to the graph</string>
     <string name="graph_stat_validation_invalid_value_stat_feature">Please select a valid data set</string>
-    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Please select a valid multiple choice answer</string>
+    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Please select at least one multiple choice answer</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Please make sure that "From" is smaller than or equal to "To"</string>
     <string name="graph_stat_validation_invalid_pie_chart_feature">Please select a valid pie chart data set</string>
     <string name="graph_stat_validation_unrecognised_color">Please make sure all data sets have a color</string>
@@ -247,5 +247,6 @@
     <string name="create">Create</string>
     <string name="use_default_value">Set a default value</string>
     <string name="default_value_description_hint">(Your default will be used automatically when you add a data point but you can always go back and change it.)</string>
+    <string name="check_all_relevant_values">Check all relevant values: </string>
 
 </resources>

@@ -55,6 +55,8 @@ data class AverageTimeBetweenStat(
     val toValue: String,
 
     @ColumnInfo(name = "duration")
-    val duration: Duration?
-)
+    val duration: Duration?,
 
+    @ColumnInfo(name = "discrete_values")
+    val discreteValues: List<Int>
+)
