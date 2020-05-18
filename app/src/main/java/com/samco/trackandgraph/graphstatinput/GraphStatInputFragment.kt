@@ -27,7 +27,9 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.CheckBox
 import android.widget.LinearLayout
+import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.*
@@ -159,7 +161,7 @@ class GraphStatInputFragment : Fragment() {
 
     private fun listenToValueStat(features: List<FeatureAndTrackGroup>) {
         val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
-        val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
+        val adapter = ArrayAdapter(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.valueStatFeatureSpinner.adapter = adapter
         val selected = viewModel.selectedValueStatFeature.value
         if (selected != null) binding.valueStatFeatureSpinner.setSelection(features.indexOf(selected))
@@ -179,6 +181,7 @@ class GraphStatInputFragment : Fragment() {
         viewModel.selectedValueStatFeature.observe(this, Observer {
             it?.let {
                 if (it.featureType == FeatureType.DISCRETE) {
+                    sanitizeValueStatDiscreteValues()
                     binding.valueStatDiscreteValueInputLayout.visibility = View.VISIBLE
                     binding.valueStatContinuousValueInputLayout.visibility = View.GONE
                 }
@@ -189,27 +192,58 @@ class GraphStatInputFragment : Fragment() {
                 onFormUpdate()
             }
         })
-        listenToValueStatDiscreteValueSpinner()
+        listenToValueStatDiscreteValueCheckBoxes()
+        listenToValueStatDiscreteValues()
         listenToValueStatContinuousRange()
     }
 
-    private fun listenToValueStatDiscreteValueSpinner() {
+    private fun sanitizeValueStatDiscreteValues() {
+        val allowedDiscreteValues = viewModel.selectedValueStatFeature.value
+            ?.discreteValues?.map { it.index }
+        if (allowedDiscreteValues != null) {
+            viewModel.selectedValueStatDiscreteValues.value =
+                viewModel.selectedValueStatDiscreteValues.value
+                    ?.filter { allowedDiscreteValues.contains(it.index) }
+                    ?.distinct()
+        } else viewModel.selectedValueStatDiscreteValues.value = null
+    }
+
+    private fun listenToValueStatDiscreteValueCheckBoxes() {
         viewModel.selectedValueStatFeature.observe(this, Observer {
-            if(it != null && it.featureType == FeatureType.DISCRETE) {
-                val itemNames = it.discreteValues.map { dv -> dv.label }
-                val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
-                binding.valueStatDiscreteValueSpinner.adapter = adapter
-                val selected = viewModel.selectedValueStatDiscreteValue.value
-                val index = it.discreteValues.indexOf(selected)
-                if (selected != null && index >= 0) binding.valueStatDiscreteValueSpinner.setSelection(index)
-                else binding.valueStatDiscreteValueSpinner.setSelection(0)
-                binding.valueStatDiscreteValueSpinner.onItemSelectedListener = object: AdapterView.OnItemSelectedListener {
-                    override fun onNothingSelected(p0: AdapterView<*>?) { }
-                    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                        viewModel.selectedValueStatDiscreteValue.value = it.discreteValues[index]
+            if (it != null && it.featureType == FeatureType.DISCRETE) {
+                val discreteValues = it.discreteValues
+                val buttonsLayout = binding.valueStatDiscreteValueButtonsLayout
+                buttonsLayout.removeAllViews()
+                val inflater = LayoutInflater.from(context)
+                for (discreteValue in discreteValues.sortedBy { dv -> dv.index }) {
+                    val item = inflater.inflate(
+                        R.layout.discrete_value_input_button,
+                        buttonsLayout, false
+                    ) as CheckBox
+                    item.text = discreteValue.label
+                    item.isChecked = viewModel.selectedValueStatDiscreteValues.value
+                        ?.contains(discreteValue)
+                        ?: false
+                    item.setOnCheckedChangeListener { _, checked ->
+                        if (checked) viewModel.selectedValueStatDiscreteValues.value =
+                            viewModel.selectedValueStatDiscreteValues.value?.plus(discreteValue)
+                                ?: listOf(discreteValue)
+                        else viewModel.selectedValueStatDiscreteValues.value =
+                            viewModel.selectedValueStatDiscreteValues.value?.minus(discreteValue)
+                                ?: listOf(discreteValue)
                         onFormUpdate()
                     }
+                    buttonsLayout.addView(item)
                 }
+            }
+        })
+    }
+
+    private fun listenToValueStatDiscreteValues() {
+        viewModel.selectedValueStatDiscreteValues.observe(this, Observer {
+            val views = binding.valueStatDiscreteValueButtonsLayout.children.toList()
+            it?.forEach { dv ->
+                if (views.size > dv.index) (views[dv.index] as CheckBox).isChecked = true
             }
         })
     }
@@ -431,7 +465,7 @@ class GraphStatInputViewModel : ViewModel() {
     val yRangeTo = MutableLiveData(1.0)
     val selectedPieChartFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
-    val selectedValueStatDiscreteValue = MutableLiveData<DiscreteValue?>(null)
+    val selectedValueStatDiscreteValues = MutableLiveData<List<DiscreteValue>?>(null)
     val selectedValueStatFromValue = MutableLiveData(0.toDouble())
     val selectedValueStatToValue = MutableLiveData(0.toDouble())
     var lineGraphFeatures = listOf<LineGraphFeature>()
@@ -496,14 +530,14 @@ class GraphStatInputViewModel : ViewModel() {
         val avTimeStat = dataSource!!.getAverageTimeBetweenStatByGraphStatId(graphStat.id) ?: return null
         val feature = dataSource!!.getFeatureAndTrackGroupByFeatureId(avTimeStat.featureId) ?: return null
         withContext(Dispatchers.Main) {
-            this@GraphStatInputViewModel.selectedValueStatFeature.value = feature
             if (feature.featureType == FeatureType.DISCRETE) {
-                this@GraphStatInputViewModel.selectedValueStatDiscreteValue.value =
-                    feature.discreteValues.firstOrNull { dv -> dv.index == avTimeStat.fromValue.toInt() }
+                this@GraphStatInputViewModel.selectedValueStatDiscreteValues.value =
+                    feature.discreteValues.filter { dv -> avTimeStat.discreteValues.contains(dv.index) }
             } else {
                 this@GraphStatInputViewModel.selectedValueStatFromValue.value = avTimeStat.fromValue.toDouble()
                 this@GraphStatInputViewModel.selectedValueStatToValue.value = avTimeStat.toValue.toDouble()
             }
+            this@GraphStatInputViewModel.selectedValueStatFeature.value = feature
             this@GraphStatInputViewModel.sampleDuration.value = avTimeStat.duration
         }
         return avTimeStat.id
@@ -513,14 +547,14 @@ class GraphStatInputViewModel : ViewModel() {
         val timeSinceStat = dataSource!!.getTimeSinceLastStatByGraphStatId(graphStat.id) ?: return null
         val feature = dataSource!!.getFeatureAndTrackGroupByFeatureId(timeSinceStat.featureId) ?: return null
         withContext(Dispatchers.Main) {
-            this@GraphStatInputViewModel.selectedValueStatFeature.value = feature
             if (feature.featureType == FeatureType.DISCRETE) {
-                this@GraphStatInputViewModel.selectedValueStatDiscreteValue.value =
-                    feature.discreteValues.firstOrNull { dv -> dv.index == timeSinceStat.fromValue.toInt() }
+                this@GraphStatInputViewModel.selectedValueStatDiscreteValues.value =
+                    feature.discreteValues.filter { dv -> timeSinceStat.discreteValues.contains(dv.index) }
             } else {
                 this@GraphStatInputViewModel.selectedValueStatFromValue.value = timeSinceStat.fromValue.toDouble()
                 this@GraphStatInputViewModel.selectedValueStatToValue.value = timeSinceStat.toValue.toDouble()
             }
+            this@GraphStatInputViewModel.selectedValueStatFeature.value = feature
         }
         return timeSinceStat.id
     }
@@ -562,10 +596,9 @@ class GraphStatInputViewModel : ViewModel() {
         if (selectedValueStatFeature.value == null)
             throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) {
-            if (selectedValueStatDiscreteValue.value == null)
+            if (selectedValueStatDiscreteValues.value == null)
                 throw ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
-            if (!selectedValueStatFeature.value!!.discreteValues
-                    .contains(selectedValueStatDiscreteValue.value!!))
+            if (selectedValueStatDiscreteValues.value!!.isEmpty())
                 throw ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
         }
         if (selectedValueStatFeature.value!!.featureType == FeatureType.CONTINUOUS) {
@@ -671,23 +704,23 @@ class GraphStatInputViewModel : ViewModel() {
     fun constructAverageTimeBetween(graphStatId: Long) = AverageTimeBetweenStat(
         id ?: 0L, graphStatId,
         selectedValueStatFeature.value!!.id, getFromValue(),
-        getToValue(), sampleDuration.value
+        getToValue(), sampleDuration.value,
+        selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
     )
 
     fun constructTimeSince(graphStatId: Long) = TimeSinceLastStat(
         id ?: 0L, graphStatId,
-        selectedValueStatFeature.value!!.id, getFromValue(), getToValue()
+        selectedValueStatFeature.value!!.id, getFromValue(), getToValue(),
+        selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
     )
 
     private fun getFromValue(): String {
-        return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE)
-            selectedValueStatDiscreteValue.value!!.index.toString()
+        return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) "0"
         else selectedValueStatFromValue.value!!.toString()
     }
 
     private fun getToValue(): String {
-        return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE)
-            selectedValueStatDiscreteValue.value!!.index.toString()
+        return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) "0"
         else selectedValueStatToValue.value!!.toString()
     }
 }
