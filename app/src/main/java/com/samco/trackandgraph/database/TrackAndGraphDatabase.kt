@@ -201,8 +201,8 @@ class Converters {
     }
 
     @TypeConverter
-    fun stringToListOfInts(intsString: String) = intsString.split(splitChars1).map {
-        it.toInt()
+    fun stringToListOfInts(intsString: String) = intsString.split(splitChars1).mapNotNull {
+        it.toIntOrNull()
     }
 }
 

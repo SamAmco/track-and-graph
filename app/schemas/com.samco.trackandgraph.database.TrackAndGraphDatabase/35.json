@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 35,
-    "identityHash": "5405efb3cfc375b48e4fe206132dddfc",
+    "identityHash": "56e727c0d4e5aa872e706a250c5294ba",
     "entities": [
       {
         "tableName": "track_groups_table",
@@ -397,7 +397,7 @@
       },
       {
         "tableName": "average_time_between_stat_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` TEXT NOT NULL, `to_value` TEXT NOT NULL, `duration` TEXT, `feature_type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` TEXT NOT NULL, `to_value` TEXT NOT NULL, `duration` TEXT, `discrete_values` TEXT NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -434,12 +434,6 @@
             "columnName": "duration",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "featureType",
-            "columnName": "feature_type",
-            "affinity": "INTEGER",
-            "notNull": true
           },
           {
             "fieldPath": "discreteValues",
@@ -593,7 +587,7 @@
       },
       {
         "tableName": "time_since_last_stat_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` TEXT NOT NULL, `to_value` TEXT NOT NULL, `feature_type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` TEXT NOT NULL, `to_value` TEXT NOT NULL, `discrete_values` TEXT NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -623,12 +617,6 @@
             "fieldPath": "toValue",
             "columnName": "to_value",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "featureType",
-            "columnName": "feature_type",
-            "affinity": "INTEGER",
             "notNull": true
           },
           {
@@ -752,7 +740,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5405efb3cfc375b48e4fe206132dddfc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '56e727c0d4e5aa872e706a250c5294ba')"
     ]
   }
 }

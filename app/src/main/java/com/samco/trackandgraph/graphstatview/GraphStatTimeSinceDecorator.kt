@@ -20,6 +20,7 @@ package com.samco.trackandgraph.graphstatview
 import android.content.Context
 import android.view.View
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.FeatureType
 import com.samco.trackandgraph.database.GraphOrStat
 import com.samco.trackandgraph.database.TimeSinceLastStat
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
@@ -50,15 +51,21 @@ class GraphStatTimeSinceDecorator(
 
     private suspend fun initTimeSinceStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
-        val feature =
-            withContext(Dispatchers.IO) { dataSource!!.getFeatureById(timeSinceLastStat.featureId) }
         var lastDataPointTimeStamp: OffsetDateTime? = null
         val lastDataPoint = withContext(Dispatchers.IO) {
-            dataSource!!.getLastDataPointBetween(
-                feature.id,
-                timeSinceLastStat.fromValue,
-                timeSinceLastStat.toValue
-            )
+            val feature = dataSource!!.getFeatureById(timeSinceLastStat.featureId)
+            if (feature.featureType == FeatureType.CONTINUOUS) {
+                dataSource!!.getLastDataPointBetween(
+                    timeSinceLastStat.featureId,
+                    timeSinceLastStat.fromValue,
+                    timeSinceLastStat.toValue
+                )
+            } else {
+                dataSource!!.getLastDataPointWithValue(
+                    timeSinceLastStat.featureId,
+                    timeSinceLastStat.discreteValues
+                )
+            }
         }
         if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
         binding!!.statMessage.visibility = View.VISIBLE
