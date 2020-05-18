@@ -76,10 +76,38 @@ val MIGRATION_33_34 = object : Migration(33, 34) {
     }
 }
 
+val MIGRATION_34_35 = object : Migration(34, 35) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE average_time_between_stat_table ADD discrete_values TEXT NOT NULL DEFAULT ''")
+        database.execSQL("ALTER TABLE time_since_last_stat_table ADD discrete_values TEXT NOT NULL DEFAULT ''")
+        val updates = mutableListOf<String>()
+        val avTimeCursor = database.query("SELECT * FROM average_time_between_stat_table")
+        while (avTimeCursor.moveToNext()) {
+            val id = avTimeCursor.getLong(0)
+            val from = avTimeCursor.getString(3)
+            val to = avTimeCursor.getString(4)
+            val discreteValues = from + splitChars1 + to
+            updates.add("UPDATE average_time_between_stat_table " +
+                    "SET discrete_values='$discreteValues' WHERE id=$id")
+        }
+        val timeSinceCursor = database.query("SELECT * FROM time_since_last_stat_table")
+        while (timeSinceCursor.moveToNext()) {
+            val id = avTimeCursor.getLong(0)
+            val from = avTimeCursor.getString(3)
+            val to = avTimeCursor.getString(4)
+            val discreteValues = from + splitChars1 + to
+            updates.add("UPDATE average_time_between_stat_table " +
+                    "SET discrete_values='$discreteValues' WHERE id=$id")
+        }
+        if (updates.size > 0) updates.forEach { database.execSQL(it) }
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
     MIGRATION_31_32,
     MIGRATION_32_33,
-    MIGRATION_33_34
+    MIGRATION_33_34,
+    MIGRATION_34_35
 )
