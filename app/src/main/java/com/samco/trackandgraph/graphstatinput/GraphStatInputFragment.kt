@@ -202,9 +202,9 @@ class GraphStatInputFragment : Fragment() {
             ?.discreteValues?.map { it.index }
         if (allowedDiscreteValues != null) {
             viewModel.selectedValueStatDiscreteValues.value =
-                viewModel.selectedValueStatDiscreteValues.value?.filter {
-                    allowedDiscreteValues.contains(it.index)
-                }
+                viewModel.selectedValueStatDiscreteValues.value
+                    ?.filter { allowedDiscreteValues.contains(it.index) }
+                    ?.distinct()
         } else viewModel.selectedValueStatDiscreteValues.value = null
     }
 
