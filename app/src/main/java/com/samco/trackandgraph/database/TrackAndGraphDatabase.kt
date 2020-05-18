@@ -65,7 +65,7 @@ const val splitChars2 = "!!"
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class],
-    version = 34
+    version = 35
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -78,7 +78,12 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
             synchronized(this) {
                 var instance = INSTANCE
                 if (instance == null) {
-                    instance = Room.databaseBuilder(context.applicationContext, TrackAndGraphDatabase::class.java, "trackandgraph_database")
+                    instance = Room
+                        .databaseBuilder(
+                            context.applicationContext,
+                            TrackAndGraphDatabase::class.java,
+                            "trackandgraph_database"
+                        )
                         .addMigrations(*allMigrations)
                         .fallbackToDestructiveMigration()
                         .build()
@@ -98,7 +103,8 @@ class Converters {
     }
 
     @TypeConverter
-    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String = values.joinToString(splitChars1) { v -> v.toString() }
+    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String =
+        values.joinToString(splitChars1) { v -> v.toString() }
 
     @TypeConverter
     fun intToFeatureType(i: Int): FeatureType = FeatureType.values()[i]
@@ -113,15 +119,18 @@ class Converters {
     fun graphStatTypeToInt(graphStat: GraphStatType): Int = graphStat.ordinal
 
     @TypeConverter
-    fun stringToOffsetDateTime(value: String?): OffsetDateTime? = value?.let { odtFromString(value) }
+    fun stringToOffsetDateTime(value: String?): OffsetDateTime? =
+        value?.let { odtFromString(value) }
 
     @TypeConverter
-    fun offsetDateTimeToString(value: OffsetDateTime?): String = value?.let { stringFromOdt(it) } ?: ""
+    fun offsetDateTimeToString(value: OffsetDateTime?): String =
+        value?.let { stringFromOdt(it) } ?: ""
 
     @TypeConverter
     fun lineGraphFeaturesToString(value: List<LineGraphFeature>): String {
-        return value.joinToString(splitChars1){ v ->
-            listOf("${v.featureId}",
+        return value.joinToString(splitChars1) { v ->
+            listOf(
+                "${v.featureId}",
                 v.name,
                 "${v.colorIndex}",
                 "${v.averagingMode.ordinal}",
@@ -154,7 +163,8 @@ class Converters {
     fun durationToString(value: Duration?): String = value?.let { value.toString() } ?: ""
 
     @TypeConverter
-    fun stringToDuration(value: String): Duration? = if (value.isEmpty()) null else Duration.parse(value)
+    fun stringToDuration(value: String): Duration? =
+        if (value.isEmpty()) null else Duration.parse(value)
 
     @TypeConverter
     fun intToGroupItemType(i: Int) = GroupItemType.values()[i]
@@ -184,9 +194,21 @@ class Converters {
 
     @TypeConverter
     fun intToYRangeType(index: Int) = YRangeType.values()[index]
+
+    @TypeConverter
+    fun listOfIntsToString(ints: List<Int>) = ints.joinToString(splitChars1) { i ->
+        i.toString()
+    }
+
+    @TypeConverter
+    fun stringToListOfInts(intsString: String) = intsString.split(splitChars1).map {
+        it.toInt()
+    }
 }
 
 
-fun odtFromString(value: String): OffsetDateTime = databaseFormatter.parse(value, OffsetDateTime::from)
+fun odtFromString(value: String): OffsetDateTime =
+    databaseFormatter.parse(value, OffsetDateTime::from)
+
 fun stringFromOdt(value: OffsetDateTime): String = databaseFormatter.format(value)
 
