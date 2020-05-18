@@ -21,6 +21,7 @@ import android.content.Context
 import android.view.View
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.AverageTimeBetweenStat
+import com.samco.trackandgraph.database.FeatureType
 import com.samco.trackandgraph.database.GraphOrStat
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
@@ -49,28 +50,7 @@ class GraphStatAverageTimeBetweenDecorator(
 
     private suspend fun initAverageTimeBetweenStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
-        val feature = withContext(Dispatchers.IO) {
-            dataSource!!.getFeatureById(timeBetweenStat.featureId)
-        }
-        val dataPoints = withContext(Dispatchers.IO) {
-            if (timeBetweenStat.duration == null) {
-                dataSource!!.getDataPointsBetween(
-                    feature.id,
-                    timeBetweenStat.fromValue,
-                    timeBetweenStat.toValue
-                )
-            } else {
-                val now = OffsetDateTime.now()
-                val cutOff = now.minus(timeBetweenStat.duration)
-                dataSource!!.getDataPointsBetweenInTimeRange(
-                    feature.id,
-                    timeBetweenStat.fromValue,
-                    timeBetweenStat.toValue,
-                    cutOff,
-                    now
-                )
-            }
-        }
+        val dataPoints = getRelevantDataPoints()
         if (dataPoints.size < 2) throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
         else {
             val totalMillis =
@@ -82,6 +62,47 @@ class GraphStatAverageTimeBetweenDecorator(
 
         binding!!.statMessage.visibility = View.VISIBLE
         binding!!.progressBar.visibility = View.GONE
+    }
+
+    private suspend fun getRelevantDataPoints() = withContext(Dispatchers.IO) {
+        val feature = dataSource!!.getFeatureById(timeBetweenStat.featureId)
+        when {
+            feature.featureType == FeatureType.CONTINUOUS && timeBetweenStat.duration == null -> {
+                dataSource!!.getDataPointsBetween(
+                    feature.id,
+                    timeBetweenStat.fromValue,
+                    timeBetweenStat.toValue
+                )
+            }
+            feature.featureType == FeatureType.CONTINUOUS -> {
+                val now = OffsetDateTime.now()
+                val cutOff = now.minus(timeBetweenStat.duration)
+                dataSource!!.getDataPointsBetweenInTimeRange(
+                    feature.id,
+                    timeBetweenStat.fromValue,
+                    timeBetweenStat.toValue,
+                    cutOff,
+                    now
+                )
+            }
+            feature.featureType == FeatureType.DISCRETE && timeBetweenStat.duration == null -> {
+                dataSource!!.getDataPointsWithValue(
+                    feature.id,
+                    timeBetweenStat.discreteValues
+                )
+            }
+            feature.featureType == FeatureType.DISCRETE -> {
+                val now = OffsetDateTime.now()
+                val cutOff = now.minus(timeBetweenStat.duration)
+                dataSource!!.getDataPointsWithValueInTimeRange(
+                    feature.id,
+                    timeBetweenStat.discreteValues,
+                    cutOff,
+                    now
+                )
+            }
+            else -> emptyList()
+        }
     }
 
     private fun setAverageTimeBetweenStatText(millis: Double) {

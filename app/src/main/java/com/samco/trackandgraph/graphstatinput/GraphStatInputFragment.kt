@@ -704,24 +704,23 @@ class GraphStatInputViewModel : ViewModel() {
     fun constructAverageTimeBetween(graphStatId: Long) = AverageTimeBetweenStat(
         id ?: 0L, graphStatId,
         selectedValueStatFeature.value!!.id, getFromValue(),
-        getToValue(), sampleDuration.value, selectedValueStatFeature.value!!.featureType,
+        getToValue(), sampleDuration.value,
         selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
     )
 
     fun constructTimeSince(graphStatId: Long) = TimeSinceLastStat(
         id ?: 0L, graphStatId,
         selectedValueStatFeature.value!!.id, getFromValue(), getToValue(),
-        selectedValueStatFeature.value!!.featureType,
         selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
     )
 
     private fun getFromValue(): String {
-        return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) ""
+        return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) "0"
         else selectedValueStatFromValue.value!!.toString()
     }
 
     private fun getToValue(): String {
-        return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) ""
+        return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) "0"
         else selectedValueStatToValue.value!!.toString()
     }
 }

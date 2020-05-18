@@ -57,9 +57,6 @@ data class AverageTimeBetweenStat(
     @ColumnInfo(name = "duration")
     val duration: Duration?,
 
-    @ColumnInfo(name = "feature_type")
-    val featureType: FeatureType,
-
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<Int>
 )

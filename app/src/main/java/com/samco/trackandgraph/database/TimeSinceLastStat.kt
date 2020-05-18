@@ -53,9 +53,6 @@ data class TimeSinceLastStat(
     @ColumnInfo(name = "to_value")
     val toValue: String,
 
-    @ColumnInfo(name = "feature_type")
-    val featureType: FeatureType,
-
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<Int>
 )
