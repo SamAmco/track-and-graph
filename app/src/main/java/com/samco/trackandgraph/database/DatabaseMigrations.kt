@@ -92,11 +92,11 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
         }
         val timeSinceCursor = database.query("SELECT * FROM time_since_last_stat_table")
         while (timeSinceCursor.moveToNext()) {
-            val id = avTimeCursor.getLong(0)
-            val from = avTimeCursor.getString(3)
-            val to = avTimeCursor.getString(4)
+            val id = timeSinceCursor.getLong(0)
+            val from = timeSinceCursor.getString(3)
+            val to = timeSinceCursor.getString(4)
             val discreteValues = from + splitChars1 + to
-            updates.add("UPDATE average_time_between_stat_table " +
+            updates.add("UPDATE time_since_last_stat_table " +
                     "SET discrete_values='$discreteValues' WHERE id=$id")
         }
         if (updates.size > 0) updates.forEach { database.execSQL(it) }
