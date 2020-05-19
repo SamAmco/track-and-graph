@@ -1,7 +1,9 @@
 package com.samco.trackandgraph.backupandrestore
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,13 +11,17 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import java.io.File
+import java.io.InputStream
 import java.io.OutputStream
+import kotlin.system.exitProcess
+
 
 const val EXPORT_DATABASE_REQUEST_CODE = 235
 const val RESTORE_DATABASE_REQUEST_CODE = 578
@@ -55,11 +61,8 @@ class BackupAndRestoreFragment : Fragment() {
     private fun listenToRestoreResult() {
         viewModel.restoreResult.observe(this, Observer {
             when (it) {
-                true -> {
-                    val color = ContextCompat.getColor(requireContext(), R.color.successTextColor)
-                    binding.restoreFeedbackText.setTextColor(color)
-                    binding.restoreFeedbackText.text = getString(R.string.restore_successful)
-                }
+                //TODO we should probably inform the user we're going to restart the app
+                true -> restartApp()
                 false -> {
                     val color = ContextCompat.getColor(requireContext(), R.color.errorText)
                     binding.restoreFeedbackText.setTextColor(color)
@@ -88,6 +91,19 @@ class BackupAndRestoreFragment : Fragment() {
         })
     }
 
+    private fun restartApp() {
+        val mStartActivity = Intent(context, MainActivity::class.java)
+        val mPendingIntent = PendingIntent.getActivity(
+            context,
+            8375,
+            mStartActivity,
+            PendingIntent.FLAG_CANCEL_CURRENT
+        )
+        val mgr = context!!.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        mgr[AlarmManager.RTC, System.currentTimeMillis() + 100] = mPendingIntent
+        exitProcess(0)
+    }
+
     private fun onBackupClicked() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
@@ -104,22 +120,28 @@ class BackupAndRestoreFragment : Fragment() {
     }
 
     private fun onRestoreClicked() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = SQLITE_MIME_TYPE
-            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/x-sqlite3"))
-        }
+        val intent = Intent(Intent.ACTION_GET_CONTENT).apply { type = "*/*" }
         startActivityForResult(intent, RESTORE_DATABASE_REQUEST_CODE)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
         when (requestCode) {
-            EXPORT_DATABASE_REQUEST_CODE ->
+            EXPORT_DATABASE_REQUEST_CODE -> {
                 viewModel.exportDatabase(
                     resultData?.data?.let { activity?.contentResolver?.openOutputStream(it) },
                     TrackAndGraphDatabase.getInstance(requireContext()).openHelper.readableDatabase.path
                 )
-            RESTORE_DATABASE_REQUEST_CODE -> viewModel.restoreDatabase(resultData?.data)
+            }
+            RESTORE_DATABASE_REQUEST_CODE -> {
+                val path = TrackAndGraphDatabase.getInstance(requireContext())
+                    .openHelper.writableDatabase.path
+                TrackAndGraphDatabase.getInstance(requireContext()).openHelper.close()
+                viewModel.restoreDatabase(
+                    resultData?.data?.let { activity?.contentResolver?.openInputStream(it) },
+                    path
+                )
+            }
         }
     }
 }
@@ -148,7 +170,7 @@ class BackupAndRestoreViewModel : ViewModel() {
             return
         }
         if (databaseFilePath == null) {
-            error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
+            error = BackupRestoreException(R.string.backup_error_could_not_find_database_file)
             _backupResult.value = false
             return
         }
@@ -160,37 +182,49 @@ class BackupAndRestoreViewModel : ViewModel() {
         }
         _inProgress.value = true
         ioScope.launch {
-            val inputStream = databaseFile.inputStream()
             try {
-                val buffer = ByteArray(10 * 1024)
-                var length: Int
-                while (inputStream.read(buffer).also { length = it } != -1) {
-                    outputStream.write(buffer, 0, length)
+                databaseFile.inputStream().use { inputStream ->
+                    outputStream.use { inputStream.copyTo(it) }
                 }
                 withContext(Dispatchers.Main) {
-                    _inProgress.value = false
                     _backupResult.value = true
+                    _inProgress.value = false
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     error = BackupRestoreException(R.string.backup_error_failed_to_copy_database)
                     _backupResult.value = false
                 }
-            } finally {
-                outputStream.close()
-                inputStream.close()
             }
         }
     }
 
-    fun restoreDatabase(uri: Uri?) {
+    fun restoreDatabase(inputStream: InputStream?, databaseFilePath: String?) {
+        if (inputStream == null) {
+            error = BackupRestoreException(R.string.restore_error_could_not_read_from_database_file)
+            _restoreResult.value = false
+            return
+        }
+        if (databaseFilePath == null) {
+            error = BackupRestoreException(R.string.restore_error_could_not_write_to_database)
+            _restoreResult.value = false
+            return
+        }
         _inProgress.value = true
         ioScope.launch {
-            //TODO
-            delay(2000)
-            withContext(Dispatchers.Main) {
-                _inProgress.value = false
-                _restoreResult.value = true
+            try {
+                inputStream.use { inStream ->
+                    File(databaseFilePath).outputStream().use { inStream.copyTo(it) }
+                }
+                withContext(Dispatchers.Main) {
+                    _restoreResult.value = true
+                    _inProgress.value = false
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    error = BackupRestoreException(R.string.restore_error_failed_to_copy_database)
+                    _restoreResult.value = false
+                }
             }
         }
     }
