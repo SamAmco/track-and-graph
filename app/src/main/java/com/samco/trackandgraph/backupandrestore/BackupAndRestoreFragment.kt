@@ -2,21 +2,20 @@ package com.samco.trackandgraph.backupandrestore
 
 import android.content.Intent
 import android.net.Uri
-import androidx.lifecycle.ViewModelProviders
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.*
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
+import java.io.File
+import java.io.OutputStream
 
 const val EXPORT_DATABASE_REQUEST_CODE = 235
 const val RESTORE_DATABASE_REQUEST_CODE = 578
@@ -64,8 +63,8 @@ class BackupAndRestoreFragment : Fragment() {
                 false -> {
                     val color = ContextCompat.getColor(requireContext(), R.color.errorText)
                     binding.restoreFeedbackText.setTextColor(color)
-                    binding.restoreFeedbackText.text =
-                        getString(R.string.restore_failed, viewModel.errorText)
+                    val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
+                    binding.restoreFeedbackText.text = getString(R.string.restore_failed, errorText)
                 }
             }
         })
@@ -82,8 +81,8 @@ class BackupAndRestoreFragment : Fragment() {
                 false -> {
                     val color = ContextCompat.getColor(requireContext(), R.color.errorText)
                     binding.backupFeedbackText.setTextColor(color)
-                    binding.backupFeedbackText.text =
-                        getString(R.string.backup_failed, viewModel.errorText)
+                    val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
+                    binding.backupFeedbackText.text = getString(R.string.backup_failed, errorText)
                 }
             }
         })
@@ -115,36 +114,71 @@ class BackupAndRestoreFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
         when (requestCode) {
-            EXPORT_DATABASE_REQUEST_CODE -> viewModel.exportDatabase(resultData?.data)
+            EXPORT_DATABASE_REQUEST_CODE ->
+                viewModel.exportDatabase(
+                    resultData?.data?.let { activity?.contentResolver?.openOutputStream(it) },
+                    TrackAndGraphDatabase.getInstance(requireContext()).openHelper.readableDatabase.path
+                )
             RESTORE_DATABASE_REQUEST_CODE -> viewModel.restoreDatabase(resultData?.data)
         }
     }
 }
 
 class BackupAndRestoreViewModel : ViewModel() {
+    class BackupRestoreException(val stringResource: Int?)
+
     private val _restoreResult: MutableLiveData<Boolean?> = MutableLiveData(null)
     val restoreResult: LiveData<Boolean?> = _restoreResult
 
     private val _backupResult: MutableLiveData<Boolean?> = MutableLiveData(null)
     val backupResult: LiveData<Boolean?> = _backupResult
 
-    var errorText: String? = null
+    var error: BackupRestoreException? = null
         private set
 
     private val _inProgress = MutableLiveData(false)
     val inProgress: LiveData<Boolean> = _inProgress
     private var workerJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.Main + workerJob)
+    private val ioScope = CoroutineScope(Dispatchers.IO + workerJob)
 
-    fun exportDatabase(uri: Uri?) {
+    fun exportDatabase(outputStream: OutputStream?, databaseFilePath: String?) {
+        if (outputStream == null) {
+            error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
+            _backupResult.value = false
+            return
+        }
+        if (databaseFilePath == null) {
+            error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
+            _backupResult.value = false
+            return
+        }
+        val databaseFile = File(databaseFilePath)
+        if (!databaseFile.exists()) {
+            error = BackupRestoreException(R.string.backup_error_failed_to_copy_database)
+            _backupResult.value = false
+            return
+        }
         _inProgress.value = true
         ioScope.launch {
-            //TODO
-            delay(2000)
-            withContext(Dispatchers.Main) {
-                _inProgress.value = false
-                errorText = "An error."
-                _backupResult.value = true
+            val inputStream = databaseFile.inputStream()
+            try {
+                val buffer = ByteArray(10 * 1024)
+                var length: Int
+                while (inputStream.read(buffer).also { length = it } != -1) {
+                    outputStream.write(buffer, 0, length)
+                }
+                withContext(Dispatchers.Main) {
+                    _inProgress.value = false
+                    _backupResult.value = true
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    error = BackupRestoreException(R.string.backup_error_failed_to_copy_database)
+                    _backupResult.value = false
+                }
+            } finally {
+                outputStream.close()
+                inputStream.close()
             }
         }
     }
@@ -156,7 +190,6 @@ class BackupAndRestoreViewModel : ViewModel() {
             delay(2000)
             withContext(Dispatchers.Main) {
                 _inProgress.value = false
-                errorText = "An error."
                 _restoreResult.value = true
             }
         }

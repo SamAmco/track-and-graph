@@ -29,7 +29,7 @@
             android:title="@string/reminders"
             />
         <item
-            android:id="@+id/backupAndRestore"
+            android:id="@+id/backupAndRestoreFragment"
             android:icon="@drawable/backup_restore_icon"
             android:title="@string/backup_and_restore"
             />

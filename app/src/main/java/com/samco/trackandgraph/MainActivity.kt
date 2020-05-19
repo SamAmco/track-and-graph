@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity() {
         R.id.selectGroupFragment,
         R.id.FAQFragment,
         R.id.aboutPageFragment,
-        R.id.remindersFragment
+        R.id.remindersFragment,
+        R.id.backupAndRestoreFragment
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {

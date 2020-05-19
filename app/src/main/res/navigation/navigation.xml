@@ -137,7 +137,7 @@
                 app:argType="long" />
     </fragment>
     <fragment
-        android:id="@+id/backupAndRestore"
+        android:id="@+id/backupAndRestoreFragment"
         android:name="com.samco.trackandgraph.backupandrestore.BackupAndRestoreFragment"
         android:label="@string/backup_and_restore" />
     <fragment
