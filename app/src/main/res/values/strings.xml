@@ -250,15 +250,18 @@
     <string name="default_value_description_hint">(Your default will be used automatically when you add a data point but you can always go back and change it.)</string>
     <string name="check_all_relevant_values">Check all relevant values: </string>
     <string name="backup_and_restore">Backup and Restore</string>
-    <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken. However bare in mind that your data will be stored in an un-encrypted file.</string>
+    <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken.</string>
     <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app.</string>
     <string name="backup_data">Backup data</string>
     <string name="restore_data">Restore data</string>
     <string name="backup_successful">Backup Successful!</string>
     <string name="backup_failed">Backup failed. %s</string>
     <string name="backup_error_could_not_write_to_file">Could not find or write to the selected file.</string>
+    <string name="restore_error_could_not_write_to_database">Could not find or write to the database.</string>
+    <string name="restore_error_could_not_read_from_database_file">Could not find or read the selected database file.</string>
     <string name="backup_error_could_not_find_database_file">Could not find or read database file.</string>
     <string name="backup_error_failed_to_copy_database">Something went wrong while copying the database file.</string>
+    <string name="restore_error_failed_to_copy_database">Something went wrong while restoring the database.</string>
     <string name="restore_successful">Restore Successful!</string>
     <string name="restore_failed">Restore failed. %s</string>
 
