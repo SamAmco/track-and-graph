@@ -58,7 +58,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">18sp</item>
         <item name="android:alpha">0.6</item>
-        <item name="android:textAlignment">center</item>item>
+        <item name="android:textAlignment">center</item>
     </style>
 
     <style name="DataPointInputNumberStyle">
@@ -73,6 +73,8 @@
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">80dp</item>
         <item name="android:scrollbars">none</item>
-        <item name="android:layout_gravity">center_horizontal</item>item>
+        <item name="android:layout_gravity">center_horizontal</item>
     </style>
+
+
 </resources>

@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/EmptyPageHintTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/input_spacing_large"
+                    android:layout_marginEnd="@dimen/input_spacing_large"
+                    android:layout_marginBottom="@dimen/dialog_input_spacing"
+                    android:text="@string/backup_hint_text"
+                    android:textAlignment="textStart" />
+
+                <Button
+                    android:id="@+id/backupButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorShadowButton"
+                    android:padding="@dimen/dialog_input_spacing"
+                    android:text="@string/backup_data" />
+
+                <TextView
+                    android:id="@+id/backupFeedbackText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/input_spacing_large"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:layout_marginEnd="@dimen/input_spacing_large"
+                    style="@style/EmptyPageHintTextStyle"
+                    android:textStyle="bold"
+                    tools:textColor="@color/warningTextColor"
+                    tools:text="Some error that goes on for a really long time and even longer" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="30dp"
+                    android:layout_marginBottom="30dp"
+                    android:src="@drawable/centered_gradient" />
+
+                <TextView
+                    style="@style/EmptyPageHintTextStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/input_spacing_large"
+                    android:layout_marginEnd="@dimen/input_spacing_large"
+                    android:layout_marginBottom="@dimen/dialog_input_spacing"
+                    android:text="@string/restore_hint_text"
+                    android:textAlignment="textStart" />
+
+                <Button
+                    android:id="@+id/restoreButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/colorShadowButton"
+                    android:padding="@dimen/dialog_input_spacing"
+                    android:text="@string/restore_data" />
+
+                <TextView
+                    android:id="@+id/restoreFeedbackText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/input_spacing_large"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:layout_marginEnd="@dimen/input_spacing_large"
+                    style="@style/EmptyPageHintTextStyle"
+                    android:textStyle="bold"
+                    tools:textColor="@color/warningTextColor"
+                    tools:text="Some error that goes on for a really long time and even longer" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <FrameLayout
+            android:id="@+id/progressOverlay"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/washoutFadeColor"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center" />
+        </FrameLayout>
+    </FrameLayout>
+</layout>
