@@ -28,6 +28,11 @@
             android:icon="@drawable/reminders_icon"
             android:title="@string/reminders"
             />
+        <item
+            android:id="@+id/backupAndRestore"
+            android:icon="@drawable/backup_restore_icon"
+            android:title="@string/backup_and_restore"
+            />
     </group>
 
     <group android:id="@+id/aboutAndFAQ">
