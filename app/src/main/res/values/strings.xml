@@ -256,6 +256,9 @@
     <string name="restore_data">Restore data</string>
     <string name="backup_successful">Backup Successful!</string>
     <string name="backup_failed">Backup failed. %s</string>
+    <string name="backup_error_could_not_write_to_file">Could not find or write to the selected file.</string>
+    <string name="backup_error_could_not_find_database_file">Could not find or read database file.</string>
+    <string name="backup_error_failed_to_copy_database">Something went wrong while copying the database file.</string>
     <string name="restore_successful">Restore Successful!</string>
     <string name="restore_failed">Restore failed. %s</string>
 
