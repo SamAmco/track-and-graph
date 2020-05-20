@@ -47,4 +47,6 @@
     <color name="visColor10">#313695</color>
 
     <color name="shadow_drop">#03000000</color>
+    <color name="washoutFadeColor">#66FFFFFF</color>
+    <color name="successTextColor">#139819</color>
 </resources>
