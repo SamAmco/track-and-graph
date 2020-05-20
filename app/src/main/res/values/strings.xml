@@ -251,7 +251,7 @@
     <string name="check_all_relevant_values">Check all relevant values: </string>
     <string name="backup_and_restore">Backup and Restore</string>
     <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken.</string>
-    <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app.</string>
+    <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app. Track &amp; Graph will restart after the restore is complete.</string>
     <string name="backup_data">Backup data</string>
     <string name="restore_data">Restore data</string>
     <string name="backup_successful">Backup Successful!</string>
