@@ -43,6 +43,7 @@
     <string name="ru_sure_del_feature">Are you sure you want to delete this tracked data?</string>
     <string name="ru_sure_del_data_point">Are you sure you want to delete this data point?</string>
     <string name="export_file_name_suffix">%s-%s-%04d%02d%02d-%02d%02d%02d.csv</string>
+    <string name="backup_file_name_suffix">%s-%04d%02d%02d-%02d%02d%02d.db</string>
     <string name="discrete_values">Add some choices below.</string>
     <string name="add_discrete_values_tip">Caution: When graphed over time the index of the choice (on the left) will be used as the Y axis value so make sure you order the choices correctly.</string>
     <string name="feature_name_cannot_be_null">Please add a name</string>
@@ -248,5 +249,20 @@
     <string name="use_default_value">Set a default value</string>
     <string name="default_value_description_hint">(Your default will be used automatically when you add a data point but you can always go back and change it.)</string>
     <string name="check_all_relevant_values">Check all relevant values: </string>
+    <string name="backup_and_restore">Backup and Restore</string>
+    <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken.</string>
+    <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app. Track &amp; Graph will restart after the restore is complete.</string>
+    <string name="backup_data">Backup data</string>
+    <string name="restore_data">Restore data</string>
+    <string name="backup_successful">Backup Successful!</string>
+    <string name="backup_failed">Backup failed. %s</string>
+    <string name="backup_error_could_not_write_to_file">Could not find or write to the selected file.</string>
+    <string name="restore_error_could_not_write_to_database">Could not find or write to the database.</string>
+    <string name="restore_error_could_not_read_from_database_file">Could not find or read the selected database file.</string>
+    <string name="backup_error_could_not_find_database_file">Could not find or read database file.</string>
+    <string name="backup_error_failed_to_copy_database">Something went wrong while copying the database file.</string>
+    <string name="restore_error_failed_to_copy_database">Something went wrong while restoring the database.</string>
+    <string name="restore_successful">Restore Successful!</string>
+    <string name="restore_failed">Restore failed. %s</string>
 
 </resources>
