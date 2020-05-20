@@ -14,8 +14,8 @@ also make sure you update any other fastlane resources you want proliferated e.g
 
 6. Use fastlane to upload the new aab to the play store e.g.
 
-	# fastlane supply --aab app/release/app-release.aab --track beta
+	# bundle exec fastlane supply --aab app/release/app-release.aab --track beta
 
 or for release
 
-	# fastlane supply --aab app/release/app-release.aab
+	# bundle exec fastlane supply --aab app/release/app-release.aab
