@@ -18,10 +18,15 @@ package com.samco.trackandgraph.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteQuery
 import org.threeten.bp.OffsetDateTime
+
 
 @Dao
 interface TrackAndGraphDatabaseDao {
+    @RawQuery
+    fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery?): Int
+
     @Insert
     fun insertTrackGroup(trackGroup: TrackGroup): Long
 

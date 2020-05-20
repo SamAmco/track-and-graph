@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
@@ -21,7 +22,6 @@ import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
 import kotlin.system.exitProcess
-
 
 const val EXPORT_DATABASE_REQUEST_CODE = 235
 const val RESTORE_DATABASE_REQUEST_CODE = 578
@@ -39,6 +39,7 @@ class BackupAndRestoreFragment : Fragment() {
         binding = BackupAndRestoreFragmentBinding.inflate(inflater)
 
         viewModel = ViewModelProviders.of(this).get(BackupAndRestoreViewModel::class.java)
+        viewModel.init(TrackAndGraphDatabase.getInstance(requireContext()))
         listenToViewModel()
 
         binding.backupButton.setOnClickListener { onBackupClicked() }
@@ -129,17 +130,13 @@ class BackupAndRestoreFragment : Fragment() {
         when (requestCode) {
             EXPORT_DATABASE_REQUEST_CODE -> {
                 viewModel.exportDatabase(
-                    resultData?.data?.let { activity?.contentResolver?.openOutputStream(it) },
-                    TrackAndGraphDatabase.getInstance(requireContext()).openHelper.readableDatabase.path
+                    resultData?.data?.let { activity?.contentResolver?.openOutputStream(it) }
+
                 )
             }
             RESTORE_DATABASE_REQUEST_CODE -> {
-                val path = TrackAndGraphDatabase.getInstance(requireContext())
-                    .openHelper.writableDatabase.path
-                TrackAndGraphDatabase.getInstance(requireContext()).openHelper.close()
                 viewModel.restoreDatabase(
-                    resultData?.data?.let { activity?.contentResolver?.openInputStream(it) },
-                    path
+                    resultData?.data?.let { activity?.contentResolver?.openInputStream(it) }
                 )
             }
         }
@@ -160,10 +157,19 @@ class BackupAndRestoreViewModel : ViewModel() {
 
     private val _inProgress = MutableLiveData(false)
     val inProgress: LiveData<Boolean> = _inProgress
+
+    private var database: TrackAndGraphDatabase? = null
     private var workerJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + workerJob)
 
-    fun exportDatabase(outputStream: OutputStream?, databaseFilePath: String?) {
+    fun init(database: TrackAndGraphDatabase) {
+        if (this.database != null) return
+        this.database = database
+    }
+
+    fun exportDatabase(outputStream: OutputStream?) {
+        val databaseFilePath = database?.openHelper?.readableDatabase?.path
+
         if (outputStream == null) {
             error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
             _backupResult.value = false
@@ -183,9 +189,14 @@ class BackupAndRestoreViewModel : ViewModel() {
         _inProgress.value = true
         ioScope.launch {
             try {
+                database!!.trackAndGraphDatabaseDao.doRawQuery(
+                    SimpleSQLiteQuery("PRAGMA wal_checkpoint(full)")
+                )
+
                 databaseFile.inputStream().use { inputStream ->
                     outputStream.use { inputStream.copyTo(it) }
                 }
+
                 withContext(Dispatchers.Main) {
                     _backupResult.value = true
                     _inProgress.value = false
@@ -199,7 +210,9 @@ class BackupAndRestoreViewModel : ViewModel() {
         }
     }
 
-    fun restoreDatabase(inputStream: InputStream?, databaseFilePath: String?) {
+    fun restoreDatabase(inputStream: InputStream?) {
+        val databaseFilePath = database?.openHelper?.writableDatabase?.path
+
         if (inputStream == null) {
             error = BackupRestoreException(R.string.restore_error_could_not_read_from_database_file)
             _restoreResult.value = false
@@ -210,9 +223,12 @@ class BackupAndRestoreViewModel : ViewModel() {
             _restoreResult.value = false
             return
         }
+
         _inProgress.value = true
         ioScope.launch {
             try {
+                database?.openHelper?.close()
+
                 inputStream.use { inStream ->
                     File(databaseFilePath).outputStream().use { inStream.copyTo(it) }
                 }
