@@ -1,0 +1,11 @@
+- Added basic tracking widget for easy tracking from the home screen
+
+- Added line point label options to line graphs to make reading certain graphs easier
+
+- Added hourly plot totals option to line graph
+
+- Removed timestamp only data type but added a more general default value option to make tracking certain things faster and easier
+
+- You can now select more than one of the multiple choice answers when creating an "Average time between" or "Time since last" statistic
+
+- Added a backup and restore page to allow quick backing up of all app data including track groups, graph groups and reminders
