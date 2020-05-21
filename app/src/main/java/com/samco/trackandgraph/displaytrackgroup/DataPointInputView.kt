@@ -154,6 +154,8 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         timeButton.text = dateTime.format(timeDisplayFormatter)
     }
 
+    //TODO Consider first converting dateTime to a ZonedDateTime before operating on it, this might
+    // fix the strange behaviour surrounding daylight savings? : https://github.com/SamAmco/track-and-graph/issues/28
     private fun initDateButton() {
         dateButton.setOnClickListener {
             val picker = DatePickerDialog(context!!,
