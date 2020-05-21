@@ -20,18 +20,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.DataPoint
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.database.stringFromOdt
+import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentFeatureHistoryBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
@@ -39,60 +37,84 @@ import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import kotlinx.coroutines.*
 
-
 class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
 
     private lateinit var binding: FragmentFeatureHistoryBinding
     private lateinit var viewModel: FeatureHistoryViewModel
+    private lateinit var adapter: DataPointAdapter
     private val args: FragmentFeatureHistoryArgs by navArgs()
 
-    private var updateJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = DataBindingUtil.inflate(
+            inflater, R.layout.fragment_feature_history, container, false
+        )
+        initPreLoadViewState()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_feature_history, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-        initFeature()
-        viewModel = createViewModel()
-        val adapter = DataPointAdapter(DataPointClickListener(
-            this::onEditDataPointClicked,
-            this::onDeleteDataPointClicked
-        ))
-        observeFeatureDataAndUpdate(viewModel, adapter)
-        binding.dataPointList.adapter = adapter
-        binding.dataPointList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        viewModel = ViewModelProviders.of(this).get(FeatureHistoryViewModel::class.java)
+        val dao = TrackAndGraphDatabase.getInstance(requireContext()).trackAndGraphDatabaseDao
+        viewModel.initViewModel(args.feature, dao)
+
+        initDataPointAdapter()
+        observeViewModel()
+        listenToBinding()
 
         (activity as AppCompatActivity).supportActionBar?.title = args.featureName
+
         return binding.root
     }
 
-    private fun initFeature() {
-        val application = requireActivity().application
-        val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                viewModel.feature = dao.getFeatureById(args.feature)
+    private fun initPreLoadViewState() {
+        binding.featureDescriptionCardView.visibility = View.GONE
+        binding.noDataPointsHintText.visibility = View.GONE
+    }
+
+    private fun listenToBinding() {
+        binding.featureDescriptionCardView.setOnClickListener {
+            viewModel.feature.value?.let {
+                AlertDialog.Builder(requireContext())
+                    .setMessage(it.description)
+                    .create()
+                    .show()
             }
         }
     }
 
-    private fun createViewModel(): FeatureHistoryViewModel {
-        val application = requireNotNull(this.activity).application
-        val dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        val viewModelFactory = FeatureHistoryViewModelFactory(args.feature, dataSource)
-        return ViewModelProviders.of(this, viewModelFactory).get(FeatureHistoryViewModel::class.java)
+    private fun initDataPointAdapter() {
+        adapter = DataPointAdapter(
+            DataPointClickListener(
+                this::onEditDataPointClicked,
+                this::onDeleteDataPointClicked
+            )
+        )
+        binding.dataPointList.adapter = adapter
+        binding.dataPointList.layoutManager = LinearLayoutManager(
+            context, RecyclerView.VERTICAL, false
+        )
     }
 
-    private fun observeFeatureDataAndUpdate(featureHistoryViewModel: FeatureHistoryViewModel, adapter: DataPointAdapter) {
-        featureHistoryViewModel.dataPoints.observe(viewLifecycleOwner, Observer {
+    private fun observeViewModel() {
+        viewModel.dataPoints.observe(this, Observer {
             it?.let {
                 adapter.submitList(it)
+                binding.noDataPointsHintText.visibility =
+                    if (it.isEmpty()) View.VISIBLE else View.GONE
+            }
+        })
+
+        viewModel.feature.observe(this, Observer {
+            if (it != null && it.description.isNotEmpty()) {
+                binding.featureDescriptionCardView.visibility = View.VISIBLE
+                binding.featureDescriptionText.text = it.description
             }
         })
     }
 
     private fun onEditDataPointClicked(dataPoint: DataPoint) {
-        viewModel.feature?.let {
+        viewModel.feature.value?.let {
             val dialog = InputDataPointDialog()
             val argBundle = Bundle()
             argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(args.feature))
@@ -105,7 +127,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
     private fun onDeleteDataPointClicked(dataPoint: DataPoint) {
         viewModel.currentActionDataPoint = dataPoint
         val dialog = YesCancelDialogFragment()
-        var args = Bundle()
+        val args = Bundle()
         args.putString("title", getString(R.string.ru_sure_del_data_point))
         dialog.arguments = args
         childFragmentManager.let { dialog.show(it, "ru_sure_del_data_point_fragment") }
@@ -113,22 +135,39 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
     override fun onDialogYes(dialog: YesCancelDialogFragment) {
         when (dialog.title) {
-            getString(R.string.ru_sure_del_data_point) -> deleteDataPoint(viewModel.currentActionDataPoint!!)
+            getString(R.string.ru_sure_del_data_point) -> viewModel.deleteDataPoint()
+        }
+    }
+}
+
+class FeatureHistoryViewModel : ViewModel() {
+    private val _feature = MutableLiveData<Feature?>(null)
+    val feature: LiveData<Feature?> = _feature
+
+    lateinit var dataPoints: LiveData<List<DataPoint>>
+        private set
+    var currentActionDataPoint: DataPoint? = null
+
+    var dataSource: TrackAndGraphDatabaseDao? = null
+    private var updateJob = Job()
+    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
+
+    fun initViewModel(featureId: Long, dataSource: TrackAndGraphDatabaseDao) {
+        if (this.dataSource != null) return
+        this.dataSource = dataSource
+        this.dataPoints = dataSource.getDataPointsForFeature(featureId)
+        ioScope.launch {
+            val feature = dataSource.getFeatureById(featureId)
+            withContext(Dispatchers.Main) { _feature.value = feature }
         }
     }
 
-    private fun deleteDataPoint(dataPoint: DataPoint) {
-        val application = requireActivity().application
-        val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        uiScope.launch {
-            withContext(Dispatchers.IO) {
-                dao.deleteDataPoint(dataPoint)
-            }
-        }
+    fun deleteDataPoint() = currentActionDataPoint?.let {
+        ioScope.launch { dataSource!!.deleteDataPoint(it) }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onCleared() {
+        super.onCleared()
         updateJob.cancel()
     }
 }

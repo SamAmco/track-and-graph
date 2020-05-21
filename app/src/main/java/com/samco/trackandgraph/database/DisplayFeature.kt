@@ -48,7 +48,10 @@ data class DisplayFeature(
     val numDataPoints: Long?,
 
     @ColumnInfo(name = "display_index")
-    val displayIndex: Int
+    val displayIndex: Int,
+
+    @ColumnInfo(name = "feature_description")
+    val description: String
 ) {
     fun getDisplayTimestamp() = timestamp?.let { displayFeatureDateFormat.format(timestamp) }
 }
