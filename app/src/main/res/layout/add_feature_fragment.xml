@@ -37,6 +37,12 @@
                     android:inputType="text"
                     android:maxLines="1" />
 
+                <androidx.appcompat.widget.AppCompatEditText
+                    android:id="@+id/featureDescriptionText"
+                    style="@style/ExpansiveTextInputStyle"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:hint="@string/feature_description_input_hint" />
+
                 <TextView
                     android:id="@+id/featureTypeLabel"
                     android:layout_width="match_parent"

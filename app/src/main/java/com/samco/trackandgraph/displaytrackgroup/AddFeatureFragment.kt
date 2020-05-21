@@ -81,12 +81,6 @@ class AddFeatureFragment : Fragment(),
             args.editFeatureId
         )
 
-        binding.discreteValuesTextView.visibility = View.INVISIBLE
-        binding.discreteValues.visibility = View.INVISIBLE
-        binding.addDiscreteValueButton.visibility = View.INVISIBLE
-        binding.defaultNumericalInput.visibility = View.INVISIBLE
-        binding.defaultDiscreteScrollView.visibility = View.INVISIBLE
-        binding.featureNameText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
         listenToViewModelState()
         return binding.root
     }
@@ -106,6 +100,9 @@ class AddFeatureFragment : Fragment(),
     private fun listenToViewModelState() {
         viewModel.state.observe(this, Observer { state ->
             when (state) {
+                AddFeatureState.INITIALIZING -> {
+                    setInitialViewState()
+                }
                 AddFeatureState.WAITING -> {
                     initViews()
                     binding.progressBar.visibility = View.GONE
@@ -128,6 +125,15 @@ class AddFeatureFragment : Fragment(),
         })
     }
 
+    private fun setInitialViewState() {
+        binding.discreteValuesTextView.visibility = View.INVISIBLE
+        binding.discreteValues.visibility = View.INVISIBLE
+        binding.addDiscreteValueButton.visibility = View.INVISIBLE
+        binding.defaultNumericalInput.visibility = View.INVISIBLE
+        binding.defaultDiscreteScrollView.visibility = View.INVISIBLE
+        binding.featureNameText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
+    }
+
     private fun updateAnyExistingWidgets() {
         val intent = Intent(
             AppWidgetManager.ACTION_APPWIDGET_UPDATE,
@@ -147,14 +153,18 @@ class AddFeatureFragment : Fragment(),
         if (viewModel.updateMode) initSpinnerInUpdateMode()
         observeHasDefaultValue()
 
-        binding.featureNameText.setText(viewModel.featureName.value)
+        binding.featureNameText.setText(viewModel.featureName)
+        binding.featureDescriptionText.setText(viewModel.featureDescription)
         binding.featureTypeSpinner.setSelection(featureTypeList.indexOf(viewModel.featureType.value!!))
         binding.featureTypeSpinner.onItemSelectedListener = this
         binding.featureNameText.setSelection(binding.featureNameText.text.length)
         binding.featureNameText.requestFocus()
         binding.featureNameText.addTextChangedListener {
-            viewModel.featureName.value = binding.featureNameText.text.toString()
+            viewModel.featureName = binding.featureNameText.text.toString()
             validateForm()
+        }
+        binding.featureDescriptionText.addTextChangedListener {
+            viewModel.featureDescription = binding.featureDescriptionText.text.toString()
         }
         binding.addDiscreteValueButton.setOnClickListener { onAddDiscreteValue() }
         binding.addBar.addButton.setOnClickListener { onAddOrUpdateClicked() }
@@ -456,7 +466,8 @@ class AddFeatureViewModel : ViewModel() {
 
     class MutableLabel(var value: String = "", val updateIndex: Int = -1)
 
-    val featureName = MutableLiveData("")
+    var featureName = ""
+    var featureDescription = ""
     val featureType = MutableLiveData(FeatureType.CONTINUOUS)
     val featureHasDefaultValue = MutableLiveData(false)
     val featureDefaultValue = MutableLiveData(1.0)
@@ -495,12 +506,13 @@ class AddFeatureViewModel : ViewModel() {
                     .sortedBy { f -> f.index }
                     .map { f -> MutableLabel(f.label, f.index) }
                 withContext(Dispatchers.Main) {
-                    featureName.value = existingFeature!!.name
+                    featureName = existingFeature!!.name
+                    featureDescription = existingFeature!!.description
                     featureType.value = existingFeature!!.featureType
                     featureHasDefaultValue.value = existingFeature!!.hasDefaultValue
                     featureDefaultValue.value = existingFeature!!.defaultValue
                     this@AddFeatureViewModel.existingFeatureNames =
-                        existingFeatureNames.minus(featureName.value)
+                        existingFeatureNames.minus(featureName)
                     discreteValues.addAll(existingDiscreteValues)
                 }
             }
@@ -545,10 +557,10 @@ class AddFeatureViewModel : ViewModel() {
 
         val feature = Feature.create(
             existingFeature!!.id,
-            featureName.value!!, trackGroupId,
+            featureName, trackGroupId,
             featureType.value!!, newDiscVals,
             featureHasDefaultValue.value!!, featureDefaultValue.value!!,
-            existingFeature!!.displayIndex
+            existingFeature!!.displayIndex, featureDescription
         )
         dao!!.updateFeature(feature)
     }
@@ -605,10 +617,10 @@ class AddFeatureViewModel : ViewModel() {
         }
         val feature = Feature.create(
             0,
-            featureName.value!!, trackGroupId,
+            featureName, trackGroupId,
             featureType.value!!, discVals,
             featureHasDefaultValue.value!!, featureDefaultValue.value!!,
-            0
+            0, featureDescription
         )
         dao!!.insertFeature(feature)
     }
