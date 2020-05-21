@@ -20,6 +20,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -59,13 +60,27 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
         initDataPointAdapter()
         observeViewModel()
+        listenToBinding()
+
         (activity as AppCompatActivity).supportActionBar?.title = args.featureName
+
         return binding.root
     }
 
     private fun initPreLoadViewState() {
         binding.featureDescriptionCardView.visibility = View.GONE
         binding.noDataPointsHintText.visibility = View.GONE
+    }
+
+    private fun listenToBinding() {
+        binding.featureDescriptionCardView.setOnClickListener {
+            viewModel.feature.value?.let {
+                AlertDialog.Builder(requireContext())
+                    .setMessage(it.description)
+                    .create()
+                    .show()
+            }
+        }
     }
 
     private fun initDataPointAdapter() {
