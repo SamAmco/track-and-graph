@@ -212,7 +212,6 @@ class DisplayTrackGroupFragment : Fragment(),
     }
 
     private fun onFeatureHistoryClicked(feature: DisplayFeature) {
-        if (feature.numDataPoints == null || feature.numDataPoints <= 0L) return
         navController?.navigate(
             DisplayTrackGroupFragmentDirections
                 .actionFeatureHistory(feature.id, feature.name)
