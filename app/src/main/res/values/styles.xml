@@ -76,5 +76,13 @@
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
 
+    <style name="ExpansiveTextInputStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:background">@drawable/expansive_text_box_background</item>
+        <item name="backgroundTint">@null</item>
+        <item name="android:inputType">textMultiLine|textAutoCorrect|textCapSentences</item>
+    </style>
 
 </resources>

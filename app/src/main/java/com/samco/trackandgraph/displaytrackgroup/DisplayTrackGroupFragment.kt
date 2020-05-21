@@ -212,7 +212,6 @@ class DisplayTrackGroupFragment : Fragment(),
     }
 
     private fun onFeatureHistoryClicked(feature: DisplayFeature) {
-        if (feature.numDataPoints == null || feature.numDataPoints <= 0L) return
         navController?.navigate(
             DisplayTrackGroupFragmentDirections
                 .actionFeatureHistory(feature.id, feature.name)
@@ -301,6 +300,9 @@ class DisplayTrackGroupViewModel : ViewModel() {
         }
     }
 
-    private fun toFeature(df: DisplayFeature) = Feature.create(df.id, df.name, df.trackGroupId,
-        df.featureType, df.discreteValues, df.hasDefaultValue, df.defaultValue, df.displayIndex)
+    private fun toFeature(df: DisplayFeature) = Feature.create(
+        df.id, df.name, df.trackGroupId,
+        df.featureType, df.discreteValues, df.hasDefaultValue, df.defaultValue, df.displayIndex,
+        df.description
+    )
 }
