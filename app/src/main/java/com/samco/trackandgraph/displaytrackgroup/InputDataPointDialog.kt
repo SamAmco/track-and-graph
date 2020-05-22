@@ -194,7 +194,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
         viewModel.onDataPointInput(
             DataPoint(dataPointInputData.dateTime, dataPointInputData.feature.id,
-                dataPointInputData.value, dataPointInputData.label),
+                dataPointInputData.value, dataPointInputData.label, ""), //TODO we need an input for note
             dataPointInputData.oldDataPoint
         )
     }

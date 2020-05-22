@@ -60,7 +60,7 @@ class TrackWidgetInputDataPointActivity : FragmentActivity() {
         if (feature == null) finish()
         else when (feature.hasDefaultValue) {
             true -> {
-                viewModel.addDataPoint()
+                viewModel.addDefaultDataPoint()
                 finish()
             }
             else -> showDialog(feature.id)
@@ -91,13 +91,13 @@ class TrackWidgetInputDataPointViewModel : ViewModel() {
         feature = dataSource!!.tryGetFeatureById(featureId)
     }
 
-    fun addDataPoint() = feature.value?.let {
+    fun addDefaultDataPoint() = feature.value?.let {
         ioScope.launch {
             val label =
                 if (it.featureType == FeatureType.DISCRETE)
                     it.discreteValues.first { dv -> dv.index == it.defaultValue.toInt() }.label
                 else ""
-            val newDataPoint = DataPoint(OffsetDateTime.now(), it.id, it.defaultValue, label)
+            val newDataPoint = DataPoint(OffsetDateTime.now(), it.id, it.defaultValue, label, "")
             dataSource!!.insertDataPoint(newDataPoint)
         }
     }

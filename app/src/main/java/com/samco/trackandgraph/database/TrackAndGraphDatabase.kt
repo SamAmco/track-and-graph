@@ -67,7 +67,7 @@ const val splitChars2 = "!!"
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class],
-    version = 36
+    version = 37
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
