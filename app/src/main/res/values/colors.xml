@@ -35,6 +35,12 @@
     <color name="warningTextColor">#bb3d18</color>
     <color name="disabledTextColor">#999999</color>
 
+    <!--
+    Some useful tools for finding color blind safe color palettes:
+    For checking how safe the palette is: https://projects.susielu.com/viz-palette
+    For generating palette's: http://paletton.com/#uid=12K0Q0kw0w0jyC+oRxVy4oIDfjr
+    The source for the original scheme: https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=10
+    -->
     <color name="visColor1">#a50026</color>
     <color name="visColor2">#d73027</color>
     <color name="visColor3">#f46d43</color>
@@ -45,6 +51,8 @@
     <color name="visColor8">#74add1</color>
     <color name="visColor9">#4575b4</color>
     <color name="visColor10">#313695</color>
+    <color name="visColor11">#54D931</color>
+    <color name="visColor12">#1B8200</color>
 
     <color name="shadow_drop">#03000000</color>
     <color name="washoutFadeColor">#66FFFFFF</color>
