@@ -65,6 +65,7 @@ class DisplayTrackGroupFragment : Fragment(),
             this::onFeatureEditClicked,
             this::onFeatureDeleteClicked,
             this::onFeatureMoveToClicked,
+            this::onFeatureDescriptionClicked,
             this::onFeatureAddClicked,
             this::onFeatureHistoryClicked
         ))
@@ -80,6 +81,10 @@ class DisplayTrackGroupFragment : Fragment(),
         setHasOptionsMenu(true)
         (activity as AppCompatActivity).supportActionBar?.title = args.trackGroupName
         return binding.root
+    }
+
+    private fun onFeatureDescriptionClicked(feature: DisplayFeature) {
+        showFeatureDescriptionDialog(requireContext(), feature.name, feature.description)
     }
 
     private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {

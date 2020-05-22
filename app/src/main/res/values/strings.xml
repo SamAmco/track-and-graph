@@ -269,5 +269,6 @@
     <string name="description_colon">Description:</string>
     <string name="info">Info</string>
     <string name="no_description">No description</string>
+    <string name="description">Description</string>
 
 </resources>
