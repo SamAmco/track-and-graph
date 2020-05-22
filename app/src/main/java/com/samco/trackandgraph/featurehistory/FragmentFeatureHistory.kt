@@ -17,9 +17,7 @@
 package com.samco.trackandgraph.featurehistory
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -35,6 +33,7 @@ import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
+import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
 import kotlinx.coroutines.*
 
 class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
@@ -60,27 +59,33 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
         initDataPointAdapter()
         observeViewModel()
-        listenToBinding()
 
         (activity as AppCompatActivity).supportActionBar?.title = args.featureName
 
+        setHasOptionsMenu(true)
         return binding.root
     }
 
-    private fun initPreLoadViewState() {
-        binding.featureDescriptionCardView.visibility = View.GONE
-        binding.noDataPointsHintText.visibility = View.GONE
+    private fun showInfo() {
+        viewModel.feature.value?.let {
+            showFeatureDescriptionDialog(requireContext(), it.name, it.description)
+        }
     }
 
-    private fun listenToBinding() {
-        binding.featureDescriptionCardView.setOnClickListener {
-            viewModel.feature.value?.let {
-                AlertDialog.Builder(requireContext())
-                    .setMessage(it.description)
-                    .create()
-                    .show()
-            }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.infoButton -> showInfo()
         }
+        return super.onOptionsItemSelected(item)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.feature_history_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    private fun initPreLoadViewState() {
+        binding.noDataPointsHintText.visibility = View.GONE
     }
 
     private fun initDataPointAdapter() {
@@ -97,18 +102,11 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
     }
 
     private fun observeViewModel() {
-        viewModel.dataPoints.observe(this, Observer {
+        viewModel.dataPoints.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it)
                 binding.noDataPointsHintText.visibility =
                     if (it.isEmpty()) View.VISIBLE else View.GONE
-            }
-        })
-
-        viewModel.feature.observe(this, Observer {
-            if (it != null && it.description.isNotEmpty()) {
-                binding.featureDescriptionCardView.visibility = View.VISIBLE
-                binding.featureDescriptionText.text = it.description
             }
         })
     }

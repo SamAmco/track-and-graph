@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.displaytrackgroup
 
-import android.annotation.SuppressLint
 import android.graphics.drawable.RippleDrawable
 import android.os.Build
 import android.view.LayoutInflater
@@ -28,7 +27,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DisplayFeature
-import com.samco.trackandgraph.database.FeatureType
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 
@@ -106,6 +104,7 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
                 R.id.edit -> clickListener?.onEdit(it)
                 R.id.delete -> clickListener?.onDelete(it)
                 R.id.moveTo -> clickListener?.onMoveTo(it)
+                R.id.description -> clickListener?.onDescription(it)
                 else -> {}
             }
         }
@@ -125,7 +124,6 @@ class DisplayFeatureDiffCallback : DiffUtil.ItemCallback<DisplayFeature>() {
     override fun areItemsTheSame(oldItem: DisplayFeature, newItem: DisplayFeature): Boolean {
         return oldItem.id == newItem.id
     }
-    @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: DisplayFeature, newItem: DisplayFeature): Boolean {
         return oldItem == newItem
     }
@@ -134,11 +132,13 @@ class DisplayFeatureDiffCallback : DiffUtil.ItemCallback<DisplayFeature>() {
 class FeatureClickListener(private val onEditListener: (feature: DisplayFeature) -> Unit,
                            private val onDeleteListener: (feature: DisplayFeature) -> Unit,
                            private val onMoveToListener: (feature: DisplayFeature) -> Unit,
+                           private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
                            private val onAddListener: (feature: DisplayFeature) -> Unit,
                            private val onHistoryListener: (feature: DisplayFeature) -> Unit) {
     fun onEdit(feature: DisplayFeature) = onEditListener(feature)
     fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
     fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
+    fun onDescription(feature: DisplayFeature) = onDescriptionListener(feature)
     fun onAdd(feature: DisplayFeature) = onAddListener(feature)
     fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
 }
