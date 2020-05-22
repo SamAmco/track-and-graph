@@ -43,8 +43,10 @@ data class DataPoint (
     val value: Double,
 
     @ColumnInfo(name = "label")
-    val label: String
+    val label: String,
 
+    @ColumnInfo(name = "note")
+    val note: String
 ) {
     fun getDisplayTimestamp(): String = displayFeatureDateFormat.format(timestamp)
     fun getDisplayValue(): String {

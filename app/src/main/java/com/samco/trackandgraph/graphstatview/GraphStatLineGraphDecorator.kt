@@ -272,7 +272,7 @@ class GraphStatLineGraphDecorator(
                 plotFrom = newData.size
                 foundPlotFrom = true
             }
-            newData.add(DataPoint(currentTimeStamp, featureId, total, ""))
+            newData.add(DataPoint(currentTimeStamp, featureId, total, "", ""))
             yield()
         }
         return RawDataSample(newData, plotFrom)

@@ -589,7 +589,7 @@ class AddFeatureViewModel : ViewModel() {
     private fun stripDataPointsToValue() {
         val oldDataPoints = dao!!.getDataPointsForFeatureSync(existingFeature!!.id)
         val newDataPoints = oldDataPoints.map {
-            DataPoint(it.timestamp, it.featureId, it.value, "")
+            DataPoint(it.timestamp, it.featureId, it.value, "", it.note)
         }
         dao!!.updateDataPoints(newDataPoints)
     }
@@ -604,7 +604,7 @@ class AddFeatureViewModel : ViewModel() {
             DataPoint(
                 v.timestamp, v.featureId,
                 valMap[v.value.toInt()]!!.first.toDouble(),
-                valMap[v.value.toInt()]!!.second
+                valMap[v.value.toInt()]!!.second, v.note
             )
         }
         dao!!.updateDataPoints(newValues)

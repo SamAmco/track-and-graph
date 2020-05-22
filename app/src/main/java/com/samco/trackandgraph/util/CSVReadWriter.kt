@@ -100,12 +100,12 @@ object CSVReadWriter {
         }
 
         val addContinuousDataPoint = { value: Double?, timestamp: OffsetDateTime, featureId: Long ->
-            newDataPoints.add(DataPoint(timestamp, featureId, value ?: 1.0, ""))
+            newDataPoints.add(DataPoint(timestamp, featureId, value ?: 1.0, "", ""))//TODO we need to be able to export and import notes as well
         }
 
         val addDiscreteDataPoint = { value: String, timestamp: OffsetDateTime, feature: Feature, lineNumber: Int ->
             val discreteValue = tryGetDiscreteValueFromString(value, lineNumber)
-            newDataPoints.add(DataPoint(timestamp, feature.id, discreteValue.index.toDouble(), discreteValue.label))
+            newDataPoints.add(DataPoint(timestamp, feature.id, discreteValue.index.toDouble(), discreteValue.label, ""))//TODO we need to be able to export and import notes as well
             discreteValue
         }
 
