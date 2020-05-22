@@ -55,7 +55,9 @@ val dataVisColorList = listOf(
     R.color.visColor7,
     R.color.visColor8,
     R.color.visColor9,
-    R.color.visColor10
+    R.color.visColor10,
+    R.color.visColor11,
+    R.color.visColor12
 )
 
 const val splitChars1 = "||"
