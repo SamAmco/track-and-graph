@@ -267,5 +267,8 @@
     <string name="feature_description_input_hint">Add a longer description (optional)</string>
     <string name="no_data_points_history_fragment_hint">Your tracking history will show up here when you have input some data.</string>
     <string name="description_colon">Description:</string>
+    <string name="info">Info</string>
+    <string name="no_description">No description</string>
+    <string name="description">Description</string>
 
 </resources>
