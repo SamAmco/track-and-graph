@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of Track & Graph
   ~ 
   ~ Track & Graph is free software: you can redistribute it and/or modify
@@ -16,10 +15,16 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/delete"
-            android:title="@string/delete" />
-    <item android:id="@+id/edit"
-            android:title="@string/edit" />
-    <item android:id="@+id/moveTo"
+    <item
+        android:id="@+id/edit"
+        android:title="@string/edit" />
+    <item
+        android:id="@+id/delete"
+        android:title="@string/delete" />
+    <item
+        android:id="@+id/moveTo"
         android:title="@string/move_to" />
+    <item
+        android:id="@+id/description"
+        android:title="@string/description" />
 </menu>
