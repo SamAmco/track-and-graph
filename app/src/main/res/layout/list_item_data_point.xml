@@ -4,49 +4,60 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/list_item_data_point_height"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         app:cardCornerRadius="@dimen/card_corner_radius">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/timestampText"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/list_item_data_point_height"
                 android:gravity="center"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"
-                app:layout_constraintLeft_toLeftOf="parent"
                 tools:text="01/02/19  08:16" />
 
-            <TextView
-                android:id="@+id/valueText"
+            <LinearLayout
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingStart="10dp"
+                android:paddingEnd="10dp"
+                android:paddingTop="7dp"
+                android:paddingBottom="7dp"
+                android:layout_gravity="center_vertical"
                 android:gravity="center"
-                android:paddingStart="15dp"
-                android:paddingEnd="15dp"
-                android:singleLine="true"
-                android:textSize="16sp"
-                app:layout_constraintLeft_toRightOf="@id/timestampText"
-                app:layout_constraintRight_toLeftOf="@id/editButton"
-                tools:text="Some value that goes on for a really long time" />
+                android:orientation="vertical">
 
-            <ImageButton
-                android:id="@+id/deleteButton"
-                android:layout_width="@dimen/list_item_data_point_height"
-                android:layout_height="match_parent"
-                android:background="?android:attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:tint="@color/secondaryDarkColor"
-                app:layout_constraintRight_toRightOf="parent"
-                app:srcCompat="@drawable/delete_icon" />
+                <TextView
+                    android:id="@+id/valueText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:singleLine="true"
+                    android:textStyle="bold"
+                    android:textSize="16sp"
+                    tools:text="1" />
+
+                <TextView
+                    android:id="@+id/noteText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:ellipsize="end"
+                    android:maxLines="3"
+                    android:textColor="@color/disabledTextColor"
+                    tools:text="Notes and\ntoo many lines \nsome more notes" />
+            </LinearLayout>
 
             <ImageButton
                 android:id="@+id/editButton"
@@ -56,10 +67,17 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:tint="@color/primaryDarkColor"
-                app:layout_constraintRight_toLeftOf="@id/deleteButton"
                 app:srcCompat="@drawable/edit_icon" />
 
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageButton
+                android:id="@+id/deleteButton"
+                android:layout_width="@dimen/list_item_data_point_height"
+                android:layout_height="match_parent"
+                android:background="?android:attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:tint="@color/secondaryDarkColor"
+                app:srcCompat="@drawable/delete_icon" />
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 </layout>
