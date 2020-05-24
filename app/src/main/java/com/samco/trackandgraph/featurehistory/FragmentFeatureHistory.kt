@@ -17,7 +17,9 @@
 package com.samco.trackandgraph.featurehistory
 
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.*
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
@@ -29,10 +31,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentFeatureHistoryBinding
+import com.samco.trackandgraph.databinding.ShowDataPointDialogHeaderBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
+import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
 import kotlinx.coroutines.*
 
@@ -92,13 +96,18 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         adapter = DataPointAdapter(
             DataPointClickListener(
                 this::onEditDataPointClicked,
-                this::onDeleteDataPointClicked
+                this::onDeleteDataPointClicked,
+                this::onViewDataPointClicked
             )
         )
         binding.dataPointList.adapter = adapter
         binding.dataPointList.layoutManager = LinearLayoutManager(
             context, RecyclerView.VERTICAL, false
         )
+    }
+
+    private fun onViewDataPointClicked(dataPoint: DataPoint) {
+        showDataPointDescriptionDialog(requireContext(), layoutInflater, dataPoint)
     }
 
     private fun observeViewModel() {
