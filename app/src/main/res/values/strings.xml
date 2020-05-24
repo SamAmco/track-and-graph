@@ -122,7 +122,7 @@
 
     <string name="import_exception_unknown">Import failed: An unknown error occurred</string>
     <string name="import_exception_bad_headers">Import failed: Headers did not match the expected headers: %s</string>
-    <string name="import_exception_inconsistent_record">Import failed: Record on line %s is not consistent with headers</string>
+    <string name="import_exception_inconsistent_record">Import failed: Record on line %s is not consistent with required headers</string>
     <string name="import_exception_bad_timestamp">Import failed: Could not interpret the timestamp for record on line: %s</string>
     <string name="import_exception_invalid_character">Import failed: Detected invalid character: %s</string>
     <string name="import_exception_inconsistent_data_type">Import failed: Received inconsistent data type on line: %s</string>
