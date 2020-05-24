@@ -124,7 +124,8 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            val view = DataPointInputView(context, uiStates[features[position]]!!)
+            val view = DataPointInputView(context)
+            view.initialize(uiStates[features[position]]!!)
             val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             view.layoutParams = params
             view.setOnClickListener(clickListener)
@@ -194,7 +195,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
         viewModel.onDataPointInput(
             DataPoint(dataPointInputData.dateTime, dataPointInputData.feature.id,
-                dataPointInputData.value, dataPointInputData.label, ""), //TODO we need an input for note
+                dataPointInputData.value, dataPointInputData.label, dataPointInputData.note),
             dataPointInputData.oldDataPoint
         )
     }
@@ -247,14 +248,16 @@ class InputDataPointDialogViewModel : ViewModel() {
             val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
             val timeFixed = dataPointTimestamp != null
             uiStates = featureData.map { f ->
-                val defaultValue = dataPointData?.value ?: if (f.hasDefaultValue)
+                val dataPointValue = dataPointData?.value ?: if (f.hasDefaultValue)
                     f.defaultValue else 0.toDouble()
-                val defaultLabel = dataPointData?.label
+                val dataPointLabel = dataPointData?.label
                     ?: if (f.hasDefaultValue && f.featureType == FeatureType.DISCRETE) {
                         f.discreteValues.first { dv -> dv.index == f.defaultValue.toInt() }.label
                     } else ""
-                f to DataPointInputView.DataPointInputData(f, timestamp, defaultValue, defaultLabel,
-                    timeFixed, this@InputDataPointDialogViewModel::onDateTimeSelected, dataPointData)
+                val dataPointNote = dataPointData?.note ?: ""
+                f to DataPointInputView.DataPointInputData(f, timestamp, dataPointValue, dataPointLabel,
+                    dataPointNote, timeFixed, this@InputDataPointDialogViewModel::onDateTimeSelected,
+                    dataPointData)
             }.toMap()
 
             withContext(Dispatchers.Main) {
