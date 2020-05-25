@@ -51,9 +51,9 @@ import kotlin.math.max
 class GraphStatLineGraphDecorator(
     private val graphOrStat: GraphOrStat,
     private val lineGraph: LineGraph,
-    private val listViewMode: Boolean
+    private val listViewMode: Boolean,
+    private val onSampledDataCallback: SampleDataCallback?
 ) : IGraphStatViewDecorator {
-
     private val lineGraphHourMinuteSecondFromat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm:ss")
         .withZone(ZoneId.systemDefault())
@@ -74,6 +74,8 @@ class GraphStatLineGraphDecorator(
     private var context: Context? = null
     private var graphStatView: IDecoratableGraphStatView? = null
 
+    private val allReferencedDataPoints: MutableList<DataPoint> = mutableListOf()
+
     override suspend fun decorate(view: IDecoratableGraphStatView) {
         graphStatView = view
         binding = view.getBinding()
@@ -82,11 +84,12 @@ class GraphStatLineGraphDecorator(
         binding!!.lineGraph.visibility = View.INVISIBLE
         initHeader(binding, graphOrStat)
         initFromLineGraphBody()
+        onSampledDataCallback?.invoke(allReferencedDataPoints.sortedByDescending { dp -> dp.timestamp })
     }
 
     private suspend fun initFromLineGraphBody() {
         binding!!.progressBar.visibility = View.VISIBLE
-        if (tryDrawLineGraphFeaturesAndCacheTimeRange()) {
+        if (tryDrawLineGraphFeatures()) {
             setUpLineGraphXAxis()
             setLineGraphBounds()
             binding!!.lineGraph.redraw()
@@ -153,7 +156,7 @@ class GraphStatLineGraphDecorator(
         }
     }
 
-    private suspend fun tryDrawLineGraphFeaturesAndCacheTimeRange(): Boolean {
+    private suspend fun tryDrawLineGraphFeatures(): Boolean {
         val bools = lineGraph.features.map {
             yield()
             drawLineGraphFeature(it)
@@ -175,6 +178,7 @@ class GraphStatLineGraphDecorator(
             movingAvDuration,
             plottingPeriod
         )
+        allReferencedDataPoints.addAll(rawDataSample.dataPoints)
         val plottingData = withContext(Dispatchers.IO) {
             when (lineGraphFeature.plottingMode) {
                 LineGraphPlottingModes.WHEN_TRACKED -> rawDataSample

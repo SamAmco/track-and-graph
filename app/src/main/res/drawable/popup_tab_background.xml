@@ -26,7 +26,7 @@
                 android:topRightRadius="@dimen/popup_card_corner_radius" />
         </shape>
     </item>
-    <item android:top="1dp" android:start="0dp" android:end="0dp">
+    <item android:top="1dp">
         <shape>
             <solid android:color="@color/cardBackgroundColor" />
             <corners

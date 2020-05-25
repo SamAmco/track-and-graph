@@ -32,6 +32,12 @@ import org.threeten.bp.temporal.TemporalAmount
 
 class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
 
+class SampleDataCallback(val callback: (List<DataPoint>) -> Unit) : (List<DataPoint>) -> Unit {
+    override fun invoke(dataPoints: List<DataPoint>) {
+        callback.invoke(dataPoints)
+    }
+}
+
 internal suspend fun sampleData(
     dataSource: TrackAndGraphDatabaseDao, featureId: Long, sampleDuration: Duration?,
     averagingDuration: Duration?, plotTotalTime: TemporalAmount?
