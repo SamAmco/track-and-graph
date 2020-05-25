@@ -33,18 +33,22 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatview.GraphStatView
+import com.samco.trackandgraph.graphstatview.SampleDataCallback
+import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import kotlinx.coroutines.*
-
 
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
     private lateinit var viewModel: ViewGraphStatViewModel
     private lateinit var graphStatView: GraphStatView
     private lateinit var binding: FragmentViewGraphStatBinding
+    private lateinit var adapter: NotesAdapter
     private val args: ViewGraphStatFragmentArgs by navArgs()
 
     private var showHideNotesAnimator: ValueAnimator? = null
@@ -59,10 +63,25 @@ class ViewGraphStatFragment : Fragment() {
         viewModel.init(activity!!, args.graphStatId)
         binding = FragmentViewGraphStatBinding.inflate(inflater, container, false)
         graphStatView = binding.graphStatView
-        graphStatView.addLineGraphPanAndZoom()
+        setViewInitialState()
         listenToState()
         listenToBinding()
         return binding.root
+    }
+
+    private fun setViewInitialState() {
+        graphStatView.addLineGraphPanAndZoom()
+        binding.showNotesButton.visibility = View.GONE
+
+        adapter = NotesAdapter(NoteClickListener(this::onViewDataPointClicked))
+        binding.notesRecyclerView.adapter = adapter
+        binding.notesRecyclerView.layoutManager = LinearLayoutManager(
+            context, RecyclerView.VERTICAL, false
+        )
+    }
+
+    private fun onViewDataPointClicked(dataPoint: DataPoint) {
+        showDataPointDescriptionDialog(requireContext(), layoutInflater, dataPoint)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -77,15 +96,22 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun listenToState() {
-        viewModel.state.observe(this, Observer {
-            when (it) {
-                ViewGraphStatViewModelState.INITIALIZING -> graphStatView.initLoading()
-                ViewGraphStatViewModelState.WAITING -> initGraphStatViewFromViewModel()
-                else -> run {}
-            }
-        })
-
+        viewModel.state.observe(this, Observer { state -> onViewModelStateChanged(state) })
         viewModel.showingNotes.observe(this, Observer { b -> onShowingNotesChanged(b) })
+        viewModel.sampledDataPoints.observe(this, Observer { p -> onSampledDataPoints(p) })
+    }
+
+    private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
+        if (dataPoints.isEmpty()) return
+        binding.showNotesButton.visibility = View.VISIBLE
+        adapter.submitList(dataPoints)
+    }
+
+    private fun onViewModelStateChanged(state: ViewGraphStatViewModelState) {
+        when (state) {
+            ViewGraphStatViewModelState.INITIALIZING -> graphStatView.initLoading()
+            ViewGraphStatViewModelState.WAITING -> initGraphStatViewFromViewModel()
+        }
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
@@ -136,19 +162,24 @@ class ViewGraphStatFragment : Fragment() {
             null -> graphStatView.initError(null, R.string.graph_stat_view_not_found)
             is LineGraph -> graphStatView.initFromLineGraph(
                 graphStat!!,
-                viewModel.graphStatInnerObject as LineGraph
+                viewModel.graphStatInnerObject as LineGraph,
+                false,
+                SampleDataCallback(viewModel::onSampledDataPoints)
             )
             is PieChart -> graphStatView.initFromPieChart(
                 graphStat!!,
-                viewModel.graphStatInnerObject as PieChart
+                viewModel.graphStatInnerObject as PieChart,
+                SampleDataCallback(viewModel::onSampledDataPoints)
             )
             is TimeSinceLastStat -> graphStatView.initTimeSinceStat(
                 graphStat!!,
-                viewModel.graphStatInnerObject as TimeSinceLastStat
+                viewModel.graphStatInnerObject as TimeSinceLastStat,
+                SampleDataCallback(viewModel::onSampledDataPoints)
             )
             is AverageTimeBetweenStat -> graphStatView.initAverageTimeBetweenStat(
                 graphStat!!,
-                viewModel.graphStatInnerObject as AverageTimeBetweenStat
+                viewModel.graphStatInnerObject as AverageTimeBetweenStat,
+                SampleDataCallback(viewModel::onSampledDataPoints)
             )
             else -> graphStatView.initError(null, R.string.graph_stat_validation_unknown)
         }
@@ -162,17 +193,14 @@ class ViewGraphStatViewModel : ViewModel() {
     var graphStatInnerObject: Any? = null
         private set
 
-    val state: LiveData<ViewGraphStatViewModelState>
-        get() {
-            return _state
-        }
+    val state: LiveData<ViewGraphStatViewModelState> get() { return _state }
     private val _state = MutableLiveData(ViewGraphStatViewModelState.INITIALIZING)
 
-    val showingNotes: LiveData<Boolean>
-        get() {
-            return _showingNotes
-        }
+    val showingNotes: LiveData<Boolean> get() { return _showingNotes }
     private val _showingNotes = MutableLiveData(false)
+
+    val sampledDataPoints: LiveData<List<DataPoint>> get() { return _sampledDataPoints }
+    private val _sampledDataPoints = MutableLiveData<List<DataPoint>>(emptyList())
 
     private val currJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + currJob)
@@ -187,6 +215,17 @@ class ViewGraphStatViewModel : ViewModel() {
         ioScope.launch {
             initFromGraphStatId(graphStatId)
             withContext(Dispatchers.Main) { _state.value = ViewGraphStatViewModelState.WAITING }
+        }
+    }
+
+    fun onSampledDataPoints(dataPoints: List<DataPoint>) {
+        ioScope.launch {
+            val notes = dataPoints
+                .filter { dp -> dp.note.isNotEmpty() }
+                .distinct()
+            withContext(Dispatchers.Main) {
+                _sampledDataPoints.value = notes
+            }
         }
     }
 

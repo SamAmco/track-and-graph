@@ -21,6 +21,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.LinearLayout
 import com.androidplot.Plot
 import com.androidplot.ui.HorizontalPositioning
 import com.androidplot.ui.Size
@@ -31,17 +32,23 @@ import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 
-class GraphStatView : FrameLayout, IDecoratableGraphStatView {
+class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
     constructor(context: Context, attrSet: AttributeSet) : super(context, attrSet)
 
     private var binding = GraphStatViewBinding.inflate(LayoutInflater.from(context), this, true)
     override fun getBinding() = binding
+
+    //TODO we shouldn't have a job inside a view. When we change configuration we don't want to have
+    // to set up the view all over again. We need a view model somewhere for this view
     private var currJob: Job? = null
     private var viewScope: CoroutineScope? = null
+
     //TODO should this data source come from somewhere else? Seems a bit weird to get a database ref
     // in a view
-    private val dataSource = TrackAndGraphDatabase.getInstance(context.applicationContext).trackAndGraphDatabaseDao
+    private val dataSource =
+        TrackAndGraphDatabase.getInstance(context.applicationContext).trackAndGraphDatabaseDao
+
     override fun getDataSource() = dataSource
 
     init {
@@ -61,10 +68,15 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         binding.lineGraph.layoutManager.remove(binding.lineGraph.title)
         binding.lineGraph.setBorderStyle(Plot.BorderStyle.NONE, null, null)
         binding.lineGraph.graph.size = Size.FILL
-        binding.lineGraph.graph.position(0f, HorizontalPositioning.ABSOLUTE_FROM_LEFT, 0f, VerticalPositioning.ABSOLUTE_FROM_TOP)
+        binding.lineGraph.graph.position(
+            0f,
+            HorizontalPositioning.ABSOLUTE_FROM_LEFT,
+            0f,
+            VerticalPositioning.ABSOLUTE_FROM_TOP
+        )
         binding.lineGraph.setPlotMargins(0f, 0f, 0f, 0f)
         binding.lineGraph.setPlotPadding(0f, 0f, 0f, 0f)
-        binding.lineGraph.graph.setPadding(0f,0f,0f,0f)
+        binding.lineGraph.graph.setPadding(0f, 0f, 0f, 0f)
         binding.lineGraph.graph.setMargins(0f, 20f, 0f, 50f)
     }
 
@@ -96,7 +108,11 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         binding.progressBar.visibility = View.VISIBLE
     }
 
-    private fun trySetDecorator(graphOrStat: GraphOrStat, decorator: IGraphStatViewDecorator) {
+
+    private fun trySetDecorator(
+        graphOrStat: GraphOrStat,
+        decorator: IGraphStatViewDecorator
+    ) {
         resetJob()
         viewScope?.launch {
             try {
@@ -105,7 +121,8 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
             } catch (exception: Exception) {
                 cleanAllViews()
                 val initException = if (exception is GraphStatInitException) exception else null
-                val errorTextId = initException?.errorTextId ?: R.string.graph_stat_view_unkown_error
+                val errorTextId =
+                    initException?.errorTextId ?: R.string.graph_stat_view_unkown_error
                 GraphStatErrorDecorator(graphOrStat, errorTextId).decorate(this@GraphStatView)
             }
         }
@@ -119,31 +136,48 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         }
     }
 
-    fun initTimeSinceStat(graphOrStat: GraphOrStat, timeSinceLastStat: TimeSinceLastStat) {
+    fun initTimeSinceStat(
+        graphOrStat: GraphOrStat,
+        timeSinceLastStat: TimeSinceLastStat,
+        onSampledDataCallback: SampleDataCallback? = null
+    ) {
         trySetDecorator(
             graphOrStat,
-            GraphStatTimeSinceDecorator(graphOrStat, timeSinceLastStat)
+            GraphStatTimeSinceDecorator(graphOrStat, timeSinceLastStat, onSampledDataCallback)
         )
     }
 
-    fun initAverageTimeBetweenStat(graphOrStat: GraphOrStat, timeBetweenStat: AverageTimeBetweenStat) {
+    fun initAverageTimeBetweenStat(
+        graphOrStat: GraphOrStat,
+        timeBetweenStat: AverageTimeBetweenStat,
+        onSampledDataCallback: SampleDataCallback? = null
+    ) {
         trySetDecorator(
             graphOrStat,
-            GraphStatAverageTimeBetweenDecorator(graphOrStat, timeBetweenStat)
+            GraphStatAverageTimeBetweenDecorator(graphOrStat, timeBetweenStat, onSampledDataCallback)
         )
     }
 
-    fun initFromLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraph, listViewMode: Boolean = false) {
+    fun initFromLineGraph(
+        graphOrStat: GraphOrStat,
+        lineGraph: LineGraph,
+        listViewMode: Boolean = false,
+        onSampledDataCallback: SampleDataCallback? = null
+    ) {
         trySetDecorator(
             graphOrStat,
-            GraphStatLineGraphDecorator(graphOrStat, lineGraph, listViewMode)
+            GraphStatLineGraphDecorator(graphOrStat, lineGraph, listViewMode, onSampledDataCallback)
         )
     }
 
-    fun initFromPieChart(graphOrStat: GraphOrStat, pieChart: PieChart) {
+    fun initFromPieChart(
+        graphOrStat: GraphOrStat,
+        pieChart: PieChart,
+        onSampledDataCallback: SampleDataCallback? = null
+    ) {
         trySetDecorator(
             graphOrStat,
-            GraphStatPieChartDecorator(graphOrStat, pieChart)
+            GraphStatPieChartDecorator(graphOrStat, pieChart, onSampledDataCallback)
         )
     }
 

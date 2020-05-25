@@ -35,7 +35,8 @@ import kotlinx.coroutines.withContext
 
 class GraphStatPieChartDecorator(
     private val graphOrStat: GraphOrStat,
-    private val pieChart: PieChart
+    private val pieChart: PieChart,
+    private val onSampledDataCallback: SampleDataCallback?
 ) : IGraphStatViewDecorator {
 
     private var binding: GraphStatViewBinding? = null
@@ -56,6 +57,7 @@ class GraphStatPieChartDecorator(
         binding!!.progressBar.visibility = View.VISIBLE
         val dataSample = tryGetPlottableDataForPieChart(pieChart)
             ?: throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_graph)
+        onSampledDataCallback?.invoke(dataSample.dataPoints)
         val segments = getPieChartSegments(dataSample)
         val total = withContext(Dispatchers.IO) {
             segments.sumByDouble { s -> s.value.toDouble() }

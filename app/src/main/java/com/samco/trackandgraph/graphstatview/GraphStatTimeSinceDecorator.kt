@@ -33,7 +33,8 @@ import org.threeten.bp.OffsetDateTime
 
 class GraphStatTimeSinceDecorator(
     private val graphOrStat: GraphOrStat,
-    private val timeSinceLastStat: TimeSinceLastStat
+    private val timeSinceLastStat: TimeSinceLastStat,
+    private val onSampledDataCallback: SampleDataCallback?
 ) : IGraphStatViewDecorator {
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
@@ -51,7 +52,6 @@ class GraphStatTimeSinceDecorator(
 
     private suspend fun initTimeSinceStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
-        var lastDataPointTimeStamp: OffsetDateTime? = null
         val lastDataPoint = withContext(Dispatchers.IO) {
             val feature = dataSource!!.getFeatureById(timeSinceLastStat.featureId)
             if (feature.featureType == FeatureType.CONTINUOUS) {
@@ -67,14 +67,14 @@ class GraphStatTimeSinceDecorator(
                 )
             }
         }
-        if (lastDataPoint != null) lastDataPointTimeStamp = lastDataPoint.timestamp
         binding!!.statMessage.visibility = View.VISIBLE
         binding!!.progressBar.visibility = View.GONE
-        if (lastDataPointTimeStamp == null) {
+        if (lastDataPoint == null) {
+            onSampledDataCallback?.invoke(emptyList())
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
-        }
-        while (true) {
-            setTimeSinceStatText(Duration.between(lastDataPointTimeStamp, OffsetDateTime.now()))
+        } else while (true) {
+            onSampledDataCallback?.invoke(listOf(lastDataPoint))
+            setTimeSinceStatText(Duration.between(lastDataPoint.timestamp, OffsetDateTime.now()))
             delay(1000)
         }
     }
