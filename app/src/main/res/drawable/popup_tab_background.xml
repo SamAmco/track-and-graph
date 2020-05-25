@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~  This file is part of Track & Graph
+  ~
+  ~  Track & Graph is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  Track & Graph is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape>
+            <solid android:color="@color/shadow_drop" />
+            <corners
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp"
+                android:radius="1dp"
+                android:topLeftRadius="@dimen/popup_card_corner_radius"
+                android:topRightRadius="@dimen/popup_card_corner_radius" />
+        </shape>
+    </item>
+    <item android:top="1dp" android:start="0dp" android:end="0dp">
+        <shape>
+            <solid android:color="@color/cardBackgroundColor" />
+            <corners
+                android:bottomLeftRadius="0dp"
+                android:bottomRightRadius="0dp"
+                android:radius="1dp"
+                android:topLeftRadius="@dimen/popup_card_corner_radius"
+                android:topRightRadius="@dimen/popup_card_corner_radius" />
+        </shape>
+    </item>
+</layer-list>

@@ -272,5 +272,6 @@
     <string name="description">Description</string>
     <string name="note_input_hint">Notes...</string>
     <string name="add_a_note">Add a note</string>
+    <string name="notes">Notes</string>
 
 </resources>

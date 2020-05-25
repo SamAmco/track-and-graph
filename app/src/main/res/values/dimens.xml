@@ -45,4 +45,5 @@
     <dimen name="line_graph_point_label_h_offset">-3dp</dimen>
     <dimen name="line_graph_point_label_v_offset">10dp</dimen>
     <dimen name="report_dialog_start_end_padding">22dp</dimen>
+    <dimen name="popup_card_corner_radius">16dp</dimen>
 </resources>
