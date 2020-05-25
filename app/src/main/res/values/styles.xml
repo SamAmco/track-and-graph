@@ -28,6 +28,8 @@
         <item name="editTextStyle">@style/EditTextStyle</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/backgroundColor</item>
+        <item name="cardViewStyle">@style/CustomCardViewStyle</item>
     </style>
 
     <style name="TransparentTheme" parent="AppTheme">
@@ -37,6 +39,10 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="CustomCardViewStyle" parent="CardView.Light">
+        <item name="cardBackgroundColor">@color/cardBackgroundColor</item>
     </style>
 
     <style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
