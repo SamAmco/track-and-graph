@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.featurehistory
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -44,6 +45,16 @@ class DataPointAdapter(private val clickListener: DataPointClickListener)
             binding.timestampText.text = dataPoint.getDisplayTimestamp()
             binding.editButton.setOnClickListener { clickListener.editClicked(dataPoint) }
             binding.deleteButton.setOnClickListener { clickListener.deleteClicked(dataPoint) }
+            if (dataPoint.note.isEmpty()) {
+                binding.cardView.isClickable = false
+                binding.noteText.visibility = View.GONE
+                binding.noteText.text = dataPoint.note
+            } else {
+                binding.cardView.isClickable = true
+                binding.cardView.setOnClickListener { clickListener.viewClicked(dataPoint) }
+                binding.noteText.visibility = View.VISIBLE
+                binding.noteText.text = dataPoint.note
+            }
         }
 
         companion object {
@@ -60,7 +71,9 @@ class DataPointDiffCallback : DiffUtil.ItemCallback<DataPoint>() {
     override fun areContentsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem == newItem
 }
 class DataPointClickListener(private val onEditDataPoint: (DataPoint) -> Unit,
-                             private val onDeleteDataPoint: (DataPoint) -> Unit) {
+                             private val onDeleteDataPoint: (DataPoint) -> Unit,
+                             private val onViewDataPoint: (DataPoint) -> Unit) {
     fun editClicked(dataPoint: DataPoint) = onEditDataPoint(dataPoint)
     fun deleteClicked(dataPoint: DataPoint) = onDeleteDataPoint(dataPoint)
+    fun viewClicked(dataPoint: DataPoint) = onViewDataPoint(dataPoint)
 }

@@ -290,7 +290,7 @@ class DisplayTrackGroupViewModel : ViewModel() {
         val label = if (feature.featureType == FeatureType.DISCRETE) {
             feature.discreteValues[feature.defaultValue.toInt()].label
         } else ""
-        val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, feature.defaultValue, label)
+        val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, feature.defaultValue, label, "")
         dataSource?.insertDataPoint(newDataPoint)
     }
 

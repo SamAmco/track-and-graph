@@ -6,14 +6,16 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 
 val MIGRATION_29_30 = object : Migration(29, 30) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.execSQL("""
+        database.execSQL(
+            """
             CREATE TABLE IF NOT EXISTS `reminders_table` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, 
                 `display_index` INTEGER NOT NULL, 
                 `name` TEXT NOT NULL,
                 `time` TEXT NOT NULL,
                 `checked_days` TEXT NOT NULL
-            )""".trimMargin())
+            )""".trimMargin()
+        )
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `reminders_table` (`id`)")
     }
 }
@@ -87,8 +89,10 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             val from = avTimeCursor.getString(3)
             val to = avTimeCursor.getString(4)
             val discreteValues = from + splitChars1 + to
-            updates.add("UPDATE average_time_between_stat_table " +
-                    "SET discrete_values='$discreteValues' WHERE id=$id")
+            updates.add(
+                "UPDATE average_time_between_stat_table " +
+                        "SET discrete_values='$discreteValues' WHERE id=$id"
+            )
         }
         val timeSinceCursor = database.query("SELECT * FROM time_since_last_stat_table")
         while (timeSinceCursor.moveToNext()) {
@@ -96,8 +100,10 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             val from = timeSinceCursor.getString(3)
             val to = timeSinceCursor.getString(4)
             val discreteValues = from + splitChars1 + to
-            updates.add("UPDATE time_since_last_stat_table " +
-                    "SET discrete_values='$discreteValues' WHERE id=$id")
+            updates.add(
+                "UPDATE time_since_last_stat_table " +
+                        "SET discrete_values='$discreteValues' WHERE id=$id"
+            )
         }
         if (updates.size > 0) updates.forEach { database.execSQL(it) }
     }
@@ -109,6 +115,12 @@ val MIGRATION_35_36 = object : Migration(35, 36) {
     }
 }
 
+val MIGRATION_36_37 = object : Migration(36, 37) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE data_points_table ADD note TEXT NOT NULL DEFAULT ''")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -116,5 +128,6 @@ val allMigrations = arrayOf(
     MIGRATION_32_33,
     MIGRATION_33_34,
     MIGRATION_34_35,
-    MIGRATION_35_36
+    MIGRATION_35_36,
+    MIGRATION_36_37
 )

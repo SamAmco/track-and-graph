@@ -16,17 +16,18 @@
 */
 package com.samco.trackandgraph.displaytrackgroup
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
-import android.text.Editable
-import android.text.TextWatcher
+import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
+import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -34,16 +35,35 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 
-//TODO if a feature has a default value we should pre-populate with that value
-class DataPointInputView(context: Context, private val state: DataPointInputData)
-    : ConstraintLayout(context), TextWatcher {
-
+class DataPointInputView : FrameLayout {
     private val titleText: TextView
+    private val noteInput: EditText
+    private val addNoteButton: View
     private val numberInput: EditText
     private val dateButton: Button
     private val timeButton: Button
     private val buttonsScroll: HorizontalScrollView
     private val buttonsLayout: LinearLayout
+
+    constructor(context: Context) : this(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    ) {
+        val view = inflate(context, R.layout.data_point_input_view, this)
+        noteInput = view.findViewById(R.id.noteInputText)
+        addNoteButton = view.findViewById(R.id.addNoteButton)
+        numberInput = view.findViewById(R.id.numberInput)
+        titleText = view.findViewById(R.id.titleText)
+        dateButton = view.findViewById(R.id.dateButton)
+        timeButton = view.findViewById(R.id.timeButton)
+        buttonsScroll = view.findViewById(R.id.buttonsScrollView)
+        buttonsLayout = view.findViewById(R.id.buttonsLayout)
+    }
+
+    private lateinit var state: DataPointInputData
     private lateinit var discreteValueCheckBoxes: MutableMap<DiscreteValue, CheckBox>
 
     private var clickListener: DataPointInputClickListener? = null
@@ -56,20 +76,13 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         .ofPattern("HH:mm")
         .withZone(ZoneId.systemDefault())
 
-    init {
-        val view = inflate(context, R.layout.data_point_input_view, this)
-
-        numberInput = view.findViewById(R.id.numberInput)
-        titleText = view.findViewById(R.id.titleText)
-        dateButton = view.findViewById(R.id.dateButton)
-        timeButton = view.findViewById(R.id.timeButton)
-        buttonsScroll = view.findViewById(R.id.buttonsScrollView)
-        buttonsLayout = view.findViewById(R.id.buttonsLayout)
-
+    fun initialize(state: DataPointInputData) {
+        this.state = state
         titleText.text = state.feature.name
 
         initDateButton()
         initTimeButton()
+        initNoteTextInput()
         setSelectedDateTime(state.dateTime)
 
         when (state.feature.featureType) {
@@ -78,13 +91,29 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         }
     }
 
+    private fun initNoteTextInput() {
+        if (state.note.isNotEmpty()) {
+            noteInput.setText(state.note)
+            addNoteButton.visibility = View.GONE
+            noteInput.visibility = View.VISIBLE
+        }
+        addNoteButton.setOnClickListener {
+            addNoteButton.visibility = View.GONE
+            noteInput.visibility = View.VISIBLE
+            noteInput.requestFocus()
+            val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        }
+        noteInput.addTextChangedListener { state.note = it.toString() }
+    }
+
     private fun initDiscrete() {
         buttonsScroll.visibility = View.VISIBLE
         numberInput.visibility = View.GONE
         createButtons()
         if (state.label.isNotEmpty()) {
             buttonsLayout.children
-                .map{ v -> v.findViewById<CheckBox>(R.id.checkbox) }
+                .map { v -> v.findViewById<CheckBox>(R.id.checkbox) }
                 .first { cb -> cb.text == state.label }
                 .isChecked = true
         }
@@ -93,8 +122,7 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
     private fun initContinuous() {
         buttonsScroll.visibility = View.GONE
         numberInput.visibility = View.VISIBLE
-        numberInput.requestFocus()
-        numberInput.addTextChangedListener(this)
+        numberInput.addTextChangedListener { state.value = getDoubleFromText(it.toString()) }
         numberInput.setOnEditorActionListener { _, i, _ ->
             return@setOnEditorActionListener if ((i and EditorInfo.IME_MASK_ACTION) != 0) {
                 state.timeFixed = true
@@ -104,12 +132,8 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         }
         val text = if (state.value == 0.0) "" else doubleFormatter.format(state.value)
         numberInput.setText(text)
-    }
-
-    override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
-    override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) { }
-    override fun afterTextChanged(p0: Editable?) {
-        state.value = getDoubleFromText(numberInput.text.toString())
+        numberInput.requestFocus()
+        numberInput.setSelection(numberInput.text.length)
     }
 
     class DataPointInputData(
@@ -117,18 +141,27 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
         var dateTime: OffsetDateTime,
         var value: Double,
         var label: String,
+        var note: String,
         var timeFixed: Boolean,
         val onDateTimeChanged: (OffsetDateTime) -> Unit,
         val oldDataPoint: DataPoint?
     )
+
     class DataPointInputClickListener(val onClick: (Feature) -> Unit)
-    fun setOnClickListener(clickListener: DataPointInputClickListener) { this.clickListener = clickListener }
+
+    fun setOnClickListener(clickListener: DataPointInputClickListener) {
+        this.clickListener = clickListener
+    }
 
     private fun createButtons() {
         discreteValueCheckBoxes = mutableMapOf()
         val inflater = LayoutInflater.from(context)
         for (discreteValue in state.feature.discreteValues.sortedBy { f -> f.index }) {
-            val item = inflater.inflate(R.layout.discrete_value_input_button, buttonsLayout, false) as CheckBox
+            val item = inflater.inflate(
+                R.layout.discrete_value_input_button,
+                buttonsLayout,
+                false
+            ) as CheckBox
             item.text = discreteValue.label
             item.setOnClickListener { onDiscreteValueClicked(discreteValue) }
             discreteValueCheckBoxes[discreteValue] = item
@@ -141,7 +174,8 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
             state.value = discreteValue.index.toDouble()
             state.label = discreteValue.label
             state.timeFixed = true
-            discreteValueCheckBoxes.filter { kvp -> kvp.key != discreteValue }.forEach { kvp -> kvp.value.isChecked = false }
+            discreteValueCheckBoxes.filter { kvp -> kvp.key != discreteValue }
+                .forEach { kvp -> kvp.value.isChecked = false }
             clickListener!!.onClick(state.feature)
         }
     }
@@ -158,15 +192,18 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
     // fix the strange behaviour surrounding daylight savings? : https://github.com/SamAmco/track-and-graph/issues/28
     private fun initDateButton() {
         dateButton.setOnClickListener {
-            val picker = DatePickerDialog(context!!,
+            val picker = DatePickerDialog(
+                context!!,
                 DatePickerDialog.OnDateSetListener { _, year, month, day ->
-                    setSelectedDateTime(state.dateTime
-                        .withYear(year)
-                        .withMonth(month+1)
-                        .withDayOfMonth(day))
+                    setSelectedDateTime(
+                        state.dateTime
+                            .withYear(year)
+                            .withMonth(month + 1)
+                            .withDayOfMonth(day)
+                    )
                     state.timeFixed = true
                     state.onDateTimeChanged(state.dateTime)
-                }, state.dateTime.year, state.dateTime.monthValue-1, state.dateTime.dayOfMonth
+                }, state.dateTime.year, state.dateTime.monthValue - 1, state.dateTime.dayOfMonth
             )
             picker.show()
         }
@@ -174,11 +211,14 @@ class DataPointInputView(context: Context, private val state: DataPointInputData
 
     private fun initTimeButton() {
         timeButton.setOnClickListener {
-            val picker = TimePickerDialog(context!!,
+            val picker = TimePickerDialog(
+                context!!,
                 TimePickerDialog.OnTimeSetListener { _, hour, minute ->
-                    setSelectedDateTime(state.dateTime
-                        .withHour(hour)
-                        .withMinute(minute))
+                    setSelectedDateTime(
+                        state.dateTime
+                            .withHour(hour)
+                            .withMinute(minute)
+                    )
                     state.timeFixed = true
                     state.onDateTimeChanged(state.dateTime)
                 }, state.dateTime.hour, state.dateTime.minute, true
