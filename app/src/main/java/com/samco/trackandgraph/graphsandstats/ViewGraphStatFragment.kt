@@ -72,16 +72,11 @@ class ViewGraphStatFragment : Fragment() {
     private fun setViewInitialState() {
         graphStatView.addLineGraphPanAndZoom()
         binding.showNotesButton.visibility = View.GONE
-
-        adapter = NotesAdapter(NoteClickListener(this::onViewDataPointClicked))
-        binding.notesRecyclerView.adapter = adapter
-        binding.notesRecyclerView.layoutManager = LinearLayoutManager(
-            context, RecyclerView.VERTICAL, false
-        )
     }
 
     private fun onViewDataPointClicked(dataPoint: DataPoint) {
-        showDataPointDescriptionDialog(requireContext(), layoutInflater, dataPoint)
+        val featureDisplayName = viewModel.featureDisplayNames?.getOrElse(dataPoint.featureId) { null }
+        showDataPointDescriptionDialog(requireContext(), layoutInflater, dataPoint, featureDisplayName)
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -98,7 +93,6 @@ class ViewGraphStatFragment : Fragment() {
     private fun listenToState() {
         viewModel.state.observe(this, Observer { state -> onViewModelStateChanged(state) })
         viewModel.showingNotes.observe(this, Observer { b -> onShowingNotesChanged(b) })
-        viewModel.sampledDataPoints.observe(this, Observer { p -> onSampledDataPoints(p) })
     }
 
     private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
@@ -110,8 +104,21 @@ class ViewGraphStatFragment : Fragment() {
     private fun onViewModelStateChanged(state: ViewGraphStatViewModelState) {
         when (state) {
             ViewGraphStatViewModelState.INITIALIZING -> graphStatView.initLoading()
-            ViewGraphStatViewModelState.WAITING -> initGraphStatViewFromViewModel()
+            ViewGraphStatViewModelState.WAITING -> {
+                initGraphStatViewFromViewModel()
+                initNotesAdapterFromViewModel()
+            }
         }
+    }
+
+    private fun initNotesAdapterFromViewModel() {
+        val featureDisplayNames = viewModel.featureDisplayNames ?: emptyMap()
+        adapter = NotesAdapter(featureDisplayNames, NoteClickListener(this::onViewDataPointClicked))
+        binding.notesRecyclerView.adapter = adapter
+        binding.notesRecyclerView.layoutManager = LinearLayoutManager(
+            context, RecyclerView.VERTICAL, false
+        )
+        viewModel.sampledDataPoints.observe(this, Observer { p -> onSampledDataPoints(p) })
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
@@ -192,6 +199,8 @@ class ViewGraphStatViewModel : ViewModel() {
         private set
     var graphStatInnerObject: Any? = null
         private set
+    var featureDisplayNames: Map<Long, String>? = null
+        private set
 
     val state: LiveData<ViewGraphStatViewModelState> get() { return _state }
     private val _state = MutableLiveData(ViewGraphStatViewModelState.INITIALIZING)
@@ -214,14 +223,22 @@ class ViewGraphStatViewModel : ViewModel() {
         _state.value = ViewGraphStatViewModelState.INITIALIZING
         ioScope.launch {
             initFromGraphStatId(graphStatId)
+            getAllFeatureDisplayNames()
             withContext(Dispatchers.Main) { _state.value = ViewGraphStatViewModelState.WAITING }
         }
+    }
+
+    private fun getAllFeatureDisplayNames() {
+        featureDisplayNames = dataSource!!.getAllFeaturesAndTrackGroupsSync()
+            .map { it.id to "${it.trackGroupName} -> ${it.name}" }
+            .toMap()
     }
 
     fun onSampledDataPoints(dataPoints: List<DataPoint>) {
         ioScope.launch {
             val notes = dataPoints
                 .filter { dp -> dp.note.isNotEmpty() }
+                .sortedByDescending { dp -> dp.timestamp }
                 .distinct()
             withContext(Dispatchers.Main) {
                 _sampledDataPoints.value = notes
