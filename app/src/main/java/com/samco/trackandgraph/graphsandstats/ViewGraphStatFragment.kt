@@ -238,8 +238,8 @@ class ViewGraphStatViewModel : ViewModel() {
         ioScope.launch {
             val notes = dataPoints
                 .filter { dp -> dp.note.isNotEmpty() }
-                .sortedByDescending { dp -> dp.timestamp }
                 .distinct()
+                .sortedByDescending { dp -> dp.timestamp }
             withContext(Dispatchers.Main) {
                 _sampledDataPoints.value = notes
             }
