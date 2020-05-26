@@ -33,6 +33,7 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.util.getDoubleFromText
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 class DataPointInputView : FrameLayout {
@@ -188,18 +189,17 @@ class DataPointInputView : FrameLayout {
         timeButton.text = dateTime.format(timeDisplayFormatter)
     }
 
-    //TODO Consider first converting dateTime to a ZonedDateTime before operating on it, this might
-    // fix the strange behaviour surrounding daylight savings? : https://github.com/SamAmco/track-and-graph/issues/28
     private fun initDateButton() {
         dateButton.setOnClickListener {
             val picker = DatePickerDialog(
                 context!!,
                 DatePickerDialog.OnDateSetListener { _, year, month, day ->
                     setSelectedDateTime(
-                        state.dateTime
+                        ZonedDateTime.of(state.dateTime.toLocalDateTime(), ZoneId.systemDefault())
                             .withYear(year)
                             .withMonth(month + 1)
                             .withDayOfMonth(day)
+                            .toOffsetDateTime()
                     )
                     state.timeFixed = true
                     state.onDateTimeChanged(state.dateTime)
@@ -215,9 +215,10 @@ class DataPointInputView : FrameLayout {
                 context!!,
                 TimePickerDialog.OnTimeSetListener { _, hour, minute ->
                     setSelectedDateTime(
-                        state.dateTime
+                        ZonedDateTime.of(state.dateTime.toLocalDateTime(), ZoneId.systemDefault())
                             .withHour(hour)
                             .withMinute(minute)
+                            .toOffsetDateTime()
                     )
                     state.timeFixed = true
                     state.onDateTimeChanged(state.dateTime)
