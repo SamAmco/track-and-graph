@@ -78,8 +78,8 @@
     <string name="day">Day</string>
 
     <string-array name="feature_types">
-        <item>Numerical</item>
         <item>Multiple choice</item>
+        <item>Numerical</item>
     </string-array>
     <string-array name="graph_types">
         <item>Line Graph</item>
