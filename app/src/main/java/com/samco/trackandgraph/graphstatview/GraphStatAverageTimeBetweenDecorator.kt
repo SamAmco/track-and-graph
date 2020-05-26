@@ -32,7 +32,8 @@ import org.threeten.bp.OffsetDateTime
 
 class GraphStatAverageTimeBetweenDecorator(
     private val graphOrStat: GraphOrStat,
-    private val timeBetweenStat: AverageTimeBetweenStat
+    private val timeBetweenStat: AverageTimeBetweenStat,
+    private val onSampledDataCallback: SampleDataCallback?
 ) : IGraphStatViewDecorator {
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
@@ -51,13 +52,16 @@ class GraphStatAverageTimeBetweenDecorator(
     private suspend fun initAverageTimeBetweenStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
         val dataPoints = getRelevantDataPoints()
-        if (dataPoints.size < 2) throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
-        else {
+        if (dataPoints.size < 2) {
+            onSampledDataCallback?.invoke(emptyList())
+            throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
+        } else {
             val totalMillis =
                 Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp)
                     .toMillis().toDouble()
             val averageMillis = totalMillis / dataPoints.size.toDouble()
             setAverageTimeBetweenStatText(averageMillis)
+            onSampledDataCallback?.invoke(dataPoints)
         }
 
         binding!!.statMessage.visibility = View.VISIBLE

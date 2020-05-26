@@ -26,7 +26,8 @@
     <color name="toolbarColorDark">#8f979c</color>
 
     <color name="toolBarTextColor">#2B3B45</color>
-    <color name="backgroundColor">#FFFFFF</color>
+    <color name="backgroundColor">#F3F3F3</color>
+    <color name="cardBackgroundColor">#FFFFFF</color>
     <color name="colorShadowButton">#E0E0E0</color>
     <color name="colorGridLines">#66000000</color>
     <color name="regularText">@android:color/tab_indicator_text</color>
@@ -54,7 +55,7 @@
     <color name="visColor11">#54D931</color>
     <color name="visColor12">#1B8200</color>
 
-    <color name="shadow_drop">#03000000</color>
+    <color name="shadow_drop">#4D7C7C7C</color>
     <color name="washoutFadeColor">#66FFFFFF</color>
     <color name="successTextColor">#139819</color>
 </resources>
