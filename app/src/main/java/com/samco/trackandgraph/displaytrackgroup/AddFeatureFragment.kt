@@ -63,7 +63,7 @@ class AddFeatureFragment : Fragment(),
     private lateinit var binding: AddFeatureFragmentBinding
     private lateinit var viewModel: AddFeatureViewModel
     private var navController: NavController? = null
-    private val featureTypeList = listOf(FeatureType.CONTINUOUS, FeatureType.DISCRETE)
+    private val featureTypeList = listOf(FeatureType.DISCRETE, FeatureType.CONTINUOUS)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,7 +75,7 @@ class AddFeatureFragment : Fragment(),
 
         viewModel = ViewModelProviders.of(this).get(AddFeatureViewModel::class.java)
         viewModel.init(
-            activity!!.application,
+            requireActivity().application,
             args.trackGroupId,
             args.existingFeatureNames.toList(),
             args.editFeatureId
@@ -87,18 +87,18 @@ class AddFeatureFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
-        val imm = activity!!.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.featureNameText, 0)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
     private fun listenToViewModelState() {
-        viewModel.state.observe(this, Observer { state ->
+        viewModel.state.observe(viewLifecycleOwner, Observer { state ->
             when (state) {
                 AddFeatureState.INITIALIZING -> {
                     setInitialViewState()
@@ -117,7 +117,7 @@ class AddFeatureFragment : Fragment(),
                 }
                 AddFeatureState.ERROR -> {
                     val errorMsg = getString(R.string.feature_add_or_update_error_occurred)
-                    Toast.makeText(activity!!, errorMsg, Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity(), errorMsg, Toast.LENGTH_LONG).show()
                     navController?.popBackStack()
                 }
                 else -> {}
@@ -178,7 +178,7 @@ class AddFeatureFragment : Fragment(),
     }
 
     private fun observeHasDefaultValue() {
-        viewModel.featureHasDefaultValue.observe(this, Observer {
+        viewModel.featureHasDefaultValue.observe(viewLifecycleOwner, Observer {
             updateDefaultValuesViewFromViewModel(it)
         })
     }
@@ -214,7 +214,7 @@ class AddFeatureFragment : Fragment(),
         val itemList = resources.getStringArray(R.array.feature_types)
             .map { s -> s as CharSequence }.toTypedArray()
         binding.featureTypeSpinner.adapter = object : ArrayAdapter<CharSequence>(
-            context!!,
+            requireContext(),
             android.R.layout.simple_spinner_dropdown_item, itemList
         ) {
             override fun isEnabled(position: Int): Boolean {
@@ -468,7 +468,7 @@ class AddFeatureViewModel : ViewModel() {
 
     var featureName = ""
     var featureDescription = ""
-    val featureType = MutableLiveData(FeatureType.CONTINUOUS)
+    val featureType = MutableLiveData(FeatureType.DISCRETE)
     val featureHasDefaultValue = MutableLiveData(false)
     val featureDefaultValue = MutableLiveData(1.0)
     val discreteValues = mutableListOf<MutableLabel>()
