@@ -27,6 +27,14 @@
             android:maxLines="1"
             android:textColor="@color/regularText"
             tools:text="24/05/20 12:42"/>
+        <TextView
+            android:id="@+id/featureDisplayNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="@color/regularText"
+            tools:text="Daily -> Exercise"/>
 
     </LinearLayout>
 </layout>

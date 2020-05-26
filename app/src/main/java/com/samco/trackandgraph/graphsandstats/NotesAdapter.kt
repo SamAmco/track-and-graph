@@ -24,47 +24,57 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.DataPoint
-import com.samco.trackandgraph.databinding.ListItemDataPointBinding
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 
-class NotesAdapter(private val clickListener: NoteClickListener)
-    : ListAdapter<DataPoint, NotesAdapter.ViewHolder>(DataPointDiffCallback()) {
+class NotesAdapter(
+    private val featureDisplayNames: Map<Long, String>,
+    private val clickListener: NoteClickListener
+) : ListAdapter<DataPoint, NotesAdapter.ViewHolder>(DataPointDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, clickListener)
+        return ViewHolder.from(parent, featureDisplayNames, clickListener)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class ViewHolder private constructor(private val binding: ListItemNoteBinding,
-                                         private val clickListener: NoteClickListener)
-        : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder private constructor(
+        private val binding: ListItemNoteBinding,
+        private val featureDisplayNames: Map<Long, String>,
+        private val clickListener: NoteClickListener
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(dataPoint: DataPoint) {
             binding.valueText.text = dataPoint.getDisplayValue()
             binding.timestampText.text = dataPoint.getDisplayTimestamp()
-            binding.featureNameText.text = "TODO inject the feature names somehow"
+            binding.featureNameText.text = featureDisplayNames.getOrElse(dataPoint.featureId) { "" }
             binding.cardView.setOnClickListener { clickListener.viewClicked(dataPoint) }
             binding.noteText.visibility = View.VISIBLE
             binding.noteText.text = dataPoint.note
         }
 
         companion object {
-            fun from(parent: ViewGroup, clickListener: NoteClickListener): ViewHolder {
+            fun from(
+                parent: ViewGroup,
+                featureDisplayNames: Map<Long, String>,
+                clickListener: NoteClickListener
+            ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemNoteBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding, clickListener)
+                return ViewHolder(binding, featureDisplayNames, clickListener)
             }
         }
     }
 }
 
 class DataPointDiffCallback : DiffUtil.ItemCallback<DataPoint>() {
-    override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem.timestamp == newItem.timestamp && oldItem.featureId == newItem.featureId
+    override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) =
+        oldItem.timestamp == newItem.timestamp && oldItem.featureId == newItem.featureId
+
     override fun areContentsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem == newItem
 }
+
 class NoteClickListener(private val onViewDataPoint: (DataPoint) -> Unit) {
     fun viewClicked(dataPoint: DataPoint) = onViewDataPoint(dataPoint)
 }

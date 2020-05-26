@@ -20,6 +20,7 @@ package com.samco.trackandgraph.ui
 import android.content.Context
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.samco.trackandgraph.R
@@ -39,7 +40,10 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
     val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
     val topBottomPadding = res.getDimension(R.dimen.card_padding).toInt()
     bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
-    bodyView.setTextSize(TypedValue.COMPLEX_UNIT_PX, res.getDimension(R.dimen.dialog_label_text_size))
+    bodyView.setTextSize(
+        TypedValue.COMPLEX_UNIT_PX,
+        res.getDimension(R.dimen.dialog_label_text_size)
+    )
 
     AlertDialog.Builder(context)
         .setTitle(name)
@@ -48,12 +52,21 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
         .show()
 }
 
-fun showDataPointDescriptionDialog(context: Context, inflater: LayoutInflater, dataPoint: DataPoint) {
+fun showDataPointDescriptionDialog(
+    context: Context, inflater: LayoutInflater, dataPoint: DataPoint,
+    featureDispalayName: String? = null
+) {
     val res = context.resources
 
     val headerView = ShowDataPointDialogHeaderBinding.inflate(inflater)
     headerView.dateTimeText.text = dataPoint.getDisplayTimestamp()
     headerView.valueText.text = dataPoint.getDisplayValue()
+    if (featureDispalayName != null && featureDispalayName.isNotEmpty()) {
+        headerView.featureDisplayNameText.visibility = View.VISIBLE
+        headerView.featureDisplayNameText.text = featureDispalayName
+    } else {
+        headerView.featureDisplayNameText.visibility = View.GONE
+    }
 
     val bodyView = TextView(context)
     bodyView.text = dataPoint.note
@@ -61,7 +74,10 @@ fun showDataPointDescriptionDialog(context: Context, inflater: LayoutInflater, d
     val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
     val topBottomPadding = res.getDimension(R.dimen.card_padding).toInt()
     bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
-    bodyView.setTextSize(TypedValue.COMPLEX_UNIT_PX, res.getDimension(R.dimen.dialog_label_text_size))
+    bodyView.setTextSize(
+        TypedValue.COMPLEX_UNIT_PX,
+        res.getDimension(R.dimen.dialog_label_text_size)
+    )
 
     AlertDialog.Builder(context)
         .setCustomTitle(headerView.root)

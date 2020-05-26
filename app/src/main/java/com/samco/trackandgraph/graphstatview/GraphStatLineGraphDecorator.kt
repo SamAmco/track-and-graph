@@ -84,7 +84,7 @@ class GraphStatLineGraphDecorator(
         binding!!.lineGraph.visibility = View.INVISIBLE
         initHeader(binding, graphOrStat)
         initFromLineGraphBody()
-        onSampledDataCallback?.invoke(allReferencedDataPoints.sortedByDescending { dp -> dp.timestamp })
+        onSampledDataCallback?.invoke(allReferencedDataPoints)
     }
 
     private suspend fun initFromLineGraphBody() {
