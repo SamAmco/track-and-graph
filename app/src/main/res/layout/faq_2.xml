@@ -49,7 +49,7 @@
                     android:id="@+id/importIcon"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/import_icon"
+                    app:srcCompat="@drawable/import_icon"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="@id/exportDesc"
                     app:layout_constraintBottom_toBottomOf="@id/exportDesc"
@@ -69,7 +69,7 @@
                     android:id="@+id/exportIcon"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/export_icon"
+                    app:srcCompat="@drawable/export_icon"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintTop_toTopOf="@id/importDesc"
                     app:layout_constraintBottom_toBottomOf="@id/importDesc"
@@ -84,9 +84,16 @@
                     app:layout_constraintLeft_toRightOf="@+id/exportIcon"
                     app:layout_constraintTop_toBottomOf="@id/exportDesc"
                     app:layout_constraintRight_toRightOf="parent"
-
                     />
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/faq_text_2_4"
+                android:textSize="15sp"
+                android:padding="20dp"
+                />
         </LinearLayout>
     </ScrollView>
 </layout>

@@ -175,7 +175,7 @@
     <string name="faq_text_1_2">Your track groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_1_3">Once you’ve created your track group select it and then click the + icon to set up something new to track.</string>
     <string name="faq_text_1_4">Type in the name of what you want to track and select an input style:</string>
-    <string name="faq_text_1_5">There are three styles of input you can choose: \n\n• Date and time only is the quickest and simplest. It will not ask you for any additional information and will simply record the date and time each time you tap the plus button. \n\n• Numerical will ask you to enter a number when tracking. \n\n• Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.</string>
+    <string name="faq_text_1_5">There are two styles of input you can choose: \n\n• Numerical will ask you to enter a number when tracking. \n\n• Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.\n\nIf you add a default value you will not be asked for a value every time you tap the + button and your default value will be used instead. However you can go back and change the value by editing the data point afterwards (as explained later).</string>
     <string name="faq_text_1_6">To create multiple choice answers click the + button at the bottom.</string>
     <string name="faq_text_1_8">When you are happy with the setup click the FINISH button.</string>
     <string name="faq_text_1_9">You should now see cards in your track group. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
@@ -273,5 +273,6 @@
     <string name="note_input_hint">Notes...</string>
     <string name="add_a_note">Add a note</string>
     <string name="notes">Notes</string>
+    <string name="faq_text_2_4">There is also a Backup &amp; Restore option in the menu. This will export and restore the entire database file containing all tracked data, graphs, reminders etc. This is an un-encrypted Sqlite3 database file which can also be opened and modified using freely available software. However this is not recommended for non-technical users as you could break the integrity of the database.</string>
 
 </resources>
