@@ -29,7 +29,7 @@ val MIGRATION_30_31 = object : Migration(30, 31) {
 val MIGRATION_31_32 = object : Migration(31, 32) {
     override fun migrate(database: SupportSQLiteDatabase) {
         val lineGraphsCursor = database.query("SELECT * FROM line_graphs_table")
-        val updates = mutableListOf<String>()
+        val updates = mutableListOf<Pair<String, List<String>>>()
         while (lineGraphsCursor.moveToNext()) {
             val id = lineGraphsCursor.getLong(0)
             val oldFeaturesString = lineGraphsCursor.getString(2)
@@ -40,16 +40,17 @@ val MIGRATION_31_32 = object : Migration(31, 32) {
                 params.joinToString(splitChars2)
             }
             val newFeaturesString = newFeatures.joinToString(splitChars1)
-            updates.add("UPDATE line_graphs_table SET features='$newFeaturesString' WHERE id=$id")
+            updates.add(Pair("UPDATE line_graphs_table SET features=? WHERE id=?",
+                listOf(newFeaturesString, id.toString())))
         }
-        if (updates.size > 0) updates.forEach { database.execSQL(it) }
+        if (updates.size > 0) updates.forEach { database.execSQL(it.first, it.second.toTypedArray()) }
     }
 }
 
 val MIGRATION_32_33 = object : Migration(32, 33) {
     override fun migrate(database: SupportSQLiteDatabase) {
         val lineGraphsCursor = database.query("SELECT * FROM line_graphs_table")
-        val updates = mutableListOf<String>()
+        val updates = mutableListOf<Pair<String, List<String>>>()
         while (lineGraphsCursor.moveToNext()) {
             val id = lineGraphsCursor.getLong(0)
             val oldFeaturesString = lineGraphsCursor.getString(2)
@@ -62,9 +63,10 @@ val MIGRATION_32_33 = object : Migration(32, 33) {
                 params.joinToString(splitChars2)
             }
             val newFeaturesString = newFeatures.joinToString(splitChars1)
-            updates.add("UPDATE line_graphs_table SET features='$newFeaturesString' WHERE id=$id")
+            updates.add(Pair("UPDATE line_graphs_table SET features=? WHERE id=?",
+                listOf(newFeaturesString, id.toString())))
         }
-        if (updates.size > 0) updates.forEach { database.execSQL(it) }
+        if (updates.size > 0) updates.forEach { database.execSQL(it.first, it.second.toTypedArray()) }
     }
 }
 
@@ -80,15 +82,16 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL("ALTER TABLE average_time_between_stat_table ADD discrete_values TEXT NOT NULL DEFAULT ''")
         database.execSQL("ALTER TABLE time_since_last_stat_table ADD discrete_values TEXT NOT NULL DEFAULT ''")
-        val updates = mutableListOf<String>()
+        val updates = mutableListOf<Pair<String, List<String>>>()
         val avTimeCursor = database.query("SELECT * FROM average_time_between_stat_table")
         while (avTimeCursor.moveToNext()) {
             val id = avTimeCursor.getLong(0)
             val from = avTimeCursor.getString(3)
             val to = avTimeCursor.getString(4)
             val discreteValues = from + splitChars1 + to
-            updates.add("UPDATE average_time_between_stat_table " +
-                    "SET discrete_values='$discreteValues' WHERE id=$id")
+            val query = "UPDATE average_time_between_stat_table SET discrete_values=? WHERE id=?"
+            val args = listOf(discreteValues, id.toString())
+            updates.add(Pair(query, args))
         }
         val timeSinceCursor = database.query("SELECT * FROM time_since_last_stat_table")
         while (timeSinceCursor.moveToNext()) {
@@ -96,10 +99,11 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             val from = timeSinceCursor.getString(3)
             val to = timeSinceCursor.getString(4)
             val discreteValues = from + splitChars1 + to
-            updates.add("UPDATE time_since_last_stat_table " +
-                    "SET discrete_values='$discreteValues' WHERE id=$id")
+            val query = "UPDATE time_since_last_stat_table SET discrete_values=? WHERE id=?"
+            val args = listOf(discreteValues, id.toString())
+            updates.add(Pair(query, args))
         }
-        if (updates.size > 0) updates.forEach { database.execSQL(it) }
+        if (updates.size > 0) updates.forEach { database.execSQL(it.first, it.second.toTypedArray()) }
     }
 }
 
