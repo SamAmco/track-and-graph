@@ -140,7 +140,10 @@ class Converters {
                 "${v.pointStyle.ordinal}",
                 "${v.offset}",
                 "${v.scale}"
-            ).joinToString(splitChars2)
+            ).joinToString(splitChars2) { i ->
+                i.replace(splitChars1, "")
+                    .replace(splitChars2, "")
+            }
         }
     }
 
