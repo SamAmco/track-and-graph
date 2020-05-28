@@ -20,7 +20,7 @@ import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.FragmentActivity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -33,7 +33,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
-class TrackWidgetInputDataPointActivity : FragmentActivity() {
+class TrackWidgetInputDataPointActivity : AppCompatActivity() {
     private lateinit var viewModel: TrackWidgetInputDataPointViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
