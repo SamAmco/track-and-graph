@@ -24,7 +24,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/queue_add_box"
+                app:srcCompat="@drawable/queue_add_box"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 />

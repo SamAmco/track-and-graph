@@ -342,7 +342,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:clickable="false"
-                    android:src="@drawable/add_icon" />
+                    app:srcCompat="@drawable/add_icon" />
 
             </LinearLayout>
         </ScrollView>
@@ -371,7 +371,7 @@
                 android:layout_height="match_parent"
                 android:clickable="true"
                 android:focusable="true"
-                android:src="@color/ap_transparent" />
+                app:srcCompat="@color/ap_transparent" />
 
             <ProgressBar
                 android:layout_width="wrap_content"
