@@ -30,7 +30,7 @@
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:src="@drawable/app_icon"
+                    app:srcCompat="@drawable/app_icon"
                     />
             </androidx.cardview.widget.CardView>
             <TextView

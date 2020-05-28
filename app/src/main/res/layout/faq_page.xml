@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:src="@drawable/left_to_right_gradient"
+            app:srcCompat="@drawable/left_to_right_gradient"
             />
 
         <TextView
@@ -34,7 +35,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:src="@drawable/left_to_right_gradient"
+            app:srcCompat="@drawable/left_to_right_gradient"
             />
 
         <TextView
@@ -49,7 +50,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:src="@drawable/left_to_right_gradient"
+            app:srcCompat="@drawable/left_to_right_gradient"
             />
 
         <TextView
@@ -64,7 +65,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:src="@drawable/left_to_right_gradient"
+            app:srcCompat="@drawable/left_to_right_gradient"
             />
 
         <TextView
@@ -79,7 +80,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:src="@drawable/left_to_right_gradient"
+            app:srcCompat="@drawable/left_to_right_gradient"
             />
 
     </LinearLayout>

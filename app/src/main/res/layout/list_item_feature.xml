@@ -71,7 +71,7 @@
                             android:layout_gravity="bottom|right"
                             android:background="@null"
                             android:scaleType="fitCenter"
-                            android:src="@drawable/history"
+                            app:srcCompat="@drawable/history"
                             android:alpha="0.55"
                             app:layout_constraintBottom_toTopOf="@id/divider"
                             app:layout_constraintTop_toBottomOf="@id/trackGroupNameText"
@@ -84,7 +84,7 @@
                             android:layout_height="1dp"
                             android:layout_marginTop="5dp"
                             android:layout_marginBottom="5dp"
-                            android:src="@color/secondaryColor"
+                            app:srcCompat="@color/secondaryColor"
                             app:layout_constraintBottom_toTopOf="@id/numEntriesText"
                             />
                     <TextView
