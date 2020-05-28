@@ -36,7 +36,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_2_1"
+                app:srcCompat="@drawable/faq_image_2_1"
                 />
 
 

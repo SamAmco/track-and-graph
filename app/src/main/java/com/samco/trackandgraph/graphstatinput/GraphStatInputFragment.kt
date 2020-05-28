@@ -66,7 +66,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToViewModelState() {
-        viewModel.state.observe(this, Observer {
+        viewModel.state.observe(viewLifecycleOwner, Observer {
             when (it) {
                 GraphStatInputState.INITIALIZING -> binding.inputProgressBar.visibility = View.VISIBLE
                 GraphStatInputState.WAITING -> {
@@ -96,7 +96,7 @@ class GraphStatInputFragment : Fragment() {
                 viewModel.yRangeType.value = YRangeType.values()[index]
             }
         }
-        viewModel.yRangeType.observe(this, Observer {
+        viewModel.yRangeType.observe(viewLifecycleOwner, Observer {
             when (it) {
                 YRangeType.DYNAMIC -> {
                     binding.yRangeFromToLayout.visibility = View.GONE
@@ -127,7 +127,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToUpdateMode() {
-        viewModel.updateMode.observe(this, Observer { b ->
+        viewModel.updateMode.observe(viewLifecycleOwner, Observer { b ->
             if (b) {
                 binding.addBar.addButton.setText(R.string.update)
                 binding.graphStatTypeLayout.visibility = View.GONE
@@ -144,7 +144,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToAllFeatures() {
-        viewModel.allFeatures.observe(this, Observer {
+        viewModel.allFeatures.observe(viewLifecycleOwner, Observer {
             initPieChartAdapter(it)
             listenToAddLineGraphFeatureButton(it)
             createLineGraphFeatureViews(it)
@@ -161,7 +161,7 @@ class GraphStatInputFragment : Fragment() {
 
     private fun listenToValueStat(features: List<FeatureAndTrackGroup>) {
         val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
-        val adapter = ArrayAdapter(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.valueStatFeatureSpinner.adapter = adapter
         val selected = viewModel.selectedValueStatFeature.value
         if (selected != null) binding.valueStatFeatureSpinner.setSelection(features.indexOf(selected))
@@ -178,7 +178,7 @@ class GraphStatInputFragment : Fragment() {
     private fun listenToValueStatFeature() {
         binding.valueStatDiscreteValueInputLayout.visibility = View.GONE
         binding.valueStatContinuousValueInputLayout.visibility = View.GONE
-        viewModel.selectedValueStatFeature.observe(this, Observer {
+        viewModel.selectedValueStatFeature.observe(viewLifecycleOwner, Observer {
             it?.let {
                 if (it.featureType == FeatureType.DISCRETE) {
                     sanitizeValueStatDiscreteValues()
@@ -209,7 +209,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToValueStatDiscreteValueCheckBoxes() {
-        viewModel.selectedValueStatFeature.observe(this, Observer {
+        viewModel.selectedValueStatFeature.observe(viewLifecycleOwner, Observer {
             if (it != null && it.featureType == FeatureType.DISCRETE) {
                 val discreteValues = it.discreteValues
                 val buttonsLayout = binding.valueStatDiscreteValueButtonsLayout
@@ -240,7 +240,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToValueStatDiscreteValues() {
-        viewModel.selectedValueStatDiscreteValues.observe(this, Observer {
+        viewModel.selectedValueStatDiscreteValues.observe(viewLifecycleOwner, Observer {
             val views = binding.valueStatDiscreteValueButtonsLayout.children.toList()
             it?.forEach { dv ->
                 if (views.size > dv.index) (views[dv.index] as CheckBox).isChecked = true
@@ -281,7 +281,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun inflateLineGraphFeatureView(lgf: LineGraphFeature, features: List<FeatureAndTrackGroup>) {
-        val view = LineGraphFeatureConfigListItemView(context!!, features, lgf)
+        val view = LineGraphFeatureConfigListItemView(requireContext(), features, lgf)
         view.setOnRemoveListener {
             viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.minus(lgf)
             binding.lineGraphFeaturesLayout.removeView(view)
@@ -313,7 +313,7 @@ class GraphStatInputFragment : Fragment() {
         }
         val itemNames = discreteFeatures
             .map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
-        val adapter = ArrayAdapter<String>(context!!, android.R.layout.simple_spinner_dropdown_item, itemNames)
+        val adapter = ArrayAdapter<String>(requireContext(), android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.pieChartFeatureSpinner.adapter = adapter
         val selected = viewModel.selectedPieChartFeature.value
         if (selected != null) binding.pieChartFeatureSpinner.setSelection(discreteFeatures.indexOf(selected))
@@ -398,7 +398,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToFormValid() {
-        viewModel.formValid.observe(this, Observer { errorNow ->
+        viewModel.formValid.observe(viewLifecycleOwner, Observer { errorNow ->
             binding.addBar.addButton.isEnabled = errorNow == null
             binding.addBar.errorText.postDelayed({
                 val errorThen = viewModel.formValid.value

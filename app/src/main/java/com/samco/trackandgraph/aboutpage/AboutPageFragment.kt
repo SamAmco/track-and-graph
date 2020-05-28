@@ -36,7 +36,7 @@ class AboutPageFragment : Fragment() {
             startActivity(browserIntent)
         }
         try {
-            val pInfo = context!!.packageManager.getPackageInfo(activity!!.packageName, 0)
+            val pInfo = requireContext().packageManager.getPackageInfo(requireActivity().packageName, 0)
             binding.versionText.text = "v${pInfo.versionName}"
         } catch (e: Exception) { Timber.d("Could not get package version name: ${e.message}") }
         return binding.root

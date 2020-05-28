@@ -63,7 +63,7 @@ class GraphsAndStatsFragment : Fragment() {
                 this::onGraphStatClicked,
                 this::onMoveGraphStatClicked
             ),
-            activity!!.application
+            requireActivity().application
         )
         binding.graphStatList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.graphStatList)
@@ -115,7 +115,7 @@ class GraphsAndStatsFragment : Fragment() {
     }
 
     private fun listenToViewModelState() {
-        viewModel.state.observe(this, Observer {
+        viewModel.state.observe(viewLifecycleOwner, Observer {
             when (it) {
                 GraphsAndStatsViewState.INITIALIZING -> {
                     binding.graphStatsProgressBar.visibility = View.VISIBLE

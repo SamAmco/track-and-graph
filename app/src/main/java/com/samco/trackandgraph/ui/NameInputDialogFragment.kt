@@ -59,8 +59,8 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             alertDialog = builder.create()
             alertDialog.setOnShowListener {
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(context!!, R.color.secondaryColor))
-                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(context!!, R.color.toolBarTextColor))
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(requireContext(), R.color.secondaryColor))
+                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(requireContext(), R.color.toolBarTextColor))
             }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")

@@ -36,7 +36,7 @@
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:src="@drawable/left_to_right_gradient"
+                    app:srcCompat="@drawable/left_to_right_gradient"
                     android:alpha="0.4"
                     />
             </LinearLayout>

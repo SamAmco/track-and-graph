@@ -60,8 +60,8 @@ class ExportFeaturesDialog : DialogFragment() {
         return activity?.let {
             viewModel = ViewModelProviders.of(this).get(ExportFeaturesViewModel::class.java)
             val view = it.layoutInflater.inflate(R.layout.export_features_dialog, null)
-            trackGroupName = arguments!!.getString(TRACK_GROUP_NAME_KEY)
-            trackGroupId = arguments!!.getLong(TRACK_GROUP_ID_KEY)
+            trackGroupName = requireArguments().getString(TRACK_GROUP_NAME_KEY)
+            trackGroupId = requireArguments().getLong(TRACK_GROUP_ID_KEY)
 
             fileButton = view.findViewById(R.id.fileButton)
             progressBar = view.findViewById(R.id.progressBar)
@@ -69,7 +69,7 @@ class ExportFeaturesDialog : DialogFragment() {
 
             fileButton.setOnClickListener { onFileButtonClicked() }
             fileButton.text = getString(R.string.select_file)
-            fileButton.setTextColor(ContextCompat.getColor(context!!, R.color.errorText))
+            fileButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.errorText))
 
             val builder = AlertDialog.Builder(it)
             builder.setView(view)
@@ -84,19 +84,19 @@ class ExportFeaturesDialog : DialogFragment() {
 
     private fun setAlertDialogShowListeners() {
         positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setTextColor(ContextCompat.getColor(context!!, R.color.secondaryColor))
+        positiveButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.secondaryColor))
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            .setTextColor(ContextCompat.getColor(context!!, R.color.toolBarTextColor))
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.toolBarTextColor))
         positiveButton.isEnabled = false
-        viewModel.loadFeatures(activity!!, trackGroupId!!)
+        viewModel.loadFeatures(requireActivity(), trackGroupId!!)
         listenToState()
         setUriListeners()
         listenToFeatures()
-        positiveButton.setOnClickListener { viewModel.beginExport(activity!!) }
+        positiveButton.setOnClickListener { viewModel.beginExport(requireActivity()) }
     }
 
     private fun listenToState() {
-        viewModel.exportState.observe(this, Observer { state ->
+        viewModel.exportState.observe(viewLifecycleOwner, Observer { state ->
             when (state) {
                 ExportState.LOADING -> {
                     progressBar.visibility = View.VISIBLE
@@ -116,15 +116,15 @@ class ExportFeaturesDialog : DialogFragment() {
     }
 
     private fun setUriListeners() {
-        viewModel.selectedFileUri.observe(this, Observer { uri ->
+        viewModel.selectedFileUri.observe(viewLifecycleOwner, Observer { uri ->
             if (uri != null) {
-                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, context!!, uri, fileButton, alertDialog)
+                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, requireContext(), uri, fileButton, alertDialog)
             }
         })
     }
 
     private fun listenToFeatures() {
-        viewModel.featuresLoaded.observe(this, Observer { loaded ->
+        viewModel.featuresLoaded.observe(viewLifecycleOwner, Observer { loaded ->
             if (loaded) { createFeatureCheckboxes() }
         })
     }

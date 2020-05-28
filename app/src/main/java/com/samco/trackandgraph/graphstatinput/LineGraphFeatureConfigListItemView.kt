@@ -153,7 +153,7 @@ class LineGraphFeatureConfigListItemView(
     private fun setupFeatureSpinner() {
         val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
         val adapter =
-            ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
+            ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.featureSpinner.adapter = adapter
         var featureSpinnerStartIndex =
             features.indexOfFirst { f -> f.id == lineGraphFeature.featureId }
