@@ -35,7 +35,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_1"
+                app:srcCompat="@drawable/faq_image_1_1"
                 />
 
             <TextView
@@ -54,7 +54,7 @@
                 android:paddingTop="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_2"
+                app:srcCompat="@drawable/faq_image_1_2"
                 />
 
 
@@ -72,7 +72,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_3"
+                app:srcCompat="@drawable/faq_image_1_3"
                 />
 
             <TextView
@@ -89,7 +89,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_4"
+                app:srcCompat="@drawable/faq_image_1_4"
                 />
 
             <TextView
@@ -114,7 +114,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_6"
+                app:srcCompat="@drawable/faq_image_1_6"
                 />
 
             <TextView
@@ -139,7 +139,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_7"
+                app:srcCompat="@drawable/faq_image_1_7"
                 />
 
             <androidx.constraintlayout.widget.ConstraintLayout
@@ -165,7 +165,7 @@
                     android:padding="20dp"
                     android:scaleType="fitStart"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/faq_image_1_8"
+                    app:srcCompat="@drawable/faq_image_1_8"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/text"
                     app:layout_constraintRight_toRightOf="parent"
@@ -178,7 +178,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_9"
+                app:srcCompat="@drawable/faq_image_1_9"
                 />
 
             <ImageView
@@ -187,7 +187,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_10"
+                app:srcCompat="@drawable/faq_image_1_10"
                 />
 
             <TextView
@@ -204,7 +204,7 @@
                 android:padding="20dp"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
-                android:src="@drawable/faq_image_1_11"
+                app:srcCompat="@drawable/faq_image_1_11"
                 />
         </LinearLayout>
     </ScrollView>

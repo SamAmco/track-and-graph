@@ -36,7 +36,7 @@
         android:layout_marginRight="40dp"
         android:scaleType="fitCenter"
         android:adjustViewBounds="true"
-        android:src="@drawable/tutorial_image_1"
+        app:srcCompat="@drawable/tutorial_image_1"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text"

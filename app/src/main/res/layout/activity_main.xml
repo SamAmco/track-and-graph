@@ -73,7 +73,7 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                android:src="@drawable/filled_circle"
+                app:srcCompat="@drawable/filled_circle"
                 android:tint="@color/ap_white"
                 />
             <ImageView
@@ -81,7 +81,7 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                android:src="@drawable/filled_circle"
+                app:srcCompat="@drawable/filled_circle"
                 android:tint="@color/ap_white"
                 />
             <ImageView
@@ -89,7 +89,7 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                android:src="@drawable/filled_circle"
+                app:srcCompat="@drawable/filled_circle"
                 android:tint="@color/ap_white"
                 />
         </LinearLayout>

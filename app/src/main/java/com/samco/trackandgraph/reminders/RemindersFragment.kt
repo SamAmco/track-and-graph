@@ -60,7 +60,7 @@ class RemindersFragment : Fragment() {
                 this::onTimeChanged,
                 this::onNameChanged,
                 this::onHideKeyboard
-            ), context!!
+            ), requireContext()
         )
         binding.remindersList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.remindersList)
@@ -85,7 +85,7 @@ class RemindersFragment : Fragment() {
             }
             // Register the channel with the system
             val notificationManager: NotificationManager =
-                context!!.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
         }
     }
@@ -98,16 +98,16 @@ class RemindersFragment : Fragment() {
 
     private fun onHideKeyboard() {
         val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(activity!!.window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        imm.hideSoftInputFromWindow(requireActivity().window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
-    private fun onDeleteClicked(reminder: Reminder) { viewModel.deleteReminder(reminder, context!!) }
+    private fun onDeleteClicked(reminder: Reminder) { viewModel.deleteReminder(reminder, requireContext()) }
 
-    private fun onDaysChanged(reminder: Reminder, checkedDays: CheckedDays) { viewModel.daysChanged(reminder, checkedDays, context!!) }
+    private fun onDaysChanged(reminder: Reminder, checkedDays: CheckedDays) { viewModel.daysChanged(reminder, checkedDays, requireContext()) }
 
-    private fun onTimeChanged(reminder: Reminder, localTime: LocalTime) { viewModel.onTimeChanged(reminder, localTime, context!!) }
+    private fun onTimeChanged(reminder: Reminder, localTime: LocalTime) { viewModel.onTimeChanged(reminder, localTime, requireContext()) }
 
-    private fun onNameChanged(reminder: Reminder, name: String) { viewModel.onNameChanged(reminder, name, context!!) }
+    private fun onNameChanged(reminder: Reminder, name: String) { viewModel.onNameChanged(reminder, name, requireContext()) }
 
     private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
         override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
@@ -136,13 +136,13 @@ class RemindersFragment : Fragment() {
     }
 
     private fun listenToViewModel() {
-        viewModel.state.observe(this, Observer {
+        viewModel.state.observe(viewLifecycleOwner, Observer {
             if (it == RemindersViewModelState.WAITING) observeAndUpdateReminders()
         })
     }
 
     private fun observeAndUpdateReminders() {
-        viewModel.allReminders.observe(this, Observer {
+        viewModel.allReminders.observe(viewLifecycleOwner, Observer {
             it?.let { adapter.submitList(it.toMutableList()) }
             if (it.isNullOrEmpty()) binding.noRemindersHintText.visibility = View.VISIBLE
             else binding.noRemindersHintText.visibility = View.GONE

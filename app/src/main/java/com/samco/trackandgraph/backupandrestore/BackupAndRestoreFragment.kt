@@ -54,13 +54,13 @@ class BackupAndRestoreFragment : Fragment() {
     }
 
     private fun listenToInProgress() {
-        viewModel.inProgress.observe(this, Observer {
+        viewModel.inProgress.observe(viewLifecycleOwner, Observer {
             binding.progressOverlay.visibility = if (it) View.VISIBLE else View.GONE
         })
     }
 
     private fun listenToRestoreResult() {
-        viewModel.restoreResult.observe(this, Observer {
+        viewModel.restoreResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 //TODO we should probably inform the user we're going to restart the app
                 true -> restartApp()
@@ -75,7 +75,7 @@ class BackupAndRestoreFragment : Fragment() {
     }
 
     private fun listenToBackupResult() {
-        viewModel.backupResult.observe(this, Observer {
+        viewModel.backupResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 true -> {
                     val color = ContextCompat.getColor(requireContext(), R.color.successTextColor)
@@ -100,7 +100,7 @@ class BackupAndRestoreFragment : Fragment() {
             mStartActivity,
             PendingIntent.FLAG_CANCEL_CURRENT
         )
-        val mgr = context!!.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val mgr = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
         mgr[AlarmManager.RTC, System.currentTimeMillis() + 100] = mPendingIntent
         exitProcess(0)
     }

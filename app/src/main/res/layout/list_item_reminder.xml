@@ -62,7 +62,7 @@
                         android:layout_height="40dp"
                         android:paddingTop="@dimen/card_padding"
                         android:paddingRight="@dimen/card_padding"
-                        android:src="@drawable/delete_icon"
+                        app:srcCompat="@drawable/delete_icon"
                         android:scaleType="fitCenter"
                         android:background="?selectableItemBackgroundBorderless"
                         />

@@ -55,8 +55,8 @@ class ImportFeaturesDialog : DialogFragment() {
         return activity?.let {
             viewModel = ViewModelProviders.of(this).get(ImportFeaturesViewModel::class.java)
             val view = it.layoutInflater.inflate(R.layout.import_features_dialog, null)
-            trackGroupName = arguments!!.getString(TRACK_GROUP_NAME_KEY)
-            trackGroupId = arguments!!.getLong(TRACK_GROUP_ID_KEY)
+            trackGroupName = requireArguments().getString(TRACK_GROUP_NAME_KEY)
+            trackGroupId = requireArguments().getLong(TRACK_GROUP_ID_KEY)
 
             fileButton = view.findViewById(R.id.fileButton)
             progressBar = view.findViewById(R.id.progressBar)
@@ -64,7 +64,7 @@ class ImportFeaturesDialog : DialogFragment() {
             progressBar.visibility = View.INVISIBLE
             fileButton.setOnClickListener { onFileButtonClicked() }
             fileButton.text = getString(R.string.select_file)
-            fileButton.setTextColor(ContextCompat.getColor(context!!, R.color.errorText))
+            fileButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.errorText))
 
             val builder = AlertDialog.Builder(it)
             builder.setView(view)
@@ -79,28 +79,28 @@ class ImportFeaturesDialog : DialogFragment() {
 
     private fun setAlertDialogShowListeners() {
         val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setTextColor(getColor(context!!, R.color.secondaryColor))
+        positiveButton.setTextColor(getColor(requireContext(), R.color.secondaryColor))
         positiveButton.isEnabled = false
         positiveButton.setOnClickListener { onImportClicked() }
         listenToUri()
         listenToImportState()
         listenToException()
         val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        negativeButton.setTextColor(getColor(context!!, R.color.toolBarTextColor))
+        negativeButton.setTextColor(getColor(requireContext(), R.color.toolBarTextColor))
         negativeButton.setOnClickListener { dismiss() }
         alertDialog.setOnCancelListener { run {} }
     }
 
     private fun listenToUri() {
-        viewModel.selectedFileUri.observe(this, Observer { uri ->
+        viewModel.selectedFileUri.observe(viewLifecycleOwner, Observer { uri ->
             if (uri != null) {
-                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, context!!, uri, fileButton, alertDialog)
+                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, requireContext(), uri, fileButton, alertDialog)
             }
         })
     }
 
     private fun listenToImportState() {
-        viewModel.importState.observe(this, Observer{ state ->
+        viewModel.importState.observe(viewLifecycleOwner, Observer{ state ->
             when (state) {
                 ImportState.WAITING -> {
                     progressBar.visibility = View.INVISIBLE
@@ -118,12 +118,12 @@ class ImportFeaturesDialog : DialogFragment() {
     }
 
     private fun listenToException() {
-        viewModel.importException.observe(this, Observer { exception ->
+        viewModel.importException.observe(viewLifecycleOwner, Observer { exception ->
             if (exception != null) {
                 val message =
                     if (exception.stringArgs == null) getString(exception.stringId)
                     else getString(exception.stringId, exception.stringArgs)
-                Toast.makeText(activity!!, message, Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity(), message, Toast.LENGTH_LONG).show()
             }
         })
     }
@@ -154,7 +154,7 @@ class ImportFeaturesDialog : DialogFragment() {
 
     private fun onImportClicked() {
         progressBar.visibility = View.VISIBLE
-        viewModel.beginImport(activity!!, trackGroupId!!)
+        viewModel.beginImport(requireActivity(), trackGroupId!!)
     }
 
     override fun onCancel(dialog: DialogInterface) {

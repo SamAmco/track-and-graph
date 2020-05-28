@@ -60,7 +60,7 @@ class ViewGraphStatFragment : Fragment() {
     ): View? {
         this.navController = container?.findNavController()
         viewModel = ViewModelProviders.of(this).get(ViewGraphStatViewModel::class.java)
-        viewModel.init(activity!!, args.graphStatId)
+        viewModel.init(requireActivity(), args.graphStatId)
         binding = FragmentViewGraphStatBinding.inflate(inflater, container, false)
         graphStatView = binding.graphStatView
         setViewInitialState()
@@ -91,8 +91,8 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun listenToState() {
-        viewModel.state.observe(this, Observer { state -> onViewModelStateChanged(state) })
-        viewModel.showingNotes.observe(this, Observer { b -> onShowingNotesChanged(b) })
+        viewModel.state.observe(viewLifecycleOwner, Observer { state -> onViewModelStateChanged(state) })
+        viewModel.showingNotes.observe(viewLifecycleOwner, Observer { b -> onShowingNotesChanged(b) })
     }
 
     private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
@@ -118,7 +118,7 @@ class ViewGraphStatFragment : Fragment() {
         binding.notesRecyclerView.layoutManager = LinearLayoutManager(
             context, RecyclerView.VERTICAL, false
         )
-        viewModel.sampledDataPoints.observe(this, Observer { p -> onSampledDataPoints(p) })
+        viewModel.sampledDataPoints.observe(viewLifecycleOwner, Observer { p -> onSampledDataPoints(p) })
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
