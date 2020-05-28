@@ -68,7 +68,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun listenToState() {
-        viewModel.state.observe(this, Observer { state ->
+        viewModel.state.observe(viewLifecycleOwner, Observer { state ->
             when (state) {
                 InputDataPointDialogState.LOADING -> { binding.addButton.isEnabled = false }
                 InputDataPointDialogState.WAITING -> { binding.addButton.isEnabled = true }
@@ -87,16 +87,16 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun listenToIndex() {
-        viewModel.currentFeatureIndex.observe(this, Observer { index ->
+        viewModel.currentFeatureIndex.observe(viewLifecycleOwner, Observer { index ->
             if (index != null) setupViewFeature(viewModel.features.value!![index], index)
         })
     }
 
     private fun listenToFeatures() {
-        viewModel.features.observe(this, Observer { features ->
+        viewModel.features.observe(viewLifecycleOwner, Observer { features ->
             if (features.isEmpty()) return@Observer
             binding.viewPager.adapter = ViewPagerAdapter(
-                context!!,
+                requireContext(),
                 features,
                 DataPointInputView.DataPointInputClickListener(this::onAddClicked),
                 viewModel.uiStates,
@@ -107,9 +107,9 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun initViewModel() {
-        val timestampStr = arguments!!.getString(DATA_POINT_TIMESTAMP_KEY)
+        val timestampStr = requireArguments().getString(DATA_POINT_TIMESTAMP_KEY)
         val timestamp = if (timestampStr != null) odtFromString(timestampStr) else null
-        viewModel.init(activity!!, arguments!!.getLongArray(FEATURE_LIST_KEY)!!.toList(), timestamp)
+        viewModel.init(requireActivity(), requireArguments().getLongArray(FEATURE_LIST_KEY)!!.toList(), timestamp)
     }
 
     private class ViewPagerAdapter(val context: Context,
@@ -163,7 +163,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         if (feature.featureType == FeatureType.CONTINUOUS) imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
         else imm.hideSoftInputFromWindow(view?.windowToken, 0)
-        activity!!.currentFocus?.clearFocus()
+        requireActivity().currentFocus?.clearFocus()
     }
 
     override fun onResume() {
@@ -187,9 +187,9 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
-        activity!!.currentFocus?.clearFocus()
+        requireActivity().currentFocus?.clearFocus()
         val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(activity!!.window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        imm.hideSoftInputFromWindow(requireActivity().window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
