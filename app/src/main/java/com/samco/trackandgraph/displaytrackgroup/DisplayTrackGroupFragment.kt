@@ -59,7 +59,7 @@ class DisplayTrackGroupFragment : Fragment(),
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_display_track_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel = ViewModelProviders.of(this).get(DisplayTrackGroupViewModel::class.java)
-        viewModel.initViewModel(activity!!, args.trackGroup)
+        viewModel.initViewModel(requireActivity(), args.trackGroup)
 
         adapter = FeatureAdapter(FeatureClickListener(
             this::onFeatureEditClicked,

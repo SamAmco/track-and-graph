@@ -67,22 +67,22 @@ class MoveToDialogFragment : DialogFragment() {
 
     private fun initViewModel() {
         viewModel = ViewModelProviders.of(this).get(MoveToDialogViewModel::class.java)
-        val mode = when (arguments!!.getString(MOVE_DIALOG_TYPE_KEY)) {
+        val mode = when (requireArguments().getString(MOVE_DIALOG_TYPE_KEY)) {
             MOVE_DIALOG_TYPE_TRACK -> GroupItemType.TRACK
             MOVE_DIALOG_TYPE_GRAPH -> GroupItemType.GRAPH
             else -> throw Exception("Unrecognised move dialog mode")
         }
-        val id = arguments!!.getLong(MOVE_DIALOG_GROUP_KEY)
-        viewModel.init(activity!!, mode, id)
+        val id = requireArguments().getLong(MOVE_DIALOG_GROUP_KEY)
+        viewModel.init(requireActivity(), mode, id)
         listenToViewModel()
     }
 
     private fun listenToViewModel() {
-        viewModel.availableGroups.observe(this, Observer {
+        viewModel.availableGroups.observe(viewLifecycleOwner, Observer {
             if (it != null) inflateGroupItems(it)
         })
 
-        viewModel.state.observe(this, Observer {
+        viewModel.state.observe(viewLifecycleOwner, Observer {
             if (it == MoveToDialogState.MOVED) dismiss()
         })
     }

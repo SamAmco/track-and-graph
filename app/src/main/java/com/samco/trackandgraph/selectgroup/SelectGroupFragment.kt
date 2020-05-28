@@ -67,8 +67,8 @@ class SelectGroupFragment : Fragment(),
                 this::onRenameClicked,
                 this::onDeleteClicked
             ),
-            getColor(context!!, R.color.primaryColor),
-            getColor(context!!, R.color.secondaryColor)
+            getColor(requireContext(), R.color.primaryColor),
+            getColor(requireContext(), R.color.secondaryColor)
         )
         binding.groupList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.groupList)
@@ -81,7 +81,7 @@ class SelectGroupFragment : Fragment(),
     }
 
     private fun listenToViewModel() {
-        viewModel.state.observe(this, Observer {
+        viewModel.state.observe(viewLifecycleOwner, Observer {
             if (it == SelectGroupViewModelState.CREATED_FIRST_GROUP) {
                 try {
                     navController?.navigate(
@@ -96,13 +96,13 @@ class SelectGroupFragment : Fragment(),
 
     override fun onStart() {
         super.onStart()
-        activity!!.toolbar.overflowIcon = getDrawable(context!!, R.drawable.add_icon)
+        requireActivity().toolbar.overflowIcon = getDrawable(requireContext(), R.drawable.add_icon)
     }
 
     override fun onStop() {
         super.onStop()
         if (navController?.currentDestination?.id != R.id.selectGroupFragment) {
-            activity!!.toolbar.overflowIcon = getDrawable(context!!, R.drawable.list_menu_icon)
+            requireActivity().toolbar.overflowIcon = getDrawable(requireContext(), R.drawable.list_menu_icon)
         }
     }
 
