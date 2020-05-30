@@ -68,7 +68,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun listenToState() {
-        viewModel.state.observe(viewLifecycleOwner, Observer { state ->
+        viewModel.state.observe(this, Observer { state ->
             when (state) {
                 InputDataPointDialogState.LOADING -> { binding.addButton.isEnabled = false }
                 InputDataPointDialogState.WAITING -> { binding.addButton.isEnabled = true }
@@ -87,13 +87,13 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun listenToIndex() {
-        viewModel.currentFeatureIndex.observe(viewLifecycleOwner, Observer { index ->
+        viewModel.currentFeatureIndex.observe(this, Observer { index ->
             if (index != null) setupViewFeature(viewModel.features.value!![index], index)
         })
     }
 
     private fun listenToFeatures() {
-        viewModel.features.observe(viewLifecycleOwner, Observer { features ->
+        viewModel.features.observe(this, Observer { features ->
             if (features.isEmpty()) return@Observer
             binding.viewPager.adapter = ViewPagerAdapter(
                 requireContext(),
