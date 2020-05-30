@@ -96,7 +96,7 @@ class ExportFeaturesDialog : DialogFragment() {
     }
 
     private fun listenToState() {
-        viewModel.exportState.observe(viewLifecycleOwner, Observer { state ->
+        viewModel.exportState.observe(this, Observer { state ->
             when (state) {
                 ExportState.LOADING -> {
                     progressBar.visibility = View.VISIBLE
@@ -116,7 +116,7 @@ class ExportFeaturesDialog : DialogFragment() {
     }
 
     private fun setUriListeners() {
-        viewModel.selectedFileUri.observe(viewLifecycleOwner, Observer { uri ->
+        viewModel.selectedFileUri.observe(this, Observer { uri ->
             if (uri != null) {
                 ImportExportFeatureUtils.setFileButtonTextFromUri(activity, requireContext(), uri, fileButton, alertDialog)
             }
@@ -124,7 +124,7 @@ class ExportFeaturesDialog : DialogFragment() {
     }
 
     private fun listenToFeatures() {
-        viewModel.featuresLoaded.observe(viewLifecycleOwner, Observer { loaded ->
+        viewModel.featuresLoaded.observe(this, Observer { loaded ->
             if (loaded) { createFeatureCheckboxes() }
         })
     }

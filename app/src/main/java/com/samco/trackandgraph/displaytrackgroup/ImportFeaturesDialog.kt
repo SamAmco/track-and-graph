@@ -92,7 +92,7 @@ class ImportFeaturesDialog : DialogFragment() {
     }
 
     private fun listenToUri() {
-        viewModel.selectedFileUri.observe(viewLifecycleOwner, Observer { uri ->
+        viewModel.selectedFileUri.observe(this, Observer { uri ->
             if (uri != null) {
                 ImportExportFeatureUtils.setFileButtonTextFromUri(activity, requireContext(), uri, fileButton, alertDialog)
             }
@@ -100,7 +100,7 @@ class ImportFeaturesDialog : DialogFragment() {
     }
 
     private fun listenToImportState() {
-        viewModel.importState.observe(viewLifecycleOwner, Observer{ state ->
+        viewModel.importState.observe(this, Observer{ state ->
             when (state) {
                 ImportState.WAITING -> {
                     progressBar.visibility = View.INVISIBLE
@@ -118,7 +118,7 @@ class ImportFeaturesDialog : DialogFragment() {
     }
 
     private fun listenToException() {
-        viewModel.importException.observe(viewLifecycleOwner, Observer { exception ->
+        viewModel.importException.observe(this, Observer { exception ->
             if (exception != null) {
                 val message =
                     if (exception.stringArgs == null) getString(exception.stringId)
