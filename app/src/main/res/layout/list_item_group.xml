@@ -1,67 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="90dp"
-                    android:layout_margin="5dp"
-                    android:layout_gravity="center"
-                    android:id="@+id/cardView"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:clickable="true"
-                    app:cardCornerRadius="@dimen/card_corner_radius"
-                    >
+                android:id="@+id/cardView"
+                android:layout_width="match_parent"
+                android:layout_height="90dp"
+                android:layout_gravity="center"
+                android:layout_margin="5dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?android:attr/selectableItemBackground"
+                app:cardCornerRadius="@dimen/card_corner_radius">
+
                 <TextView
-                        android:id="@+id/graphStatGroupNameText"
-                        android:textSize="20sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:layout_marginBottom="8dp"
-                        android:padding="@dimen/card_padding"
-                        tools:text="Group Name that spans over two lines eventually"/>
+                    android:id="@+id/graphStatGroupNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:padding="@dimen/card_padding"
+                    android:textSize="20sp"
+                    tools:text="Group Name that spans over two lines eventually" />
+
                 <ImageView
                     android:id="@+id/cornerTabImage"
                     android:layout_width="140dp"
                     android:layout_height="70dp"
-                    app:srcCompat="@drawable/group_tab_corner"
-                    android:layout_gravity="bottom|right"
+                    android:layout_gravity="bottom|end"
                     android:tint="@color/primaryColor"
-                    />
+                    app:srcCompat="@drawable/group_tab_corner"
+                    tools:ignore="ContentDescription" />
+
                 <ImageView
                     android:id="@+id/trackIcon"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
+                    android:layout_gravity="bottom|end"
                     android:paddingBottom="3dp"
-                    app:srcCompat="@drawable/add_box"
-                    android:layout_gravity="bottom|right"
                     android:tint="@color/ap_white"
-                    />
+                    app:srcCompat="@drawable/add_box"
+                    tools:ignore="ContentDescription" />
+
                 <ImageView
                     android:id="@+id/graphIcon"
                     android:layout_width="35dp"
                     android:layout_height="35dp"
+                    android:layout_gravity="bottom|end"
                     android:paddingBottom="3dp"
-                    app:srcCompat="@drawable/graph_icon"
-                    android:layout_gravity="bottom|right"
                     android:tint="@color/ap_white"
-                    />
+                    app:srcCompat="@drawable/graph_icon"
+                    tools:ignore="ContentDescription" />
             </androidx.cardview.widget.CardView>
         </FrameLayout>
+
         <ImageButton
             android:id="@+id/menuButton"
-            app:srcCompat="@drawable/list_menu_icon"
-            android:background="#00FFFFFF"
-            android:padding="10dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="top|end"/>
+            android:layout_gravity="top|end"
+            android:background="#00FFFFFF"
+            android:padding="10dp"
+            app:srcCompat="@drawable/list_menu_icon" />
     </FrameLayout>
 </layout>
