@@ -114,9 +114,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:layout_marginLeft="@dimen/dialog_input_spacing"
+                        android:layout_marginStart="@dimen/dialog_input_spacing"
                         android:entries="@array/y_range_styles" />
-                    >
                 </LinearLayout>
 
                 <LinearLayout
@@ -282,7 +281,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dialog_input_spacing"
-                            android:gravity="right"
+                            android:gravity="end"
                             android:paddingBottom="8dp"
                             android:text="@string/to"
                             android:textSize="@dimen/dialog_label_text_size"
