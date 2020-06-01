@@ -104,7 +104,7 @@ class AddFeatureFragment : Fragment(),
                     setInitialViewState()
                 }
                 AddFeatureState.WAITING -> {
-                    initViews()
+                    onViewModelReady()
                     binding.progressBar.visibility = View.GONE
                 }
                 AddFeatureState.ADDING -> {
@@ -146,12 +146,17 @@ class AddFeatureFragment : Fragment(),
         activity?.sendBroadcast(intent)
     }
 
-    private fun initViews() {
+    private fun onViewModelReady() {
+        initViewFromViewModel()
+        observeHasDefaultValue()
+        observeFeatureType()
+    }
+
+    private fun initViewFromViewModel() {
         viewModel.discreteValues.forEach { v -> inflateDiscreteValue(v) }
         if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
             binding.addDiscreteValueButton.isEnabled = false
         if (viewModel.updateMode) initSpinnerInUpdateMode()
-        observeHasDefaultValue()
 
         binding.featureNameText.setText(viewModel.featureName)
         binding.featureDescriptionText.setText(viewModel.featureDescription)
@@ -175,6 +180,12 @@ class AddFeatureFragment : Fragment(),
         binding.defaultNumericalInput.addTextChangedListener {
             viewModel.featureDefaultValue.value = getDoubleFromText(it.toString())
         }
+    }
+
+    private fun observeFeatureType() {
+        viewModel.featureType.observe(viewLifecycleOwner, Observer {
+            onFeatureTypeChanged(it)
+        })
     }
 
     private fun observeHasDefaultValue() {
@@ -415,18 +426,20 @@ class AddFeatureFragment : Fragment(),
     }
 
     override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
-        val newType = featureTypeList[position]
-        showOnFeatureTypeUpdatedMessage(newType)
-        viewModel.featureType.value = newType
+        viewModel.featureType.value = featureTypeList[position]
+    }
+
+    override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+    private fun onFeatureTypeChanged(featureType: FeatureType) {
+        showOnFeatureTypeUpdatedMessage(featureType)
         updateDefaultValuesViewFromViewModel(viewModel.featureHasDefaultValue.value!!)
-        val vis = if (newType == FeatureType.DISCRETE) View.VISIBLE else View.GONE
+        val vis = if (featureType == FeatureType.DISCRETE) View.VISIBLE else View.GONE
         binding.discreteValuesTextView.visibility = vis
         binding.discreteValues.visibility = vis
         binding.addDiscreteValueButton.visibility = vis
         validateForm()
     }
-
-    override fun onNothingSelected(p0: AdapterView<*>?) {}
 
     private fun showOnFeatureTypeUpdatedMessage(newType: FeatureType) {
         val oldType = viewModel.existingFeature?.featureType
