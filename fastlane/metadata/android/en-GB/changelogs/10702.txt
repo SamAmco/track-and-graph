@@ -1,0 +1,9 @@
+- Data points can now have notes that show up under any graph they are a part of
+
+- Tracked data can now have optional more detailed descriptions
+
+- Swapped order of default tracking input types 
+
+- Two more data visualisation colors to use
+
+- Various minor bug fixes
