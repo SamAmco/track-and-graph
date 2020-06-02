@@ -20,13 +20,13 @@
     <color name="primaryDarkColor">#427ea0</color>
     <color name="secondaryColor">#f46d43</color>
     <color name="secondaryDarkColor">#bb3d18</color>
-    <color name="toolbarColor">#d3dade</color>
+    <color name="toolbarColor">#3C4042</color>
 
-    <color name="textColor">#000000</color>
-    <color name="toolBarTextColor">#2B3B45</color>
-    <color name="backgroundColor">#F3F3F3</color>
-    <color name="cardBackgroundColor">#FFFFFF</color>
-    <color name="colorShadowButton">#E0E0E0</color>
+    <color name="textColor">#FFFFFF</color>
+    <color name="toolBarTextColor">#FFFFFF</color>
+    <color name="backgroundColor">#232323</color>
+    <color name="cardBackgroundColor">#333333</color>
+    <color name="colorShadowButton">#636363</color>
     <color name="colorGridLines">#66000000</color>
     <color name="regularText">@android:color/tab_indicator_text</color>
     <color name="divider">#616161</color>
