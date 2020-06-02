@@ -25,13 +25,25 @@ import org.threeten.bp.OffsetDateTime
 // to top level constants as below
 
 private const val getAllFeaturesAndTrackGroupsQuery = """
-        SELECT features_table.*, track_groups_table.id as track_group_id, track_groups_table.name as track_group_name 
+        SELECT features_table.id, features_table.name, features_table.display_index,
+            features_table.type, features_table.discrete_values, track_groups_table.id as track_group_id,
+            track_groups_table.name as track_group_name 
         FROM features_table 
         LEFT JOIN track_groups_table 
         ON features_table.track_group_id = track_groups_table.id
         ORDER BY track_groups_table.display_index ASC, features_table.display_index ASC, features_table.id ASC"""
 
-private const val getFeatureByIdQuery = """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
+private const val getFeatureAndTrackGroupByFeatureId = """
+    SELECT features_table.id, features_table.name, features_table.display_index,
+            features_table.type, features_table.discrete_values, track_groups_table.id as track_group_id,
+            track_groups_table.name as track_group_name
+    FROM features_table
+    LEFT JOIN track_groups_table
+    ON features_table.track_group_id = track_groups_table.id
+    WHERE features_table.id = :featureId LIMIT 1"""
+
+private const val getFeatureByIdQuery =
+    """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
 
 @Dao
 interface TrackAndGraphDatabaseDao {
@@ -48,26 +60,30 @@ interface TrackAndGraphDatabaseDao {
     fun getNumFeatures(): Long
 
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
-    fun getAllReminders() : LiveData<List<Reminder>>
+    fun getAllReminders(): LiveData<List<Reminder>>
 
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
-    fun getAllRemindersSync() : List<Reminder>
+    fun getAllRemindersSync(): List<Reminder>
 
-    @Query("""SELECT track_groups_table.*, 0 as type FROM track_groups_table 
+    @Query(
+        """SELECT track_groups_table.*, 0 as type FROM track_groups_table 
         UNION SELECT graph_stat_groups_table.*, 1 as type FROM graph_stat_groups_table
-        ORDER BY display_index ASC""")
-    fun getAllGroups() : LiveData<List<GroupItem>>
+        ORDER BY display_index ASC"""
+    )
+    fun getAllGroups(): LiveData<List<GroupItem>>
 
-    @Query("""SELECT track_groups_table.*, 0 as type FROM track_groups_table 
+    @Query(
+        """SELECT track_groups_table.*, 0 as type FROM track_groups_table 
         UNION SELECT graph_stat_groups_table.*, 1 as type FROM graph_stat_groups_table
-        ORDER BY display_index ASC""")
-    fun getAllGroupsSync() : List<GroupItem>
+        ORDER BY display_index ASC"""
+    )
+    fun getAllGroupsSync(): List<GroupItem>
 
     @Query("SELECT * FROM track_groups_table ORDER BY display_index ASC")
-    fun getTrackGroups() : LiveData<List<TrackGroup>>
+    fun getTrackGroups(): LiveData<List<TrackGroup>>
 
     @Query("SELECT * FROM graph_stat_groups_table ORDER BY display_index ASC")
-    fun getGraphStatGroups() : LiveData<List<GraphStatGroup>>
+    fun getGraphStatGroups(): LiveData<List<GraphStatGroup>>
 
     @Delete
     fun deleteGraphStatGroup(graphStatGroup: GraphStatGroup)
@@ -94,7 +110,7 @@ interface TrackAndGraphDatabaseDao {
     fun updateReminders(reminders: List<Reminder>)
 
     @Query("SELECT * FROM track_groups_table WHERE id = :id LIMIT 1")
-    fun getTrackGroupById(id: Int) : TrackGroup
+    fun getTrackGroupById(id: Int): TrackGroup
 
     @Update
     fun updateTrackGroup(trackGroup: TrackGroup)
@@ -105,14 +121,16 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateFeatures(features: List<Feature>)
 
-    @Query("""SELECT features_table.*, num_data_points, last_timestamp from features_table 
+    @Query(
+        """SELECT features_table.*, num_data_points, last_timestamp from features_table 
         LEFT JOIN (
             SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
             FROM data_points_table GROUP BY feature_id
         ) as feature_data 
         ON feature_data.id = features_table.id
 		WHERE track_group_id = :trackGroupId
-        ORDER BY features_table.display_index ASC, id DESC""")
+        ORDER BY features_table.display_index ASC, id DESC"""
+    )
     fun getDisplayFeaturesForTrackGroup(trackGroupId: Long): LiveData<List<DisplayFeature>>
 
     @Query("SELECT features_table.* FROM features_table WHERE track_group_id = :trackGroupId ORDER BY features_table.display_index ASC")
@@ -133,11 +151,7 @@ interface TrackAndGraphDatabaseDao {
     @Query(getAllFeaturesAndTrackGroupsQuery)
     fun getAllFeaturesAndTrackGroupsSync(): List<FeatureAndTrackGroup>
 
-    @Query("""SELECT features_table.*, track_groups_table.id as track_group_id, track_groups_table.name as track_group_name 
-        FROM features_table 
-        LEFT JOIN track_groups_table 
-        ON features_table.track_group_id = track_groups_table.id
-        WHERE features_table.id = :featureId LIMIT 1""")
+    @Query(getFeatureAndTrackGroupByFeatureId)
     fun getFeatureAndTrackGroupByFeatureId(featureId: Long): FeatureAndTrackGroup?
 
     @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
@@ -183,10 +197,21 @@ interface TrackAndGraphDatabaseDao {
     fun getDataPointsWithValue(featureId: Long, values: List<Int>): List<DataPoint>
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :now AND timestamp > :cutOff ORDER BY timestamp""")
-    fun getDataPointsWithValueInTimeRange(featureId: Long, values: List<Int>, cutOff: OffsetDateTime, now: OffsetDateTime): List<DataPoint>
+    fun getDataPointsWithValueInTimeRange(
+        featureId: Long,
+        values: List<Int>,
+        cutOff: OffsetDateTime,
+        now: OffsetDateTime
+    ): List<DataPoint>
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max  AND timestamp < :now AND timestamp > :cutOff ORDER BY timestamp""")
-    fun getDataPointsBetweenInTimeRange(featureId: Long, min: String, max: String, cutOff: OffsetDateTime, now: OffsetDateTime): List<DataPoint>
+    fun getDataPointsBetweenInTimeRange(
+        featureId: Long,
+        min: String,
+        max: String,
+        cutOff: OffsetDateTime,
+        now: OffsetDateTime
+    ): List<DataPoint>
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp DESC LIMIT 1""")
     fun getLastDataPointBetween(featureId: Long, min: String, max: String): DataPoint?
@@ -201,7 +226,11 @@ interface TrackAndGraphDatabaseDao {
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp > :cutOff AND timestamp < :now ORDER BY timestamp ASC")
-    fun getDataPointsForFeatureBetweenAscSync(featureId: Long, cutOff: OffsetDateTime, now: OffsetDateTime): List<DataPoint>
+    fun getDataPointsForFeatureBetweenAscSync(
+        featureId: Long,
+        cutOff: OffsetDateTime,
+        now: OffsetDateTime
+    ): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT 1")
     fun getLastDataPointForFeatureSync(featureId: Long): List<DataPoint>
