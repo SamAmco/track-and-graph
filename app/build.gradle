@@ -51,8 +51,9 @@ android {
             resValue "string", "app_name", "Track & Graph"
         }
     }
-    dataBinding {
-        enabled = true
+
+    buildFeatures {
+        dataBinding true
     }
 }
 
