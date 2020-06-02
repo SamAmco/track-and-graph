@@ -1,24 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:app="http://schemas.android.com/apk/res-auto">
-    <LinearLayout
+<layout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" >
+        tools:ignore="UseCompoundDrawables">
+        <!-- I don't want to use compound drawables here because I have custom
+         properties life alpha on the image that I don't want to set from code -->
+
         <TextView
             android:id="@+id/groupNameText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:textSize="18sp"
-            tools:text="Some group"
-            />
+            tools:text="Some group" />
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:alpha="0.4"
             app:srcCompat="@drawable/left_to_right_gradient"
-            />
+            tools:ignore="ContentDescription" />
     </LinearLayout>
 </layout>
