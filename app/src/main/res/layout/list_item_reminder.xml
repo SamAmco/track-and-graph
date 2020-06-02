@@ -1,174 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    >
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="5dp"
         android:clipToPadding="false"
-        >
+        android:padding="5dp">
+
         <androidx.cardview.widget.CardView
             android:id="@+id/cardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusable="true"
             android:focusableInTouchMode="true"
-            app:cardCornerRadius="@dimen/card_corner_radius"
-            >
+            app:cardCornerRadius="@dimen/card_corner_radius">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical">
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginLeft="@dimen/card_padding"
-                    >
+                    android:layout_marginStart="@dimen/card_padding"
+                    android:orientation="horizontal">
 
                     <EditText
                         android:id="@+id/reminderNameText"
-                        android:maxLines="1"
-                        android:inputType="text"
-                        android:imeOptions="actionDone"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginTop="@dimen/card_padding"
-                        />
+                        android:layout_weight="1"
+                        android:hint="@string/default_reminder_name"
+                        android:imeOptions="actionDone"
+                        android:importantForAutofill="no"
+                        android:inputType="text"
+                        android:maxLines="1" />
 
                     <TextView
                         android:id="@+id/timeText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:textSize="35sp"
-                        android:textStyle="bold"
-                        android:paddingLeft="@dimen/dialog_input_spacing"
-                        android:paddingRight="@dimen/dialog_input_spacing"
                         android:layout_marginTop="@dimen/card_padding"
                         android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
+                        android:focusable="true"
+                        android:paddingLeft="@dimen/dialog_input_spacing"
+                        android:paddingRight="@dimen/dialog_input_spacing"
                         android:text="00:00"
-                        tools:text="17:35"
-                        />
+                        android:textSize="35sp"
+                        android:textStyle="bold"
+                        tools:ignore="HardcodedText"
+                        tools:text="17:35" />
 
                     <ImageButton
                         android:id="@+id/deleteButton"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
-                        android:paddingTop="@dimen/card_padding"
-                        android:paddingRight="@dimen/card_padding"
-                        app:srcCompat="@drawable/delete_icon"
-                        android:scaleType="fitCenter"
                         android:background="?selectableItemBackgroundBorderless"
-                        />
+                        android:contentDescription="@string/delete_reminder_content_description"
+                        android:paddingTop="@dimen/card_padding"
+                        android:paddingEnd="@dimen/card_padding"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/delete_icon"
+                        tools:ignore="RtlSymmetry" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginLeft="@dimen/card_padding"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginRight="@dimen/card_padding"
-                    >
+                    android:baselineAligned="false"
+                    android:orientation="horizontal">
+
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
+
                         <CheckBox
                             android:id="@+id/monBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            />
+                            android:layout_gravity="center" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
+
                         <CheckBox
                             android:id="@+id/tueBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            />
+                            android:layout_gravity="center" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
+
                         <CheckBox
                             android:id="@+id/wedBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            />
+                            android:layout_gravity="center" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
+
                         <CheckBox
                             android:id="@+id/thuBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            />
+                            android:layout_gravity="center" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
+
                         <CheckBox
                             android:id="@+id/friBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            />
+                            android:layout_gravity="center" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
+
                         <CheckBox
                             android:id="@+id/satBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            />
+                            android:layout_gravity="center" />
                     </FrameLayout>
 
                     <FrameLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
+
                         <CheckBox
                             android:id="@+id/sunBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            />
+                            android:layout_gravity="center" />
                     </FrameLayout>
                 </LinearLayout>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
                     android:layout_marginLeft="@dimen/card_padding"
                     android:layout_marginRight="@dimen/card_padding"
                     android:layout_marginBottom="@dimen/card_padding"
-                    >
+                    android:orientation="horizontal">
 
                     <TextView
                         android:id="@+id/monLabel"
@@ -176,8 +178,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/mon"
-                        android:textAlignment="center"
-                        />
+                        android:textAlignment="center" />
 
                     <TextView
                         android:id="@+id/tueLabel"
@@ -185,8 +186,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/tue"
-                        android:textAlignment="center"
-                        />
+                        android:textAlignment="center" />
 
                     <TextView
                         android:id="@+id/wedLabel"
@@ -194,8 +194,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/wed"
-                        android:textAlignment="center"
-                        />
+                        android:textAlignment="center" />
 
                     <TextView
                         android:id="@+id/thuLabel"
@@ -203,8 +202,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/thu"
-                        android:textAlignment="center"
-                        />
+                        android:textAlignment="center" />
 
                     <TextView
                         android:id="@+id/friLabel"
@@ -212,8 +210,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/fri"
-                        android:textAlignment="center"
-                        />
+                        android:textAlignment="center" />
 
                     <TextView
                         android:id="@+id/satLabel"
@@ -221,8 +218,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/sat"
-                        android:textAlignment="center"
-                        />
+                        android:textAlignment="center" />
 
                     <TextView
                         android:id="@+id/sunLabel"
@@ -230,8 +226,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/sun"
-                        android:textAlignment="center"
-                        />
+                        android:textAlignment="center" />
 
                 </LinearLayout>
             </LinearLayout>
