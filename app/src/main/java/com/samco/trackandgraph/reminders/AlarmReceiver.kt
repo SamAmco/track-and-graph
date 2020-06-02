@@ -61,6 +61,12 @@ class AlarmReceiver : BroadcastReceiver() {
 
 class RecreateAlarms : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
+        val validActions = listOf(
+            "android.intent.action.BOOT_COMPLETED",
+            "android.intent.action.QUICKBOOT_POWERON",
+            "android.intent.action.MY_PACKAGE_REPLACED"
+        )
+        if (!validActions.contains(intent?.action)) return
         if (context == null) return
         runBlocking { RemindersHelper.syncAlarms(context) }
     }
