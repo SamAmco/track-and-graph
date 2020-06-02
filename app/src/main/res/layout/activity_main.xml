@@ -2,96 +2,98 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <androidx.drawerlayout.widget.DrawerLayout
-            android:id="@+id/drawer_layout"
+        android:id="@+id/drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-        >
-        <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+            android:orientation="vertical">
 
             <com.google.android.material.appbar.AppBarLayout
-                    android:id="@+id/appbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    >
+                android:id="@+id/appbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
                 <androidx.appcompat.widget.Toolbar
-                        android:id="@+id/toolbar"
-                        android:layout_width="match_parent"
-                        android:layout_height="?attr/actionBarSize"
-                        app:titleTextColor="@color/toolBarTextColor"
-                        />
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    app:titleTextColor="@color/toolBarTextColor" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
-            <fragment
-                    android:id="@+id/nav_fragment"
-                    android:name="androidx.navigation.fragment.NavHostFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    app:defaultNavHost="true"
-                    app:navGraph="@navigation/navigation"/>
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/nav_fragment"
+                android:name="androidx.navigation.fragment.NavHostFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:navGraph="@navigation/navigation" />
 
         </LinearLayout>
+
         <com.google.android.material.navigation.NavigationView
-                android:id="@+id/nav_view"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:paddingTop="50dp"
-                android:layout_gravity="start"
-                android:fitsSystemWindows="true"
-                app:headerLayout="@layout/nav_header"
-                app:menu="@menu/navigation_menu"
-                app:itemTextColor="@color/toolBarTextColor"
-            />
+            android:id="@+id/nav_view"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:fitsSystemWindows="true"
+            android:paddingTop="50dp"
+            app:headerLayout="@layout/nav_header"
+            app:itemTextColor="@color/toolBarTextColor"
+            app:menu="@menu/navigation_menu" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
+
     <FrameLayout
         android:id="@+id/tutorialOverlay"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        >
+        android:layout_height="match_parent">
+
         <androidx.viewpager.widget.ViewPager
             android:id="@+id/tutorialViewPager"
-            android:visibility="invisible"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            android:visibility="invisible" />
+
         <LinearLayout
             android:id="@+id/tutorialPips"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_gravity="center|bottom"
             android:layout_marginBottom="40dp"
-            >
+            android:orientation="horizontal">
+
             <ImageView
                 android:id="@+id/pip1"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                app:srcCompat="@drawable/filled_circle"
                 android:tint="@color/ap_white"
-                />
+                app:srcCompat="@drawable/filled_circle"
+                tools:ignore="ContentDescription" />
+
             <ImageView
                 android:id="@+id/pip2"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                app:srcCompat="@drawable/filled_circle"
                 android:tint="@color/ap_white"
-                />
+                app:srcCompat="@drawable/filled_circle"
+                tools:ignore="ContentDescription" />
+
             <ImageView
                 android:id="@+id/pip3"
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                app:srcCompat="@drawable/filled_circle"
                 android:tint="@color/ap_white"
-                />
+                app:srcCompat="@drawable/filled_circle"
+                tools:ignore="ContentDescription" />
         </LinearLayout>
     </FrameLayout>
 </merge>

@@ -27,6 +27,8 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import androidx.navigation.ui.navigateUp
@@ -55,7 +57,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         drawerLayout = findViewById(R.id.drawer_layout)
-        navController = findNavController(R.id.nav_fragment)
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_fragment)!! as NavHostFragment
+        navController = navHostFragment.navController
         appBarConfiguration = AppBarConfiguration(navFragments, drawerLayout)
         navView = findViewById(R.id.nav_view)
         navView.itemIconTintList = null
