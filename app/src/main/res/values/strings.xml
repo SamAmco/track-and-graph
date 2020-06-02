@@ -19,7 +19,6 @@
     <string name="home">Home</string>
     <string name="track_group">Track Group</string>
     <string name="graph_group">Graph Group</string>
-    <string name="track_groups">Track Groups</string>
     <string name="add_track_group">Add A Track Group: </string>
     <string name="add_feature">Track something:</string>
     <string name="add">Add</string>
@@ -45,7 +44,6 @@
     <string name="export_file_name_suffix">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
     <string name="backup_file_name_suffix">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.db</string>
     <string name="discrete_values">Add some choices below.</string>
-    <string name="add_discrete_values_tip">Caution: When graphed over time the index of the choice (on the left) will be used as the Y axis value so make sure you order the choices correctly.</string>
     <string name="feature_name_cannot_be_null">Please add a name</string>
     <string name="feature_with_that_name_exists">You are already tracking something with that name</string>
     <string name="discrete_value_must_have_name">Please make sure all your choices have names</string>
@@ -63,13 +61,11 @@
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
     <string name="graph_type_label">Graph type:</string>
     <string name="maximum_sample_duration">Maximum history:</string>
-    <string name="moving_average_duration">Moving average duration:</string>
     <string name="select_a_discrete_feature">Select a multiple choice data set: </string>
     <string name="no_discrete_features_pie_chart">You can not currently create a pie chart because you are not tracking anything multiple choice.</string>
     <string name="select_a_feature">Select a data set:</string>
     <string name="offset">Offset:</string>
     <string name="scale">Scale:</string>
-    <string name="select_a_value">Select a value:</string>
     <string name="from">From:</string>
     <string name="to">To:</string>
     <string name="select_a_value_range">Select a value range:</string>
@@ -124,24 +120,19 @@
     <string name="import_exception_bad_headers">Import failed: Headers did not match the expected headers: %1$s</string>
     <string name="import_exception_inconsistent_record">Import failed: Record on line %1$s is not consistent with required headers</string>
     <string name="import_exception_bad_timestamp">Import failed: Could not interpret the timestamp for record on line: %1$s</string>
-    <string name="import_exception_invalid_character">Import failed: Detected invalid character: %1$s</string>
     <string name="import_exception_inconsistent_data_type">Import failed: Received inconsistent data type on line: %1$s</string>
     <string name="import_exception_bad_discrete_value">Import failed: Failed to read multiple choice value on line: %1$s</string>
     <string name="import_exception_discrete_value_conflict">Import failed: multiple choice value conflict on line: %1$s</string>
     <string name="import_exception_discrete_value_index_exists">Import failed: Failed to read multiple choice value on line: %1$s, index %2$s already exists</string>
     <string name="import_exception_discrete_value_label_exists">Import failed: Failed to read multiple choice value on line: %1$s, label %2$s exists with a different index</string>
-    <string name="import_exception_not_a_valid_number">Import failed: Failed to read continuous value on line: %1$s</string>
     <string name="import_exception_feature_name_too_long">Import failed: name too long on line: %1$s</string>
     <string name="import_exception_max_discrete_values_reached">Import failed: Max multiple choice values for a feature is: %1$s</string>
 
-    <string name="graph_stat_validation_bad_type">Graph type not set</string>
     <string name="graph_stat_validation_unknown">An unknown error occurred</string>
     <string name="graph_stat_validation_no_name">Please provide a name</string>
     <string name="graph_stat_validation_no_line_graph_features">Please add something to the graph</string>
-    <string name="graph_stat_validation_invalid_value_stat_feature">Please select a valid data set</string>
     <string name="graph_stat_validation_invalid_value_stat_discrete_value">Please select at least one multiple choice answer</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Please make sure that "From" is smaller than or equal to "To"</string>
-    <string name="graph_stat_validation_invalid_pie_chart_feature">Please select a valid pie chart data set</string>
     <string name="graph_stat_validation_unrecognised_color">Please make sure all data sets have a color</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Invalid line graph data set detected</string>
     <string name="graph_stat_validation_bad_fixed_range">Please make sure that "From" is smaller than "To"</string>
@@ -239,10 +230,8 @@
     <string name="reminders_notifications_channel_name">Reminders</string>
     <string name="reminders_notifications_channel_description">User created notifications to remind you when to track</string>
     <string name="default_reminder_name">Time to track!</string>
-    <string name="track">Track</string>
     <string name="range_style">Range style:</string>
 
-    <string name="track_widget_configure_button">Create widget</string>
     <string name="track_widget_configure_no_data_error">Please create a track group and track some data first.</string>
     <string name="track_widget_configure_no_data_selected_error">You must select a valid data set to create a tracking widget.</string>
     <string name="create">Create</string>
@@ -262,15 +251,13 @@
     <string name="backup_error_could_not_find_database_file">Could not find or read database file.</string>
     <string name="backup_error_failed_to_copy_database">Something went wrong while copying the database file.</string>
     <string name="restore_error_failed_to_copy_database">Something went wrong while restoring the database.</string>
-    <string name="restore_successful">Restore Successful!</string>
     <string name="restore_failed">Restore failed. %1$s</string>
     <string name="feature_description_input_hint">Add a longer description (optional)</string>
     <string name="no_data_points_history_fragment_hint">Your tracking history will show up here when you have input some data.</string>
-    <string name="description_colon">Description:</string>
     <string name="info">Info</string>
     <string name="no_description">No description</string>
     <string name="description">Description</string>
-    <string name="note_input_hint">Notes...</string>
+    <string name="note_input_hint">Notes…</string>
     <string name="add_a_note">Add a note</string>
     <string name="notes">Notes</string>
     <string name="faq_text_2_4">There is also a Backup &amp; Restore option in the menu. This will export and restore the entire database file containing all tracked data, graphs, reminders etc. This is an un-encrypted Sqlite3 database file which can also be opened and modified using freely available software. However this is not recommended for non-technical users as you could break the integrity of the database.</string>
