@@ -26,6 +26,7 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -80,20 +81,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initDrawerSpinners() {
-        val themeNames = resources.getStringArray(R.array.theme_names)
+        setUpThemeSpinner()
+    }
+
+    private fun setUpThemeSpinner() {
         val spinner = navView.menu.findItem(R.id.themeSpinner).actionView as AppCompatSpinner
         spinner.adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
-            themeNames
+            getThemeNames()
         )
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+            override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                onThemeSelected(position)
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
+
+    private fun onThemeSelected(position: Int) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            when (position) {
+                0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                3 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+        } else {
+            when (position) {
+                0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
+                2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                3 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            }
+        }
+    }
+
+    private fun getThemeNames() =
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
+            resources.getStringArray(R.array.theme_names_Q)
+        else resources.getStringArray(R.array.theme_names_pre_Q)
 
     private fun onDrawerHideKeyboard() {
         drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {

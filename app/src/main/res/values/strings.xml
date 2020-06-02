@@ -73,7 +73,13 @@
     <string name="days">Days</string>
     <string name="day">Day</string>
 
-    <string-array name="theme_names">
+    <string-array name="theme_names_pre_Q">
+        <item>Set by Battery Saver</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>System Default</item>
         <item>Light</item>
         <item>Dark</item>
     </string-array>
