@@ -17,13 +17,11 @@
   -->
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <!-- Customize your theme here. -->
         <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
         <item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
-        <item name="android:textColor">@color/toolBarTextColor</item>
-        <item name="colorPrimary">@color/toolbarColor</item>
-        <item name="colorPrimaryDark">@color/toolbarColorDark</item>
+        <item name="android:textViewStyle">@style/textViewBaseStyle</item>
         <item name="colorAccent">@color/secondaryColor</item>
         <item name="editTextStyle">@style/EditTextStyle</item>
         <item name="windowActionBar">false</item>
@@ -41,8 +39,15 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
-    <style name="CustomCardViewStyle" parent="CardView.Light">
+    <style name="textViewBaseStyle">
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:textColorPrimary">@color/textColor</item>
+        <item name="android:textColorSecondary">@color/textColor</item>
+    </style>
+
+    <style name="CustomCardViewStyle" parent="CardView">
         <item name="cardBackgroundColor">@color/cardBackgroundColor</item>
+        <item name="android:textColor">@color/textColor</item>
     </style>
 
     <style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
