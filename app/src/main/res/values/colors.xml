@@ -17,10 +17,8 @@
   -->
 <resources>
     <color name="primaryColor">#74add1</color>
-    <color name="primaryLightColor">#a6dfff</color>
     <color name="primaryDarkColor">#427ea0</color>
     <color name="secondaryColor">#f46d43</color>
-    <color name="secondaryLightColor">#ff9e70</color>
     <color name="secondaryDarkColor">#bb3d18</color>
     <color name="toolbarColor">#d3dade</color>
     <color name="toolbarColorDark">#8f979c</color>
