@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of Track & Graph
   ~ 
   ~ Track & Graph is free software: you can redistribute it and/or modify
@@ -21,36 +20,37 @@
         <item
             android:id="@+id/selectGroupFragment"
             android:icon="@drawable/home_menu_icon"
-            android:title="@string/home"
-            />
+            android:title="@string/home" />
         <item
             android:id="@+id/remindersFragment"
             android:icon="@drawable/reminders_icon"
-            android:title="@string/reminders"
-            />
+            android:title="@string/reminders" />
         <item
             android:id="@+id/backupAndRestoreFragment"
             android:icon="@drawable/backup_restore_icon"
-            android:title="@string/backup_and_restore"
-            />
+            android:title="@string/backup_and_restore" />
     </group>
 
     <group android:id="@+id/aboutAndFAQ">
         <item
             android:id="@+id/FAQFragment"
-            android:title="@string/faq"
             android:icon="@drawable/faq_icon"
-            />
+            android:title="@string/faq" />
         <item
             android:id="@+id/rateAppRedirectFragment"
-            android:title="@string/rate_the_app"
             android:icon="@drawable/rate_icon"
-            />
+            android:title="@string/rate_the_app" />
         <item
             android:id="@+id/aboutPageFragment"
-            android:title="@string/about"
             android:icon="@drawable/about_icon"
-            />
+            android:title="@string/about" />
+    </group>
+
+    <group android:id="@+id/settings">
+        <item
+            android:id="@+id/themeSpinner"
+            android:title="@string/theme_colon"
+            app:actionLayout="@layout/navigation_menu_spinner" />
     </group>
 
 </menu>

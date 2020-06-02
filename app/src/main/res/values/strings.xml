@@ -73,6 +73,10 @@
     <string name="days">Days</string>
     <string name="day">Day</string>
 
+    <string-array name="theme_names">
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
     <string-array name="feature_types">
         <item>Multiple choice</item>
         <item>Numerical</item>
@@ -262,5 +266,6 @@
     <string name="notes">Notes</string>
     <string name="faq_text_2_4">There is also a Backup &amp; Restore option in the menu. This will export and restore the entire database file containing all tracked data, graphs, reminders etc. This is an un-encrypted Sqlite3 database file which can also be opened and modified using freely available software. However this is not recommended for non-technical users as you could break the integrity of the database.</string>
     <string name="delete_reminder_content_description">Delete Reminder</string>
+    <string name="theme_colon">Theme:</string>
 
 </resources>
