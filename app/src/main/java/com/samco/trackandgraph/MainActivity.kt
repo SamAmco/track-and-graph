@@ -17,26 +17,29 @@
 package com.samco.trackandgraph
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
@@ -69,23 +72,47 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
 
         onDrawerHideKeyboard()
+        initDrawerSpinners()
         RemindersHelper.syncAlarms(this)
 
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
     }
 
+    private fun initDrawerSpinners() {
+        val themeNames = resources.getStringArray(R.array.theme_names)
+        val spinner = navView.menu.findItem(R.id.themeSpinner).actionView as AppCompatSpinner
+        spinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            themeNames
+        )
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
     private fun onDrawerHideKeyboard() {
-        drawerLayout.addDrawerListener(object: DrawerLayout.DrawerListener{
-            override fun onDrawerStateChanged(newState: Int) { }
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerStateChanged(newState: Int) {}
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                imm.hideSoftInputFromWindow(
+                    window.decorView.windowToken,
+                    InputMethodManager.HIDE_NOT_ALWAYS
+                )
             }
-            override fun onDrawerClosed(drawerView: View) { }
+
+            override fun onDrawerClosed(drawerView: View) {}
             override fun onDrawerOpened(drawerView: View) {
                 val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                imm.hideSoftInputFromWindow(
+                    window.decorView.windowToken,
+                    InputMethodManager.HIDE_NOT_ALWAYS
+                )
             }
         })
     }
@@ -110,9 +137,17 @@ class MainActivity : AppCompatActivity() {
         viewPager.visibility = View.VISIBLE
         viewPager.adapter = TutorialPagerAdapter(applicationContext, this::destroyTutorial)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) { }
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
-            override fun onPageSelected(position: Int) { refreshPips.invoke(position) }
+            override fun onPageScrollStateChanged(state: Int) {}
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+            }
+
+            override fun onPageSelected(position: Int) {
+                refreshPips.invoke(position)
+            }
         })
     }
 
