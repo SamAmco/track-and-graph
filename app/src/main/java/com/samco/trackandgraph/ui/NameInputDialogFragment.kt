@@ -29,6 +29,7 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.util.getColorFromAttr
 
 abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
     private lateinit var editText: EditText
@@ -59,8 +60,10 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             alertDialog = builder.create()
             alertDialog.setOnShowListener {
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(requireContext(), R.color.secondaryColor))
-                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(requireContext(), R.color.toolBarTextColor))
+                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                positiveButton.setTextColor(positiveButton.context.getColorFromAttr(R.attr.colorSecondary))
+                val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                negativeButton.setTextColor(negativeButton.context.getColorFromAttr(R.attr.colorControlNormal))
             }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")

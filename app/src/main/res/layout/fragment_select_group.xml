@@ -21,7 +21,7 @@
             style="@style/EmptyPageHintTextStyle"
             android:alpha="1"
             android:padding="20dp"
-            android:textColor="@color/toolBarTextColor"
+            android:textColor="?attr/colorControlNormal"
             android:text="@string/no_groups_hint"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"

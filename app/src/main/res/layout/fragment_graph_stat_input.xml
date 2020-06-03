@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -32,7 +33,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/input_spacing_large"
-                    android:background="@color/divider" />
+                    android:background="?attr/colorControlHighlight"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/nameLabel"
@@ -47,6 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/graph_name_hint"
+                    android:importantForAutofill="no"
                     android:inputType="text"
                     android:maxLines="2" />
 
@@ -67,7 +70,7 @@
                         android:id="@+id/graphTypeSpinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/dialog_input_spacing"
+                        android:layout_marginStart="@dimen/dialog_input_spacing"
                         android:entries="@array/graph_types"
                         android:focusable="true" />
                 </LinearLayout>
@@ -90,7 +93,7 @@
                         android:id="@+id/sampleDurationSpinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/dialog_input_spacing"
+                        android:layout_marginStart="@dimen/dialog_input_spacing"
                         android:entries="@array/graph_time_durations" />
                 </LinearLayout>
 
@@ -141,8 +144,10 @@
                         android:digits="0123456789.,-"
                         android:gravity="center"
                         android:hint="0"
+                        android:importantForAutofill="no"
                         android:inputType="numberSigned|numberDecimal"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="HardcodedText" />
 
                     <TextView
                         android:id="@+id/yRangeFixedToLabel"
@@ -161,8 +166,10 @@
                         android:digits="0123456789.,-"
                         android:gravity="center"
                         android:hint="0"
+                        android:importantForAutofill="no"
                         android:inputType="numberSigned|numberDecimal"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="HardcodedText" />
                 </LinearLayout>
 
                 <ImageView
@@ -170,7 +177,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/input_spacing_large"
-                    android:background="@color/divider" />
+                    android:background="?attr/colorControlHighlight"
+                    tools:ignore="ContentDescription" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/valueStatInputLayout"
@@ -195,7 +203,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:background="@color/colorShadowButton"
+                        android:background="?attr/colorControlHighlight"
                         android:spinnerMode="dialog"
                         app:layout_constraintLeft_toRightOf="@id/valueStatFeatureLabel"
                         app:layout_constraintRight_toRightOf="parent"
@@ -253,7 +261,7 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dialog_input_spacing"
-                            android:gravity="right"
+                            android:gravity="end"
                             android:paddingBottom="8dp"
                             android:text="@string/from"
                             android:textSize="@dimen/dialog_label_text_size"
@@ -269,12 +277,14 @@
                             android:digits="0123456789.,-"
                             android:gravity="center"
                             android:hint="0"
+                            android:importantForAutofill="no"
                             android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toRightOf="@id/valueStatFromLabel"
                             app:layout_constraintRight_toLeftOf="@id/valueStatToLabel"
-                            app:layout_constraintTop_toTopOf="@id/valueStatFromLabel" />
+                            app:layout_constraintTop_toTopOf="@id/valueStatFromLabel"
+                            tools:ignore="HardcodedText" />
 
                         <TextView
                             android:id="@+id/valueStatToLabel"
@@ -297,12 +307,14 @@
                             android:digits="0123456789.,-"
                             android:gravity="center"
                             android:hint="0"
+                            android:importantForAutofill="no"
                             android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toRightOf="@id/valueStatToLabel"
                             app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintTop_toTopOf="@id/valueStatFromLabel" />
+                            app:layout_constraintTop_toTopOf="@id/valueStatFromLabel"
+                            tools:ignore="HardcodedText" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -341,6 +353,7 @@
                     android:layout_height="match_parent"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:clickable="false"
+                    android:contentDescription="@string/add_line_button_content_description"
                     app:srcCompat="@drawable/add_icon" />
 
             </LinearLayout>
@@ -370,7 +383,8 @@
                 android:layout_height="match_parent"
                 android:clickable="true"
                 android:focusable="true"
-                app:srcCompat="@color/ap_transparent" />
+                app:srcCompat="@color/ap_transparent"
+                tools:ignore="ContentDescription" />
 
             <ProgressBar
                 android:layout_width="wrap_content"

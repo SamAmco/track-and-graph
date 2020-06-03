@@ -67,7 +67,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:text="@string/add"
-                android:textColor="@color/secondaryColor"
+                android:textColor="?attr/colorSecondary"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent" />

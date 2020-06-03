@@ -33,7 +33,7 @@
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_gravity="center"
-                app:srcCompat="@color/primaryColor"
+                app:srcCompat="?attr/colorPrimary"
                 app:layout_constraintLeft_toLeftOf="@id/titleText"
                 app:layout_constraintRight_toRightOf="@id/titleText"
                 app:layout_constraintTop_toBottomOf="@id/titleText"
@@ -51,7 +51,7 @@
                 android:id="@+id/dateButton"
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
-                android:background="@color/colorShadowButton"
+                android:background="?attr/colorControlHighlight"
                 tools:text="02/03/2017" />
 
             <Button
@@ -59,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="35dp"
                 android:layout_marginStart="30dp"
-                android:background="@color/colorShadowButton"
+                android:background="?attr/colorControlHighlight"
                 tools:text="08:22" />
 
         </LinearLayout>
@@ -78,7 +78,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/add_a_note"
-                android:textColor="@color/regularText"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -87,7 +86,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginStart="4dp"
-                android:tint="@color/regularText"
                 app:layout_constraintBottom_toBottomOf="@id/addNoteText"
                 app:layout_constraintLeft_toRightOf="@id/addNoteText"
                 app:layout_constraintTop_toTopOf="@id/addNoteText"

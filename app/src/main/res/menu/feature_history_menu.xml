@@ -20,6 +20,6 @@
     <item android:id="@+id/infoButton"
         android:title="@string/info"
         android:icon="@drawable/about_icon"
-        app:iconTint="@color/toolBarTextColor"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="ifRoom" />
 </menu>

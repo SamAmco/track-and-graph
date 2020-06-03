@@ -17,6 +17,10 @@
 
 package com.samco.trackandgraph.util
 
+import android.content.Context
+import android.util.TypedValue
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import java.lang.NumberFormatException
 
 /**
@@ -49,4 +53,14 @@ fun getDoubleFromText(text: String): Double {
         val after = dotsOnly.substring(lastDot)
         return "$before$after".toDouble()
     } catch (e: NumberFormatException) { return 0.0 }
+}
+
+@ColorInt
+fun Context.getColorFromAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    return typedValue.data
 }

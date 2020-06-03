@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of Track & Graph
+  ~ 
+  ~ Track & Graph is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~ 
+  ~ Track & Graph is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ 
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<resources>
+    <style name="AppTheme" parent="AppThemeBase">
+        <!--COLORS-->
+        <item name="colorAccent">@color/orange</item>
+        <item name="colorPrimary">@color/light_blue</item>
+        <item name="colorPrimaryDark">@color/dark_blue</item>
+        <item name="colorSecondary">@color/orange</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorPrimaryVariant">@color/dark_blue</item>
+        <item name="colorSecondaryVariant">@color/dark_orange</item>
+        <item name="errorTextColor">@color/dark_orange</item>
+        <item name="colorOnError">@color/green</item>
+        <item name="colorControlNormal">@color/blue_black</item>
+        <item name="colorControlHighlight">@color/light_gray</item>
+        <item name="toolbarBackgroundColor">@color/blue_white_pastel</item>
+        <item name="android:textColorSecondary">@color/dark_gray</item>
+        <item name="android:textColorPrimary">@color/blue_black</item>
+    </style>
+</resources>
