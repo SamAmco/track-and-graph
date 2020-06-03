@@ -34,5 +34,6 @@
         <item name="toolbarBackgroundColor">@color/blue_white_pastel</item>
         <item name="android:textColorSecondary">@color/dark_gray</item>
         <item name="android:textColorPrimary">@color/blue_black</item>
+        <item name="android:windowBackground">@color/chalky_white</item>
     </style>
 </resources>

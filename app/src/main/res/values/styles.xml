@@ -16,7 +16,19 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+    <style name="Style.OverflowMenuStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">?attr/colorSurface</item>
+    </style>
+
+    <style name="Style.PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+        <item name="android:popupBackground">?attr/colorSurface</item>
+    </style>
+
+    <style name="Style.CardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+    </style>
+
+    <style name="Style.OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
         <item name="android:tint">?attr/colorControlNormal</item>
     </style>
 
@@ -25,13 +37,13 @@
         <item name="titleTextColor">?attr/colorControlNormal</item>
     </style>
 
-    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
+    <style name="Style.EditTextStyle" parent="Widget.AppCompat.EditText">
         <item name="colorControlActivated">?attr/colorSecondary</item>
         <item name="colorControlHighlight">?attr/colorSecondary</item>
         <item name="backgroundTint">?attr/colorSecondary</item>
     </style>
 
-    <style name="EmptyPageHintTextStyle" parent="Widget.AppCompat.TextView">
+    <style name="Style.EmptyPageHintTextStyle" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">250dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">18sp</item>
@@ -39,7 +51,7 @@
         <item name="android:textAlignment">center</item>
     </style>
 
-    <style name="DataPointInputNumberStyle">
+    <style name="Style.DataPointInputNumberStyle" parent="Widget.AppCompat.EditText">
         <item name="android:gravity">center</item>
         <item name="android:inputType">numberDecimal|numberSigned</item>
         <item name="android:singleLine">true</item>
@@ -47,14 +59,14 @@
         <item name="android:hint">0</item>
     </style>
 
-    <style name="DiscreteValueButtonsScrollViewStyle">
+    <style name="Style.DiscreteValueButtonsScrollViewStyle" parent="">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">80dp</item>
         <item name="android:scrollbars">none</item>
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
 
-    <style name="ExpansiveTextInputStyle">
+    <style name="Style.ExpansiveTextInputStyle" parent="Widget.AppCompat.EditText">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:padding">12dp</item>
@@ -62,5 +74,4 @@
         <item name="backgroundTint">@null</item>
         <item name="android:inputType">textMultiLine|textAutoCorrect|textCapSentences</item>
     </style>
-
 </resources>

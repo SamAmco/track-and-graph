@@ -18,7 +18,7 @@
 
         <TextView
             android:id="@+id/noDataPointsHintText"
-            style="@style/EmptyPageHintTextStyle"
+            style="@style/Style.EmptyPageHintTextStyle"
             android:layout_gravity="center"
             android:layout_marginTop="@dimen/input_spacing_large"
             android:text="@string/no_data_points_history_fragment_hint" />

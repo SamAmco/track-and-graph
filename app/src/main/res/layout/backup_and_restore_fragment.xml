@@ -19,7 +19,7 @@
                 android:orientation="vertical">
 
                 <TextView
-                    style="@style/EmptyPageHintTextStyle"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/input_spacing_large"
@@ -43,7 +43,7 @@
                     android:layout_marginStart="@dimen/input_spacing_large"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginEnd="@dimen/input_spacing_large"
-                    style="@style/EmptyPageHintTextStyle"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:textStyle="bold"
                     tools:textColor="?attr/errorTextColor"
                     tools:text="Some error that goes on for a really long time and even longer" />
@@ -57,7 +57,7 @@
                     tools:ignore="ContentDescription" />
 
                 <TextView
-                    style="@style/EmptyPageHintTextStyle"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/input_spacing_large"
@@ -81,7 +81,7 @@
                     android:layout_marginStart="@dimen/input_spacing_large"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginEnd="@dimen/input_spacing_large"
-                    style="@style/EmptyPageHintTextStyle"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:textStyle="bold"
                     tools:textColor="?attr/errorTextColor"
                     tools:text="Some error that goes on for a really long time and even longer" />

@@ -227,7 +227,7 @@
                             android:textSize="@dimen/dialog_label_text_size" />
 
                         <HorizontalScrollView
-                            style="@style/DiscreteValueButtonsScrollViewStyle"
+                            style="@style/Style.DiscreteValueButtonsScrollViewStyle"
                             android:layout_marginTop="@dimen/dialog_input_spacing">
 
                             <LinearLayout

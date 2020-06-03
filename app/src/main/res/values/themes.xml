@@ -17,12 +17,17 @@
   -->
 <resources>
     <style name="AppThemeBase" parent="Theme.AppCompat.DayNight">
-        <item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
-        <item name="editTextStyle">@style/EditTextStyle</item>
+        <item name="android:actionOverflowButtonStyle">@style/Style.OverflowButtonStyle</item>
+        <item name="popupMenuStyle">@style/Style.PopupMenuStyle</item>
+        <item name="actionOverflowMenuStyle">@style/Style.OverflowMenuStyle</item>
+        <item name="editTextStyle">@style/Style.EditTextStyle</item>
+        <item name="dialogTheme">@style/Theme.DialogTheme</item>
+        <item name="cardViewStyle">@style/Style.CardViewStyle</item>
+        <item name="alertDialogTheme">@style/Theme.AlertDialogTheme</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">@color/chalky_white</item>
     </style>
+
     <!-- Base application theme. -->
     <style name="AppTheme" parent="AppThemeBase">
         <!--COLORS-->
@@ -42,6 +47,7 @@
         <item name="toolbarBackgroundColor">@color/blue_white_pastel</item>
         <item name="android:textColorSecondary">@color/dark_gray</item>
         <item name="android:textColorPrimary">@color/blue_black</item>
+        <item name="android:windowBackground">@color/chalky_white</item>
     </style>
 
     <style name="TransparentTheme" parent="AppTheme">
@@ -51,5 +57,13 @@
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowIsFloating">true</item>
         <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="Theme.DialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style name="Theme.AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="android:background">?attr/colorSurface</item>
     </style>
 </resources>

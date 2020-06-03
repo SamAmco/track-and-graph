@@ -19,7 +19,7 @@
 
         <TextView
             android:id="@+id/noRemindersHintText"
-            style="@style/EmptyPageHintTextStyle"
+            style="@style/Style.EmptyPageHintTextStyle"
             android:text="@string/no_reminders_hint"
             android:visibility="gone"
             app:layout_constraintRight_toRightOf="parent"
