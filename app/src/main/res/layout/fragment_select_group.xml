@@ -18,7 +18,7 @@
 
         <TextView
             android:id="@+id/noGroupsHintText"
-            style="@style/EmptyPageHintTextStyle"
+            style="@style/Style.EmptyPageHintTextStyle"
             android:alpha="1"
             android:padding="20dp"
             android:textColor="?attr/colorControlNormal"

@@ -54,7 +54,7 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
             editText.addTextChangedListener(this)
             editText.filters = arrayOf(InputFilter.LengthFilter(getMaxChars()))
             view.findViewById<TextView>(R.id.prompt_text).text = getTitleText()
-            var builder = AlertDialog.Builder(it)
+            var builder = AlertDialog.Builder(it, R.style.Theme_AlertDialogTheme)
             builder.setView(view)
                 .setPositiveButton(getPositiveButtonName()) { _, _ -> onPositiveClicked(editText.text.toString()) }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }

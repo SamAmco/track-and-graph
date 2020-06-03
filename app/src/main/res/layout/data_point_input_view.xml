@@ -95,7 +95,7 @@
 
         <EditText
             android:id="@+id/noteInputText"
-            style="@style/ExpansiveTextInputStyle"
+            style="@style/Style.ExpansiveTextInputStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/input_spacing_large"
