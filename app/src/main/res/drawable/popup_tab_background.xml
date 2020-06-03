@@ -17,7 +17,7 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item>
         <shape>
-            <solid android:color="@color/shadow_drop" />
+            <solid android:color="?attr/colorControlHighlight" />
             <corners
                 android:bottomLeftRadius="0dp"
                 android:bottomRightRadius="0dp"
@@ -28,7 +28,7 @@
     </item>
     <item android:top="1dp">
         <shape>
-            <solid android:color="@color/cardBackgroundColor" />
+            <solid android:color="?attr/colorSurface" />
             <corners
                 android:bottomLeftRadius="0dp"
                 android:bottomRightRadius="0dp"

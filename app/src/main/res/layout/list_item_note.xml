@@ -32,7 +32,7 @@
                     android:ellipsize="end"
                     android:gravity="center"
                     android:maxLines="1"
-                    android:textColor="@color/disabledTextColor"
+                    android:textColor="?android:attr/textColorSecondary"
                     android:textStyle="italic|bold"
                     tools:text="01/02/19  08:16" />
 
@@ -44,7 +44,7 @@
                     android:ellipsize="end"
                     android:singleLine="true"
                     android:textAlignment="textEnd"
-                    android:textColor="@color/disabledTextColor"
+                    android:textColor="?android:attr/textColorSecondary"
                     tools:text="track group -> feature name" />
 
 
@@ -57,7 +57,7 @@
                 android:layout_marginTop="@dimen/dialog_input_spacing"
                 android:ellipsize="end"
                 android:maxLines="1"
-                android:textColor="@color/disabledTextColor"
+                android:textColor="?android:attr/textColorSecondary"
                 android:textStyle="bold"
                 tools:text="22: Some multiple choice answer name" />
 
@@ -68,7 +68,7 @@
                 android:layout_marginTop="@dimen/dialog_input_spacing"
                 android:ellipsize="end"
                 android:maxLines="3"
-                android:textColor="@color/disabledTextColor"
+                android:textColor="?android:attr/textColorSecondary"
                 tools:text="Notes and\ntoo many lines \nsome more notes" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

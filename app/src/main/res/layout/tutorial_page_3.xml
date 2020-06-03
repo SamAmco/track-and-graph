@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/secondaryColor">
+    android:background="@color/orange">
 
     <TextView
         android:id="@+id/text"
@@ -12,49 +13,47 @@
         android:layout_marginLeft="40dp"
         android:layout_marginTop="100dp"
         android:layout_marginRight="40dp"
-        android:paddingBottom="30dp"
         android:lineSpacingExtra="5dp"
+        android:paddingBottom="30dp"
         android:text="@string/tutorial_text_3"
-        android:textColor="@color/toolBarTextColor"
         android:textAlignment="center"
+        android:textColor="@color/blue_black"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@id/image"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        app:layout_constraintVertical_chainStyle="packed"
-        />
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <ImageView
         android:id="@+id/image"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="80dp"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:scaleType="fitCenter"
+        android:layout_marginBottom="80dp"
         android:adjustViewBounds="true"
-        app:srcCompat="@drawable/tutorial_image_3"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        />
+        app:srcCompat="@drawable/tutorial_image_3"
+        tools:ignore="ContentDescription" />
 
     <Button
         android:id="@+id/closeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/got_it"
-        android:textColor="@color/toolBarTextColor"
-        android:layout_gravity="bottom|right"
-        android:layout_marginRight="30dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="30dp"
         android:layout_marginBottom="20dp"
         android:background="@color/ap_transparent"
-        app:layout_constraintRight_toRightOf="parent"
+        android:text="@string/got_it"
+        android:textColor="@color/blue_black"
         app:layout_constraintBottom_toBottomOf="parent"
-        />
+        app:layout_constraintRight_toRightOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

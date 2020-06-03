@@ -32,7 +32,7 @@
                     android:padding="@dimen/card_padding"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dialog_header_top_margin"
-                    android:background="@color/colorShadowButton"
+                    android:background="?attr/colorControlHighlight"
                     android:textAllCaps="false"
                     android:ellipsize="start"
                     android:singleLine="true"

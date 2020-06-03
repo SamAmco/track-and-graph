@@ -56,7 +56,7 @@
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:layout_marginStart="5dp"
-                        android:gravity="left|center"
+                        android:gravity="start|center"
                         android:text="@{feature.getDisplayTimestamp() != null ? feature.getDisplayTimestamp() : @string/no_data}"
                         android:textSize="14sp"
                         app:layout_constraintBottom_toTopOf="@id/divider"
@@ -69,14 +69,15 @@
                         android:id="@+id/historyIcon"
                         android:layout_width="@dimen/feature_history_button_size"
                         android:layout_height="0dp"
-                        android:layout_gravity="bottom|right"
+                        android:layout_gravity="bottom|end"
                         android:alpha="0.55"
                         android:background="@null"
                         android:scaleType="fitCenter"
                         app:layout_constraintBottom_toTopOf="@id/divider"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/trackGroupNameText"
-                        app:srcCompat="@drawable/history" />
+                        app:srcCompat="@drawable/history"
+                        android:contentDescription="@string/tracked_data_history_button_content_description" />
 
                     <ImageView
                         android:id="@+id/divider"
@@ -85,13 +86,14 @@
                         android:layout_marginTop="5dp"
                         android:layout_marginBottom="5dp"
                         app:layout_constraintBottom_toTopOf="@id/numEntriesText"
-                        app:srcCompat="@color/secondaryColor" />
+                        app:srcCompat="?attr/colorSecondary"
+                        tools:ignore="ContentDescription" />
 
                     <TextView
                         android:id="@+id/numEntriesText"
                         android:layout_width="0dp"
                         android:layout_height="35dp"
-                        android:gravity="center|left"
+                        android:gravity="center|start"
                         android:lines="1"
                         android:text="@{feature.numDataPoints != null ? String.format(@string/data_points, feature.numDataPoints) : @string/no_data}"
                         android:textSize="14sp"
@@ -110,8 +112,9 @@
             android:id="@+id/menuButton"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:layout_gravity="top|right"
+            android:layout_gravity="top|end"
             android:background="#00FFFFFF"
+            android:contentDescription="@string/tracked_data_menu_button_content_description"
             android:padding="8dp"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/list_menu_icon" />
@@ -120,28 +123,30 @@
             android:id="@+id/addButton"
             android:layout_width="55dp"
             android:layout_height="55dp"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="bottom|end"
             android:background="@null"
-            android:paddingLeft="3dp"
+            android:contentDescription="@string/add_data_point_button_content_description"
+            android:paddingStart="3dp"
             android:paddingTop="3dp"
-            android:paddingRight="10dp"
+            android:paddingEnd="10dp"
             android:paddingBottom="10dp"
             android:scaleType="fitXY"
-            android:tint="@color/toolBarTextColor"
+            android:tint="?attr/colorControlNormal"
             app:srcCompat="@drawable/add_box" />
 
         <ImageButton
             android:id="@+id/quickAddButton"
             android:layout_width="55dp"
             android:layout_height="55dp"
-            android:layout_gravity="bottom|right"
+            android:layout_gravity="bottom|end"
             android:background="@null"
-            android:paddingLeft="3dp"
+            android:contentDescription="@string/add_data_point_button_content_description"
+            android:paddingStart="3dp"
             android:paddingTop="3dp"
-            android:paddingRight="10dp"
+            android:paddingEnd="10dp"
             android:paddingBottom="10dp"
             android:scaleType="fitXY"
-            android:tint="@color/primaryColor"
+            android:tint="?attr/colorPrimary"
             app:srcCompat="@drawable/add_box" />
     </FrameLayout>
 </layout>

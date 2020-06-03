@@ -21,10 +21,9 @@
 
                 <androidx.appcompat.widget.Toolbar
                     android:id="@+id/toolbar"
+                    style="@style/Style.Toolbar"
                     android:layout_width="match_parent"
-                    android:layout_height="?attr/actionBarSize"
-                    android:background="@color/toolbarColor"
-                    app:titleTextColor="@color/toolBarTextColor" />
+                    android:layout_height="?attr/actionBarSize" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -46,7 +45,7 @@
             android:fitsSystemWindows="true"
             android:paddingTop="50dp"
             app:headerLayout="@layout/nav_header"
-            app:itemTextColor="@color/toolBarTextColor"
+            app:itemTextColor="?attr/colorControlNormal"
             app:menu="@menu/navigation_menu" />
 
     </androidx.drawerlayout.widget.DrawerLayout>

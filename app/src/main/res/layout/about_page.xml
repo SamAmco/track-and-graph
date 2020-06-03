@@ -1,48 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <ScrollView
+
+    <ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto">
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingBottom="40dp"
-            >
+            android:paddingBottom="40dp">
+
             <TextView
                 android:id="@+id/versionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
                 android:layout_gravity="bottom|right"
-                tools:text="v0.0.0"
-                />
+                android:layout_margin="4dp"
+                tools:text="v0.0.0" />
+
             <androidx.cardview.widget.CardView
                 android:layout_width="80dp"
                 android:layout_height="80dp"
-                android:layout_marginTop="50dp"
                 android:layout_gravity="center"
-                app:cardElevation="0dp"
+                android:layout_marginTop="50dp"
                 app:cardCornerRadius="8dp"
-                >
+                app:cardElevation="0dp">
+
                 <ImageView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    app:srcCompat="@drawable/app_icon"
-                    />
+                    app:srcCompat="@drawable/app_icon" />
             </androidx.cardview.widget.CardView>
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
                 android:layout_marginLeft="10dp"
+                android:layout_marginTop="50dp"
                 android:layout_marginRight="10dp"
                 android:text="@string/about_description"
-                android:textSize="20sp"
                 android:textAlignment="center"
-                />
+                android:textSize="20sp" />
+
             <Button
                 android:id="@+id/githubLinkButton"
                 android:layout_width="match_parent"
@@ -50,84 +51,83 @@
                 android:background="@color/ap_transparent"
                 android:text="@string/github_link_friendly"
                 android:textAllCaps="false"
-                android:textColor="@color/primaryColor"
-                android:textSize="16sp"
-                />
+                android:textColor="?attr/colorPrimary"
+                android:textSize="16sp" />
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="50dp"
-                android:text="@string/about_libraries_message"
                 android:layout_marginLeft="20dp"
+                android:layout_marginTop="50dp"
                 android:layout_marginRight="20dp"
-                android:textSize="16sp"
+                android:text="@string/about_libraries_message"
                 android:textAlignment="center"
-                />
+                android:textSize="16sp" />
+
             <GridLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="40dp"
                 android:layout_gravity="center"
-                android:columnCount="2"
-                >
+                android:layout_marginTop="40dp"
+                android:columnCount="2">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
-                    android:text="@string/androidplot"
-                    />
+                    android:text="@string/androidplot" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_columnSpan="1"
                     android:layout_marginLeft="40dp"
-                    android:layout_columnSpan="1"
-                    android:text="@string/apache_2_0"
-                    />
+                    android:text="@string/apache_2_0" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:layout_columnSpan="1"
-                    android:text="@string/apache_commons_csv"
-                    />
+                    android:layout_marginTop="5dp"
+                    android:text="@string/apache_commons_csv" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_columnSpan="1"
                     android:layout_marginLeft="40dp"
-                    android:layout_columnSpan="1"
-                    android:text="@string/apache_2_0"
-                    />
+                    android:layout_marginTop="5dp"
+                    android:text="@string/apache_2_0" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:layout_columnSpan="1"
-                    android:text="@string/three_ten_android_backport"
-                    />
+                    android:layout_marginTop="5dp"
+                    android:text="@string/three_ten_android_backport" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_columnSpan="1"
                     android:layout_marginLeft="40dp"
-                    android:layout_columnSpan="1"
-                    android:text="@string/apache_2_0"
-                    />
+                    android:layout_marginTop="5dp"
+                    android:text="@string/apache_2_0" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
                     android:layout_columnSpan="1"
-                    android:text="@string/timber"
-                    />
+                    android:layout_marginTop="5dp"
+                    android:text="@string/timber" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
+                    android:layout_columnSpan="1"
                     android:layout_marginLeft="40dp"
-                    android:layout_columnSpan="1"
-                    android:text="@string/apache_2_0"
-                    />
+                    android:layout_marginTop="5dp"
+                    android:text="@string/apache_2_0" />
             </GridLayout>
         </LinearLayout>
     </ScrollView>

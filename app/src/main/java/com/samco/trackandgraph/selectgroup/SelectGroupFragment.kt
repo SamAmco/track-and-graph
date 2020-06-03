@@ -34,6 +34,7 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentSelectGroupBinding
 import com.samco.trackandgraph.ui.RenameGroupDialogFragment
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
+import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 
@@ -67,8 +68,8 @@ class SelectGroupFragment : Fragment(),
                 this::onRenameClicked,
                 this::onDeleteClicked
             ),
-            getColor(requireContext(), R.color.primaryColor),
-            getColor(requireContext(), R.color.secondaryColor)
+            binding.groupList.context.getColorFromAttr(R.attr.colorPrimary),
+            binding.groupList.context.getColorFromAttr(R.attr.colorSecondary)
         )
         binding.groupList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.groupList)

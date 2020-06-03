@@ -16,52 +16,19 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
-        <!-- Customize your theme here. -->
-        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-        <item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
-        <item name="android:textViewStyle">@style/textViewBaseStyle</item>
-        <item name="colorAccent">@color/secondaryColor</item>
-        <item name="editTextStyle">@style/EditTextStyle</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">@color/backgroundColor</item>
-        <item name="cardViewStyle">@style/CustomCardViewStyle</item>
-    </style>
-
-    <style name="TransparentTheme" parent="AppTheme">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
-    </style>
-
-    <style name="textViewBaseStyle">
-        <item name="android:textColor">@color/textColor</item>
-        <item name="android:textColorPrimary">@color/textColor</item>
-        <item name="android:textColorSecondary">@color/textColor</item>
-    </style>
-
-    <style name="CustomCardViewStyle" parent="CardView">
-        <item name="cardBackgroundColor">@color/cardBackgroundColor</item>
-        <item name="android:textColor">@color/textColor</item>
-    </style>
-
     <style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-        <item name="android:tint">@color/toolBarTextColor</item>
+        <item name="android:tint">?attr/colorControlNormal</item>
     </style>
 
-    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/toolBarTextColor</item>
+    <style name="Style.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/toolbarBackgroundColor</item>
+        <item name="titleTextColor">?attr/colorControlNormal</item>
     </style>
 
     <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="colorControlActivated">@color/secondaryColor</item>
-        <item name="colorControlHighlight">@color/secondaryColor</item>
-        <item name="backgroundTint">@color/secondaryColor</item>
+        <item name="colorControlActivated">?attr/colorSecondary</item>
+        <item name="colorControlHighlight">?attr/colorSecondary</item>
+        <item name="backgroundTint">?attr/colorSecondary</item>
     </style>
 
     <style name="EmptyPageHintTextStyle" parent="Widget.AppCompat.TextView">

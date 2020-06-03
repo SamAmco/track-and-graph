@@ -16,7 +16,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/dialog_label_text_size"
-                    android:textColor="@color/errorText"
+                    android:textColor="?attr/errorTextColor"
                     android:gravity="center_vertical"
                     android:padding="8dp"
                     app:layout_constraintLeft_toLeftOf="parent"

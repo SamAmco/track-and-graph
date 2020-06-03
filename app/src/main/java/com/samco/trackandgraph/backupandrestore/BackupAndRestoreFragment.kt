@@ -16,6 +16,7 @@ import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
+import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import java.io.File
@@ -62,10 +63,9 @@ class BackupAndRestoreFragment : Fragment() {
     private fun listenToRestoreResult() {
         viewModel.restoreResult.observe(viewLifecycleOwner, Observer {
             when (it) {
-                //TODO we should probably inform the user we're going to restart the app
                 true -> restartApp()
                 false -> {
-                    val color = ContextCompat.getColor(requireContext(), R.color.errorText)
+                    val color = binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.restoreFeedbackText.setTextColor(color)
                     val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
                     binding.restoreFeedbackText.text = getString(R.string.restore_failed, errorText)
@@ -78,12 +78,12 @@ class BackupAndRestoreFragment : Fragment() {
         viewModel.backupResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 true -> {
-                    val color = ContextCompat.getColor(requireContext(), R.color.successTextColor)
+                    val color = binding.backupFeedbackText.context.getColorFromAttr(R.attr.colorOnError)
                     binding.backupFeedbackText.setTextColor(color)
                     binding.backupFeedbackText.text = getString(R.string.backup_successful)
                 }
                 false -> {
-                    val color = ContextCompat.getColor(requireContext(), R.color.errorText)
+                    val color = binding.backupFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.backupFeedbackText.setTextColor(color)
                     val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
                     binding.backupFeedbackText.text = getString(R.string.backup_failed, errorText)
