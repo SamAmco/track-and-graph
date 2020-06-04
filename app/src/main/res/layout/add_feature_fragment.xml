@@ -76,11 +76,11 @@
 
                 <ImageButton
                     android:id="@+id/addDiscreteValueButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/Style.AddBarButton"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginBottom="@dimen/dialog_input_spacing"
-                    app:srcCompat="@drawable/add_icon" />
+                    app:srcCompat="@drawable/add_icon"
+                    android:contentDescription="@string/add_multiple_choice_answer_button_content_description" />
 
                 <CheckBox
                     android:id="@+id/hasDefaultValueCheckbox"

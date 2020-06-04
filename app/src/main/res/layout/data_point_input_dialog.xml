@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <ScrollView
-        android:theme="@style/Theme.DialogTheme"
+        android:theme="@style/AppTheme.DialogTheme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

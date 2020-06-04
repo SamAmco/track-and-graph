@@ -71,7 +71,7 @@ class ExportFeaturesDialog : DialogFragment() {
             fileButton.text = getString(R.string.select_file)
             fileButton.setTextColor(fileButton.context.getColorFromAttr(R.attr.colorError))
 
-            val builder = AlertDialog.Builder(it)
+            val builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setView(view)
                 .setPositiveButton(R.string.exportButton) { _, _ -> run {} }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }

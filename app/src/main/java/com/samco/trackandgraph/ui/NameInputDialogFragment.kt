@@ -25,7 +25,6 @@ import android.text.TextWatcher
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
@@ -54,7 +53,7 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
             editText.addTextChangedListener(this)
             editText.filters = arrayOf(InputFilter.LengthFilter(getMaxChars()))
             view.findViewById<TextView>(R.id.prompt_text).text = getTitleText()
-            var builder = AlertDialog.Builder(it, R.style.Theme_AlertDialogTheme)
+            var builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setView(view)
                 .setPositiveButton(getPositiveButtonName()) { _, _ -> onPositiveClicked(editText.text.toString()) }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }

@@ -349,9 +349,9 @@
 
                 <ImageButton
                     android:id="@+id/addFeatureButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    style="@style/Style.AddBarButton"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:layout_marginBottom="@dimen/dialog_input_spacing"
                     android:clickable="false"
                     android:contentDescription="@string/add_line_button_content_description"
                     app:srcCompat="@drawable/add_icon" />

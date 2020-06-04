@@ -37,7 +37,7 @@ class YesCancelDialogFragment : DialogFragment() {
         title = arguments?.getString("title") ?: ""
         return activity?.let {
             listener = parentFragment as YesCancelDialogListener
-            var builder = AlertDialog.Builder(it)
+            var builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setMessage(title)
                 .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this) }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }

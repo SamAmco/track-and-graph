@@ -32,7 +32,6 @@
                     android:id="@+id/backupButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorControlHighlight"
                     android:padding="@dimen/dialog_input_spacing"
                     android:text="@string/backup_data" />
 
@@ -70,7 +69,6 @@
                     android:id="@+id/restoreButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="?attr/colorControlHighlight"
                     android:padding="@dimen/dialog_input_spacing"
                     android:text="@string/restore_data" />
 
