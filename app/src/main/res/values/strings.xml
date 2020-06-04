@@ -280,5 +280,6 @@
     <string name="delete_data_point_button_content_description">Delete data point button</string>
     <string name="edit_data_point_button_content_description">Edit data point button</string>
     <string name="add_line_button_content_description">Add line button</string>
+    <string name="add_multiple_choice_answer_button_content_description">Add multiple choice answer button</string>
 
 </resources>

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of Track & Graph
   ~ 
   ~ Track & Graph is free software: you can redistribute it and/or modify
@@ -16,11 +15,23 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <style name="Style.OverflowMenuStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
-        <item name="android:popupBackground">?attr/colorSurface</item>
+
+    <style name="Style.AddBarButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:background">?attr/colorControlHighlight</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="tint">?attr/colorControlNormal</item>
+        <item name="android:layout_marginStart">50dp</item>
+        <item name="android:layout_marginEnd">50dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">30dp</item>
     </style>
 
-    <style name="Style.PopupMenuStyle" parent="Widget.AppCompat.PopupMenu">
+    <style name="Style.ButtonStyle" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorControlHighlight">?attr/colorControlHighlight</item>
+        <item name="colorControlNormal">?attr/colorAccent</item>
+    </style>
+
+    <style name="Style.OverflowMenuStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
         <item name="android:popupBackground">?attr/colorSurface</item>
     </style>
 

@@ -36,4 +36,14 @@
         <item name="android:textColorPrimary">@color/blue_black</item>
         <item name="android:windowBackground">@color/chalky_white</item>
     </style>
+
+    <style name="AppTheme.DialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
+        <item name="android:background">?attr/colorSurface</item>
+        <item name="colorAccent">@color/orange</item>
+    </style>
+
+    <style name="AppTheme.AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="android:background">?attr/colorSurface</item>
+        <item name="colorAccent">@color/orange</item>
+    </style>
 </resources>
