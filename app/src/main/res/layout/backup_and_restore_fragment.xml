@@ -26,6 +26,7 @@
                     android:layout_marginEnd="@dimen/input_spacing_large"
                     android:layout_marginBottom="@dimen/dialog_input_spacing"
                     android:text="@string/backup_hint_text"
+                    android:textAppearance="@style/TextAppearance.Body"
                     android:textAlignment="textStart" />
 
                 <Button
@@ -63,6 +64,7 @@
                     android:layout_marginEnd="@dimen/input_spacing_large"
                     android:layout_marginBottom="@dimen/dialog_input_spacing"
                     android:text="@string/restore_hint_text"
+                    android:textAppearance="@style/TextAppearance.Body"
                     android:textAlignment="textStart" />
 
                 <Button

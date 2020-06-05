@@ -15,7 +15,6 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-
     <style name="Style.AddBarButton" parent="Widget.AppCompat.Button.Colored">
         <item name="android:background">?attr/colorControlHighlight</item>
         <item name="android:foreground">?attr/selectableItemBackground</item>
@@ -57,7 +56,7 @@
     <style name="Style.EmptyPageHintTextStyle" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">250dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Subtitle2</item>
         <item name="android:alpha">0.6</item>
         <item name="android:textAlignment">center</item>
     </style>

@@ -6,7 +6,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="@dimen/card_padding"
-        android:theme="@style/AppTheme.DialogTheme">
+        android:theme="@style/AppTheme.AlertDialogTheme">
 
         <TextView
             android:id="@+id/featureTypeLabel"
@@ -14,7 +14,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/input_spacing_large"
             android:text="@string/select_a_feature"
-            android:textSize="@dimen/dialog_header_size" />
+            android:textAppearance="@style/TextAppearance.Headline6" />
 
         <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/featureSpinner"

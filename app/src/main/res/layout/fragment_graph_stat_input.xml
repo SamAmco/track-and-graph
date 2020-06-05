@@ -42,7 +42,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/input_spacing_large"
                     android:text="@string/new_name"
-                    android:textSize="@dimen/dialog_label_text_size" />
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <EditText
                     android:id="@+id/graphStatNameInput"
@@ -64,7 +64,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/graph_type_label"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <Spinner
                         android:id="@+id/graphTypeSpinner"
@@ -87,7 +87,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/maximum_sample_duration"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <Spinner
                         android:id="@+id/sampleDurationSpinner"
@@ -110,7 +110,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:text="@string/range_style"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <Spinner
                         android:id="@+id/yRangeStyleSpinner"
@@ -134,7 +134,7 @@
                         android:layout_gravity="center_vertical"
                         android:gravity="center_vertical"
                         android:text="@string/from"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <EditText
                         android:id="@+id/yRangeFrom"
@@ -156,7 +156,7 @@
                         android:layout_gravity="center_vertical"
                         android:gravity="center_vertical"
                         android:text="@string/to"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <EditText
                         android:id="@+id/yRangeTo"
@@ -192,7 +192,7 @@
                         android:layout_height="0dp"
                         android:gravity="center"
                         android:text="@string/select_a_feature"
-                        android:textSize="@dimen/dialog_label_text_size"
+                        android:textAppearance="@style/TextAppearance.Body"
                         app:layout_constraintBottom_toBottomOf="@id/valueStatFeatureSpinner"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/valueStatFeatureSpinner"
@@ -224,7 +224,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/check_all_relevant_values"
-                            android:textSize="@dimen/dialog_label_text_size" />
+                            android:textAppearance="@style/TextAppearance.Body" />
 
                         <HorizontalScrollView
                             style="@style/Style.DiscreteValueButtonsScrollViewStyle"
@@ -252,7 +252,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/select_a_value_range"
-                            android:textSize="@dimen/dialog_label_text_size"
+                            android:textAppearance="@style/TextAppearance.Body"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -264,7 +264,7 @@
                             android:gravity="end"
                             android:paddingBottom="8dp"
                             android:text="@string/from"
-                            android:textSize="@dimen/dialog_label_text_size"
+                            android:textAppearance="@style/TextAppearance.Body"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintRight_toLeftOf="@id/valueStatFromInput"
@@ -294,7 +294,7 @@
                             android:gravity="end"
                             android:paddingBottom="8dp"
                             android:text="@string/to"
-                            android:textSize="@dimen/dialog_label_text_size"
+                            android:textAppearance="@style/TextAppearance.Body"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toRightOf="@id/valueStatFromInput"
                             app:layout_constraintRight_toLeftOf="@id/valueStatToInput"
@@ -330,7 +330,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/select_a_discrete_feature"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <Spinner
                         android:id="@+id/pieChartFeatureSpinner"

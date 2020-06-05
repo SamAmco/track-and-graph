@@ -29,7 +29,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:padding="@dimen/card_padding"
-                    android:textSize="20sp"
+                    android:textAppearance="@style/TextAppearance.Headline6"
                     tools:text="Group Name that spans over two lines eventually" />
 
                 <ImageView

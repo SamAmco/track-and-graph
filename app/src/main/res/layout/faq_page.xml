@@ -1,87 +1,88 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/ap_white"
-        >
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/faq1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/faq_1"
             android:padding="20dp"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            />
+            android:text="@string/faq_1"
+            android:textAppearance="@style/TextAppearance.Subtitle2"
+            android:textStyle="bold" />
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
             app:srcCompat="@drawable/left_to_right_gradient"
-            />
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/faq2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/faq_2"
             android:padding="20dp"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            />
+            android:text="@string/faq_2"
+            android:textAppearance="@style/TextAppearance.Subtitle2"
+            android:textStyle="bold" />
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
             app:srcCompat="@drawable/left_to_right_gradient"
-            />
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/faq3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/faq_3"
             android:padding="20dp"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            />
+            android:text="@string/faq_3"
+            android:textAppearance="@style/TextAppearance.Subtitle2"
+            android:textStyle="bold" />
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
             app:srcCompat="@drawable/left_to_right_gradient"
-            />
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/faq4"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/faq_4"
             android:padding="20dp"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            />
+            android:text="@string/faq_4"
+            android:textAppearance="@style/TextAppearance.Subtitle2"
+            android:textStyle="bold" />
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
             app:srcCompat="@drawable/left_to_right_gradient"
-            />
+            tools:ignore="ContentDescription" />
 
         <TextView
             android:id="@+id/faq5"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/faq_5"
             android:padding="20dp"
-            android:textStyle="bold"
-            android:textSize="16sp"
-            />
+            android:text="@string/faq_5"
+            android:textAppearance="@style/TextAppearance.Subtitle2"
+            android:textStyle="bold" />
+
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="1dp"
             app:srcCompat="@drawable/left_to_right_gradient"
-            />
+            tools:ignore="ContentDescription" />
 
     </LinearLayout>
 </layout>

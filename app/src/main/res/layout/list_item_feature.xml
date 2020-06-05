@@ -46,7 +46,7 @@
                         android:gravity="center"
                         android:maxHeight="70dp"
                         android:text="@{feature.name}"
-                        android:textSize="@dimen/track_card_title_size"
+                        android:textAppearance="@style/TextAppearance.Headline5"
                         android:textStyle="bold"
                         app:layout_constraintTop_toTopOf="parent"
                         tools:text="Some name" />
@@ -58,7 +58,7 @@
                         android:layout_marginStart="5dp"
                         android:gravity="start|center"
                         android:text="@{feature.getDisplayTimestamp() != null ? feature.getDisplayTimestamp() : @string/no_data}"
-                        android:textSize="14sp"
+                        android:textAppearance="@style/TextAppearance.Body"
                         app:layout_constraintBottom_toTopOf="@id/divider"
                         app:layout_constraintLeft_toRightOf="@id/historyIcon"
                         app:layout_constraintRight_toRightOf="parent"
@@ -67,7 +67,7 @@
 
                     <ImageView
                         android:id="@+id/historyIcon"
-                        android:layout_width="@dimen/feature_history_button_size"
+                        android:layout_width="28dp"
                         android:layout_height="0dp"
                         android:layout_gravity="bottom|end"
                         android:alpha="0.55"
@@ -96,11 +96,11 @@
                         android:gravity="center|start"
                         android:lines="1"
                         android:text="@{feature.numDataPoints != null ? String.format(@string/data_points, feature.numDataPoints) : @string/no_data}"
-                        android:textSize="14sp"
+                        android:textAppearance="@style/TextAppearance.Body"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toRightOf="parent"
-                        tools:text="1324 Tracked" />
+                        tools:text="1345 Tracked" />
 
 
                 </androidx.constraintlayout.widget.ConstraintLayout>

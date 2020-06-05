@@ -16,8 +16,9 @@
                 android:id="@+id/versionText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
+                android:layout_gravity="bottom|end"
                 android:layout_margin="4dp"
+                android:textAppearance="@style/TextAppearance.Body"
                 tools:text="v0.0.0" />
 
             <androidx.cardview.widget.CardView
@@ -42,7 +43,7 @@
                 android:layout_marginRight="10dp"
                 android:text="@string/about_description"
                 android:textAlignment="center"
-                android:textSize="20sp" />
+                android:textAppearance="@style/TextAppearance.Subtitle2" />
 
             <Button
                 android:id="@+id/githubLinkButton"
@@ -51,8 +52,8 @@
                 android:background="@color/ap_transparent"
                 android:text="@string/github_link_friendly"
                 android:textAllCaps="false"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextAppearance.Body"
+                android:textColor="?attr/colorPrimary" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -62,7 +63,7 @@
                 android:layout_marginRight="20dp"
                 android:text="@string/about_libraries_message"
                 android:textAlignment="center"
-                android:textSize="16sp" />
+                android:textAppearance="@style/TextAppearance.Body" />
 
             <GridLayout
                 android:layout_width="wrap_content"
@@ -75,59 +76,67 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
-                    android:text="@string/androidplot" />
+                    android:text="@string/androidplot"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
-                    android:layout_marginLeft="40dp"
-                    android:text="@string/apache_2_0" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/apache_commons_csv" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
-                    android:layout_marginLeft="40dp"
-                    android:layout_marginTop="5dp"
-                    android:text="@string/apache_2_0" />
+                    android:layout_marginStart="40dp"
+                    android:text="@string/apache_2_0"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
-                    android:text="@string/three_ten_android_backport" />
+                    android:text="@string/apache_commons_csv"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
-                    android:layout_marginLeft="40dp"
+                    android:layout_marginStart="40dp"
                     android:layout_marginTop="5dp"
-                    android:text="@string/apache_2_0" />
+                    android:text="@string/apache_2_0"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
-                    android:text="@string/timber" />
+                    android:text="@string/three_ten_android_backport"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
-                    android:layout_marginLeft="40dp"
+                    android:layout_marginStart="40dp"
                     android:layout_marginTop="5dp"
-                    android:text="@string/apache_2_0" />
+                    android:text="@string/apache_2_0"
+                    android:textAppearance="@style/TextAppearance.Body" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnSpan="1"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/timber"
+                    android:textAppearance="@style/TextAppearance.Body" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnSpan="1"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/apache_2_0"
+                    android:textAppearance="@style/TextAppearance.Body" />
             </GridLayout>
         </LinearLayout>
     </ScrollView>

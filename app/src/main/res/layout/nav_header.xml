@@ -11,7 +11,7 @@
         android:paddingStart="20dp"
         android:paddingEnd="20dp"
         android:text="@string/nav_header_title"
-        android:textSize="20sp" />
+        android:textAppearance="@style/TextAppearance.Headline6" />
 
     <ImageView
         android:layout_width="match_parent"
