@@ -45,14 +45,14 @@
                         android:id="@+id/timeText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/card_padding"
                         android:background="?android:attr/selectableItemBackground"
+                        android:layout_marginTop="@dimen/card_padding"
                         android:clickable="true"
                         android:focusable="true"
-                        android:paddingLeft="@dimen/dialog_input_spacing"
-                        android:paddingRight="@dimen/dialog_input_spacing"
+                        android:paddingStart="@dimen/dialog_input_spacing"
+                        android:paddingEnd="@dimen/dialog_input_spacing"
                         android:text="00:00"
-                        android:textSize="35sp"
+                        android:textAppearance="@style/TextAppearance.Headline4"
                         android:textStyle="bold"
                         tools:ignore="HardcodedText"
                         tools:text="17:35" />
@@ -88,7 +88,8 @@
                             android:id="@+id/monBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center" />
+                            android:layout_gravity="center"
+                            android:text="" />
                     </FrameLayout>
 
                     <FrameLayout
@@ -100,7 +101,8 @@
                             android:id="@+id/tueBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center" />
+                            android:layout_gravity="center"
+                            android:text="" />
                     </FrameLayout>
 
                     <FrameLayout
@@ -112,7 +114,8 @@
                             android:id="@+id/wedBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center" />
+                            android:layout_gravity="center"
+                            android:text="" />
                     </FrameLayout>
 
                     <FrameLayout
@@ -124,7 +127,8 @@
                             android:id="@+id/thuBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center" />
+                            android:layout_gravity="center"
+                            android:text="" />
                     </FrameLayout>
 
                     <FrameLayout
@@ -136,7 +140,8 @@
                             android:id="@+id/friBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center" />
+                            android:layout_gravity="center"
+                            android:text="" />
                     </FrameLayout>
 
                     <FrameLayout
@@ -148,7 +153,8 @@
                             android:id="@+id/satBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center" />
+                            android:layout_gravity="center"
+                            android:text="" />
                     </FrameLayout>
 
                     <FrameLayout
@@ -160,7 +166,8 @@
                             android:id="@+id/sunBox"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_gravity="center" />
+                            android:layout_gravity="center"
+                            android:text="" />
                     </FrameLayout>
                 </LinearLayout>
 
@@ -178,7 +185,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/mon"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <TextView
                         android:id="@+id/tueLabel"
@@ -186,7 +194,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/tue"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <TextView
                         android:id="@+id/wedLabel"
@@ -194,7 +203,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/wed"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <TextView
                         android:id="@+id/thuLabel"
@@ -202,7 +212,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/thu"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <TextView
                         android:id="@+id/friLabel"
@@ -210,7 +221,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/fri"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <TextView
                         android:id="@+id/satLabel"
@@ -218,7 +230,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/sat"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <TextView
                         android:id="@+id/sunLabel"
@@ -226,7 +239,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="@string/sun"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                 </LinearLayout>
             </LinearLayout>

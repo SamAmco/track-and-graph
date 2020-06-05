@@ -20,7 +20,6 @@
         <item name="android:actionOverflowButtonStyle">@style/Style.OverflowButtonStyle</item>
         <item name="actionOverflowMenuStyle">@style/Style.OverflowMenuStyle</item>
         <item name="editTextStyle">@style/Style.EditTextStyle</item>
-        <item name="dialogTheme">@style/AppTheme.DialogTheme</item>
         <item name="cardViewStyle">@style/Style.CardViewStyle</item>
         <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
         <item name="windowActionBar">false</item>
@@ -48,9 +47,12 @@
         <item name="colorControlHighlight">@color/light_gray</item>
         <item name="colorControlActivated">@color/dark_gray</item>
         <item name="toolbarBackgroundColor">@color/blue_white_pastel</item>
-        <item name="android:textColorSecondary">@color/dark_gray</item>
         <item name="android:textColorPrimary">@color/blue_black</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/blue_black</item>
+        <item name="android:textColorSecondary">@color/dark_gray</item>
+        <item name="android:textColorHint">@color/mid_gray</item>
         <item name="android:windowBackground">@color/chalky_white</item>
+
     </style>
 
     <style name="TransparentTheme" parent="AppTheme">
@@ -62,13 +64,10 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
-    <style name="AppTheme.DialogTheme" parent="Theme.AppCompat.DayNight.Dialog">
-        <item name="android:background">?attr/colorSurface</item>
-        <item name="colorAccent">@color/orange</item>
-    </style>
-
     <style name="AppTheme.AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
         <item name="android:background">?attr/colorSurface</item>
         <item name="colorAccent">@color/orange</item>
+        <item name="android:textColorPrimary">@color/blue_black</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/blue_black</item>
     </style>
 </resources>

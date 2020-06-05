@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/track_widget_card"
-    >
+    android:background="@drawable/track_widget_card">
 
     <RelativeLayout
         android:id="@+id/widget_container"
@@ -12,8 +11,9 @@
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
+
+        <!--TODO can we apply dark theme to widgets?-->
         <TextView
             android:id="@+id/track_widget_title"
             android:layout_width="match_parent"
@@ -28,7 +28,7 @@
             android:gravity="center"
             android:maxHeight="40dp"
             android:textColor="@android:color/black"
-            android:textSize="@dimen/track_card_title_size"
+            android:textSize="@dimen/headline5_size"
             android:textStyle="bold"
             tools:text="Track" />
 

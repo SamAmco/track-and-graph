@@ -23,6 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DataPoint
 import com.samco.trackandgraph.databinding.ShowDataPointDialogHeaderBinding
@@ -35,6 +36,7 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
     else description
 
     val bodyView = TextView(context)
+    TextViewCompat.setTextAppearance(bodyView, R.style.TextAppearance_Body)
     bodyView.text = descriptionOrNone
     bodyView.setTextIsSelectable(true)
     val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
@@ -42,7 +44,7 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
     bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
     bodyView.setTextSize(
         TypedValue.COMPLEX_UNIT_PX,
-        res.getDimension(R.dimen.dialog_label_text_size)
+        res.getDimension(R.dimen.text_body_size)
     )
 
     AlertDialog.Builder(context)
@@ -69,6 +71,7 @@ fun showDataPointDescriptionDialog(
     }
 
     val bodyView = TextView(context)
+    TextViewCompat.setTextAppearance(bodyView, R.style.TextAppearance_Body)
     bodyView.text = dataPoint.note
     bodyView.setTextIsSelectable(true)
     val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
@@ -76,7 +79,7 @@ fun showDataPointDescriptionDialog(
     bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
     bodyView.setTextSize(
         TypedValue.COMPLEX_UNIT_PX,
-        res.getDimension(R.dimen.dialog_label_text_size)
+        res.getDimension(R.dimen.text_body_size)
     )
 
     AlertDialog.Builder(context)
