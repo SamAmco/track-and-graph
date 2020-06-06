@@ -46,6 +46,7 @@
             android:paddingTop="50dp"
             app:headerLayout="@layout/nav_header"
             app:itemTextColor="?attr/colorControlNormal"
+            app:itemIconTint="?attr/colorControlNormal"
             app:menu="@menu/navigation_menu" />
 
     </androidx.drawerlayout.widget.DrawerLayout>

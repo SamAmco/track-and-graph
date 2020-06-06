@@ -72,12 +72,12 @@
                         android:layout_gravity="bottom|end"
                         android:alpha="0.55"
                         android:background="@null"
+                        android:contentDescription="@string/tracked_data_history_button_content_description"
                         android:scaleType="fitCenter"
                         app:layout_constraintBottom_toTopOf="@id/divider"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/trackGroupNameText"
-                        app:srcCompat="@drawable/history"
-                        android:contentDescription="@string/tracked_data_history_button_content_description" />
+                        app:srcCompat="@drawable/history" />
 
                     <ImageView
                         android:id="@+id/divider"
@@ -117,6 +117,7 @@
             android:contentDescription="@string/tracked_data_menu_button_content_description"
             android:padding="8dp"
             android:scaleType="fitCenter"
+            android:tint="?attr/colorControlNormal"
             app:srcCompat="@drawable/list_menu_icon" />
 
         <ImageButton

@@ -24,7 +24,9 @@
         <item
             android:id="@+id/remindersFragment"
             android:icon="@drawable/reminders_icon"
-            android:title="@string/reminders" />
+            android:title="@string/reminders"
+            android:checkable="true"
+            />
         <item
             android:id="@+id/backupAndRestoreFragment"
             android:icon="@drawable/backup_restore_icon"
