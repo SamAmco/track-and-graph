@@ -45,7 +45,6 @@
         <item name="colorOnError">@color/green</item>
         <item name="colorControlNormal">@color/blue_black</item>
         <item name="colorControlHighlight">@color/light_gray</item>
-        <item name="colorControlActivated">@color/dark_gray</item>
         <item name="toolbarBackgroundColor">@color/blue_white_pastel</item>
         <item name="android:textColorPrimary">@color/blue_black</item>
         <item name="android:textColorPrimaryDisableOnly">@color/blue_black</item>

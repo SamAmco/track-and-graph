@@ -89,7 +89,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_marginStart="4dp"
-                android:tint="?attr/colorControlActivated"
+                android:tint="?android:attr/textColorSecondary"
                 app:layout_constraintBottom_toBottomOf="@id/addNoteText"
                 app:layout_constraintLeft_toRightOf="@id/addNoteText"
                 app:layout_constraintTop_toTopOf="@id/addNoteText"

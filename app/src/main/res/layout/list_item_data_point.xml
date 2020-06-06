@@ -68,7 +68,7 @@
                 android:clickable="true"
                 android:contentDescription="@string/edit_data_point_button_content_description"
                 android:focusable="true"
-                android:tint="?attr/colorPrimaryDark"
+                android:tint="?attr/colorPrimary"
                 app:srcCompat="@drawable/edit_icon" />
 
             <ImageButton
@@ -79,7 +79,7 @@
                 android:clickable="true"
                 android:contentDescription="@string/delete_data_point_button_content_description"
                 android:focusable="true"
-                android:tint="?attr/colorSecondaryVariant"
+                android:tint="?attr/colorSecondary"
                 app:srcCompat="@drawable/delete_icon" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>

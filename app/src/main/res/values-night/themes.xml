@@ -31,8 +31,7 @@
         <item name="colorOnError">@color/faded_green</item>
         <item name="colorControlNormal">@color/blue_white_pastel</item>
         <item name="colorControlHighlight">@color/dark_gray</item>
-        <item name="colorControlActivated">@color/dark_gray</item>
-        <item name="toolbarBackgroundColor">@color/blue_black</item>
+        <item name="toolbarBackgroundColor">@color/light_charcoal</item>
         <item name="android:textColorPrimary">@color/blue_white_pastel</item>
         <item name="android:textColorPrimaryDisableOnly">@color/blue_white_pastel</item>
         <item name="android:textColorSecondary">@color/light_gray</item>
