@@ -40,9 +40,8 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
+import com.samco.trackandgraph.util.*
 
-const val THEME_SETTING_PREF_KEY = "theme_setting"
-const val FIRST_RUN_PREF_KEY = "firstrun"
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -83,7 +82,35 @@ class MainActivity : AppCompatActivity() {
 
     private fun initDrawerSpinners() {
         setUpThemeSpinner()
+        setUpDateFormatSpinner()
     }
+
+    private fun setUpDateFormatSpinner() {
+        val spinner = navView.menu.findItem(R.id.dateFormatSpinner).actionView as AppCompatSpinner
+        val formatNames = resources.getStringArray(R.array.date_formats)
+        spinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            formatNames
+        )
+        spinner.setSelection(getDateFormatValue())
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                onDateFormatSelected(position)
+            }
+
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+        }
+    }
+
+    private fun onDateFormatSelected(index: Int) {
+        getPrefs(applicationContext).edit().putInt(DATE_FORMAT_SETTING_PREF_KEY, index).apply()
+    }
+
+    private fun getDateFormatValue() = getPrefs(applicationContext).getInt(
+        DATE_FORMAT_SETTING_PREF_KEY, DateFormatSetting.DMY.ordinal
+    )
 
     private fun setUpThemeSpinner() {
         val spinner = navView.menu.findItem(R.id.themeSpinner).actionView as AppCompatSpinner
@@ -101,6 +128,7 @@ class MainActivity : AppCompatActivity() {
             override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
                 onThemeSelected(position)
             }
+
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
     }
@@ -115,14 +143,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun getDefaultThemeValue() =
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
-                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         else AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 
-    private fun getThemeValue() = getPrefs().getInt(THEME_SETTING_PREF_KEY, getDefaultThemeValue())
+    private fun getThemeValue() =
+        getPrefs(applicationContext).getInt(THEME_SETTING_PREF_KEY, getDefaultThemeValue())
 
     private fun setThemeValue(themeValue: Int) {
         AppCompatDelegate.setDefaultNightMode(themeValue)
-        getPrefs().edit().putInt(THEME_SETTING_PREF_KEY, themeValue).apply()
+        getPrefs(applicationContext).edit().putInt(THEME_SETTING_PREF_KEY, themeValue).apply()
     }
 
     private fun readThemeValue() {
@@ -160,7 +189,7 @@ class MainActivity : AppCompatActivity() {
     private fun destroyTutorial() {
         val tutorialLayout = findViewById<ViewGroup>(R.id.tutorialOverlay)
         tutorialLayout.removeAllViews()
-        getPrefs().edit().putBoolean(FIRST_RUN_PREF_KEY, false).apply()
+        getPrefs(applicationContext).edit().putBoolean(FIRST_RUN_PREF_KEY, false).apply()
     }
 
     private fun showTutorial() {
@@ -191,9 +220,8 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun getPrefs() = getSharedPreferences("com.samco.trackandgraph", MODE_PRIVATE)
 
-    private fun isFirstRun() = getPrefs().getBoolean(FIRST_RUN_PREF_KEY, true)
+    private fun isFirstRun() = getPrefs(applicationContext).getBoolean(FIRST_RUN_PREF_KEY, true)
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration) || super.onNavigateUp()

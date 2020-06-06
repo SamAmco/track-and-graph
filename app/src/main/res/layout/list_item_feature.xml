@@ -3,13 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <data>
-
-        <variable
-            name="feature"
-            type="com.samco.trackandgraph.database.DisplayFeature" />
-    </data>
-
     <FrameLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
@@ -45,7 +38,6 @@
                         android:layout_height="60dp"
                         android:gravity="center"
                         android:maxHeight="70dp"
-                        android:text="@{feature.name}"
                         android:textAppearance="@style/TextAppearance.Headline5"
                         android:textStyle="bold"
                         app:layout_constraintTop_toTopOf="parent"
@@ -57,7 +49,6 @@
                         android:layout_height="0dp"
                         android:layout_marginStart="5dp"
                         android:gravity="start|center"
-                        android:text="@{feature.getDisplayTimestamp() != null ? feature.getDisplayTimestamp() : @string/no_data}"
                         android:textAppearance="@style/TextAppearance.Body"
                         app:layout_constraintBottom_toTopOf="@id/divider"
                         app:layout_constraintLeft_toRightOf="@id/historyIcon"
@@ -96,7 +87,6 @@
                         android:layout_height="35dp"
                         android:gravity="center|start"
                         android:lines="1"
-                        android:text="@{feature.numDataPoints != null ? String.format(@string/data_points, feature.numDataPoints) : @string/no_data}"
                         android:textAppearance="@style/TextAppearance.Body"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintLeft_toLeftOf="parent"

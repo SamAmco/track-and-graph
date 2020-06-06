@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.DataPoint
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
+import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 
 class DataPointAdapter(private val clickListener: DataPointClickListener)
     : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(DataPointDiffCallback()) {
@@ -42,7 +43,7 @@ class DataPointAdapter(private val clickListener: DataPointClickListener)
 
         fun bind(dataPoint: DataPoint) {
             binding.valueText.text = dataPoint.getDisplayValue()
-            binding.timestampText.text = dataPoint.getDisplayTimestamp()
+            binding.timestampText.text = formatDayMonthYearHourMinute(binding.timestampText.context, dataPoint.timestamp)
             binding.editButton.setOnClickListener { clickListener.editClicked(dataPoint) }
             binding.deleteButton.setOnClickListener { clickListener.deleteClicked(dataPoint) }
             if (dataPoint.note.isEmpty()) {

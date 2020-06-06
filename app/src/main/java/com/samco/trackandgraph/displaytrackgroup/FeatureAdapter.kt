@@ -29,12 +29,16 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
+import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 
 
 private val getIdForDisplayFeature = { df: DisplayFeature -> df.id }
 
-class FeatureAdapter(private val clickListener: FeatureClickListener)
-    : OrderedListAdapter<DisplayFeature, FeatureViewHolder>(getIdForDisplayFeature, DisplayFeatureDiffCallback()) {
+class FeatureAdapter(private val clickListener: FeatureClickListener) :
+    OrderedListAdapter<DisplayFeature, FeatureViewHolder>(
+        getIdForDisplayFeature,
+        DisplayFeatureDiffCallback()
+    ) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeatureViewHolder {
         return FeatureViewHolder.from(parent)
@@ -45,8 +49,8 @@ class FeatureAdapter(private val clickListener: FeatureClickListener)
     }
 }
 
-class FeatureViewHolder private constructor(private val binding: ListItemFeatureBinding)
-    : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+class FeatureViewHolder private constructor(private val binding: ListItemFeatureBinding) :
+    RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
     private var clickListener: FeatureClickListener? = null
     private var feature: DisplayFeature? = null
@@ -56,7 +60,9 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         this.feature = feature
         this.clickListener = clickListener
         this.dropElevation = binding.cardView.cardElevation
-        binding.feature = feature
+        setLastDateText()
+        setNumEntriesText()
+        binding.trackGroupNameText.text = feature.name
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
@@ -68,6 +74,24 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
             binding.quickAddButton.visibility = View.INVISIBLE
         }
         binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
+    }
+
+    private fun setLastDateText() {
+        val timestamp = feature?.timestamp
+        binding.lastDateText.text = if (timestamp == null) {
+            binding.lastDateText.context.getString(R.string.no_data)
+        } else {
+            formatDayMonthYearHourMinute(binding.lastDateText.context, timestamp)
+        }
+    }
+
+    private fun setNumEntriesText() {
+        val numDataPoints = feature?.numDataPoints
+        binding.numEntriesText.text = if (numDataPoints != null) {
+            binding.numEntriesText.context.getString(R.string.data_points, numDataPoints)
+        } else {
+            binding.numEntriesText.context.getString(R.string.no_data)
+        }
     }
 
     private fun onQuickAddClicked() {
@@ -104,7 +128,8 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
                 R.id.delete -> clickListener?.onDelete(it)
                 R.id.moveTo -> clickListener?.onMoveTo(it)
                 R.id.description -> clickListener?.onDescription(it)
-                else -> {}
+                else -> {
+                }
             }
         }
         return false
@@ -123,17 +148,20 @@ class DisplayFeatureDiffCallback : DiffUtil.ItemCallback<DisplayFeature>() {
     override fun areItemsTheSame(oldItem: DisplayFeature, newItem: DisplayFeature): Boolean {
         return oldItem.id == newItem.id
     }
+
     override fun areContentsTheSame(oldItem: DisplayFeature, newItem: DisplayFeature): Boolean {
         return oldItem == newItem
     }
 }
 
-class FeatureClickListener(private val onEditListener: (feature: DisplayFeature) -> Unit,
-                           private val onDeleteListener: (feature: DisplayFeature) -> Unit,
-                           private val onMoveToListener: (feature: DisplayFeature) -> Unit,
-                           private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
-                           private val onAddListener: (feature: DisplayFeature) -> Unit,
-                           private val onHistoryListener: (feature: DisplayFeature) -> Unit) {
+class FeatureClickListener(
+    private val onEditListener: (feature: DisplayFeature) -> Unit,
+    private val onDeleteListener: (feature: DisplayFeature) -> Unit,
+    private val onMoveToListener: (feature: DisplayFeature) -> Unit,
+    private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
+    private val onAddListener: (feature: DisplayFeature) -> Unit,
+    private val onHistoryListener: (feature: DisplayFeature) -> Unit
+) {
     fun onEdit(feature: DisplayFeature) = onEditListener(feature)
     fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
     fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
