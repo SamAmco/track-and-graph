@@ -41,7 +41,8 @@ import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 
-
+const val THEME_SETTING_PREF_KEY = "theme_setting"
+const val FIRST_RUN_PREF_KEY = "firstrun"
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        readThemeValue()
         setContentView(R.layout.activity_main)
 
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -90,6 +92,11 @@ class MainActivity : AppCompatActivity() {
             android.R.layout.simple_spinner_dropdown_item,
             getThemeNames()
         )
+        when (getThemeValue()) {
+            AppCompatDelegate.MODE_NIGHT_NO -> spinner.setSelection(1)
+            AppCompatDelegate.MODE_NIGHT_YES -> spinner.setSelection(2)
+            else -> spinner.setSelection(0)
+        }
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
                 onThemeSelected(position)
@@ -99,19 +106,28 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onThemeSelected(position: Int) {
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-            when (position) {
-                0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
-        } else {
-            when (position) {
-                0 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
-                1 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                2 -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
+        when (position) {
+            0 -> setThemeValue(getDefaultThemeValue())
+            1 -> setThemeValue(AppCompatDelegate.MODE_NIGHT_NO)
+            2 -> setThemeValue(AppCompatDelegate.MODE_NIGHT_YES)
         }
+    }
+
+    private fun getDefaultThemeValue() =
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        else AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+
+    private fun getThemeValue() = getPrefs().getInt(THEME_SETTING_PREF_KEY, getDefaultThemeValue())
+
+    private fun setThemeValue(themeValue: Int) {
+        AppCompatDelegate.setDefaultNightMode(themeValue)
+        getPrefs().edit().putInt(THEME_SETTING_PREF_KEY, themeValue).apply()
+    }
+
+    private fun readThemeValue() {
+        val themeValue = getThemeValue()
+        AppCompatDelegate.setDefaultNightMode(themeValue)
     }
 
     private fun getThemeNames() =
@@ -144,7 +160,7 @@ class MainActivity : AppCompatActivity() {
     private fun destroyTutorial() {
         val tutorialLayout = findViewById<ViewGroup>(R.id.tutorialOverlay)
         tutorialLayout.removeAllViews()
-        getPrefs().edit().putBoolean("firstrun", false).apply()
+        getPrefs().edit().putBoolean(FIRST_RUN_PREF_KEY, false).apply()
     }
 
     private fun showTutorial() {
@@ -177,7 +193,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun getPrefs() = getSharedPreferences("com.samco.trackandgraph", MODE_PRIVATE)
 
-    private fun isFirstRun() = getPrefs().getBoolean("firstrun", true)
+    private fun isFirstRun() = getPrefs().getBoolean(FIRST_RUN_PREF_KEY, true)
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration) || super.onNavigateUp()
