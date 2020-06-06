@@ -26,7 +26,7 @@
 
     <!--Primarily dark theme colors-->
     <color name="dark_charcoal">#121212</color>
-    <color name="mid_charcoal">#272727</color>
+    <color name="mid_charcoal">#222222</color>
     <color name="light_charcoal">#373737</color>
     <color name="faded_light_blue">#88aabf</color>
     <color name="faded_dark_blue">#54788c</color>

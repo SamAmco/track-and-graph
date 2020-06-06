@@ -41,7 +41,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/input_spacing_large"
-                    android:text="@string/new_name"
+                    android:text="@string/graph_or_stat_name"
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <EditText
