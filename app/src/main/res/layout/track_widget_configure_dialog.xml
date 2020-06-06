@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/card_padding">
+        android:padding="@dimen/card_padding"
+        android:theme="@style/AppTheme.AlertDialogTheme">
 
         <TextView
             android:id="@+id/featureTypeLabel"
@@ -12,7 +14,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/input_spacing_large"
             android:text="@string/select_a_feature"
-            android:textSize="@dimen/dialog_header_size" />
+            android:textAppearance="@style/TextAppearance.Headline6" />
 
         <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/featureSpinner"
@@ -30,7 +32,7 @@
                 android:id="@+id/cancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|left"
+                android:layout_gravity="bottom|start"
                 android:layout_marginStart="16dp"
                 android:background="@null"
                 android:text="@string/cancel"
@@ -40,10 +42,10 @@
                 android:id="@+id/createButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom|right"
+                android:layout_gravity="bottom|end"
                 android:background="@null"
                 android:text="@string/create"
-                android:textColor="@color/secondaryColor"
+                android:textColor="?attr/colorSecondary"
                 android:textStyle="bold" />
 
         </FrameLayout>

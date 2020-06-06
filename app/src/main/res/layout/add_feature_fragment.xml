@@ -28,7 +28,7 @@
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:labelFor="@id/trackGroupNameText"
                     android:text="@string/feature_name"
-                    android:textSize="@dimen/dialog_label_text_size" />
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <EditText
                     android:id="@+id/featureNameText"
@@ -39,7 +39,7 @@
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/featureDescriptionText"
-                    style="@style/ExpansiveTextInputStyle"
+                    style="@style/Style.ExpansiveTextInputStyle"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:hint="@string/feature_description_input_hint" />
 
@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/input_spacing_large"
                     android:text="@string/feature_type"
-                    android:textSize="@dimen/dialog_label_text_size" />
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <androidx.appcompat.widget.AppCompatSpinner
                     android:id="@+id/featureTypeSpinner"
@@ -65,7 +65,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/input_spacing_large"
                     android:text="@string/discrete_values"
-                    android:textSize="@dimen/dialog_label_text_size" />
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <LinearLayout
                     android:id="@+id/discreteValues"
@@ -76,29 +76,30 @@
 
                 <ImageButton
                     android:id="@+id/addDiscreteValueButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/Style.AddBarButton"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginBottom="@dimen/dialog_input_spacing"
-                    app:srcCompat="@drawable/add_icon" />
+                    app:srcCompat="@drawable/add_icon"
+                    android:contentDescription="@string/add_multiple_choice_answer_button_content_description" />
 
                 <CheckBox
                     android:id="@+id/hasDefaultValueCheckbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:text="@string/use_default_value" />
+                    android:text="@string/use_default_value"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
                     android:id="@+id/defaultValueHint"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/default_value_description_hint"
-                    android:textColor="@color/disabledTextColor" />
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <EditText
                     android:id="@+id/defaultNumericalInput"
-                    style="@style/DataPointInputNumberStyle"
+                    style="@style/Style.DataPointInputNumberStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
@@ -106,7 +107,7 @@
 
                 <HorizontalScrollView
                     android:id="@+id/defaultDiscreteScrollView"
-                    style="@style/DiscreteValueButtonsScrollViewStyle"
+                    style="@style/Style.DiscreteValueButtonsScrollViewStyle"
                     android:layout_marginTop="@dimen/dialog_input_spacing">
 
                     <LinearLayout

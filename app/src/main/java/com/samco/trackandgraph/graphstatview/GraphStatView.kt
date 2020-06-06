@@ -31,6 +31,7 @@ import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.util.getColorFromAttr
 
 class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
@@ -78,6 +79,19 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         binding.lineGraph.setPlotPadding(0f, 0f, 0f, 0f)
         binding.lineGraph.graph.setPadding(0f, 0f, 0f, 0f)
         binding.lineGraph.graph.setMargins(0f, 20f, 0f, 50f)
+
+        val colorOnSurface = context.getColorFromAttr(R.attr.colorOnSurface)
+        val colorSurface = context.getColorFromAttr(R.attr.colorSurface)
+        binding.lineGraph.graph.domainGridLinePaint.color = colorOnSurface
+        binding.lineGraph.graph.rangeGridLinePaint.color = colorOnSurface
+        binding.lineGraph.graph.domainSubGridLinePaint.color = colorOnSurface
+        binding.lineGraph.graph.rangeSubGridLinePaint.color = colorOnSurface
+        binding.lineGraph.graph.domainOriginLinePaint.color = colorOnSurface
+        binding.lineGraph.graph.domainOriginLinePaint.strokeWidth = 1f
+        binding.lineGraph.graph.rangeOriginLinePaint.color = colorOnSurface
+        binding.lineGraph.graph.rangeOriginLinePaint.strokeWidth = 1f
+
+        binding.lineGraph.graph.gridBackgroundPaint.color = colorSurface
     }
 
     fun addLineGraphPanAndZoom() {

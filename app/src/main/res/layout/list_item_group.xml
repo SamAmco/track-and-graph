@@ -29,7 +29,7 @@
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
                     android:padding="@dimen/card_padding"
-                    android:textSize="20sp"
+                    android:textAppearance="@style/TextAppearance.Headline6"
                     tools:text="Group Name that spans over two lines eventually" />
 
                 <ImageView
@@ -37,7 +37,7 @@
                     android:layout_width="140dp"
                     android:layout_height="70dp"
                     android:layout_gravity="bottom|end"
-                    android:tint="@color/primaryColor"
+                    android:tint="?attr/colorPrimary"
                     app:srcCompat="@drawable/group_tab_corner"
                     tools:ignore="ContentDescription" />
 
@@ -68,8 +68,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
-            android:background="#00FFFFFF"
+            android:background="@null"
             android:padding="10dp"
+            android:tint="?attr/colorControlNormal"
             app:srcCompat="@drawable/list_menu_icon" />
     </FrameLayout>
 </layout>

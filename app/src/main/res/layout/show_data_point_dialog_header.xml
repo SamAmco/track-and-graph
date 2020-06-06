@@ -4,37 +4,38 @@
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/card_padding"
-        android:paddingStart="@dimen/report_dialog_start_end_padding"
-        android:paddingEnd="@dimen/report_dialog_start_end_padding"
         android:orientation="vertical"
-        >
+        android:paddingStart="@dimen/report_dialog_start_end_padding"
+        android:paddingTop="@dimen/card_padding"
+        android:paddingEnd="@dimen/report_dialog_start_end_padding">
+
         <TextView
             android:id="@+id/valueText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="1"
             android:ellipsize="end"
-            android:textColor="@color/regularText"
-            android:textSize="@dimen/dialog_header_size"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Headline6"
             android:textStyle="bold"
-            tools:text="1 : Some"/>
+            tools:text="1 : Some" />
+
         <TextView
             android:id="@+id/dateTimeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/regularText"
-            tools:text="24/05/20 12:42"/>
+            android:textAppearance="@style/TextAppearance.Body"
+            tools:text="24/05/20 12:42" />
+
         <TextView
             android:id="@+id/featureDisplayNameText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textColor="@color/regularText"
-            tools:text="Daily -> Exercise"/>
+            android:textAppearance="@style/TextAppearance.Body"
+            tools:text="Daily -> Exercise" />
 
     </LinearLayout>
 </layout>

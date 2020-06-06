@@ -36,6 +36,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/notes"
+                android:textAppearance="@style/TextAppearance.Body"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
@@ -48,6 +49,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/notesButtonText"
                 app:layout_constraintLeft_toRightOf="@id/notesButtonText"
                 app:layout_constraintTop_toTopOf="@id/notesButtonText"
+                android:tint="?attr/colorControlNormal"
                 app:srcCompat="@drawable/up_arrow" />
 
             <ImageView
@@ -55,6 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:visibility="gone"
+                android:tint="?attr/colorControlNormal"
                 app:layout_constraintBottom_toBottomOf="@id/notesButtonText"
                 app:layout_constraintLeft_toRightOf="@id/notesButtonText"
                 app:layout_constraintTop_toTopOf="@id/notesButtonText"
@@ -67,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="0"
-            android:background="@color/cardBackgroundColor"
+            android:background="?attr/colorSurface"
             android:clipToPadding="false"
             android:paddingTop="@dimen/dialog_input_spacing"
             tools:listitem="@layout/list_item_data_point" />

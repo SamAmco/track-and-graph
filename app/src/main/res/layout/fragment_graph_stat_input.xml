@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -32,21 +33,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/input_spacing_large"
-                    android:background="@color/divider" />
+                    android:background="?attr/colorControlHighlight"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
                     android:id="@+id/nameLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/input_spacing_large"
-                    android:text="@string/new_name"
-                    android:textSize="@dimen/dialog_label_text_size" />
+                    android:text="@string/graph_or_stat_name"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
                 <EditText
                     android:id="@+id/graphStatNameInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/graph_name_hint"
+                    android:importantForAutofill="no"
                     android:inputType="text"
                     android:maxLines="2" />
 
@@ -61,13 +64,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/graph_type_label"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <Spinner
                         android:id="@+id/graphTypeSpinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/dialog_input_spacing"
+                        android:layout_marginStart="@dimen/dialog_input_spacing"
                         android:entries="@array/graph_types"
                         android:focusable="true" />
                 </LinearLayout>
@@ -84,13 +87,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/maximum_sample_duration"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <Spinner
                         android:id="@+id/sampleDurationSpinner"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/dialog_input_spacing"
+                        android:layout_marginStart="@dimen/dialog_input_spacing"
                         android:entries="@array/graph_time_durations" />
                 </LinearLayout>
 
@@ -107,7 +110,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:text="@string/range_style"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <Spinner
                         android:id="@+id/yRangeStyleSpinner"
@@ -131,7 +134,7 @@
                         android:layout_gravity="center_vertical"
                         android:gravity="center_vertical"
                         android:text="@string/from"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <EditText
                         android:id="@+id/yRangeFrom"
@@ -141,8 +144,10 @@
                         android:digits="0123456789.,-"
                         android:gravity="center"
                         android:hint="0"
+                        android:importantForAutofill="no"
                         android:inputType="numberSigned|numberDecimal"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="HardcodedText" />
 
                     <TextView
                         android:id="@+id/yRangeFixedToLabel"
@@ -151,7 +156,7 @@
                         android:layout_gravity="center_vertical"
                         android:gravity="center_vertical"
                         android:text="@string/to"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <EditText
                         android:id="@+id/yRangeTo"
@@ -161,8 +166,10 @@
                         android:digits="0123456789.,-"
                         android:gravity="center"
                         android:hint="0"
+                        android:importantForAutofill="no"
                         android:inputType="numberSigned|numberDecimal"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        tools:ignore="HardcodedText" />
                 </LinearLayout>
 
                 <ImageView
@@ -170,7 +177,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginTop="@dimen/input_spacing_large"
-                    android:background="@color/divider" />
+                    android:background="?attr/colorControlHighlight"
+                    tools:ignore="ContentDescription" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/valueStatInputLayout"
@@ -184,7 +192,7 @@
                         android:layout_height="0dp"
                         android:gravity="center"
                         android:text="@string/select_a_feature"
-                        android:textSize="@dimen/dialog_label_text_size"
+                        android:textAppearance="@style/TextAppearance.Body"
                         app:layout_constraintBottom_toBottomOf="@id/valueStatFeatureSpinner"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintRight_toLeftOf="@id/valueStatFeatureSpinner"
@@ -195,7 +203,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:background="@color/colorShadowButton"
+                        android:background="?attr/colorControlHighlight"
                         android:spinnerMode="dialog"
                         app:layout_constraintLeft_toRightOf="@id/valueStatFeatureLabel"
                         app:layout_constraintRight_toRightOf="parent"
@@ -216,10 +224,10 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="@string/check_all_relevant_values"
-                            android:textSize="@dimen/dialog_label_text_size" />
+                            android:textAppearance="@style/TextAppearance.Body" />
 
                         <HorizontalScrollView
-                            style="@style/DiscreteValueButtonsScrollViewStyle"
+                            style="@style/Style.DiscreteValueButtonsScrollViewStyle"
                             android:layout_marginTop="@dimen/dialog_input_spacing">
 
                             <LinearLayout
@@ -244,7 +252,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/select_a_value_range"
-                            android:textSize="@dimen/dialog_label_text_size"
+                            android:textAppearance="@style/TextAppearance.Body"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintTop_toTopOf="parent" />
 
@@ -253,10 +261,10 @@
                             android:layout_width="0dp"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/dialog_input_spacing"
-                            android:gravity="right"
+                            android:gravity="end"
                             android:paddingBottom="8dp"
                             android:text="@string/from"
-                            android:textSize="@dimen/dialog_label_text_size"
+                            android:textAppearance="@style/TextAppearance.Body"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toLeftOf="parent"
                             app:layout_constraintRight_toLeftOf="@id/valueStatFromInput"
@@ -269,12 +277,14 @@
                             android:digits="0123456789.,-"
                             android:gravity="center"
                             android:hint="0"
+                            android:importantForAutofill="no"
                             android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toRightOf="@id/valueStatFromLabel"
                             app:layout_constraintRight_toLeftOf="@id/valueStatToLabel"
-                            app:layout_constraintTop_toTopOf="@id/valueStatFromLabel" />
+                            app:layout_constraintTop_toTopOf="@id/valueStatFromLabel"
+                            tools:ignore="HardcodedText" />
 
                         <TextView
                             android:id="@+id/valueStatToLabel"
@@ -284,7 +294,7 @@
                             android:gravity="end"
                             android:paddingBottom="8dp"
                             android:text="@string/to"
-                            android:textSize="@dimen/dialog_label_text_size"
+                            android:textAppearance="@style/TextAppearance.Body"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toRightOf="@id/valueStatFromInput"
                             app:layout_constraintRight_toLeftOf="@id/valueStatToInput"
@@ -297,12 +307,14 @@
                             android:digits="0123456789.,-"
                             android:gravity="center"
                             android:hint="0"
+                            android:importantForAutofill="no"
                             android:inputType="numberSigned|numberDecimal"
                             android:singleLine="true"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toRightOf="@id/valueStatToLabel"
                             app:layout_constraintRight_toRightOf="parent"
-                            app:layout_constraintTop_toTopOf="@id/valueStatFromLabel" />
+                            app:layout_constraintTop_toTopOf="@id/valueStatFromLabel"
+                            tools:ignore="HardcodedText" />
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -318,7 +330,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/select_a_discrete_feature"
-                        android:textSize="@dimen/dialog_label_text_size" />
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <Spinner
                         android:id="@+id/pieChartFeatureSpinner"
@@ -337,10 +349,11 @@
 
                 <ImageButton
                     android:id="@+id/addFeatureButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                    style="@style/Style.AddBarButton"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:layout_marginBottom="@dimen/dialog_input_spacing"
                     android:clickable="false"
+                    android:contentDescription="@string/add_line_button_content_description"
                     app:srcCompat="@drawable/add_icon" />
 
             </LinearLayout>
@@ -370,7 +383,8 @@
                 android:layout_height="match_parent"
                 android:clickable="true"
                 android:focusable="true"
-                app:srcCompat="@color/ap_transparent" />
+                app:srcCompat="@color/ap_transparent"
+                tools:ignore="ContentDescription" />
 
             <ProgressBar
                 android:layout_width="wrap_content"

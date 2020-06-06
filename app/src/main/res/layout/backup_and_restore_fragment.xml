@@ -8,31 +8,33 @@
         android:layout_height="match_parent">
 
         <ScrollView
+            android:layout_gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content" >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
+                android:gravity="center_horizontal"
+                android:paddingTop="@dimen/input_spacing_large"
+                android:paddingBottom="@dimen/input_spacing_large"
                 android:orientation="vertical">
 
                 <TextView
-                    style="@style/EmptyPageHintTextStyle"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/input_spacing_large"
                     android:layout_marginEnd="@dimen/input_spacing_large"
                     android:layout_marginBottom="@dimen/dialog_input_spacing"
                     android:text="@string/backup_hint_text"
+                    android:textAppearance="@style/TextAppearance.Body"
                     android:textAlignment="textStart" />
 
                 <Button
                     android:id="@+id/backupButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorShadowButton"
                     android:padding="@dimen/dialog_input_spacing"
                     android:text="@string/backup_data" />
 
@@ -43,9 +45,9 @@
                     android:layout_marginStart="@dimen/input_spacing_large"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginEnd="@dimen/input_spacing_large"
-                    style="@style/EmptyPageHintTextStyle"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:textStyle="bold"
-                    tools:textColor="@color/warningTextColor"
+                    tools:textColor="?attr/errorTextColor"
                     tools:text="Some error that goes on for a really long time and even longer" />
 
                 <ImageView
@@ -53,23 +55,24 @@
                     android:layout_height="2dp"
                     android:layout_marginTop="30dp"
                     android:layout_marginBottom="30dp"
-                    app:srcCompat="@drawable/centered_gradient" />
+                    app:srcCompat="@drawable/centered_gradient"
+                    tools:ignore="ContentDescription" />
 
                 <TextView
-                    style="@style/EmptyPageHintTextStyle"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/input_spacing_large"
                     android:layout_marginEnd="@dimen/input_spacing_large"
                     android:layout_marginBottom="@dimen/dialog_input_spacing"
                     android:text="@string/restore_hint_text"
+                    android:textAppearance="@style/TextAppearance.Body"
                     android:textAlignment="textStart" />
 
                 <Button
                     android:id="@+id/restoreButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@color/colorShadowButton"
                     android:padding="@dimen/dialog_input_spacing"
                     android:text="@string/restore_data" />
 
@@ -80,9 +83,9 @@
                     android:layout_marginStart="@dimen/input_spacing_large"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginEnd="@dimen/input_spacing_large"
-                    style="@style/EmptyPageHintTextStyle"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:textStyle="bold"
-                    tools:textColor="@color/warningTextColor"
+                    tools:textColor="?attr/errorTextColor"
                     tools:text="Some error that goes on for a really long time and even longer" />
 
             </LinearLayout>
@@ -92,7 +95,8 @@
             android:id="@+id/progressOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/washoutFadeColor"
+            android:background="?android:attr/windowBackground"
+            android:alpha="0.3"
             android:clickable="true"
             android:focusable="true"
             android:visibility="gone">

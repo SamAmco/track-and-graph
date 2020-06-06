@@ -25,10 +25,10 @@ import android.text.TextWatcher
 import android.view.WindowManager
 import android.widget.EditText
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.util.getColorFromAttr
 
 abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
     private lateinit var editText: EditText
@@ -53,14 +53,16 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
             editText.addTextChangedListener(this)
             editText.filters = arrayOf(InputFilter.LengthFilter(getMaxChars()))
             view.findViewById<TextView>(R.id.prompt_text).text = getTitleText()
-            var builder = AlertDialog.Builder(it)
+            var builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setView(view)
                 .setPositiveButton(getPositiveButtonName()) { _, _ -> onPositiveClicked(editText.text.toString()) }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             alertDialog = builder.create()
             alertDialog.setOnShowListener {
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(requireContext(), R.color.secondaryColor))
-                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(requireContext(), R.color.toolBarTextColor))
+                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                positiveButton.setTextColor(positiveButton.context.getColorFromAttr(R.attr.colorSecondary))
+                val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                negativeButton.setTextColor(negativeButton.context.getColorFromAttr(R.attr.colorControlNormal))
             }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
