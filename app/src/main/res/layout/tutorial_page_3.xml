@@ -36,12 +36,12 @@
         android:layout_marginBottom="80dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
+        android:src="@drawable/tutorial_image_3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text"
         app:layout_constraintVertical_chainStyle="packed"
-        app:srcCompat="@drawable/tutorial_image_3"
         tools:ignore="ContentDescription" />
 
     <Button
