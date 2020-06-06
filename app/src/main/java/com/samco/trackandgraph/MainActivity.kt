@@ -42,7 +42,11 @@ import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 
 const val THEME_SETTING_PREF_KEY = "theme_setting"
+const val DATE_FORMAT_SETTING_PREF_KEY = "date_format_setting"
 const val FIRST_RUN_PREF_KEY = "firstrun"
+
+enum class DATE_FORMATS { DMY, MDY, YMD }
+
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -83,7 +87,32 @@ class MainActivity : AppCompatActivity() {
 
     private fun initDrawerSpinners() {
         setUpThemeSpinner()
+        setUpDateFormatSpinner()
     }
+
+    private fun setUpDateFormatSpinner() {
+        val spinner = navView.menu.findItem(R.id.dateFormatSpinner).actionView as AppCompatSpinner
+        val formatNames = resources.getStringArray(R.array.date_formats)
+        spinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            formatNames
+        )
+        spinner.setSelection(getDateFormatValue())
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                onDateFormatSelected(position)
+            }
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+        }
+    }
+
+    private fun onDateFormatSelected(index: Int) {
+        getPrefs().edit().putInt(DATE_FORMAT_SETTING_PREF_KEY, index).apply()
+    }
+
+    private fun getDateFormatValue() = getPrefs().getInt(DATE_FORMAT_SETTING_PREF_KEY, 0)
 
     private fun setUpThemeSpinner() {
         val spinner = navView.menu.findItem(R.id.themeSpinner).actionView as AppCompatSpinner
