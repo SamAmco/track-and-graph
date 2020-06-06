@@ -8,14 +8,16 @@
         android:layout_height="match_parent">
 
         <ScrollView
+            android:layout_gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content" >
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
+                android:gravity="center_horizontal"
+                android:paddingTop="@dimen/input_spacing_large"
+                android:paddingBottom="@dimen/input_spacing_large"
                 android:orientation="vertical">
 
                 <TextView

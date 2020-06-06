@@ -49,6 +49,7 @@
                 app:layout_constraintBottom_toBottomOf="@id/notesButtonText"
                 app:layout_constraintLeft_toRightOf="@id/notesButtonText"
                 app:layout_constraintTop_toTopOf="@id/notesButtonText"
+                android:tint="?attr/colorControlNormal"
                 app:srcCompat="@drawable/up_arrow" />
 
             <ImageView
@@ -56,6 +57,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:visibility="gone"
+                android:tint="?attr/colorControlNormal"
                 app:layout_constraintBottom_toBottomOf="@id/notesButtonText"
                 app:layout_constraintLeft_toRightOf="@id/notesButtonText"
                 app:layout_constraintTop_toTopOf="@id/notesButtonText"
