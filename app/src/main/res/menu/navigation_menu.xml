@@ -51,6 +51,10 @@
             android:id="@+id/themeSpinner"
             android:title="@string/theme_colon"
             app:actionLayout="@layout/navigation_menu_spinner" />
+        <item
+            android:id="@+id/dateFormatSpinner"
+            android:title="@string/date_format_colon"
+            app:actionLayout="@layout/navigation_menu_spinner" />
     </group>
 
 </menu>

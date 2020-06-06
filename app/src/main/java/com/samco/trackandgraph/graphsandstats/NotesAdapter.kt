@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.DataPoint
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
+import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 
 class NotesAdapter(
     private val featureDisplayNames: Map<Long, String>,
@@ -47,7 +48,8 @@ class NotesAdapter(
 
         fun bind(dataPoint: DataPoint) {
             binding.valueText.text = dataPoint.getDisplayValue()
-            binding.timestampText.text = dataPoint.getDisplayTimestamp()
+            binding.timestampText.text =
+                formatDayMonthYearHourMinute(binding.timestampText.context, dataPoint.timestamp)
             binding.featureNameText.text = featureDisplayNames.getOrElse(dataPoint.featureId) { "" }
             binding.cardView.setOnClickListener { clickListener.viewClicked(dataPoint) }
             binding.noteText.visibility = View.VISIBLE

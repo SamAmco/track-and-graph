@@ -28,6 +28,8 @@ import com.androidplot.xy.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
+import com.samco.trackandgraph.util.formatDayMonth
+import com.samco.trackandgraph.util.formatMonthYear
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -60,12 +62,6 @@ class GraphStatLineGraphDecorator(
         .withZone(ZoneId.systemDefault())
     private val lineGraphHoursDateFormat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm")
-        .withZone(ZoneId.systemDefault())
-    private val lineGraphDaysDateFormat: DateTimeFormatter = DateTimeFormatter
-        .ofPattern("dd/MM")
-        .withZone(ZoneId.systemDefault())
-    private val lineGraphMonthsDateFormat: DateTimeFormatter = DateTimeFormatter
-        .ofPattern("MM/yy")
         .withZone(ZoneId.systemDefault())
 
     private val currentXYRegions = mutableListOf<RectRegion>()
@@ -135,25 +131,30 @@ class GraphStatLineGraphDecorator(
                     val millis = (obj as Number).toLong()
                     val duration = Duration.ofMillis(millis)
                     val timeStamp = creationTime.plus(duration)
-                    val formatter = getDateTimeFormatForDuration(
+                    val formattedTimestamp = getDateTimeFormattedForDuration(
                         binding!!.lineGraph.bounds.minX,
-                        binding!!.lineGraph.bounds.maxX
+                        binding!!.lineGraph.bounds.maxX,
+                        timeStamp
                     )
-                    return toAppendTo.append(formatter.format(timeStamp))
+                    return toAppendTo.append(formattedTimestamp)
                 }
 
                 override fun parseObject(source: String, pos: ParsePosition) = null
             }
     }
 
-    private fun getDateTimeFormatForDuration(minX: Number?, maxX: Number?): DateTimeFormatter {
-        if (minX == null || maxX == null) return lineGraphDaysDateFormat
+    private fun getDateTimeFormattedForDuration(
+        minX: Number?,
+        maxX: Number?,
+        timestamp: OffsetDateTime
+    ): String {
+        if (minX == null || maxX == null) return formatDayMonth(context!!, timestamp)
         val duration = Duration.ofMillis(abs(maxX.toLong() - minX.toLong()))
         return when {
-            duration.toMinutes() < 5L -> lineGraphHourMinuteSecondFromat
-            duration.toDays() >= 304 -> lineGraphMonthsDateFormat
-            duration.toDays() >= 1 -> lineGraphDaysDateFormat
-            else -> lineGraphHoursDateFormat
+            duration.toMinutes() < 5L -> lineGraphHourMinuteSecondFromat.format(timestamp)
+            duration.toDays() >= 304 -> formatMonthYear(context!!, timestamp)
+            duration.toDays() >= 1 -> formatDayMonth(context!!, timestamp)
+            else -> lineGraphHoursDateFormat.format(timestamp)
         }
     }
 

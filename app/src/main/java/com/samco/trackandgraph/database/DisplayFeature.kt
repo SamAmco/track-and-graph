@@ -52,6 +52,4 @@ data class DisplayFeature(
 
     @ColumnInfo(name = "feature_description")
     val description: String
-) {
-    fun getDisplayTimestamp() = timestamp?.let { displayFeatureDateFormat.format(timestamp) }
-}
+)
