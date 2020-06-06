@@ -68,8 +68,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|end"
-            android:background="#00FFFFFF"
+            android:background="@null"
             android:padding="10dp"
+            android:tint="?attr/colorControlNormal"
             app:srcCompat="@drawable/list_menu_icon" />
     </FrameLayout>
 </layout>

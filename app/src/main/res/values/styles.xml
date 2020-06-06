@@ -84,4 +84,5 @@
         <item name="backgroundTint">@null</item>
         <item name="android:inputType">textMultiLine|textAutoCorrect|textCapSentences</item>
     </style>
+
 </resources>

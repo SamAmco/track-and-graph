@@ -28,6 +28,7 @@
                     android:contentDescription="@string/delete_line_button_content_description"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
+                    android:tint="?attr/colorControlNormal"
                     app:layout_constraintBottom_toBottomOf="@id/lineGraphFeatureName"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintLeft_toRightOf="@id/lineGraphFeatureName"
