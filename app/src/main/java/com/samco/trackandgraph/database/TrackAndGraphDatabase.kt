@@ -18,8 +18,6 @@ package com.samco.trackandgraph.database
 
 import android.content.Context
 import androidx.room.*
-import androidx.room.migration.Migration
-import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.R
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalTime
@@ -37,11 +35,7 @@ const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
 const val MAX_LINE_GRAPH_FEATURES = 10
 
 val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-val displayFeatureDateFormat: DateTimeFormatter = DateTimeFormatter
-    .ofPattern("dd/MM/yy  HH:mm")
-    .withZone(ZoneId.systemDefault())
 val doubleFormatter = DecimalFormat("#.##################")
-
 
 //this is a number coprime to the number of colours used to select them in a pseudo random order for greater contrast
 const val dataVisColorGenerator = 7

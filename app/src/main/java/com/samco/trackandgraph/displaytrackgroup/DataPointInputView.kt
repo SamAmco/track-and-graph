@@ -30,6 +30,7 @@ import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.util.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
@@ -68,10 +69,6 @@ class DataPointInputView : FrameLayout {
     private lateinit var discreteValueCheckBoxes: MutableMap<DiscreteValue, CheckBox>
 
     private var clickListener: DataPointInputClickListener? = null
-
-    private val dateDisplayFormatter: DateTimeFormatter = DateTimeFormatter
-        .ofPattern("dd/MM/yyyy")
-        .withZone(ZoneId.systemDefault())
 
     private val timeDisplayFormatter: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm")
@@ -185,7 +182,7 @@ class DataPointInputView : FrameLayout {
 
     private fun setSelectedDateTime(dateTime: OffsetDateTime) {
         state.dateTime = dateTime
-        dateButton.text = dateTime.format(dateDisplayFormatter)
+        dateButton.text = formatDayMonthYear(context, dateTime)
         timeButton.text = dateTime.format(timeDisplayFormatter)
     }
 

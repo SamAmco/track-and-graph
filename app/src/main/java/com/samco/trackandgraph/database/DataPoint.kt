@@ -21,18 +21,19 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import org.threeten.bp.OffsetDateTime
 
-@Entity(tableName = "data_points_table",
-        primaryKeys = ["timestamp", "feature_id"],
-        foreignKeys = [
-            androidx.room.ForeignKey(
-                entity = Feature::class,
-                parentColumns = arrayOf("id"),
-                childColumns = arrayOf("feature_id"),
-                onDelete = ForeignKey.CASCADE
-            )
+@Entity(
+    tableName = "data_points_table",
+    primaryKeys = ["timestamp", "feature_id"],
+    foreignKeys = [
+        androidx.room.ForeignKey(
+            entity = Feature::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("feature_id"),
+            onDelete = ForeignKey.CASCADE
+        )
     ]
 )
-data class DataPoint (
+data class DataPoint(
     @ColumnInfo(name = "timestamp")
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
@@ -48,9 +49,8 @@ data class DataPoint (
     @ColumnInfo(name = "note")
     val note: String
 ) {
-    fun getDisplayTimestamp(): String = displayFeatureDateFormat.format(timestamp)
     fun getDisplayValue(): String {
         return if (label.isNotEmpty()) doubleFormatter.format(value) + " : $label"
-            else doubleFormatter.format(value)
+        else doubleFormatter.format(value)
     }
 }

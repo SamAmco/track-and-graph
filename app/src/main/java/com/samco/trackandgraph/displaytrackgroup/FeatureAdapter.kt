@@ -29,6 +29,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
+import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 
 
 private val getIdForDisplayFeature = { df: DisplayFeature -> df.id }
@@ -56,7 +57,9 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         this.feature = feature
         this.clickListener = clickListener
         this.dropElevation = binding.cardView.cardElevation
-        binding.feature = feature
+        setLastDateText()
+        setNumEntriesText()
+        binding.trackGroupNameText.text = feature.name
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
@@ -68,6 +71,25 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
             binding.quickAddButton.visibility = View.INVISIBLE
         }
         binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
+    }
+
+    private fun setLastDateText() {
+        val timestamp = feature?.timestamp
+        binding.lastDateText.text = if (timestamp == null) {
+            binding.lastDateText.context.getString(R.string.no_data)
+        } else {
+            formatDayMonthYearHourMinute(binding.lastDateText.context, timestamp)
+        }
+    }
+
+    private fun setNumEntriesText() {
+        val numDataPoints = feature?.numDataPoints
+        binding.numEntriesText.text = if (numDataPoints != null) {
+            val format = binding.numEntriesText.context.getString(R.string.data_points)
+            String.format(format, numDataPoints)
+        } else {
+            binding.numEntriesText.context.getString(R.string.no_data)
+        }
     }
 
     private fun onQuickAddClicked() {

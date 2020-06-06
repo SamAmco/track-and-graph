@@ -27,6 +27,7 @@ import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DataPoint
 import com.samco.trackandgraph.databinding.ShowDataPointDialogHeaderBinding
+import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 
 fun showFeatureDescriptionDialog(context: Context, name: String, description: String) {
     val res = context.resources
@@ -61,7 +62,7 @@ fun showDataPointDescriptionDialog(
     val res = context.resources
 
     val headerView = ShowDataPointDialogHeaderBinding.inflate(inflater)
-    headerView.dateTimeText.text = dataPoint.getDisplayTimestamp()
+    headerView.dateTimeText.text = formatDayMonthYearHourMinute(context, dataPoint.timestamp)
     headerView.valueText.text = dataPoint.getDisplayValue()
     if (featureDispalayName != null && featureDispalayName.isNotEmpty()) {
         headerView.featureDisplayNameText.visibility = View.VISIBLE
