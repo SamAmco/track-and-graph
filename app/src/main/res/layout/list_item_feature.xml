@@ -74,6 +74,7 @@
                         android:background="@null"
                         android:contentDescription="@string/tracked_data_history_button_content_description"
                         android:scaleType="fitCenter"
+                        android:tint="?attr/colorControlNormal"
                         app:layout_constraintBottom_toTopOf="@id/divider"
                         app:layout_constraintLeft_toLeftOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/trackGroupNameText"
