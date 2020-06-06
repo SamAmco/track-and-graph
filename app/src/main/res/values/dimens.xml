@@ -19,13 +19,9 @@
     <dimen name="card_margin_small">4dp</dimen>
     <dimen name="card_padding">10dp</dimen>
     <dimen name="card_corner_radius">4dp</dimen>
-    <dimen name="dialog_label_text_size">16sp</dimen>
     <dimen name="dialog_input_spacing">10dp</dimen>
     <dimen name="input_spacing_large">20dp</dimen>
     <dimen name="feature_discrete_value_list_item_height">60dp</dimen>
-    <dimen name="feature_history_button_size">30dp</dimen>
-    <dimen name="dialog_header_size">20sp</dimen>
-    <dimen name="dialog_header_size_large">30sp</dimen>
     <dimen name="dialog_header_top_margin">16dp</dimen>
     <dimen name="list_item_data_point_height">50dp</dimen>
     <dimen name="data_point_input_fragment_height">270dp</dimen>
@@ -38,11 +34,18 @@
     <dimen name="widget_width">180dp</dimen>
     <dimen name="widget_resize_width">110dp</dimen>
     <dimen name="widget_height">40dp</dimen>
-    <dimen name="track_card_title_size">22sp</dimen>
     <dimen name="line_graph_line_thickness">2dp</dimen>
     <dimen name="line_graph_vertex_thickness">6dp</dimen>
     <dimen name="line_graph_point_label_h_offset">-3dp</dimen>
     <dimen name="line_graph_point_label_v_offset">10dp</dimen>
     <dimen name="report_dialog_start_end_padding">22dp</dimen>
     <dimen name="popup_card_corner_radius">16dp</dimen>
+
+    <dimen name="headline2_size">70sp</dimen>
+    <dimen name="headline4_size">30sp</dimen>
+    <dimen name="headline5_size">22sp</dimen>
+    <dimen name="headline6_size">20sp</dimen>
+    <dimen name="subtitle_size">17sp</dimen>
+    <dimen name="text_body_size">15sp</dimen>
+    <dimen name="small_label_size">10sp</dimen>
 </resources>

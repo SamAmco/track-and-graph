@@ -19,14 +19,14 @@
                 android:left="-4dp"
                 android:right="4dp"
                 android:top="-4dp" />
-            <solid android:color="@color/light_blue" />
+            <solid android:color="@color/faded_light_blue" />
             <corners android:radius="@dimen/card_corner_radius" />
         </shape>
     </item>
     <!-- Background -->
     <item>
         <shape>
-            <solid android:color="@color/white" />
+            <solid android:color="@color/mid_charcoal" />
             <corners android:radius="@dimen/card_corner_radius" />
         </shape>
     </item>

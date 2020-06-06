@@ -31,7 +31,7 @@
 
         <TextView
             android:id="@+id/noFeaturesHintText"
-            style="@style/EmptyPageHintTextStyle"
+            style="@style/Style.EmptyPageHintTextStyle"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"

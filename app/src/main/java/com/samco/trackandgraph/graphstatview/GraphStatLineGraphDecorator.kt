@@ -28,6 +28,7 @@ import com.androidplot.xy.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
+import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -383,8 +384,9 @@ class GraphStatLineGraphDecorator(
 
     private fun getPointLabelFormatter(lineGraphFeature: LineGraphFeature): PointLabelFormatter? {
         if (lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS) return null
+        val color = context!!.getColorFromAttr(android.R.attr.textColorPrimary)
         val pointLabelFormatter = PointLabelFormatter(
-            Color.BLACK,
+            color,
             context!!.resources.getDimension(R.dimen.line_graph_point_label_h_offset),
             context!!.resources.getDimension(R.dimen.line_graph_point_label_v_offset)
         )

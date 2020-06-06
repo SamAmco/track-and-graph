@@ -25,8 +25,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
                     android:background="@null"
+                    android:contentDescription="@string/delete_line_button_content_description"
                     android:paddingLeft="5dp"
                     android:paddingRight="5dp"
+                    android:tint="?attr/colorControlNormal"
                     app:layout_constraintBottom_toBottomOf="@id/lineGraphFeatureName"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintLeft_toRightOf="@id/lineGraphFeatureName"
@@ -38,11 +40,13 @@
                     android:id="@+id/lineGraphFeatureName"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:importantForAutofill="no"
                     android:inputType="text"
                     android:maxLines="1"
                     app:layout_constraintLeft_toLeftOf="parent"
                     app:layout_constraintRight_toLeftOf="@id/removeButton"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="LabelFor" />
 
                 <Spinner
                     android:id="@+id/colorSpinner"
@@ -74,7 +78,7 @@
                     android:id="@+id/featureSpinner"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:background="@color/colorShadowButton"
+                    android:background="?attr/colorControlHighlight"
                     android:spinnerMode="dialog"
                     app:layout_constraintBottom_toTopOf="@id/averagingModeSpinner"
                     app:layout_constraintHorizontal_weight="3"
@@ -88,7 +92,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:background="@color/colorShadowButton"
+                    android:background="?attr/colorControlHighlight"
                     android:entries="@array/line_graph_feature_modes"
                     android:spinnerMode="dialog"
                     app:layout_constraintBottom_toTopOf="@id/plottingModeSpinner"
@@ -102,7 +106,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:background="@color/colorShadowButton"
+                    android:background="?attr/colorControlHighlight"
                     android:entries="@array/line_graph_generation_modes"
                     android:spinnerMode="dialog"
                     app:layout_constraintBottom_toTopOf="@id/offsetLabel"
@@ -118,6 +122,7 @@
                     android:gravity="bottom"
                     android:paddingBottom="8dp"
                     android:text="@string/offset"
+                    android:textAppearance="@style/TextAppearance.Body"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toLeftOf="@id/plottingModeSpinner"
                     app:layout_constraintRight_toLeftOf="@id/offsetInput"
@@ -129,13 +134,15 @@
                     android:layout_height="match_parent"
                     android:digits="0123456789.,-"
                     android:hint="0"
+                    android:importantForAutofill="no"
                     android:inputType="numberSigned|numberDecimal"
                     android:singleLine="true"
                     android:textAlignment="center"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintLeft_toRightOf="@id/offsetLabel"
                     app:layout_constraintRight_toLeftOf="@id/scaleLabel"
-                    app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner" />
+                    app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner"
+                    tools:ignore="HardcodedText" />
 
                 <TextView
                     android:id="@+id/scaleLabel"
@@ -144,6 +151,7 @@
                     android:gravity="bottom"
                     android:paddingBottom="8dp"
                     android:text="@string/scale"
+                    android:textAppearance="@style/TextAppearance.Body"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintLeft_toRightOf="@id/offsetInput"
                     app:layout_constraintRight_toLeftOf="@id/scaleInput"
@@ -155,13 +163,15 @@
                     android:layout_height="match_parent"
                     android:digits="0123456789.,-"
                     android:hint="1"
+                    android:importantForAutofill="no"
                     android:inputType="numberSigned|numberDecimal"
                     android:singleLine="true"
                     android:textAlignment="center"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintLeft_toRightOf="@id/scaleLabel"
                     app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner" />
+                    app:layout_constraintTop_toBottomOf="@id/plottingModeSpinner"
+                    tools:ignore="HardcodedText" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>

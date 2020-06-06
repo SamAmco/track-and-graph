@@ -17,27 +17,32 @@
 package com.samco.trackandgraph
 
 import android.app.Activity
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
 import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 
+const val THEME_SETTING_PREF_KEY = "theme_setting"
+const val FIRST_RUN_PREF_KEY = "firstrun"
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -54,6 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        readThemeValue()
         setContentView(R.layout.activity_main)
 
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -62,30 +68,91 @@ class MainActivity : AppCompatActivity() {
         navController = navHostFragment.navController
         appBarConfiguration = AppBarConfiguration(navFragments, drawerLayout)
         navView = findViewById(R.id.nav_view)
-        navView.itemIconTintList = null
 
         setSupportActionBar(findViewById(R.id.toolbar))
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
 
         onDrawerHideKeyboard()
+        initDrawerSpinners()
         RemindersHelper.syncAlarms(this)
 
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
     }
 
+    private fun initDrawerSpinners() {
+        setUpThemeSpinner()
+    }
+
+    private fun setUpThemeSpinner() {
+        val spinner = navView.menu.findItem(R.id.themeSpinner).actionView as AppCompatSpinner
+        spinner.adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_dropdown_item,
+            getThemeNames()
+        )
+        when (getThemeValue()) {
+            AppCompatDelegate.MODE_NIGHT_NO -> spinner.setSelection(1)
+            AppCompatDelegate.MODE_NIGHT_YES -> spinner.setSelection(2)
+            else -> spinner.setSelection(0)
+        }
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
+                onThemeSelected(position)
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+    }
+
+    private fun onThemeSelected(position: Int) {
+        when (position) {
+            0 -> setThemeValue(getDefaultThemeValue())
+            1 -> setThemeValue(AppCompatDelegate.MODE_NIGHT_NO)
+            2 -> setThemeValue(AppCompatDelegate.MODE_NIGHT_YES)
+        }
+    }
+
+    private fun getDefaultThemeValue() =
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        else AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
+
+    private fun getThemeValue() = getPrefs().getInt(THEME_SETTING_PREF_KEY, getDefaultThemeValue())
+
+    private fun setThemeValue(themeValue: Int) {
+        AppCompatDelegate.setDefaultNightMode(themeValue)
+        getPrefs().edit().putInt(THEME_SETTING_PREF_KEY, themeValue).apply()
+    }
+
+    private fun readThemeValue() {
+        val themeValue = getThemeValue()
+        AppCompatDelegate.setDefaultNightMode(themeValue)
+    }
+
+    private fun getThemeNames() =
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
+            resources.getStringArray(R.array.theme_names_Q)
+        else resources.getStringArray(R.array.theme_names_pre_Q)
+
     private fun onDrawerHideKeyboard() {
-        drawerLayout.addDrawerListener(object: DrawerLayout.DrawerListener{
-            override fun onDrawerStateChanged(newState: Int) { }
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
+            override fun onDrawerStateChanged(newState: Int) {}
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
                 val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                imm.hideSoftInputFromWindow(
+                    window.decorView.windowToken,
+                    InputMethodManager.HIDE_NOT_ALWAYS
+                )
             }
-            override fun onDrawerClosed(drawerView: View) { }
+
+            override fun onDrawerClosed(drawerView: View) {}
             override fun onDrawerOpened(drawerView: View) {
                 val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                imm.hideSoftInputFromWindow(
+                    window.decorView.windowToken,
+                    InputMethodManager.HIDE_NOT_ALWAYS
+                )
             }
         })
     }
@@ -93,7 +160,7 @@ class MainActivity : AppCompatActivity() {
     private fun destroyTutorial() {
         val tutorialLayout = findViewById<ViewGroup>(R.id.tutorialOverlay)
         tutorialLayout.removeAllViews()
-        getPrefs().edit().putBoolean("firstrun", false).apply()
+        getPrefs().edit().putBoolean(FIRST_RUN_PREF_KEY, false).apply()
     }
 
     private fun showTutorial() {
@@ -110,15 +177,23 @@ class MainActivity : AppCompatActivity() {
         viewPager.visibility = View.VISIBLE
         viewPager.adapter = TutorialPagerAdapter(applicationContext, this::destroyTutorial)
         viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) { }
-            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
-            override fun onPageSelected(position: Int) { refreshPips.invoke(position) }
+            override fun onPageScrollStateChanged(state: Int) {}
+            override fun onPageScrolled(
+                position: Int,
+                positionOffset: Float,
+                positionOffsetPixels: Int
+            ) {
+            }
+
+            override fun onPageSelected(position: Int) {
+                refreshPips.invoke(position)
+            }
         })
     }
 
     private fun getPrefs() = getSharedPreferences("com.samco.trackandgraph", MODE_PRIVATE)
 
-    private fun isFirstRun() = getPrefs().getBoolean("firstrun", true)
+    private fun isFirstRun() = getPrefs().getBoolean(FIRST_RUN_PREF_KEY, true)
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(appBarConfiguration) || super.onNavigateUp()

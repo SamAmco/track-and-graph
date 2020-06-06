@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:theme="@style/AppTheme"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/track_widget_card"
-    >
+    android:background="@drawable/track_widget_card">
 
     <RelativeLayout
         android:id="@+id/widget_container"
@@ -12,8 +12,9 @@
         android:layout_height="match_parent"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
-        android:focusable="true"
-        >
+        android:focusable="true">
+
+        <!--TODO can we apply dark theme to widgets?-->
         <TextView
             android:id="@+id/track_widget_title"
             android:layout_width="match_parent"
@@ -27,8 +28,7 @@
             android:layout_toStartOf="@id/track_widget_icon"
             android:gravity="center"
             android:maxHeight="40dp"
-            android:textColor="@android:color/black"
-            android:textSize="@dimen/track_card_title_size"
+            android:textAppearance="@style/TextAppearance.Headline5"
             android:textStyle="bold"
             tools:text="Track" />
 
@@ -41,6 +41,7 @@
             android:layout_marginTop="@dimen/card_margin_small"
             android:layout_marginEnd="@dimen/card_margin_small"
             android:layout_marginBottom="@dimen/card_margin_small"
+            android:tint="?attr/colorControlNormal"
             tools:src="@drawable/add_box" />
     </RelativeLayout>
 </FrameLayout>

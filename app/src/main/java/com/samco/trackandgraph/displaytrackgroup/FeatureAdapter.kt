@@ -57,7 +57,6 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         this.clickListener = clickListener
         this.dropElevation = binding.cardView.cardElevation
         binding.feature = feature
-        binding.clickListener = clickListener
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }

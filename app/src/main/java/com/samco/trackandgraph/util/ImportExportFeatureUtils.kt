@@ -33,7 +33,7 @@ object ImportExportFeatureUtils {
         cursor?.moveToFirst()
         if (cursor != null && index != null) {
             fileButton.text = cursor.getString(index)
-            fileButton.setTextColor(ContextCompat.getColor(context, R.color.regularText))
+            fileButton.setTextColor(fileButton.context.getColorFromAttr(android.R.attr.textColorPrimary))
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
         }
         cursor?.close()

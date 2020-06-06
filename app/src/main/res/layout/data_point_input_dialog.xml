@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <ScrollView
+        android:theme="@style/AppTheme.AlertDialogTheme"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -18,7 +19,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dialog_header_top_margin"
                 android:text="@string/add_data_point_hint"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Body"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
@@ -26,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dialog_header_top_margin"
-                android:textSize="14sp"
+                android:textAppearance="@style/TextAppearance.Body"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="4/16" />
@@ -48,6 +49,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:text="@string/cancel"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent" />
 
@@ -57,6 +59,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:text="@string/skip"
+                android:textColor="?attr/colorOnSurface"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent" />
@@ -67,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:background="@null"
                 android:text="@string/add"
-                android:textColor="@color/secondaryColor"
+                android:textColor="?attr/colorSecondary"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent" />

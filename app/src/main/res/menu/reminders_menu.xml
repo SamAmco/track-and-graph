@@ -23,6 +23,7 @@
         android:id="@+id/add_reminder"
         android:title="@string/add"
         android:icon="@drawable/add_icon"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="always"
         />
 </menu>

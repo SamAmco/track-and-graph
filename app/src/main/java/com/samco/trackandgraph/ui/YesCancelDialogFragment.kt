@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.util.getColorFromAttr
 
 class YesCancelDialogFragment : DialogFragment() {
     lateinit var title: String
@@ -36,14 +37,16 @@ class YesCancelDialogFragment : DialogFragment() {
         title = arguments?.getString("title") ?: ""
         return activity?.let {
             listener = parentFragment as YesCancelDialogListener
-            var builder = AlertDialog.Builder(it)
+            var builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setMessage(title)
                 .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this) }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             val alertDialog = builder.create()
             alertDialog.setOnShowListener {
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getColor(requireContext(), R.color.secondaryColor))
-                alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getColor(requireContext(), R.color.toolBarTextColor ))
+                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                positiveButton.setTextColor(positiveButton.context.getColorFromAttr(R.attr.colorSecondary))
+                val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                negativeButton.setTextColor(negativeButton.context.getColorFromAttr(R.attr.colorControlNormal))
             }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")

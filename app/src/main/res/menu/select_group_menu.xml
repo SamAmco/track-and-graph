@@ -20,12 +20,12 @@
         android:id="@+id/add_track_group"
         android:title="@string/track_group"
         android:icon="@drawable/add_icon"
-        app:iconTint="@color/toolBarTextColor"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
     <item
         android:id="@+id/add_graph_group"
         android:title="@string/graph_group"
         android:icon="@drawable/add_icon"
-        app:iconTint="@color/toolBarTextColor"
+        app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
 </menu>

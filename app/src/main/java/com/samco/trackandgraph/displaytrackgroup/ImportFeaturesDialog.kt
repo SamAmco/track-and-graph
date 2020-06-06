@@ -36,6 +36,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.util.CSVReadWriter
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
+import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -64,9 +65,9 @@ class ImportFeaturesDialog : DialogFragment() {
             progressBar.visibility = View.INVISIBLE
             fileButton.setOnClickListener { onFileButtonClicked() }
             fileButton.text = getString(R.string.select_file)
-            fileButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.errorText))
+            fileButton.setTextColor(fileButton.context.getColorFromAttr(R.attr.colorError))
 
-            val builder = AlertDialog.Builder(it)
+            val builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setView(view)
                 .setPositiveButton(R.string.importButton) { _, _ -> run {} }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
@@ -79,14 +80,14 @@ class ImportFeaturesDialog : DialogFragment() {
 
     private fun setAlertDialogShowListeners() {
         val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setTextColor(getColor(requireContext(), R.color.secondaryColor))
+        positiveButton.setTextColor(positiveButton.context.getColorFromAttr(R.attr.colorSecondary))
         positiveButton.isEnabled = false
         positiveButton.setOnClickListener { onImportClicked() }
         listenToUri()
         listenToImportState()
         listenToException()
         val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        negativeButton.setTextColor(getColor(requireContext(), R.color.toolBarTextColor))
+        negativeButton.setTextColor(negativeButton.context.getColorFromAttr(R.attr.colorControlNormal))
         negativeButton.setOnClickListener { dismiss() }
         alertDialog.setOnCancelListener { run {} }
     }

@@ -21,7 +21,7 @@
 
         <TextView
             android:id="@+id/noGraphsHintText"
-            style="@style/EmptyPageHintTextStyle"
+            style="@style/Style.EmptyPageHintTextStyle"
             android:layout_gravity="center"
             tools:text="some hint text to tell you what to do next"
             />

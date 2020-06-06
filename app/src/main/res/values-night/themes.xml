@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of Track & Graph
+  ~ 
+  ~ Track & Graph is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~ 
+  ~ Track & Graph is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ 
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<resources>
+    <style name="AppTheme" parent="AppThemeBase">
+        <!--COLORS-->
+        <item name="colorAccent">@color/faded_orange</item>
+        <item name="colorPrimary">@color/faded_light_blue</item>
+        <item name="colorPrimaryDark">@color/faded_dark_blue</item>
+        <item name="colorSecondary">@color/faded_orange</item>
+        <item name="colorSurface">@color/mid_charcoal</item>
+        <item name="colorOnSurface">@color/light_gray</item>
+        <item name="colorOnSecondary">@color/blue_white_pastel</item>
+        <item name="colorPrimaryVariant">@color/faded_dark_blue</item>
+        <item name="colorSecondaryVariant">@color/faded_dark_orange</item>
+        <item name="errorTextColor">@color/faded_dark_orange</item>
+        <item name="colorOnError">@color/faded_green</item>
+        <item name="colorControlNormal">@color/blue_white_pastel</item>
+        <item name="colorControlHighlight">@color/dark_gray</item>
+        <item name="toolbarBackgroundColor">@color/light_charcoal</item>
+        <item name="android:textColorPrimary">@color/blue_white_pastel</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/blue_white_pastel</item>
+        <item name="android:textColorSecondary">@color/light_gray</item>
+        <item name="android:textColorHint">@color/mid_gray</item>
+        <item name="android:windowBackground">@color/dark_charcoal</item>
+    </style>
+
+    <style name="AppTheme.AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+        <item name="android:background">?attr/colorSurface</item>
+        <item name="colorAccent">@color/faded_orange</item>
+        <item name="android:textColorPrimary">@color/blue_white_pastel</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/blue_white_pastel</item>
+    </style>
+</resources>

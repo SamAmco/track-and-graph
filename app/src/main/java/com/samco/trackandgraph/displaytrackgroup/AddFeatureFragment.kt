@@ -43,12 +43,12 @@ import com.samco.trackandgraph.databinding.AddFeatureFragmentBinding
 import com.samco.trackandgraph.databinding.FeatureDiscreteValueListItemBinding
 import kotlinx.coroutines.*
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.forEachIndexed
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
+import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
 import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import java.lang.Exception
@@ -241,8 +241,8 @@ class AddFeatureFragment : Fragment(),
                 val textView = view as TextView
                 val enabled = viewModel.isFeatureTypeEnabled(featureTypeList[position])
                 val color =
-                    if (enabled) ContextCompat.getColor(context, R.color.toolBarTextColor)
-                    else ContextCompat.getColor(context, R.color.disabledTextColor)
+                    if (enabled) view.context.getColorFromAttr(R.attr.colorControlNormal)
+                    else view.context.getColorFromAttr(android.R.attr.textColorSecondary)
                 textView.setTextColor(color)
                 return view
             }

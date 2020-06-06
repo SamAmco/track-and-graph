@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of Track & Graph
   ~ 
   ~ Track & Graph is free software: you can redistribute it and/or modify
@@ -16,58 +15,53 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
-        <item name="android:actionOverflowButtonStyle">@style/OverflowButtonStyle</item>
-        <item name="android:textColor">@color/toolBarTextColor</item>
-        <item name="colorPrimary">@color/toolbarColor</item>
-        <item name="colorPrimaryDark">@color/toolbarColorDark</item>
-        <item name="colorAccent">@color/secondaryColor</item>
-        <item name="editTextStyle">@style/EditTextStyle</item>
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowBackground">@color/backgroundColor</item>
-        <item name="cardViewStyle">@style/CustomCardViewStyle</item>
+    <style name="Style.AddBarButton" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:background">?attr/colorControlHighlight</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="tint">?attr/colorControlNormal</item>
+        <item name="android:layout_marginStart">50dp</item>
+        <item name="android:layout_marginEnd">50dp</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">30dp</item>
     </style>
 
-    <style name="TransparentTheme" parent="AppTheme">
-        <item name="android:windowIsTranslucent">true</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:windowContentOverlay">@null</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowIsFloating">true</item>
-        <item name="android:backgroundDimEnabled">false</item>
+    <style name="Style.ButtonStyle" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorControlHighlight">?attr/colorControlHighlight</item>
+        <item name="colorControlNormal">?attr/colorAccent</item>
     </style>
 
-    <style name="CustomCardViewStyle" parent="CardView.Light">
-        <item name="cardBackgroundColor">@color/cardBackgroundColor</item>
+    <style name="Style.OverflowMenuStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">?attr/colorSurface</item>
     </style>
 
-    <style name="OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-        <item name="android:tint">@color/toolBarTextColor</item>
+    <style name="Style.CardViewStyle" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
     </style>
 
-    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="color">@color/toolBarTextColor</item>
+    <style name="Style.OverflowButtonStyle" parent="Widget.AppCompat.ActionButton.Overflow">
+        <item name="android:tint">?attr/colorControlNormal</item>
     </style>
 
-    <style name="EditTextStyle" parent="Widget.AppCompat.EditText">
-        <item name="colorControlActivated">@color/secondaryColor</item>
-        <item name="colorControlHighlight">@color/secondaryColor</item>
-        <item name="backgroundTint">@color/secondaryColor</item>
+    <style name="Style.Toolbar" parent="Widget.AppCompat.Toolbar">
+        <item name="android:background">?attr/toolbarBackgroundColor</item>
+        <item name="titleTextColor">?attr/colorControlNormal</item>
     </style>
 
-    <style name="EmptyPageHintTextStyle" parent="Widget.AppCompat.TextView">
+    <style name="Style.EditTextStyle" parent="Widget.AppCompat.EditText">
+        <item name="colorControlActivated">?attr/colorSecondary</item>
+        <item name="colorControlHighlight">?attr/colorSecondary</item>
+        <item name="backgroundTint">?attr/colorSecondary</item>
+    </style>
+
+    <style name="Style.EmptyPageHintTextStyle" parent="Widget.AppCompat.TextView">
         <item name="android:layout_width">250dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textAppearance">@style/TextAppearance.Subtitle2</item>
         <item name="android:alpha">0.6</item>
         <item name="android:textAlignment">center</item>
     </style>
 
-    <style name="DataPointInputNumberStyle">
+    <style name="Style.DataPointInputNumberStyle" parent="Widget.AppCompat.EditText">
         <item name="android:gravity">center</item>
         <item name="android:inputType">numberDecimal|numberSigned</item>
         <item name="android:singleLine">true</item>
@@ -75,14 +69,14 @@
         <item name="android:hint">0</item>
     </style>
 
-    <style name="DiscreteValueButtonsScrollViewStyle">
+    <style name="Style.DiscreteValueButtonsScrollViewStyle" parent="">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">80dp</item>
         <item name="android:scrollbars">none</item>
         <item name="android:layout_gravity">center_horizontal</item>
     </style>
 
-    <style name="ExpansiveTextInputStyle">
+    <style name="Style.ExpansiveTextInputStyle" parent="Widget.AppCompat.EditText">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:padding">12dp</item>

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<selector xmlns:android="http://schemas.android.com/apk/res/android" >
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_pressed="true">
-        <shape android:shape="rectangle" >
+        <shape android:shape="rectangle">
             <corners android:radius="3dip" />
-            <stroke android:width="1dip" android:color="@color/secondaryColor" />
-            <solid android:color="@color/colorShadowButton" />
+            <stroke android:width="1dip" android:color="?attr/colorSecondary" />
+            <solid android:color="?attr/colorControlHighlight" />
         </shape>
     </item>
 
     <item android:state_checked="true">
         <shape android:shape="rectangle">
             <corners android:radius="3dip" />
-            <stroke android:width="1dip" android:color="@color/secondaryDarkColor" />
-            <solid android:color="@color/colorShadowButton" />
+            <stroke android:width="1dip" android:color="?attr/colorSecondary" />
+            <solid android:color="?attr/colorControlHighlight" />
         </shape>
     </item>
 
     <item>
         <shape android:shape="rectangle">
             <corners android:radius="3dip" />
-            <stroke android:width="1dip" android:color="@color/primaryColor" />
+            <stroke android:width="1dip" android:color="?attr/colorPrimary" />
             <solid android:color="@color/ap_transparent" />
         </shape>
     </item>
