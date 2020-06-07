@@ -24,6 +24,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -43,7 +44,7 @@ import kotlinx.coroutines.*
 class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
 
     private lateinit var binding: FragmentFeatureHistoryBinding
-    private lateinit var viewModel: FeatureHistoryViewModel
+    private val viewModel by viewModels<FeatureHistoryViewModel>()
     private lateinit var adapter: DataPointAdapter
     private val args: FragmentFeatureHistoryArgs by navArgs()
 
@@ -57,7 +58,6 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         )
         initPreLoadViewState()
 
-        viewModel = ViewModelProviders.of(this).get(FeatureHistoryViewModel::class.java)
         val dao = TrackAndGraphDatabase.getInstance(requireContext()).trackAndGraphDatabaseDao
         viewModel.initViewModel(args.feature, dao)
 

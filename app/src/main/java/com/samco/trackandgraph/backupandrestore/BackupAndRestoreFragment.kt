@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.samco.trackandgraph.MainActivity
@@ -30,7 +31,7 @@ const val SQLITE_MIME_TYPE = "application/vnd.sqlite3"
 
 class BackupAndRestoreFragment : Fragment() {
     private lateinit var binding: BackupAndRestoreFragmentBinding
-    private lateinit var viewModel: BackupAndRestoreViewModel
+    private val viewModel by viewModels<BackupAndRestoreViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,7 +40,6 @@ class BackupAndRestoreFragment : Fragment() {
     ): View? {
         binding = BackupAndRestoreFragmentBinding.inflate(inflater)
 
-        viewModel = ViewModelProviders.of(this).get(BackupAndRestoreViewModel::class.java)
         viewModel.init(TrackAndGraphDatabase.getInstance(requireContext()))
         listenToViewModel()
 

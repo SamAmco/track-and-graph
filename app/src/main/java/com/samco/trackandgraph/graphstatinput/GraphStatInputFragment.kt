@@ -32,6 +32,7 @@ import android.widget.LinearLayout
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -49,7 +50,7 @@ class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
     private val args: GraphStatInputFragmentArgs by navArgs()
     private lateinit var binding: FragmentGraphStatInputBinding
-    private lateinit var viewModel: GraphStatInputViewModel
+    private val viewModel by viewModels<GraphStatInputViewModel>()
 
     private val updateDemoHandler = Handler()
 
@@ -58,7 +59,6 @@ class GraphStatInputFragment : Fragment() {
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_graph_stat_input, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.graphStatNameInput.filters = arrayOf(InputFilter.LengthFilter(MAX_GRAPH_STAT_NAME_LENGTH))
-        viewModel = ViewModelProviders.of(this).get(GraphStatInputViewModel::class.java)
         viewModel.initViewModel(requireActivity(), args.graphStatGroupId, args.graphStatId)
         binding.demoGraphStatCardView.hideMenuButton()
         listenToViewModelState()

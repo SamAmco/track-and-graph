@@ -24,6 +24,7 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -50,14 +51,13 @@ class DisplayTrackGroupFragment : Fragment(),
 
     private lateinit var binding: FragmentDisplayTrackGroupBinding
     private lateinit var adapter: FeatureAdapter
-    private lateinit var viewModel: DisplayTrackGroupViewModel
+    private val viewModel by viewModels<DisplayTrackGroupViewModel>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.navController = container?.findNavController()
 
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_display_track_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        viewModel = ViewModelProviders.of(this).get(DisplayTrackGroupViewModel::class.java)
         viewModel.initViewModel(requireActivity(), args.trackGroup)
 
         adapter = FeatureAdapter(FeatureClickListener(

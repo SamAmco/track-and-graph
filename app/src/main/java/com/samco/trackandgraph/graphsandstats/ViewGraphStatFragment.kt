@@ -29,6 +29,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -45,7 +46,7 @@ import kotlinx.coroutines.*
 
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
-    private lateinit var viewModel: ViewGraphStatViewModel
+    private val viewModel by viewModels<ViewGraphStatViewModel>()
     private lateinit var graphStatView: GraphStatView
     private lateinit var binding: FragmentViewGraphStatBinding
     private lateinit var adapter: NotesAdapter
@@ -59,7 +60,6 @@ class ViewGraphStatFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         this.navController = container?.findNavController()
-        viewModel = ViewModelProviders.of(this).get(ViewGraphStatViewModel::class.java)
         viewModel.init(requireActivity(), args.graphStatId)
         binding = FragmentViewGraphStatBinding.inflate(inflater, container, false)
         graphStatView = binding.graphStatView

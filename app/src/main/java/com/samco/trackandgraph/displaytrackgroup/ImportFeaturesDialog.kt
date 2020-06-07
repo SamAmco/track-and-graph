@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.room.withTransaction
 import com.samco.trackandgraph.R
@@ -47,14 +48,13 @@ class ImportFeaturesDialog : DialogFragment() {
     private var trackGroupName: String? = null
     private var trackGroupId: Long? = null
 
-    private lateinit var viewModel: ImportFeaturesViewModel
+    private val viewModel by viewModels<ImportFeaturesViewModel>()
     private lateinit var alertDialog: AlertDialog
     private lateinit var fileButton: Button
     private lateinit var progressBar: ProgressBar
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            viewModel = ViewModelProviders.of(this).get(ImportFeaturesViewModel::class.java)
             val view = it.layoutInflater.inflate(R.layout.import_features_dialog, null)
             trackGroupName = requireArguments().getString(TRACK_GROUP_NAME_KEY)
             trackGroupId = requireArguments().getLong(TRACK_GROUP_ID_KEY)
