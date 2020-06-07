@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -36,7 +37,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
 
 class TrackWidgetConfigureDialog : DialogFragment() {
-    private lateinit var viewModel: TrackWidgetConfigureDialogViewModel
+    private val viewModel by viewModels<TrackWidgetConfigureDialogViewModel>()
     private lateinit var binding: TrackWidgetConfigureDialogBinding
     private lateinit var listener: TrackWidgetConfigureDialogListener
 
@@ -52,8 +53,6 @@ class TrackWidgetConfigureDialog : DialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         return activity?.let {
-            viewModel = ViewModelProviders.of(this)
-                .get(TrackWidgetConfigureDialogViewModel::class.java)
             viewModel.init(requireActivity().application)
             binding = TrackWidgetConfigureDialogBinding.inflate(inflater, container, false)
             listener = activity as TrackWidgetConfigureDialogListener

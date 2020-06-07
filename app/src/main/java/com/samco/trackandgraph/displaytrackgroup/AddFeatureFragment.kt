@@ -46,6 +46,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.children
 import androidx.core.view.forEachIndexed
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.viewModels
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -61,7 +62,7 @@ class AddFeatureFragment : Fragment(),
 
     private val args: AddFeatureFragmentArgs by navArgs()
     private lateinit var binding: AddFeatureFragmentBinding
-    private lateinit var viewModel: AddFeatureViewModel
+    private val viewModel by viewModels<AddFeatureViewModel>()
     private var navController: NavController? = null
     private val featureTypeList = listOf(FeatureType.DISCRETE, FeatureType.CONTINUOUS)
 
@@ -73,7 +74,6 @@ class AddFeatureFragment : Fragment(),
         binding = DataBindingUtil.inflate(inflater, R.layout.add_feature_fragment, container, false)
         navController = container?.findNavController()
 
-        viewModel = ViewModelProviders.of(this).get(AddFeatureViewModel::class.java)
         viewModel.init(
             requireActivity().application,
             args.trackGroupId,

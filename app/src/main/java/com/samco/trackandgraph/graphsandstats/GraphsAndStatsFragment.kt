@@ -22,6 +22,7 @@ import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -43,17 +44,15 @@ import kotlinx.coroutines.*
 class GraphsAndStatsFragment : Fragment() {
     private var navController: NavController? = null
     private val args: GraphsAndStatsFragmentArgs by navArgs()
-    private lateinit var viewModel: GraphsAndStatsViewModel
+    private val viewModel by viewModels<GraphsAndStatsViewModel>()
     private lateinit var binding: GraphsAndStatsFragmentBinding
     private lateinit var adapter: GraphStatAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         this.navController = container?.findNavController()
-        viewModel = ViewModelProviders.of(this).get(GraphsAndStatsViewModel::class.java)
         binding = DataBindingUtil.inflate(inflater, R.layout.graphs_and_stats_fragment, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel = ViewModelProviders.of(this).get(GraphsAndStatsViewModel::class.java)
         viewModel.initViewModel(requireActivity(), args.graphStatGroupId)
 
         adapter = GraphStatAdapter(

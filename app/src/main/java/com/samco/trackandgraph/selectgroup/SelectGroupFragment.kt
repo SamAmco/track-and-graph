@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -45,7 +46,7 @@ class SelectGroupFragment : Fragment(),
 {
     private var navController: NavController? = null
     private lateinit var binding: FragmentSelectGroupBinding
-    private lateinit var viewModel: SelectGroupViewModel
+    private val viewModel by viewModels<SelectGroupViewModel>()
     private lateinit var adapter: GroupListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -53,7 +54,6 @@ class SelectGroupFragment : Fragment(),
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_select_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel = ViewModelProviders.of(this).get(SelectGroupViewModel::class.java)
         viewModel.initViewModel(requireActivity())
         listenToViewModel()
 
