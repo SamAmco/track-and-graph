@@ -6,7 +6,7 @@
 
 also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.
 
-3. Build an apk and an aab for the release (using Android Studio)
+3. Build an aab for the release (using Android Studio)
 
 4. Use fastlane to upload the new aab to the play store e.g.
 
@@ -18,4 +18,6 @@ or for release
 
 5. Commit everything and tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload)
 
-6. On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
+6. Build an apk for the release (using Android Studio)
+
+7. On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
