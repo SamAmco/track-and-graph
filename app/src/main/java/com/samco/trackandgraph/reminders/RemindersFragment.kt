@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.view.*
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -44,14 +45,12 @@ const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
 
 class RemindersFragment : Fragment() {
     private lateinit var binding: RemindersFragmentBinding
-    private lateinit var viewModel: RemindersViewModel
+    private val viewModel by viewModels<RemindersViewModel>()
     private lateinit var adapter: ReminderListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = RemindersFragmentBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-
-        viewModel = ViewModelProviders.of(this).get(RemindersViewModel::class.java)
 
         adapter = ReminderListAdapter(
             ReminderClickListener(

@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -43,7 +44,7 @@ const val MOVE_DIALOG_TYPE_TRACK = "track"
 const val MOVE_DIALOG_TYPE_GRAPH = "graph"
 
 class MoveToDialogFragment : DialogFragment() {
-    private lateinit var viewModel: MoveToDialogViewModel
+    private val viewModel by viewModels<MoveToDialogViewModel>()
     private lateinit var binding: MoveToGroupDialogBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -66,7 +67,6 @@ class MoveToDialogFragment : DialogFragment() {
     }
 
     private fun initViewModel() {
-        viewModel = ViewModelProviders.of(this).get(MoveToDialogViewModel::class.java)
         val mode = when (requireArguments().getString(MOVE_DIALOG_TYPE_KEY)) {
             MOVE_DIALOG_TYPE_TRACK -> GroupItemType.TRACK
             MOVE_DIALOG_TYPE_GRAPH -> GroupItemType.GRAPH

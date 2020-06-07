@@ -20,6 +20,7 @@ import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -34,7 +35,7 @@ import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
 class TrackWidgetInputDataPointActivity : AppCompatActivity() {
-    private lateinit var viewModel: TrackWidgetInputDataPointViewModel
+    private val viewModel by viewModels<TrackWidgetInputDataPointViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +50,6 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
                 return
             }
 
-            viewModel = ViewModelProviders.of(this)
-                .get(TrackWidgetInputDataPointViewModel::class.java)
             viewModel.init(this.application, featureId)
             observeFeature()
         } ?: finish()

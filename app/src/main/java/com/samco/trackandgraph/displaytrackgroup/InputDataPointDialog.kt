@@ -26,6 +26,7 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -42,13 +43,12 @@ const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 
 open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
-    private lateinit var viewModel: InputDataPointDialogViewModel
+    private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private lateinit var binding: DataPointInputDialogBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return activity?.let {
-            viewModel = ViewModelProviders.of(this).get(InputDataPointDialogViewModel::class.java)
             initViewModel()
             binding = DataPointInputDialogBinding.inflate(inflater, container, false)
 
