@@ -20,7 +20,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.FrameLayout
 import android.widget.LinearLayout
 import com.androidplot.Plot
 import com.androidplot.ui.HorizontalPositioning
@@ -133,11 +132,12 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
                 cleanAllViews()
                 decorator.decorate(this@GraphStatView)
             } catch (exception: Exception) {
+                val initException =
+                    (if (exception is GraphStatInitException) exception else null) ?: return@launch
+                val errorTextId = initException.errorTextId
                 cleanAllViews()
-                val initException = if (exception is GraphStatInitException) exception else null
-                val errorTextId =
-                    initException?.errorTextId ?: R.string.graph_stat_view_unkown_error
-                GraphStatErrorDecorator(graphOrStat, errorTextId).decorate(this@GraphStatView)
+                GraphStatErrorDecorator(graphOrStat, errorTextId)
+                    .decorate(this@GraphStatView)
             }
         }
     }
@@ -168,7 +168,11 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     ) {
         trySetDecorator(
             graphOrStat,
-            GraphStatAverageTimeBetweenDecorator(graphOrStat, timeBetweenStat, onSampledDataCallback)
+            GraphStatAverageTimeBetweenDecorator(
+                graphOrStat,
+                timeBetweenStat,
+                onSampledDataCallback
+            )
         )
     }
 

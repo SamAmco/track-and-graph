@@ -108,8 +108,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
-                        android:textAppearance="@style/TextAppearance.Body"
-                        android:text="@string/ending_at_colon"/>
+                        android:text="@string/ending_at_colon"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
                     <com.samco.trackandgraph.ui.ExtendedSpinner
                         android:id="@+id/endDateSpinner"
@@ -117,15 +117,17 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
                         android:layout_marginStart="@dimen/dialog_input_spacing"
-                        android:entries="@array/ending_at_values"/>
+                        android:entries="@array/ending_at_values" />
 
                     <TextView
                         android:id="@+id/customEndDateText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:textAppearance="@style/TextAppearance.Body"
-                        tools:text="(10/04/2020)"/>
+                        tools:text="(10/04/2020)" />
                 </LinearLayout>
 
                 <LinearLayout
