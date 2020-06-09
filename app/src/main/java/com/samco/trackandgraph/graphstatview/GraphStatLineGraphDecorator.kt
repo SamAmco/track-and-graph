@@ -70,6 +70,7 @@ class GraphStatLineGraphDecorator(
         binding = view.getBinding()
         context = view.getContext()
 
+        yield()
         binding!!.lineGraph.visibility = View.INVISIBLE
         initHeader(binding, graphOrStat)
         initFromLineGraphBody()
@@ -77,10 +78,12 @@ class GraphStatLineGraphDecorator(
     }
 
     private suspend fun initFromLineGraphBody() {
+        yield()
         binding!!.progressBar.visibility = View.VISIBLE
         if (tryDrawLineGraphFeatures()) {
             setUpLineGraphXAxis()
             setLineGraphBounds()
+            yield()
             binding!!.lineGraph.redraw()
             binding!!.lineGraph.visibility = View.VISIBLE
             binding!!.progressBar.visibility = View.GONE
@@ -89,9 +92,10 @@ class GraphStatLineGraphDecorator(
         }
     }
 
-    private fun setLineGraphBounds() {
+    private suspend fun setLineGraphBounds() {
         val bounds = RectRegion()
         currentXYRegions.forEach { r -> bounds.union(r) }
+        yield()
         if (lineGraph.yRangeType == YRangeType.FIXED) {
             bounds.minY = lineGraph.yFrom
             bounds.maxY = lineGraph.yTo
@@ -102,11 +106,12 @@ class GraphStatLineGraphDecorator(
         setLineGraphPaddingFromBounds(bounds)
     }
 
-    private fun setLineGraphPaddingFromBounds(bounds: RectRegion) {
+    private suspend fun setLineGraphPaddingFromBounds(bounds: RectRegion) {
         val minY = bounds.minY.toDouble()
         val maxY = bounds.maxY.toDouble()
         val maxBound = max(abs(minY), abs(maxY))
         val numDigits = log10(maxBound).toFloat() + 3
+        yield()
         binding!!.lineGraph.graph.paddingLeft =
             (numDigits - 1) * (context!!.resources.displayMetrics.scaledDensity) * 3.5f
         binding!!.lineGraph.graph.refreshLayout()
@@ -196,12 +201,13 @@ class GraphStatLineGraphDecorator(
         addSeries(series, lineGraphFeature)
     }
 
-    private fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
+    private suspend fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
         val seriesFormat =
             if (listViewMode && lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
                 getFastLineAndPointFormatter(lineGraphFeature)
             else getLineAndPointFormatter(lineGraphFeature)
         currentXYRegions.add(series.minMax())
+        yield()
         binding!!.lineGraph.addSeries(series, seriesFormat)
     }
 
