@@ -328,7 +328,7 @@ object CSVReadWriter {
         }
         lateinit var parsedTimestamp: OffsetDateTime
         try {
-            parsedTimestamp = odtFromString(timestamp)
+            parsedTimestamp = odtFromString(timestamp)!!
         } catch (_: Exception) {
             throw ImportFeaturesException(
                 R.string.import_exception_bad_timestamp,

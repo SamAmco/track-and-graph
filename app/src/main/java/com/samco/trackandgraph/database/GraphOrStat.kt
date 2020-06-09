@@ -21,6 +21,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
 enum class GraphStatType { LINE_GRAPH, PIE_CHART, AVERAGE_TIME_BETWEEN, TIME_SINCE }
 
@@ -55,15 +56,18 @@ data class GraphOrStat(
     val type: GraphStatType,
 
     @ColumnInfo(name = "display_index")
-    val displayIndex: Int
+    val displayIndex: Int,
+
+    @ColumnInfo(name = "end_date")
+    val endDate: OffsetDateTime?
 ) {
     companion object {
         fun create(id: Long, graphStatGroupId: Long, name: String,
-                   type: GraphStatType, displayIndex: Int): GraphOrStat {
+                   type: GraphStatType, displayIndex: Int, endDate: OffsetDateTime?): GraphOrStat {
             val validName = name.take(MAX_GRAPH_STAT_NAME_LENGTH)
                 .replace(splitChars1, " ")
                 .replace(splitChars2, " ")
-            return GraphOrStat(id, graphStatGroupId, validName, type, displayIndex)
+            return GraphOrStat(id, graphStatGroupId, validName, type, displayIndex, endDate)
         }
     }
 }
