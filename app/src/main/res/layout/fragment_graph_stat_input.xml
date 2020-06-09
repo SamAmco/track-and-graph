@@ -98,6 +98,37 @@
                 </LinearLayout>
 
                 <LinearLayout
+                    android:id="@+id/end_time_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textAppearance="@style/TextAppearance.Body"
+                        android:text="@string/ending_at_colon"/>
+
+                    <com.samco.trackandgraph.ui.ExtendedSpinner
+                        android:id="@+id/endDateSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginStart="@dimen/dialog_input_spacing"
+                        android:entries="@array/ending_at_values"/>
+
+                    <TextView
+                        android:id="@+id/customEndDateText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:textAppearance="@style/TextAppearance.Body"
+                        tools:text="(10/04/2020)"/>
+                </LinearLayout>
+
+                <LinearLayout
                     android:id="@+id/yRangeLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
