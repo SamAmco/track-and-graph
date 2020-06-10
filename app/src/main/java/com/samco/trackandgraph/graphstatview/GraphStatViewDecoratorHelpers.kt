@@ -48,26 +48,46 @@ class SampleDataCallback(val callback: (List<DataPoint>) -> Unit) : (List<DataPo
     }
 }
 
+/**
+ * This function will call the dataSource to get a sample of the data points with the given featureId.
+ * The end date of this sample is calculated as:
+ *  - If an endDate is given then it is used
+ *  - If an endDate is not given then the last data point tracked or the current date/time is used (which ever is later)
+ * The start date of this sample is calculated as:
+ *  - The beginning of time if no sampleDuration is provided
+ *  - If a sampleDuration is provided then it is the end date minus the sample duration. However if there is
+ *      a plotTotalTime or averagingDuration provided as well then which ever of the two is larger will be added
+ *      to the sampleDuration before it is subtracted from the end date such that all relevant information
+ *      is contained in the sample.
+ *
+ * The RawDataSample.plotFrom variable should mark the index of the first data point within the sample that should
+ * actually be plotted. This may not be 0 because previous points may be included only to help calculate the
+ * moving average or plot total. The RawDataSample.plotFrom will be -1 if there is not enough data.
+ *
+ * Note: No actual averaging or totalling is performed by this function, it just collects all relevant data.
+ */
 internal suspend fun sampleData(
     dataSource: TrackAndGraphDatabaseDao, featureId: Long, sampleDuration: Duration?,
-    averagingDuration: Duration?, plotTotalTime: TemporalAmount?
+    endDate: OffsetDateTime?, averagingDuration: Duration?, plotTotalTime: TemporalAmount?
 ): RawDataSample {
     return withContext(Dispatchers.IO) {
-        if (sampleDuration == null) RawDataSample(
+        if (sampleDuration == null && endDate == null) RawDataSample(
             dataSource.getDataPointsForFeatureAscSync(featureId),
             0
         )
         else {
-            val latest = getLatestTimeOrNowForFeature(dataSource, featureId)
-            val startDate = latest.minus(sampleDuration)
+            val latest = endDate ?: getLastTrackedTimeOrNow(dataSource, featureId)
+            val startDate = sampleDuration?.let { latest.minus(sampleDuration) } ?: OffsetDateTime.MIN
             val plottingDuration =
                 plotTotalTime?.let { Duration.between(latest, latest.plus(plotTotalTime)) }
-            val maxSampleDuration = listOf(
-                sampleDuration,
-                averagingDuration?.plus(sampleDuration),
-                plottingDuration?.plus(sampleDuration)
-            ).maxBy { d -> d ?: Duration.ZERO }
-            val minSampleDate = latest.minus(maxSampleDuration)
+            val minSampleDate = sampleDuration?.let {
+                val possibleLongestDurations = listOf(
+                    sampleDuration,
+                    averagingDuration?.plus(sampleDuration),
+                    plottingDuration?.plus(sampleDuration)
+                )
+                latest.minus(possibleLongestDurations.maxBy { d -> d ?: Duration.ZERO })
+            } ?: OffsetDateTime.MIN
             val dataPoints =
                 dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
             val startIndex = dataPoints.indexOfFirst { dp -> dp.timestamp.isAfter(startDate) }
@@ -76,7 +96,7 @@ internal suspend fun sampleData(
     }
 }
 
-internal fun getLatestTimeOrNowForFeature(
+private fun getLastTrackedTimeOrNow(
     dataSource: TrackAndGraphDatabaseDao,
     featureId: Long
 ): OffsetDateTime {
@@ -112,19 +132,21 @@ internal fun inflateGraphLegendItem(
     )
 }
 
+//TODO test this
 internal suspend fun calculateDurationAccumulatedValues(
     rawData: RawDataSample,
     featureId: Long,
+    endTime: OffsetDateTime,
     plotTotalTime: TemporalAmount
 ): RawDataSample {
     var plotFrom = 0
     var foundPlotFrom = false
     val newData = mutableListOf<DataPoint>()
-    val firstDataPointTime = if (rawData.dataPoints.isEmpty()) {
-        OffsetDateTime.now()
-    } else rawData.dataPoints[0].timestamp
+    val firstDataPointTime =
+        if (rawData.dataPoints.isEmpty()) endTime
+        else rawData.dataPoints[0].timestamp
     var currentTimeStamp = findFirstPlotDateTime(firstDataPointTime, plotTotalTime)
-    val latest = getNowOrLatest(rawData)
+    val latest = getEndTimeOrLatest(rawData, endTime)
     var index = 0
     while (currentTimeStamp.isBefore(latest)) {
         currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(plotTotalTime) }
@@ -146,14 +168,13 @@ internal suspend fun calculateDurationAccumulatedValues(
     return RawDataSample(newData, plotFrom)
 }
 
-internal fun getNowOrLatest(rawData: RawDataSample): OffsetDateTime {
-    val now = OffsetDateTime.now()
-    if (rawData.dataPoints.isEmpty()) return now
+private fun getEndTimeOrLatest(rawData: RawDataSample, endTime: OffsetDateTime): OffsetDateTime {
+    if (rawData.dataPoints.isEmpty()) return endTime
     val latest = rawData.dataPoints.last().timestamp
-    return if (latest > now) latest else now
+    return if (latest > endTime) latest else endTime
 }
 
-internal fun findFirstPlotDateTime(
+private fun findFirstPlotDateTime(
     startDateTime: OffsetDateTime,
     plotTotalTime: TemporalAmount
 ): OffsetDateTime {
@@ -186,7 +207,8 @@ internal fun findFirstPlotDateTime(
     }
 }
 
-internal suspend fun calculateMovingAverage(
+//TODO this is a pretty naive implementation, we could probably do a lot better
+private suspend fun calculateMovingAverage(
     rawData: RawDataSample,
     movingAvDuration: Duration
 ): List<Double> {
