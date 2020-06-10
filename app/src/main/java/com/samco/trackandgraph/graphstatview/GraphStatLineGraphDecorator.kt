@@ -57,7 +57,7 @@ class GraphStatLineGraphDecorator(
         .withZone(ZoneId.systemDefault())
 
     private val currentXYRegions = mutableListOf<RectRegion>()
-    private val creationTime = OffsetDateTime.now()
+    private lateinit var endTime: OffsetDateTime
 
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
@@ -69,6 +69,7 @@ class GraphStatLineGraphDecorator(
         graphStatView = view
         binding = view.getBinding()
         context = view.getContext()
+        endTime = graphOrStat.endDate ?: OffsetDateTime.now()
 
         yield()
         binding!!.lineGraph.visibility = View.INVISIBLE
@@ -127,7 +128,7 @@ class GraphStatLineGraphDecorator(
                 ): StringBuffer {
                     val millis = (obj as Number).toLong()
                     val duration = Duration.ofMillis(millis)
-                    val timeStamp = creationTime.plus(duration)
+                    val timeStamp = endTime.plus(duration)
                     val formattedTimestamp = getDateTimeFormattedForDuration(
                         binding!!.lineGraph.bounds.minX,
                         binding!!.lineGraph.bounds.maxX,
@@ -175,6 +176,7 @@ class GraphStatLineGraphDecorator(
             graphStatView!!.getDataSource(),
             lineGraphFeature.featureId,
             lineGraph.duration,
+            graphOrStat.endDate,
             movingAvDuration,
             plottingPeriod
         )
@@ -184,6 +186,7 @@ class GraphStatLineGraphDecorator(
             else -> calculateDurationAccumulatedValues(
                 rawDataSample,
                 lineGraphFeature.featureId,
+                endTime,
                 plottingPeriod!!
             )
         }
@@ -196,7 +199,7 @@ class GraphStatLineGraphDecorator(
         lineGraphFeature: LineGraphFeature
     ) {
         val series = withContext(Dispatchers.IO) {
-            getXYSeriesFromRawDataSample(rawData, creationTime, lineGraphFeature)
+            getXYSeriesFromRawDataSample(rawData, endTime, lineGraphFeature)
         }
         addSeries(series, lineGraphFeature)
     }

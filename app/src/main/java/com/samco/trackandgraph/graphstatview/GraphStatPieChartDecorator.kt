@@ -76,8 +76,8 @@ class GraphStatPieChartDecorator(
             dataSource.getFeatureById(pieChart.featureId)
         }
         val dataSample = sampleData(
-            dataSource, feature.id,
-            pieChart.duration, null, null
+            dataSource, feature.id, pieChart.duration,
+            graphOrStat.endDate, null, null
         )
         return if (dataPlottable(dataSample)) dataSample else null
     }

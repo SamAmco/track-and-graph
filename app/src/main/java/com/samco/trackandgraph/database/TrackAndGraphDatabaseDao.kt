@@ -190,34 +190,28 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp""")
-    fun getDataPointsBetween(featureId: Long, min: String, max: String): List<DataPoint>
-
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp""")
-    fun getDataPointsWithValue(featureId: Long, values: List<Int>): List<DataPoint>
-
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :now AND timestamp > :cutOff ORDER BY timestamp""")
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :endDateTime AND timestamp > :startDateTime ORDER BY timestamp""")
     fun getDataPointsWithValueInTimeRange(
         featureId: Long,
         values: List<Int>,
-        cutOff: OffsetDateTime,
-        now: OffsetDateTime
+        startDateTime: OffsetDateTime,
+        endDateTime: OffsetDateTime
     ): List<DataPoint>
 
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max  AND timestamp < :now AND timestamp > :cutOff ORDER BY timestamp""")
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max  AND timestamp < :endDateTime AND timestamp > :startDateTime ORDER BY timestamp""")
     fun getDataPointsBetweenInTimeRange(
         featureId: Long,
         min: String,
         max: String,
-        cutOff: OffsetDateTime,
-        now: OffsetDateTime
+        startDateTime: OffsetDateTime,
+        endDateTime: OffsetDateTime
     ): List<DataPoint>
 
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointBetween(featureId: Long, min: String, max: String): DataPoint?
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max AND timestamp < :endDate ORDER BY timestamp DESC LIMIT 1""")
+    fun getLastDataPointBetween(featureId: Long, min: String, max: String, endDate: OffsetDateTime): DataPoint?
 
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointWithValue(featureId: Long, values: List<Int>): DataPoint?
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :endDate ORDER BY timestamp DESC LIMIT 1""")
+    fun getLastDataPointWithValue(featureId: Long, values: List<Int>, endDate: OffsetDateTime): DataPoint?
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value = :value ORDER BY timestamp DESC LIMIT 1""")
     fun getLastDataPointWithValue(featureId: Long, value: String): DataPoint?
