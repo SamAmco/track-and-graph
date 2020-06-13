@@ -49,6 +49,8 @@ class GraphStatAverageTimeBetweenDecorator(
         initAverageTimeBetweenStatBody()
     }
 
+    override fun setTimeMarker(time: OffsetDateTime) { }
+
     private suspend fun initAverageTimeBetweenStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
         val dataPoints = getRelevantDataPoints()

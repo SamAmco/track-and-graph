@@ -32,6 +32,7 @@ import com.samco.trackandgraph.database.dataVisColorList
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.threeten.bp.OffsetDateTime
 
 class GraphStatPieChartDecorator(
     private val graphOrStat: GraphOrStat,
@@ -52,6 +53,8 @@ class GraphStatPieChartDecorator(
         initHeader(binding!!, graphOrStat)
         initFromPieChartBody()
     }
+
+    override fun setTimeMarker(time: OffsetDateTime) { }
 
     private suspend fun initFromPieChartBody() {
         binding!!.progressBar.visibility = View.VISIBLE
