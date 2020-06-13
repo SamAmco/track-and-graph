@@ -61,7 +61,7 @@
     <string name="graphs_and_statistics"><![CDATA[Graphs & Statistics]]></string>
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
     <string name="graph_type_label">Graph type:</string>
-    <string name="maximum_sample_duration">Maximum history:</string>
+    <string name="maximum_sample_duration">Sample length:</string>
     <string name="select_a_discrete_feature">Select a multiple choice data set: </string>
     <string name="no_discrete_features_pie_chart">You can not currently create a pie chart because you are not tracking anything multiple choice.</string>
     <string name="select_a_feature">Select a data set:</string>
@@ -130,6 +130,10 @@
         <item>Dynamic</item>
         <item>Fixed</item>
     </string-array>
+    <string-array name="ending_at_values">
+        <item>Latest</item>
+        <item>Custom date…</item>
+    </string-array>
 
 
     <string name="import_exception_unknown">Import failed: An unknown error occurred</string>
@@ -157,7 +161,6 @@
     <string name="graph_stat_view_not_found">An error occurred while finding this graph</string>
     <string name="graph_stat_view_not_enough_data_stat">This statistic will show when enough data has been tracked to generate it.</string>
     <string name="graph_stat_view_not_enough_data_graph">This graph will show when enough data has been tracked to generate it.</string>
-    <string name="graph_stat_view_unkown_error">There is not enough data tracked to generate this graph yet</string>
     <string name="finish">Finish</string>
     <string name="about_description"><![CDATA[Track & Graph is free and open source software under the GPL 3.0 License.]]></string>
     <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
@@ -288,5 +291,6 @@
     <string name="edit_data_point_button_content_description">Edit data point button</string>
     <string name="add_line_button_content_description">Add line button</string>
     <string name="add_multiple_choice_answer_button_content_description">Add multiple choice answer button</string>
+    <string name="ending_at_colon">Ending at:</string>
 
 </resources>

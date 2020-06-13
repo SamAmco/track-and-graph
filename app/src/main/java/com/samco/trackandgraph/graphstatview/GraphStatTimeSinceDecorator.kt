@@ -20,10 +20,7 @@ package com.samco.trackandgraph.graphstatview
 import android.content.Context
 import android.view.View
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.FeatureType
-import com.samco.trackandgraph.database.GraphOrStat
-import com.samco.trackandgraph.database.TimeSinceLastStat
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -52,21 +49,7 @@ class GraphStatTimeSinceDecorator(
 
     private suspend fun initTimeSinceStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
-        val lastDataPoint = withContext(Dispatchers.IO) {
-            val feature = dataSource!!.getFeatureById(timeSinceLastStat.featureId)
-            if (feature.featureType == FeatureType.CONTINUOUS) {
-                dataSource!!.getLastDataPointBetween(
-                    timeSinceLastStat.featureId,
-                    timeSinceLastStat.fromValue,
-                    timeSinceLastStat.toValue
-                )
-            } else {
-                dataSource!!.getLastDataPointWithValue(
-                    timeSinceLastStat.featureId,
-                    timeSinceLastStat.discreteValues
-                )
-            }
-        }
+        val lastDataPoint = withContext(Dispatchers.IO) { getLastDataPoint() }
         binding!!.statMessage.visibility = View.VISIBLE
         binding!!.progressBar.visibility = View.GONE
         if (lastDataPoint == null) {
@@ -74,8 +57,32 @@ class GraphStatTimeSinceDecorator(
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
         } else while (true) {
             onSampledDataCallback?.invoke(listOf(lastDataPoint))
-            setTimeSinceStatText(Duration.between(lastDataPoint.timestamp, OffsetDateTime.now()))
+            setTimeSinceStatText(
+                Duration.between(
+                    lastDataPoint.timestamp,
+                    graphOrStat.endDate ?: OffsetDateTime.now()
+                )
+            )
             delay(1000)
+        }
+    }
+
+    private fun getLastDataPoint(): DataPoint? {
+        val feature = dataSource!!.getFeatureById(timeSinceLastStat.featureId)
+        val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
+        return if (feature.featureType == FeatureType.CONTINUOUS) {
+            dataSource!!.getLastDataPointBetween(
+                timeSinceLastStat.featureId,
+                timeSinceLastStat.fromValue,
+                timeSinceLastStat.toValue,
+                endDate
+            )
+        } else {
+            dataSource!!.getLastDataPointWithValue(
+                timeSinceLastStat.featureId,
+                timeSinceLastStat.discreteValues,
+                endDate
+            )
         }
     }
 
