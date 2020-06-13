@@ -16,7 +16,9 @@
 */
 package com.samco.trackandgraph.graphstatinput
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DatePickerDialog
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputFilter
@@ -25,10 +27,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.CheckBox
-import android.widget.LinearLayout
+import android.widget.*
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import androidx.databinding.DataBindingUtil
@@ -41,9 +40,14 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
+import com.samco.trackandgraph.ui.ExtendedSpinner
+import com.samco.trackandgraph.util.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 import java.lang.Exception
 
 class GraphStatInputFragment : Fragment() {
@@ -74,6 +78,7 @@ class GraphStatInputFragment : Fragment() {
                     listenToUpdateMode()
                     listenToGraphTypeSpinner()
                     listenToYRangeTypeSpinner()
+                    listenToEndDate()
                     listenToYRangeFixedFromTo()
                     listenToGraphName()
                     listenToTimeDuration()
@@ -84,6 +89,49 @@ class GraphStatInputFragment : Fragment() {
                 else -> navController?.popBackStack()
             }
         })
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun listenToEndDate() {
+        binding.endDateSpinner.setSelection(if (viewModel.endDate.value == null) 0 else 1)
+        binding.endDateSpinner.setOnItemClickedListener(
+            object : ExtendedSpinner.OnItemClickedListener {
+                override fun onItemClicked(index: Int) {
+                    when (index) {
+                        0 -> viewModel.endDate.value = null
+                        else -> onUserSelectedCustomEndDate()
+                    }
+                }
+            })
+        viewModel.endDate.observe(viewLifecycleOwner, Observer { endDate ->
+            binding.customEndDateText.text =
+                endDate?.let { "(${formatDayMonthYear(requireContext(), it)})" } ?: ""
+            binding.customEndDateText.visibility = if (endDate == null) View.GONE else View.VISIBLE
+            onFormUpdate()
+        })
+    }
+
+    private fun onUserSelectedCustomEndDate() {
+        val suggestedDate = viewModel.endDate.value ?: OffsetDateTime.now()
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0)
+            .plusDays(1)
+            .minusNanos(1)//The very end of today
+        viewModel.endDate.value = suggestedDate
+        val picker = DatePickerDialog(
+            requireContext(), DatePickerDialog.OnDateSetListener { _, year, month, day ->
+                val selectedDate =
+                    ZonedDateTime.of(suggestedDate.toLocalDateTime(), ZoneId.systemDefault())
+                        .withYear(year)
+                        .withMonth(month + 1)
+                        .withDayOfMonth(day)
+                        .toOffsetDateTime()
+                viewModel.endDate.value = selectedDate
+            }, suggestedDate.year, suggestedDate.monthValue - 1, suggestedDate.dayOfMonth
+        )
+        picker.show()
     }
 
     private fun listenToYRangeTypeSpinner() {
@@ -463,6 +511,7 @@ class GraphStatInputViewModel : ViewModel() {
     val yRangeType = MutableLiveData(YRangeType.DYNAMIC)
     val yRangeFrom = MutableLiveData(0.0)
     val yRangeTo = MutableLiveData(1.0)
+    val endDate = MutableLiveData<OffsetDateTime?>(null)
     val selectedPieChartFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatFeature = MutableLiveData<FeatureAndTrackGroup?>(null)
     val selectedValueStatDiscreteValues = MutableLiveData<List<DiscreteValue>?>(null)
@@ -509,6 +558,7 @@ class GraphStatInputViewModel : ViewModel() {
                 this@GraphStatInputViewModel.graphStatType.value = graphStat.type
                 this@GraphStatInputViewModel.graphStatId = graphStat.id
                 this@GraphStatInputViewModel.graphStatDisplayIndex = graphStat.displayIndex
+                this@GraphStatInputViewModel.endDate.value = graphStat.endDate
                 this@GraphStatInputViewModel.id = existingId
                 this@GraphStatInputViewModel._updateMode.value = true
             }
@@ -687,8 +737,8 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     fun constructGraphOrStat() = GraphOrStat.create(
-        graphStatId ?: 0L, graphStatGroupId, graphName.value!!,
-        graphStatType.value!!, graphStatDisplayIndex ?: 0
+        graphStatId ?: 0L, graphStatGroupId, graphName.value!!, graphStatType.value!!,
+        graphStatDisplayIndex ?: 0, endDate.value
     )
 
     fun constructLineGraph(graphStatId: Long) = LineGraph.create(

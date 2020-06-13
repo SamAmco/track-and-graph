@@ -70,42 +70,26 @@ class GraphStatAverageTimeBetweenDecorator(
 
     private suspend fun getRelevantDataPoints() = withContext(Dispatchers.IO) {
         val feature = dataSource!!.getFeatureById(timeBetweenStat.featureId)
-        when {
-            feature.featureType == FeatureType.CONTINUOUS && timeBetweenStat.duration == null -> {
-                dataSource!!.getDataPointsBetween(
-                    feature.id,
-                    timeBetweenStat.fromValue,
-                    timeBetweenStat.toValue
-                )
-            }
-            feature.featureType == FeatureType.CONTINUOUS -> {
-                val now = OffsetDateTime.now()
-                val cutOff = now.minus(timeBetweenStat.duration)
+        val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
+        val startDate = timeBetweenStat.duration?.let { endDate.minus(it) } ?: OffsetDateTime.MIN
+        when (feature.featureType) {
+            FeatureType.CONTINUOUS -> {
                 dataSource!!.getDataPointsBetweenInTimeRange(
                     feature.id,
                     timeBetweenStat.fromValue,
                     timeBetweenStat.toValue,
-                    cutOff,
-                    now
+                    startDate,
+                    endDate
                 )
             }
-            feature.featureType == FeatureType.DISCRETE && timeBetweenStat.duration == null -> {
-                dataSource!!.getDataPointsWithValue(
-                    feature.id,
-                    timeBetweenStat.discreteValues
-                )
-            }
-            feature.featureType == FeatureType.DISCRETE -> {
-                val now = OffsetDateTime.now()
-                val cutOff = now.minus(timeBetweenStat.duration)
+            FeatureType.DISCRETE -> {
                 dataSource!!.getDataPointsWithValueInTimeRange(
                     feature.id,
                     timeBetweenStat.discreteValues,
-                    cutOff,
-                    now
+                    startDate,
+                    endDate
                 )
             }
-            else -> emptyList()
         }
     }
 

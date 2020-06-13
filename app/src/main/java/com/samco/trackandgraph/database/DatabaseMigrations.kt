@@ -121,6 +121,12 @@ val MIGRATION_36_37 = object : Migration(36, 37) {
     }
 }
 
+val MIGRATION_37_38 = object : Migration(37, 38) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE graphs_and_stats_table ADD end_date TEXT")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -129,5 +135,6 @@ val allMigrations = arrayOf(
     MIGRATION_33_34,
     MIGRATION_34_35,
     MIGRATION_35_36,
-    MIGRATION_36_37
+    MIGRATION_36_37,
+    MIGRATION_37_38
 )

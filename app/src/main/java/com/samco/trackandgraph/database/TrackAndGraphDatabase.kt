@@ -61,7 +61,7 @@ const val splitChars2 = "!!"
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class],
-    version = 37
+    version = 38
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -206,8 +206,9 @@ class Converters {
 }
 
 
-fun odtFromString(value: String): OffsetDateTime =
-    databaseFormatter.parse(value, OffsetDateTime::from)
+fun odtFromString(value: String): OffsetDateTime? =
+    if (value.isEmpty()) null
+    else databaseFormatter.parse(value, OffsetDateTime::from)
 
 fun stringFromOdt(value: OffsetDateTime): String = databaseFormatter.format(value)
 
