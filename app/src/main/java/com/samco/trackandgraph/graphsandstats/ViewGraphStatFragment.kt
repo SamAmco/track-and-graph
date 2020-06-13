@@ -75,6 +75,7 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun onViewDataPointClicked(dataPoint: DataPoint) {
+        viewModel.noteClicked(dataPoint)
         val featureDisplayName = viewModel.featureDisplayNames?.getOrElse(dataPoint.featureId) { null }
         showDataPointDescriptionDialog(requireContext(), layoutInflater, dataPoint, featureDisplayName)
     }
@@ -95,6 +96,13 @@ class ViewGraphStatFragment : Fragment() {
         viewModel.showingNotes.observe(viewLifecycleOwner, Observer { b -> onShowingNotesChanged(b) })
     }
 
+    private fun observeNoteMarker() {
+        viewModel.markedNote.observe(viewLifecycleOwner, Observer { dataPoint ->
+            if (dataPoint == null) return@Observer
+            binding.graphStatView.placeMarker(dataPoint.timestamp)
+        })
+    }
+
     private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
         if (dataPoints.isEmpty()) return
         binding.showNotesButton.visibility = View.VISIBLE
@@ -107,6 +115,7 @@ class ViewGraphStatFragment : Fragment() {
             ViewGraphStatViewModelState.WAITING -> {
                 initGraphStatViewFromViewModel()
                 initNotesAdapterFromViewModel()
+                observeNoteMarker()
             }
         }
     }
@@ -211,6 +220,9 @@ class ViewGraphStatViewModel : ViewModel() {
     val sampledDataPoints: LiveData<List<DataPoint>> get() { return _sampledDataPoints }
     private val _sampledDataPoints = MutableLiveData<List<DataPoint>>(emptyList())
 
+    val markedNote: LiveData<DataPoint?> get() { return _markedNote }
+    private val _markedNote = MutableLiveData<DataPoint?>(null)
+
     private val currJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + currJob)
 
@@ -258,6 +270,10 @@ class ViewGraphStatViewModel : ViewModel() {
 
     fun showHideNotesClicked() {
         _showingNotes.value = _showingNotes.value?.not()
+    }
+
+    fun noteClicked(dataPoint: DataPoint) {
+        _markedNote.value = dataPoint
     }
 
     private fun initLineGraph() {

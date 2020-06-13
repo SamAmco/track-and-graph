@@ -21,6 +21,8 @@ import android.content.Context
 import android.graphics.Paint
 import android.view.View
 import androidx.core.content.ContextCompat
+import com.androidplot.ui.VerticalPosition
+import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
@@ -28,9 +30,7 @@ import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.util.formatDayMonth
 import com.samco.trackandgraph.util.formatMonthYear
 import com.samco.trackandgraph.util.getColorFromAttr
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.*
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
@@ -76,6 +76,22 @@ class GraphStatLineGraphDecorator(
         initHeader(binding, graphOrStat)
         initFromLineGraphBody()
         onSampledDataCallback?.invoke(allReferencedDataPoints)
+    }
+
+    override fun setTimeMarker(time: OffsetDateTime) {
+        binding!!.lineGraph.removeMarkers()
+        val markerPaint = getMarkerPaint()
+        val millis = Duration.between(endTime, time).toMillis()
+        binding!!.lineGraph.addMarker(
+            XValueMarker(
+                millis,
+                null,
+                VerticalPosition(0f, VerticalPositioning.ABSOLUTE_FROM_TOP),
+                markerPaint,
+                null
+            )
+        )
+        binding!!.lineGraph.redraw()
     }
 
     private suspend fun initFromLineGraphBody() {
@@ -180,7 +196,8 @@ class GraphStatLineGraphDecorator(
             movingAvDuration,
             plottingPeriod
         )
-        allReferencedDataPoints.addAll(rawDataSample.dataPoints)
+        val visibleSection = clipDataSample(rawDataSample, graphOrStat.endDate, lineGraph.duration)
+        allReferencedDataPoints.addAll(visibleSection.dataPoints)
         val plotTotalData = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> rawDataSample
             else -> calculateDurationAccumulatedValues(
@@ -288,4 +305,12 @@ class GraphStatLineGraphDecorator(
 
     private fun getPaintColor(lineGraphFeature: LineGraphFeature) =
         ContextCompat.getColor(context!!, dataVisColorList[lineGraphFeature.colorIndex])
+
+    private fun getMarkerPaint(): Paint {
+        val color = context!!.getColorFromAttr(R.attr.errorTextColor)
+        val paint = Paint()
+        paint.color = color
+        paint.strokeWidth = 2f
+        return paint
+    }
 }

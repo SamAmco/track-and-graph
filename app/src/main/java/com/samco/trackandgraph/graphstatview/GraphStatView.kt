@@ -31,6 +31,7 @@ import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.util.getColorFromAttr
+import org.threeten.bp.OffsetDateTime
 
 class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
@@ -41,13 +42,16 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
 
     //TODO we shouldn't have a job inside a view. When we change configuration we don't want to have
     // to set up the view all over again. We need a view model somewhere for this view
-    private var currJob: Job? = null
+    private var viewJob: Job? = null
     private var viewScope: CoroutineScope? = null
+    private var decorJob: Job? = null
 
     //TODO should this data source come from somewhere else? Seems a bit weird to get a database ref
     // in a view
     private val dataSource =
         TrackAndGraphDatabase.getInstance(context.applicationContext).trackAndGraphDatabaseDao
+
+    private var currentDecorator: IGraphStatViewDecorator? = null
 
     override fun getDataSource() = dataSource
 
@@ -57,9 +61,11 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     }
 
     private fun resetJob() {
-        currJob?.cancel()
-        currJob = Job()
-        viewScope = CoroutineScope(Dispatchers.Main + currJob!!)
+        decorJob?.cancel()
+        decorJob = null
+        viewJob?.cancel()
+        viewJob = Job()
+        viewScope = CoroutineScope(Dispatchers.Main + viewJob!!)
     }
 
     private fun basicLineGraphSetup() {
@@ -100,6 +106,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     private fun cleanAllViews() {
         binding.legendFlexboxLayout.removeAllViews()
         binding.lineGraph.clear()
+        binding.lineGraph.removeMarkers()
         binding.lineGraph.graph.paddingLeft = 0f
         binding.lineGraph.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
         binding.lineGraph.setDomainBoundaries(0, 1, BoundaryMode.GROW)
@@ -121,32 +128,42 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         binding.progressBar.visibility = View.VISIBLE
     }
 
+    fun placeMarker(time: OffsetDateTime) {
+        viewScope?.launch {
+            decorJob?.join()
+            currentDecorator?.setTimeMarker(time)
+        }
+    }
 
     private fun trySetDecorator(
         graphOrStat: GraphOrStat,
         decorator: IGraphStatViewDecorator
     ) {
         resetJob()
-        viewScope?.launch {
+        decorJob = viewScope?.launch {
             try {
                 cleanAllViews()
+                currentDecorator = decorator
                 decorator.decorate(this@GraphStatView)
             } catch (exception: Exception) {
                 val initException =
                     (if (exception is GraphStatInitException) exception else null) ?: return@launch
                 val errorTextId = initException.errorTextId
                 cleanAllViews()
-                GraphStatErrorDecorator(graphOrStat, errorTextId)
-                    .decorate(this@GraphStatView)
+                val errorDecorator = GraphStatErrorDecorator(graphOrStat, errorTextId)
+                currentDecorator = errorDecorator
+                errorDecorator.decorate(this@GraphStatView)
             }
         }
     }
 
     fun initError(graphOrStat: GraphOrStat?, errorTextId: Int) {
         resetJob()
-        viewScope?.launch {
+        decorJob = viewScope?.launch {
             cleanAllViews()
-            GraphStatErrorDecorator(graphOrStat, errorTextId).decorate(this@GraphStatView)
+            val errorDecorator = GraphStatErrorDecorator(graphOrStat, errorTextId)
+            currentDecorator = errorDecorator
+            errorDecorator.decorate(this@GraphStatView)
         }
     }
 
@@ -199,5 +216,5 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         )
     }
 
-    fun dispose() = currJob?.cancel()
+    fun dispose() = viewJob?.cancel()
 }
