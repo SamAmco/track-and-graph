@@ -34,12 +34,6 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
-/**
- * TODO this class really only tests the calculation of start and end OffsetDateTimes before the
- *  data is reaquested from the data souce. However the function should also correctly calculate
- *  the RawDataSample.plotFrom variable. This implementation is not tested here and probably should
- *  be for completeness.
-**/
 class GraphStatViewDecoratorHelpers_sampleData_KtTest {
     @Test
     fun sampleData_no_duration_or_endTime() {

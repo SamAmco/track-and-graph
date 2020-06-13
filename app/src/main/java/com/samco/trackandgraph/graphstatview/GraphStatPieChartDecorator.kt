@@ -70,7 +70,7 @@ class GraphStatPieChartDecorator(
         binding!!.progressBar.visibility = View.GONE
     }
 
-    private suspend fun tryGetPlottableDataForPieChart(pieChart: PieChart): RawDataSample? {
+    private suspend fun tryGetPlottableDataForPieChart(pieChart: PieChart): DataSample? {
         val dataSource = graphStatView!!.getDataSource()
         val feature = withContext(Dispatchers.IO) {
             dataSource.getFeatureById(pieChart.featureId)
@@ -79,7 +79,7 @@ class GraphStatPieChartDecorator(
             dataSource, feature.id, pieChart.duration,
             graphOrStat.endDate, null, null
         )
-        return if (dataPlottable(dataSample)) dataSample else null
+        return if (dataSample.dataPoints.size >= 2) dataSample else null
     }
 
     private fun plotPieChartSegments(segments: List<Segment>, total: Double) {
@@ -94,10 +94,9 @@ class GraphStatPieChartDecorator(
         }
     }
 
-    private suspend fun getPieChartSegments(dataSample: RawDataSample) =
+    private suspend fun getPieChartSegments(dataSample: DataSample) =
         withContext(Dispatchers.IO) {
             dataSample.dataPoints
-                .drop(dataSample.plotFrom)
                 .groupingBy { dp -> dp.label }
                 .eachCount()
                 .map { b -> Segment(b.key, b.value) }

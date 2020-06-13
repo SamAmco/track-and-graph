@@ -57,7 +57,12 @@ class GraphStatTimeSinceDecorator(
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
         } else while (true) {
             onSampledDataCallback?.invoke(listOf(lastDataPoint))
-            setTimeSinceStatText(Duration.between(lastDataPoint.timestamp, OffsetDateTime.now()))
+            setTimeSinceStatText(
+                Duration.between(
+                    lastDataPoint.timestamp,
+                    graphOrStat.endDate ?: OffsetDateTime.now()
+                )
+            )
             delay(1000)
         }
     }

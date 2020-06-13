@@ -169,7 +169,7 @@ class GraphStatLineGraphDecorator(
         return bools.any { b -> b }
     }
 
-    private suspend fun tryGetPlottingData(lineGraphFeature: LineGraphFeature): RawDataSample? {
+    private suspend fun tryGetPlottingData(lineGraphFeature: LineGraphFeature): DataSample? {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
         val rawDataSample = sampleData(
@@ -181,25 +181,34 @@ class GraphStatLineGraphDecorator(
             plottingPeriod
         )
         allReferencedDataPoints.addAll(rawDataSample.dataPoints)
-        val plottingData = when (lineGraphFeature.plottingMode) {
+        val plotTotalData = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> rawDataSample
             else -> calculateDurationAccumulatedValues(
                 rawDataSample,
                 lineGraphFeature.featureId,
-                endTime,
+                lineGraph.duration,
+                graphOrStat.endDate,
                 plottingPeriod!!
             )
         }
+        val averagedData = when (lineGraphFeature.averagingMode) {
+            LineGraphAveraginModes.NO_AVERAGING -> plotTotalData
+            else -> calculateMovingAverages(
+                plotTotalData,
+                movingAvDuration!!
+            )
+        }
+        val plottingData = clipDataSample(averagedData, graphOrStat.endDate, lineGraph.duration)
 
-        return if (dataPlottable(plottingData, 2)) plottingData else null
+        return if (plottingData.dataPoints.size >= 2) plottingData else null
     }
 
     private suspend fun createAndAddSeries(
-        rawData: RawDataSample,
+        rawData: DataSample,
         lineGraphFeature: LineGraphFeature
     ) {
         val series = withContext(Dispatchers.IO) {
-            getXYSeriesFromRawDataSample(rawData, endTime, lineGraphFeature)
+            getXYSeriesFromDataSample(rawData, endTime, lineGraphFeature)
         }
         addSeries(series, lineGraphFeature)
     }

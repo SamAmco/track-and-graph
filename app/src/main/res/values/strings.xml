@@ -131,7 +131,7 @@
         <item>Fixed</item>
     </string-array>
     <string-array name="ending_at_values">
-        <item>Last data point</item>
+        <item>Latest</item>
         <item>Custom date…</item>
     </string-array>
 
