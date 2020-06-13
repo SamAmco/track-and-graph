@@ -241,15 +241,15 @@ class InputDataPointDialogViewModel : ViewModel() {
         _state.value = InputDataPointDialogState.LOADING
         ioScope.launch {
             val featureData = dao.getFeaturesByIdsSync(featureIds)
-            val dataPointData = if (dataPointTimestamp != null) {
-                dao.getDataPointByTimestampAndFeatureSync(featureData[0].id, dataPointTimestamp)
-            } else null
+            val dataPointData = dataPointTimestamp?.let {
+                dao.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
+            }
 
             val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
             val timeFixed = dataPointTimestamp != null
             uiStates = featureData.map { f ->
                 val dataPointValue = dataPointData?.value ?: if (f.hasDefaultValue)
-                    f.defaultValue else 0.toDouble()
+                    f.defaultValue else 1.0
                 val dataPointLabel = dataPointData?.label
                     ?: if (f.hasDefaultValue && f.featureType == FeatureType.DISCRETE) {
                         f.discreteValues.first { dv -> dv.index == f.defaultValue.toInt() }.label

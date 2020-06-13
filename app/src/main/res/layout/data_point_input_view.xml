@@ -123,7 +123,7 @@
                 android:focusable="true"
                 android:focusableInTouchMode="true"
                 android:gravity="center"
-                android:hint="0"
+                android:hint="1"
                 android:importantForAutofill="no"
                 android:inputType="numberDecimal|numberSigned"
                 android:singleLine="true"

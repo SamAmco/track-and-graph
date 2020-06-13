@@ -100,7 +100,10 @@ class DataPointInputView : FrameLayout {
             noteInput.visibility = View.VISIBLE
             noteInput.requestFocus()
             val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+            imm.toggleSoftInput(
+                InputMethodManager.SHOW_FORCED,
+                InputMethodManager.HIDE_IMPLICIT_ONLY
+            )
         }
         noteInput.addTextChangedListener { state.note = it.toString() }
     }
@@ -120,7 +123,11 @@ class DataPointInputView : FrameLayout {
     private fun initContinuous() {
         buttonsScroll.visibility = View.GONE
         numberInput.visibility = View.VISIBLE
-        numberInput.addTextChangedListener { state.value = getDoubleFromText(it.toString()) }
+        numberInput.addTextChangedListener {
+            if (it.toString().isNotBlank()) {
+                state.value = getDoubleFromText(it.toString())
+            } else state.value = 1.0
+        }
         numberInput.setOnEditorActionListener { _, i, _ ->
             return@setOnEditorActionListener if ((i and EditorInfo.IME_MASK_ACTION) != 0) {
                 state.timeFixed = true
@@ -128,7 +135,7 @@ class DataPointInputView : FrameLayout {
                 true
             } else false
         }
-        val text = if (state.value == 0.0) "" else doubleFormatter.format(state.value)
+        val text = if (state.value == 1.0) "" else doubleFormatter.format(state.value)
         numberInput.setText(text)
         numberInput.requestFocus()
         numberInput.setSelection(numberInput.text.length)
