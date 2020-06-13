@@ -292,5 +292,6 @@
     <string name="add_line_button_content_description">Add line button</string>
     <string name="add_multiple_choice_answer_button_content_description">Add multiple choice answer button</string>
     <string name="ending_at_colon">Ending at:</string>
+    <string name="duplicate">Duplicate</string>
 
 </resources>
