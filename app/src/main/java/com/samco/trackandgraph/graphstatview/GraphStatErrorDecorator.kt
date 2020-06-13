@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatview
 
 import android.view.View
 import com.samco.trackandgraph.database.GraphOrStat
+import org.threeten.bp.OffsetDateTime
 
 class GraphStatErrorDecorator(
     private val graphOrStat: GraphOrStat?,
@@ -32,5 +33,7 @@ class GraphStatErrorDecorator(
         binding.errorMessage.visibility = View.VISIBLE
         binding.errorMessage.text = view.getContext().getString(errorTextId)
     }
+
+    override fun setTimeMarker(time: OffsetDateTime) { }
 }
 

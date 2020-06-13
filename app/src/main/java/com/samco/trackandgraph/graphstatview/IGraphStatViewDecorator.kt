@@ -17,6 +17,9 @@
 
 package com.samco.trackandgraph.graphstatview
 
+import org.threeten.bp.OffsetDateTime
+
 interface IGraphStatViewDecorator {
     suspend fun decorate(view: IDecoratableGraphStatView)
+    fun setTimeMarker(time: OffsetDateTime)
 }

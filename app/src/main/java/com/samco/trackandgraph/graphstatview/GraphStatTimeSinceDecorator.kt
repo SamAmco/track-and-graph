@@ -47,6 +47,8 @@ class GraphStatTimeSinceDecorator(
         initTimeSinceStatBody()
     }
 
+    override fun setTimeMarker(time: OffsetDateTime) { }
+
     private suspend fun initTimeSinceStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
         val lastDataPoint = withContext(Dispatchers.IO) { getLastDataPoint() }
