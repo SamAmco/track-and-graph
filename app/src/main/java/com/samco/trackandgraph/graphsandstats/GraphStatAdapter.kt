@@ -35,8 +35,13 @@ import kotlinx.coroutines.*
 
 private val getIdForGraphStat = { gs: GraphOrStat -> gs.id }
 
-class GraphStatAdapter(private val clickListener: GraphStatClickListener, application: Application)
-    : OrderedListAdapter<GraphOrStat, GraphStatViewHolder>(getIdForGraphStat, GraphStatDiffCallback()) {
+class GraphStatAdapter(
+    private val clickListener: GraphStatClickListener,
+    application: Application
+) : OrderedListAdapter<GraphOrStat, GraphStatViewHolder>(
+    getIdForGraphStat,
+    GraphStatDiffCallback()
+) {
     private val dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
 
     override fun onBindViewHolder(holder: GraphStatViewHolder, position: Int) {
@@ -48,14 +53,18 @@ class GraphStatAdapter(private val clickListener: GraphStatClickListener, applic
     }
 }
 
-class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView)
-    : RecyclerView.ViewHolder(graphStatCardView), PopupMenu.OnMenuItemClickListener {
+class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView) :
+    RecyclerView.ViewHolder(graphStatCardView), PopupMenu.OnMenuItemClickListener {
     private var currJob: Job? = null
     private var clickListener: GraphStatClickListener? = null
     private var graphStat: GraphOrStat? = null
     private var dropElevation = 0f
 
-    fun bind(graphStat: GraphOrStat, clickListener: GraphStatClickListener, dataSource: TrackAndGraphDatabaseDao) {
+    fun bind(
+        graphStat: GraphOrStat,
+        clickListener: GraphStatClickListener,
+        dataSource: TrackAndGraphDatabaseDao
+    ) {
         this.dropElevation = graphStatCardView.cardView.cardElevation
         this.graphStat = graphStat
         this.clickListener = clickListener
@@ -68,9 +77,15 @@ class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView)
                 GraphStatType.LINE_GRAPH -> tryInitLineGraph(dataSource, graphStat)
                 GraphStatType.PIE_CHART -> tryInitPieChart(dataSource, graphStat)
                 GraphStatType.TIME_SINCE -> tryInitTimeSinceStat(dataSource, graphStat)
-                GraphStatType.AVERAGE_TIME_BETWEEN -> tryInitAverageTimeBetween(dataSource, graphStat)
+                GraphStatType.AVERAGE_TIME_BETWEEN -> tryInitAverageTimeBetween(
+                    dataSource,
+                    graphStat
+                )
             }
-            if (!foundGraphStat) graphStatCardView.graphStatView.initError(graphStat, R.string.graph_stat_view_not_found)
+            if (!foundGraphStat) graphStatCardView.graphStatView.initError(
+                graphStat,
+                R.string.graph_stat_view_not_found
+            )
         }
     }
 
@@ -97,13 +112,18 @@ class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView)
                 R.id.edit -> clickListener?.onEdit(it)
                 R.id.delete -> clickListener?.onDelete(it)
                 R.id.moveTo -> clickListener?.onMoveGraphStat(it)
-                else -> {}
+                R.id.duplicate -> clickListener?.onDuplicate(it)
+                else -> {
+                }
             }
         }
         return false
     }
 
-    private suspend fun tryInitPieChart(dataSource: TrackAndGraphDatabaseDao, graphStat: GraphOrStat): Boolean {
+    private suspend fun tryInitPieChart(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphStat: GraphOrStat
+    ): Boolean {
         val pieChart = withContext(Dispatchers.IO) {
             dataSource.getPieChartByGraphStatId(graphStat.id)
         } ?: return false
@@ -111,7 +131,10 @@ class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView)
         return true
     }
 
-    private suspend fun tryInitAverageTimeBetween(dataSource: TrackAndGraphDatabaseDao, graphStat: GraphOrStat): Boolean {
+    private suspend fun tryInitAverageTimeBetween(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphStat: GraphOrStat
+    ): Boolean {
         val avTimeStat = withContext(Dispatchers.IO) {
             dataSource.getAverageTimeBetweenStatByGraphStatId(graphStat.id)
         } ?: return false
@@ -119,7 +142,10 @@ class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView)
         return true
     }
 
-    private suspend fun tryInitTimeSinceStat(dataSource: TrackAndGraphDatabaseDao, graphStat: GraphOrStat): Boolean {
+    private suspend fun tryInitTimeSinceStat(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphStat: GraphOrStat
+    ): Boolean {
         val timeSinceStat = withContext(Dispatchers.IO) {
             dataSource.getTimeSinceLastStatByGraphStatId(graphStat.id)
         } ?: return false
@@ -127,7 +153,10 @@ class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView)
         return true
     }
 
-    private suspend fun tryInitLineGraph(dataSource: TrackAndGraphDatabaseDao, graphStat: GraphOrStat): Boolean {
+    private suspend fun tryInitLineGraph(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphStat: GraphOrStat
+    ): Boolean {
         val lineGraph = withContext(Dispatchers.IO) {
             dataSource.getLineGraphByGraphStatId(graphStat.id)
         } ?: return false
@@ -148,18 +177,22 @@ class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView)
 }
 
 class GraphStatDiffCallback : DiffUtil.ItemCallback<GraphOrStat>() {
-    override fun areItemsTheSame(oldItem: GraphOrStat, newItem: GraphOrStat) = oldItem.id == newItem.id
+    override fun areItemsTheSame(oldItem: GraphOrStat, newItem: GraphOrStat) =
+        oldItem.id == newItem.id
 
     override fun areContentsTheSame(oldItem: GraphOrStat, newItem: GraphOrStat) = oldItem == newItem
 }
 
-class GraphStatClickListener(private val onDelete: (graphStat: GraphOrStat) -> Unit,
-                             private val onEdit: (graphStat: GraphOrStat) -> Unit,
-                             private val onClick: (graphStat: GraphOrStat) -> Unit,
-                             private val onMoveGraphStat: (graphStat: GraphOrStat) -> Unit
-                             ) {
+class GraphStatClickListener(
+    private val onDelete: (graphStat: GraphOrStat) -> Unit,
+    private val onEdit: (graphStat: GraphOrStat) -> Unit,
+    private val onClick: (graphStat: GraphOrStat) -> Unit,
+    private val onMoveGraphStat: (graphStat: GraphOrStat) -> Unit,
+    private val onDuplicateGraphStat: (graphStat: GraphOrStat) -> Unit
+) {
     fun onDelete(graphStat: GraphOrStat) = onDelete.invoke(graphStat)
     fun onEdit(graphStat: GraphOrStat) = onEdit.invoke(graphStat)
     fun onClick(graphStat: GraphOrStat) = onClick.invoke(graphStat)
     fun onMoveGraphStat(graphStat: GraphOrStat) = onMoveGraphStat.invoke(graphStat)
+    fun onDuplicate(graphStat: GraphOrStat) = onDuplicateGraphStat.invoke(graphStat)
 }

@@ -30,6 +30,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.withTransaction
 
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.GraphOrStat
@@ -48,25 +49,34 @@ class GraphsAndStatsFragment : Fragment() {
     private lateinit var binding: GraphsAndStatsFragmentBinding
     private lateinit var adapter: GraphStatAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         this.navController = container?.findNavController()
-        binding = DataBindingUtil.inflate(inflater, R.layout.graphs_and_stats_fragment, container, false)
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.graphs_and_stats_fragment, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.initViewModel(requireActivity(), args.graphStatGroupId)
+        val database = TrackAndGraphDatabase
+            .getInstance(requireActivity().applicationContext)
+        viewModel.initViewModel(database, args.graphStatGroupId)
 
         adapter = GraphStatAdapter(
             GraphStatClickListener(
                 viewModel::deleteGraphStat,
                 this::onEditGraphStat,
                 this::onGraphStatClicked,
-                this::onMoveGraphStatClicked
+                this::onMoveGraphStatClicked,
+                this::onDuplicateGraphStatClicked
             ),
             requireActivity().application
         )
         binding.graphStatList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.graphStatList)
-        binding.graphStatList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        binding.graphStatList.layoutManager =
+            LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         listenToViewModelState()
 
         setHasOptionsMenu(true)
@@ -74,12 +84,26 @@ class GraphsAndStatsFragment : Fragment() {
         return binding.root
     }
 
+    private fun onDuplicateGraphStatClicked(graphOrStat: GraphOrStat) {
+        viewModel.duplicateGraphOrStat(graphOrStat)
+    }
+
     private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
-        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-            return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.UP or ItemTouchHelper.DOWN)
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            return makeFlag(
+                ItemTouchHelper.ACTION_STATE_DRAG,
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            )
         }
 
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
             adapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
             return true
         }
@@ -97,7 +121,7 @@ class GraphsAndStatsFragment : Fragment() {
             viewModel.adjustDisplayIndexes(adapter.getItems())
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { }
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
     }
 
     private fun onMoveGraphStatClicked(graphOrStat: GraphOrStat) {
@@ -128,7 +152,8 @@ class GraphsAndStatsFragment : Fragment() {
                     binding.graphStatsProgressBar.visibility = View.GONE
                     observeGraphStatsAndUpdate(adapter)
                 }
-                else -> {}
+                else -> {
+                }
             }
         })
     }
@@ -150,7 +175,10 @@ class GraphsAndStatsFragment : Fragment() {
                 binding.noGraphsHintText.visibility = View.VISIBLE
             } else {
                 if (viewModel.numGraphsStats < it.size) {
-                    binding.graphStatList.postDelayed({ binding.graphStatList.scrollToPosition(0) }, 100)
+                    binding.graphStatList.postDelayed(
+                        { binding.graphStatList.scrollToPosition(0) },
+                        100
+                    )
                 }
                 viewModel.numGraphsStats = it.size
                 binding.noGraphsHintText.visibility = View.INVISIBLE
@@ -187,6 +215,7 @@ class GraphsAndStatsFragment : Fragment() {
 
 enum class GraphsAndStatsViewState { INITIALIZING, NO_FEATURES, WAITING }
 class GraphsAndStatsViewModel : ViewModel() {
+    private var database: TrackAndGraphDatabase? = null
     private var dataSource: TrackAndGraphDatabaseDao? = null
     lateinit var graphStats: LiveData<List<GraphOrStat>>
 
@@ -195,13 +224,17 @@ class GraphsAndStatsViewModel : ViewModel() {
     private val job = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + job)
 
-    val state: LiveData<GraphsAndStatsViewState> get() { return _state }
+    val state: LiveData<GraphsAndStatsViewState>
+        get() {
+            return _state
+        }
     private val _state = MutableLiveData(GraphsAndStatsViewState.INITIALIZING)
 
-    fun initViewModel(activity: Activity, graphStatGroupId: Long) {
-        if (dataSource != null) return
+    fun initViewModel(database: TrackAndGraphDatabase, graphStatGroupId: Long) {
+        if (this.database != null) return
         _state.value = GraphsAndStatsViewState.INITIALIZING
-        dataSource = TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
+        this.database = database
+        dataSource = database.trackAndGraphDatabaseDao
         graphStats = dataSource!!.getGraphsAndStatsByGroupId(graphStatGroupId)
         preenGraphStats()
     }
@@ -211,10 +244,14 @@ class GraphsAndStatsViewModel : ViewModel() {
             val graphStats = dataSource!!.getAllGraphStatsSync()
             graphStats.forEach {
                 when (it.type) {
-                    GraphStatType.LINE_GRAPH -> if (preenLineGraph(it)) dataSource!!.deleteGraphOrStat(it)
-                    GraphStatType.PIE_CHART -> if (preenPieChart(it)) dataSource!!.deleteGraphOrStat(it)
-                    GraphStatType.AVERAGE_TIME_BETWEEN -> if (preenAverageTimeBetween(it)) dataSource!!.deleteGraphOrStat(it)
-                    GraphStatType.TIME_SINCE -> if (preenTimeSince(it)) dataSource!!.deleteGraphOrStat(it)
+                    GraphStatType.LINE_GRAPH ->
+                        if (preenLineGraph(it)) dataSource!!.deleteGraphOrStat(it)
+                    GraphStatType.PIE_CHART ->
+                        if (preenPieChart(it)) dataSource!!.deleteGraphOrStat(it)
+                    GraphStatType.AVERAGE_TIME_BETWEEN ->
+                        if (preenAverageTimeBetween(it)) dataSource!!.deleteGraphOrStat(it)
+                    GraphStatType.TIME_SINCE ->
+                        if (preenTimeSince(it)) dataSource!!.deleteGraphOrStat(it)
                 }
             }
             val numFeatures = dataSource!!.getNumFeatures()
@@ -244,6 +281,35 @@ class GraphsAndStatsViewModel : ViewModel() {
 
     fun deleteGraphStat(graphOrStat: GraphOrStat) {
         ioScope.launch { dataSource?.deleteGraphOrStat(graphOrStat) }
+    }
+
+    fun duplicateGraphOrStat(graphOrStat: GraphOrStat) = ioScope.launch {
+        database?.withTransaction {
+            val originalId = graphOrStat.id
+            val newId = dataSource!!.insertGraphOrStat(graphOrStat.copy(id = 0))
+            when (graphOrStat.type) {
+                GraphStatType.LINE_GRAPH -> {
+                    val lineGraph = dataSource!!.getLineGraphByGraphStatId(originalId)
+                    val copy = lineGraph?.copy(id = 0, graphStatId = newId)
+                    copy?.let { dataSource!!.insertLineGraph(it) }
+                }
+                GraphStatType.PIE_CHART -> {
+                    val pieChart = dataSource!!.getPieChartByGraphStatId(originalId)
+                    val copy = pieChart?.copy(id = 0, graphStatId = newId)
+                    copy?.let { dataSource!!.insertPieChart(it) }
+                }
+                GraphStatType.AVERAGE_TIME_BETWEEN -> {
+                    val avTimeStat = dataSource!!.getAverageTimeBetweenStatByGraphStatId(originalId)
+                    val copy = avTimeStat?.copy(id = 0, graphStatId = newId)
+                    copy?.let { dataSource!!.insertAverageTimeBetweenStat(it) }
+                }
+                GraphStatType.TIME_SINCE -> {
+                    val timeSinceStat = dataSource!!.getTimeSinceLastStatByGraphStatId(originalId)
+                    val copy = timeSinceStat?.copy(id = 0, graphStatId = newId)
+                    copy?.let { dataSource!!.insertTimeSinceLastStat(it) }
+                }
+            }
+        }
     }
 
     fun adjustDisplayIndexes(graphStats: List<GraphOrStat>) = ioScope.launch {
