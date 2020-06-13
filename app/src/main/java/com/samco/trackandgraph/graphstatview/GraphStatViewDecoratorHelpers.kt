@@ -37,10 +37,7 @@ import org.threeten.bp.temporal.WeekFields
 import java.util.*
 import kotlin.math.abs
 
-//TODO The functions in this class should probably all have javadoc and unit tests as many of them
-// contain functionality which is not easy to decipher at a glance
-
-class RawDataSample(val dataPoints: List<DataPoint>, val plotFrom: Int)
+class DataSample(val dataPoints: List<DataPoint>)
 
 class SampleDataCallback(val callback: (List<DataPoint>) -> Unit) : (List<DataPoint>) -> Unit {
     override fun invoke(dataPoints: List<DataPoint>) {
@@ -60,24 +57,18 @@ class SampleDataCallback(val callback: (List<DataPoint>) -> Unit) : (List<DataPo
  *      to the sampleDuration before it is subtracted from the end date such that all relevant information
  *      is contained in the sample.
  *
- * The RawDataSample.plotFrom variable should mark the index of the first data point within the sample that should
- * actually be plotted. This may not be 0 because previous points may be included only to help calculate the
- * moving average or plot total. The RawDataSample.plotFrom will be -1 if there is not enough data.
- *
  * Note: No actual averaging or totalling is performed by this function, it just collects all relevant data.
  */
 internal suspend fun sampleData(
     dataSource: TrackAndGraphDatabaseDao, featureId: Long, sampleDuration: Duration?,
     endDate: OffsetDateTime?, averagingDuration: Duration?, plotTotalTime: TemporalAmount?
-): RawDataSample {
+): DataSample {
     return withContext(Dispatchers.IO) {
-        if (sampleDuration == null && endDate == null) RawDataSample(
-            dataSource.getDataPointsForFeatureAscSync(featureId),
-            0
+        if (sampleDuration == null && endDate == null) DataSample(
+            dataSource.getDataPointsForFeatureAscSync(featureId)
         )
         else {
             val latest = endDate ?: getLastTrackedTimeOrNow(dataSource, featureId)
-            val startDate = sampleDuration?.let { latest.minus(sampleDuration) } ?: OffsetDateTime.MIN
             val plottingDuration =
                 plotTotalTime?.let { Duration.between(latest, latest.plus(plotTotalTime)) }
             val minSampleDate = sampleDuration?.let {
@@ -90,8 +81,7 @@ internal suspend fun sampleData(
             } ?: OffsetDateTime.MIN
             val dataPoints =
                 dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
-            val startIndex = dataPoints.indexOfFirst { dp -> dp.timestamp.isAfter(startDate) }
-            RawDataSample(dataPoints, startIndex)
+            DataSample(dataPoints)
         }
     }
 }
@@ -106,74 +96,77 @@ private fun getLastTrackedTimeOrNow(
     return listOfNotNull(now, latest).max()!!
 }
 
-internal fun initHeader(binding: GraphStatViewBinding?, graphOrStat: GraphOrStat?) {
-    val headerText = graphOrStat?.name ?: ""
-    binding?.headerText?.text = headerText
-}
-
-internal fun dataPlottable(
-    rawData: RawDataSample,
-    minDataPoints: Int = 1
-): Boolean {
-    return rawData.plotFrom >= 0 && rawData.dataPoints.size - rawData.plotFrom >= minDataPoints
-}
-
-internal fun inflateGraphLegendItem(
-    binding: GraphStatViewBinding, context: Context,
-    colorIndex: Int, label: String
-) {
-    val colorId = dataVisColorList[colorIndex]
-    binding.legendFlexboxLayout.addView(
-        GraphLegendItemView(
-            context,
-            colorId,
-            label
-        )
-    )
-}
-
-//TODO test this
+/**
+ * Add up all data points per plotTotalTime. For example if the plot total time is 1 day and the
+ * sample data contains 3 data points {1, 3, 7} all tracked on the same day then the function will
+ * return a data sample containing 1 point with the value 11.
+ *
+ * The currently supported plotTotalTime values are: Duration.ofHours(1), Period.ofDays(1),
+ * Period.ofWeeks(1), Period.ofMonths(1), Period.ofYears(1)
+ *
+ * If end time is provided then there will be a maximum of one data point in the returned sample with
+ * a date/time after endTime. So for example if end time was a Friday and the plot total time was a
+ * week then the last data point returned would be the following Sunday.
+ *
+ * All notes and labels will be lost in the output data.
+ *
+ * sampleData.dataPoints should be sorted from oldest timestamp to newest timestamp
+ */
 internal suspend fun calculateDurationAccumulatedValues(
-    rawData: RawDataSample,
+    sampleData: DataSample,
     featureId: Long,
-    endTime: OffsetDateTime,
+    sampleDuration: Duration?,
+    endTime: OffsetDateTime?,
     plotTotalTime: TemporalAmount
-): RawDataSample {
-    var plotFrom = 0
-    var foundPlotFrom = false
+): DataSample {
     val newData = mutableListOf<DataPoint>()
+    val latest = getEndTimeNowOrLatest(sampleData, endTime)
     val firstDataPointTime =
-        if (rawData.dataPoints.isEmpty()) endTime
-        else rawData.dataPoints[0].timestamp
+        getStartTimeOrFirst(sampleData, latest, endTime, sampleDuration)
     var currentTimeStamp = findFirstPlotDateTime(firstDataPointTime, plotTotalTime)
-    val latest = getEndTimeOrLatest(rawData, endTime)
     var index = 0
     while (currentTimeStamp.isBefore(latest)) {
         currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(plotTotalTime) }
-        val points = rawData.dataPoints.drop(index)
+        val points = sampleData.dataPoints.drop(index)
             .takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
         val total = points.sumByDouble { dp -> dp.value }
         index += points.size
-        if (index > rawData.plotFrom && !foundPlotFrom) {
-            plotFrom = newData.size
-            foundPlotFrom = true
-        }
         newData.add(DataPoint(currentTimeStamp, featureId, total, "", ""))
         yield()
     }
-    if (newData.size == 1) {
-        val newPointTime = findFirstPlotDateTime(firstDataPointTime, plotTotalTime)
-        newData.add(0, DataPoint(newPointTime, featureId, 0.0, "", ""))
+    return DataSample(newData)
+}
+
+private fun getStartTimeOrFirst(
+    sampleData: DataSample,
+    latest: OffsetDateTime,
+    endTime: OffsetDateTime?,
+    sampleDuration: Duration?
+): OffsetDateTime {
+    val firstDataPointTime = sampleData.dataPoints.firstOrNull()?.timestamp
+    val beginningOfDuration = sampleDuration?.let { endTime?.minus(it) }
+    val durationBeforeLatest = sampleDuration?.let { latest.minus(it) }
+    return listOf(
+        firstDataPointTime,
+        beginningOfDuration,
+        durationBeforeLatest,
+        latest
+    ).minBy { t -> t ?: OffsetDateTime.MAX }!!
+}
+
+private fun getEndTimeNowOrLatest(rawData: DataSample, endTime: OffsetDateTime?): OffsetDateTime {
+    val now = OffsetDateTime.now()
+    val last = rawData.dataPoints.lastOrNull()?.timestamp
+    return when {
+        last == null && endTime == null -> now
+        else -> listOf(last, endTime).maxBy { t -> t ?: OffsetDateTime.MIN }!!
     }
-    return RawDataSample(newData, plotFrom)
 }
 
-private fun getEndTimeOrLatest(rawData: RawDataSample, endTime: OffsetDateTime): OffsetDateTime {
-    if (rawData.dataPoints.isEmpty()) return endTime
-    val latest = rawData.dataPoints.last().timestamp
-    return if (latest > endTime) latest else endTime
-}
-
+/**
+ * Finds the first ending of plotTotalTime before startDateTime. For example if plotTotalTime is a
+ * week then it will find the very end of the sunday before startDateTime.
+ */
 private fun findFirstPlotDateTime(
     startDateTime: OffsetDateTime,
     plotTotalTime: TemporalAmount
@@ -207,47 +200,91 @@ private fun findFirstPlotDateTime(
     }
 }
 
-//TODO this is a pretty naive implementation, we could probably do a lot better
-private suspend fun calculateMovingAverage(
-    rawData: RawDataSample,
+/**
+ * Calculate the moving averages of all of the data points given over the moving average duration given.
+ * A new DataSample will be returned with one data point for every data point in the input set whose
+ * timestamp shall be the same but value will be equal to the average of it and all previous data points
+ * within the movingAvDuration.
+ *
+ * The data points in the input sample are expected to be in date order with the oldest data points
+ * earliest in the list
+ */
+internal suspend fun calculateMovingAverages(
+    dataSample: DataSample,
     movingAvDuration: Duration
-): List<Double> {
-    return rawData.dataPoints
-        .drop(rawData.plotFrom)
-        .mapIndexed { index, dataPoint ->
-            val inRange = mutableListOf(dataPoint)
-            var i = rawData.plotFrom + index - 1
-            while (i > 0 && Duration.between(
-                    rawData.dataPoints[i].timestamp,
-                    dataPoint.timestamp
-                ) <= movingAvDuration
-            ) {
-                inRange.add(rawData.dataPoints[i])
-                i--
-            }
-            yield()
-            inRange.sumByDouble { dp -> dp.value } / inRange.size.toDouble()
+): DataSample {
+    val movingAverages = mutableListOf<DataPoint>()
+    var currentAccumulation = 0.0
+    var currentCount = 0
+    var addIndex = 0
+    val dataPoints = dataSample.dataPoints.reversed()
+    for (index in dataPoints.indices) {
+        yield()
+        val current = dataPoints[index]
+        while (addIndex < dataPoints.size
+            && Duration.between(
+                dataPoints[addIndex].timestamp,
+                current.timestamp
+            ) <= movingAvDuration
+        ) {
+            currentAccumulation += dataPoints[addIndex++].value
+            currentCount++
         }
+        val averageValue = currentAccumulation / currentCount.toDouble()
+        movingAverages.add(
+            0,
+            DataPoint(
+                current.timestamp,
+                current.featureId,
+                averageValue,
+                current.label,
+                current.note
+            )
+        )
+        currentAccumulation -= current.value
+        currentCount--
+    }
+
+    return DataSample(movingAverages)
 }
 
-internal suspend fun getXYSeriesFromRawDataSample(
-    rawData: RawDataSample,
+/**
+ * Return all the data points in the sample that lie within the sampleDuration leading up to the endTime.
+ * If the sampleDuration is null then all data points leading up to the end time will be returned.
+ * If the endTime is null then all data points within the sampleDuration leading up to the last data point
+ * will be returned. If both the sampleDuration and endTime are null then the whole list will be returned.
+ */
+internal fun clipDataSample(
+    dataSample: DataSample,
+    endTime: OffsetDateTime?,
+    sampleDuration: Duration?
+): DataSample {
+    if (dataSample.dataPoints.isEmpty()) return dataSample
+
+    var newDataPoints = dataSample.dataPoints
+    if (endTime != null) {
+        val lastIndex = newDataPoints.indexOfLast { dp -> dp.timestamp <= endTime }
+        newDataPoints = newDataPoints.take(lastIndex + 1)
+    }
+    if (sampleDuration != null) {
+        val endOfDuration = endTime ?: dataSample.dataPoints.last().timestamp
+        val startTime = endOfDuration.minus(sampleDuration)
+        val firstIndex = newDataPoints.indexOfFirst { dp -> dp.timestamp >= startTime }
+        newDataPoints = if (firstIndex < 0) emptyList() else newDataPoints.drop(firstIndex)
+    }
+    return DataSample(newDataPoints)
+}
+
+internal fun getXYSeriesFromDataSample(
+    dataSample: DataSample,
     endTime: OffsetDateTime,
     lineGraphFeature: LineGraphFeature
 ): FastXYSeries {
-    val yValues = when (lineGraphFeature.averagingMode) {
-        LineGraphAveraginModes.NO_AVERAGING -> rawData.dataPoints
-            .drop(rawData.plotFrom)
-            .map { dp -> dp.value }
-        else -> calculateMovingAverage(
-            rawData,
-            movingAverageDurations[lineGraphFeature.averagingMode]!!
-        )
-    }.map { v -> (v * lineGraphFeature.scale) + lineGraphFeature.offset }
-
-    val xValues = rawData.dataPoints.drop(rawData.plotFrom).map { dp ->
-        Duration.between(endTime, dp.timestamp).toMillis()
-    }
+    val scale = lineGraphFeature.scale
+    val offset = lineGraphFeature.offset
+    val yValues = dataSample.dataPoints.map { dp -> (dp.value * scale) + offset }
+    val xValues =
+        dataSample.dataPoints.map { dp -> Duration.between(endTime, dp.timestamp).toMillis() }
 
     var yRegion = SeriesUtils.minMax(yValues)
     if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1)
@@ -260,7 +297,25 @@ internal suspend fun getXYSeriesFromRawDataSample(
         override fun getX(index: Int): Number = xValues[index]
         override fun getY(index: Int): Number = yValues[index]
         override fun getTitle() = lineGraphFeature.name
-        override fun size() = rawData.dataPoints.size - rawData.plotFrom
+        override fun size() = dataSample.dataPoints.size
     }
 }
 
+internal fun initHeader(binding: GraphStatViewBinding?, graphOrStat: GraphOrStat?) {
+    val headerText = graphOrStat?.name ?: ""
+    binding?.headerText?.text = headerText
+}
+
+internal fun inflateGraphLegendItem(
+    binding: GraphStatViewBinding, context: Context,
+    colorIndex: Int, label: String
+) {
+    val colorId = dataVisColorList[colorIndex]
+    binding.legendFlexboxLayout.addView(
+        GraphLegendItemView(
+            context,
+            colorId,
+            label
+        )
+    )
+}

@@ -20,6 +20,7 @@ package com.samco.trackandgraph.graphstatview
 import com.samco.trackandgraph.database.DataPoint
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -36,10 +37,10 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime = Duration.ofHours(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData: RawDataSample = RawDataSample(dataPoints, 3)
+            val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(rawData, 0L, endTime, plotTotalTime)
+            val answer = calculateDurationAccumulatedValues(rawData, 0L, null, null, plotTotalTime)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -56,10 +57,10 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData: RawDataSample = RawDataSample(dataPoints, 3)
+            val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(rawData, 0L, endTime, plotTotalTime)
+            val answer = calculateDurationAccumulatedValues(rawData, 0L, null, null, plotTotalTime)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -69,17 +70,19 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
     }
 
     @Test
-    fun calculateDurationAccumulatedValues_weekly_plot_totals_() {
+    fun calculateDurationAccumulatedValues_plot_totals_with_larger_duration_containing_data() {
         runBlocking {
             //GIVEN
+            val sampleDuration = Duration.ofHours(3)
             val endTime = OffsetDateTime.now()
-            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotalTime: TemporalAmount = Duration.ofHours(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData: RawDataSample = RawDataSample(dataPoints, 3)
+            val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(rawData, 0L, endTime, plotTotalTime)
+            val answer =
+                calculateDurationAccumulatedValues(rawData, 0L, sampleDuration, null, plotTotalTime)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -87,6 +90,293 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             assertEquals(plotTotals, answerTotals)
         }
     }
+
+    @Test
+    fun calculateDurationAccumulatedValues_plot_totals_with_larger_duration_not_containing_data() {
+        runBlocking {
+            //GIVEN
+            val sampleDuration = Duration.ofHours(3)
+            val plotTotalTime: TemporalAmount = Duration.ofHours(1)
+            val dataPoints = emptyList<DataPoint>()
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(rawData, 0L, sampleDuration, null, plotTotalTime)
+
+            //THEN
+            assertEquals(4, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(listOf(0, 0, 0, 0), answerTotals)
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_plot_totals_with_smaller_duration_containing_data() {
+        runBlocking {
+            //GIVEN
+            val sampleDuration = Duration.ofHours(1)
+            val endTime = OffsetDateTime.now()
+            val plotTotalTime: TemporalAmount = Duration.ofHours(3)
+            val plotTotals = listOf(8, 3, 1, 7)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(rawData, 0L, sampleDuration, null, plotTotalTime)
+
+            //THEN
+            assertEquals(4, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals)
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_plot_totals_with_smaller_duration_not_containing_data() {
+        runBlocking {
+            //GIVEN
+            val sampleDuration = Duration.ofHours(1)
+            val plotTotalTime: TemporalAmount = Period.ofDays(1)
+            val dataPoints = emptyList<DataPoint>()
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(rawData, 0L, sampleDuration, null, plotTotalTime)
+
+            //THEN
+            assertEquals(1, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(listOf(0), answerTotals)
+            val timestamp = answer.dataPoints[0].timestamp
+            //it should be right at the end of the current day
+            assertEquals(23, timestamp.hour)
+            assertEquals(59, timestamp.minute)
+            assertEquals(59, timestamp.second)
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_plot_totals_no_duration_containing_data() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+            val plotTotalTime: TemporalAmount = Period.ofYears(1)
+            val plotTotals = listOf(8, 3, 1, 7)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(rawData, 0L, null, null, plotTotalTime)
+
+            //THEN
+            assertEquals(4, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals)
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_plot_totals_no_duration_containing_no_data() {
+        runBlocking {
+            //GIVEN
+            val plotTotalTime: TemporalAmount = Period.ofYears(1)
+            val dataPoints = emptyList<DataPoint>()
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(rawData, 0L, null, null, plotTotalTime)
+
+            //THEN
+            assertEquals(1, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(listOf(0), answerTotals)
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_no_duration_with_end_time_in_past() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+                .withYear(2020)
+                .withMonth(5)
+                .withDayOfMonth(15)
+            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotals = listOf(8, 3, 1, 7)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(rawData, 0L, null, endTime, plotTotalTime)
+
+            //THEN
+            assertEquals(4, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals)
+            val last = answer.dataPoints.last().timestamp
+            assertEquals(17, last.dayOfMonth)
+            assertEquals(5, last.monthValue)
+            assertEquals(2020, last.year)
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_no_duration_with_end_time_data_before_end_time() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+                .withYear(2020)
+                .withMonth(5)
+                .withDayOfMonth(15)
+            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotals = listOf(8, 3, 1, 7)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    OffsetDateTime.now(),
+                    plotTotalTime
+                )
+
+            //THEN
+            assertTrue(answer.dataPoints.size > 4)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals.subList(0, 4))
+            assertTrue(answerTotals.drop(4).all { i -> i == 0 })
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_with_duration_with_end_time_data_before_end_time() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+                .withYear(2020)
+                .withMonth(5)
+                .withDayOfMonth(15)
+            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotals = listOf(8, 3, 1, 7)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+            val sampleDuration = Duration.ofDays(7 * 4)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    sampleDuration,
+                    OffsetDateTime.now(),
+                    plotTotalTime
+                )
+
+            //THEN
+            // (the clipping isn't done by this algorithm it totals everything passed
+            //  to it regardless of sampleDuration and endTime)
+            assertTrue(answer.dataPoints.size > 4)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals.subList(0, 4))
+            assertTrue(answerTotals.drop(4).all { i -> i == 0 })
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_with_data_after_end_time() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+                .plusMonths(1)
+            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotals = listOf(8, 3, 1)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer = calculateDurationAccumulatedValues(
+                rawData,
+                0L,
+                null,
+                OffsetDateTime.now(),
+                plotTotalTime
+            )
+
+            //THEN
+            // (the clipping isn't done by this algorithm it totals everything passed
+            //  to it regardless of sampleDuration and endTime)
+            assertEquals(3, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals)
+            assertTrue(answer.dataPoints.all { dp -> dp.timestamp > OffsetDateTime.now() })
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_with_data_after_end_time_with_duration() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+                .plusMonths(1)
+            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotals = listOf(8, 3, 1)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+            val sampleDuration = Duration.ofDays(7 * 4)
+
+            //WHEN
+            val answer = calculateDurationAccumulatedValues(
+                rawData,
+                0L,
+                sampleDuration,
+                OffsetDateTime.now(),
+                plotTotalTime
+            )
+
+            //THEN we should go back to the beginning of endTime-sampleDuration
+            assertEquals(10, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals.takeLast(3))
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_with_data_in_future_no_end_time_or_duration() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+                .plusMonths(1)
+            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotals = listOf(8, 3, 1, 7, 6, 4, 2, 4, 2, 3, 1, 9)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer = calculateDurationAccumulatedValues(
+                rawData,
+                0L,
+                null,
+                null,
+                plotTotalTime
+            )
+
+            //THEN we should go back to the beginning of endTime-sampleDuration
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals)
+            assertTrue(answer.dataPoints.takeLast(3).all { dp -> dp.timestamp > OffsetDateTime.now() })
+            assertTrue(answer.dataPoints.take(3).all { dp -> dp.timestamp < OffsetDateTime.now() })
+        }
+    }
+
 
     private fun generateDataPoints(
         endTime: OffsetDateTime,
