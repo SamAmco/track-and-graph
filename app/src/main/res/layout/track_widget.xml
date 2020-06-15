@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:theme="@style/AppTheme"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/track_widget_card">
+    android:background="@drawable/track_widget_card"
+    android:theme="@style/AppTheme">
 
     <RelativeLayout
         android:id="@+id/widget_container"
@@ -32,6 +32,8 @@
             android:textStyle="bold"
             tools:text="Track" />
 
+        <!--No tint here since this image is replaced at runtime
+        if the tint should be different-->
         <ImageView
             android:id="@+id/track_widget_icon"
             android:layout_width="40dp"
@@ -41,7 +43,6 @@
             android:layout_marginTop="@dimen/card_margin_small"
             android:layout_marginEnd="@dimen/card_margin_small"
             android:layout_marginBottom="@dimen/card_margin_small"
-            android:tint="?attr/colorControlNormal"
             tools:src="@drawable/add_box" />
     </RelativeLayout>
 </FrameLayout>
