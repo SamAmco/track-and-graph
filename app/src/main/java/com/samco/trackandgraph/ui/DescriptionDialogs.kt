@@ -26,8 +26,11 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DataPoint
+import com.samco.trackandgraph.database.DisplayNote
+import com.samco.trackandgraph.database.NoteType
 import com.samco.trackandgraph.databinding.ShowDataPointDialogHeaderBinding
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
+import org.threeten.bp.OffsetDateTime
 
 fun showFeatureDescriptionDialog(context: Context, name: String, description: String) {
     val res = context.resources
@@ -36,17 +39,7 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
         context.getString(R.string.no_description)
     else description
 
-    val bodyView = TextView(context)
-    TextViewCompat.setTextAppearance(bodyView, R.style.TextAppearance_Body)
-    bodyView.text = descriptionOrNone
-    bodyView.setTextIsSelectable(true)
-    val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
-    val topBottomPadding = res.getDimension(R.dimen.card_padding).toInt()
-    bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
-    bodyView.setTextSize(
-        TypedValue.COMPLEX_UNIT_PX,
-        res.getDimension(R.dimen.text_body_size)
-    )
+    val bodyView = getBodyTextView(context, descriptionOrNone)
 
     AlertDialog.Builder(context)
         .setTitle(name)
@@ -55,15 +48,61 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
         .show()
 }
 
+private fun getBodyTextView(context: Context, text: String): TextView {
+    val bodyView = TextView(context)
+    TextViewCompat.setTextAppearance(bodyView, R.style.TextAppearance_Body)
+    bodyView.text = text
+    bodyView.setTextIsSelectable(true)
+    val res = context.resources
+    val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
+    val topBottomPadding = res.getDimension(R.dimen.card_padding).toInt()
+    bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
+    bodyView.setTextSize(
+        TypedValue.COMPLEX_UNIT_PX,
+        res.getDimension(R.dimen.text_body_size)
+    )
+    return bodyView
+}
+
+fun showNoteDialog(context: Context, note: DisplayNote) {
+    val bodyText = when (note.noteType) {
+        NoteType.DATA_POINT -> """${note.trackGroupName} -> ${note.featureName}
+            |
+            |${note.note}
+        """.trimMargin()
+        NoteType.GLOBAL_NOTE -> note.note
+    }
+
+    AlertDialog.Builder(context)
+        .setTitle(formatDayMonthYearHourMinute(context, note.timestamp))
+        .setView(getBodyTextView(context, bodyText))
+        .create()
+        .show()
+}
+
 fun showDataPointDescriptionDialog(
     context: Context, inflater: LayoutInflater, dataPoint: DataPoint,
     featureDispalayName: String? = null
 ) {
+    showDataPointDescriptionDialog(
+        context,
+        inflater,
+        dataPoint.timestamp,
+        dataPoint.getDisplayValue(),
+        dataPoint.note,
+        featureDispalayName
+    )
+}
+
+fun showDataPointDescriptionDialog(
+    context: Context, inflater: LayoutInflater, timestamp: OffsetDateTime, displayValue: String,
+    note: String, featureDispalayName: String? = null
+) {
     val res = context.resources
 
     val headerView = ShowDataPointDialogHeaderBinding.inflate(inflater)
-    headerView.dateTimeText.text = formatDayMonthYearHourMinute(context, dataPoint.timestamp)
-    headerView.valueText.text = dataPoint.getDisplayValue()
+    headerView.dateTimeText.text = formatDayMonthYearHourMinute(context, timestamp)
+    headerView.valueText.text = displayValue
     if (featureDispalayName != null && featureDispalayName.isNotEmpty()) {
         headerView.featureDisplayNameText.visibility = View.VISIBLE
         headerView.featureDisplayNameText.text = featureDispalayName
@@ -73,7 +112,7 @@ fun showDataPointDescriptionDialog(
 
     val bodyView = TextView(context)
     TextViewCompat.setTextAppearance(bodyView, R.style.TextAppearance_Body)
-    bodyView.text = dataPoint.note
+    bodyView.text = note
     bodyView.setTextIsSelectable(true)
     val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
     val topBottomPadding = res.getDimension(R.dimen.card_padding).toInt()

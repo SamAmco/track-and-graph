@@ -278,6 +278,7 @@ interface TrackAndGraphDatabaseDao {
                 FROM data_points_table as dp 
                 LEFT JOIN features_table as f ON dp.feature_id = f.id
                 LEFT JOIN track_groups_table as t ON f.track_group_id = t.id
+                WHERE dp.note IS NOT NULL AND dp.note != ""
             ) UNION SELECT * FROM (
                 SELECT n.timestamp as timestamp, 1 as note_type, NULL as feature_id, NULL as feature_name, NULL as track_group_name, n.note as note
                 FROM notes_table as n
@@ -285,6 +286,12 @@ interface TrackAndGraphDatabaseDao {
         """
     )
     fun getAllDisplayNotes(): LiveData<List<DisplayNote>>
+
+    @Query("UPDATE data_points_table SET note = '' WHERE timestamp = :timestamp AND feature_id = :featureId")
+    fun removeNote(timestamp: OffsetDateTime, featureId: Long)
+
+    @Delete
+    fun deleteGlobalNote(note: GlobalNote)
 
     @Insert
     fun insertLineGraph(lineGraph: LineGraph): Long
@@ -318,4 +325,5 @@ interface TrackAndGraphDatabaseDao {
 
     @Update
     fun updateGraphStats(graphStat: List<GraphOrStat>)
+
 }

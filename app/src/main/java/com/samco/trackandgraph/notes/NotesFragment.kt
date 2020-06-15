@@ -24,18 +24,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.DisplayNote
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
-import com.samco.trackandgraph.reminders.RemindersViewModel
+import com.samco.trackandgraph.ui.showNoteDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 class NotesFragment : Fragment() {
     lateinit var binding: FragmentNotesBinding
@@ -54,12 +53,24 @@ class NotesFragment : Fragment() {
             TrackAndGraphDatabase.getInstance(requireActivity().applicationContext).trackAndGraphDatabaseDao
         viewModel.init(dataSource)
 
+        listenToViewModel()
+
         return binding.root
+    }
+
+    private fun listenToViewModel() {
+        viewModel.notes.observe(viewLifecycleOwner, Observer { notes ->
+            if (notes == null) return@Observer
+            if (notes.isNotEmpty()) binding.noNotesHintText.visibility = View.GONE
+            else binding.noNotesHintText.visibility = View.VISIBLE
+            adapter.submitList(notes)
+        })
     }
 
     private fun initListAdapter() {
         adapter = NoteListAdapter(
             NoteClickListener(
+                this::onNoteClicked,
                 this::onEditNote,
                 this::onDeleteNote
             )
@@ -69,24 +80,22 @@ class NotesFragment : Fragment() {
             LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
     }
 
+    private fun onNoteClicked(note: DisplayNote) {
+        showNoteDialog(requireContext(), note)
+    }
+
     private fun onDeleteNote(note: DisplayNote) {
+        viewModel.deleteNote(note)
     }
 
     private fun onEditNote(note: DisplayNote) {
     }
 }
 
-enum class NoteViewModelState { INITIALIZING, WAITING }
 class NotesViewModel : ViewModel() {
     private var dataSource: TrackAndGraphDatabaseDao? = null
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
-
-    val state: LiveData<NoteViewModelState>
-        get() {
-            return _state
-        }
-    private val _state = MutableLiveData(NoteViewModelState.INITIALIZING)
 
     lateinit var notes: LiveData<List<DisplayNote>>
         private set
@@ -95,5 +104,20 @@ class NotesViewModel : ViewModel() {
         if (this.dataSource != null) return
         this.dataSource = dataSource
         notes = dataSource.getAllDisplayNotes()
+    }
+
+    fun deleteNote(note: DisplayNote) = ioScope.launch {
+        when (note.noteType) {
+            NoteType.DATA_POINT -> note.featureId?.let {
+                dataSource!!.removeNote(note.timestamp, note.featureId)
+            }
+            NoteType.GLOBAL_NOTE -> {
+                val globalNote = GlobalNote(
+                    note.timestamp,
+                    note.note
+                )
+                dataSource!!.deleteGlobalNote(globalNote)
+            }
+        }
     }
 }
