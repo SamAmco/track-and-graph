@@ -18,18 +18,22 @@
 package com.samco.trackandgraph.notes
 
 import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
 import android.view.ViewGroup
+import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DisplayNote
-import com.samco.trackandgraph.databinding.ListItemNoteBinding
-import com.samco.trackandgraph.ui.OrderedListAdapter
-
-private val getIdForNote = { n: DisplayNote -> n.timestamp.hashCode().toLong() }
+import com.samco.trackandgraph.database.NoteType
+import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
+import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 
 internal class NoteListAdapter(
     private val clickListener: NoteClickListener
-) : OrderedListAdapter<DisplayNote, NoteViewHolder>(getIdForNote, NoteDiffCallback()) {
+) : ListAdapter<DisplayNote, NoteViewHolder>(NoteDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         return NoteViewHolder.from(parent)
     }
@@ -49,8 +53,8 @@ internal class NoteDiffCallback : DiffUtil.ItemCallback<DisplayNote>() {
     }
 }
 
-internal class NoteViewHolder private constructor(private val binding: ListItemNoteBinding) :
-    RecyclerView.ViewHolder(binding.root) {
+internal class NoteViewHolder private constructor(private val binding: ListItemGlobalNoteBinding) :
+    RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
     private var clickListener: NoteClickListener? = null
     private var note: DisplayNote? = null
@@ -58,22 +62,50 @@ internal class NoteViewHolder private constructor(private val binding: ListItemN
     fun bind(note: DisplayNote, clickListener: NoteClickListener) {
         this.note = note
         this.clickListener = clickListener
-        //TODO initialise the view from the note
+        binding.timestampText.text =
+            formatDayMonthYearHourMinute(binding.root.context, note.timestamp)
+        binding.noteText.text = note.note
+        binding.featureAndTrackGroupText.text = when (note.noteType) {
+            NoteType.DATA_POINT -> "${note.trackGroupName} -> ${note.featureName}"
+            NoteType.GLOBAL_NOTE -> ""
+        }
+        binding.editButton.setOnClickListener { createContextMenu(binding.editButton) }
+        binding.cardView.setOnClickListener { clickListener.onClicked(note) }
+    }
+
+    private fun createContextMenu(view: View) {
+        val popup = PopupMenu(view.context, view)
+        popup.menuInflater.inflate(R.menu.edit_note_context_menu, popup.menu)
+        popup.setOnMenuItemClickListener(this)
+        popup.show()
     }
 
     companion object {
         fun from(parent: ViewGroup): NoteViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val binding = ListItemNoteBinding.inflate(layoutInflater, parent, false)
+            val binding = ListItemGlobalNoteBinding.inflate(layoutInflater, parent, false)
             return NoteViewHolder(binding)
         }
+    }
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        note?.let { note ->
+            when (item?.itemId) {
+                R.id.edit -> clickListener?.onEditClicked(note)
+                R.id.delete -> clickListener?.onDeleteClicked(note)
+                else -> run { }
+            }
+        }
+        return false
     }
 }
 
 internal class NoteClickListener(
+    private val onClick: (DisplayNote) -> Unit,
     private val onEdit: (DisplayNote) -> Unit,
     private val onDelete: (DisplayNote) -> Unit
 ) {
-    fun edit(note: DisplayNote) = onEdit(note)
-    fun delete(note: DisplayNote) = onDelete(note)
+    fun onClicked(note: DisplayNote) = onClick(note)
+    fun onEditClicked(note: DisplayNote) = onEdit(note)
+    fun onDeleteClicked(note: DisplayNote) = onDelete(note)
 }

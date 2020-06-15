@@ -16,6 +16,7 @@
             android:id="@+id/noNotesHintText"
             style="@style/Style.EmptyPageHintTextStyle"
             android:layout_gravity="center"
-            android:text="@string/no_notes_hint_text" />
+            android:text="@string/no_notes_hint_text"
+            android:visibility="gone" />
     </FrameLayout>
 </layout>
