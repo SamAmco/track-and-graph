@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         R.id.FAQFragment,
         R.id.aboutPageFragment,
         R.id.remindersFragment,
+        R.id.notesFragment,
         R.id.backupAndRestoreFragment
     )
 

@@ -60,8 +60,8 @@ const val splitChars2 = "!!"
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
-        TimeSinceLastStat::class, Reminder::class],
-    version = 38
+        TimeSinceLastStat::class, Reminder::class, GlobalNote::class],
+    version = 39
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -193,6 +193,12 @@ class Converters {
 
     @TypeConverter
     fun intToYRangeType(index: Int) = YRangeType.values()[index]
+
+    @TypeConverter
+    fun noteTypeToInt(noteType: NoteType) = noteType.ordinal
+
+    @TypeConverter
+    fun intToNoteType(index: Int) = NoteType.values()[index]
 
     @TypeConverter
     fun listOfIntsToString(ints: List<Int>) = ints.joinToString(splitChars1) { i ->

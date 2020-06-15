@@ -14,7 +14,8 @@ val MIGRATION_29_30 = object : Migration(29, 30) {
                 `name` TEXT NOT NULL,
                 `time` TEXT NOT NULL,
                 `checked_days` TEXT NOT NULL
-            )""".trimMargin()
+            )
+            """.trimMargin()
         )
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `reminders_table` (`id`)")
     }
@@ -42,10 +43,19 @@ val MIGRATION_31_32 = object : Migration(31, 32) {
                 params.joinToString(splitChars2)
             }
             val newFeaturesString = newFeatures.joinToString(splitChars1)
-            updates.add(Pair("UPDATE line_graphs_table SET features=? WHERE id=?",
-                listOf(newFeaturesString, id.toString())))
+            updates.add(
+                Pair(
+                    "UPDATE line_graphs_table SET features=? WHERE id=?",
+                    listOf(newFeaturesString, id.toString())
+                )
+            )
         }
-        if (updates.size > 0) updates.forEach { database.execSQL(it.first, it.second.toTypedArray()) }
+        if (updates.size > 0) updates.forEach {
+            database.execSQL(
+                it.first,
+                it.second.toTypedArray()
+            )
+        }
     }
 }
 
@@ -65,10 +75,19 @@ val MIGRATION_32_33 = object : Migration(32, 33) {
                 params.joinToString(splitChars2)
             }
             val newFeaturesString = newFeatures.joinToString(splitChars1)
-            updates.add(Pair("UPDATE line_graphs_table SET features=? WHERE id=?",
-                listOf(newFeaturesString, id.toString())))
+            updates.add(
+                Pair(
+                    "UPDATE line_graphs_table SET features=? WHERE id=?",
+                    listOf(newFeaturesString, id.toString())
+                )
+            )
         }
-        if (updates.size > 0) updates.forEach { database.execSQL(it.first, it.second.toTypedArray()) }
+        if (updates.size > 0) updates.forEach {
+            database.execSQL(
+                it.first,
+                it.second.toTypedArray()
+            )
+        }
     }
 }
 
@@ -105,7 +124,12 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             val args = listOf(discreteValues, id.toString())
             updates.add(Pair(query, args))
         }
-        if (updates.size > 0) updates.forEach { database.execSQL(it.first, it.second.toTypedArray()) }
+        if (updates.size > 0) updates.forEach {
+            database.execSQL(
+                it.first,
+                it.second.toTypedArray()
+            )
+        }
     }
 }
 
@@ -127,6 +151,19 @@ val MIGRATION_37_38 = object : Migration(37, 38) {
     }
 }
 
+val MIGRATION_38_39 = object : Migration(38, 39) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `notes_table` (
+                `timestamp` TEXT PRIMARY KEY NOT NULL, 
+                `note` TEXT NOT NULL
+            )
+            """.trimMargin()
+        )
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -136,5 +173,6 @@ val allMigrations = arrayOf(
     MIGRATION_34_35,
     MIGRATION_35_36,
     MIGRATION_36_37,
-    MIGRATION_37_38
+    MIGRATION_37_38,
+    MIGRATION_38_39
 )
