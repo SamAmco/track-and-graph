@@ -3,12 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/itemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
         tools:ignore="UseCompoundDrawables">
         <!-- I don't want to use compound drawables here because I have custom
-         properties life alpha on the image that I don't want to set from code -->
+         properties like alpha on the image that I don't want to set from code -->
 
         <TextView
             android:id="@+id/groupNameText"
