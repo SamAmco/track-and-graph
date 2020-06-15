@@ -24,7 +24,6 @@
         <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:itemBackground">?attr/colorSurface</item>
         <item name="android:colorBackground">?attr/colorSurface</item>
         <item name="buttonStyle">@style/Style.ButtonStyle</item>
     </style>

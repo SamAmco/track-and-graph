@@ -92,7 +92,7 @@ class MoveToDialogFragment : DialogFragment() {
         for (item in items) {
             val groupItemView = ListItemMoveToGroupBinding.inflate(inflater, binding.groupsLayout, false)
             groupItemView.groupNameText.text = item.name
-            groupItemView.groupNameText.setOnClickListener { viewModel.moveTo(item.id) }
+            groupItemView.itemBackground.setOnClickListener { viewModel.moveTo(item.id) }
             binding.groupsLayout.addView(groupItemView.root)
         }
         setDialogHeight(items.size)
