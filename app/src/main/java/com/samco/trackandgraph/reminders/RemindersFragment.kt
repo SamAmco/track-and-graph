@@ -183,7 +183,7 @@ class RemindersViewModel : ViewModel() {
         private set
 
     val state: LiveData<RemindersViewModelState> get() { return _state }
-    private val _state = MutableLiveData<RemindersViewModelState>(RemindersViewModelState.INITIALIZING)
+    private val _state = MutableLiveData(RemindersViewModelState.INITIALIZING)
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return

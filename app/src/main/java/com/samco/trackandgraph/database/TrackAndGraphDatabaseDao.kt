@@ -208,10 +208,19 @@ interface TrackAndGraphDatabaseDao {
     ): List<DataPoint>
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max AND timestamp < :endDate ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointBetween(featureId: Long, min: String, max: String, endDate: OffsetDateTime): DataPoint?
+    fun getLastDataPointBetween(
+        featureId: Long,
+        min: String,
+        max: String,
+        endDate: OffsetDateTime
+    ): DataPoint?
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :endDate ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointWithValue(featureId: Long, values: List<Int>, endDate: OffsetDateTime): DataPoint?
+    fun getLastDataPointWithValue(
+        featureId: Long,
+        values: List<Int>,
+        endDate: OffsetDateTime
+    ): DataPoint?
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value = :value ORDER BY timestamp DESC LIMIT 1""")
     fun getLastDataPointWithValue(featureId: Long, value: String): DataPoint?
@@ -261,6 +270,21 @@ interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM graphs_and_stats_table ORDER BY display_index ASC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
+
+    @Query(
+        """
+            SELECT * FROM (
+                SELECT dp.timestamp as timestamp, 0 as note_type, dp.feature_id as feature_id, f.name as feature_name, t.name as track_group_name, dp.note as note
+                FROM data_points_table as dp 
+                LEFT JOIN features_table as f ON dp.feature_id = f.id
+                LEFT JOIN track_groups_table as t ON f.track_group_id = t.id
+            ) UNION SELECT * FROM (
+                SELECT n.timestamp as timestamp, 1 as note_type, NULL as feature_id, NULL as feature_name, NULL as track_group_name, n.note as note
+                FROM notes_table as n
+            ) ORDER BY timestamp DESC
+        """
+    )
+    fun getAllDisplayNotes(): LiveData<List<DisplayNote>>
 
     @Insert
     fun insertLineGraph(lineGraph: LineGraph): Long

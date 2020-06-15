@@ -212,4 +212,8 @@
         android:id="@+id/remindersFragment"
         android:name="com.samco.trackandgraph.reminders.RemindersFragment"
         android:label="@string/reminders" />
+    <fragment
+        android:id="@+id/notesFragment"
+        android:name="com.samco.trackandgraph.notes.NotesFragment"
+        android:label="@string/notes" />
 </navigation>
