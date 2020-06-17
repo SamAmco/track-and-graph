@@ -101,7 +101,7 @@ class NotesFragment : Fragment() {
     }
 
     private fun onNoteClicked(note: DisplayNote) {
-        showNoteDialog(requireContext(), note)
+        showNoteDialog(layoutInflater, requireContext(), note)
     }
 
     private fun onDeleteNote(note: DisplayNote) {

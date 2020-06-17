@@ -130,7 +130,7 @@
     </fragment>
     <fragment
             android:id="@+id/viewGraphStatFragment"
-            android:name="com.samco.trackandgraph.graphsandstats.ViewGraphStatFragment"
+            android:name="com.samco.trackandgraph.viewgraphstat.ViewGraphStatFragment"
             android:label="ViewGraphStatFragment" >
         <argument
                 android:name="graphStatId"

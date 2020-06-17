@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.graphsandstats
+package com.samco.trackandgraph.viewgraphstat
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -42,6 +42,7 @@ import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatview.GraphStatView
 import com.samco.trackandgraph.graphstatview.SampleDataCallback
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
+import com.samco.trackandgraph.ui.showNoteDialog
 import kotlinx.coroutines.*
 
 class ViewGraphStatFragment : Fragment() {
@@ -74,15 +75,27 @@ class ViewGraphStatFragment : Fragment() {
         binding.showNotesButton.visibility = View.GONE
     }
 
-    private fun onViewDataPointClicked(dataPoint: DataPoint) {
-        viewModel.noteClicked(dataPoint)
-        val featureDisplayName = viewModel.featureDisplayNames?.getOrElse(dataPoint.featureId) { null }
-        showDataPointDescriptionDialog(requireContext(), layoutInflater, dataPoint, featureDisplayName)
+    private fun onViewNoteClicked(note: GraphNote) {
+        viewModel.noteClicked(note)
+        when (note.noteType) {
+            NoteType.GLOBAL_NOTE -> showNoteDialog(layoutInflater, requireContext(), note.globalNote!!)
+            NoteType.DATA_POINT -> {
+                val dataPoint = note.dataPoint!!
+                val featureDisplayName =
+                    viewModel.featureDisplayNames?.getOrElse(dataPoint.featureId) { null }
+                showDataPointDescriptionDialog(
+                    requireContext(),
+                    layoutInflater,
+                    dataPoint,
+                    featureDisplayName
+                )
+            }
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun listenToBinding() {
-        binding.showNotesButton.setOnTouchListener{ _, motionEvent ->
+        binding.showNotesButton.setOnTouchListener { _, motionEvent ->
             if (motionEvent?.action == MotionEvent.ACTION_DOWN) {
                 viewModel.showHideNotesClicked()
                 return@setOnTouchListener true
@@ -92,21 +105,25 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun listenToState() {
-        viewModel.state.observe(viewLifecycleOwner, Observer { state -> onViewModelStateChanged(state) })
-        viewModel.showingNotes.observe(viewLifecycleOwner, Observer { b -> onShowingNotesChanged(b) })
+        viewModel.state.observe(
+            viewLifecycleOwner,
+            Observer { state -> onViewModelStateChanged(state) })
+        viewModel.showingNotes.observe(
+            viewLifecycleOwner,
+            Observer { b -> onShowingNotesChanged(b) })
     }
 
     private fun observeNoteMarker() {
-        viewModel.markedNote.observe(viewLifecycleOwner, Observer { dataPoint ->
-            if (dataPoint == null) return@Observer
-            binding.graphStatView.placeMarker(dataPoint.timestamp)
+        viewModel.markedNote.observe(viewLifecycleOwner, Observer { note ->
+            if (note == null) return@Observer
+            binding.graphStatView.placeMarker(note.timestamp)
         })
     }
 
-    private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
-        if (dataPoints.isEmpty()) return
+    private fun onNewNotesList(notes: List<GraphNote>) {
+        if (notes.isEmpty()) return
         binding.showNotesButton.visibility = View.VISIBLE
-        adapter.submitList(dataPoints)
+        adapter.submitList(notes)
     }
 
     private fun onViewModelStateChanged(state: ViewGraphStatViewModelState) {
@@ -122,12 +139,15 @@ class ViewGraphStatFragment : Fragment() {
 
     private fun initNotesAdapterFromViewModel() {
         val featureDisplayNames = viewModel.featureDisplayNames ?: emptyMap()
-        adapter = NotesAdapter(featureDisplayNames, NoteClickListener(this::onViewDataPointClicked))
+        adapter = NotesAdapter(
+            featureDisplayNames,
+            NoteClickListener(this::onViewNoteClicked)
+        )
         binding.notesRecyclerView.adapter = adapter
         binding.notesRecyclerView.layoutManager = LinearLayoutManager(
             context, RecyclerView.VERTICAL, false
         )
-        viewModel.sampledDataPoints.observe(viewLifecycleOwner, Observer { p -> onSampledDataPoints(p) })
+        viewModel.notes.observe(viewLifecycleOwner, Observer { onNewNotesList(it) })
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
@@ -211,17 +231,26 @@ class ViewGraphStatViewModel : ViewModel() {
     var featureDisplayNames: Map<Long, String>? = null
         private set
 
-    val state: LiveData<ViewGraphStatViewModelState> get() { return _state }
+    val state: LiveData<ViewGraphStatViewModelState>
+        get() {
+            return _state
+        }
     private val _state = MutableLiveData(ViewGraphStatViewModelState.INITIALIZING)
 
-    val showingNotes: LiveData<Boolean> get() { return _showingNotes }
+    val showingNotes: LiveData<Boolean>
+        get() {
+            return _showingNotes
+        }
     private val _showingNotes = MutableLiveData(false)
 
-    val sampledDataPoints: LiveData<List<DataPoint>> get() { return _sampledDataPoints }
-    private val _sampledDataPoints = MutableLiveData<List<DataPoint>>(emptyList())
+    private val _notes = MutableLiveData<List<GraphNote>>(emptyList())
+    val notes: LiveData<List<GraphNote>> = _notes
 
-    val markedNote: LiveData<DataPoint?> get() { return _markedNote }
-    private val _markedNote = MutableLiveData<DataPoint?>(null)
+    val markedNote: LiveData<GraphNote?>
+        get() {
+            return _markedNote
+        }
+    private val _markedNote = MutableLiveData<GraphNote?>(null)
 
     private val currJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + currJob)
@@ -232,12 +261,25 @@ class ViewGraphStatViewModel : ViewModel() {
         if (dataSource != null) return
         dataSource =
             TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
-        _state.value = ViewGraphStatViewModelState.INITIALIZING
+        _state.value =
+            ViewGraphStatViewModelState.INITIALIZING
         ioScope.launch {
             initFromGraphStatId(graphStatId)
             getAllFeatureDisplayNames()
-            withContext(Dispatchers.Main) { _state.value = ViewGraphStatViewModelState.WAITING }
+            getAllGlobalNotes()
+            withContext(Dispatchers.Main) { _state.value =
+                ViewGraphStatViewModelState.WAITING
+            }
         }
+    }
+
+    private suspend fun getAllGlobalNotes() = withContext(Dispatchers.IO) {
+        val globalNotes = dataSource!!.getAllGlobalNotesSync()
+            .map { GraphNote(it) }
+        val mergedList = _notes.value
+            ?.union(globalNotes)
+            ?.sortedByDescending { it -> it.timestamp }
+        withContext(Dispatchers.Main) { _notes.value = mergedList }
     }
 
     private fun getAllFeatureDisplayNames() {
@@ -248,13 +290,14 @@ class ViewGraphStatViewModel : ViewModel() {
 
     fun onSampledDataPoints(dataPoints: List<DataPoint>) {
         ioScope.launch {
-            val notes = dataPoints
+            val dataPointNotes = dataPoints
                 .filter { dp -> dp.note.isNotEmpty() }
                 .distinct()
-                .sortedByDescending { dp -> dp.timestamp }
-            withContext(Dispatchers.Main) {
-                _sampledDataPoints.value = notes
-            }
+                .map { GraphNote(it) }
+            val mergedList = _notes.value
+                ?.union(dataPointNotes)
+                ?.sortedByDescending { it -> it.timestamp }
+            withContext(Dispatchers.Main) { _notes.value = mergedList }
         }
     }
 
@@ -272,8 +315,8 @@ class ViewGraphStatViewModel : ViewModel() {
         _showingNotes.value = _showingNotes.value?.not()
     }
 
-    fun noteClicked(dataPoint: DataPoint) {
-        _markedNote.value = dataPoint
+    fun noteClicked(note: GraphNote) {
+        _markedNote.value = note
     }
 
     private fun initLineGraph() {

@@ -9,15 +9,6 @@
         android:paddingTop="@dimen/card_padding"
         android:paddingEnd="@dimen/report_dialog_start_end_padding">
 
-        <TextView
-            android:id="@+id/valueText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.Headline6"
-            android:textStyle="bold"
-            tools:text="1 : Some" />
 
         <TextView
             android:id="@+id/dateTimeText"
@@ -25,8 +16,10 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:textAppearance="@style/TextAppearance.Body"
+            android:textAppearance="@style/TextAppearance.Headline6"
+            android:textStyle="bold"
             tools:text="24/05/20 12:42" />
+
 
         <TextView
             android:id="@+id/featureDisplayNameText"
@@ -35,7 +28,17 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:textAppearance="@style/TextAppearance.Body"
+            android:textStyle="italic"
             tools:text="Daily -> Exercise" />
 
+        <TextView
+            android:id="@+id/valueText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textAppearance="@style/TextAppearance.Body"
+            android:textStyle="italic"
+            tools:text="1 : Some" />
     </LinearLayout>
 </layout>

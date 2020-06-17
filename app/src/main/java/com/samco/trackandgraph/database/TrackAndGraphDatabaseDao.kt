@@ -299,6 +299,9 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM notes_table WHERE timestamp = :timestamp LIMIT 1")
     fun getGlobalNoteByTimeSync(timestamp: OffsetDateTime?): GlobalNote?
 
+    @Query("SELECT * FROM notes_table")
+    fun getAllGlobalNotesSync(): List<GlobalNote>
+
     @Insert
     fun insertLineGraph(lineGraph: LineGraph): Long
 

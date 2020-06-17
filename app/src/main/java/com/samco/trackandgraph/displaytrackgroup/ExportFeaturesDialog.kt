@@ -31,7 +31,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.Feature
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
@@ -118,7 +117,7 @@ class ExportFeaturesDialog : DialogFragment() {
     private fun setUriListeners() {
         viewModel.selectedFileUri.observe(this, Observer { uri ->
             if (uri != null) {
-                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, requireContext(), uri, fileButton, alertDialog)
+                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, uri, fileButton, alertDialog)
             }
         })
     }

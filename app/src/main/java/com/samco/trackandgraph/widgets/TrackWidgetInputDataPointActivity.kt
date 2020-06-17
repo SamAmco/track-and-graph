@@ -25,7 +25,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import kotlinx.coroutines.CoroutineScope
