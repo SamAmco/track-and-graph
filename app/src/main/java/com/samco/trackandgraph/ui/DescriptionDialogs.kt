@@ -27,14 +27,13 @@ import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.DataPoint
 import com.samco.trackandgraph.database.DisplayNote
+import com.samco.trackandgraph.database.GlobalNote
 import com.samco.trackandgraph.database.NoteType
-import com.samco.trackandgraph.databinding.ShowDataPointDialogHeaderBinding
+import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 import org.threeten.bp.OffsetDateTime
 
 fun showFeatureDescriptionDialog(context: Context, name: String, description: String) {
-    val res = context.resources
-
     val descriptionOrNone = if (description.isEmpty())
         context.getString(R.string.no_description)
     else description
@@ -64,20 +63,41 @@ private fun getBodyTextView(context: Context, text: String): TextView {
     return bodyView
 }
 
-fun showNoteDialog(context: Context, note: DisplayNote) {
-    val bodyText = when (note.noteType) {
-        NoteType.DATA_POINT -> """${note.trackGroupName} -> ${note.featureName}
-            |
-            |${note.note}
-        """.trimMargin()
-        NoteType.GLOBAL_NOTE -> note.note
-    }
-
+fun showNoteDialog(inflater: LayoutInflater, context: Context, note: GlobalNote) {
+    val headerView = getNoteDialogHeader(inflater, context, note.timestamp, null, null)
     AlertDialog.Builder(context)
-        .setTitle(formatDayMonthYearHourMinute(context, note.timestamp))
-        .setView(getBodyTextView(context, bodyText))
+        .setCustomTitle(headerView)
+        .setView(getBodyTextView(context, note.note))
         .create()
         .show()
+}
+
+fun showNoteDialog(inflater: LayoutInflater, context: Context, note: DisplayNote) {
+    val featureDispalayName = when (note.noteType) {
+        NoteType.DATA_POINT -> "${note.trackGroupName} -> ${note.featureName}"
+        NoteType.GLOBAL_NOTE -> ""
+    }
+    val headerView =
+        getNoteDialogHeader(inflater, context, note.timestamp, null, featureDispalayName)
+    AlertDialog.Builder(context)
+        .setCustomTitle(headerView)
+        .setView(getBodyTextView(context, note.note))
+        .create()
+        .show()
+}
+
+fun getNoteDialogHeader(
+    inflater: LayoutInflater, context: Context, timestamp: OffsetDateTime,
+    displayValue: String?, featureDispalayName: String?
+): View {
+    val headerView = ShowNoteDialogHeaderBinding.inflate(inflater)
+    headerView.dateTimeText.text = formatDayMonthYearHourMinute(context, timestamp)
+    headerView.valueText.visibility = if (displayValue.isNullOrEmpty()) View.GONE else View.VISIBLE
+    displayValue?.let { headerView.valueText.text = it }
+    headerView.featureDisplayNameText.visibility =
+        if (featureDispalayName.isNullOrEmpty()) View.GONE else View.VISIBLE
+    featureDispalayName?.let { headerView.featureDisplayNameText.text = it }
+    return headerView.root
 }
 
 fun showDataPointDescriptionDialog(
@@ -100,15 +120,8 @@ fun showDataPointDescriptionDialog(
 ) {
     val res = context.resources
 
-    val headerView = ShowDataPointDialogHeaderBinding.inflate(inflater)
-    headerView.dateTimeText.text = formatDayMonthYearHourMinute(context, timestamp)
-    headerView.valueText.text = displayValue
-    if (featureDispalayName != null && featureDispalayName.isNotEmpty()) {
-        headerView.featureDisplayNameText.visibility = View.VISIBLE
-        headerView.featureDisplayNameText.text = featureDispalayName
-    } else {
-        headerView.featureDisplayNameText.visibility = View.GONE
-    }
+    val headerView =
+        getNoteDialogHeader(inflater, context, timestamp, displayValue, featureDispalayName)
 
     val bodyView = TextView(context)
     TextViewCompat.setTextAppearance(bodyView, R.style.TextAppearance_Body)
@@ -123,7 +136,7 @@ fun showDataPointDescriptionDialog(
     )
 
     AlertDialog.Builder(context)
-        .setCustomTitle(headerView.root)
+        .setCustomTitle(headerView)
         .setView(bodyView)
         .create()
         .show()

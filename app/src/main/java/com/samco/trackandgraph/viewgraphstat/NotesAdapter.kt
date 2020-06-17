@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphsandstats
+package com.samco.trackandgraph.viewgraphstat
 
 import android.view.LayoutInflater
 import android.view.View
@@ -24,16 +24,25 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.DataPoint
+import com.samco.trackandgraph.database.GlobalNote
+import com.samco.trackandgraph.database.NoteType
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
+import org.threeten.bp.OffsetDateTime
 
 class NotesAdapter(
     private val featureDisplayNames: Map<Long, String>,
     private val clickListener: NoteClickListener
-) : ListAdapter<DataPoint, NotesAdapter.ViewHolder>(DataPointDiffCallback()) {
+) : ListAdapter<GraphNote, NotesAdapter.ViewHolder>(
+    NoteDiffCallback()
+) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, featureDisplayNames, clickListener)
+        return ViewHolder.from(
+            parent,
+            featureDisplayNames,
+            clickListener
+        )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -46,12 +55,34 @@ class NotesAdapter(
         private val clickListener: NoteClickListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(dataPoint: DataPoint) {
-            binding.valueText.text = dataPoint.getDisplayValue()
+        var note: GraphNote? = null
+
+        fun bind(note: GraphNote) {
+            this.note = note
             binding.timestampText.text =
-                formatDayMonthYearHourMinute(binding.timestampText.context, dataPoint.timestamp)
+                formatDayMonthYearHourMinute(binding.timestampText.context, note.timestamp)
+            when (note.noteType) {
+                NoteType.DATA_POINT -> initFromDataPointNote()
+                NoteType.GLOBAL_NOTE -> initFromGlobalNote()
+            }
+        }
+
+        private fun initFromGlobalNote() {
+            val globalNote = note!!.globalNote!!
+            binding.valueText.visibility = View.GONE
+            binding.featureNameText.visibility = View.GONE
+            binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
+            binding.noteText.visibility = View.VISIBLE
+            binding.noteText.text = globalNote.note
+        }
+
+        private fun initFromDataPointNote() {
+            val dataPoint = note!!.dataPoint!!
+            binding.valueText.visibility = View.VISIBLE
+            binding.valueText.text = dataPoint.getDisplayValue()
+            binding.featureNameText.visibility = View.VISIBLE
             binding.featureNameText.text = featureDisplayNames.getOrElse(dataPoint.featureId) { "" }
-            binding.cardView.setOnClickListener { clickListener.viewClicked(dataPoint) }
+            binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
             binding.noteText.visibility = View.VISIBLE
             binding.noteText.text = dataPoint.note
         }
@@ -64,19 +95,27 @@ class NotesAdapter(
             ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemNoteBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding, featureDisplayNames, clickListener)
+                return ViewHolder(
+                    binding,
+                    featureDisplayNames,
+                    clickListener
+                )
             }
         }
     }
 }
 
-class DataPointDiffCallback : DiffUtil.ItemCallback<DataPoint>() {
-    override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) =
-        oldItem.timestamp == newItem.timestamp && oldItem.featureId == newItem.featureId
+class NoteDiffCallback : DiffUtil.ItemCallback<GraphNote>() {
+    override fun areItemsTheSame(oldItem: GraphNote, newItem: GraphNote) =
+        oldItem.timestamp == newItem.timestamp
+                && oldItem.noteType == newItem.noteType
+                && oldItem.dataPoint?.featureId == newItem.dataPoint?.featureId
 
-    override fun areContentsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem == newItem
+    override fun areContentsTheSame(oldItem: GraphNote, newItem: GraphNote) =
+        oldItem.dataPoint == newItem.dataPoint
+                && oldItem.globalNote == newItem.globalNote
 }
 
-class NoteClickListener(private val onViewDataPoint: (DataPoint) -> Unit) {
-    fun viewClicked(dataPoint: DataPoint) = onViewDataPoint(dataPoint)
+class NoteClickListener(private val onViewDataPoint: (GraphNote) -> Unit) {
+    fun viewClicked(note: GraphNote) = onViewDataPoint(note)
 }

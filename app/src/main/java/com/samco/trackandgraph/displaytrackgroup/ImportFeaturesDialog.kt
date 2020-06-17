@@ -95,7 +95,7 @@ class ImportFeaturesDialog : DialogFragment() {
     private fun listenToUri() {
         viewModel.selectedFileUri.observe(this, Observer { uri ->
             if (uri != null) {
-                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, requireContext(), uri, fileButton, alertDialog)
+                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, uri, fileButton, alertDialog)
             }
         })
     }

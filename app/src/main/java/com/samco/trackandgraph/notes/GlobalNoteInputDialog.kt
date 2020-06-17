@@ -89,6 +89,7 @@ class GlobalNoteInputDialog : DialogFragment() {
                     binding.noteInputText.setSelection(binding.noteInputText.text.length)
                 }
                 GlobalNoteInputState.DONE -> dismiss()
+                else -> run {}
             }
         })
     }
