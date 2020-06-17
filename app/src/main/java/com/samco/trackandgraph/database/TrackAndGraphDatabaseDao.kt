@@ -293,6 +293,12 @@ interface TrackAndGraphDatabaseDao {
     @Delete
     fun deleteGlobalNote(note: GlobalNote)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertGlobalNote(note: GlobalNote): Long
+
+    @Query("SELECT * FROM notes_table WHERE timestamp = :timestamp LIMIT 1")
+    fun getGlobalNoteByTimeSync(timestamp: OffsetDateTime?): GlobalNote?
+
     @Insert
     fun insertLineGraph(lineGraph: LineGraph): Long
 
