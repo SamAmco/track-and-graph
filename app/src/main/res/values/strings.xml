@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of Track & Graph
   ~ 
   ~ Track & Graph is free software: you can redistribute it and/or modify
@@ -293,5 +292,7 @@
     <string name="add_multiple_choice_answer_button_content_description">Add multiple choice answer button</string>
     <string name="ending_at_colon">Ending at:</string>
     <string name="duplicate">Duplicate</string>
+    <string name="no_notes_hint_text">Notes added when tracking will show up here. You can also add global notes using the + button.</string>
+    <string name="add_a_global_note">Add a global note:</string>
 
 </resources>

@@ -34,7 +34,7 @@ import org.threeten.bp.format.DateTimeFormatter
 
 private val getIdForReminder = { r: Reminder -> r.id }
 
-class ReminderListAdapter(private val clickListener: ReminderClickListener, private val context: Context)
+internal class ReminderListAdapter(private val clickListener: ReminderClickListener, private val context: Context)
     : OrderedListAdapter<Reminder, ReminderViewHolder>(getIdForReminder, ReminderDiffCallback()) {
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener)
@@ -45,7 +45,7 @@ class ReminderListAdapter(private val clickListener: ReminderClickListener, priv
     }
 }
 
-class ReminderViewHolder private constructor(
+internal class ReminderViewHolder private constructor(
     private val binding: ListItemReminderBinding,
     private val context: Context) : RecyclerView.ViewHolder(binding.root) {
 
@@ -142,7 +142,7 @@ class ReminderDiffCallback : DiffUtil.ItemCallback<Reminder>() {
 }
 
 
-class ReminderClickListener(
+internal class ReminderClickListener(
     private val onDelete: (Reminder) -> Unit,
     private val onDaysChanged: (Reminder, CheckedDays) -> Unit,
     private val onTimeChanged: (Reminder, LocalTime) -> Unit,

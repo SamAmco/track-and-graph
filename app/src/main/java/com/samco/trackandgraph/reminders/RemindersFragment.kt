@@ -29,7 +29,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -183,7 +182,7 @@ class RemindersViewModel : ViewModel() {
         private set
 
     val state: LiveData<RemindersViewModelState> get() { return _state }
-    private val _state = MutableLiveData<RemindersViewModelState>(RemindersViewModelState.INITIALIZING)
+    private val _state = MutableLiveData(RemindersViewModelState.INITIALIZING)
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return

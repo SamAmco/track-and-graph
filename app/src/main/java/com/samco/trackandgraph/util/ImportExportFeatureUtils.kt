@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.R
 
 object ImportExportFeatureUtils {
-    fun setFileButtonTextFromUri(activity: Activity?, context: Context, uri: Uri, fileButton: Button, alertDialog: AlertDialog) {
+    fun setFileButtonTextFromUri(activity: Activity?, uri: Uri, fileButton: Button, alertDialog: AlertDialog) {
         val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
         val cursor = activity?.contentResolver?.query(uri, projection, null, null, null)
         val index = cursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)

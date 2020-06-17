@@ -26,6 +26,10 @@
             android:icon="@drawable/reminders_icon"
             android:title="@string/reminders" />
         <item
+            android:id="@+id/notesFragment"
+            android:icon="@drawable/edit_icon"
+            android:title="@string/notes" />
+        <item
             android:id="@+id/backupAndRestoreFragment"
             android:icon="@drawable/backup_restore_icon"
             android:title="@string/backup_and_restore" />
