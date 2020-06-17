@@ -178,6 +178,7 @@ class NotesViewModel : ViewModel() {
     }
 
     override fun onCleared() {
+        super.onCleared()
         notesObserver?.let { notes.removeObserver(it) }
         updateJob.cancel()
     }

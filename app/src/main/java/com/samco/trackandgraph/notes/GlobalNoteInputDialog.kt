@@ -199,6 +199,7 @@ class GlobalNoteInputViewModel : ViewModel() {
     }
 
     override fun onCleared() {
+        super.onCleared()
         updateJob.cancel()
     }
 }
