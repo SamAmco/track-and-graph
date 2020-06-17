@@ -323,9 +323,6 @@ object CSVReadWriter {
                 listOf(lineNumber.toString())
             )
         val note = if (record.isMapped(HEADERS.Note.name)) record.get(HEADERS.Note) else ""
-        if (note.isNotEmpty()) {
-            val s = 0
-        }
         lateinit var parsedTimestamp: OffsetDateTime
         try {
             parsedTimestamp = odtFromString(timestamp)!!
