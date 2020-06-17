@@ -169,9 +169,6 @@ class Converters {
     fun intToGroupItemType(i: Int) = GroupItemType.values()[i]
 
     @TypeConverter
-    fun groupItemTypeToInt(groupItemType: GroupItemType) = groupItemType.ordinal
-
-    @TypeConverter
     fun localTimeToString(value: LocalTime) = value.toString()
 
     @TypeConverter
@@ -193,9 +190,6 @@ class Converters {
 
     @TypeConverter
     fun intToYRangeType(index: Int) = YRangeType.values()[index]
-
-    @TypeConverter
-    fun noteTypeToInt(noteType: NoteType) = noteType.ordinal
 
     @TypeConverter
     fun intToNoteType(index: Int) = NoteType.values()[index]
