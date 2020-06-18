@@ -60,6 +60,11 @@ data class Feature(
     @ColumnInfo(name = "feature_description")
     val description: String
 ) {
+    fun getDefaultLabel(): String =
+        if (featureType == FeatureType.DISCRETE)
+            discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
+        else ""
+
     companion object {
         fun create(
             id: Long, name: String, trackGroupId: Long, featureType: FeatureType,
@@ -79,7 +84,7 @@ data class Feature(
     }
 }
 
-enum class FeatureType { DISCRETE, CONTINUOUS }
+enum class FeatureType { DISCRETE, CONTINUOUS, DURATION }
 
 data class DiscreteValue(val index: Int, val label: String) {
     override fun toString() = "$index:$label"

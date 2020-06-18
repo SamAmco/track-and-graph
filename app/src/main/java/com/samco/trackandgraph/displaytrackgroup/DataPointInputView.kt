@@ -86,6 +86,7 @@ class DataPointInputView : FrameLayout {
         when (state.feature.featureType) {
             FeatureType.CONTINUOUS -> initContinuous()
             FeatureType.DISCRETE -> initDiscrete()
+            FeatureType.DURATION -> initContinuous()//TODO we need a new UI for this
         }
     }
 

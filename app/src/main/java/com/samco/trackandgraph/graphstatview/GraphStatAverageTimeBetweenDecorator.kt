@@ -20,10 +20,7 @@ package com.samco.trackandgraph.graphstatview
 import android.content.Context
 import android.view.View
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.AverageTimeBetweenStat
-import com.samco.trackandgraph.database.FeatureType
-import com.samco.trackandgraph.database.GraphOrStat
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -49,11 +46,12 @@ class GraphStatAverageTimeBetweenDecorator(
         initAverageTimeBetweenStatBody()
     }
 
-    override fun setTimeMarker(time: OffsetDateTime) { }
+    override fun setTimeMarker(time: OffsetDateTime) {}
 
     private suspend fun initAverageTimeBetweenStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
-        val dataPoints = getRelevantDataPoints()
+        val feature = dataSource!!.getFeatureById(timeBetweenStat.featureId)
+        val dataPoints = getRelevantDataPoints(feature)
         if (dataPoints.size < 2) {
             onSampledDataCallback?.invoke(emptyList())
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
@@ -61,7 +59,14 @@ class GraphStatAverageTimeBetweenDecorator(
             val totalMillis =
                 Duration.between(dataPoints.first().timestamp, dataPoints.last().timestamp)
                     .toMillis().toDouble()
-            val averageMillis = totalMillis / dataPoints.size.toDouble()
+            val durationMillis = when (feature.featureType) {
+                FeatureType.DURATION -> dataPoints.drop(1).sumByDouble { it.value }
+                else -> 0.0
+            }
+            val totalGapMillis =
+                if (durationMillis > totalMillis) totalMillis
+                else totalMillis - durationMillis
+            val averageMillis = totalGapMillis / (dataPoints.size - 1).toDouble()
             setAverageTimeBetweenStatText(averageMillis)
             onSampledDataCallback?.invoke(dataPoints)
         }
@@ -70,12 +75,11 @@ class GraphStatAverageTimeBetweenDecorator(
         binding!!.progressBar.visibility = View.GONE
     }
 
-    private suspend fun getRelevantDataPoints() = withContext(Dispatchers.IO) {
-        val feature = dataSource!!.getFeatureById(timeBetweenStat.featureId)
+    private suspend fun getRelevantDataPoints(feature: Feature) = withContext(Dispatchers.IO) {
         val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
         val startDate = timeBetweenStat.duration?.let { endDate.minus(it) } ?: OffsetDateTime.MIN
         when (feature.featureType) {
-            FeatureType.CONTINUOUS -> {
+            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
                 dataSource!!.getDataPointsBetweenInTimeRange(
                     feature.id,
                     timeBetweenStat.fromValue,

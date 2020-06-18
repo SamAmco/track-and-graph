@@ -46,7 +46,11 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private lateinit var binding: DataPointInputDialogBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return activity?.let {
             initViewModel()
             binding = DataPointInputDialogBinding.inflate(inflater, container, false)
@@ -69,18 +73,24 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun listenToState() {
         viewModel.state.observe(this, Observer { state ->
             when (state) {
-                InputDataPointDialogState.LOADING -> { binding.addButton.isEnabled = false }
-                InputDataPointDialogState.WAITING -> { binding.addButton.isEnabled = true }
-                InputDataPointDialogState.ADDING -> { binding.addButton.isEnabled = false }
+                InputDataPointDialogState.LOADING -> {
+                    binding.addButton.isEnabled = false
+                }
+                InputDataPointDialogState.WAITING -> {
+                    binding.addButton.isEnabled = true
+                }
+                InputDataPointDialogState.ADDING -> {
+                    binding.addButton.isEnabled = false
+                }
                 InputDataPointDialogState.ADDED -> {
                     binding.addButton.isEnabled = true
-                    if (viewModel.currentFeatureIndex.value!! < viewModel.features.value!!.size-1) {
+                    if (viewModel.currentFeatureIndex.value!! < viewModel.features.value!!.size - 1) {
                         skip()
                         viewModel.onFinishedTransition()
-                    }
-                    else dismiss()
+                    } else dismiss()
                 }
-                else -> {}
+                else -> {
+                }
             }
         })
     }
@@ -108,14 +118,20 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun initViewModel() {
         val timestampStr = requireArguments().getString(DATA_POINT_TIMESTAMP_KEY)
         val timestamp = if (timestampStr != null) odtFromString(timestampStr) else null
-        viewModel.init(requireActivity(), requireArguments().getLongArray(FEATURE_LIST_KEY)!!.toList(), timestamp)
+        viewModel.init(
+            requireActivity(),
+            requireArguments().getLongArray(FEATURE_LIST_KEY)!!.toList(),
+            timestamp
+        )
     }
 
-    private class ViewPagerAdapter(val context: Context,
-                                   val features: List<Feature>,
-                                   val clickListener: DataPointInputView.DataPointInputClickListener,
-                                   val uiStates: Map<Feature, DataPointInputView.DataPointInputData>,
-                                   val inputViews: MutableMap<Int, DataPointInputView>) : PagerAdapter() {
+    private class ViewPagerAdapter(
+        val context: Context,
+        val features: List<Feature>,
+        val clickListener: DataPointInputView.DataPointInputClickListener,
+        val uiStates: Map<Feature, DataPointInputView.DataPointInputData>,
+        val inputViews: MutableMap<Int, DataPointInputView>
+    ) : PagerAdapter() {
         private val existingViews = mutableListOf<DataPointInputView>()
 
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
@@ -125,7 +141,10 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val view = DataPointInputView(context)
             view.initialize(uiStates[features[position]]!!)
-            val params = ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+            val params = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             view.layoutParams = params
             view.setOnClickListener(clickListener)
             inputViews[position] = view
@@ -146,21 +165,24 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         override fun getCount() = features.size
     }
 
-    override fun onPageScrollStateChanged(state: Int) { }
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { }
+    override fun onPageScrollStateChanged(state: Int) {}
+    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
     override fun onPageSelected(position: Int) {
         (binding.viewPager.adapter as ViewPagerAdapter).updateAllDateTimes()
         viewModel.currentFeatureIndex.value = position
     }
 
     private fun setupViewFeature(feature: Feature, index: Int) {
-        if (feature.featureType != FeatureType.CONTINUOUS) binding.addButton.visibility = View.GONE
+        if (feature.featureType != FeatureType.DISCRETE) binding.addButton.visibility = View.VISIBLE
         else binding.addButton.visibility = View.VISIBLE
-        indexText.text = "${index+1} / ${viewModel.features.value!!.size}"
+        indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
         val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (feature.featureType == FeatureType.CONTINUOUS) imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+        if (feature.featureType != FeatureType.DISCRETE) imm.toggleSoftInput(
+            InputMethodManager.SHOW_FORCED,
+            InputMethodManager.HIDE_IMPLICIT_ONLY
+        )
         else imm.hideSoftInputFromWindow(view?.windowToken, 0)
         requireActivity().currentFocus?.clearFocus()
     }
@@ -188,19 +210,24 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         super.onDismiss(dialog)
         requireActivity().currentFocus?.clearFocus()
         val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(requireActivity().window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+        imm.hideSoftInputFromWindow(
+            requireActivity().window.decorView.windowToken,
+            InputMethodManager.HIDE_NOT_ALWAYS
+        )
     }
 
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
         viewModel.onDataPointInput(
-            DataPoint(dataPointInputData.dateTime, dataPointInputData.feature.id,
-                dataPointInputData.value, dataPointInputData.label, dataPointInputData.note),
+            DataPoint(
+                dataPointInputData.dateTime, dataPointInputData.feature.id,
+                dataPointInputData.value, dataPointInputData.label, dataPointInputData.note
+            ),
             dataPointInputData.oldDataPoint
         )
     }
 
     private fun skip() {
-        if (binding.viewPager.currentItem == viewModel.features.value!!.size-1) dismiss()
+        if (binding.viewPager.currentItem == viewModel.features.value!!.size - 1) dismiss()
         else binding.viewPager.setCurrentItem(binding.viewPager.currentItem + 1, true)
     }
 }
@@ -211,7 +238,10 @@ class InputDataPointDialogViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    val state: LiveData<InputDataPointDialogState> get() { return _state }
+    val state: LiveData<InputDataPointDialogState>
+        get() {
+            return _state
+        }
     private val _state by lazy {
         val state = MutableLiveData<InputDataPointDialogState>()
         state.value = InputDataPointDialogState.LOADING
@@ -219,14 +249,20 @@ class InputDataPointDialogViewModel : ViewModel() {
     }
 
     lateinit var uiStates: Map<Feature, DataPointInputView.DataPointInputData>
-    val features: LiveData<List<Feature>> get() { return _features }
+    val features: LiveData<List<Feature>>
+        get() {
+            return _features
+        }
     private val _features by lazy {
         val feats = MutableLiveData<List<Feature>>()
         feats.value = listOf()
         return@lazy feats
     }
 
-    val currentFeatureIndex: MutableLiveData<Int?> get() { return _currentFeatureIndex }
+    val currentFeatureIndex: MutableLiveData<Int?>
+        get() {
+            return _currentFeatureIndex
+        }
     private val _currentFeatureIndex by lazy {
         val index = MutableLiveData<Int?>()
         index.value = null
@@ -247,16 +283,21 @@ class InputDataPointDialogViewModel : ViewModel() {
             val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
             val timeFixed = dataPointTimestamp != null
             uiStates = featureData.map { f ->
-                val dataPointValue = dataPointData?.value ?: if (f.hasDefaultValue)
-                    f.defaultValue else 1.0
+                val dataPointValue = dataPointData?.value
+                    ?: if (f.hasDefaultValue) f.defaultValue else 1.0
                 val dataPointLabel = dataPointData?.label
-                    ?: if (f.hasDefaultValue && f.featureType == FeatureType.DISCRETE) {
-                        f.discreteValues.first { dv -> dv.index == f.defaultValue.toInt() }.label
-                    } else ""
+                    ?: if (f.hasDefaultValue) f.getDefaultLabel() else ""
                 val dataPointNote = dataPointData?.note ?: ""
-                f to DataPointInputView.DataPointInputData(f, timestamp, dataPointValue, dataPointLabel,
-                    dataPointNote, timeFixed, this@InputDataPointDialogViewModel::onDateTimeSelected,
-                    dataPointData)
+                f to DataPointInputView.DataPointInputData(
+                    f,
+                    timestamp,
+                    dataPointValue,
+                    dataPointLabel,
+                    dataPointNote,
+                    timeFixed,
+                    this@InputDataPointDialogViewModel::onDateTimeSelected,
+                    dataPointData
+                )
             }.toMap()
 
             withContext(Dispatchers.Main) {
@@ -268,7 +309,11 @@ class InputDataPointDialogViewModel : ViewModel() {
     }
 
     private fun onDateTimeSelected(dateTime: OffsetDateTime) {
-        uiStates.values.forEach { dp -> if(!dp.timeFixed) { dp.dateTime = dateTime } }
+        uiStates.values.forEach { dp ->
+            if (!dp.timeFixed) {
+                dp.dateTime = dateTime
+            }
+        }
     }
 
     fun onDataPointInput(newDataPoint: DataPoint, oldDataPoint: DataPoint?) {
