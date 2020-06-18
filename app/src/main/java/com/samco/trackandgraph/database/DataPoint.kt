@@ -19,6 +19,7 @@ package com.samco.trackandgraph.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
 @Entity(
@@ -49,8 +50,16 @@ data class DataPoint(
     @ColumnInfo(name = "note")
     val note: String
 ) {
-    fun getDisplayValue(): String {
-        return if (label.isNotEmpty()) doubleFormatter.format(value) + " : $label"
-        else doubleFormatter.format(value)
+    companion object {
+        fun getDisplayValue(dataPoint: DataPoint, featureType: FeatureType): String {
+            return when (featureType) {
+                FeatureType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
+                FeatureType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
+                FeatureType.DURATION -> {
+                    val sec = dataPoint.value.toLong()
+                    String.format("%d:%02d:%02d", sec / 3600, (sec % 3600) / 60, (sec % 60))
+                }
+            }
+        }
     }
 }
