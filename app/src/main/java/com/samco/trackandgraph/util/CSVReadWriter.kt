@@ -22,6 +22,7 @@ import kotlinx.coroutines.yield
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.csv.CSVRecord
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 import java.io.InputStream
@@ -42,6 +43,10 @@ object CSVReadWriter {
         Note
     }
 
+    private fun formatDuration(seconds: Long): String {
+        return String.format("%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
+    }
+
     suspend fun writeFeaturesToCSV(
         features: List<Feature>,
         dataSource: TrackAndGraphDatabaseDao,
@@ -57,6 +62,7 @@ object CSVReadWriter {
                         DiscreteValue.fromDataPoint(dp).toString()
                     }
                     FeatureType.CONTINUOUS -> { dp: DataPoint -> dp.value.toString() }
+                    FeatureType.DURATION -> { dp: DataPoint -> formatDuration(dp.value.toLong()) }
                 }
 
                 dataPoints.forEach { dp ->
@@ -103,109 +109,28 @@ object CSVReadWriter {
         val existingFeaturesByName = existingFeatures.map { it.name to it }.toMap().toMutableMap()
         val newDataPoints = mutableListOf<DataPoint>()
 
-        val insertFeature = { feature: Feature ->
-            existingFeatures.add(feature)
-            existingFeaturesByName[feature.name] = feature
-        }
-
-        val validateNotDiscreteValueConflict =
-            { discreteValue: DiscreteValue, feature: Feature, lineNumber: Int ->
-                if (feature.discreteValues.any { dv -> dv.index == discreteValue.index })
-                    throw ImportFeaturesException(
-                        R.string.import_exception_discrete_value_conflict,
-                        listOf(lineNumber.toString())
-                    )
-            }
-
-        val addDiscreteValueToFeature =
-            { feature: Feature, discreteValue: DiscreteValue, lineNumber: Int ->
-                validateNotDiscreteValueConflict(discreteValue, feature, lineNumber)
-                existingFeatures.remove(feature)
-                existingFeaturesByName.remove(feature.name)
-                val newFeature =
-                    tryAddDiscreteValueToFeature(dataSource, feature, discreteValue, lineNumber)
-                existingFeatures.add(newFeature)
-                existingFeaturesByName[newFeature.name] = newFeature
-            }
-
-        val addContinuousDataPoint =
-            { value: Double?, timestamp: OffsetDateTime, featureId: Long, note: String ->
-                newDataPoints.add(
-                    DataPoint(
-                        timestamp,
-                        featureId,
-                        value ?: 1.0,
-                        "",
-                        note
-                    )
-                )
-            }
-
-        val addDiscreteDataPoint =
-            { value: String, timestamp: OffsetDateTime, feature: Feature, note: String, lineNumber: Int ->
-                val discreteValue = tryGetDiscreteValueFromString(value, lineNumber)
-                newDataPoints.add(
-                    DataPoint(
-                        timestamp,
-                        feature.id,
-                        discreteValue.index.toDouble(),
-                        discreteValue.label,
-                        note
-                    )
-                )
-                discreteValue
-            }
-
         records.forEachIndexed { recordNumber, record ->
             val lineNumber = recordNumber + 2 //one for index by zero and one for headers
             val rec = getValidRecordData(record, lineNumber)
             if (existingFeaturesByName.containsKey(rec.featureName)) {
-                val feature = existingFeaturesByName[rec.featureName]!!
-                when (getFeatureTypeForValue(rec.value)) {
-                    FeatureType.DISCRETE -> {
-                        validateFeatureType(feature, FeatureType.DISCRETE, lineNumber)
-                        val discreteValue =
-                            addDiscreteDataPoint(
-                                rec.value,
-                                rec.timestamp,
-                                feature,
-                                rec.note,
-                                lineNumber
-                            )
-                        if (!feature.discreteValues.contains(discreteValue)) addDiscreteValueToFeature(
-                            feature,
-                            discreteValue,
-                            lineNumber
-                        )
-                    }
-                    FeatureType.CONTINUOUS -> {
-                        validateFeatureType(feature, FeatureType.CONTINUOUS, lineNumber)
-                        addContinuousDataPoint(
-                            rec.value.toDoubleOrNull(),
-                            rec.timestamp,
-                            feature.id,
-                            rec.note
-                        )
-                    }
-                }
+                addDataPointToExistingFeature(
+                    dataSource,
+                    existingFeatures,
+                    existingFeaturesByName,
+                    newDataPoints,
+                    rec,
+                    lineNumber
+                )
             } else {
-                val newFeature = createNewFeature(dataSource, rec, trackGroupId, lineNumber)
-                insertFeature(newFeature)
-                when (newFeature.featureType) {
-                    FeatureType.DISCRETE -> addDiscreteDataPoint(
-                        rec.value,
-                        rec.timestamp,
-                        newFeature,
-                        rec.note,
-                        lineNumber
-                    )
-                    FeatureType.CONTINUOUS -> addContinuousDataPoint(
-                        rec.value.toDoubleOrNull(),
-                        rec.timestamp,
-                        newFeature.id,
-                        rec.note
-                    )
-                }
+                addDataPointToNewFeature(
+                    dataSource,
+                    existingFeatures,
+                    existingFeaturesByName,
+                    newDataPoints,
+                    trackGroupId,
+                    rec,
+                    lineNumber
+                )
             }
             if (lineNumber % 1000 == 0) {
                 dataSource.insertDataPoints(newDataPoints)
@@ -214,6 +139,205 @@ object CSVReadWriter {
             yield()
         }
         if (newDataPoints.isNotEmpty()) dataSource.insertDataPoints(newDataPoints)
+    }
+
+    private fun addDataPointToNewFeature(
+        dataSource: TrackAndGraphDatabaseDao,
+        existingFeatures: MutableList<Feature>,
+        existingFeaturesByName: MutableMap<String, Feature>,
+        points: MutableList<DataPoint>,
+        trackGroupId: Long,
+        rec: RecordData,
+        lineNumber: Int
+    ) {
+        val newFeature = createNewFeature(dataSource, rec, trackGroupId, lineNumber)
+        insertFeature(existingFeatures, existingFeaturesByName, newFeature)
+        when (newFeature.featureType) {
+            FeatureType.DISCRETE -> addDiscreteDataPoint(
+                points,
+                rec.value,
+                rec.timestamp,
+                newFeature,
+                rec.note,
+                lineNumber
+            )
+            FeatureType.CONTINUOUS -> addContinuousDataPoint(
+                points,
+                rec.value.toDoubleOrNull(),
+                rec.timestamp,
+                newFeature.id,
+                rec.note
+            )
+            FeatureType.DURATION -> addDurationDataPoint(
+                points,
+                rec.value,
+                rec.timestamp,
+                newFeature.id,
+                rec.note
+            )
+        }
+    }
+
+    private fun addDataPointToExistingFeature(
+        dataSource: TrackAndGraphDatabaseDao,
+        existingFeatures: MutableList<Feature>,
+        existingFeaturesByName: MutableMap<String, Feature>,
+        points: MutableList<DataPoint>,
+        rec: RecordData,
+        lineNumber: Int
+    ) {
+        val feature = existingFeaturesByName[rec.featureName]!!
+        when (getFeatureTypeForValue(rec.value)) {
+            FeatureType.DISCRETE -> {
+                validateFeatureType(feature, FeatureType.DISCRETE, lineNumber)
+                val discreteValue =
+                    addDiscreteDataPoint(
+                        points,
+                        rec.value,
+                        rec.timestamp,
+                        feature,
+                        rec.note,
+                        lineNumber
+                    )
+                if (!feature.discreteValues.contains(discreteValue)) {
+                    addDiscreteValueToFeature(
+                        dataSource,
+                        existingFeatures,
+                        existingFeaturesByName,
+                        feature,
+                        discreteValue,
+                        lineNumber
+                    )
+                }
+            }
+            FeatureType.CONTINUOUS -> {
+                validateFeatureType(feature, FeatureType.CONTINUOUS, lineNumber)
+                addContinuousDataPoint(
+                    points,
+                    rec.value.toDoubleOrNull(),
+                    rec.timestamp,
+                    feature.id,
+                    rec.note
+                )
+            }
+            FeatureType.DURATION -> {
+                validateFeatureType(feature, FeatureType.DURATION, lineNumber)
+                addDurationDataPoint(
+                    points,
+                    rec.value,
+                    rec.timestamp,
+                    feature.id,
+                    rec.note
+                )
+            }
+        }
+    }
+
+    private fun insertFeature(
+        existingFeatures: MutableList<Feature>,
+        existingFeaturesByName: MutableMap<String, Feature>,
+        feature: Feature
+    ) {
+        existingFeatures.add(feature)
+        existingFeaturesByName[feature.name] = feature
+    }
+
+    private fun validateNotDiscreteValueConflict(
+        discreteValue: DiscreteValue,
+        feature: Feature,
+        lineNumber: Int
+    ) {
+        if (feature.discreteValues.any { dv -> dv.index == discreteValue.index }) {
+            throw ImportFeaturesException(
+                R.string.import_exception_discrete_value_conflict,
+                listOf(lineNumber.toString())
+            )
+        }
+    }
+
+    private fun addDiscreteValueToFeature(
+        dataSource: TrackAndGraphDatabaseDao,
+        existingFeatures: MutableList<Feature>,
+        existingFeaturesByName: MutableMap<String, Feature>,
+        feature: Feature,
+        discreteValue: DiscreteValue,
+        lineNumber: Int
+    ) {
+        validateNotDiscreteValueConflict(discreteValue, feature, lineNumber)
+        existingFeatures.remove(feature)
+        existingFeaturesByName.remove(feature.name)
+        val newFeature =
+            tryAddDiscreteValueToFeature(dataSource, feature, discreteValue, lineNumber)
+        existingFeatures.add(newFeature)
+        existingFeaturesByName[newFeature.name] = newFeature
+    }
+
+    private fun addDiscreteDataPoint(
+        points: MutableList<DataPoint>,
+        value: String,
+        timestamp: OffsetDateTime,
+        feature: Feature,
+        note: String,
+        lineNumber: Int
+    ): DiscreteValue {
+        val discreteValue = tryGetDiscreteValueFromString(value, lineNumber)
+        points.add(
+            DataPoint(
+                timestamp,
+                feature.id,
+                discreteValue.index.toDouble(),
+                discreteValue.label,
+                note
+            )
+        )
+        return discreteValue
+    }
+
+    private fun addContinuousDataPoint(
+        points: MutableList<DataPoint>,
+        value: Double?,
+        timestamp: OffsetDateTime,
+        featureId: Long,
+        note: String
+    ) {
+        points.add(
+            DataPoint(
+                timestamp,
+                featureId,
+                value ?: 1.0,
+                "",
+                note
+            )
+        )
+    }
+
+
+    private fun addDurationDataPoint(
+        points: MutableList<DataPoint>,
+        value: String,
+        timestamp: OffsetDateTime,
+        featureId: Long,
+        note: String
+    ) {
+        val segments = value.split(":")
+        val hours = segments.getOrNull(0)?.toLong() ?: 0L
+        val minutes = segments.getOrNull(1)?.toLong() ?: 0L
+        val seconds = segments.getOrNull(2)?.toLong() ?: 0L
+        val totalSeconds = Duration.ZERO
+            .plusHours(hours)
+            .plusMinutes(minutes)
+            .plusSeconds(seconds)
+            .seconds
+            .toDouble()
+        points.add(
+            DataPoint(
+                timestamp,
+                featureId,
+                totalSeconds,
+                "",
+                note
+            )
+        )
     }
 
     private fun createNewFeature(
@@ -290,8 +414,10 @@ object CSVReadWriter {
     }
 
     private fun getFeatureTypeForValue(value: String): FeatureType {
+        val durationRegex = Regex("\\d*:\\d{2}:\\d{2}")
         return when {
-            value.contains(':') -> FeatureType.DISCRETE
+            value.matches(durationRegex) -> FeatureType.DURATION
+            value.contains(":") -> FeatureType.DISCRETE
             else -> FeatureType.CONTINUOUS
         }
     }

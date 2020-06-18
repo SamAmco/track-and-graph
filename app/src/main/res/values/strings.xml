@@ -91,6 +91,7 @@
     <string-array name="feature_types">
         <item>Multiple choice</item>
         <item>Numerical</item>
+        <item>Time duration</item>
     </string-array>
     <string-array name="graph_types">
         <item>Line Graph</item>

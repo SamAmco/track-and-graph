@@ -91,11 +91,7 @@ class TrackWidgetInputDataPointViewModel : ViewModel() {
 
     fun addDefaultDataPoint() = feature.value?.let {
         ioScope.launch {
-            val label =
-                if (it.featureType == FeatureType.DISCRETE)
-                    it.discreteValues.first { dv -> dv.index == it.defaultValue.toInt() }.label
-                else ""
-            val newDataPoint = DataPoint(OffsetDateTime.now(), it.id, it.defaultValue, label, "")
+            val newDataPoint = DataPoint(OffsetDateTime.now(), it.id, it.defaultValue, it.getDefaultLabel(), "")
             dataSource!!.insertDataPoint(newDataPoint)
         }
     }

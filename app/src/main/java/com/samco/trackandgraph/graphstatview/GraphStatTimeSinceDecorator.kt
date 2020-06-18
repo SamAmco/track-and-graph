@@ -72,19 +72,22 @@ class GraphStatTimeSinceDecorator(
     private fun getLastDataPoint(): DataPoint? {
         val feature = dataSource!!.getFeatureById(timeSinceLastStat.featureId)
         val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
-        return if (feature.featureType == FeatureType.CONTINUOUS) {
-            dataSource!!.getLastDataPointBetween(
-                timeSinceLastStat.featureId,
-                timeSinceLastStat.fromValue,
-                timeSinceLastStat.toValue,
-                endDate
-            )
-        } else {
-            dataSource!!.getLastDataPointWithValue(
-                timeSinceLastStat.featureId,
-                timeSinceLastStat.discreteValues,
-                endDate
-            )
+        return when (feature.featureType) {
+            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
+                dataSource!!.getLastDataPointBetween(
+                    timeSinceLastStat.featureId,
+                    timeSinceLastStat.fromValue,
+                    timeSinceLastStat.toValue,
+                    endDate
+                )
+            }
+            else -> {
+                dataSource!!.getLastDataPointWithValue(
+                    timeSinceLastStat.featureId,
+                    timeSinceLastStat.discreteValues,
+                    endDate
+                )
+            }
         }
     }
 

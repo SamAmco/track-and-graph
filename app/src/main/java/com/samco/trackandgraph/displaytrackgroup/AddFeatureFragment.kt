@@ -27,7 +27,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -54,23 +53,23 @@ import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import java.lang.Exception
 import kotlin.math.absoluteValue
 
-
-class AddFeatureFragment : Fragment(),
-    AdapterView.OnItemSelectedListener,
-    YesCancelDialogFragment.YesCancelDialogListener {
-
+class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
     private val args: AddFeatureFragmentArgs by navArgs()
     private lateinit var binding: AddFeatureFragmentBinding
     private val viewModel by viewModels<AddFeatureViewModel>()
     private var navController: NavController? = null
-    private val featureTypeList = listOf(FeatureType.DISCRETE, FeatureType.CONTINUOUS)
+    private val featureTypeList = listOf(
+        FeatureType.DISCRETE,
+        FeatureType.CONTINUOUS,
+        FeatureType.DURATION
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.add_feature_fragment, container, false)
+        binding = AddFeatureFragmentBinding.inflate(inflater, container, false)
         navController = container?.findNavController()
 
         viewModel.init(
@@ -86,13 +85,15 @@ class AddFeatureFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
-        val imm = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.featureNameText, 0)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        val imm = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
@@ -119,7 +120,8 @@ class AddFeatureFragment : Fragment(),
                     Toast.makeText(requireActivity(), errorMsg, Toast.LENGTH_LONG).show()
                     navController?.popBackStack()
                 }
-                else -> {}
+                else -> {
+                }
             }
         })
     }
@@ -151,16 +153,27 @@ class AddFeatureFragment : Fragment(),
         observeFeatureType()
     }
 
+    private fun getOnFeatureSelectedListener(): AdapterView.OnItemSelectedListener {
+        return object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                viewModel.featureType.value = featureTypeList[position]
+            }
+        }
+    }
+
     private fun initViewFromViewModel() {
         viewModel.discreteValues.forEach { v -> inflateDiscreteValue(v) }
         if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
             binding.addDiscreteValueButton.isEnabled = false
         if (viewModel.updateMode) initSpinnerInUpdateMode()
 
-        binding.featureNameText.setText(viewModel.featureName)
         binding.featureDescriptionText.setText(viewModel.featureDescription)
         binding.featureTypeSpinner.setSelection(featureTypeList.indexOf(viewModel.featureType.value!!))
-        binding.featureTypeSpinner.onItemSelectedListener = this
+        binding.featureTypeSpinner.onItemSelectedListener = getOnFeatureSelectedListener()
+
+        binding.featureNameText.setText(viewModel.featureName)
         binding.featureNameText.setSelection(binding.featureNameText.text.length)
         binding.featureNameText.requestFocus()
         binding.featureNameText.addTextChangedListener {
@@ -215,7 +228,7 @@ class AddFeatureFragment : Fragment(),
 
     private fun currentDefaultValueIsInvalidDiscreteValue(): Boolean {
         val currentDefaultValue = viewModel.featureDefaultValue.value!!
-        return currentDefaultValue > viewModel.discreteValues.size-1
+        return currentDefaultValue > viewModel.discreteValues.size - 1
                 || currentDefaultValue < 0
                 || (currentDefaultValue - currentDefaultValue.toInt().toDouble()).absoluteValue > 0
     }
@@ -268,7 +281,7 @@ class AddFeatureFragment : Fragment(),
 
     private fun updateCurrentlySelectedDefaultDiscreteValue() {
         val selected = viewModel.featureDefaultValue.value!!.toInt()
-        binding.defaultDiscreteButtonsLayout.children.forEachIndexed {i, view ->
+        binding.defaultDiscreteButtonsLayout.children.forEachIndexed { i, view ->
             (view as CheckBox).isChecked = i == selected
         }
     }
@@ -379,7 +392,7 @@ class AddFeatureFragment : Fragment(),
         binding.discreteValues.addView(item.root, currIndex + 1)
         val defaultButtonView = binding.defaultDiscreteButtonsLayout.getChildAt(currIndex)
         binding.defaultDiscreteButtonsLayout.removeViewAt(currIndex)
-        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex+1)
+        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex + 1)
         if (currIndex == viewModel.featureDefaultValue.value!!.toInt())
             viewModel.featureDefaultValue.value = viewModel.featureDefaultValue.value!! + 1
         reIndexDiscreteValueViews()
@@ -393,7 +406,7 @@ class AddFeatureFragment : Fragment(),
         binding.discreteValues.addView(item.root, currIndex - 1)
         val defaultButtonView = binding.defaultDiscreteButtonsLayout.getChildAt(currIndex)
         binding.defaultDiscreteButtonsLayout.removeViewAt(currIndex)
-        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex-1)
+        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex - 1)
         if (currIndex == viewModel.featureDefaultValue.value!!.toInt())
             viewModel.featureDefaultValue.value = viewModel.featureDefaultValue.value!! - 1
         reIndexDiscreteValueViews()
@@ -424,12 +437,6 @@ class AddFeatureFragment : Fragment(),
         }
     }
 
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
-        viewModel.featureType.value = featureTypeList[position]
-    }
-
-    override fun onNothingSelected(p0: AdapterView<*>?) {}
-
     private fun onFeatureTypeChanged(featureType: FeatureType) {
         showOnFeatureTypeUpdatedMessage(featureType)
         updateDefaultValuesViewFromViewModel(viewModel.featureHasDefaultValue.value!!)
@@ -456,10 +463,14 @@ class AddFeatureFragment : Fragment(),
     }
 
     private fun getOnDataTypeChangedMessage(oldType: FeatureType, newType: FeatureType): String? {
-        return if (oldType == FeatureType.DISCRETE) when (newType) {
-            FeatureType.DISCRETE -> null
-            FeatureType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
-        } else null
+        return when (oldType) {
+            FeatureType.DISCRETE -> when (newType) {
+                FeatureType.DISCRETE -> null
+                FeatureType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
+                else -> null
+            }
+            else -> null
+        }
     }
 
     override fun onDialogYes(dialog: YesCancelDialogFragment) {
@@ -535,10 +546,15 @@ class AddFeatureViewModel : ViewModel() {
     fun isFeatureTypeEnabled(type: FeatureType): Boolean {
         if (!updateMode) return true
         // disc -> cont Y
+        // disc -> dur N
         // cont -> disc N
+        // cont -> dur Y
+        // dur -> disc N
+        // dur -> cont Y
         return when (type) {
-            FeatureType.CONTINUOUS -> true
+            FeatureType.CONTINUOUS -> existingFeature!!.featureType == FeatureType.DURATION
             FeatureType.DISCRETE -> existingFeature!!.featureType == FeatureType.DISCRETE
+            FeatureType.DURATION -> existingFeature!!.featureType == FeatureType.CONTINUOUS
         }
     }
 
@@ -578,9 +594,20 @@ class AddFeatureViewModel : ViewModel() {
     }
 
     private fun updateAllExistingDataPointsForTransformation(valOfDiscVal: (MutableLabel) -> Int) {
-        if (existingFeature!!.featureType == FeatureType.DISCRETE) when (featureType.value) {
-            FeatureType.CONTINUOUS -> stripDataPointsToValue()
-            FeatureType.DISCRETE -> updateDiscreteValueDataPoints(valOfDiscVal)
+        when (existingFeature!!.featureType) {
+            FeatureType.DISCRETE -> when (featureType.value) {
+                FeatureType.CONTINUOUS -> stripDataPointsToValue()
+                FeatureType.DISCRETE -> updateDiscreteValueDataPoints(valOfDiscVal)
+                else -> run {}
+            }
+            FeatureType.CONTINUOUS -> when (featureType.value) {
+                FeatureType.DURATION -> run {} //TODO we need a UI to enable the transformation from numbers to hours, minutes or seconds
+                else -> run {}
+            }
+            FeatureType.DURATION -> when (featureType.value) {
+                FeatureType.CONTINUOUS -> run {} //TODO we need a UI to enable the transformation from hours, minutes or seconds to numbers
+                else -> run {}
+            }
         }
     }
 
