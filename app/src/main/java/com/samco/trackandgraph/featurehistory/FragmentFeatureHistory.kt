@@ -17,10 +17,7 @@
 package com.samco.trackandgraph.featurehistory
 
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.*
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -60,8 +57,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         val dao = TrackAndGraphDatabase.getInstance(requireContext()).trackAndGraphDatabaseDao
         viewModel.initViewModel(args.feature, dao)
 
-        initDataPointAdapter()
-        observeViewModel()
+        observeFeature()
 
         (activity as AppCompatActivity).supportActionBar?.title = args.featureName
 
@@ -91,25 +87,35 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         binding.noDataPointsHintText.visibility = View.GONE
     }
 
-    private fun initDataPointAdapter() {
-        adapter = DataPointAdapter(
-            DataPointClickListener(
-                this::onEditDataPointClicked,
-                this::onDeleteDataPointClicked,
-                this::onViewDataPointClicked
+    private fun observeFeature() {
+        viewModel.feature.observe(viewLifecycleOwner, Observer {
+            if (it == null) return@Observer
+            adapter = DataPointAdapter(
+                DataPointClickListener(
+                    this::onEditDataPointClicked,
+                    this::onDeleteDataPointClicked,
+                    this::onViewDataPointClicked
+                ),
+                it.featureType
             )
-        )
-        binding.dataPointList.adapter = adapter
-        binding.dataPointList.layoutManager = LinearLayoutManager(
-            context, RecyclerView.VERTICAL, false
-        )
+            binding.dataPointList.adapter = adapter
+            binding.dataPointList.layoutManager = LinearLayoutManager(
+                context, RecyclerView.VERTICAL, false
+            )
+            observeDataPoints()
+        })
     }
 
     private fun onViewDataPointClicked(dataPoint: DataPoint) {
-        showDataPointDescriptionDialog(requireContext(), layoutInflater, dataPoint)
+        showDataPointDescriptionDialog(
+            requireContext(),
+            layoutInflater,
+            dataPoint,
+            viewModel.feature.value!!.featureType
+        )
     }
 
-    private fun observeViewModel() {
+    private fun observeDataPoints() {
         viewModel.dataPoints.observe(viewLifecycleOwner, Observer {
             it?.let {
                 adapter.submitList(it)

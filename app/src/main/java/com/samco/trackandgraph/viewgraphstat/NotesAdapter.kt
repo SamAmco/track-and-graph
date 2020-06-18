@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.DataPoint
+import com.samco.trackandgraph.database.FeatureType
 import com.samco.trackandgraph.database.GlobalNote
 import com.samco.trackandgraph.database.NoteType
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
@@ -32,6 +33,7 @@ import org.threeten.bp.OffsetDateTime
 
 class NotesAdapter(
     private val featureDisplayNames: Map<Long, String>,
+    private val featureTypes: Map<Long, FeatureType>,
     private val clickListener: NoteClickListener
 ) : ListAdapter<GraphNote, NotesAdapter.ViewHolder>(
     NoteDiffCallback()
@@ -41,6 +43,7 @@ class NotesAdapter(
         return ViewHolder.from(
             parent,
             featureDisplayNames,
+            featureTypes,
             clickListener
         )
     }
@@ -52,6 +55,7 @@ class NotesAdapter(
     class ViewHolder private constructor(
         private val binding: ListItemNoteBinding,
         private val featureDisplayNames: Map<Long, String>,
+        private val featureTypes: Map<Long, FeatureType>,
         private val clickListener: NoteClickListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -79,7 +83,8 @@ class NotesAdapter(
         private fun initFromDataPointNote() {
             val dataPoint = note!!.dataPoint!!
             binding.valueText.visibility = View.VISIBLE
-            binding.valueText.text = dataPoint.getDisplayValue()
+            val featureType = featureTypes.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
+            binding.valueText.text = DataPoint.getDisplayValue(note!!.dataPoint!!, featureType)
             binding.featureNameText.visibility = View.VISIBLE
             binding.featureNameText.text = featureDisplayNames.getOrElse(dataPoint.featureId) { "" }
             binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
@@ -91,6 +96,7 @@ class NotesAdapter(
             fun from(
                 parent: ViewGroup,
                 featureDisplayNames: Map<Long, String>,
+                featureTypes: Map<Long, FeatureType>,
                 clickListener: NoteClickListener
             ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
@@ -98,6 +104,7 @@ class NotesAdapter(
                 return ViewHolder(
                     binding,
                     featureDisplayNames,
+                    featureTypes,
                     clickListener
                 )
             }

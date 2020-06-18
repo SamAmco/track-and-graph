@@ -78,15 +78,23 @@ class ViewGraphStatFragment : Fragment() {
     private fun onViewNoteClicked(note: GraphNote) {
         viewModel.noteClicked(note)
         when (note.noteType) {
-            NoteType.GLOBAL_NOTE -> showNoteDialog(layoutInflater, requireContext(), note.globalNote!!)
+            NoteType.GLOBAL_NOTE -> showNoteDialog(
+                layoutInflater,
+                requireContext(),
+                note.globalNote!!
+            )
             NoteType.DATA_POINT -> {
                 val dataPoint = note.dataPoint!!
                 val featureDisplayName =
                     viewModel.featureDisplayNames?.getOrElse(dataPoint.featureId) { null }
+                val featureType =
+                    viewModel.featureTypes?.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
+                        ?: FeatureType.CONTINUOUS
                 showDataPointDescriptionDialog(
                     requireContext(),
                     layoutInflater,
                     dataPoint,
+                    featureType,
                     featureDisplayName
                 )
             }
@@ -139,8 +147,10 @@ class ViewGraphStatFragment : Fragment() {
 
     private fun initNotesAdapterFromViewModel() {
         val featureDisplayNames = viewModel.featureDisplayNames ?: emptyMap()
+        val featureTypes = viewModel.featureTypes ?: emptyMap()
         adapter = NotesAdapter(
             featureDisplayNames,
+            featureTypes,
             NoteClickListener(this::onViewNoteClicked)
         )
         binding.notesRecyclerView.adapter = adapter
@@ -230,6 +240,8 @@ class ViewGraphStatViewModel : ViewModel() {
         private set
     var featureDisplayNames: Map<Long, String>? = null
         private set
+    var featureTypes: Map<Long, FeatureType>? = null
+        private set
 
     val state: LiveData<ViewGraphStatViewModelState>
         get() {
@@ -265,10 +277,11 @@ class ViewGraphStatViewModel : ViewModel() {
             ViewGraphStatViewModelState.INITIALIZING
         ioScope.launch {
             initFromGraphStatId(graphStatId)
-            getAllFeatureDisplayNames()
+            getAllFeatureAttributes()
             getAllGlobalNotes()
-            withContext(Dispatchers.Main) { _state.value =
-                ViewGraphStatViewModelState.WAITING
+            withContext(Dispatchers.Main) {
+                _state.value =
+                    ViewGraphStatViewModelState.WAITING
             }
         }
     }
@@ -282,9 +295,13 @@ class ViewGraphStatViewModel : ViewModel() {
         withContext(Dispatchers.Main) { _notes.value = mergedList }
     }
 
-    private fun getAllFeatureDisplayNames() {
-        featureDisplayNames = dataSource!!.getAllFeaturesAndTrackGroupsSync()
+    private fun getAllFeatureAttributes() {
+        val allFeatures = dataSource!!.getAllFeaturesAndTrackGroupsSync()
+        featureDisplayNames = allFeatures
             .map { it.id to "${it.trackGroupName} -> ${it.name}" }
+            .toMap()
+        featureTypes = allFeatures
+            .map { it.id to it.featureType }
             .toMap()
     }
 

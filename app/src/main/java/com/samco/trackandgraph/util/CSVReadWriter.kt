@@ -43,10 +43,6 @@ object CSVReadWriter {
         Note
     }
 
-    private fun formatDuration(seconds: Long): String {
-        return String.format("%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, (seconds % 60));
-    }
-
     suspend fun writeFeaturesToCSV(
         features: List<Feature>,
         dataSource: TrackAndGraphDatabaseDao,
@@ -62,7 +58,7 @@ object CSVReadWriter {
                         DiscreteValue.fromDataPoint(dp).toString()
                     }
                     FeatureType.CONTINUOUS -> { dp: DataPoint -> dp.value.toString() }
-                    FeatureType.DURATION -> { dp: DataPoint -> formatDuration(dp.value.toLong()) }
+                    FeatureType.DURATION -> { dp: DataPoint -> DataPoint.getDisplayValue(dp, FeatureType.DURATION) }
                 }
 
                 dataPoints.forEach { dp ->
