@@ -295,5 +295,8 @@
     <string name="duplicate">Duplicate</string>
     <string name="no_notes_hint_text">Notes added when tracking will show up here. You can also add global notes using the + button.</string>
     <string name="add_a_global_note">Add a global note:</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
 
 </resources>
