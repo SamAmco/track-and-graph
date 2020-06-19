@@ -30,6 +30,7 @@ import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.util.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText
 import org.threeten.bp.OffsetDateTime
@@ -46,6 +47,7 @@ class DataPointInputView : FrameLayout {
     private val timeButton: Button
     private val buttonsScroll: HorizontalScrollView
     private val buttonsLayout: LinearLayout
+    private val durationInput: DurationInputView
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -63,6 +65,7 @@ class DataPointInputView : FrameLayout {
         timeButton = view.findViewById(R.id.timeButton)
         buttonsScroll = view.findViewById(R.id.buttonsScrollView)
         buttonsLayout = view.findViewById(R.id.buttonsLayout)
+        durationInput = view.findViewById(R.id.durationInput)
     }
 
     private lateinit var state: DataPointInputData
@@ -86,7 +89,19 @@ class DataPointInputView : FrameLayout {
         when (state.feature.featureType) {
             FeatureType.CONTINUOUS -> initContinuous()
             FeatureType.DISCRETE -> initDiscrete()
-            FeatureType.DURATION -> initContinuous()//TODO we need a new UI for this
+            FeatureType.DURATION -> initDuration()
+        }
+    }
+
+    private fun initDuration() {
+        buttonsScroll.visibility = View.GONE
+        numberInput.visibility = View.GONE
+        durationInput.visibility = View.VISIBLE
+        durationInput.setTimeInSeconds(state.value.toLong())
+        durationInput.setDurationChangedListener { state.value = it.toDouble() }
+        durationInput.setDoneListener {
+            state.timeFixed = true
+            clickListener?.onClick?.invoke(state.feature)
         }
     }
 
@@ -112,6 +127,7 @@ class DataPointInputView : FrameLayout {
     private fun initDiscrete() {
         buttonsScroll.visibility = View.VISIBLE
         numberInput.visibility = View.GONE
+        durationInput.visibility = View.GONE
         createButtons()
         if (state.label.isNotEmpty()) {
             buttonsLayout.children
@@ -124,6 +140,7 @@ class DataPointInputView : FrameLayout {
     private fun initContinuous() {
         buttonsScroll.visibility = View.GONE
         numberInput.visibility = View.VISIBLE
+        durationInput.visibility = View.GONE
         numberInput.addTextChangedListener {
             if (it.toString().isNotBlank()) {
                 state.value = getDoubleFromText(it.toString())
