@@ -279,26 +279,7 @@ class InputDataPointDialogViewModel : ViewModel() {
             val dataPointData = dataPointTimestamp?.let {
                 dao.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
             }
-
-            val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
-            val timeFixed = dataPointTimestamp != null
-            uiStates = featureData.map { f ->
-                val dataPointValue = dataPointData?.value
-                    ?: if (f.hasDefaultValue) f.defaultValue else 1.0
-                val dataPointLabel = dataPointData?.label
-                    ?: if (f.hasDefaultValue) f.getDefaultLabel() else ""
-                val dataPointNote = dataPointData?.note ?: ""
-                f to DataPointInputView.DataPointInputData(
-                    f,
-                    timestamp,
-                    dataPointValue,
-                    dataPointLabel,
-                    dataPointNote,
-                    timeFixed,
-                    this@InputDataPointDialogViewModel::onDateTimeSelected,
-                    dataPointData
-                )
-            }.toMap()
+            uiStates = getUIStatesForFeatures(featureData, dataPointData)
 
             withContext(Dispatchers.Main) {
                 _features.value = featureData
@@ -306,6 +287,35 @@ class InputDataPointDialogViewModel : ViewModel() {
                 _state.value = InputDataPointDialogState.WAITING
             }
         }
+    }
+
+    private fun getUIStatesForFeatures(
+        featureData: List<Feature>,
+        dataPointData: DataPoint?
+    ): Map<Feature, DataPointInputView.DataPointInputData> {
+        val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
+        val timeFixed = dataPointData != null
+        return featureData.map { f ->
+            val dataPointValue = when {
+                dataPointData?.value != null -> dataPointData.value
+                f.hasDefaultValue -> f.defaultValue
+                f.featureType == FeatureType.CONTINUOUS -> 1.0
+                else -> 0.0
+            }
+            val dataPointLabel = dataPointData?.label
+                ?: if (f.hasDefaultValue) f.getDefaultLabel() else ""
+            val dataPointNote = dataPointData?.note ?: ""
+            f to DataPointInputView.DataPointInputData(
+                f,
+                timestamp,
+                dataPointValue,
+                dataPointLabel,
+                dataPointNote,
+                timeFixed,
+                this@InputDataPointDialogViewModel::onDateTimeSelected,
+                dataPointData
+            )
+        }.toMap()
     }
 
     private fun onDateTimeSelected(dateTime: OffsetDateTime) {

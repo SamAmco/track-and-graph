@@ -199,6 +199,14 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         binding.defaultDurationInput.setDurationChangedListener {
             viewModel.featureDefaultValue.value = it.toDouble()
         }
+        binding.defaultDurationInput.setDoneListener {
+            val imm =
+                activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(
+                requireActivity().window.decorView.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
+        }
         binding.durationNumericConversionModeSpinner.onItemSelectedListener =
             getOnDurationNumericConversionModeSelectedListener()
     }

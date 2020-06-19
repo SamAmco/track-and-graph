@@ -20,7 +20,7 @@ package com.samco.trackandgraph.ui
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.databinding.DurationInputLayoutBinding
@@ -29,6 +29,7 @@ class DurationInputView : FrameLayout {
     val binding: DurationInputLayoutBinding
     private var seconds = 0L;
     private var listener: ((Long) -> Unit)? = null
+    private var doneListener: (() -> Unit)? = null
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -41,6 +42,14 @@ class DurationInputView : FrameLayout {
         binding.hoursInput.addTextChangedListener { onDurationTextChanged() }
         binding.minutesInput.addTextChangedListener { onDurationTextChanged() }
         binding.secondsInput.addTextChangedListener { onDurationTextChanged() }
+        binding.secondsInput.setOnEditorActionListener { _, i, _ ->
+            if (i == EditorInfo.IME_ACTION_DONE) {
+                doneListener?.invoke()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
+        }
+        binding.hoursInput.requestFocus()
     }
 
     private fun onDurationTextChanged() {
@@ -60,31 +69,21 @@ class DurationInputView : FrameLayout {
         val hours = totalSeconds / 3600L
         val minutes = (totalSeconds % 3600L) / 60
         val seconds = totalSeconds % 60
+
         binding.hoursInput.setText(if (hours > 0) hours.toString() else "")
         binding.minutesInput.setText(if (minutes > 0) minutes.toString() else "")
         binding.secondsInput.setText(if (seconds > 0) seconds.toString() else "")
+
+        binding.hoursInput.setSelection(binding.hoursInput.text.length)
+        binding.minutesInput.setSelection(binding.minutesInput.text.length)
+        binding.secondsInput.setSelection(binding.secondsInput.text.length)
+    }
+
+    fun setDoneListener(doneListener: () -> Unit) {
+        this.doneListener = doneListener
     }
 
     fun setDurationChangedListener(listener: (Long) -> Unit) {
         this.listener = listener
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

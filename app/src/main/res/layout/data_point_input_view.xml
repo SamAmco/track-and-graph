@@ -127,6 +127,13 @@
                 tools:ignore="HardcodedText"
                 tools:text="33" />
 
+            <com.samco.trackandgraph.ui.DurationInputView
+                android:id="@+id/durationInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                />
+
             <HorizontalScrollView
                 android:id="@+id/buttonsScrollView"
                 android:layout_width="wrap_content"
