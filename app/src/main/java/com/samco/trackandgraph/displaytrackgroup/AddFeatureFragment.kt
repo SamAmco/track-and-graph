@@ -133,6 +133,9 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         binding.defaultNumericalInput.visibility = View.INVISIBLE
         binding.defaultDurationInput.visibility = View.INVISIBLE
         binding.defaultDiscreteScrollView.visibility = View.INVISIBLE
+        binding.durationNumericConversionModeSpinner.visibility = View.INVISIBLE
+        binding.durationToNumericModeHeader.visibility = View.INVISIBLE
+        binding.numericToDurationModeHeader.visibility = View.INVISIBLE
         binding.featureNameText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
     }
 
@@ -195,6 +198,19 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         }
         binding.defaultDurationInput.setDurationChangedListener {
             viewModel.featureDefaultValue.value = it.toDouble()
+        }
+        binding.durationNumericConversionModeSpinner.onItemSelectedListener =
+            getOnDurationNumericConversionModeSelectedListener()
+    }
+
+    private fun getOnDurationNumericConversionModeSelectedListener(): AdapterView.OnItemSelectedListener {
+        return object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                viewModel.durationNumericConversionMode.value =
+                    DurationNumericConversionMode.values()[position]
+            }
         }
     }
 
@@ -453,8 +469,24 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         }
     }
 
+    private fun updateDurationNumericConversionUI() {
+        val durationToNumeric = viewModel.updateMode
+                && viewModel.existingFeature?.featureType == FeatureType.DURATION
+                && viewModel.featureType.value == FeatureType.CONTINUOUS
+        val numericToDuration = viewModel.updateMode
+                && viewModel.existingFeature?.featureType == FeatureType.CONTINUOUS
+                && viewModel.featureType.value == FeatureType.DURATION
+        binding.durationToNumericModeHeader.visibility =
+            if (durationToNumeric) View.VISIBLE else View.GONE
+        binding.numericToDurationModeHeader.visibility =
+            if (numericToDuration) View.VISIBLE else View.GONE
+        binding.durationNumericConversionModeSpinner.visibility =
+            if (durationToNumeric || numericToDuration) View.VISIBLE else View.GONE
+    }
+
     private fun onFeatureTypeChanged(featureType: FeatureType) {
         showOnFeatureTypeUpdatedMessage(featureType)
+        updateDurationNumericConversionUI()
         updateDefaultValuesViewFromViewModel(viewModel.featureHasDefaultValue.value!!)
         val vis = if (featureType == FeatureType.DISCRETE) View.VISIBLE else View.GONE
         binding.discreteValuesTextView.visibility = vis
@@ -497,6 +529,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 }
 
 enum class AddFeatureState { INITIALIZING, WAITING, ADDING, DONE, ERROR }
+enum class DurationNumericConversionMode { HOURS, MINUTES, SECONDS }
 class AddFeatureViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -508,6 +541,7 @@ class AddFeatureViewModel : ViewModel() {
     var featureName = ""
     var featureDescription = ""
     val featureType = MutableLiveData(FeatureType.DISCRETE)
+    val durationNumericConversionMode = MutableLiveData(DurationNumericConversionMode.HOURS)
     val featureHasDefaultValue = MutableLiveData(false)
     val featureDefaultValue = MutableLiveData(1.0)
     val discreteValues = mutableListOf<MutableLabel>()
@@ -620,14 +654,44 @@ class AddFeatureViewModel : ViewModel() {
                 else -> run {}
             }
             FeatureType.CONTINUOUS -> when (featureType.value) {
-                FeatureType.DURATION -> run {} //TODO we need a UI to enable the transformation from numbers to hours, minutes or seconds
+                FeatureType.DURATION -> updateContinuousDataPointsToDurations()
                 else -> run {}
             }
             FeatureType.DURATION -> when (featureType.value) {
-                FeatureType.CONTINUOUS -> run {} //TODO we need a UI to enable the transformation from hours, minutes or seconds to numbers
+                FeatureType.CONTINUOUS -> updateDurationDataPointsToContinuous()
                 else -> run {}
             }
         }
+    }
+
+    private fun updateDurationDataPointsToContinuous() {
+        val oldDataPoints = dao!!.getDataPointsForFeatureSync(existingFeature!!.id)
+        val divisor = when (durationNumericConversionMode.value) {
+            DurationNumericConversionMode.HOURS -> 3600.0
+            DurationNumericConversionMode.MINUTES -> 60.0
+            DurationNumericConversionMode.SECONDS -> 1.0
+            null -> 1.0
+        }
+        val newDataPoints = oldDataPoints.map {
+            val newValue = it.value / divisor
+            DataPoint(it.timestamp, it.featureId, newValue, "", it.note)
+        }
+        dao!!.updateDataPoints(newDataPoints)
+    }
+
+    private fun updateContinuousDataPointsToDurations() {
+        val oldDataPoints = dao!!.getDataPointsForFeatureSync(existingFeature!!.id)
+        val multiplier = when (durationNumericConversionMode.value) {
+            DurationNumericConversionMode.HOURS -> 3600.0
+            DurationNumericConversionMode.MINUTES -> 60.0
+            DurationNumericConversionMode.SECONDS -> 1.0
+            null -> 1.0
+        }
+        val newDataPoints = oldDataPoints.map {
+            val newValue = it.value * multiplier
+            DataPoint(it.timestamp, it.featureId, newValue, "", it.note)
+        }
+        dao!!.updateDataPoints(newDataPoints)
     }
 
     private fun updateDiscreteValueDataPoints(valOfDiscVal: (MutableLabel) -> Int) {

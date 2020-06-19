@@ -60,6 +60,30 @@
                     android:spinnerMode="dropdown" />
 
                 <TextView
+                    android:id="@+id/numericToDurationModeHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/input_spacing_large"
+                    android:text="@string/numeric_to_duration_mode_header"
+                    android:textAppearance="@style/TextAppearance.Body" />
+
+                <TextView
+                    android:id="@+id/durationToNumericModeHeader"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/input_spacing_large"
+                    android:text="@string/duration_to_numeric_mode_header"
+                    android:textAppearance="@style/TextAppearance.Body" />
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/durationNumericConversionModeSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:entries="@array/numeric_duration_conversion_modes"
+                    android:spinnerMode="dropdown" />
+
+                <TextView
                     android:id="@+id/discreteValuesTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -86,7 +110,7 @@
                     android:id="@+id/hasDefaultValueCheckbox"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:layout_marginTop="@dimen/input_spacing_large"
                     android:text="@string/use_default_value"
                     android:textAppearance="@style/TextAppearance.Body" />
 
@@ -103,7 +127,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
-                    tools:text="33" />
+                    android:hint="@string/default_value"
+                    android:importantForAutofill="no" />
 
                 <HorizontalScrollView
                     android:id="@+id/defaultDiscreteScrollView"
