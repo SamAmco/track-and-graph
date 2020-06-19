@@ -88,6 +88,11 @@
         <item>Light</item>
         <item>Dark</item>
     </string-array>
+    <string-array name="numeric_duration_conversion_modes">
+        <item>Number of hours</item>
+        <item>Number of minutes</item>
+        <item>Number of seconds</item>
+    </string-array>
     <string-array name="feature_types">
         <item>Multiple choice</item>
         <item>Numerical</item>
@@ -298,5 +303,8 @@
     <string name="hours_suffix">h</string>
     <string name="minutes_suffix">m</string>
     <string name="seconds_suffix">s</string>
+    <string name="default_value">Default value</string>
+    <string name="numeric_to_duration_mode_header">Previously tracked values represent:</string>
+    <string name="duration_to_numeric_mode_header">What should previously tracked values be converted to:</string>
 
 </resources>
