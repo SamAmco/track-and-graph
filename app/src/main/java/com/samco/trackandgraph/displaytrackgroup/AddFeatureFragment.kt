@@ -131,6 +131,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         binding.discreteValues.visibility = View.INVISIBLE
         binding.addDiscreteValueButton.visibility = View.INVISIBLE
         binding.defaultNumericalInput.visibility = View.INVISIBLE
+        binding.defaultDurationInput.visibility = View.INVISIBLE
         binding.defaultDiscreteScrollView.visibility = View.INVISIBLE
         binding.featureNameText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
     }
@@ -192,6 +193,9 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         binding.defaultNumericalInput.addTextChangedListener {
             viewModel.featureDefaultValue.value = getDoubleFromText(it.toString())
         }
+        binding.defaultDurationInput.setDurationChangedListener {
+            viewModel.featureDefaultValue.value = it.toDouble()
+        }
     }
 
     private fun observeFeatureType() {
@@ -208,21 +212,33 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
     private fun updateDefaultValuesViewFromViewModel(checked: Boolean) {
         if (checked) {
-            if (viewModel.featureType.value == FeatureType.DISCRETE) {
-                if (currentDefaultValueIsInvalidDiscreteValue()) {
-                    viewModel.featureDefaultValue.value = 0.0
+            when (viewModel.featureType.value) {
+                FeatureType.DISCRETE -> {
+                    if (currentDefaultValueIsInvalidDiscreteValue()) {
+                        viewModel.featureDefaultValue.value = 0.0
+                    }
+                    updateCurrentlySelectedDefaultDiscreteValue()
+                    binding.defaultDiscreteScrollView.visibility = View.VISIBLE
+                    binding.defaultNumericalInput.visibility = View.GONE
+                    binding.defaultDurationInput.visibility = View.GONE
                 }
-                updateCurrentlySelectedDefaultDiscreteValue()
-                binding.defaultDiscreteScrollView.visibility = View.VISIBLE
-                binding.defaultNumericalInput.visibility = View.GONE
-            } else {
-                binding.defaultNumericalInput.setText(viewModel.featureDefaultValue.value!!.toString())
-                binding.defaultDiscreteScrollView.visibility = View.GONE
-                binding.defaultNumericalInput.visibility = View.VISIBLE
+                FeatureType.CONTINUOUS -> {
+                    binding.defaultNumericalInput.setText(viewModel.featureDefaultValue.value!!.toString())
+                    binding.defaultDiscreteScrollView.visibility = View.GONE
+                    binding.defaultNumericalInput.visibility = View.VISIBLE
+                    binding.defaultDurationInput.visibility = View.GONE
+                }
+                FeatureType.DURATION -> {
+                    binding.defaultDurationInput.setTimeInSeconds(viewModel.featureDefaultValue.value!!.toLong())
+                    binding.defaultDiscreteScrollView.visibility = View.GONE
+                    binding.defaultNumericalInput.visibility = View.GONE
+                    binding.defaultDurationInput.visibility = View.VISIBLE
+                }
             }
         } else {
             binding.defaultDiscreteScrollView.visibility = View.GONE
             binding.defaultNumericalInput.visibility = View.GONE
+            binding.defaultDurationInput.visibility = View.GONE
         }
     }
 
@@ -253,8 +269,8 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
                 val textView = view as TextView
                 val enabled = viewModel.isFeatureTypeEnabled(featureTypeList[position])
                 val color =
-                    if (enabled) view.context.getColorFromAttr(R.attr.colorControlNormal)
-                    else view.context.getColorFromAttr(android.R.attr.textColorSecondary)
+                    if (enabled) view.context.getColorFromAttr(android.R.attr.textColorPrimary)
+                    else view.context.getColorFromAttr(android.R.attr.textColorHint)
                 textView.setTextColor(color)
                 return view
             }
@@ -552,9 +568,12 @@ class AddFeatureViewModel : ViewModel() {
         // dur -> disc N
         // dur -> cont Y
         return when (type) {
-            FeatureType.CONTINUOUS -> existingFeature!!.featureType == FeatureType.DURATION
             FeatureType.DISCRETE -> existingFeature!!.featureType == FeatureType.DISCRETE
+            FeatureType.CONTINUOUS -> existingFeature!!.featureType == FeatureType.DURATION
+                    || existingFeature!!.featureType == FeatureType.DISCRETE
+                    || existingFeature!!.featureType == FeatureType.CONTINUOUS
             FeatureType.DURATION -> existingFeature!!.featureType == FeatureType.CONTINUOUS
+                    || existingFeature!!.featureType == FeatureType.DURATION
         }
     }
 
