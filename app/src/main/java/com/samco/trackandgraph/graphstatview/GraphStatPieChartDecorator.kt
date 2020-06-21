@@ -25,8 +25,8 @@ import com.androidplot.pie.PieRenderer
 import com.androidplot.pie.Segment
 import com.androidplot.pie.SegmentFormatter
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.GraphOrStat
-import com.samco.trackandgraph.database.PieChart
+import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.database.entity.PieChart
 import com.samco.trackandgraph.database.dataVisColorGenerator
 import com.samco.trackandgraph.database.dataVisColorList
 import com.samco.trackandgraph.databinding.GraphStatViewBinding

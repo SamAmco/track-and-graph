@@ -25,7 +25,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.DisplayNote
+import com.samco.trackandgraph.database.dto.NoteType
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.GlobalNote
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 import org.threeten.bp.OffsetDateTime

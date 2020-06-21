@@ -15,7 +15,7 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -55,10 +55,20 @@ data class CheckedDays (
     companion object {
         fun fromList(bools: List<Boolean>): CheckedDays {
             if (bools.size != 7) return none()
-            return CheckedDays(bools[0], bools[1], bools[2], bools[3], bools[4], bools[5], bools[6])
+            return CheckedDays(
+                bools[0],
+                bools[1],
+                bools[2],
+                bools[3],
+                bools[4],
+                bools[5],
+                bools[6]
+            )
         }
 
-        fun none() = CheckedDays(false, false, false,
-            false, false, false, false)
+        fun none() = CheckedDays(
+            false, false, false,
+            false, false, false, false
+        )
     }
 }

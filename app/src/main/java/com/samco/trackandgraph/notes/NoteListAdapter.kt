@@ -26,8 +26,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.DisplayNote
-import com.samco.trackandgraph.database.NoteType
+import com.samco.trackandgraph.database.dto.DisplayNote
+import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 

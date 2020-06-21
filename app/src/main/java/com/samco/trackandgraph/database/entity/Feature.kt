@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,12 +14,13 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.database.*
 import java.lang.Exception
 
 @Entity(
@@ -71,7 +72,11 @@ data class Feature(
             discreteValues: List<DiscreteValue>, hasDefaultValue: Boolean, defaultValue: Double,
             displayIndex: Int, description: String
         ): Feature {
-            discreteValues.forEach { dv -> validateDiscreteValue(dv) }
+            discreteValues.forEach { dv ->
+                validateDiscreteValue(
+                    dv
+                )
+            }
             val validName = name
                 .take(MAX_FEATURE_NAME_LENGTH)
                 .replace(splitChars1, " ")
@@ -94,18 +99,29 @@ data class DiscreteValue(val index: Int, val label: String) {
             if (!value.contains(':')) throw Exception("value did not contain a colon")
             val label = value.substring(value.indexOf(':') + 1).trim()
             val index = value.substring(0, value.indexOf(':')).trim().toInt()
-            val discreteValue = DiscreteValue(index, label)
-            validateDiscreteValue(discreteValue)
+            val discreteValue =
+                DiscreteValue(
+                    index,
+                    label
+                )
+            validateDiscreteValue(
+                discreteValue
+            )
             return discreteValue
         }
 
         fun fromDataPoint(dataPoint: DataPoint) =
-            DiscreteValue(dataPoint.value.toInt(), dataPoint.label)
+            DiscreteValue(
+                dataPoint.value.toInt(),
+                dataPoint.label
+            )
     }
 }
 
 fun validateDiscreteValue(discreteValue: DiscreteValue) {
-    if (discreteValue.label.contains(splitChars1) || discreteValue.label.contains(splitChars2))
+    if (discreteValue.label.contains(splitChars1) || discreteValue.label.contains(
+            splitChars2
+        ))
         throw Exception("Illegal discrete value name")
     if (discreteValue.label.length > MAX_LABEL_LENGTH)
         throw Exception("label size exceeded the maximum size allowed")

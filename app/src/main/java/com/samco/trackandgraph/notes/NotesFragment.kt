@@ -26,6 +26,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.DisplayNote
+import com.samco.trackandgraph.database.dto.NoteType
+import com.samco.trackandgraph.database.entity.GlobalNote
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
@@ -168,10 +171,11 @@ class NotesViewModel : ViewModel() {
                 dataSource!!.removeNote(note.timestamp, note.featureId)
             }
             NoteType.GLOBAL_NOTE -> {
-                val globalNote = GlobalNote(
-                    note.timestamp,
-                    note.note
-                )
+                val globalNote =
+                    GlobalNote(
+                        note.timestamp,
+                        note.note
+                    )
                 dataSource!!.deleteGlobalNote(globalNote)
             }
         }

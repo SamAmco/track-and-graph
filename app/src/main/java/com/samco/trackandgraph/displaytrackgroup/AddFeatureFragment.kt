@@ -46,6 +46,10 @@ import androidx.core.view.forEachIndexed
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -642,7 +646,12 @@ class AddFeatureViewModel : ViewModel() {
         updateAllExistingDataPointsForTransformation(valOfDiscVal)
 
         val newDiscVals = discreteValues
-            .map { s -> DiscreteValue(valOfDiscVal(s), s.value) }
+            .map { s ->
+                DiscreteValue(
+                    valOfDiscVal(s),
+                    s.value
+                )
+            }
 
         val feature = Feature.create(
             existingFeature!!.id,
@@ -682,7 +691,13 @@ class AddFeatureViewModel : ViewModel() {
         }
         val newDataPoints = oldDataPoints.map {
             val newValue = it.value / divisor
-            DataPoint(it.timestamp, it.featureId, newValue, "", it.note)
+            DataPoint(
+                it.timestamp,
+                it.featureId,
+                newValue,
+                "",
+                it.note
+            )
         }
         dao!!.updateDataPoints(newDataPoints)
     }
@@ -697,7 +712,13 @@ class AddFeatureViewModel : ViewModel() {
         }
         val newDataPoints = oldDataPoints.map {
             val newValue = it.value * multiplier
-            DataPoint(it.timestamp, it.featureId, newValue, "", it.note)
+            DataPoint(
+                it.timestamp,
+                it.featureId,
+                newValue,
+                "",
+                it.note
+            )
         }
         dao!!.updateDataPoints(newDataPoints)
     }
@@ -719,7 +740,13 @@ class AddFeatureViewModel : ViewModel() {
     private fun stripDataPointsToValue() {
         val oldDataPoints = dao!!.getDataPointsForFeatureSync(existingFeature!!.id)
         val newDataPoints = oldDataPoints.map {
-            DataPoint(it.timestamp, it.featureId, it.value, "", it.note)
+            DataPoint(
+                it.timestamp,
+                it.featureId,
+                it.value,
+                "",
+                it.note
+            )
         }
         dao!!.updateDataPoints(newDataPoints)
     }

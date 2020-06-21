@@ -34,6 +34,9 @@ import androidx.lifecycle.ViewModel
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import kotlinx.android.synthetic.main.data_point_input_dialog.*
 import kotlinx.coroutines.*

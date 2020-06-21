@@ -27,8 +27,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.GraphOrStat
-import com.samco.trackandgraph.database.GraphStatType
+import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.database.entity.GraphStatType
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.ui.OrderedListAdapter
 import kotlinx.coroutines.*
