@@ -26,6 +26,7 @@ import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.util.formatDayMonth
 import com.samco.trackandgraph.util.formatMonthYear

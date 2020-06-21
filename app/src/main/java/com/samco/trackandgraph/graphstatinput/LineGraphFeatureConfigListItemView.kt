@@ -18,7 +18,6 @@ package com.samco.trackandgraph.graphstatinput
 
 import android.content.Context
 import android.text.InputFilter
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +29,8 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
 import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
@@ -85,7 +86,9 @@ class LineGraphFeatureConfigListItemView(
 
     private fun setupPointStyleSpinner(context: Context) {
         binding.pointStyleSpinner.adapter =
-            PointStyleSpinnerAdapter(context, pointStyleDrawableResources)
+            PointStyleSpinnerAdapter(context,
+                pointStyleDrawableResources
+            )
         binding.pointStyleSpinner.setSelection(lineGraphFeature.pointStyle.ordinal)
         binding.pointStyleSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {

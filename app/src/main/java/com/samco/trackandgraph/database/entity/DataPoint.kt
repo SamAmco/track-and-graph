@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,12 +14,12 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import org.threeten.bp.Duration
+import com.samco.trackandgraph.database.doubleFormatter
 import org.threeten.bp.OffsetDateTime
 
 @Entity(

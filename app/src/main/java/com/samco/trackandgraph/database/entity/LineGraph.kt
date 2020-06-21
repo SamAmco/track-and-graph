@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,13 +14,17 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.MAX_LINE_GRAPH_FEATURES
+import com.samco.trackandgraph.database.MAX_LINE_GRAPH_FEATURE_NAME_LENGTH
+import com.samco.trackandgraph.database.splitChars1
+import com.samco.trackandgraph.database.splitChars2
 import org.threeten.bp.Duration
 import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAmount
@@ -127,8 +131,20 @@ data class LineGraph(
                    yRangeType: YRangeType, yFrom: Double, yTo: Double): LineGraph {
             val validFeatures = features
                 .take(MAX_LINE_GRAPH_FEATURES)
-                .map { f -> validateLineGraphFeature(f) }
-            return LineGraph(id, graphStatId, validFeatures, duration, yRangeType, yFrom, yTo)
+                .map { f ->
+                    validateLineGraphFeature(
+                        f
+                    )
+                }
+            return LineGraph(
+                id,
+                graphStatId,
+                validFeatures,
+                duration,
+                yRangeType,
+                yFrom,
+                yTo
+            )
         }
 
         private fun validateLineGraphFeature(f: LineGraphFeature): LineGraphFeature {

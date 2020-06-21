@@ -26,7 +26,7 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.DisplayFeature
+import com.samco.trackandgraph.database.dto.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute

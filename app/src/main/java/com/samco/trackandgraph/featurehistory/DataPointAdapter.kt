@@ -22,8 +22,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.DataPoint
-import com.samco.trackandgraph.database.FeatureType
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 

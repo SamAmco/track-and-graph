@@ -19,6 +19,11 @@ package com.samco.trackandgraph.database
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.samco.trackandgraph.database.dto.DisplayFeature
+import com.samco.trackandgraph.database.dto.DisplayNote
+import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
+import com.samco.trackandgraph.database.dto.GroupItem
+import com.samco.trackandgraph.database.entity.*
 import org.threeten.bp.OffsetDateTime
 
 //TODO there is a lot of duplication in this file, you should extract all common queries (possibly all queries)

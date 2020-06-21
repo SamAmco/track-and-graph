@@ -30,6 +30,7 @@ import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
 

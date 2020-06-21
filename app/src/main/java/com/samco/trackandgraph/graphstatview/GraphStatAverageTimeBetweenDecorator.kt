@@ -21,6 +21,10 @@ import android.content.Context
 import android.view.View
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.AverageTimeBetweenStat
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

@@ -23,6 +23,9 @@ import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.database.entity.LineGraphFeature
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
@@ -131,7 +134,15 @@ internal suspend fun calculateDurationAccumulatedValues(
             .takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
         val total = points.sumByDouble { dp -> dp.value }
         index += points.size
-        newData.add(DataPoint(currentTimeStamp, featureId, total, "", ""))
+        newData.add(
+            DataPoint(
+                currentTimeStamp,
+                featureId,
+                total,
+                "",
+                ""
+            )
+        )
         yield()
     }
     return DataSample(newData)

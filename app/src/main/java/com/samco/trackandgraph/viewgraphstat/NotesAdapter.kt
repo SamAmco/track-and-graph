@@ -23,13 +23,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.DataPoint
-import com.samco.trackandgraph.database.FeatureType
-import com.samco.trackandgraph.database.GlobalNote
-import com.samco.trackandgraph.database.NoteType
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
-import org.threeten.bp.OffsetDateTime
 
 class NotesAdapter(
     private val featureDisplayNames: Map<Long, String>,

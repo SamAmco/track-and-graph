@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview
 
-import com.samco.trackandgraph.database.DataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -388,7 +388,15 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
         for (element in clusters.reversed()) {
             for (y in 0 until element) {
                 val dataPointTime = currentTime.minusSeconds(y + 1L)
-                dataPoints.add(0, DataPoint(dataPointTime, 0L, 1.0, "", ""))
+                dataPoints.add(0,
+                    DataPoint(
+                        dataPointTime,
+                        0L,
+                        1.0,
+                        "",
+                        ""
+                    )
+                )
             }
             currentTime = currentTime.minus(totalingPeriod)
         }

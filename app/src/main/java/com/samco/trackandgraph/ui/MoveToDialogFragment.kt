@@ -30,6 +30,10 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.GroupItem
+import com.samco.trackandgraph.database.dto.GroupItemType
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.databinding.ListItemMoveToGroupBinding
 import com.samco.trackandgraph.databinding.MoveToGroupDialogBinding
 import kotlinx.coroutines.*

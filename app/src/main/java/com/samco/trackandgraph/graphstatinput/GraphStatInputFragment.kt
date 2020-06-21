@@ -39,6 +39,8 @@ import androidx.navigation.fragment.navArgs
 
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.ui.ExtendedSpinner
 import com.samco.trackandgraph.util.formatDayMonthYear
@@ -327,11 +329,17 @@ class GraphStatInputFragment : Fragment() {
         binding.addFeatureButton.setOnClickListener {
             val nextColorIndex =
                 (viewModel.lineGraphFeatures.size * dataVisColorGenerator) % dataVisColorList.size
-            val newLineGraphFeature = LineGraphFeature(
-                -1, "", nextColorIndex,
-                LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED,
-                LineGraphPointStyle.NONE, 0.toDouble(), 1.toDouble()
-            )
+            val newLineGraphFeature =
+                LineGraphFeature(
+                    -1,
+                    "",
+                    nextColorIndex,
+                    LineGraphAveraginModes.NO_AVERAGING,
+                    LineGraphPlottingModes.WHEN_TRACKED,
+                    LineGraphPointStyle.NONE,
+                    0.toDouble(),
+                    1.toDouble()
+                )
             viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.plus(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
         }
@@ -818,23 +826,26 @@ class GraphStatInputViewModel : ViewModel() {
         yRangeType.value!!, yRangeFrom.value!!, yRangeTo.value!!
     )
 
-    fun constructPieChart(graphStatId: Long) = PieChart(
-        id ?: 0L, graphStatId,
-        selectedPieChartFeature.value!!.id, sampleDuration.value
-    )
+    fun constructPieChart(graphStatId: Long) =
+        PieChart(
+            id ?: 0L, graphStatId,
+            selectedPieChartFeature.value!!.id, sampleDuration.value
+        )
 
-    fun constructAverageTimeBetween(graphStatId: Long) = AverageTimeBetweenStat(
-        id ?: 0L, graphStatId,
-        selectedValueStatFeature.value!!.id, getFromValue(),
-        getToValue(), sampleDuration.value,
-        selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
-    )
+    fun constructAverageTimeBetween(graphStatId: Long) =
+        AverageTimeBetweenStat(
+            id ?: 0L, graphStatId,
+            selectedValueStatFeature.value!!.id, getFromValue(),
+            getToValue(), sampleDuration.value,
+            selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
+        )
 
-    fun constructTimeSince(graphStatId: Long) = TimeSinceLastStat(
-        id ?: 0L, graphStatId,
-        selectedValueStatFeature.value!!.id, getFromValue(), getToValue(),
-        selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
-    )
+    fun constructTimeSince(graphStatId: Long) =
+        TimeSinceLastStat(
+            id ?: 0L, graphStatId,
+            selectedValueStatFeature.value!!.id, getFromValue(), getToValue(),
+            selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
+        )
 
     private fun getFromValue(): String {
         return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) "0"

@@ -30,6 +30,10 @@ import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.util.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText

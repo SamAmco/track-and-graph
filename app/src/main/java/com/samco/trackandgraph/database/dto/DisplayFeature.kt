@@ -14,11 +14,14 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.dto
 
 import androidx.room.ColumnInfo
+import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.samco.trackandgraph.database.entity.FeatureType
+import org.threeten.bp.OffsetDateTime
 
-data class FeatureAndTrackGroup(
+data class DisplayFeature(
     @ColumnInfo(name = "id")
     var id: Long,
 
@@ -28,15 +31,27 @@ data class FeatureAndTrackGroup(
     @ColumnInfo(name = "track_group_id")
     val trackGroupId: Long,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
     @ColumnInfo(name = "type")
     val featureType: FeatureType = FeatureType.CONTINUOUS,
 
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
 
-    @ColumnInfo(name = "track_group_name")
-    val trackGroupName: String
+    @ColumnInfo(name = "has_default_value")
+    val hasDefaultValue: Boolean,
+
+    @ColumnInfo(name = "default_value")
+    val defaultValue: Double,
+
+    @ColumnInfo(name = "last_timestamp")
+    val timestamp: OffsetDateTime?,
+
+    @ColumnInfo(name = "num_data_points")
+    val numDataPoints: Long?,
+
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int,
+
+    @ColumnInfo(name = "feature_description")
+    val description: String
 )

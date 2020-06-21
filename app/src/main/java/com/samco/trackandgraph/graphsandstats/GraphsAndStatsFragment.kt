@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.graphsandstats
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AppCompatActivity
@@ -33,10 +32,10 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.room.withTransaction
 
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.GraphOrStat
+import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.GraphStatType
+import com.samco.trackandgraph.database.entity.GraphStatType
 import com.samco.trackandgraph.databinding.GraphsAndStatsFragmentBinding
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.ui.*

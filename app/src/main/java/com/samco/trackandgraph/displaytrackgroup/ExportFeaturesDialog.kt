@@ -32,7 +32,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.Feature
+import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.util.CSVReadWriter
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
