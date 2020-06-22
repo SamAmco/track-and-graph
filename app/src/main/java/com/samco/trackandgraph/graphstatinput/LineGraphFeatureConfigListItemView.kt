@@ -156,7 +156,8 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupFeatureSpinner() {
-        val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
+        val items = features.flatMap { getSpinnerItemsForFeature(it) }
+        val itemNames = items.map { it.third }
         val adapter =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.featureSpinner.adapter = adapter
@@ -171,12 +172,30 @@ class LineGraphFeatureConfigListItemView(
                     onFeatureChangeNameUpdate(
                         lineGraphFeature.featureId,
                         lineGraphFeature.name,
-                        features[index].name
+                        items[index].first.name
                     )
-                    lineGraphFeature.featureId = features[index].id
+                    lineGraphFeature.featureId = items[index].first.id
+                    lineGraphFeature.durationPlottingMode = items[index].second
                     onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
                 }
             }
+    }
+
+    private fun getSpinnerItemsForFeature(feature: FeatureAndTrackGroup)
+            : List<Triple<FeatureAndTrackGroup, DurationPlottingMode, String>> {
+        val name = "${feature.trackGroupName} -> ${feature.name}"
+        return if (feature.featureType == FeatureType.DURATION) {
+            val time = context.getString(R.string.time_duration)
+            val hours = context.getString(R.string.hours)
+            val minutes = context.getString(R.string.minutes)
+            val seconds = context.getString(R.string.seconds)
+            listOf(
+                Triple(feature, DurationPlottingMode.DURATION_IF_POSSIBLE, "$name ($time)"),
+                Triple(feature, DurationPlottingMode.HOURS, "$name ($hours)"),
+                Triple(feature, DurationPlottingMode.MINUTES, "$name ($minutes)"),
+                Triple(feature, DurationPlottingMode.SECONDS, "$name ($seconds)")
+            )
+        } else listOf(Triple(feature, DurationPlottingMode.NONE, name))
     }
 
     private fun onFeatureChangeNameUpdate(
