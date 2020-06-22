@@ -67,8 +67,8 @@ data class CheckedDays (
         }
 
         fun none() = CheckedDays(
-            false, false, false,
-            false, false, false, false
+            monday = false, tuesday = false, wednesday = false,
+            thursday = false, friday = false, saturday = false, sunday = false
         )
     }
 }

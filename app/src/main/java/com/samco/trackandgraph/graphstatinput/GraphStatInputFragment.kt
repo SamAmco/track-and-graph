@@ -36,10 +36,11 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.room.withTransaction
 
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
+import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.ui.ExtendedSpinner
@@ -51,6 +52,9 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 import java.lang.Exception
+
+const val MAX_LINE_GRAPH_FEATURES = 10
+const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
 
 //TODO we need to allow the user to select whether they're graphing hours, minutes or seconds for durations
 class GraphStatInputFragment : Fragment() {
@@ -72,7 +76,11 @@ class GraphStatInputFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         binding.graphStatNameInput.filters =
             arrayOf(InputFilter.LengthFilter(MAX_GRAPH_STAT_NAME_LENGTH))
-        viewModel.initViewModel(requireActivity(), args.graphStatGroupId, args.graphStatId)
+        viewModel.initViewModel(
+            TrackAndGraphDatabase.getInstance(requireContext()),
+            args.graphStatGroupId,
+            args.graphStatId
+        )
         binding.demoGraphStatCardView.hideMenuButton()
         listenToViewModelState()
         return binding.root
@@ -328,9 +336,9 @@ class GraphStatInputFragment : Fragment() {
         binding.addFeatureButton.isClickable = true
         binding.addFeatureButton.setOnClickListener {
             val nextColorIndex =
-                (viewModel.lineGraphFeatures.size * dataVisColorGenerator) % dataVisColorList.size
+                (viewModel.lineGraphFeatureConfigs.size * dataVisColorGenerator) % dataVisColorList.size
             val newLineGraphFeature =
-                LineGraphFeature(
+                LineGraphFeatureConfig(
                     -1,
                     "",
                     nextColorIndex,
@@ -338,25 +346,32 @@ class GraphStatInputFragment : Fragment() {
                     LineGraphPlottingModes.WHEN_TRACKED,
                     LineGraphPointStyle.NONE,
                     0.toDouble(),
-                    1.toDouble()
+                    1.toDouble(),
+                    DurationPlottingMode.NONE//TODO we need to actually set this
                 )
-            viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.plus(newLineGraphFeature)
+            viewModel.lineGraphFeatureConfigs =
+                viewModel.lineGraphFeatureConfigs.plus(newLineGraphFeature)
             inflateLineGraphFeatureView(newLineGraphFeature, features)
         }
         binding.scrollView.fullScroll(View.FOCUS_DOWN)
     }
 
     private fun createLineGraphFeatureViews(features: List<FeatureAndTrackGroup>) {
-        viewModel.lineGraphFeatures.forEach { lgf -> inflateLineGraphFeatureView(lgf, features) }
+        viewModel.lineGraphFeatureConfigs.forEach { lgf ->
+            inflateLineGraphFeatureView(
+                lgf,
+                features
+            )
+        }
     }
 
     private fun inflateLineGraphFeatureView(
-        lgf: LineGraphFeature,
+        lgf: LineGraphFeatureConfig,
         features: List<FeatureAndTrackGroup>
     ) {
         val view = LineGraphFeatureConfigListItemView(requireContext(), features, lgf)
         view.setOnRemoveListener {
-            viewModel.lineGraphFeatures = viewModel.lineGraphFeatures.minus(lgf)
+            viewModel.lineGraphFeatureConfigs = viewModel.lineGraphFeatureConfigs.minus(lgf)
             binding.lineGraphFeaturesLayout.removeView(view)
             binding.addFeatureButton.isEnabled = true
         }
@@ -371,7 +386,7 @@ class GraphStatInputFragment : Fragment() {
             binding.scrollView.fullScroll(View.FOCUS_DOWN)
             view.requestFocus()
         }
-        if (viewModel.lineGraphFeatures.size == MAX_LINE_GRAPH_FEATURES) {
+        if (viewModel.lineGraphFeatureConfigs.size == MAX_LINE_GRAPH_FEATURES) {
             binding.addFeatureButton.isEnabled = false
         }
     }
@@ -511,7 +526,7 @@ class GraphStatInputFragment : Fragment() {
                     GraphStatType.LINE_GRAPH -> binding.demoGraphStatCardView.graphStatView
                         .initFromLineGraph(
                             graphOrStat,
-                            viewModel.constructLineGraph(graphOrStat.id)
+                            viewModel.constructLineGraphWithFeaturesForDemo()
                         )
                     GraphStatType.PIE_CHART -> binding.demoGraphStatCardView.graphStatView
                         .initFromPieChart(graphOrStat, viewModel.constructPieChart(graphOrStat.id))
@@ -546,6 +561,7 @@ enum class GraphStatInputState { INITIALIZING, WAITING, ADDING, FINISHED }
 class GraphStatInputViewModel : ViewModel() {
     class ValidationException(val errorMessageId: Int) : Exception()
 
+    private var database: TrackAndGraphDatabase? = null
     private var dataSource: TrackAndGraphDatabaseDao? = null
 
     private var updateJob = Job()
@@ -568,7 +584,7 @@ class GraphStatInputViewModel : ViewModel() {
     val selectedValueStatDiscreteValues = MutableLiveData<List<DiscreteValue>?>(null)
     val selectedValueStatFromValue = MutableLiveData(0.toDouble())
     val selectedValueStatToValue = MutableLiveData(0.toDouble())
-    var lineGraphFeatures = listOf<LineGraphFeature>()
+    var lineGraphFeatureConfigs = listOf<LineGraphFeatureConfig>()
     val updateMode: LiveData<Boolean>
         get() {
             return _updateMode
@@ -587,12 +603,12 @@ class GraphStatInputViewModel : ViewModel() {
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
 
 
-    fun initViewModel(activity: Activity, graphStatGroupId: Long, graphStatId: Long) {
-        if (dataSource != null) return
+    fun initViewModel(database: TrackAndGraphDatabase, graphStatGroupId: Long, graphStatId: Long) {
+        if (this.database != null) return
+        this.database = database
+        this.dataSource = database.trackAndGraphDatabaseDao
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
-        dataSource =
-            TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
         allFeatures = dataSource!!.getAllFeaturesAndTrackGroups()
         if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
         else _state.value = GraphStatInputState.WAITING
@@ -640,7 +656,9 @@ class GraphStatInputViewModel : ViewModel() {
 
     private suspend fun tryInitFromAverageTimeBetweenStat(graphStat: GraphOrStat): Long? {
         val ats = dataSource!!.getAverageTimeBetweenStatByGraphStatId(graphStat.id) ?: return null
-        this@GraphStatInputViewModel.sampleDuration.value = ats.duration
+        withContext(Dispatchers.Main) {
+            this@GraphStatInputViewModel.sampleDuration.value = ats.duration
+        }
         tryInitFromValueStat(
             ats.featureId,
             ats.discreteValues,
@@ -684,7 +702,8 @@ class GraphStatInputViewModel : ViewModel() {
         val lineGraph = dataSource!!.getLineGraphByGraphStatId(graphStat.id) ?: return null
         withContext(Dispatchers.Main) {
             this@GraphStatInputViewModel.sampleDuration.value = lineGraph.duration
-            this@GraphStatInputViewModel.lineGraphFeatures = lineGraph.features
+            this@GraphStatInputViewModel.lineGraphFeatureConfigs =
+                lineGraph.features.map { LineGraphFeatureConfig.fromLineGraphFeature(it) }
             this@GraphStatInputViewModel.yRangeType.value = lineGraph.yRangeType
             this@GraphStatInputViewModel.yRangeFrom.value = lineGraph.yFrom
             this@GraphStatInputViewModel.yRangeTo.value = lineGraph.yTo
@@ -744,9 +763,9 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     private fun validateLineGraph() {
-        if (lineGraphFeatures.isEmpty())
+        if (lineGraphFeatureConfigs.isEmpty())
             throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        lineGraphFeatures.forEach { f ->
+        lineGraphFeatureConfigs.forEach { f ->
             if (f.colorIndex !in dataVisColorList.indices)
                 throw ValidationException(R.string.graph_stat_validation_unrecognised_color)
             if (allFeatures.value?.map { feat -> feat.id }?.contains(f.featureId) != true)
@@ -762,23 +781,23 @@ class GraphStatInputViewModel : ViewModel() {
         if (_state.value != GraphStatInputState.WAITING) return
         _state.value = GraphStatInputState.ADDING
         ioScope.launch {
-            val graphStatId = if (_updateMode.value!!) {
-                dataSource!!.updateGraphOrStat(constructGraphOrStat())
-                graphStatId!!
-            } else {
-                shiftUpGraphStatViewIndexes()
-                dataSource!!.insertGraphOrStat(constructGraphOrStat())
-            }
+            database!!.withTransaction {
+                val graphStatId = if (_updateMode.value!!) {
+                    dataSource!!.updateGraphOrStat(constructGraphOrStat())
+                    graphStatId!!
+                } else {
+                    shiftUpGraphStatViewIndexes()
+                    dataSource!!.insertGraphOrStat(constructGraphOrStat())
+                }
 
-            when (graphStatType.value) {
-                GraphStatType.LINE_GRAPH -> addLineGraph(constructLineGraph(graphStatId))
-                GraphStatType.PIE_CHART -> addPieChart(constructPieChart(graphStatId))
-                GraphStatType.AVERAGE_TIME_BETWEEN -> addAvTimeBetween(
-                    constructAverageTimeBetween(
-                        graphStatId
+                when (graphStatType.value) {
+                    GraphStatType.LINE_GRAPH -> addLineGraph(constructLineGraph(graphStatId))
+                    GraphStatType.PIE_CHART -> addPieChart(constructPieChart(graphStatId))
+                    GraphStatType.AVERAGE_TIME_BETWEEN -> addAvTimeBetween(
+                        constructAverageTimeBetween(graphStatId)
                     )
-                )
-                GraphStatType.TIME_SINCE -> addTimeSince(constructTimeSince(graphStatId))
+                    GraphStatType.TIME_SINCE -> addTimeSince(constructTimeSince(graphStatId))
+                }
             }
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
         }
@@ -792,8 +811,15 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     private fun addLineGraph(lineGraph: LineGraph) {
-        if (_updateMode.value!!) dataSource!!.updateLineGraph(lineGraph)
-        else dataSource!!.insertLineGraph(lineGraph)
+        val newLineGraphId = if (_updateMode.value!!) {
+            id?.let { dataSource!!.deleteFeaturesForLineGraph(it) }
+            dataSource!!.updateLineGraph(lineGraph)
+            lineGraph.id
+        } else {
+            dataSource!!.insertLineGraph(lineGraph)
+        }
+        val lineGraphFeatures = constructLineGraphFeatures(newLineGraphId)
+        dataSource!!.insertLineGraphFeatures(lineGraphFeatures)
     }
 
     private fun addPieChart(pieChart: PieChart) {
@@ -821,10 +847,25 @@ class GraphStatInputViewModel : ViewModel() {
         graphStatDisplayIndex ?: 0, endDate.value
     )
 
-    fun constructLineGraph(graphStatId: Long) = LineGraph.create(
-        id ?: 0L, graphStatId, lineGraphFeatures, sampleDuration.value,
+    fun constructLineGraphWithFeaturesForDemo() = LineGraphWithFeatures(
+        id ?: 0L,
+        graphStatId ?: 0L,
+        lineGraphFeatureConfigs.map { LineGraphFeatureConfig.toLineGraphFeature(it) },
+        sampleDuration.value,
+        yRangeType.value!!,
+        yRangeFrom.value!!,
+        yRangeTo.value!!
+    )
+
+    private fun constructLineGraph(graphStatId: Long) = LineGraph(
+        id ?: 0L, graphStatId, sampleDuration.value,
         yRangeType.value!!, yRangeFrom.value!!, yRangeTo.value!!
     )
+
+    private fun constructLineGraphFeatures(lineGraphId: Long) =
+        lineGraphFeatureConfigs.map { lgfc ->
+            LineGraphFeatureConfig.toLineGraphFeature(lgfc, lineGraphId = lineGraphId)
+        }
 
     fun constructPieChart(graphStatId: Long) =
         PieChart(

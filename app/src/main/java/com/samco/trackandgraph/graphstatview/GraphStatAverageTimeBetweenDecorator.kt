@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
 import com.samco.trackandgraph.R
@@ -54,7 +55,9 @@ class GraphStatAverageTimeBetweenDecorator(
 
     private suspend fun initAverageTimeBetweenStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
-        val feature = dataSource!!.getFeatureById(timeBetweenStat.featureId)
+        val feature = withContext(Dispatchers.IO) {
+            dataSource!!.getFeatureById(timeBetweenStat.featureId)
+        }
         val dataPoints = getRelevantDataPoints(feature)
         if (dataPoints.size < 2) {
             onSampledDataCallback?.invoke(emptyList())
@@ -103,6 +106,7 @@ class GraphStatAverageTimeBetweenDecorator(
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun setAverageTimeBetweenStatText(millis: Double) {
         val days = "%.1f".format((millis / 86400000).toFloat())
         binding!!.statMessage.text = "$days ${context!!.getString(R.string.days)}"
