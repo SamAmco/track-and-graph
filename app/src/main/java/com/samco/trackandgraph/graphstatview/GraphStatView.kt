@@ -30,6 +30,7 @@ import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
@@ -196,7 +197,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
 
     fun initFromLineGraph(
         graphOrStat: GraphOrStat,
-        lineGraph: LineGraph,
+        lineGraph: LineGraphWithFeatures,
         listViewMode: Boolean = false,
         onSampledDataCallback: SampleDataCallback? = null
     ) {

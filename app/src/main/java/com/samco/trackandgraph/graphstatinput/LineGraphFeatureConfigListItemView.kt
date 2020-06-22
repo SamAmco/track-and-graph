@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatinput
 
 import android.content.Context
+
 import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
@@ -29,7 +30,7 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
+import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -38,7 +39,7 @@ import java.text.DecimalFormat
 class LineGraphFeatureConfigListItemView(
     context: Context,
     private val features: List<FeatureAndTrackGroup>,
-    private val lineGraphFeature: LineGraphFeature
+    private val lineGraphFeature: LineGraphFeatureConfig
 ) : LinearLayout(context) {
     private val binding =
         ListItemLineGraphFeatureBinding.inflate(LayoutInflater.from(context), this, true)
@@ -86,7 +87,8 @@ class LineGraphFeatureConfigListItemView(
 
     private fun setupPointStyleSpinner(context: Context) {
         binding.pointStyleSpinner.adapter =
-            PointStyleSpinnerAdapter(context,
+            PointStyleSpinnerAdapter(
+                context,
                 pointStyleDrawableResources
             )
         binding.pointStyleSpinner.setSelection(lineGraphFeature.pointStyle.ordinal)
@@ -232,5 +234,49 @@ class LineGraphFeatureConfigListItemView(
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
             return getView(position, convertView, parent)
         }
+    }
+}
+
+data class LineGraphFeatureConfig(
+    var featureId: Long,
+    var name: String,
+    var colorIndex: Int,
+    var averagingMode: LineGraphAveraginModes,
+    var plottingMode: LineGraphPlottingModes,
+    var pointStyle: LineGraphPointStyle,
+    var offset: Double,
+    var scale: Double,
+    var durationPlottingMode: DurationPlottingMode
+) {
+    companion object {
+        fun fromLineGraphFeature(lgf: LineGraphFeature) = LineGraphFeatureConfig(
+            lgf.featureId,
+            lgf.name,
+            lgf.colorIndex,
+            lgf.averagingMode,
+            lgf.plottingMode,
+            lgf.pointStyle,
+            lgf.offset,
+            lgf.scale,
+            lgf.durationPlottingMode
+        )
+
+        fun toLineGraphFeature(
+            lgfc: LineGraphFeatureConfig,
+            id: Long = 0L,
+            lineGraphId: Long = 0L
+        ) = LineGraphFeature(
+            id,
+            lineGraphId,
+            lgfc.featureId,
+            lgfc.name,
+            lgfc.colorIndex,
+            lgfc.averagingMode,
+            lgfc.plottingMode,
+            lgfc.pointStyle,
+            lgfc.offset,
+            lgfc.scale,
+            lgfc.durationPlottingMode
+        )
     }
 }

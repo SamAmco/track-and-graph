@@ -26,6 +26,7 @@ import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.util.formatDayMonth
@@ -46,7 +47,7 @@ import kotlin.math.max
 
 class GraphStatLineGraphDecorator(
     private val graphOrStat: GraphOrStat,
-    private val lineGraph: LineGraph,
+    private val lineGraph: LineGraphWithFeatures,
     private val listViewMode: Boolean,
     private val onSampledDataCallback: SampleDataCallback?
 ) : IGraphStatViewDecorator {

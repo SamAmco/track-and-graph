@@ -289,8 +289,14 @@ class GraphsAndStatsViewModel : ViewModel() {
             when (graphOrStat.type) {
                 GraphStatType.LINE_GRAPH -> {
                     val lineGraph = dataSource!!.getLineGraphByGraphStatId(originalId)
-                    val copy = lineGraph?.copy(id = 0, graphStatId = newId)
-                    copy?.let { dataSource!!.insertLineGraph(it) }
+                    lineGraph?.let {
+                        val copy = it.toLineGraph().copy(id = 0, graphStatId = newId)
+                        val newLineGraphId = dataSource!!.insertLineGraph(copy)
+                        val newFeatures = lineGraph.features.map { f ->
+                            f.copy(id = 0, lineGraphId = newLineGraphId)
+                        }
+                        dataSource!!.insertLineGraphFeatures(newFeatures)
+                    }
                 }
                 GraphStatType.PIE_CHART -> {
                     val pieChart = dataSource!!.getPieChartByGraphStatId(originalId)

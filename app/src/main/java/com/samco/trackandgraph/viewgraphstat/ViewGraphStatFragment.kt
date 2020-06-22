@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
@@ -208,9 +209,9 @@ class ViewGraphStatFragment : Fragment() {
         if (graphStat == null) graphStatView.initError(null, R.string.graph_stat_view_not_found)
         when (viewModel.graphStatInnerObject) {
             null -> graphStatView.initError(null, R.string.graph_stat_view_not_found)
-            is LineGraph -> graphStatView.initFromLineGraph(
+            is LineGraphWithFeatures -> graphStatView.initFromLineGraph(
                 graphStat!!,
-                viewModel.graphStatInnerObject as LineGraph,
+                viewModel.graphStatInnerObject as LineGraphWithFeatures,
                 false,
                 SampleDataCallback(viewModel::onSampledDataPoints)
             )
