@@ -162,35 +162,52 @@ class GraphStatInputFragment : Fragment() {
                     viewModel.yRangeType.value = YRangeType.values()[index]
                 }
             }
-        viewModel.yRangeType.observe(viewLifecycleOwner, Observer {
-            when (it) {
-                YRangeType.DYNAMIC -> {
-                    binding.yRangeFromToLayout.visibility = View.GONE
-                    onFormUpdate()
-                }
-                YRangeType.FIXED -> {
-                    binding.yRangeFromToLayout.visibility = View.VISIBLE
-                    onFormUpdate()
-                }
-                else -> {
-                }
-            }
-        })
+        viewModel.yRangeType.observe(viewLifecycleOwner, Observer { updateYRangeInputType() })
     }
 
     private fun listenToYRangeFixedFromTo() {
-        if (viewModel.yRangeFrom.value != null)
-            binding.yRangeFrom.setText(doubleFormatter.format(viewModel.yRangeFrom.value!!))
+        viewModel.yRangeFrom.observe(viewLifecycleOwner, Observer {
+            val fromText = doubleFormatter.format(it)
+            if (binding.yRangeFrom.text.toString() != fromText)
+                binding.yRangeFrom.setText(fromText)
+            if (binding.yRangeFromDuration.seconds != it.toLong())
+                binding.yRangeFromDuration.setTimeInSeconds(it.toLong())
+        })
         binding.yRangeFrom.addTextChangedListener { editText ->
             viewModel.yRangeFrom.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
-        if (viewModel.yRangeTo.value != null)
-            binding.yRangeTo.setText(doubleFormatter.format(viewModel.yRangeTo.value!!))
+        binding.yRangeFromDuration.setDurationChangedListener {
+            viewModel.yRangeFrom.value = it.toDouble()
+            onFormUpdate()
+        }
+
+        viewModel.yRangeTo.observe(viewLifecycleOwner, Observer {
+            val toText = doubleFormatter.format(it)
+            if (binding.yRangeTo.text.toString() != toText)
+                binding.yRangeTo.setText(toText)
+            if (binding.yRangeToDuration.seconds != it.toLong())
+                binding.yRangeToDuration.setTimeInSeconds(it.toLong())
+        })
         binding.yRangeTo.addTextChangedListener { editText ->
             viewModel.yRangeTo.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
+        binding.yRangeToDuration.setDurationChangedListener {
+            viewModel.yRangeTo.value = it.toDouble()
+            onFormUpdate()
+        }
+
+        val doneListener: () -> Unit = {
+            val imm =
+                activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(
+                requireActivity().window.decorView.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
+        }
+        binding.yRangeToDuration.setDoneListener(doneListener)
+        binding.yRangeFromDuration.setDoneListener(doneListener)
     }
 
     private fun listenToUpdateMode() {
@@ -238,10 +255,30 @@ class GraphStatInputFragment : Fragment() {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                     viewModel.selectedValueStatFeature.value = features[index]
-                    onFormUpdate()
+                    updateYRangeInputType()
                 }
             }
         listenToValueStatFeature()
+    }
+
+    private fun updateYRangeInputType() {
+        when (viewModel.yRangeType.value) {
+            YRangeType.DYNAMIC -> {
+                binding.yRangeFromToLayout.visibility = View.GONE
+                binding.yRangeFromToDurationLayout.visibility = View.GONE
+            }
+            YRangeType.FIXED -> {
+                if (viewModel.isDurationMode) {
+                    binding.yRangeFromToDurationLayout.visibility = View.VISIBLE
+                    binding.yRangeFromToLayout.visibility = View.GONE
+                } else {
+                    binding.yRangeFromToDurationLayout.visibility = View.GONE
+                    binding.yRangeFromToLayout.visibility = View.VISIBLE
+                }
+            }
+            else -> run { }
+        }
+        onFormUpdate()
     }
 
     private fun listenToValueStatFeature() {
@@ -415,7 +452,10 @@ class GraphStatInputFragment : Fragment() {
             binding.lineGraphFeaturesLayout.removeView(view)
             binding.addFeatureButton.isEnabled = true
         }
-        view.setOnUpdateListener { onFormUpdate() }
+        view.setOnUpdateListener {
+            updateYRangeInputType()
+            onFormUpdate()
+        }
         val params = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
@@ -458,7 +498,7 @@ class GraphStatInputFragment : Fragment() {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                     viewModel.selectedPieChartFeature.value = discreteFeatures[index]
-                    onFormUpdate()
+                    updateYRangeInputType()
                 }
             }
     }
@@ -491,7 +531,7 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun updateViewForSelectedGraphStatType(graphStatType: GraphStatType) {
-        onFormUpdate()
+        updateYRangeInputType()
         when (graphStatType) {
             GraphStatType.LINE_GRAPH -> initLineGraphView()
             GraphStatType.PIE_CHART -> initPieChartView()
@@ -642,6 +682,17 @@ class GraphStatInputViewModel : ViewModel() {
     private val _formValid = MutableLiveData<ValidationException?>(null)
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
 
+    val isDurationMode: Boolean
+        get() {
+            return when (graphStatType.value) {
+                GraphStatType.LINE_GRAPH -> lineGraphFeatureConfigs.any {
+                    it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE
+                }
+                GraphStatType.AVERAGE_TIME_BETWEEN, GraphStatType.TIME_SINCE -> selectedValueStatFeature.value?.featureType == FeatureType.DURATION
+                GraphStatType.PIE_CHART -> selectedPieChartFeature.value?.featureType == FeatureType.DURATION
+                null -> false
+            }
+        }
 
     fun initViewModel(database: TrackAndGraphDatabase, graphStatGroupId: Long, graphStatId: Long) {
         if (this.database != null) return
