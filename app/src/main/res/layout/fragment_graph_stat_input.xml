@@ -135,74 +135,130 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:orientation="horizontal">
+                    android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/yRangeLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:text="@string/range_style"
-                        android:textAppearance="@style/TextAppearance.Body" />
-
-                    <Spinner
-                        android:id="@+id/yRangeStyleSpinner"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="@dimen/dialog_input_spacing"
-                        android:entries="@array/y_range_styles" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/yRangeFromToLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/yRangeFixedFromLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
-                        android:text="@string/from"
-                        android:textAppearance="@style/TextAppearance.Body" />
-
-                    <EditText
-                        android:id="@+id/yRangeFrom"
+                    <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:digits="0123456789.,-"
-                        android:gravity="center"
-                        android:hint="0"
-                        android:importantForAutofill="no"
-                        android:inputType="numberSigned|numberDecimal"
-                        android:singleLine="true"
-                        tools:ignore="HardcodedText" />
+                        android:orientation="horizontal">
 
-                    <TextView
-                        android:id="@+id/yRangeFixedToLabel"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center_vertical"
-                        android:gravity="center_vertical"
-                        android:text="@string/to"
-                        android:textAppearance="@style/TextAppearance.Body" />
+                        <TextView
+                            android:id="@+id/yRangeLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:text="@string/range_style"
+                            android:textAppearance="@style/TextAppearance.Body" />
 
-                    <EditText
-                        android:id="@+id/yRangeTo"
+                        <Spinner
+                            android:id="@+id/yRangeStyleSpinner"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            android:layout_marginStart="@dimen/dialog_input_spacing"
+                            android:entries="@array/y_range_styles" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/yRangeFromToDurationLayout"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:digits="0123456789.,-"
-                        android:gravity="center"
-                        android:hint="0"
-                        android:importantForAutofill="no"
-                        android:inputType="numberSigned|numberDecimal"
-                        android:singleLine="true"
-                        tools:ignore="HardcodedText" />
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dialog_input_spacing"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/yRangeFixedFromDurationLabel"
+                                android:layout_width="50dp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/from"
+                                android:textAlignment="textEnd"
+                                android:textAppearance="@style/TextAppearance.Body" />
+
+                            <com.samco.trackandgraph.ui.DurationInputView
+                                android:id="@+id/yRangeFromDuration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/dialog_input_spacing"
+                            android:gravity="center"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/yRangeFixedToDurationLabel"
+                                android:layout_width="50dp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/to"
+                                android:textAlignment="textEnd"
+                                android:textAppearance="@style/TextAppearance.Body" />
+
+                            <com.samco.trackandgraph.ui.DurationInputView
+                                android:id="@+id/yRangeToDuration"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/yRangeFromToLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/yRangeFixedFromLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical"
+                            android:text="@string/from"
+                            android:textAppearance="@style/TextAppearance.Body" />
+
+                        <EditText
+                            android:id="@+id/yRangeFrom"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:digits="0123456789.,-"
+                            android:gravity="center"
+                            android:hint="0"
+                            android:importantForAutofill="no"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            tools:ignore="HardcodedText" />
+
+                        <TextView
+                            android:id="@+id/yRangeFixedToLabel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:layout_gravity="center_vertical"
+                            android:gravity="center_vertical"
+                            android:text="@string/to"
+                            android:textAppearance="@style/TextAppearance.Body" />
+
+                        <EditText
+                            android:id="@+id/yRangeTo"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:digits="0123456789.,-"
+                            android:gravity="center"
+                            android:hint="0"
+                            android:importantForAutofill="no"
+                            android:inputType="numberSigned|numberDecimal"
+                            android:singleLine="true"
+                            tools:ignore="HardcodedText" />
+                    </LinearLayout>
+
                 </LinearLayout>
 
                 <ImageView
@@ -359,10 +415,10 @@
                             android:text="@string/from"
                             android:textAlignment="textEnd"
                             android:textAppearance="@style/TextAppearance.Body"
+                            app:layout_constraintBottom_toBottomOf="@id/valueStatFromInput"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toLeftOf="parent"
-                            app:layout_constraintRight_toLeftOf="@id/valueStatFromInput"
-                            app:layout_constraintBottom_toBottomOf="@id/valueStatFromInput" />
+                            app:layout_constraintRight_toLeftOf="@id/valueStatFromInput" />
 
                         <EditText
                             android:id="@+id/valueStatFromInput"
@@ -388,10 +444,10 @@
                             android:text="@string/to"
                             android:textAlignment="textEnd"
                             android:textAppearance="@style/TextAppearance.Body"
+                            app:layout_constraintBottom_toBottomOf="@id/valueStatToInput"
                             app:layout_constraintHorizontal_weight="1"
                             app:layout_constraintLeft_toRightOf="@id/valueStatFromInput"
-                            app:layout_constraintRight_toLeftOf="@id/valueStatToInput"
-                            app:layout_constraintBottom_toBottomOf="@id/valueStatToInput" />
+                            app:layout_constraintRight_toLeftOf="@id/valueStatToInput" />
 
                         <EditText
                             android:id="@+id/valueStatToInput"

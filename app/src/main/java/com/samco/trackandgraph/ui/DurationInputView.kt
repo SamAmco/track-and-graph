@@ -27,7 +27,8 @@ import com.samco.trackandgraph.databinding.DurationInputLayoutBinding
 
 class DurationInputView : FrameLayout {
     val binding: DurationInputLayoutBinding
-    private var seconds = 0L;
+    var seconds = 0L
+        private set
     private var listener: ((Long) -> Unit)? = null
     private var doneListener: (() -> Unit)? = null
 
