@@ -56,7 +56,6 @@ import java.lang.Exception
 const val MAX_LINE_GRAPH_FEATURES = 10
 const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
 
-//TODO we need to allow the user to select whether they're graphing hours, minutes or seconds for durations
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
     private val args: GraphStatInputFragmentArgs by navArgs()
@@ -347,7 +346,7 @@ class GraphStatInputFragment : Fragment() {
                     LineGraphPointStyle.NONE,
                     0.toDouble(),
                     1.toDouble(),
-                    DurationPlottingMode.NONE//TODO we need to actually set this
+                    DurationPlottingMode.NONE
                 )
             viewModel.lineGraphFeatureConfigs =
                 viewModel.lineGraphFeatureConfigs.plus(newLineGraphFeature)
@@ -770,6 +769,10 @@ class GraphStatInputViewModel : ViewModel() {
                 throw ValidationException(R.string.graph_stat_validation_unrecognised_color)
             if (allFeatures.value?.map { feat -> feat.id }?.contains(f.featureId) != true)
                 throw ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)
+        }
+        if (lineGraphFeatureConfigs.any { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
+            && !lineGraphFeatureConfigs.all { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }) {
+            throw ValidationException(R.string.graph_stat_validation_mixed_time_value_line_graph_features)
         }
         if (yRangeType.value == YRangeType.FIXED) {
             if (yRangeFrom.value!! >= yRangeTo.value!!)
