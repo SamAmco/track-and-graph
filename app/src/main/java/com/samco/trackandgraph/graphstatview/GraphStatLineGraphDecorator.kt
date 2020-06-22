@@ -31,6 +31,7 @@ import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.util.formatDayMonth
 import com.samco.trackandgraph.util.formatMonthYear
+import com.samco.trackandgraph.util.formatTimeDuration
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
@@ -147,9 +148,7 @@ class GraphStatLineGraphDecorator(
                         pos: FieldPosition
                     ): StringBuffer {
                         val sec = (obj as Number).toLong()
-                        val formattedDuration =
-                            String.format("%d:%02d:%02d", sec / 3600, (sec % 3600) / 60, (sec % 60))
-                        return toAppendTo.append(formattedDuration)
+                        return toAppendTo.append(formatTimeDuration(sec))
                     }
 
                     override fun parseObject(source: String, pos: ParsePosition) = null

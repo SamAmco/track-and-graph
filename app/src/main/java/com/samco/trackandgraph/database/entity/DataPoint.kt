@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.database.doubleFormatter
+import com.samco.trackandgraph.util.formatTimeDuration
 import org.threeten.bp.OffsetDateTime
 
 @Entity(
@@ -55,10 +56,7 @@ data class DataPoint(
             return when (featureType) {
                 FeatureType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
                 FeatureType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
-                FeatureType.DURATION -> {
-                    val sec = dataPoint.value.toLong()
-                    String.format("%d:%02d:%02d", sec / 3600, (sec % 3600) / 60, (sec % 60))
-                }
+                FeatureType.DURATION -> formatTimeDuration(dataPoint.value.toLong())
             }
         }
     }

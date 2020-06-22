@@ -311,5 +311,6 @@
     <string name="duration_to_numeric_mode_header">What should previously tracked values be converted to:</string>
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">You can not mix time durations with other types of data. Consider plotting hours, minutes or seconds</string>
     <string name="time_duration">Time duration</string>
+    <string name="select_a_duration_range">Select a duration range</string>
 
 </resources>

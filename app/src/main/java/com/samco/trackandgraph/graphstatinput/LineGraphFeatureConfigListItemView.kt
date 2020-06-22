@@ -46,6 +46,7 @@ class LineGraphFeatureConfigListItemView(
     private var onRemoveListener: ((LineGraphFeatureConfigListItemView) -> Unit)? = null
     private var onUpdatedListener: ((LineGraphFeatureConfigListItemView) -> Unit)? = null
     private val decimalFormat = DecimalFormat("0.###############")
+    private var pointStyleSpinnerAdapter: PointStyleSpinnerAdapter? = null
 
     init {
         setupFeatureSpinner()
@@ -86,17 +87,19 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupPointStyleSpinner(context: Context) {
-        binding.pointStyleSpinner.adapter =
-            PointStyleSpinnerAdapter(
-                context,
-                pointStyleDrawableResources
-            )
+        val pointStyleImages = mapOf(
+            LineGraphPointStyle.NONE to pointStyleDrawableResources[0],
+            LineGraphPointStyle.CIRCLES to pointStyleDrawableResources[1],
+            LineGraphPointStyle.CIRCLES_AND_NUMBERS to pointStyleDrawableResources[2]
+        )
+        pointStyleSpinnerAdapter = PointStyleSpinnerAdapter(context, pointStyleImages)
+        binding.pointStyleSpinner.adapter = pointStyleSpinnerAdapter
         binding.pointStyleSpinner.setSelection(lineGraphFeature.pointStyle.ordinal)
         binding.pointStyleSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                    lineGraphFeature.pointStyle = LineGraphPointStyle.values()[index]
+                    lineGraphFeature.pointStyle = pointStyleImages.keys.elementAt(index)
                     onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
                 }
             }
@@ -162,7 +165,7 @@ class LineGraphFeatureConfigListItemView(
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.featureSpinner.adapter = adapter
         var featureSpinnerStartIndex =
-            features.indexOfFirst { f -> f.id == lineGraphFeature.featureId }
+            items.indexOfFirst { it.first.id == lineGraphFeature.featureId && it.second == lineGraphFeature.durationPlottingMode }
         if (featureSpinnerStartIndex == -1) featureSpinnerStartIndex = 0
         binding.featureSpinner.setSelection(featureSpinnerStartIndex)
         binding.featureSpinner.onItemSelectedListener =
@@ -176,9 +179,22 @@ class LineGraphFeatureConfigListItemView(
                     )
                     lineGraphFeature.featureId = items[index].first.id
                     lineGraphFeature.durationPlottingMode = items[index].second
+                    adjustPointStyleSpinnerForFeature()
                     onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
                 }
             }
+    }
+
+    private fun adjustPointStyleSpinnerForFeature() {
+        if (lineGraphFeature.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE) {
+            pointStyleSpinnerAdapter?.disableNumbers()
+            val selected = binding.pointStyleSpinner.selectedItemPosition
+            if (pointStyleSpinnerAdapter?.isEnabled(selected) == false) {
+                binding.pointStyleSpinner.setSelection(selected - 1)
+            }
+        } else {
+            pointStyleSpinnerAdapter?.enableNumbers()
+        }
     }
 
     private fun getSpinnerItemsForFeature(feature: FeatureAndTrackGroup)
@@ -238,20 +254,43 @@ class LineGraphFeatureConfigListItemView(
         }
     }
 
-    private class PointStyleSpinnerAdapter(context: Context, val imageIds: List<Int>) :
+    private class PointStyleSpinnerAdapter(
+        context: Context,
+        val pointStyleImages: Map<LineGraphPointStyle, Int>
+    ) :
         ArrayAdapter<Int>(context, R.layout.circular_spinner_item) {
+
+        var enabledStyles = pointStyleImages.keys
+        var imageIds = pointStyleImages.values
 
         override fun getCount(): Int = imageIds.size
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: LayoutInflater.from(context)
                 .inflate(R.layout.circular_spinner_item, parent, false)
-            view.findViewById<ImageView>(R.id.image).setImageResource(imageIds[position])
+            view.findViewById<ImageView>(R.id.image).setImageResource(imageIds.elementAt(position))
             return view
         }
 
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-            return getView(position, convertView, parent)
+            val view = getView(position, convertView, parent)
+            if (!isEnabled(position)) view.alpha = 0.5f
+            else view.alpha = 1.0f
+            return view
+        }
+
+        override fun isEnabled(position: Int): Boolean {
+            return enabledStyles.contains(pointStyleImages.keys.elementAt(position))
+        }
+
+        fun disableNumbers() {
+            enabledStyles = pointStyleImages
+                .filter { kvp -> kvp.key != LineGraphPointStyle.CIRCLES_AND_NUMBERS }
+                .keys
+        }
+
+        fun enableNumbers() {
+            enabledStyles = pointStyleImages.keys
         }
     }
 }

@@ -247,22 +247,34 @@ class GraphStatInputFragment : Fragment() {
     private fun listenToValueStatFeature() {
         binding.valueStatDiscreteValueInputLayout.visibility = View.GONE
         binding.valueStatContinuousValueInputLayout.visibility = View.GONE
+        binding.valueStatDurationRangeInput.visibility = View.GONE
         viewModel.selectedValueStatFeature.observe(viewLifecycleOwner, Observer {
             it?.let {
-                if (it.featureType == FeatureType.DISCRETE) {
-                    sanitizeValueStatDiscreteValues()
-                    binding.valueStatDiscreteValueInputLayout.visibility = View.VISIBLE
-                    binding.valueStatContinuousValueInputLayout.visibility = View.GONE
-                } else {
-                    binding.valueStatDiscreteValueInputLayout.visibility = View.GONE
-                    binding.valueStatContinuousValueInputLayout.visibility = View.VISIBLE
-                }//TODO we'll need custom from and to views for durations
+                when (it.featureType) {
+                    FeatureType.DISCRETE -> {
+                        sanitizeValueStatDiscreteValues()
+                        binding.valueStatDiscreteValueInputLayout.visibility = View.VISIBLE
+                        binding.valueStatDurationRangeInput.visibility = View.GONE
+                        binding.valueStatContinuousValueInputLayout.visibility = View.GONE
+                    }
+                    FeatureType.CONTINUOUS -> {
+                        binding.valueStatDiscreteValueInputLayout.visibility = View.GONE
+                        binding.valueStatDurationRangeInput.visibility = View.GONE
+                        binding.valueStatContinuousValueInputLayout.visibility = View.VISIBLE
+                    }
+                    FeatureType.DURATION -> {
+                        binding.valueStatDiscreteValueInputLayout.visibility = View.GONE
+                        binding.valueStatContinuousValueInputLayout.visibility = View.GONE
+                        binding.valueStatDurationRangeInput.visibility = View.VISIBLE
+                    }
+                }
                 onFormUpdate()
             }
         })
         listenToValueStatDiscreteValueCheckBoxes()
         listenToValueStatDiscreteValues()
         listenToValueStatContinuousRange()
+        listenToValueStatDurationRange()
     }
 
     private fun sanitizeValueStatDiscreteValues() {
@@ -317,18 +329,47 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun listenToValueStatContinuousRange() {
-        if (viewModel.selectedValueStatToValue.value != null)
+        if (viewModel.selectedValueStatToValue.value != null) {
             binding.valueStatToInput.setText(doubleFormatter.format(viewModel.selectedValueStatToValue.value!!))
+        }
         binding.valueStatToInput.addTextChangedListener { editText ->
             viewModel.selectedValueStatToValue.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
-        if (viewModel.selectedValueStatFromValue.value != null)
+        if (viewModel.selectedValueStatFromValue.value != null) {
             binding.valueStatFromInput.setText(doubleFormatter.format(viewModel.selectedValueStatFromValue.value!!))
+        }
         binding.valueStatFromInput.addTextChangedListener { editText ->
             viewModel.selectedValueStatFromValue.value = getDoubleFromText(editText.toString())
             onFormUpdate()
         }
+    }
+
+    private fun listenToValueStatDurationRange() {
+        if (viewModel.selectedValueStatToValue.value != null) {
+            binding.valueStatDurationToInput.setTimeInSeconds(viewModel.selectedValueStatToValue.value!!.toLong())
+        }
+        binding.valueStatDurationToInput.setDurationChangedListener {
+            viewModel.selectedValueStatToValue.value = it.toDouble()
+            onFormUpdate()
+        }
+        if (viewModel.selectedValueStatFromValue.value != null) {
+            binding.valueStatDurationFromInput.setTimeInSeconds(viewModel.selectedValueStatFromValue.value!!.toLong())
+        }
+        binding.valueStatDurationFromInput.setDurationChangedListener {
+            viewModel.selectedValueStatFromValue.value = it.toDouble()
+            onFormUpdate()
+        }
+        val doneListener: () -> Unit = {
+            val imm =
+                activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(
+                requireActivity().window.decorView.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
+        }
+        binding.valueStatDurationFromInput.setDoneListener(doneListener)
+        binding.valueStatDurationToInput.setDoneListener(doneListener)
     }
 
     private fun listenToAddLineGraphFeatureButton(features: List<FeatureAndTrackGroup>) {
@@ -692,7 +733,7 @@ class GraphStatInputViewModel : ViewModel() {
             } else {
                 this@GraphStatInputViewModel.selectedValueStatFromValue.value = fromValue
                 this@GraphStatInputViewModel.selectedValueStatToValue.value = toValue
-            } //TODO we'll need to init our custom from and to views for duration feature types
+            }
             this@GraphStatInputViewModel.selectedValueStatFeature.value = feature
         }
     }
