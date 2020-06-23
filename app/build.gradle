@@ -20,8 +20,8 @@ android {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 10801
-        versionName "1.8.1"
+        versionCode 10900
+        versionName "1.9.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {

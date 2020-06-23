@@ -289,6 +289,7 @@ class ViewGraphStatViewModel : ViewModel() {
         }
     }
 
+    //TODO we need to filter these by date/time and only show global notes relevant to the current graph/stat
     private suspend fun getAllGlobalNotes() = withContext(Dispatchers.IO) {
         val globalNotes = dataSource!!.getAllGlobalNotesSync()
             .map { GraphNote(it) }
