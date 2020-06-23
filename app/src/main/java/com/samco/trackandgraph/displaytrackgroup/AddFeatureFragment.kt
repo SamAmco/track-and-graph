@@ -27,7 +27,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -47,6 +46,10 @@ import androidx.core.view.forEachIndexed
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -54,23 +57,23 @@ import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import java.lang.Exception
 import kotlin.math.absoluteValue
 
-
-class AddFeatureFragment : Fragment(),
-    AdapterView.OnItemSelectedListener,
-    YesCancelDialogFragment.YesCancelDialogListener {
-
+class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
     private val args: AddFeatureFragmentArgs by navArgs()
     private lateinit var binding: AddFeatureFragmentBinding
     private val viewModel by viewModels<AddFeatureViewModel>()
     private var navController: NavController? = null
-    private val featureTypeList = listOf(FeatureType.DISCRETE, FeatureType.CONTINUOUS)
+    private val featureTypeList = listOf(
+        FeatureType.DISCRETE,
+        FeatureType.CONTINUOUS,
+        FeatureType.DURATION
+    )
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = DataBindingUtil.inflate(inflater, R.layout.add_feature_fragment, container, false)
+        binding = AddFeatureFragmentBinding.inflate(inflater, container, false)
         navController = container?.findNavController()
 
         viewModel.init(
@@ -86,13 +89,15 @@ class AddFeatureFragment : Fragment(),
 
     override fun onResume() {
         super.onResume()
-        val imm = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.showSoftInput(binding.featureNameText, 0)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        val imm = requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        val imm =
+            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
@@ -119,7 +124,8 @@ class AddFeatureFragment : Fragment(),
                     Toast.makeText(requireActivity(), errorMsg, Toast.LENGTH_LONG).show()
                     navController?.popBackStack()
                 }
-                else -> {}
+                else -> {
+                }
             }
         })
     }
@@ -129,7 +135,11 @@ class AddFeatureFragment : Fragment(),
         binding.discreteValues.visibility = View.INVISIBLE
         binding.addDiscreteValueButton.visibility = View.INVISIBLE
         binding.defaultNumericalInput.visibility = View.INVISIBLE
+        binding.defaultDurationInput.visibility = View.INVISIBLE
         binding.defaultDiscreteScrollView.visibility = View.INVISIBLE
+        binding.durationNumericConversionModeSpinner.visibility = View.INVISIBLE
+        binding.durationToNumericModeHeader.visibility = View.INVISIBLE
+        binding.numericToDurationModeHeader.visibility = View.INVISIBLE
         binding.featureNameText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
     }
 
@@ -151,16 +161,27 @@ class AddFeatureFragment : Fragment(),
         observeFeatureType()
     }
 
+    private fun getOnFeatureSelectedListener(): AdapterView.OnItemSelectedListener {
+        return object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                viewModel.featureType.value = featureTypeList[position]
+            }
+        }
+    }
+
     private fun initViewFromViewModel() {
         viewModel.discreteValues.forEach { v -> inflateDiscreteValue(v) }
         if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
             binding.addDiscreteValueButton.isEnabled = false
         if (viewModel.updateMode) initSpinnerInUpdateMode()
 
-        binding.featureNameText.setText(viewModel.featureName)
         binding.featureDescriptionText.setText(viewModel.featureDescription)
         binding.featureTypeSpinner.setSelection(featureTypeList.indexOf(viewModel.featureType.value!!))
-        binding.featureTypeSpinner.onItemSelectedListener = this
+        binding.featureTypeSpinner.onItemSelectedListener = getOnFeatureSelectedListener()
+
+        binding.featureNameText.setText(viewModel.featureName)
         binding.featureNameText.setSelection(binding.featureNameText.text.length)
         binding.featureNameText.requestFocus()
         binding.featureNameText.addTextChangedListener {
@@ -179,6 +200,30 @@ class AddFeatureFragment : Fragment(),
         binding.defaultNumericalInput.addTextChangedListener {
             viewModel.featureDefaultValue.value = getDoubleFromText(it.toString())
         }
+        binding.defaultDurationInput.setDurationChangedListener {
+            viewModel.featureDefaultValue.value = it.toDouble()
+        }
+        binding.defaultDurationInput.setDoneListener {
+            val imm =
+                activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(
+                requireActivity().window.decorView.windowToken,
+                InputMethodManager.HIDE_NOT_ALWAYS
+            )
+        }
+        binding.durationNumericConversionModeSpinner.onItemSelectedListener =
+            getOnDurationNumericConversionModeSelectedListener()
+    }
+
+    private fun getOnDurationNumericConversionModeSelectedListener(): AdapterView.OnItemSelectedListener {
+        return object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
+                viewModel.durationNumericConversionMode.value =
+                    DurationNumericConversionMode.values()[position]
+            }
+        }
     }
 
     private fun observeFeatureType() {
@@ -195,27 +240,39 @@ class AddFeatureFragment : Fragment(),
 
     private fun updateDefaultValuesViewFromViewModel(checked: Boolean) {
         if (checked) {
-            if (viewModel.featureType.value == FeatureType.DISCRETE) {
-                if (currentDefaultValueIsInvalidDiscreteValue()) {
-                    viewModel.featureDefaultValue.value = 0.0
+            when (viewModel.featureType.value) {
+                FeatureType.DISCRETE -> {
+                    if (currentDefaultValueIsInvalidDiscreteValue()) {
+                        viewModel.featureDefaultValue.value = 0.0
+                    }
+                    updateCurrentlySelectedDefaultDiscreteValue()
+                    binding.defaultDiscreteScrollView.visibility = View.VISIBLE
+                    binding.defaultNumericalInput.visibility = View.GONE
+                    binding.defaultDurationInput.visibility = View.GONE
                 }
-                updateCurrentlySelectedDefaultDiscreteValue()
-                binding.defaultDiscreteScrollView.visibility = View.VISIBLE
-                binding.defaultNumericalInput.visibility = View.GONE
-            } else {
-                binding.defaultNumericalInput.setText(viewModel.featureDefaultValue.value!!.toString())
-                binding.defaultDiscreteScrollView.visibility = View.GONE
-                binding.defaultNumericalInput.visibility = View.VISIBLE
+                FeatureType.CONTINUOUS -> {
+                    binding.defaultNumericalInput.setText(viewModel.featureDefaultValue.value!!.toString())
+                    binding.defaultDiscreteScrollView.visibility = View.GONE
+                    binding.defaultNumericalInput.visibility = View.VISIBLE
+                    binding.defaultDurationInput.visibility = View.GONE
+                }
+                FeatureType.DURATION -> {
+                    binding.defaultDurationInput.setTimeInSeconds(viewModel.featureDefaultValue.value!!.toLong())
+                    binding.defaultDiscreteScrollView.visibility = View.GONE
+                    binding.defaultNumericalInput.visibility = View.GONE
+                    binding.defaultDurationInput.visibility = View.VISIBLE
+                }
             }
         } else {
             binding.defaultDiscreteScrollView.visibility = View.GONE
             binding.defaultNumericalInput.visibility = View.GONE
+            binding.defaultDurationInput.visibility = View.GONE
         }
     }
 
     private fun currentDefaultValueIsInvalidDiscreteValue(): Boolean {
         val currentDefaultValue = viewModel.featureDefaultValue.value!!
-        return currentDefaultValue > viewModel.discreteValues.size-1
+        return currentDefaultValue > viewModel.discreteValues.size - 1
                 || currentDefaultValue < 0
                 || (currentDefaultValue - currentDefaultValue.toInt().toDouble()).absoluteValue > 0
     }
@@ -240,8 +297,8 @@ class AddFeatureFragment : Fragment(),
                 val textView = view as TextView
                 val enabled = viewModel.isFeatureTypeEnabled(featureTypeList[position])
                 val color =
-                    if (enabled) view.context.getColorFromAttr(R.attr.colorControlNormal)
-                    else view.context.getColorFromAttr(android.R.attr.textColorSecondary)
+                    if (enabled) view.context.getColorFromAttr(android.R.attr.textColorPrimary)
+                    else view.context.getColorFromAttr(android.R.attr.textColorHint)
                 textView.setTextColor(color)
                 return view
             }
@@ -268,7 +325,7 @@ class AddFeatureFragment : Fragment(),
 
     private fun updateCurrentlySelectedDefaultDiscreteValue() {
         val selected = viewModel.featureDefaultValue.value!!.toInt()
-        binding.defaultDiscreteButtonsLayout.children.forEachIndexed {i, view ->
+        binding.defaultDiscreteButtonsLayout.children.forEachIndexed { i, view ->
             (view as CheckBox).isChecked = i == selected
         }
     }
@@ -379,7 +436,7 @@ class AddFeatureFragment : Fragment(),
         binding.discreteValues.addView(item.root, currIndex + 1)
         val defaultButtonView = binding.defaultDiscreteButtonsLayout.getChildAt(currIndex)
         binding.defaultDiscreteButtonsLayout.removeViewAt(currIndex)
-        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex+1)
+        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex + 1)
         if (currIndex == viewModel.featureDefaultValue.value!!.toInt())
             viewModel.featureDefaultValue.value = viewModel.featureDefaultValue.value!! + 1
         reIndexDiscreteValueViews()
@@ -393,7 +450,7 @@ class AddFeatureFragment : Fragment(),
         binding.discreteValues.addView(item.root, currIndex - 1)
         val defaultButtonView = binding.defaultDiscreteButtonsLayout.getChildAt(currIndex)
         binding.defaultDiscreteButtonsLayout.removeViewAt(currIndex)
-        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex-1)
+        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex - 1)
         if (currIndex == viewModel.featureDefaultValue.value!!.toInt())
             viewModel.featureDefaultValue.value = viewModel.featureDefaultValue.value!! - 1
         reIndexDiscreteValueViews()
@@ -424,14 +481,24 @@ class AddFeatureFragment : Fragment(),
         }
     }
 
-    override fun onItemSelected(p0: AdapterView<*>?, p1: View?, position: Int, p3: Long) {
-        viewModel.featureType.value = featureTypeList[position]
+    private fun updateDurationNumericConversionUI() {
+        val durationToNumeric = viewModel.updateMode
+                && viewModel.existingFeature?.featureType == FeatureType.DURATION
+                && viewModel.featureType.value == FeatureType.CONTINUOUS
+        val numericToDuration = viewModel.updateMode
+                && viewModel.existingFeature?.featureType == FeatureType.CONTINUOUS
+                && viewModel.featureType.value == FeatureType.DURATION
+        binding.durationToNumericModeHeader.visibility =
+            if (durationToNumeric) View.VISIBLE else View.GONE
+        binding.numericToDurationModeHeader.visibility =
+            if (numericToDuration) View.VISIBLE else View.GONE
+        binding.durationNumericConversionModeSpinner.visibility =
+            if (durationToNumeric || numericToDuration) View.VISIBLE else View.GONE
     }
-
-    override fun onNothingSelected(p0: AdapterView<*>?) {}
 
     private fun onFeatureTypeChanged(featureType: FeatureType) {
         showOnFeatureTypeUpdatedMessage(featureType)
+        updateDurationNumericConversionUI()
         updateDefaultValuesViewFromViewModel(viewModel.featureHasDefaultValue.value!!)
         val vis = if (featureType == FeatureType.DISCRETE) View.VISIBLE else View.GONE
         binding.discreteValuesTextView.visibility = vis
@@ -456,10 +523,14 @@ class AddFeatureFragment : Fragment(),
     }
 
     private fun getOnDataTypeChangedMessage(oldType: FeatureType, newType: FeatureType): String? {
-        return if (oldType == FeatureType.DISCRETE) when (newType) {
-            FeatureType.DISCRETE -> null
-            FeatureType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
-        } else null
+        return when (oldType) {
+            FeatureType.DISCRETE -> when (newType) {
+                FeatureType.DISCRETE -> null
+                FeatureType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
+                else -> null
+            }
+            else -> null
+        }
     }
 
     override fun onDialogYes(dialog: YesCancelDialogFragment) {
@@ -470,6 +541,7 @@ class AddFeatureFragment : Fragment(),
 }
 
 enum class AddFeatureState { INITIALIZING, WAITING, ADDING, DONE, ERROR }
+enum class DurationNumericConversionMode { HOURS, MINUTES, SECONDS }
 class AddFeatureViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -481,6 +553,7 @@ class AddFeatureViewModel : ViewModel() {
     var featureName = ""
     var featureDescription = ""
     val featureType = MutableLiveData(FeatureType.DISCRETE)
+    val durationNumericConversionMode = MutableLiveData(DurationNumericConversionMode.HOURS)
     val featureHasDefaultValue = MutableLiveData(false)
     val featureDefaultValue = MutableLiveData(1.0)
     val discreteValues = mutableListOf<MutableLabel>()
@@ -535,10 +608,18 @@ class AddFeatureViewModel : ViewModel() {
     fun isFeatureTypeEnabled(type: FeatureType): Boolean {
         if (!updateMode) return true
         // disc -> cont Y
+        // disc -> dur N
         // cont -> disc N
+        // cont -> dur Y
+        // dur -> disc N
+        // dur -> cont Y
         return when (type) {
-            FeatureType.CONTINUOUS -> true
             FeatureType.DISCRETE -> existingFeature!!.featureType == FeatureType.DISCRETE
+            FeatureType.CONTINUOUS -> existingFeature!!.featureType == FeatureType.DURATION
+                    || existingFeature!!.featureType == FeatureType.DISCRETE
+                    || existingFeature!!.featureType == FeatureType.CONTINUOUS
+            FeatureType.DURATION -> existingFeature!!.featureType == FeatureType.CONTINUOUS
+                    || existingFeature!!.featureType == FeatureType.DURATION
         }
     }
 
@@ -565,7 +646,12 @@ class AddFeatureViewModel : ViewModel() {
         updateAllExistingDataPointsForTransformation(valOfDiscVal)
 
         val newDiscVals = discreteValues
-            .map { s -> DiscreteValue(valOfDiscVal(s), s.value) }
+            .map { s ->
+                DiscreteValue(
+                    valOfDiscVal(s),
+                    s.value
+                )
+            }
 
         val feature = Feature.create(
             existingFeature!!.id,
@@ -578,10 +664,63 @@ class AddFeatureViewModel : ViewModel() {
     }
 
     private fun updateAllExistingDataPointsForTransformation(valOfDiscVal: (MutableLabel) -> Int) {
-        if (existingFeature!!.featureType == FeatureType.DISCRETE) when (featureType.value) {
-            FeatureType.CONTINUOUS -> stripDataPointsToValue()
-            FeatureType.DISCRETE -> updateDiscreteValueDataPoints(valOfDiscVal)
+        when (existingFeature!!.featureType) {
+            FeatureType.DISCRETE -> when (featureType.value) {
+                FeatureType.CONTINUOUS -> stripDataPointsToValue()
+                FeatureType.DISCRETE -> updateDiscreteValueDataPoints(valOfDiscVal)
+                else -> run {}
+            }
+            FeatureType.CONTINUOUS -> when (featureType.value) {
+                FeatureType.DURATION -> updateContinuousDataPointsToDurations()
+                else -> run {}
+            }
+            FeatureType.DURATION -> when (featureType.value) {
+                FeatureType.CONTINUOUS -> updateDurationDataPointsToContinuous()
+                else -> run {}
+            }
         }
+    }
+
+    private fun updateDurationDataPointsToContinuous() {
+        val oldDataPoints = dao!!.getDataPointsForFeatureSync(existingFeature!!.id)
+        val divisor = when (durationNumericConversionMode.value) {
+            DurationNumericConversionMode.HOURS -> 3600.0
+            DurationNumericConversionMode.MINUTES -> 60.0
+            DurationNumericConversionMode.SECONDS -> 1.0
+            null -> 1.0
+        }
+        val newDataPoints = oldDataPoints.map {
+            val newValue = it.value / divisor
+            DataPoint(
+                it.timestamp,
+                it.featureId,
+                newValue,
+                "",
+                it.note
+            )
+        }
+        dao!!.updateDataPoints(newDataPoints)
+    }
+
+    private fun updateContinuousDataPointsToDurations() {
+        val oldDataPoints = dao!!.getDataPointsForFeatureSync(existingFeature!!.id)
+        val multiplier = when (durationNumericConversionMode.value) {
+            DurationNumericConversionMode.HOURS -> 3600.0
+            DurationNumericConversionMode.MINUTES -> 60.0
+            DurationNumericConversionMode.SECONDS -> 1.0
+            null -> 1.0
+        }
+        val newDataPoints = oldDataPoints.map {
+            val newValue = it.value * multiplier
+            DataPoint(
+                it.timestamp,
+                it.featureId,
+                newValue,
+                "",
+                it.note
+            )
+        }
+        dao!!.updateDataPoints(newDataPoints)
     }
 
     private fun updateDiscreteValueDataPoints(valOfDiscVal: (MutableLabel) -> Int) {
@@ -601,7 +740,13 @@ class AddFeatureViewModel : ViewModel() {
     private fun stripDataPointsToValue() {
         val oldDataPoints = dao!!.getDataPointsForFeatureSync(existingFeature!!.id)
         val newDataPoints = oldDataPoints.map {
-            DataPoint(it.timestamp, it.featureId, it.value, "", it.note)
+            DataPoint(
+                it.timestamp,
+                it.featureId,
+                it.value,
+                "",
+                it.note
+            )
         }
         dao!!.updateDataPoints(newDataPoints)
     }

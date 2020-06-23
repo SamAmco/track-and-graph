@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,11 +14,13 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import com.samco.trackandgraph.database.doubleFormatter
+import com.samco.trackandgraph.util.formatTimeDuration
 import org.threeten.bp.OffsetDateTime
 
 @Entity(
@@ -49,8 +51,13 @@ data class DataPoint(
     @ColumnInfo(name = "note")
     val note: String
 ) {
-    fun getDisplayValue(): String {
-        return if (label.isNotEmpty()) doubleFormatter.format(value) + " : $label"
-        else doubleFormatter.format(value)
+    companion object {
+        fun getDisplayValue(dataPoint: DataPoint, featureType: FeatureType): String {
+            return when (featureType) {
+                FeatureType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
+                FeatureType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
+                FeatureType.DURATION -> formatTimeDuration(dataPoint.value.toLong())
+            }
+        }
     }
 }

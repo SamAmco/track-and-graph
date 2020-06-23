@@ -30,7 +30,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.database.GlobalNote
+import com.samco.trackandgraph.database.entity.GlobalNote
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.odtFromString
@@ -194,11 +194,17 @@ class GlobalNoteInputViewModel : ViewModel() {
 
     fun onAddClicked() = ioScope.launch {
         oldNote?.let { dataSource?.deleteGlobalNote(it) }
-        if (noteText.isNotEmpty()) dataSource?.insertGlobalNote(GlobalNote(timestamp, noteText))
+        if (noteText.isNotEmpty()) dataSource?.insertGlobalNote(
+            GlobalNote(
+                timestamp,
+                noteText
+            )
+        )
         withContext(Dispatchers.Main) { _state.value = GlobalNoteInputState.DONE }
     }
 
     override fun onCleared() {
+        super.onCleared()
         updateJob.cancel()
     }
 }

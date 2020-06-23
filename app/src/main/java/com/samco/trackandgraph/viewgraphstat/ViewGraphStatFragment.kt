@@ -38,6 +38,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.database.dto.NoteType
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatview.GraphStatView
 import com.samco.trackandgraph.graphstatview.SampleDataCallback
@@ -78,15 +81,23 @@ class ViewGraphStatFragment : Fragment() {
     private fun onViewNoteClicked(note: GraphNote) {
         viewModel.noteClicked(note)
         when (note.noteType) {
-            NoteType.GLOBAL_NOTE -> showNoteDialog(layoutInflater, requireContext(), note.globalNote!!)
+            NoteType.GLOBAL_NOTE -> showNoteDialog(
+                layoutInflater,
+                requireContext(),
+                note.globalNote!!
+            )
             NoteType.DATA_POINT -> {
                 val dataPoint = note.dataPoint!!
                 val featureDisplayName =
                     viewModel.featureDisplayNames?.getOrElse(dataPoint.featureId) { null }
+                val featureType =
+                    viewModel.featureTypes?.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
+                        ?: FeatureType.CONTINUOUS
                 showDataPointDescriptionDialog(
                     requireContext(),
                     layoutInflater,
                     dataPoint,
+                    featureType,
                     featureDisplayName
                 )
             }
@@ -139,8 +150,10 @@ class ViewGraphStatFragment : Fragment() {
 
     private fun initNotesAdapterFromViewModel() {
         val featureDisplayNames = viewModel.featureDisplayNames ?: emptyMap()
+        val featureTypes = viewModel.featureTypes ?: emptyMap()
         adapter = NotesAdapter(
             featureDisplayNames,
+            featureTypes,
             NoteClickListener(this::onViewNoteClicked)
         )
         binding.notesRecyclerView.adapter = adapter
@@ -196,9 +209,9 @@ class ViewGraphStatFragment : Fragment() {
         if (graphStat == null) graphStatView.initError(null, R.string.graph_stat_view_not_found)
         when (viewModel.graphStatInnerObject) {
             null -> graphStatView.initError(null, R.string.graph_stat_view_not_found)
-            is LineGraph -> graphStatView.initFromLineGraph(
+            is LineGraphWithFeatures -> graphStatView.initFromLineGraph(
                 graphStat!!,
-                viewModel.graphStatInnerObject as LineGraph,
+                viewModel.graphStatInnerObject as LineGraphWithFeatures,
                 false,
                 SampleDataCallback(viewModel::onSampledDataPoints)
             )
@@ -229,6 +242,8 @@ class ViewGraphStatViewModel : ViewModel() {
     var graphStatInnerObject: Any? = null
         private set
     var featureDisplayNames: Map<Long, String>? = null
+        private set
+    var featureTypes: Map<Long, FeatureType>? = null
         private set
 
     val state: LiveData<ViewGraphStatViewModelState>
@@ -265,10 +280,11 @@ class ViewGraphStatViewModel : ViewModel() {
             ViewGraphStatViewModelState.INITIALIZING
         ioScope.launch {
             initFromGraphStatId(graphStatId)
-            getAllFeatureDisplayNames()
+            getAllFeatureAttributes()
             getAllGlobalNotes()
-            withContext(Dispatchers.Main) { _state.value =
-                ViewGraphStatViewModelState.WAITING
+            withContext(Dispatchers.Main) {
+                _state.value =
+                    ViewGraphStatViewModelState.WAITING
             }
         }
     }
@@ -282,9 +298,13 @@ class ViewGraphStatViewModel : ViewModel() {
         withContext(Dispatchers.Main) { _notes.value = mergedList }
     }
 
-    private fun getAllFeatureDisplayNames() {
-        featureDisplayNames = dataSource!!.getAllFeaturesAndTrackGroupsSync()
+    private fun getAllFeatureAttributes() {
+        val allFeatures = dataSource!!.getAllFeaturesAndTrackGroupsSync()
+        featureDisplayNames = allFeatures
             .map { it.id to "${it.trackGroupName} -> ${it.name}" }
+            .toMap()
+        featureTypes = allFeatures
+            .map { it.id to it.featureType }
             .toMap()
     }
 

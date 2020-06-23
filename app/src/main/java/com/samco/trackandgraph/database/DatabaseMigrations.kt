@@ -3,7 +3,6 @@ package com.samco.trackandgraph.database
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
-
 val MIGRATION_29_30 = object : Migration(29, 30) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.execSQL(
@@ -164,6 +163,81 @@ val MIGRATION_38_39 = object : Migration(38, 39) {
     }
 }
 
+val MIGRATION_39_40 = object : Migration(39, 40) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `line_graphs_table2` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                 `graph_stat_id` INTEGER NOT NULL, 
+                `duration` TEXT, 
+                `y_range_type` INTEGER NOT NULL, 
+                `y_from` REAL NOT NULL, 
+                `y_to` REAL NOT NULL, 
+                FOREIGN KEY(`graph_stat_id`) 
+                REFERENCES `graphs_and_stats_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
+            )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table2_id` ON `line_graphs_table2` (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graphs_table2_graph_stat_id` ON `line_graphs_table2` (`graph_stat_id`)")
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `line_graph_features_table` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `line_graph_id` INTEGER NOT NULL,
+                `feature_id` INTEGER NOT NULL,
+                `name` TEXT NOT NULL,
+                `color_index` INTEGER NOT NULL,
+                `averaging_mode` INTEGER NOT NULL,
+                 `plotting_mode` INTEGER NOT NULL, 
+                `point_style` INTEGER NOT NULL, 
+                `offset` REAL NOT NULL, 
+                `scale` REAL NOT NULL, 
+                `duration_plotting_mode` INTEGER NOT NULL, 
+                FOREIGN KEY(`line_graph_id`) REFERENCES `line_graphs_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
+                FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
+            )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table_id` ON `line_graph_features_table` (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_line_graph_features_table_line_graph_id` ON `line_graph_features_table` (`line_graph_id`)")
+
+        database.execSQL("INSERT INTO line_graphs_table2 SELECT id, graph_stat_id, duration, y_range_type, y_from, y_to FROM line_graphs_table")
+        val lineGraphsCursor = database.query("SELECT * FROM line_graphs_table")
+        val inserts = mutableListOf<Pair<String, List<String>>>()
+        var index = 0L
+        val lineGraphFeatureInsertStatement =
+            """
+                INSERT INTO line_graph_features_table(
+                    id, line_graph_id, feature_id, name,
+                    color_index, averaging_mode, plotting_mode, point_style,
+                    offset, scale, duration_plotting_mode
+                ) VALUES (?,?,?,?,?,?,?,?,?,?,?)
+            """.trimIndent()
+        while (lineGraphsCursor.moveToNext()) {
+            val id = lineGraphsCursor.getString(0)
+            val features = lineGraphsCursor.getString(2).split(splitChars1)
+            for (featureString in features) {
+                val featureProperties = featureString.split(splitChars2)
+                if (featureProperties.size >= 8) {
+                    val params = mutableListOf(index++.toString(), id)
+                    params.addAll(featureProperties)
+                    params.add(0.toString())
+                    inserts.add(Pair(lineGraphFeatureInsertStatement, params))
+                }
+            }
+        }
+        if (inserts.size > 0) inserts.forEach {
+            database.execSQL(
+                it.first,
+                it.second.toTypedArray()
+            )
+        }
+        database.execSQL("DROP TABLE IF EXISTS `line_graphs_table`")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -174,5 +248,6 @@ val allMigrations = arrayOf(
     MIGRATION_35_36,
     MIGRATION_36_37,
     MIGRATION_37_38,
-    MIGRATION_38_39
+    MIGRATION_38_39,
+    MIGRATION_39_40
 )

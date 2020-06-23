@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,49 +14,41 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.dto
 
 import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import androidx.room.Relation
+import com.samco.trackandgraph.database.entity.LineGraph
+import com.samco.trackandgraph.database.entity.LineGraphFeature
 import org.threeten.bp.Duration
 
-@Entity(tableName = "average_time_between_stat_table",
-    foreignKeys = [
-        ForeignKey(
-            entity = GraphOrStat::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("graph_stat_id"),
-            onDelete = ForeignKey.CASCADE),
-        ForeignKey(
-            entity = Feature::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("feature_id"),
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
-data class AverageTimeBetweenStat(
-    @PrimaryKey(autoGenerate = true)
+enum class YRangeType {
+    DYNAMIC,
+    FIXED
+}
+
+data class LineGraphWithFeatures(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
     @ColumnInfo(name = "graph_stat_id", index = true)
     val graphStatId: Long,
 
-    @ColumnInfo(name = "feature_id", index = true)
-    val featureId: Long,
-
-    @ColumnInfo(name = "from_value")
-    val fromValue: String,
-
-    @ColumnInfo(name = "to_value")
-    val toValue: String,
+    @Relation(parentColumn = "id", entityColumn = "line_graph_id", entity = LineGraphFeature::class)
+    val features: List<LineGraphFeature>,
 
     @ColumnInfo(name = "duration")
     val duration: Duration?,
 
-    @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<Int>
-)
+    @ColumnInfo(name = "y_range_type")
+    val yRangeType: YRangeType,
+
+    @ColumnInfo(name = "y_from")
+    val yFrom: Double,
+
+    @ColumnInfo(name = "y_to")
+    val yTo: Double
+) {
+    fun toLineGraph() = LineGraph(id, graphStatId, duration, yRangeType, yFrom, yTo)
+}

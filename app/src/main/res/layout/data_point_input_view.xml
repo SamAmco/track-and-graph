@@ -33,10 +33,10 @@
                 android:layout_width="0dp"
                 android:layout_height="1dp"
                 android:layout_gravity="center"
-                app:srcCompat="?attr/colorPrimary"
                 app:layout_constraintLeft_toLeftOf="@id/titleText"
                 app:layout_constraintRight_toRightOf="@id/titleText"
                 app:layout_constraintTop_toBottomOf="@id/titleText"
+                app:srcCompat="?attr/colorPrimary"
                 tools:ignore="ContentDescription" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -116,19 +116,23 @@
 
             <EditText
                 android:id="@+id/numberInput"
+                style="@style/Style.DataPointInputNumberStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:cursorVisible="true"
-                android:digits="0123456789.,-"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
-                android:gravity="center"
                 android:hint="1"
                 android:importantForAutofill="no"
-                android:inputType="numberDecimal|numberSigned"
-                android:singleLine="true"
                 tools:ignore="HardcodedText"
                 tools:text="33" />
+
+            <com.samco.trackandgraph.ui.DurationInputView
+                android:id="@+id/durationInput"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                />
 
             <HorizontalScrollView
                 android:id="@+id/buttonsScrollView"

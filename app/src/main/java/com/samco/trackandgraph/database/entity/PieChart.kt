@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,28 +14,40 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import org.threeten.bp.Duration
 
-@Entity(tableName = "graph_stat_groups_table")
-data class GraphStatGroup(
+@Entity(tableName = "pie_chart_table",
+    foreignKeys = [
+        ForeignKey(
+            entity = GraphOrStat::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("graph_stat_id"),
+            onDelete = ForeignKey.CASCADE),
+        ForeignKey(
+            entity = Feature::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("feature_id"),
+            onDelete = ForeignKey.CASCADE
+        )
+    ]
+)
+data class PieChart(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
-    @ColumnInfo(name = "name")
-    val name: String,
+    @ColumnInfo(name = "graph_stat_id", index = true)
+    val graphStatId: Long,
 
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int
-) {
-    companion object {
-        fun create(id: Long, name: String, displayIndex: Int): GraphStatGroup {
-            val validName = name.take(MAX_GROUP_NAME_LENGTH)
-            return GraphStatGroup(id, validName, displayIndex)
-        }
-    }
-}
+    @ColumnInfo(name = "feature_id", index = true)
+    val featureId: Long,
+
+    @ColumnInfo(name = "duration")
+    val duration: Duration?
+)

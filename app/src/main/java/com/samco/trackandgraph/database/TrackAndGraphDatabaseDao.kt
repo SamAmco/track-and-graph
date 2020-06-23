@@ -19,6 +19,8 @@ package com.samco.trackandgraph.database
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.samco.trackandgraph.database.dto.*
+import com.samco.trackandgraph.database.entity.*
 import org.threeten.bp.OffsetDateTime
 
 //TODO there is a lot of duplication in this file, you should extract all common queries (possibly all queries)
@@ -253,8 +255,8 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM graphs_and_stats_table WHERE id = :graphStatId LIMIT 1")
     fun tryGetGraphStatById(graphStatId: Long): GraphOrStat?
 
-    @Query("SELECT * FROM line_graphs_table WHERE graph_stat_id = :graphStatId LIMIT 1")
-    fun getLineGraphByGraphStatId(graphStatId: Long): LineGraph?
+    @Query("SELECT * FROM line_graphs_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
+    fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
 
     @Query("SELECT * FROM pie_chart_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getPieChartByGraphStatId(graphStatId: Long): PieChart?
@@ -301,6 +303,12 @@ interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM notes_table")
     fun getAllGlobalNotesSync(): List<GlobalNote>
+
+    @Query("DELETE FROM line_graph_features_table WHERE line_graph_id = :lineGraphId")
+    fun deleteFeaturesForLineGraph(lineGraphId: Long)
+
+    @Insert
+    fun insertLineGraphFeatures(lineGraphFeatures: List<LineGraphFeature>)
 
     @Insert
     fun insertLineGraph(lineGraph: LineGraph): Long

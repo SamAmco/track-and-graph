@@ -21,14 +21,12 @@ import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import com.samco.trackandgraph.database.DataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.any
 
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -173,7 +171,10 @@ class GraphStatViewDecoratorHelpers_sampleData_KtTest {
             //GIVEN
             val dataSource = mock<TrackAndGraphDatabaseDao>()
             val featureId = 0L
-            val lastDataPoint = DataPoint(OffsetDateTime.now().plusDays(10), 0, 0.0, "", "")
+            val lastDataPoint =
+                DataPoint(
+                    OffsetDateTime.now().plusDays(10), 0, 0.0, "", ""
+                )
             `when`(dataSource.getLastDataPointForFeatureSync(0)).thenReturn(listOf(lastDataPoint))
             val sampleDuration: Duration = Duration.ofDays(10)
             val endDate: OffsetDateTime = OffsetDateTime.now().minusDays(100)
@@ -218,7 +219,14 @@ class GraphStatViewDecoratorHelpers_sampleData_KtTest {
             val dataSource = mock<TrackAndGraphDatabaseDao>()
             val featureId = 0L
             val lastDataPointTime = OffsetDateTime.now().plusDays(10)
-            val lastDataPoint = DataPoint(lastDataPointTime, 0, 0.0, "", "")
+            val lastDataPoint =
+                DataPoint(
+                    lastDataPointTime,
+                    0,
+                    0.0,
+                    "",
+                    ""
+                )
             `when`(dataSource.getLastDataPointForFeatureSync(0)).thenReturn(listOf(lastDataPoint))
             val sampleDuration: Duration = Duration.ofDays(10)
             val endDate: OffsetDateTime? = null

@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,12 +14,15 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.database.MAX_GRAPH_STAT_NAME_LENGTH
+import com.samco.trackandgraph.database.splitChars1
+import com.samco.trackandgraph.database.splitChars2
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -67,7 +70,14 @@ data class GraphOrStat(
             val validName = name.take(MAX_GRAPH_STAT_NAME_LENGTH)
                 .replace(splitChars1, " ")
                 .replace(splitChars2, " ")
-            return GraphOrStat(id, graphStatGroupId, validName, type, displayIndex, endDate)
+            return GraphOrStat(
+                id,
+                graphStatGroupId,
+                validName,
+                type,
+                displayIndex,
+                endDate
+            )
         }
     }
 }

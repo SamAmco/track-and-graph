@@ -26,9 +26,12 @@ import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.*
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.util.formatDayMonth
 import com.samco.trackandgraph.util.formatMonthYear
+import com.samco.trackandgraph.util.formatTimeDuration
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
@@ -45,7 +48,7 @@ import kotlin.math.max
 
 class GraphStatLineGraphDecorator(
     private val graphOrStat: GraphOrStat,
-    private val lineGraph: LineGraph,
+    private val lineGraph: LineGraphWithFeatures,
     private val listViewMode: Boolean,
     private val onSampledDataCallback: SampleDataCallback?
 ) : IGraphStatViewDecorator {
@@ -99,6 +102,7 @@ class GraphStatLineGraphDecorator(
         binding!!.progressBar.visibility = View.VISIBLE
         if (tryDrawLineGraphFeatures()) {
             setUpLineGraphXAxis()
+            setUpLineGraphYAxis()
             setLineGraphBounds()
             yield()
             binding!!.lineGraph.redraw()
@@ -132,6 +136,24 @@ class GraphStatLineGraphDecorator(
         binding!!.lineGraph.graph.paddingLeft =
             (numDigits - 1) * (context!!.resources.displayMetrics.scaledDensity) * 3.5f
         binding!!.lineGraph.graph.refreshLayout()
+    }
+
+    private fun setUpLineGraphYAxis() {
+        if (lineGraph.features.any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }) {
+            binding!!.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
+                object : Format() {
+                    override fun format(
+                        obj: Any,
+                        toAppendTo: StringBuffer,
+                        pos: FieldPosition
+                    ): StringBuffer {
+                        val sec = (obj as Number).toLong()
+                        return toAppendTo.append(formatTimeDuration(sec))
+                    }
+
+                    override fun parseObject(source: String, pos: ParsePosition) = null
+                }
+        }
     }
 
     private fun setUpLineGraphXAxis() {

@@ -21,8 +21,8 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.GroupItem
-import com.samco.trackandgraph.database.GroupItemType
+import com.samco.trackandgraph.database.dto.GroupItem
+import com.samco.trackandgraph.database.dto.GroupItemType
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 
