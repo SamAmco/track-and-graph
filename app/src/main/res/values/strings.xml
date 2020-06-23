@@ -185,12 +185,13 @@
     <string name="faq_3">How does multiple choice data work?</string>
     <string name="faq_4">How do I start creating graphs?</string>
     <string name="faq_5">How are moving averages and plot totals calculated?</string>
+    <string name="faq_6">How do notes work?</string>
     <string name="faq">FAQ</string>
     <string name="faq_text_1_1">To begin tracking you will need to create at least one track group. Track groups allow you to separate out groups of things you might want to track at the same time. For example you may wish to create one group for your exercise routine and another for food types.</string>
     <string name="faq_text_1_2">Your track groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_1_3">Once you’ve created your track group select it and then click the + icon to set up something new to track.</string>
     <string name="faq_text_1_4">Type in the name of what you want to track and select an input style:</string>
-    <string name="faq_text_1_5">There are two styles of input you can choose: \n\n• Numerical will ask you to enter a number when tracking. \n\n• Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.\n\nIf you add a default value you will not be asked for a value every time you tap the + button and your default value will be used instead. However you can go back and change the value by editing the data point afterwards (as explained later).</string>
+    <string name="faq_text_1_5">There are three styles of input you can choose: \n\n• Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.\n\n• Numerical will ask you to enter a number when tracking.\n\n• Time duration will ask you to enter an amount of time in hours, minutes and seconds when tracking. \n\nIf you add a default value you will not be asked for a value every time you tap the + button and your default value will be used instead. However you can go back and change the value by editing the data point afterwards (as explained later).</string>
     <string name="faq_text_1_6">To create multiple choice answers click the + button at the bottom.</string>
     <string name="faq_text_1_8">When you are happy with the setup click the FINISH button.</string>
     <string name="faq_text_1_9">You should now see cards in your track group. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
@@ -206,7 +207,7 @@
     <string name="faq_text_4_3">Your graph groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_4_4">Once you’ve created your graph group select it and then click the + icon to set up a new graph or statistic.</string>
     <string name="faq_text_4_5">Begin by entering a name for your new graph and then select a graph type. Here we will demonstrate the line graph since other graph types are relatively trivial to set up. One caveat to note however is that you can only create pie charts from multiple choice data.</string>
-    <string name="faq_text_4_6">Now we will add some lines to our graph by using the + button at the bottom:</string>
+    <string name="faq_text_4_6">The Dynamic range style will automatically calculate the min and max value for the Y axis. Now we will add some lines to our graph by using the + button at the bottom:</string>
     <string name="faq_text_4_7">Because our wheat values are multiple choice answers ranging from 0–2 and our stomach pain values are numbers ranging from 1–8 we have multiplied our wheat values by 4 to make the ranges similar. We have used a three day moving average to smooth out anomalies and reduce noise in the output graph. We have also selected plot when tracked because this data was tracked relatively consistently. You can read more about how these settings affect line graphs in the FAQ: “How are moving averages and plot totals calculated?”</string>
     <string name="faq_text_4_8">Next we click the FINISH button to complete the setup. Notice how our new graph appears as a card in our graph group:</string>
     <string name="faq_text_4_9">To explore the graph in more detail you can tap the card to open it in a full screen view and then pinch and drag the lines:</string>
@@ -226,6 +227,11 @@
     <string name="faq_text_5_13">Notice a point is plotted at the end of each month representing the total of all tracked values in that month.</string>
     <string name="faq_text_5_14">You can use scale, offset, averaging and totals all at once. The order of precedence is as follows:</string>
     <string name="faq_text_5_15">• First your data is converted to totals\n• Then each point is converted to its moving average\n• Then your points are multiplied by the scale value\n• Finally the offset is added to each point</string>
+    <string name="faq_text_6_1">Notes allow you to keep track of qualitative data alongside your quantitative data. There are two types of notes:\n\n• Global notes (added directly in the notes menu)\n• Data point notes (attached to specific data points)\n\nWhen adding a data point you may wish to track an important piece of information specific to that data set. For example:</string>
+    <string name="faq_text_6_2">After adding this note you will notice it shows up in a list underneath any graph of that data set. If you tap the note it will open in a dialog window and a marker will be added to the graph.</string>
+    <string name="faq_text_6_3">However some pieces of information might be relevant to all your data. In this case you can add a global note by tapping the plus button in the global notes menu:</string>
+    <string name="faq_text_6_4">You will notice this note now shows up underneath all graphs.</string>
+    <string name="faq_text_6_5">You can edit or delete any note from the notes menu. Deleting a data point note from the notes menu will not delete the data point its self, just the attached note.</string>
     <string name="tutorial_text_1"><![CDATA[Everything in Track & Graph is organised into blue track groups and orange graph groups.]]></string>
     <string name="tutorial_text_2">Use track groups to quickly track lots of things at the same time.</string>
     <string name="tutorial_text_3">Use graph groups to investigate data from multiple track groups.</string>
@@ -312,5 +318,4 @@
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">You can not mix time durations with other types of data. Consider plotting hours, minutes or seconds</string>
     <string name="time_duration">Time duration</string>
     <string name="select_a_duration_range">Select a duration range</string>
-
 </resources>
