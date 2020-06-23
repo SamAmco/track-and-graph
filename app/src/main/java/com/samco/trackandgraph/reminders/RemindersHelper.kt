@@ -21,7 +21,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.samco.trackandgraph.database.Reminder
+import com.samco.trackandgraph.database.entity.Reminder
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

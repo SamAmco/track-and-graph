@@ -22,28 +22,34 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.DataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 
-class DataPointAdapter(private val clickListener: DataPointClickListener)
-    : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(DataPointDiffCallback()) {
+class DataPointAdapter(
+    private val clickListener: DataPointClickListener,
+    private val featureType: FeatureType
+) : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(DataPointDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, clickListener)
+        return ViewHolder.from(parent, clickListener, featureType)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
-    class ViewHolder private constructor(private val binding: ListItemDataPointBinding,
-                                         private val clickListener: DataPointClickListener)
-        : RecyclerView.ViewHolder(binding.root) {
+    class ViewHolder private constructor(
+        private val binding: ListItemDataPointBinding,
+        private val clickListener: DataPointClickListener,
+        private val featureType: FeatureType
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(dataPoint: DataPoint) {
-            binding.valueText.text = dataPoint.getDisplayValue()
-            binding.timestampText.text = formatDayMonthYearHourMinute(binding.timestampText.context, dataPoint.timestamp)
+            binding.valueText.text = DataPoint.getDisplayValue(dataPoint, featureType)
+            binding.timestampText.text =
+                formatDayMonthYearHourMinute(binding.timestampText.context, dataPoint.timestamp)
             binding.editButton.setOnClickListener { clickListener.editClicked(dataPoint) }
             binding.deleteButton.setOnClickListener { clickListener.deleteClicked(dataPoint) }
             if (dataPoint.note.isEmpty()) {
@@ -59,21 +65,31 @@ class DataPointAdapter(private val clickListener: DataPointClickListener)
         }
 
         companion object {
-            fun from(parent: ViewGroup, clickListener: DataPointClickListener): ViewHolder {
+            fun from(
+                parent: ViewGroup,
+                clickListener: DataPointClickListener,
+                featureType: FeatureType
+            ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemDataPointBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding, clickListener)
+                return ViewHolder(binding, clickListener, featureType)
             }
         }
     }
 }
+
 class DataPointDiffCallback : DiffUtil.ItemCallback<DataPoint>() {
-    override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem.timestamp == newItem.timestamp && oldItem.featureId == newItem.featureId
+    override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) =
+        oldItem.timestamp == newItem.timestamp && oldItem.featureId == newItem.featureId
+
     override fun areContentsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem == newItem
 }
-class DataPointClickListener(private val onEditDataPoint: (DataPoint) -> Unit,
-                             private val onDeleteDataPoint: (DataPoint) -> Unit,
-                             private val onViewDataPoint: (DataPoint) -> Unit) {
+
+class DataPointClickListener(
+    private val onEditDataPoint: (DataPoint) -> Unit,
+    private val onDeleteDataPoint: (DataPoint) -> Unit,
+    private val onViewDataPoint: (DataPoint) -> Unit
+) {
     fun editClicked(dataPoint: DataPoint) = onEditDataPoint(dataPoint)
     fun deleteClicked(dataPoint: DataPoint) = onDeleteDataPoint(dataPoint)
     fun viewClicked(dataPoint: DataPoint) = onViewDataPoint(dataPoint)

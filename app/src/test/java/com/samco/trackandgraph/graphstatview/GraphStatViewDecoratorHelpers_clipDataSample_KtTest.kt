@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview
 
-import com.samco.trackandgraph.database.DataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.Duration
@@ -307,6 +307,12 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
     }
 
     private fun makedp(value: Double, timestamp: OffsetDateTime): DataPoint {
-        return DataPoint(timestamp, 0L, value, "", "")
+        return DataPoint(
+            timestamp,
+            0L,
+            value,
+            "",
+            ""
+        )
     }
 }

@@ -30,8 +30,11 @@ import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
+import java.text.DecimalFormat
 
 class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
@@ -111,6 +114,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         binding.lineGraph.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
         binding.lineGraph.setDomainBoundaries(0, 1, BoundaryMode.GROW)
         binding.lineGraph.graph.refreshLayout()
+        binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format = DecimalFormat("0.0")
         binding.pieChart.clear()
         binding.progressBar.visibility = View.GONE
         binding.lineGraph.visibility = View.GONE
@@ -195,7 +199,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
 
     fun initFromLineGraph(
         graphOrStat: GraphOrStat,
-        lineGraph: LineGraph,
+        lineGraph: LineGraphWithFeatures,
         listViewMode: Boolean = false,
         onSampledDataCallback: SampleDataCallback? = null
     ) {

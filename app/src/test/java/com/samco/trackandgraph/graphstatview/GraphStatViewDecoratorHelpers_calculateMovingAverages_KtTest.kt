@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview
 
-import com.samco.trackandgraph.database.DataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -70,6 +70,12 @@ class GraphStatViewDecoratorHelpers_calculateMovingAverages_KtTest {
     }
 
     private fun makedp(value: Double, timestamp: OffsetDateTime): DataPoint {
-        return DataPoint(timestamp, 0L, value, "", "")
+        return DataPoint(
+            timestamp,
+            0L,
+            value,
+            "",
+            ""
+        )
     }
 }

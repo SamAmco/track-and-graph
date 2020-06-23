@@ -88,9 +88,15 @@
         <item>Light</item>
         <item>Dark</item>
     </string-array>
+    <string-array name="numeric_duration_conversion_modes">
+        <item>Number of hours</item>
+        <item>Number of minutes</item>
+        <item>Number of seconds</item>
+    </string-array>
     <string-array name="feature_types">
         <item>Multiple choice</item>
         <item>Numerical</item>
+        <item>Time duration</item>
     </string-array>
     <string-array name="graph_types">
         <item>Line Graph</item>
@@ -294,5 +300,17 @@
     <string name="duplicate">Duplicate</string>
     <string name="no_notes_hint_text">Notes added when tracking will show up here. You can also add global notes using the + button.</string>
     <string name="add_a_global_note">Add a global note:</string>
+    <string name="hours">Hours</string>
+    <string name="minutes">Minutes</string>
+    <string name="seconds">Seconds</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="default_value">Default value</string>
+    <string name="numeric_to_duration_mode_header">Previously tracked values represent:</string>
+    <string name="duration_to_numeric_mode_header">What should previously tracked values be converted to:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">You can not mix time durations with other types of data. Consider plotting hours, minutes or seconds</string>
+    <string name="time_duration">Time duration</string>
+    <string name="select_a_duration_range">Select a duration range</string>
 
 </resources>

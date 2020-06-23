@@ -19,7 +19,6 @@ package com.samco.trackandgraph.selectgroup
 import android.app.Activity
 import android.os.Bundle
 import android.view.*
-import androidx.core.content.ContextCompat.getColor
 import androidx.core.content.ContextCompat.getDrawable
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -32,6 +31,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.GroupItem
+import com.samco.trackandgraph.database.dto.GroupItemType
+import com.samco.trackandgraph.database.entity.GraphStatGroup
+import com.samco.trackandgraph.database.entity.TrackGroup
 import com.samco.trackandgraph.databinding.FragmentSelectGroupBinding
 import com.samco.trackandgraph.ui.RenameGroupDialogFragment
 import com.samco.trackandgraph.ui.YesCancelDialogFragment

@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview
 
 import android.view.View
-import com.samco.trackandgraph.database.GraphOrStat
+import com.samco.trackandgraph.database.entity.GraphOrStat
 import org.threeten.bp.OffsetDateTime
 
 class GraphStatErrorDecorator(

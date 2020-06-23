@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,40 +14,37 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.database
+package com.samco.trackandgraph.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import org.threeten.bp.Duration
+import com.samco.trackandgraph.database.MAX_GROUP_NAME_LENGTH
+import com.samco.trackandgraph.database.splitChars1
+import com.samco.trackandgraph.database.splitChars2
 
-@Entity(tableName = "pie_chart_table",
-    foreignKeys = [
-        ForeignKey(
-            entity = GraphOrStat::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("graph_stat_id"),
-            onDelete = ForeignKey.CASCADE),
-        ForeignKey(
-            entity = Feature::class,
-            parentColumns = arrayOf("id"),
-            childColumns = arrayOf("feature_id"),
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
-data class PieChart(
+@Entity(tableName = "track_groups_table")
+data class TrackGroup(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
-    @ColumnInfo(name = "graph_stat_id", index = true)
-    val graphStatId: Long,
+    @ColumnInfo(name = "name")
+    val name: String,
 
-    @ColumnInfo(name = "feature_id", index = true)
-    val featureId: Long,
-
-    @ColumnInfo(name = "duration")
-    val duration: Duration?
-)
+    @ColumnInfo(name = "display_index")
+    val displayIndex: Int
+) {
+    companion object {
+        fun create(id: Long, name: String, displayIndex: Int): TrackGroup {
+            val validName = name.take(MAX_GROUP_NAME_LENGTH)
+                .replace(splitChars1, " ")
+                .replace(splitChars2, " ")
+            return TrackGroup(
+                id,
+                validName,
+                displayIndex
+            )
+        }
+    }
+}

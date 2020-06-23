@@ -26,6 +26,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -91,11 +93,13 @@ class TrackWidgetInputDataPointViewModel : ViewModel() {
 
     fun addDefaultDataPoint() = feature.value?.let {
         ioScope.launch {
-            val label =
-                if (it.featureType == FeatureType.DISCRETE)
-                    it.discreteValues.first { dv -> dv.index == it.defaultValue.toInt() }.label
-                else ""
-            val newDataPoint = DataPoint(OffsetDateTime.now(), it.id, it.defaultValue, label, "")
+            val newDataPoint = DataPoint(
+                OffsetDateTime.now(),
+                it.id,
+                it.defaultValue,
+                it.getDefaultLabel(),
+                ""
+            )
             dataSource!!.insertDataPoint(newDataPoint)
         }
     }

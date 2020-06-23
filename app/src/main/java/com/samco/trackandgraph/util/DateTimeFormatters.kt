@@ -22,7 +22,6 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
 
-
 enum class DateFormatSetting { DMY, MDY, YMD }
 
 private fun getDateTimePref(context: Context): DateFormatSetting {
@@ -69,4 +68,9 @@ fun formatMonthYear(context: Context, temporal: Temporal): String {
         DateFormatSetting.YMD -> "yy/MM"
     }
     return formatDate(format, temporal)
+}
+
+fun formatTimeDuration(seconds: Long): String {
+    val absSecs = kotlin.math.abs(seconds)
+    return String.format("%d:%02d:%02d", seconds / 3600, (absSecs % 3600) / 60, (absSecs % 60))
 }

@@ -34,6 +34,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.CheckedDays
+import com.samco.trackandgraph.database.entity.Reminder
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
 import com.samco.trackandgraph.reminders.RemindersHelper.Companion.createAlarms
 import com.samco.trackandgraph.reminders.RemindersHelper.Companion.deleteAlarms
@@ -193,7 +195,13 @@ class RemindersViewModel : ViewModel() {
 
     fun addReminder(defaultName: String) = ioScope.launch {
         dataSource?.insertReminder(
-            Reminder(0, 0, defaultName, LocalTime.now(), CheckedDays.none())
+            Reminder(
+                0,
+                0,
+                defaultName,
+                LocalTime.now(),
+                CheckedDays.none()
+            )
         )
     }
 

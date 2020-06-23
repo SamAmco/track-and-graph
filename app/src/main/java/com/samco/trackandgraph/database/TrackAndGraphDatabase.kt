@@ -19,10 +19,11 @@ package com.samco.trackandgraph.database
 import android.content.Context
 import androidx.room.*
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.dto.*
+import com.samco.trackandgraph.database.entity.*
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import java.text.DecimalFormat
 
@@ -31,8 +32,6 @@ const val MAX_LABEL_LENGTH = 30
 const val MAX_DISCRETE_VALUES_PER_FEATURE = 10
 const val MAX_GRAPH_STAT_NAME_LENGTH = 100
 const val MAX_GROUP_NAME_LENGTH = 40
-const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
-const val MAX_LINE_GRAPH_FEATURES = 10
 
 val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 val doubleFormatter = DecimalFormat("#.##################")
@@ -60,8 +59,8 @@ const val splitChars2 = "!!"
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
-        TimeSinceLastStat::class, Reminder::class, GlobalNote::class],
-    version = 39
+        TimeSinceLastStat::class, Reminder::class, GlobalNote::class, LineGraphFeature::class],
+    version = 40
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -123,42 +122,6 @@ class Converters {
         value?.let { stringFromOdt(it) } ?: ""
 
     @TypeConverter
-    fun lineGraphFeaturesToString(value: List<LineGraphFeature>): String {
-        return value.joinToString(splitChars1) { v ->
-            listOf(
-                "${v.featureId}",
-                v.name,
-                "${v.colorIndex}",
-                "${v.averagingMode.ordinal}",
-                "${v.plottingMode.ordinal}",
-                "${v.pointStyle.ordinal}",
-                "${v.offset}",
-                "${v.scale}"
-            ).joinToString(splitChars2) { i ->
-                i.replace(splitChars1, "")
-                    .replace(splitChars2, "")
-            }
-        }
-    }
-
-    @TypeConverter
-    fun stringToLineGraphFeatures(value: String): List<LineGraphFeature> {
-        return value.split(splitChars1).map {
-            val strs = it.split(splitChars2)
-            LineGraphFeature(
-                strs[0].toLong(),
-                strs[1],
-                strs[2].toInt(),
-                LineGraphAveraginModes.values()[strs[3].toInt()],
-                LineGraphPlottingModes.values()[strs[4].toInt()],
-                LineGraphPointStyle.values()[strs[5].toInt()],
-                strs[6].toDouble(),
-                strs[7].toDouble()
-            )
-        }
-    }
-
-    @TypeConverter
     fun durationToString(value: Duration?): String = value?.let { value.toString() } ?: ""
 
     @TypeConverter
@@ -203,8 +166,31 @@ class Converters {
     fun stringToListOfInts(intsString: String) = intsString.split(splitChars1).mapNotNull {
         it.toIntOrNull()
     }
-}
 
+    @TypeConverter
+    fun averagingModeToInt(averaginMode: LineGraphAveraginModes) = averaginMode.ordinal
+
+    @TypeConverter
+    fun intToAveragingMode(index: Int) = LineGraphAveraginModes.values()[index]
+
+    @TypeConverter
+    fun lineGraphPlottingModeToInt(lineGraphPlottingMode: LineGraphPlottingModes) = lineGraphPlottingMode.ordinal
+
+    @TypeConverter
+    fun intToLineGraphPlottingMode(index: Int) = LineGraphPlottingModes.values()[index]
+
+    @TypeConverter
+    fun lineGraphPointStyleToInt(lineGraphPointStyle: LineGraphPointStyle) = lineGraphPointStyle.ordinal
+
+    @TypeConverter
+    fun intToLineGraphPointStyle(index: Int) = LineGraphPointStyle.values()[index]
+
+    @TypeConverter
+    fun durationPlottingModeToInt(durationPlottingMode: DurationPlottingMode) = durationPlottingMode.ordinal
+
+    @TypeConverter
+    fun intToDurationPlottingMode(index: Int) = DurationPlottingMode.values()[index]
+}
 
 fun odtFromString(value: String): OffsetDateTime? =
     if (value.isEmpty()) null

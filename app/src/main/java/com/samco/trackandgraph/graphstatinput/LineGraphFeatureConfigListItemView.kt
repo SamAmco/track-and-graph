@@ -17,8 +17,8 @@
 package com.samco.trackandgraph.graphstatinput
 
 import android.content.Context
+
 import android.text.InputFilter
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -30,6 +30,8 @@ import androidx.core.content.ContextCompat.getColor
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.*
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
 import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
@@ -37,13 +39,14 @@ import java.text.DecimalFormat
 class LineGraphFeatureConfigListItemView(
     context: Context,
     private val features: List<FeatureAndTrackGroup>,
-    private val lineGraphFeature: LineGraphFeature
+    private val lineGraphFeature: LineGraphFeatureConfig
 ) : LinearLayout(context) {
     private val binding =
         ListItemLineGraphFeatureBinding.inflate(LayoutInflater.from(context), this, true)
     private var onRemoveListener: ((LineGraphFeatureConfigListItemView) -> Unit)? = null
     private var onUpdatedListener: ((LineGraphFeatureConfigListItemView) -> Unit)? = null
     private val decimalFormat = DecimalFormat("0.###############")
+    private var pointStyleSpinnerAdapter: PointStyleSpinnerAdapter? = null
 
     init {
         setupFeatureSpinner()
@@ -84,14 +87,19 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupPointStyleSpinner(context: Context) {
-        binding.pointStyleSpinner.adapter =
-            PointStyleSpinnerAdapter(context, pointStyleDrawableResources)
+        val pointStyleImages = mapOf(
+            LineGraphPointStyle.NONE to pointStyleDrawableResources[0],
+            LineGraphPointStyle.CIRCLES to pointStyleDrawableResources[1],
+            LineGraphPointStyle.CIRCLES_AND_NUMBERS to pointStyleDrawableResources[2]
+        )
+        pointStyleSpinnerAdapter = PointStyleSpinnerAdapter(context, pointStyleImages)
+        binding.pointStyleSpinner.adapter = pointStyleSpinnerAdapter
         binding.pointStyleSpinner.setSelection(lineGraphFeature.pointStyle.ordinal)
         binding.pointStyleSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                    lineGraphFeature.pointStyle = LineGraphPointStyle.values()[index]
+                    lineGraphFeature.pointStyle = pointStyleImages.keys.elementAt(index)
                     onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
                 }
             }
@@ -151,12 +159,13 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupFeatureSpinner() {
-        val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
+        val items = features.flatMap { getSpinnerItemsForFeature(it) }
+        val itemNames = items.map { it.third }
         val adapter =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.featureSpinner.adapter = adapter
         var featureSpinnerStartIndex =
-            features.indexOfFirst { f -> f.id == lineGraphFeature.featureId }
+            items.indexOfFirst { it.first.id == lineGraphFeature.featureId && it.second == lineGraphFeature.durationPlottingMode }
         if (featureSpinnerStartIndex == -1) featureSpinnerStartIndex = 0
         binding.featureSpinner.setSelection(featureSpinnerStartIndex)
         binding.featureSpinner.onItemSelectedListener =
@@ -166,12 +175,43 @@ class LineGraphFeatureConfigListItemView(
                     onFeatureChangeNameUpdate(
                         lineGraphFeature.featureId,
                         lineGraphFeature.name,
-                        features[index].name
+                        items[index].first.name
                     )
-                    lineGraphFeature.featureId = features[index].id
+                    lineGraphFeature.featureId = items[index].first.id
+                    lineGraphFeature.durationPlottingMode = items[index].second
+                    adjustPointStyleSpinnerForFeature()
                     onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
                 }
             }
+    }
+
+    private fun adjustPointStyleSpinnerForFeature() {
+        if (lineGraphFeature.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE) {
+            pointStyleSpinnerAdapter?.disableNumbers()
+            val selected = binding.pointStyleSpinner.selectedItemPosition
+            if (pointStyleSpinnerAdapter?.isEnabled(selected) == false) {
+                binding.pointStyleSpinner.setSelection(selected - 1)
+            }
+        } else {
+            pointStyleSpinnerAdapter?.enableNumbers()
+        }
+    }
+
+    private fun getSpinnerItemsForFeature(feature: FeatureAndTrackGroup)
+            : List<Triple<FeatureAndTrackGroup, DurationPlottingMode, String>> {
+        val name = "${feature.trackGroupName} -> ${feature.name}"
+        return if (feature.featureType == FeatureType.DURATION) {
+            val time = context.getString(R.string.time_duration)
+            val hours = context.getString(R.string.hours)
+            val minutes = context.getString(R.string.minutes)
+            val seconds = context.getString(R.string.seconds)
+            listOf(
+                Triple(feature, DurationPlottingMode.DURATION_IF_POSSIBLE, "$name ($time)"),
+                Triple(feature, DurationPlottingMode.HOURS, "$name ($hours)"),
+                Triple(feature, DurationPlottingMode.MINUTES, "$name ($minutes)"),
+                Triple(feature, DurationPlottingMode.SECONDS, "$name ($seconds)")
+            )
+        } else listOf(Triple(feature, DurationPlottingMode.NONE, name))
     }
 
     private fun onFeatureChangeNameUpdate(
@@ -214,20 +254,87 @@ class LineGraphFeatureConfigListItemView(
         }
     }
 
-    private class PointStyleSpinnerAdapter(context: Context, val imageIds: List<Int>) :
+    private class PointStyleSpinnerAdapter(
+        context: Context,
+        val pointStyleImages: Map<LineGraphPointStyle, Int>
+    ) :
         ArrayAdapter<Int>(context, R.layout.circular_spinner_item) {
+
+        var enabledStyles = pointStyleImages.keys
+        var imageIds = pointStyleImages.values
 
         override fun getCount(): Int = imageIds.size
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
             val view = convertView ?: LayoutInflater.from(context)
                 .inflate(R.layout.circular_spinner_item, parent, false)
-            view.findViewById<ImageView>(R.id.image).setImageResource(imageIds[position])
+            view.findViewById<ImageView>(R.id.image).setImageResource(imageIds.elementAt(position))
             return view
         }
 
         override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-            return getView(position, convertView, parent)
+            val view = getView(position, convertView, parent)
+            if (!isEnabled(position)) view.alpha = 0.5f
+            else view.alpha = 1.0f
+            return view
         }
+
+        override fun isEnabled(position: Int): Boolean {
+            return enabledStyles.contains(pointStyleImages.keys.elementAt(position))
+        }
+
+        fun disableNumbers() {
+            enabledStyles = pointStyleImages
+                .filter { kvp -> kvp.key != LineGraphPointStyle.CIRCLES_AND_NUMBERS }
+                .keys
+        }
+
+        fun enableNumbers() {
+            enabledStyles = pointStyleImages.keys
+        }
+    }
+}
+
+data class LineGraphFeatureConfig(
+    var featureId: Long,
+    var name: String,
+    var colorIndex: Int,
+    var averagingMode: LineGraphAveraginModes,
+    var plottingMode: LineGraphPlottingModes,
+    var pointStyle: LineGraphPointStyle,
+    var offset: Double,
+    var scale: Double,
+    var durationPlottingMode: DurationPlottingMode
+) {
+    companion object {
+        fun fromLineGraphFeature(lgf: LineGraphFeature) = LineGraphFeatureConfig(
+            lgf.featureId,
+            lgf.name,
+            lgf.colorIndex,
+            lgf.averagingMode,
+            lgf.plottingMode,
+            lgf.pointStyle,
+            lgf.offset,
+            lgf.scale,
+            lgf.durationPlottingMode
+        )
+
+        fun toLineGraphFeature(
+            lgfc: LineGraphFeatureConfig,
+            id: Long = 0L,
+            lineGraphId: Long = 0L
+        ) = LineGraphFeature(
+            id,
+            lineGraphId,
+            lgfc.featureId,
+            lgfc.name,
+            lgfc.colorIndex,
+            lgfc.averagingMode,
+            lgfc.plottingMode,
+            lgfc.pointStyle,
+            lgfc.offset,
+            lgfc.scale,
+            lgfc.durationPlottingMode
+        )
     }
 }

@@ -18,7 +18,7 @@ package com.samco.trackandgraph.displaytrackgroup
 
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.Feature
+import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.ui.NameInputDialogFragment
 
 class RenameFeatureDialogFragment : NameInputDialogFragment() {

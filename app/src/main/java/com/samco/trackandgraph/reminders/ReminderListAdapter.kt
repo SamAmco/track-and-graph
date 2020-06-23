@@ -24,8 +24,8 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.CheckedDays
-import com.samco.trackandgraph.database.Reminder
+import com.samco.trackandgraph.database.entity.CheckedDays
+import com.samco.trackandgraph.database.entity.Reminder
 import com.samco.trackandgraph.databinding.ListItemReminderBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 import org.threeten.bp.LocalTime

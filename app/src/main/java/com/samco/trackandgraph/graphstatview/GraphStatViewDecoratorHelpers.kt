@@ -23,6 +23,10 @@ import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.DurationPlottingMode
+import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.database.entity.LineGraphFeature
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
@@ -131,7 +135,15 @@ internal suspend fun calculateDurationAccumulatedValues(
             .takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
         val total = points.sumByDouble { dp -> dp.value }
         index += points.size
-        newData.add(DataPoint(currentTimeStamp, featureId, total, "", ""))
+        newData.add(
+            DataPoint(
+                currentTimeStamp,
+                featureId,
+                total,
+                "",
+                ""
+            )
+        )
         yield()
     }
     return DataSample(newData)
@@ -282,7 +294,14 @@ internal fun getXYSeriesFromDataSample(
 ): FastXYSeries {
     val scale = lineGraphFeature.scale
     val offset = lineGraphFeature.offset
-    val yValues = dataSample.dataPoints.map { dp -> (dp.value * scale) + offset }
+    val durationDivisor = when (lineGraphFeature.durationPlottingMode) {
+        DurationPlottingMode.HOURS -> 3600.0
+        DurationPlottingMode.MINUTES -> 60.0
+        else -> 1.0
+    }
+    val yValues = dataSample.dataPoints.map { dp ->
+        (dp.value * scale / durationDivisor) + offset
+    }
     val xValues =
         dataSample.dataPoints.map { dp -> Duration.between(endTime, dp.timestamp).toMillis() }
 

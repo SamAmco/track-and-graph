@@ -34,6 +34,10 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.DisplayFeature
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.widgets.TrackWidgetProvider
@@ -289,7 +293,13 @@ class DisplayTrackGroupViewModel : ViewModel() {
         val label = if (feature.featureType == FeatureType.DISCRETE) {
             feature.discreteValues[feature.defaultValue.toInt()].label
         } else ""
-        val newDataPoint = DataPoint(OffsetDateTime.now(), feature.id, feature.defaultValue, label, "")
+        val newDataPoint = DataPoint(
+            OffsetDateTime.now(),
+            feature.id,
+            feature.defaultValue,
+            label,
+            ""
+        )
         dataSource?.insertDataPoint(newDataPoint)
     }
 
