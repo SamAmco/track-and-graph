@@ -1,0 +1,11 @@
+- Added time duration input option
+
+- Graphs can have end times
+
+- Added duplicate graph button
+
+- Notes show markers on line graphs
+
+- Added global notes menu
+
+- Various minor bug fixes
