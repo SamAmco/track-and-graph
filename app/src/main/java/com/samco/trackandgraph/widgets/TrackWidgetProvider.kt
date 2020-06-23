@@ -25,6 +25,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.os.Build
+import android.view.View
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.R
@@ -79,7 +80,7 @@ class TrackWidgetProvider : AppWidgetProvider() {
                 }
             }
 
-            setWidgetDrawable(context, disable, requireInput, remoteViews)
+            setWidgetDrawable(disable, requireInput, remoteViews)
 
             return remoteViews
         }
@@ -105,32 +106,25 @@ class TrackWidgetProvider : AppWidgetProvider() {
          * Pre-Lollipop, construct a bitmap for the drawable.
          */
         private fun setWidgetDrawable(
-            context: Context,
             disable: Boolean,
             requireInput: Boolean?,
             remoteViews: RemoteViews
         ) {
-            val drawable = when {
-                disable -> R.drawable.warning_icon
-                requireInput == false -> R.drawable.add_box_tint
-                else -> R.drawable.add_box
-            }
-
-            // Vector graphics in appwidgets need to be programmatically added.
-            // Pre-Lollipop, these vectors need to be converted to a bitmap first.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                remoteViews.setImageViewResource(R.id.track_widget_icon, drawable)
-            } else {
-                ContextCompat.getDrawable(context, drawable)?.let { drawable ->
-                    val bitmap = Bitmap.createBitmap(
-                        drawable.intrinsicWidth,
-                        drawable.intrinsicHeight,
-                        Bitmap.Config.ARGB_8888
-                    )
-                    val canvas = Canvas(bitmap)
-                    drawable.setBounds(0, 0, canvas.width, canvas.height)
-                    drawable.draw(canvas)
-                    remoteViews.setImageViewBitmap(R.id.track_widget_icon, bitmap)
+            when {
+                disable -> {
+                    remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.VISIBLE)
+                    remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.INVISIBLE)
+                    remoteViews.setViewVisibility(R.id.track_widget_icon, View.INVISIBLE)
+                }
+                requireInput == false -> {
+                    remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.INVISIBLE)
+                    remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.VISIBLE)
+                    remoteViews.setViewVisibility(R.id.track_widget_icon, View.INVISIBLE)
+                }
+                else -> {
+                    remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.INVISIBLE)
+                    remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.INVISIBLE)
+                    remoteViews.setViewVisibility(R.id.track_widget_icon, View.VISIBLE)
                 }
             }
         }
