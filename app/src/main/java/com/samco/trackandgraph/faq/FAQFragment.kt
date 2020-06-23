@@ -33,6 +33,7 @@ class FAQFragment : Fragment() {
         binding.faq3.setOnClickListener { navController?.navigate(FAQFragmentDirections.actionFaq3()) }
         binding.faq4.setOnClickListener { navController?.navigate(FAQFragmentDirections.actionFaq4()) }
         binding.faq5.setOnClickListener { navController?.navigate(FAQFragmentDirections.actionFaq5()) }
+        binding.faq6.setOnClickListener { navController?.navigate(FAQFragmentDirections.actionFaq6()) }
         return binding.root
     }
 }
