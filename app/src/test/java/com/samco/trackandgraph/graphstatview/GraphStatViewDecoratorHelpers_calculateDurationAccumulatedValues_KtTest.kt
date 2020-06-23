@@ -343,7 +343,7 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             )
 
             //THEN we should go back to the beginning of endTime-sampleDuration
-            assertEquals(10, answer.dataPoints.size)
+            assertEquals(9, answer.dataPoints.size)
             val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
             assertEquals(plotTotals, answerTotals.takeLast(3))
         }
