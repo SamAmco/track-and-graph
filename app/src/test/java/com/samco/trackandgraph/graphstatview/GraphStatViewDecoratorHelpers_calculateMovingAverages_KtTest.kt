@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.graphstatview
 
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.graphstatview.decorators.DataSample
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -45,7 +46,13 @@ class GraphStatViewDecoratorHelpers_calculateMovingAverages_KtTest {
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
-            val answer = calculateMovingAverages(DataSample(dataPoints), averagingDuration)
+            val answer =
+                com.samco.trackandgraph.graphstatview.decorators.calculateMovingAverages(
+                    DataSample(
+                        dataPoints
+                    ),
+                    averagingDuration
+                )
 
             //THEN
             val expected = listOf(5.0, 0.0, 2.0, 2.0, 1.5, 2.0, 8.0, 7.5, 5.0)
@@ -62,7 +69,13 @@ class GraphStatViewDecoratorHelpers_calculateMovingAverages_KtTest {
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
-            val answer = calculateMovingAverages(DataSample(dataPoints), averagingDuration)
+            val answer =
+                com.samco.trackandgraph.graphstatview.decorators.calculateMovingAverages(
+                    DataSample(
+                        dataPoints
+                    ),
+                    averagingDuration
+                )
 
             //THEN
             assertEquals(0, answer.dataPoints.size)

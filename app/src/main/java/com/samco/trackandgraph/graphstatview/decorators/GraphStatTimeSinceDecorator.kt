@@ -15,83 +15,50 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.graphstatview.decorators
 
 import android.content.Context
 import android.view.View
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.database.entity.TimeSinceLastStat
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
-import kotlinx.coroutines.Dispatchers
+import com.samco.trackandgraph.graphstatview.*
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-class GraphStatTimeSinceDecorator(
-    private val graphOrStat: GraphOrStat,
-    private val timeSinceLastStat: TimeSinceLastStat,
-    private val onSampledDataCallback: SampleDataCallback?
-) : IGraphStatViewDecorator {
+class GraphStatTimeSinceDecorator : IGraphStatViewDecorator<ITimeSinceViewData> {
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
-    private var dataSource: TrackAndGraphDatabaseDao? = null
+    private var data: ITimeSinceViewData? = null
 
-    override suspend fun decorate(view: IDecoratableGraphStatView) {
+    override suspend fun decorate(view: IDecoratableGraphStatView, data: ITimeSinceViewData) {
         binding = view.getBinding()
         context = view.getContext()
-        dataSource = view.getDataSource()
+        this.data = data
 
         binding!!.statMessage.visibility = View.INVISIBLE
-        initHeader(binding, graphOrStat)
         initTimeSinceStatBody()
     }
 
-    override fun setTimeMarker(time: OffsetDateTime) { }
+    override fun setTimeMarker(time: OffsetDateTime) {}
 
     private suspend fun initTimeSinceStatBody() {
         binding!!.progressBar.visibility = View.VISIBLE
-        val lastDataPoint = withContext(Dispatchers.IO) { getLastDataPoint() }
         binding!!.statMessage.visibility = View.VISIBLE
         binding!!.progressBar.visibility = View.GONE
-        if (lastDataPoint == null) {
-            onSampledDataCallback?.invoke(emptyList())
+        val dataPoint = data!!.lastDataPoint
+        if (dataPoint == null) {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
         } else while (true) {
-            onSampledDataCallback?.invoke(listOf(lastDataPoint))
             setTimeSinceStatText(
                 Duration.between(
-                    lastDataPoint.timestamp,
-                    graphOrStat.endDate ?: OffsetDateTime.now()
+                    dataPoint.timestamp,
+                    data!!.endDate ?: OffsetDateTime.now()
                 )
             )
             delay(1000)
-        }
-    }
-
-    private fun getLastDataPoint(): DataPoint? {
-        val feature = dataSource!!.getFeatureById(timeSinceLastStat.featureId)
-        val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
-        return when (feature.featureType) {
-            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
-                dataSource!!.getLastDataPointBetween(
-                    timeSinceLastStat.featureId,
-                    timeSinceLastStat.fromValue,
-                    timeSinceLastStat.toValue,
-                    endDate
-                )
-            }
-            else -> {
-                dataSource!!.getLastDataPointWithValue(
-                    timeSinceLastStat.featureId,
-                    timeSinceLastStat.discreteValues,
-                    endDate
-                )
-            }
         }
     }
 

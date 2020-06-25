@@ -18,6 +18,8 @@
 package com.samco.trackandgraph.graphstatview
 
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.graphstatview.decorators.DataSample
+import com.samco.trackandgraph.graphstatview.decorators.calculateDurationAccumulatedValues
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -37,10 +39,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime = Duration.ofHours(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(rawData, 0L, null, null, plotTotalTime)
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -57,10 +69,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(rawData, 0L, null, null, plotTotalTime)
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -78,11 +100,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Duration.ofHours(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
             val answer =
-                calculateDurationAccumulatedValues(rawData, 0L, sampleDuration, null, plotTotalTime)
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    sampleDuration,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -98,11 +129,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofHours(3)
             val plotTotalTime: TemporalAmount = Duration.ofHours(1)
             val dataPoints = emptyList<DataPoint>()
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
             val answer =
-                calculateDurationAccumulatedValues(rawData, 0L, sampleDuration, null, plotTotalTime)
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    sampleDuration,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -120,11 +160,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Duration.ofHours(3)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
             val answer =
-                calculateDurationAccumulatedValues(rawData, 0L, sampleDuration, null, plotTotalTime)
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    sampleDuration,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -140,11 +189,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofHours(1)
             val plotTotalTime: TemporalAmount = Period.ofDays(1)
             val dataPoints = emptyList<DataPoint>()
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
             val answer =
-                calculateDurationAccumulatedValues(rawData, 0L, sampleDuration, null, plotTotalTime)
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    sampleDuration,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(1, answer.dataPoints.size)
@@ -166,11 +224,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofYears(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
             val answer =
-                calculateDurationAccumulatedValues(rawData, 0L, null, null, plotTotalTime)
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -185,11 +252,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             //GIVEN
             val plotTotalTime: TemporalAmount = Period.ofYears(1)
             val dataPoints = emptyList<DataPoint>()
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
             val answer =
-                calculateDurationAccumulatedValues(rawData, 0L, null, null, plotTotalTime)
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(1, answer.dataPoints.size)
@@ -209,11 +285,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
             val answer =
-                calculateDurationAccumulatedValues(rawData, 0L, null, endTime, plotTotalTime)
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    endTime,
+                    plotTotalTime
+                )
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -237,7 +322,10 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
             val answer =
@@ -268,7 +356,10 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
             val sampleDuration = Duration.ofDays(7 * 4)
 
             //WHEN
@@ -300,16 +391,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(
-                rawData,
-                0L,
-                null,
-                OffsetDateTime.now(),
-                plotTotalTime
-            )
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    OffsetDateTime.now(),
+                    plotTotalTime
+                )
 
             //THEN
             // (the clipping isn't done by this algorithm it totals everything passed
@@ -330,17 +425,21 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
             val sampleDuration = Duration.ofDays(7 * 4)
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(
-                rawData,
-                0L,
-                sampleDuration,
-                OffsetDateTime.now(),
-                plotTotalTime
-            )
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    sampleDuration,
+                    OffsetDateTime.now(),
+                    plotTotalTime
+                )
 
             //THEN we should go back to the beginning of endTime-sampleDuration
             assertEquals(9, answer.dataPoints.size)
@@ -358,16 +457,20 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7, 6, 4, 2, 4, 2, 3, 1, 9)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample(dataPoints)
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(
-                rawData,
-                0L,
-                null,
-                null,
-                plotTotalTime
-            )
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    null,
+                    plotTotalTime
+                )
 
             //THEN we should go back to the beginning of endTime-sampleDuration
             val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()

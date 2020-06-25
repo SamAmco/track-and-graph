@@ -18,6 +18,8 @@
 package com.samco.trackandgraph.graphstatview
 
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.graphstatview.decorators.DataSample
+import com.samco.trackandgraph.graphstatview.decorators.clipDataSample
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.Duration
@@ -27,7 +29,14 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
     @Test
     fun clipDataSample_empty_sample() {
         //WHEN
-        val answer = clipDataSample(DataSample(listOf()), null, null)
+        val answer =
+            clipDataSample(
+                DataSample(
+                    listOf()
+                ),
+                null,
+                null
+            )
 
         //THEN
         assertEquals(0, answer.dataPoints.size)
@@ -48,10 +57,18 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
 
         //WHEN
-        val answer = clipDataSample(dataSample, null, null)
+        val answer =
+            clipDataSample(
+                dataSample,
+                null,
+                null
+            )
 
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
@@ -72,11 +89,19 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
         val sampleDuration = Duration.ofHours(30)
 
         //WHEN
-        val answer = clipDataSample(dataSample, null, sampleDuration)
+        val answer =
+            clipDataSample(
+                dataSample,
+                null,
+                sampleDuration
+            )
 
         //THEN
         assertEquals(dataPoints.takeLast(3), answer.dataPoints)
@@ -97,11 +122,19 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
         val sampleDuration = Duration.ofHours(100)
 
         //WHEN
-        val answer = clipDataSample(dataSample, null, sampleDuration)
+        val answer =
+            clipDataSample(
+                dataSample,
+                null,
+                sampleDuration
+            )
 
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
@@ -122,11 +155,19 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
         val sampleDuration = Duration.ofHours(1)
 
         //WHEN
-        val answer = clipDataSample(dataSample, null, sampleDuration)
+        val answer =
+            clipDataSample(
+                dataSample,
+                null,
+                sampleDuration
+            )
 
         //THEN
         assertEquals(dataPoints.takeLast(1), answer.dataPoints)
@@ -147,11 +188,19 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, future.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
         val sampleDuration = Duration.ofHours(35)
 
         //WHEN
-        val answer = clipDataSample(dataSample, null, sampleDuration)
+        val answer =
+            clipDataSample(
+                dataSample,
+                null,
+                sampleDuration
+            )
 
         //THEN
         assertEquals(dataPoints.takeLast(5), answer.dataPoints)
@@ -172,11 +221,19 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
         val endTime = now.minusDays(20)
 
         //WHEN
-        val answer = clipDataSample(dataSample, endTime, null)
+        val answer =
+            clipDataSample(
+                dataSample,
+                endTime,
+                null
+            )
 
         //THEN
         assertEquals(dataPoints.take(8), answer.dataPoints)
@@ -197,10 +254,18 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, future.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
 
         //WHEN
-        val answer = clipDataSample(dataSample, OffsetDateTime.now(), null)
+        val answer =
+            clipDataSample(
+                dataSample,
+                OffsetDateTime.now(),
+                null
+            )
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)
@@ -221,10 +286,18 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
 
         //WHEN
-        val answer = clipDataSample(dataSample, now, null)
+        val answer =
+            clipDataSample(
+                dataSample,
+                now,
+                null
+            )
 
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
@@ -246,11 +319,19 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, future.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
         val sampleDuration = Duration.ofDays(30)
 
         //WHEN
-        val answer = clipDataSample(dataSample, now, sampleDuration)
+        val answer =
+            clipDataSample(
+                dataSample,
+                now,
+                sampleDuration
+            )
 
         //THEN
         assertEquals(dataPoints.drop(1).take(6), answer.dataPoints)
@@ -271,11 +352,19 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
         val sampleDuration = Duration.ofDays(3)
 
         //WHEN
-        val answer = clipDataSample(dataSample, now, sampleDuration)
+        val answer =
+            clipDataSample(
+                dataSample,
+                now,
+                sampleDuration
+            )
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)
@@ -296,11 +385,19 @@ class GraphStatViewDecoratorHelpers_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.plusMonths(3).minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample =
+            DataSample(
+                dataPoints
+            )
         val sampleDuration = Duration.ofDays(20)
 
         //WHEN
-        val answer = clipDataSample(dataSample, now, sampleDuration)
+        val answer =
+            clipDataSample(
+                dataSample,
+                now,
+                sampleDuration
+            )
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)
