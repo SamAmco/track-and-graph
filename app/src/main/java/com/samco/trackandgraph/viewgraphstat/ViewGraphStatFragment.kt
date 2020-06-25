@@ -36,14 +36,16 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatview.GraphStatView
-import com.samco.trackandgraph.graphstatview.SampleDataCallback
+import com.samco.trackandgraph.graphstatview.factories.AverageTimeBetweenDataFactory
+import com.samco.trackandgraph.graphstatview.factories.LineGraphDataFactory
+import com.samco.trackandgraph.graphstatview.factories.PieChartDataFactory
+import com.samco.trackandgraph.graphstatview.factories.TimeSinceViewDataFactory
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
 import kotlinx.coroutines.*
@@ -141,7 +143,7 @@ class ViewGraphStatFragment : Fragment() {
         when (state) {
             ViewGraphStatViewModelState.INITIALIZING -> graphStatView.initLoading()
             ViewGraphStatViewModelState.WAITING -> {
-                initGraphStatViewFromViewModel()
+                observeGraphStatViewData()
                 initNotesAdapterFromViewModel()
                 observeNoteMarker()
             }
@@ -204,67 +206,37 @@ class ViewGraphStatFragment : Fragment() {
         graphStatView.dispose()
     }
 
-    private fun initGraphStatViewFromViewModel() {
-        val graphStat = viewModel.graphStatObject
-        if (graphStat == null) graphStatView.initError(null, R.string.graph_stat_view_not_found)
-        when (viewModel.graphStatInnerObject) {
-            null -> graphStatView.initError(null, R.string.graph_stat_view_not_found)
-            is LineGraphWithFeatures -> graphStatView.initFromLineGraph(
-                graphStat!!,
-                viewModel.graphStatInnerObject as LineGraphWithFeatures,
-                false,
-                SampleDataCallback(viewModel::onSampledDataPoints)
-            )
-            is PieChart -> graphStatView.initFromPieChart(
-                graphStat!!,
-                viewModel.graphStatInnerObject as PieChart,
-                SampleDataCallback(viewModel::onSampledDataPoints)
-            )
-            is TimeSinceLastStat -> graphStatView.initTimeSinceStat(
-                graphStat!!,
-                viewModel.graphStatInnerObject as TimeSinceLastStat,
-                SampleDataCallback(viewModel::onSampledDataPoints)
-            )
-            is AverageTimeBetweenStat -> graphStatView.initAverageTimeBetweenStat(
-                graphStat!!,
-                viewModel.graphStatInnerObject as AverageTimeBetweenStat,
-                SampleDataCallback(viewModel::onSampledDataPoints)
-            )
-            else -> graphStatView.initError(null, R.string.graph_stat_validation_unknown)
-        }
+    private fun observeGraphStatViewData() {
+        viewModel.graphStatViewData.observe(viewLifecycleOwner, Observer {
+            graphStatView.initFromGraphStat(it)
+        })
     }
 }
 
 enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
 class ViewGraphStatViewModel : ViewModel() {
-    var graphStatObject: GraphOrStat? = null
-        private set
-    var graphStatInnerObject: Any? = null
-        private set
     var featureDisplayNames: Map<Long, String>? = null
         private set
     var featureTypes: Map<Long, FeatureType>? = null
         private set
 
     val state: LiveData<ViewGraphStatViewModelState>
-        get() {
-            return _state
-        }
+        get() = _state
     private val _state = MutableLiveData(ViewGraphStatViewModelState.INITIALIZING)
 
+    val graphStatViewData: LiveData<IGraphStatViewData>
+        get() = _graphStatViewData
+    private val _graphStatViewData = MutableLiveData<IGraphStatViewData>()
+
     val showingNotes: LiveData<Boolean>
-        get() {
-            return _showingNotes
-        }
+        get() = _showingNotes
     private val _showingNotes = MutableLiveData(false)
 
     private val _notes = MutableLiveData<List<GraphNote>>(emptyList())
     val notes: LiveData<List<GraphNote>> = _notes
 
     val markedNote: LiveData<GraphNote?>
-        get() {
-            return _markedNote
-        }
+        get() = _markedNote
     private val _markedNote = MutableLiveData<GraphNote?>(null)
 
     private val currJob = Job()
@@ -322,14 +294,23 @@ class ViewGraphStatViewModel : ViewModel() {
         }
     }
 
-    private fun initFromGraphStatId(graphStatId: Long) {
-        graphStatObject = dataSource!!.getGraphStatById(graphStatId)
-        when (graphStatObject!!.type) {
-            GraphStatType.LINE_GRAPH -> initLineGraph()
-            GraphStatType.PIE_CHART -> initPieChart()
-            GraphStatType.TIME_SINCE -> initTimeSince()
-            GraphStatType.AVERAGE_TIME_BETWEEN -> initAverageTimeBetween()
+    private suspend fun initFromGraphStatId(graphStatId: Long) {
+        val graphStat = dataSource!!.getGraphStatById(graphStatId)
+
+        val viewData = when (graphStat.type) {
+            GraphStatType.LINE_GRAPH -> LineGraphDataFactory(dataSource!!, graphStat)
+                .getViewData(this::onSampledDataPoints)
+            GraphStatType.PIE_CHART -> PieChartDataFactory(dataSource!!, graphStat)
+                .getViewData(this::onSampledDataPoints)
+            GraphStatType.TIME_SINCE -> TimeSinceViewDataFactory(dataSource!!, graphStat)
+                .getViewData(this::onSampledDataPoints)
+            GraphStatType.AVERAGE_TIME_BETWEEN -> AverageTimeBetweenDataFactory(
+                dataSource!!,
+                graphStat
+            ).getViewData(this::onSampledDataPoints)
         }
+
+        withContext(Dispatchers.Main) { _graphStatViewData.value = viewData }
     }
 
     fun showHideNotesClicked() {
@@ -338,23 +319,6 @@ class ViewGraphStatViewModel : ViewModel() {
 
     fun noteClicked(note: GraphNote) {
         _markedNote.value = note
-    }
-
-    private fun initLineGraph() {
-        graphStatInnerObject = dataSource!!.getLineGraphByGraphStatId(graphStatObject!!.id)
-    }
-
-    private fun initPieChart() {
-        graphStatInnerObject = dataSource!!.getPieChartByGraphStatId(graphStatObject!!.id)
-    }
-
-    private fun initTimeSince() {
-        graphStatInnerObject = dataSource!!.getTimeSinceLastStatByGraphStatId(graphStatObject!!.id)
-    }
-
-    private fun initAverageTimeBetween() {
-        graphStatInnerObject =
-            dataSource!!.getAverageTimeBetweenStatByGraphStatId(graphStatObject!!.id)
     }
 
     override fun onCleared() {

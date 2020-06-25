@@ -15,7 +15,7 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.graphstatview.decorators
 
 import android.content.Context
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
@@ -24,5 +24,4 @@ import com.samco.trackandgraph.databinding.GraphStatViewBinding
 interface IDecoratableGraphStatView {
     fun getBinding(): GraphStatViewBinding
     fun getContext(): Context
-    fun getDataSource(): TrackAndGraphDatabaseDao
 }

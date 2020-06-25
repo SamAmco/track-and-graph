@@ -1,0 +1,38 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.samco.trackandgraph.graphstatview.factories
+
+import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.database.entity.GraphStatType
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+
+abstract class ViewDataFactory<T : IGraphStatViewData>(
+    protected val dataSource: TrackAndGraphDatabaseDao,
+    protected val graphOrStat: GraphOrStat
+) {
+    protected abstract suspend fun createViewData(onDataSampled: (List<DataPoint>) -> Unit): T
+
+    suspend fun getViewData(onDataSampled: (List<DataPoint>) -> Unit = {}): T =
+        withContext(Dispatchers.IO) {
+            return@withContext createViewData(onDataSampled)
+        }
+}

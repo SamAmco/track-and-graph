@@ -1,39 +1,35 @@
 /*
- * This file is part of Track & Graph
+ *  This file is part of Track & Graph
  *
- * Track & Graph is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * Track & Graph is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.statistics
 
-import android.content.Context
 import com.androidplot.Region
 import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
-import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DurationPlottingMode
-import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.entity.LineGraphFeature
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import com.samco.trackandgraph.databinding.GraphStatViewBinding
-import com.samco.trackandgraph.ui.GraphLegendItemView
-import kotlinx.coroutines.yield
 import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
@@ -42,12 +38,6 @@ import java.util.*
 import kotlin.math.abs
 
 class DataSample(val dataPoints: List<DataPoint>)
-
-class SampleDataCallback(val callback: (List<DataPoint>) -> Unit) : (List<DataPoint>) -> Unit {
-    override fun invoke(dataPoints: List<DataPoint>) {
-        callback.invoke(dataPoints)
-    }
-}
 
 /**
  * This function will call the dataSource to get a sample of the data points with the given featureId.
@@ -72,7 +62,10 @@ internal suspend fun sampleData(
             dataSource.getDataPointsForFeatureAscSync(featureId)
         )
         else {
-            val latest = endDate ?: getLastTrackedTimeOrNow(dataSource, featureId)
+            val latest = endDate ?: getLastTrackedTimeOrNow(
+                dataSource,
+                featureId
+            )
             val plottingDuration =
                 plotTotalTime?.let { Duration.between(latest, latest.plus(plotTotalTime)) }
             val minSampleDate = sampleDuration?.let {
@@ -85,7 +78,9 @@ internal suspend fun sampleData(
             } ?: OffsetDateTime.MIN
             val dataPoints =
                 dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
-            DataSample(dataPoints)
+            DataSample(
+                dataPoints
+            )
         }
     }
 }
@@ -124,10 +119,23 @@ internal suspend fun calculateDurationAccumulatedValues(
     plotTotalTime: TemporalAmount
 ): DataSample {
     val newData = mutableListOf<DataPoint>()
-    val latest = getEndTimeNowOrLatest(sampleData, endTime)
+    val latest =
+        getEndTimeNowOrLatest(
+            sampleData,
+            endTime
+        )
     val firstDataPointTime =
-        getStartTimeOrFirst(sampleData, latest, endTime, sampleDuration)
-    var currentTimeStamp = findFirstPlotDateTime(firstDataPointTime, plotTotalTime)
+        getStartTimeOrFirst(
+            sampleData,
+            latest,
+            endTime,
+            sampleDuration
+        )
+    var currentTimeStamp =
+        findFirstPlotDateTime(
+            firstDataPointTime,
+            plotTotalTime
+        )
     var index = 0
     while (currentTimeStamp.isBefore(latest)) {
         currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(plotTotalTime) }
@@ -135,15 +143,7 @@ internal suspend fun calculateDurationAccumulatedValues(
             .takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
         val total = points.sumByDouble { dp -> dp.value }
         index += points.size
-        newData.add(
-            DataPoint(
-                currentTimeStamp,
-                featureId,
-                total,
-                "",
-                ""
-            )
-        )
+        newData.add(DataPoint(currentTimeStamp, featureId, total, "", ""))
         yield()
     }
     return DataSample(newData)
@@ -257,7 +257,9 @@ internal suspend fun calculateMovingAverages(
         currentCount--
     }
 
-    return DataSample(movingAverages)
+    return DataSample(
+        movingAverages
+    )
 }
 
 /**
@@ -320,21 +322,3 @@ internal fun getXYSeriesFromDataSample(
     }
 }
 
-internal fun initHeader(binding: GraphStatViewBinding?, graphOrStat: GraphOrStat?) {
-    val headerText = graphOrStat?.name ?: ""
-    binding?.headerText?.text = headerText
-}
-
-internal fun inflateGraphLegendItem(
-    binding: GraphStatViewBinding, context: Context,
-    colorIndex: Int, label: String
-) {
-    val colorId = dataVisColorList[colorIndex]
-    binding.legendFlexboxLayout.addView(
-        GraphLegendItemView(
-            context,
-            colorId,
-            label
-        )
-    )
-}
