@@ -31,14 +31,14 @@ import org.threeten.bp.OffsetDateTime
 class TimeSinceViewDataFactory(
     dataSource: TrackAndGraphDatabaseDao,
     graphOrStat: GraphOrStat
-) : ViewDataFactory<ITimeSinceViewData>(
+) : ViewDataFactory<TimeSinceLastStat, ITimeSinceViewData>(
     dataSource, graphOrStat
 ) {
-    fun createViewData(
-        timeSinceStat: TimeSinceLastStat,
+    override suspend fun createViewData(
+        config: TimeSinceLastStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
-        val dataPoint = getLastDataPoint(dataSource, graphOrStat, timeSinceStat)
+        val dataPoint = getLastDataPoint(dataSource, config)
         onDataSampled.invoke(dataPoint?.let { listOf(dataPoint) } ?: emptyList())
         return object : ITimeSinceViewData {
             override val lastDataPoint: DataPoint?
@@ -47,8 +47,6 @@ class TimeSinceViewDataFactory(
                 get() = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat
                 get() = this@TimeSinceViewDataFactory.graphOrStat
-            override val endDate: OffsetDateTime?
-                get() = graphOrStat.endDate
         }
     }
 
@@ -68,25 +66,21 @@ class TimeSinceViewDataFactory(
 
     private fun getLastDataPoint(
         dataSource: TrackAndGraphDatabaseDao,
-        graphOrStat: GraphOrStat,
         timeSinceLastStat: TimeSinceLastStat
     ): DataPoint? {
         val feature = dataSource.getFeatureById(timeSinceLastStat.featureId)
-        val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
         return when (feature.featureType) {
             FeatureType.CONTINUOUS, FeatureType.DURATION -> {
                 dataSource.getLastDataPointBetween(
                     timeSinceLastStat.featureId,
                     timeSinceLastStat.fromValue,
-                    timeSinceLastStat.toValue,
-                    endDate
+                    timeSinceLastStat.toValue
                 )
             }
             else -> {
                 dataSource.getLastDataPointWithValue(
                     timeSinceLastStat.featureId,
-                    timeSinceLastStat.discreteValues,
-                    endDate
+                    timeSinceLastStat.discreteValues
                 )
             }
         }

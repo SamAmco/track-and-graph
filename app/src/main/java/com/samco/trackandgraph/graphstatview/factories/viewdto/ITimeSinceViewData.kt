@@ -24,8 +24,6 @@ import org.threeten.bp.OffsetDateTime
 interface ITimeSinceViewData : IGraphStatViewData {
     val lastDataPoint: DataPoint?
         get() = null
-    val endDate: OffsetDateTime?
-        get() = null
 
     companion object {
         fun loading(graphOrStat: GraphOrStat) = object : ITimeSinceViewData {

@@ -17,18 +17,24 @@
 
 package com.samco.trackandgraph
 
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.room.testing.MigrationTestHelper
 import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.database.dto.YRangeType
+import com.samco.trackandgraph.database.entity.*
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
@@ -38,7 +44,8 @@ class MigrationTest {
         private const val TEST_DB = "migration-test"
     }
 
-    @Rule @JvmField
+    @Rule
+    @JvmField
     val helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
         TrackAndGraphDatabase::class.java.canonicalName,
@@ -71,7 +78,7 @@ class MigrationTest {
         val featuresCursor = db.query("SELECT features FROM line_graphs_table")
         val featureStrings = mutableListOf<String>()
         while (featuresCursor.moveToNext()) {
-          featureStrings.add(featuresCursor.getString(0))
+            featureStrings.add(featuresCursor.getString(0))
         }
         assertTrue(featureStrings.contains("10!!Anxiety!!4!!6!!3!!0!!9.0!!1.01||11!!Stress!!7!!3!!0!!0!!10.0!!0.255"))
         assertTrue(featureStrings.contains("4!!Weather!!0!!0!!0!!0!!0.0!!1.0"))
@@ -149,7 +156,9 @@ class MigrationTest {
         assertEquals(avCursor.getString(3), "0")
         assertEquals(avCursor.getString(4), "1")
         assertEquals(avCursor.getString(5), "PT2232H")
-        assertEquals(avCursor.getString(6), listOf(0, 1).joinToString(splitChars1) { i -> i.toString() })
+        assertEquals(
+            avCursor.getString(6),
+            listOf(0, 1).joinToString(splitChars1) { i -> i.toString() })
 
         val tsCursor = db.query("SELECT * FROM time_since_last_stat_table")
         tsCursor.moveToNext()
@@ -158,7 +167,96 @@ class MigrationTest {
         assertEquals(tsCursor.getLong(2), 4)
         assertEquals(tsCursor.getString(3), "-5")
         assertEquals(tsCursor.getString(4), "10")
-        assertEquals(tsCursor.getString(5), listOf(-5, 10).joinToString(splitChars1) { i -> i.toString() })
+        assertEquals(
+            tsCursor.getString(5),
+            listOf(-5, 10).joinToString(splitChars1) { i -> i.toString() })
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun testMigrateLineGraphFeatures_40_41() {
+        helper.createDatabase(TEST_DB, 40).apply {
+            execSQL("INSERT INTO graphs_and_stats_table (id, graph_stat_group_id, name, graph_stat_type, display_index, end_date) VALUES (0, 0, 'graph1', 0, 0, '321')")
+            execSQL("INSERT INTO graphs_and_stats_table (id, graph_stat_group_id, name, graph_stat_type, display_index, end_date) VALUES (1, 0, 'graph2', 1, 1, '21')")
+            execSQL("INSERT INTO graphs_and_stats_table (id, graph_stat_group_id, name, graph_stat_type, display_index, end_date) VALUES (2, 0, 'graph3', 2, 2, '32')")
+            execSQL("INSERT INTO graphs_and_stats_table (id, graph_stat_group_id, name, graph_stat_type, display_index, end_date) VALUES (3, 0, 'graph4', 3, 3, '31')")
+            execSQL("INSERT INTO time_since_last_stat_table (id, graph_stat_id, feature_id, from_value, to_value, discrete_values) VALUES (0, 3, 0, '5.0', '6.0', '7,8')")
+            execSQL("INSERT INTO pie_chart_table (id, graph_stat_id, feature_id, duration) VALUES (0, 1, 0, '123')")
+            execSQL("INSERT INTO line_graphs_table2 (id, graph_stat_id, duration, y_range_type, y_from, y_to) VALUES (0, 0, '234', 3, '3.0', '4.0')")
+            execSQL("INSERT INTO average_time_between_stat_table (id, graph_stat_id, feature_id, from_value, to_value, duration, discrete_values) VALUES (0, 2, 0, '2.0', '4.0', '545', '3,2,1')")
+            execSQL("INSERT INTO line_graph_features_table (id, line_graph_id, feature_id, name, color_index, averaging_mode, plotting_mode, point_style, offset, scale, duration_plotting_mode) VALUES(0, 0, 0, 'some name', 3, 2, 6, 4, 4, 2, 3)")
+            close()
+        }
+        val db = helper.runMigrationsAndValidate(TEST_DB, 41, true, *allMigrations)
+        val graphStatCursor = db.query("SELECT * FROM graphs_and_stats_table2")
+        var graphStatCursorCount = 0
+        val expectedGraphStatValues = listOf(
+            listOf(0L, 0L, "graph1", 0, 0),
+            listOf(1L, 0L, "graph2", 1, 1),
+            listOf(2L, 0L, "graph3", 2, 2),
+            listOf(3L, 0L, "graph4", 3, 3)
+        )
+        while (graphStatCursor.moveToNext()) {
+            assertEquals(expectedGraphStatValues[graphStatCursorCount][0], graphStatCursor.getLong(0))
+            assertEquals(expectedGraphStatValues[graphStatCursorCount][1], graphStatCursor.getLong(1))
+            assertEquals(expectedGraphStatValues[graphStatCursorCount][2], graphStatCursor.getString(2))
+            assertEquals(expectedGraphStatValues[graphStatCursorCount][3], graphStatCursor.getInt(3))
+            assertEquals(expectedGraphStatValues[graphStatCursorCount][4], graphStatCursor.getInt(4))
+            graphStatCursorCount++
+        }
+        assertEquals(4, graphStatCursorCount)
+
+        val timeSinceLastCursor = db.query("SELECT * FROM time_since_last_stat_table2")
+        timeSinceLastCursor.moveToNext()
+        assertEquals(0L, timeSinceLastCursor.getLong(0))
+        assertEquals(3L, timeSinceLastCursor.getLong(1))
+        assertEquals(0L, timeSinceLastCursor.getLong(2))
+        assertEquals("5.0", timeSinceLastCursor.getString(3))
+        assertEquals("6.0", timeSinceLastCursor.getString(4))
+        assertEquals("7,8", timeSinceLastCursor.getString(5))
+
+        val pieChartCursor = db.query("SELECT * FROM pie_charts_table2")
+        pieChartCursor.moveToNext()
+        assertEquals(0L, pieChartCursor.getLong(0))
+        assertEquals(1L, pieChartCursor.getLong(1))
+        assertEquals(0L, pieChartCursor.getLong(2))
+        assertEquals("123", pieChartCursor.getString(3))
+        assertEquals("21", pieChartCursor.getString(4))
+
+        val lineGraphCursor = db.query("SELECT * FROM line_graphs_table3")
+        lineGraphCursor.moveToNext()
+        assertEquals(0L, lineGraphCursor.getLong(0))
+        assertEquals(0L, lineGraphCursor.getLong(1))
+        assertEquals("234", lineGraphCursor.getString(2))
+        assertEquals(3, lineGraphCursor.getInt(3))
+        assertEquals(3.0, lineGraphCursor.getDouble(4))
+        assertEquals(4.0, lineGraphCursor.getDouble(5))
+        assertEquals("321", lineGraphCursor.getString(6))
+
+        val avTimeBetweenCursor = db.query("SELECT * FROM average_time_between_stat_table2")
+        avTimeBetweenCursor.moveToNext()
+        assertEquals(0L, avTimeBetweenCursor.getLong(0))
+        assertEquals(2L, avTimeBetweenCursor.getLong(1))
+        assertEquals(0L, avTimeBetweenCursor.getLong(2))
+        assertEquals("2.0", avTimeBetweenCursor.getString(3))
+        assertEquals("4.0", avTimeBetweenCursor.getString(4))
+        assertEquals("545", avTimeBetweenCursor.getString(5))
+        assertEquals("3,2,1", avTimeBetweenCursor.getString(6))
+        assertEquals("32", avTimeBetweenCursor.getString(7))
+
+        val lineGraphFeatureCursor = db.query("SELECT * FROM line_graph_features_table2")
+        lineGraphFeatureCursor.moveToNext()
+        assertEquals(0L, lineGraphFeatureCursor.getLong(0))
+        assertEquals(0L, lineGraphFeatureCursor.getLong(1))
+        assertEquals(0L, lineGraphFeatureCursor.getLong(2))
+        assertEquals("some name", lineGraphFeatureCursor.getString(3))
+        assertEquals(3, lineGraphFeatureCursor.getInt(4))
+        assertEquals(2, lineGraphFeatureCursor.getInt(5))
+        assertEquals(6, lineGraphFeatureCursor.getInt(6))
+        assertEquals(4, lineGraphFeatureCursor.getInt(7))
+        assertEquals(4, lineGraphFeatureCursor.getInt(8))
+        assertEquals(2, lineGraphFeatureCursor.getInt(9))
+        assertEquals(3, lineGraphFeatureCursor.getInt(10))
     }
 
     private fun tryOpenDatabase() {

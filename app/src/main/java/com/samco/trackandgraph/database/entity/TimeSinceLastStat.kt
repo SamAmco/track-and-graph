@@ -20,8 +20,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import org.threeten.bp.OffsetDateTime
 
-@Entity(tableName = "time_since_last_stat_table",
+@Entity(tableName = "time_since_last_stat_table2",
     foreignKeys = [
         ForeignKey(
             entity = GraphOrStat::class,

@@ -38,7 +38,7 @@ val maxGraphPeriodDurations = listOf(
     Duration.ofDays(365)
 )
 
-@Entity(tableName = "graphs_and_stats_table",
+@Entity(tableName = "graphs_and_stats_table2",
     foreignKeys = [ForeignKey(entity = GraphStatGroup::class,
     parentColumns = arrayOf("id"),
     childColumns = arrayOf("graph_stat_group_id"),
@@ -59,14 +59,11 @@ data class GraphOrStat(
     val type: GraphStatType,
 
     @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
-    @ColumnInfo(name = "end_date")
-    val endDate: OffsetDateTime?
+    val displayIndex: Int
 ) {
     companion object {
         fun create(id: Long, graphStatGroupId: Long, name: String,
-                   type: GraphStatType, displayIndex: Int, endDate: OffsetDateTime?): GraphOrStat {
+                   type: GraphStatType, displayIndex: Int): GraphOrStat {
             val validName = name.take(MAX_GRAPH_STAT_NAME_LENGTH)
                 .replace(splitChars1, " ")
                 .replace(splitChars2, " ")
@@ -75,8 +72,7 @@ data class GraphOrStat(
                 graphStatGroupId,
                 validName,
                 type,
-                displayIndex,
-                endDate
+                displayIndex
             )
         }
     }

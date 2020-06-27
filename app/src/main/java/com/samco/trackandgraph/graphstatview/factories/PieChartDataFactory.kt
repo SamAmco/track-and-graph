@@ -34,12 +34,12 @@ import kotlinx.coroutines.withContext
 class PieChartDataFactory(
     dataSource: TrackAndGraphDatabaseDao,
     graphOrStat: GraphOrStat
-) : ViewDataFactory<IPieChartViewData>(
+) : ViewDataFactory<PieChart, IPieChartViewData>(
     dataSource,
     graphOrStat
 ) {
-    suspend fun createViewData(pieChart: PieChart, onDataSampled: (List<DataPoint>) -> Unit): IPieChartViewData {
-        val plottingData = tryGetPlottableDataForPieChart(pieChart)
+    override suspend fun createViewData(config: PieChart, onDataSampled: (List<DataPoint>) -> Unit): IPieChartViewData {
+        val plottingData = tryGetPlottableDataForPieChart(config)
             ?: return object : IPieChartViewData {
                 override val state: IGraphStatViewData.State
                     get() = IGraphStatViewData.State.READY
@@ -88,7 +88,7 @@ class PieChartDataFactory(
         }
         val dataSample = sampleData(
             dataSource, feature.id, pieChart.duration,
-            graphOrStat.endDate, null, null
+            pieChart.endDate, null, null
         )
         return if (dataSample.dataPoints.isNotEmpty()) dataSample else null
     }

@@ -34,25 +34,25 @@ import org.threeten.bp.OffsetDateTime
 class LineGraphDataFactory(
     dataSource: TrackAndGraphDatabaseDao,
     graphOrStat: GraphOrStat
-) : ViewDataFactory<ILineGraphViewData>(
+) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(
     dataSource,
     graphOrStat
 ) {
-    suspend fun createViewData(
-        lineGraph: LineGraphWithFeatures,
+    override suspend fun createViewData(
+        config: LineGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData {
-        val endTime = graphOrStat.endDate ?: OffsetDateTime.now()
+        val endTime = config.endDate ?: OffsetDateTime.now()
         val allReferencedDataPoints = mutableListOf<DataPoint>()
         val plottableData = generatePlottingData(
-            lineGraph,
+            config,
             allReferencedDataPoints,
             endTime
         )
         val hasPlottableData = plottableData.any { kvp -> kvp.value != null }
-        val bounds = getBounds(lineGraph, plottableData.values)
+        val bounds = getBounds(config, plottableData.values)
         val durationBasedRange =
-            lineGraph.features.any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
+            config.features.any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
 
         onDataSampled(allReferencedDataPoints)
 
@@ -60,7 +60,7 @@ class LineGraphDataFactory(
             override val durationBasedRange: Boolean
                 get() = durationBasedRange
             override val yRangeType: YRangeType
-                get() = lineGraph.yRangeType
+                get() = config.yRangeType
             override val bounds: RectRegion
                 get() = bounds
             override val hasPlottableData: Boolean
@@ -113,14 +113,14 @@ class LineGraphDataFactory(
                 dataSource,
                 lineGraphFeature.featureId,
                 lineGraph.duration,
-                graphOrStat.endDate,
+                lineGraph.endDate,
                 movingAvDuration,
                 plottingPeriod
             )
         val visibleSection =
             clipDataSample(
                 rawDataSample,
-                graphOrStat.endDate,
+                lineGraph.endDate,
                 lineGraph.duration
             )
         allReferencedDataPoints.addAll(visibleSection.dataPoints)
@@ -130,7 +130,7 @@ class LineGraphDataFactory(
                 rawDataSample,
                 lineGraphFeature.featureId,
                 lineGraph.duration,
-                graphOrStat.endDate,
+                lineGraph.endDate,
                 plottingPeriod!!
             )
         }
@@ -144,7 +144,7 @@ class LineGraphDataFactory(
         val plottingData =
             clipDataSample(
                 averagedData,
-                graphOrStat.endDate,
+                lineGraph.endDate,
                 lineGraph.duration
             )
 
