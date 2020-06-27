@@ -530,14 +530,15 @@ class GraphStatInputFragment : Fragment() {
     private fun listenToGraphTypeSpinner() {
         val graphTypes = GraphStatType.values()
         binding.graphTypeSpinner.setSelection(graphTypes.indexOf(viewModel.graphStatType.value))
-        updateViewForSelectedGraphStatType(viewModel.graphStatType.value!!)
+        viewModel.graphStatType.observe(viewLifecycleOwner, Observer {
+            updateViewForSelectedGraphStatType(it)
+        })
         binding.graphTypeSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                     val graphStatType = graphTypes[index]
                     viewModel.graphStatType.value = graphStatType
-                    updateViewForSelectedGraphStatType(graphStatType)
                 }
             }
     }
