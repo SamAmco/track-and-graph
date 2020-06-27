@@ -87,7 +87,7 @@ val pointStyleDrawableResources = listOf(
 )
 
 @Entity(
-    tableName = "line_graph_features_table",
+    tableName = "line_graph_features_table2",
     foreignKeys = [ForeignKey(
         entity = LineGraph::class,
         parentColumns = arrayOf("id"),

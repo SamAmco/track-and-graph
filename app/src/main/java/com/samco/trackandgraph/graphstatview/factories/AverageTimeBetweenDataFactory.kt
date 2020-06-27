@@ -27,16 +27,16 @@ import org.threeten.bp.OffsetDateTime
 class AverageTimeBetweenDataFactory(
     dataSource: TrackAndGraphDatabaseDao,
     graphOrStat: GraphOrStat
-) : ViewDataFactory<IAverageTimeBetweenViewData>(
+) : ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>(
     dataSource,
     graphOrStat
 ) {
-    fun createViewData(
-        timeBetweenStat: AverageTimeBetweenStat,
+    override suspend fun createViewData(
+        config: AverageTimeBetweenStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
-        val feature = dataSource.getFeatureById(timeBetweenStat.featureId)
-        val dataPoints = getRelevantDataPoints(timeBetweenStat, feature)
+        val feature = dataSource.getFeatureById(config.featureId)
+        val dataPoints = getRelevantDataPoints(config, feature)
         if (dataPoints.size < 2) return notEnoughData()
         val totalMillis = Duration.between(
             dataPoints.first().timestamp,
@@ -80,7 +80,7 @@ class AverageTimeBetweenDataFactory(
         timeBetweenStat: AverageTimeBetweenStat,
         feature: Feature
     ): List<DataPoint> {
-        val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
+        val endDate = timeBetweenStat.endDate ?: OffsetDateTime.now()
         val startDate =
             timeBetweenStat.duration?.let { endDate.minus(it) } ?: OffsetDateTime.MIN
         return when (feature.featureType) {

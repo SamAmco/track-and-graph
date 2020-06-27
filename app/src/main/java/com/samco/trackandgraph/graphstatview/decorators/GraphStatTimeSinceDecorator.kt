@@ -52,12 +52,7 @@ class GraphStatTimeSinceDecorator : IGraphStatViewDecorator<ITimeSinceViewData> 
         if (dataPoint == null) {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
         } else while (true) {
-            setTimeSinceStatText(
-                Duration.between(
-                    dataPoint.timestamp,
-                    data!!.endDate ?: OffsetDateTime.now()
-                )
-            )
+            setTimeSinceStatText(Duration.between(dataPoint.timestamp, OffsetDateTime.now()))
             delay(1000)
         }
     }

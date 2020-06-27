@@ -20,16 +20,32 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.database.entity.GraphStatType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-abstract class ViewDataFactory<T : IGraphStatViewData>(
+/**
+ * An abstract factory for generating data for a graph or stat ready to be displayed by an appropriate
+ * decorator.
+ *
+ * I is the store of configuration options that tells the factory how to generate the data
+ * T is the type of data produced by this factory
+ */
+abstract class ViewDataFactory<in I, out T : IGraphStatViewData>(
     protected val dataSource: TrackAndGraphDatabaseDao,
     protected val graphOrStat: GraphOrStat
 ) {
     protected abstract suspend fun createViewData(onDataSampled: (List<DataPoint>) -> Unit): T
+
+    protected abstract suspend fun createViewData(
+        config: I,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): T
+
+    suspend fun getViewData(config: I, onDataSampled: (List<DataPoint>) -> Unit = {}): T =
+        withContext(Dispatchers.IO) {
+            return@withContext createViewData(config, onDataSampled)
+        }
 
     suspend fun getViewData(onDataSampled: (List<DataPoint>) -> Unit = {}): T =
         withContext(Dispatchers.IO) {

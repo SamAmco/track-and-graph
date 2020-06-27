@@ -179,6 +179,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     }
 
     fun initFromGraphStat(data: IGraphStatViewData, listMode: Boolean = false) {
+        //TODO what if it's just a loading state, the cast might cause a crash
         when (data.graphOrStat.type) {
             GraphStatType.LINE_GRAPH -> {
                 trySetDecorator(

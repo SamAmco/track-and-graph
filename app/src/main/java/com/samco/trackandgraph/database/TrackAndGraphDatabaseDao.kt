@@ -209,19 +209,17 @@ interface TrackAndGraphDatabaseDao {
         endDateTime: OffsetDateTime
     ): List<DataPoint>
 
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max AND timestamp < :endDate ORDER BY timestamp DESC LIMIT 1""")
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp DESC LIMIT 1""")
     fun getLastDataPointBetween(
         featureId: Long,
         min: String,
-        max: String,
-        endDate: OffsetDateTime
+        max: String
     ): DataPoint?
 
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :endDate ORDER BY timestamp DESC LIMIT 1""")
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp DESC LIMIT 1""")
     fun getLastDataPointWithValue(
         featureId: Long,
-        values: List<Int>,
-        endDate: OffsetDateTime
+        values: List<Int>
     ): DataPoint?
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value = :value ORDER BY timestamp DESC LIMIT 1""")
@@ -249,28 +247,28 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp = :timestamp")
     fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
 
-    @Query("SELECT * FROM graphs_and_stats_table WHERE id = :graphStatId LIMIT 1")
+    @Query("SELECT * FROM graphs_and_stats_table2 WHERE id = :graphStatId LIMIT 1")
     fun getGraphStatById(graphStatId: Long): GraphOrStat
 
-    @Query("SELECT * FROM graphs_and_stats_table WHERE id = :graphStatId LIMIT 1")
+    @Query("SELECT * FROM graphs_and_stats_table2 WHERE id = :graphStatId LIMIT 1")
     fun tryGetGraphStatById(graphStatId: Long): GraphOrStat?
 
-    @Query("SELECT * FROM line_graphs_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Query("SELECT * FROM line_graphs_table3 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
 
-    @Query("SELECT * FROM pie_chart_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Query("SELECT * FROM pie_charts_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getPieChartByGraphStatId(graphStatId: Long): PieChart?
 
-    @Query("SELECT * FROM average_time_between_stat_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Query("SELECT * FROM average_time_between_stat_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
 
-    @Query("SELECT * FROM time_since_last_stat_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Query("SELECT * FROM time_since_last_stat_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
-    @Query("SELECT * FROM graphs_and_stats_table WHERE graph_stat_group_id = :graphStatGroupId ORDER BY display_index ASC")
+    @Query("SELECT * FROM graphs_and_stats_table2 WHERE graph_stat_group_id = :graphStatGroupId ORDER BY display_index ASC")
     fun getGraphsAndStatsByGroupId(graphStatGroupId: Long): LiveData<List<GraphOrStat>>
 
-    @Query("SELECT * FROM graphs_and_stats_table ORDER BY display_index ASC")
+    @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
 
     @Query(
@@ -304,7 +302,7 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM notes_table")
     fun getAllGlobalNotesSync(): List<GlobalNote>
 
-    @Query("DELETE FROM line_graph_features_table WHERE line_graph_id = :lineGraphId")
+    @Query("DELETE FROM line_graph_features_table2 WHERE line_graph_id = :lineGraphId")
     fun deleteFeaturesForLineGraph(lineGraphId: Long)
 
     @Insert
