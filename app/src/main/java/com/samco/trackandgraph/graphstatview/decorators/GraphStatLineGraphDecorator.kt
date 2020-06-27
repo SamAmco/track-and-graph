@@ -15,7 +15,7 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.graphstatview.decorators
 
 import android.content.Context
 import android.graphics.Paint
@@ -29,6 +29,8 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
+import com.samco.trackandgraph.graphstatview.*
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.util.formatDayMonth
 import com.samco.trackandgraph.util.formatMonthYear
 import com.samco.trackandgraph.util.formatTimeDuration
@@ -46,12 +48,8 @@ import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.max
 
-class GraphStatLineGraphDecorator(
-    private val graphOrStat: GraphOrStat,
-    private val lineGraph: LineGraphWithFeatures,
-    private val listViewMode: Boolean,
-    private val onSampledDataCallback: SampleDataCallback?
-) : IGraphStatViewDecorator {
+class GraphStatLineGraphDecorator(private val listViewMode: Boolean) :
+    IGraphStatViewDecorator<ILineGraphViewData> {
     private val lineGraphHourMinuteSecondFromat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm:ss")
         .withZone(ZoneId.systemDefault())
@@ -59,32 +57,25 @@ class GraphStatLineGraphDecorator(
         .ofPattern("HH:mm")
         .withZone(ZoneId.systemDefault())
 
-    private val currentXYRegions = mutableListOf<RectRegion>()
-    private lateinit var endTime: OffsetDateTime
-
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
     private var graphStatView: IDecoratableGraphStatView? = null
+    private var data: ILineGraphViewData? = null
 
-    private val allReferencedDataPoints: MutableList<DataPoint> = mutableListOf()
-
-    override suspend fun decorate(view: IDecoratableGraphStatView) {
-        graphStatView = view
+    override suspend fun decorate(view: IDecoratableGraphStatView, data: ILineGraphViewData) {
+        this.data = data
+        this.graphStatView = view
         binding = view.getBinding()
         context = view.getContext()
-        endTime = graphOrStat.endDate ?: OffsetDateTime.now()
 
         yield()
-        binding!!.lineGraph.visibility = View.INVISIBLE
-        initHeader(binding, graphOrStat)
-        initFromLineGraphBody()
-        onSampledDataCallback?.invoke(allReferencedDataPoints)
+        withContext(Dispatchers.Default) { initFromLineGraphBody() }
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {
         binding!!.lineGraph.removeMarkers()
         val markerPaint = getMarkerPaint()
-        val millis = Duration.between(endTime, time).toMillis()
+        val millis = Duration.between(data!!.endTime, time).toMillis()
         binding!!.lineGraph.addMarker(
             XValueMarker(
                 millis,
@@ -99,27 +90,28 @@ class GraphStatLineGraphDecorator(
 
     private suspend fun initFromLineGraphBody() {
         yield()
-        binding!!.progressBar.visibility = View.VISIBLE
-        if (tryDrawLineGraphFeatures()) {
+        withContext(Dispatchers.Main) {
+            binding!!.lineGraph.visibility = View.INVISIBLE
+            binding!!.progressBar.visibility = View.VISIBLE
+        }
+        if (data!!.hasPlottableData) {
+            drawLineGraphFeatures()
             setUpLineGraphXAxis()
             setUpLineGraphYAxis()
             setLineGraphBounds()
-            yield()
             binding!!.lineGraph.redraw()
-            binding!!.lineGraph.visibility = View.VISIBLE
-            binding!!.progressBar.visibility = View.GONE
+            withContext(Dispatchers.Main) {
+                binding!!.lineGraph.visibility = View.VISIBLE
+                binding!!.progressBar.visibility = View.GONE
+            }
         } else {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_graph)
         }
     }
 
     private suspend fun setLineGraphBounds() {
-        val bounds = RectRegion()
-        currentXYRegions.forEach { r -> bounds.union(r) }
-        yield()
-        if (lineGraph.yRangeType == YRangeType.FIXED) {
-            bounds.minY = lineGraph.yFrom
-            bounds.maxY = lineGraph.yTo
+        val bounds = data!!.bounds
+        if (data!!.yRangeType == YRangeType.FIXED) {
             binding!!.lineGraph.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
         }
         binding!!.lineGraph.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
@@ -139,7 +131,7 @@ class GraphStatLineGraphDecorator(
     }
 
     private fun setUpLineGraphYAxis() {
-        if (lineGraph.features.any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }) {
+        if (data!!.durationBasedRange) {
             binding!!.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
                 object : Format() {
                     override fun format(
@@ -166,7 +158,7 @@ class GraphStatLineGraphDecorator(
                 ): StringBuffer {
                     val millis = (obj as Number).toLong()
                     val duration = Duration.ofMillis(millis)
-                    val timeStamp = endTime.plus(duration)
+                    val timeStamp = data!!.endTime.plus(duration)
                     val formattedTimestamp = getDateTimeFormattedForDuration(
                         binding!!.lineGraph.bounds.minX,
                         binding!!.lineGraph.bounds.maxX,
@@ -194,62 +186,13 @@ class GraphStatLineGraphDecorator(
         }
     }
 
-    private suspend fun tryDrawLineGraphFeatures(): Boolean {
-        val bools = lineGraph.features.map {
-            yield()
-            inflateGraphLegendItem(binding!!, context!!, it.colorIndex, it.name)
-            val plottingData = withContext(Dispatchers.IO) { tryGetPlottingData(it) }
-            return@map if (plottingData != null) {
-                createAndAddSeries(plottingData, it)
-                true
-            } else false
+    private suspend fun drawLineGraphFeatures() {
+        for (kvp in data!!.plottableData) {
+            withContext(Dispatchers.Main) {
+                inflateGraphLegendItem(binding!!, context!!, kvp.key.colorIndex, kvp.key.name)
+            }
+            kvp.value?.let { addSeries(it, kvp.key) }
         }
-        return bools.any { b -> b }
-    }
-
-    private suspend fun tryGetPlottingData(lineGraphFeature: LineGraphFeature): DataSample? {
-        val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
-        val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
-        val rawDataSample = sampleData(
-            graphStatView!!.getDataSource(),
-            lineGraphFeature.featureId,
-            lineGraph.duration,
-            graphOrStat.endDate,
-            movingAvDuration,
-            plottingPeriod
-        )
-        val visibleSection = clipDataSample(rawDataSample, graphOrStat.endDate, lineGraph.duration)
-        allReferencedDataPoints.addAll(visibleSection.dataPoints)
-        val plotTotalData = when (lineGraphFeature.plottingMode) {
-            LineGraphPlottingModes.WHEN_TRACKED -> rawDataSample
-            else -> calculateDurationAccumulatedValues(
-                rawDataSample,
-                lineGraphFeature.featureId,
-                lineGraph.duration,
-                graphOrStat.endDate,
-                plottingPeriod!!
-            )
-        }
-        val averagedData = when (lineGraphFeature.averagingMode) {
-            LineGraphAveraginModes.NO_AVERAGING -> plotTotalData
-            else -> calculateMovingAverages(
-                plotTotalData,
-                movingAvDuration!!
-            )
-        }
-        val plottingData = clipDataSample(averagedData, graphOrStat.endDate, lineGraph.duration)
-
-        return if (plottingData.dataPoints.size >= 2) plottingData else null
-    }
-
-    private suspend fun createAndAddSeries(
-        rawData: DataSample,
-        lineGraphFeature: LineGraphFeature
-    ) {
-        val series = withContext(Dispatchers.IO) {
-            getXYSeriesFromDataSample(rawData, endTime, lineGraphFeature)
-        }
-        addSeries(series, lineGraphFeature)
     }
 
     private suspend fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
@@ -257,7 +200,6 @@ class GraphStatLineGraphDecorator(
             if (listViewMode && lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
                 getFastLineAndPointFormatter(lineGraphFeature)
             else getLineAndPointFormatter(lineGraphFeature)
-        currentXYRegions.add(series.minMax())
         yield()
         binding!!.lineGraph.addSeries(series, seriesFormat)
     }

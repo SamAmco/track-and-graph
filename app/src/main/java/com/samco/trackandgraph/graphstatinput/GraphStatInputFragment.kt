@@ -43,6 +43,11 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
+import com.samco.trackandgraph.graphstatview.factories.AverageTimeBetweenDataFactory
+import com.samco.trackandgraph.graphstatview.factories.LineGraphDataFactory
+import com.samco.trackandgraph.graphstatview.factories.PieChartDataFactory
+import com.samco.trackandgraph.graphstatview.factories.TimeSinceViewDataFactory
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.ExtendedSpinner
 import com.samco.trackandgraph.util.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -101,10 +106,17 @@ class GraphStatInputFragment : Fragment() {
                     listenToTimeDuration()
                     listenToAllFeatures()
                     listenToFormValid()
+                    listenToDemoViewData()
                 }
                 GraphStatInputState.ADDING -> binding.inputProgressBar.visibility = View.VISIBLE
                 else -> navController?.popBackStack()
             }
+        })
+    }
+
+    private fun listenToDemoViewData() {
+        viewModel.demoViewData.observe(viewLifecycleOwner, Observer {
+            updateDemoView(it)
         })
     }
 
@@ -124,7 +136,7 @@ class GraphStatInputFragment : Fragment() {
             binding.customEndDateText.text =
                 endDate?.let { "(${formatDayMonthYear(requireContext(), it)})" } ?: ""
             binding.customEndDateText.visibility = if (endDate == null) View.GONE else View.VISIBLE
-            onFormUpdate()
+            viewModel.updateDemoData()
         })
     }
 
@@ -175,11 +187,11 @@ class GraphStatInputFragment : Fragment() {
         })
         binding.yRangeFrom.addTextChangedListener { editText ->
             viewModel.yRangeFrom.value = getDoubleFromText(editText.toString())
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
         binding.yRangeFromDuration.setDurationChangedListener {
             viewModel.yRangeFrom.value = it.toDouble()
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
 
         viewModel.yRangeTo.observe(viewLifecycleOwner, Observer {
@@ -191,11 +203,11 @@ class GraphStatInputFragment : Fragment() {
         })
         binding.yRangeTo.addTextChangedListener { editText ->
             viewModel.yRangeTo.value = getDoubleFromText(editText.toString())
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
         binding.yRangeToDuration.setDurationChangedListener {
             viewModel.yRangeTo.value = it.toDouble()
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
 
         val doneListener: () -> Unit = {
@@ -223,7 +235,7 @@ class GraphStatInputFragment : Fragment() {
         binding.graphStatNameInput.setText(viewModel.graphName.value)
         binding.graphStatNameInput.addTextChangedListener { editText ->
             viewModel.graphName.value = editText.toString()
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
     }
 
@@ -278,7 +290,7 @@ class GraphStatInputFragment : Fragment() {
             }
             else -> run { }
         }
-        onFormUpdate()
+        viewModel.updateDemoData()
     }
 
     private fun listenToValueStatFeature() {
@@ -305,7 +317,7 @@ class GraphStatInputFragment : Fragment() {
                         binding.valueStatDurationRangeInput.visibility = View.VISIBLE
                     }
                 }
-                onFormUpdate()
+                viewModel.updateDemoData()
             }
         })
         listenToValueStatDiscreteValueCheckBoxes()
@@ -348,7 +360,7 @@ class GraphStatInputFragment : Fragment() {
                         else viewModel.selectedValueStatDiscreteValues.value =
                             viewModel.selectedValueStatDiscreteValues.value?.minus(discreteValue)
                                 ?: listOf(discreteValue)
-                        onFormUpdate()
+                        viewModel.updateDemoData()
                     }
                     buttonsLayout.addView(item)
                 }
@@ -371,14 +383,14 @@ class GraphStatInputFragment : Fragment() {
         }
         binding.valueStatToInput.addTextChangedListener { editText ->
             viewModel.selectedValueStatToValue.value = getDoubleFromText(editText.toString())
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
         if (viewModel.selectedValueStatFromValue.value != null) {
             binding.valueStatFromInput.setText(doubleFormatter.format(viewModel.selectedValueStatFromValue.value!!))
         }
         binding.valueStatFromInput.addTextChangedListener { editText ->
             viewModel.selectedValueStatFromValue.value = getDoubleFromText(editText.toString())
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
     }
 
@@ -388,14 +400,14 @@ class GraphStatInputFragment : Fragment() {
         }
         binding.valueStatDurationToInput.setDurationChangedListener {
             viewModel.selectedValueStatToValue.value = it.toDouble()
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
         if (viewModel.selectedValueStatFromValue.value != null) {
             binding.valueStatDurationFromInput.setTimeInSeconds(viewModel.selectedValueStatFromValue.value!!.toLong())
         }
         binding.valueStatDurationFromInput.setDurationChangedListener {
             viewModel.selectedValueStatFromValue.value = it.toDouble()
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
         val doneListener: () -> Unit = {
             val imm =
@@ -454,7 +466,7 @@ class GraphStatInputFragment : Fragment() {
         }
         view.setOnUpdateListener {
             updateYRangeInputType()
-            onFormUpdate()
+            viewModel.updateDemoData()
         }
         val params = LinearLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -510,7 +522,7 @@ class GraphStatInputFragment : Fragment() {
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                     viewModel.sampleDuration.value = maxGraphPeriodDurations[index]
-                    onFormUpdate()
+                    viewModel.updateDemoData()
                 }
             }
     }
@@ -587,44 +599,15 @@ class GraphStatInputFragment : Fragment() {
         })
     }
 
-    private fun onFormUpdate() {
-        viewModel.validateForm()
-        updateDemoView()
-    }
-
-    private fun updateDemoView() {
+    private fun updateDemoView(data: IGraphStatViewData?) {
         updateDemoHandler.removeCallbacksAndMessages(null)
         updateDemoHandler.postDelayed(Runnable {
-            if (viewModel.formValid.value != null) {
+            if (viewModel.formValid.value != null || data == null) {
                 binding.demoGraphStatCardView.graphStatView.initError(
-                    null,
                     R.string.graph_stat_view_invalid_setup
                 )
             } else {
-                val graphOrStat = viewModel.constructGraphOrStat()
-                when (viewModel.graphStatType.value) {
-                    GraphStatType.LINE_GRAPH -> binding.demoGraphStatCardView.graphStatView
-                        .initFromLineGraph(
-                            graphOrStat,
-                            viewModel.constructLineGraphWithFeaturesForDemo()
-                        )
-                    GraphStatType.PIE_CHART -> binding.demoGraphStatCardView.graphStatView
-                        .initFromPieChart(graphOrStat, viewModel.constructPieChart(graphOrStat.id))
-                    GraphStatType.AVERAGE_TIME_BETWEEN -> binding.demoGraphStatCardView.graphStatView
-                        .initAverageTimeBetweenStat(
-                            graphOrStat,
-                            viewModel.constructAverageTimeBetween(graphOrStat.id)
-                        )
-                    GraphStatType.TIME_SINCE -> binding.demoGraphStatCardView.graphStatView
-                        .initTimeSinceStat(
-                            graphOrStat,
-                            viewModel.constructTimeSince(graphOrStat.id)
-                        )
-                    else -> binding.demoGraphStatCardView.graphStatView.initError(
-                        null,
-                        R.string.graph_stat_view_invalid_setup
-                    )
-                }
+                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data)
             }
         }, 500)
     }
@@ -666,21 +649,19 @@ class GraphStatInputViewModel : ViewModel() {
     val selectedValueStatToValue = MutableLiveData(0.toDouble())
     var lineGraphFeatureConfigs = listOf<LineGraphFeatureConfig>()
     val updateMode: LiveData<Boolean>
-        get() {
-            return _updateMode
-        }
+        get() = _updateMode
     private val _updateMode = MutableLiveData(false)
     val state: LiveData<GraphStatInputState>
-        get() {
-            return _state
-        }
+        get() = _state
     private val _state = MutableLiveData(GraphStatInputState.INITIALIZING)
     val formValid: LiveData<ValidationException?>
-        get() {
-            return _formValid
-        }
+        get() = _formValid
     private val _formValid = MutableLiveData<ValidationException?>(null)
     lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
+
+    val demoViewData: LiveData<IGraphStatViewData?>
+        get() = _demoViewData
+    private val _demoViewData = MutableLiveData<IGraphStatViewData?>(null)
 
     val isDurationMode: Boolean
         get() {
@@ -802,7 +783,42 @@ class GraphStatInputViewModel : ViewModel() {
         return lineGraph.id
     }
 
-    fun validateForm() {
+    fun updateDemoData() {
+        if (validateForm()) {
+            updateDemoViewData()
+        } else {
+            _demoViewData.value = null
+        }
+    }
+
+    private fun updateDemoViewData() = ioScope.launch {
+        withContext(Dispatchers.Default) {
+            val graphOrStat = constructGraphOrStat()
+            val graphStatId = graphOrStat.id
+            val demoData = when (graphStatType.value) {
+                GraphStatType.LINE_GRAPH -> {
+                    LineGraphDataFactory(dataSource!!, graphOrStat)
+                        .createViewData(constructLineGraphWithFeaturesForDemo()) {}
+                }
+                GraphStatType.PIE_CHART -> {
+                    PieChartDataFactory(dataSource!!, constructGraphOrStat())
+                        .createViewData(constructPieChart(graphStatId)) {}
+                }
+                GraphStatType.AVERAGE_TIME_BETWEEN -> {
+                    AverageTimeBetweenDataFactory(dataSource!!, constructGraphOrStat())
+                        .createViewData(constructAverageTimeBetween(graphStatId)) {}
+                }
+                GraphStatType.TIME_SINCE -> {
+                    TimeSinceViewDataFactory(dataSource!!, constructGraphOrStat())
+                        .createViewData(constructTimeSince(graphStatId)) {}
+                }
+                null -> null
+            }
+            withContext(Dispatchers.Main) { demoData?.let { _demoViewData.value = it } }
+        }
+    }
+
+    private fun validateForm(): Boolean {
         try {
             if (graphName.value!!.isEmpty()) throw ValidationException(R.string.graph_stat_validation_no_name)
             when (graphStatType.value) {
@@ -813,9 +829,11 @@ class GraphStatInputViewModel : ViewModel() {
                 else -> throw Exception("")
             }
             _formValid.value = null
+            return true
         } catch (e: Exception) {
             if (e is ValidationException) _formValid.value = e
             else _formValid.value = ValidationException(R.string.graph_stat_validation_unknown)
+            return false
         }
     }
 
@@ -937,12 +955,12 @@ class GraphStatInputViewModel : ViewModel() {
         ioScope.cancel()
     }
 
-    fun constructGraphOrStat() = GraphOrStat.create(
+    private fun constructGraphOrStat() = GraphOrStat.create(
         graphStatId ?: 0L, graphStatGroupId, graphName.value!!, graphStatType.value!!,
         graphStatDisplayIndex ?: 0, endDate.value
     )
 
-    fun constructLineGraphWithFeaturesForDemo() = LineGraphWithFeatures(
+    private fun constructLineGraphWithFeaturesForDemo() = LineGraphWithFeatures(
         id ?: 0L,
         graphStatId ?: 0L,
         lineGraphFeatureConfigs.map { LineGraphFeatureConfig.toLineGraphFeature(it) },
@@ -962,13 +980,13 @@ class GraphStatInputViewModel : ViewModel() {
             LineGraphFeatureConfig.toLineGraphFeature(lgfc, lineGraphId = lineGraphId)
         }
 
-    fun constructPieChart(graphStatId: Long) =
+    private fun constructPieChart(graphStatId: Long) =
         PieChart(
             id ?: 0L, graphStatId,
             selectedPieChartFeature.value!!.id, sampleDuration.value
         )
 
-    fun constructAverageTimeBetween(graphStatId: Long) =
+    private fun constructAverageTimeBetween(graphStatId: Long) =
         AverageTimeBetweenStat(
             id ?: 0L, graphStatId,
             selectedValueStatFeature.value!!.id, getFromValue(),
@@ -976,7 +994,7 @@ class GraphStatInputViewModel : ViewModel() {
             selectedValueStatDiscreteValues.value?.map { dv -> dv.index } ?: emptyList()
         )
 
-    fun constructTimeSince(graphStatId: Long) =
+    private fun constructTimeSince(graphStatId: Long) =
         TimeSinceLastStat(
             id ?: 0L, graphStatId,
             selectedValueStatFeature.value!!.id, getFromValue(), getToValue(),
@@ -992,4 +1010,5 @@ class GraphStatInputViewModel : ViewModel() {
         return if (selectedValueStatFeature.value!!.featureType == FeatureType.DISCRETE) "0"
         else selectedValueStatToValue.value!!.toString()
     }
+
 }
