@@ -48,7 +48,7 @@ class GraphStatAverageTimeBetweenDecorator :
 
     @SuppressLint("SetTextI18n")
     private fun initAverageTimeBetweenStatBody() {
-        if (data!!.hasEnoughData) {
+        if (!data!!.hasEnoughData) {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
         } else {
             val days = "%.1f".format((data!!.averageMillis / 86400000).toFloat())

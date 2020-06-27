@@ -69,7 +69,7 @@ class GraphStatLineGraphDecorator(private val listViewMode: Boolean) :
         context = view.getContext()
 
         yield()
-        initFromLineGraphBody()
+        withContext(Dispatchers.Default) { initFromLineGraphBody() }
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {
@@ -90,17 +90,20 @@ class GraphStatLineGraphDecorator(private val listViewMode: Boolean) :
 
     private suspend fun initFromLineGraphBody() {
         yield()
-        binding!!.lineGraph.visibility = View.INVISIBLE
-        binding!!.progressBar.visibility = View.VISIBLE
+        withContext(Dispatchers.Main) {
+            binding!!.lineGraph.visibility = View.INVISIBLE
+            binding!!.progressBar.visibility = View.VISIBLE
+        }
         if (data!!.hasPlottableData) {
             drawLineGraphFeatures()
             setUpLineGraphXAxis()
             setUpLineGraphYAxis()
             setLineGraphBounds()
-            yield()
             binding!!.lineGraph.redraw()
-            binding!!.lineGraph.visibility = View.VISIBLE
-            binding!!.progressBar.visibility = View.GONE
+            withContext(Dispatchers.Main) {
+                binding!!.lineGraph.visibility = View.VISIBLE
+                binding!!.progressBar.visibility = View.GONE
+            }
         } else {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_graph)
         }
@@ -185,8 +188,9 @@ class GraphStatLineGraphDecorator(private val listViewMode: Boolean) :
 
     private suspend fun drawLineGraphFeatures() {
         for (kvp in data!!.plottableData) {
-            yield()
-            inflateGraphLegendItem(binding!!, context!!, kvp.key.colorIndex, kvp.key.name)
+            withContext(Dispatchers.Main) {
+                inflateGraphLegendItem(binding!!, context!!, kvp.key.colorIndex, kvp.key.name)
+            }
             kvp.value?.let { addSeries(it, kvp.key) }
         }
     }
