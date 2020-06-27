@@ -15,25 +15,15 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.graphstatview.decorators
 
-import android.view.View
-import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import org.threeten.bp.OffsetDateTime
 
-class GraphStatErrorDecorator(
-    private val graphOrStat: GraphOrStat?,
-    private val errorTextId: Int
-) : IGraphStatViewDecorator {
-
-    override suspend fun decorate(view: IDecoratableGraphStatView) {
-        val binding = view.getBinding()
-        initHeader(binding, graphOrStat)
-        graphOrStat?.let { binding.headerText.text = graphOrStat.name }
-        binding.errorMessage.visibility = View.VISIBLE
-        binding.errorMessage.text = view.getContext().getString(errorTextId)
-    }
-
-    override fun setTimeMarker(time: OffsetDateTime) { }
+interface IGraphStatViewDecoratorBase {
+    fun setTimeMarker(time: OffsetDateTime)
 }
 
+interface IGraphStatViewDecorator<T : IGraphStatViewData> : IGraphStatViewDecoratorBase {
+    suspend fun decorate(view: IDecoratableGraphStatView, data: T)
+}

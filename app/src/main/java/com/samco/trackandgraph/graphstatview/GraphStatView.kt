@@ -32,6 +32,8 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.graphstatview.decorators.*
+import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
 import java.text.DecimalFormat
@@ -43,24 +45,15 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     private var binding = GraphStatViewBinding.inflate(LayoutInflater.from(context), this, true)
     override fun getBinding() = binding
 
-    //TODO we shouldn't have a job inside a view. When we change configuration we don't want to have
-    // to set up the view all over again. We need a view model somewhere for this view
     private var viewJob: Job? = null
     private var viewScope: CoroutineScope? = null
     private var decorJob: Job? = null
 
-    //TODO should this data source come from somewhere else? Seems a bit weird to get a database ref
-    // in a view
-    private val dataSource =
-        TrackAndGraphDatabase.getInstance(context.applicationContext).trackAndGraphDatabaseDao
-
-    private var currentDecorator: IGraphStatViewDecorator? = null
-
-    override fun getDataSource() = dataSource
+    private var currentDecorator: IGraphStatViewDecoratorBase? = null
 
     init {
         basicLineGraphSetup()
-        initError(null, R.string.graph_stat_view_invalid_setup)
+        initError(R.string.graph_stat_view_invalid_setup)
     }
 
     private fun resetJob() {
@@ -114,7 +107,8 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         binding.lineGraph.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
         binding.lineGraph.setDomainBoundaries(0, 1, BoundaryMode.GROW)
         binding.lineGraph.graph.refreshLayout()
-        binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format = DecimalFormat("0.0")
+        binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
+            DecimalFormat("0.0")
         binding.pieChart.clear()
         binding.progressBar.visibility = View.GONE
         binding.lineGraph.visibility = View.GONE
@@ -139,85 +133,78 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         }
     }
 
-    private fun trySetDecorator(
-        graphOrStat: GraphOrStat,
-        decorator: IGraphStatViewDecorator
+    private fun <T : IGraphStatViewData> trySetDecorator(
+        decorator: IGraphStatViewDecorator<T>,
+        data: T
     ) {
         resetJob()
         decorJob = viewScope?.launch {
+            cleanAllViews()
             try {
-                cleanAllViews()
-                currentDecorator = decorator
-                decorator.decorate(this@GraphStatView)
+                decorate(data.graphOrStat, decorator, data)
             } catch (exception: Exception) {
-                val initException =
-                    (if (exception is GraphStatInitException) exception else null) ?: return@launch
-                val errorTextId = initException.errorTextId
+                if (exception !is GraphStatInitException) return@launch
                 cleanAllViews()
-                val errorDecorator = GraphStatErrorDecorator(graphOrStat, errorTextId)
-                currentDecorator = errorDecorator
-                errorDecorator.decorate(this@GraphStatView)
+                currentDecorator = null
+                val headerText = data.graphOrStat.name
+                binding.headerText.text = headerText
+                binding.errorMessage.visibility = View.VISIBLE
+                binding.errorMessage.text = context.getString(exception.errorTextId)
             }
         }
     }
 
-    fun initError(graphOrStat: GraphOrStat?, errorTextId: Int) {
-        resetJob()
-        decorJob = viewScope?.launch {
-            cleanAllViews()
-            val errorDecorator = GraphStatErrorDecorator(graphOrStat, errorTextId)
-            currentDecorator = errorDecorator
-            errorDecorator.decorate(this@GraphStatView)
+    private suspend fun <T : IGraphStatViewData> decorate(
+        graphOrStat: GraphOrStat,
+        decorator: IGraphStatViewDecorator<T>,
+        data: T
+    ) {
+        currentDecorator = decorator
+        val headerText = graphOrStat.name
+        binding.headerText.text = headerText
+        when (data.state) {
+            IGraphStatViewData.State.LOADING -> binding.progressBar.visibility = View.VISIBLE
+            IGraphStatViewData.State.READY -> decorator.decorate(this@GraphStatView, data)
+            IGraphStatViewData.State.ERROR -> throw data.error!!
         }
     }
 
-    fun initTimeSinceStat(
-        graphOrStat: GraphOrStat,
-        timeSinceLastStat: TimeSinceLastStat,
-        onSampledDataCallback: SampleDataCallback? = null
-    ) {
-        trySetDecorator(
-            graphOrStat,
-            GraphStatTimeSinceDecorator(graphOrStat, timeSinceLastStat, onSampledDataCallback)
-        )
+    fun initError(errorTextId: Int) {
+        resetJob()
+        decorJob = viewScope?.launch {
+            cleanAllViews()
+            binding.errorMessage.visibility = View.VISIBLE
+            binding.errorMessage.text = context.getString(errorTextId)
+        }
     }
 
-    fun initAverageTimeBetweenStat(
-        graphOrStat: GraphOrStat,
-        timeBetweenStat: AverageTimeBetweenStat,
-        onSampledDataCallback: SampleDataCallback? = null
-    ) {
-        trySetDecorator(
-            graphOrStat,
-            GraphStatAverageTimeBetweenDecorator(
-                graphOrStat,
-                timeBetweenStat,
-                onSampledDataCallback
-            )
-        )
-    }
-
-    fun initFromLineGraph(
-        graphOrStat: GraphOrStat,
-        lineGraph: LineGraphWithFeatures,
-        listViewMode: Boolean = false,
-        onSampledDataCallback: SampleDataCallback? = null
-    ) {
-        trySetDecorator(
-            graphOrStat,
-            GraphStatLineGraphDecorator(graphOrStat, lineGraph, listViewMode, onSampledDataCallback)
-        )
-    }
-
-    fun initFromPieChart(
-        graphOrStat: GraphOrStat,
-        pieChart: PieChart,
-        onSampledDataCallback: SampleDataCallback? = null
-    ) {
-        trySetDecorator(
-            graphOrStat,
-            GraphStatPieChartDecorator(graphOrStat, pieChart, onSampledDataCallback)
-        )
+    fun initFromGraphStat(data: IGraphStatViewData, listMode: Boolean = false) {
+        when (data.graphOrStat.type) {
+            GraphStatType.LINE_GRAPH -> {
+                trySetDecorator(
+                    GraphStatLineGraphDecorator(listMode),
+                    data as ILineGraphViewData
+                )
+            }
+            GraphStatType.PIE_CHART -> {
+                trySetDecorator(
+                    GraphStatPieChartDecorator(),
+                    data as IPieChartViewData
+                )
+            }
+            GraphStatType.AVERAGE_TIME_BETWEEN -> {
+                trySetDecorator(
+                    GraphStatAverageTimeBetweenDecorator(),
+                    data as IAverageTimeBetweenViewData
+                )
+            }
+            GraphStatType.TIME_SINCE -> {
+                trySetDecorator(
+                    GraphStatTimeSinceDecorator(),
+                    data as ITimeSinceViewData
+                )
+            }
+        }
     }
 
     fun dispose() = viewJob?.cancel()

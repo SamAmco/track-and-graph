@@ -15,11 +15,23 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.graphstatview.decorators
 
-import org.threeten.bp.OffsetDateTime
+import android.content.Context
+import com.samco.trackandgraph.database.*
+import com.samco.trackandgraph.databinding.GraphStatViewBinding
+import com.samco.trackandgraph.ui.GraphLegendItemView
 
-interface IGraphStatViewDecorator {
-    suspend fun decorate(view: IDecoratableGraphStatView)
-    fun setTimeMarker(time: OffsetDateTime)
+internal fun inflateGraphLegendItem(
+    binding: GraphStatViewBinding, context: Context,
+    colorIndex: Int, label: String
+) {
+    val colorId = dataVisColorList[colorIndex]
+    binding.legendFlexboxLayout.addView(
+        GraphLegendItemView(
+            context,
+            colorId,
+            label
+        )
+    )
 }
