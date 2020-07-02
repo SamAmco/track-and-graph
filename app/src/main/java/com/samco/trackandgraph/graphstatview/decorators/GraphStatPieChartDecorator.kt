@@ -32,7 +32,8 @@ import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import org.threeten.bp.OffsetDateTime
 
-class GraphStatPieChartDecorator : IGraphStatViewDecorator<IPieChartViewData> {
+class GraphStatPieChartDecorator(listMode: Boolean) :
+    GraphStatViewDecorator<IPieChartViewData>(listMode) {
 
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null

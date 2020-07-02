@@ -40,10 +40,10 @@ import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.graphstatinput.configviews.*
-import com.samco.trackandgraph.graphstatview.factories.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.*
 import java.lang.Exception
+import kotlin.reflect.full.primaryConstructor
 
 const val MAX_LINE_GRAPH_FEATURES = 10
 const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
@@ -162,14 +162,12 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun inflateConfigView(graphStatType: GraphStatType) {
-        val newView: GraphStatConfigView = when (graphStatType) {
-            GraphStatType.LINE_GRAPH -> LineGraphConfigView(requireContext())
-            GraphStatType.PIE_CHART -> PieChartConfigView(requireContext())
-            GraphStatType.AVERAGE_TIME_BETWEEN -> AverageTimeBetweenConfigView(requireContext())
-            GraphStatType.TIME_SINCE -> TimeSinceConfigView(requireContext())
-        }
-        currentConfigView = newView
-        binding.configLayout.addView(newView)
+        graphStatTypes[graphStatType]?.configViewClass
+            ?.primaryConstructor?.call(requireContext(), null, 0)
+            ?.let {
+                currentConfigView = it
+                binding.configLayout.addView(it)
+            }
     }
 
     private fun listenToFormValid() {
@@ -205,7 +203,7 @@ class GraphStatInputFragment : Fragment() {
 }
 
 enum class GraphStatInputState { INITIALIZING, WAITING, ADDING, FINISHED }
-internal class ValidationException(val errorMessageId: Int) : Exception()
+class ValidationException(val errorMessageId: Int) : Exception()
 class GraphStatInputViewModel : ViewModel() {
 
     private var database: TrackAndGraphDatabase? = null
@@ -218,7 +216,6 @@ class GraphStatInputViewModel : ViewModel() {
     private var graphStatGroupId: Long = -1L
     private var graphStatId: Long? = null
     private var graphStatDisplayIndex: Int? = null
-    private var id: Long? = null
 
     val graphName: LiveData<String> get() = _graphName
     private val _graphName = MutableLiveData("")
@@ -268,46 +265,20 @@ class GraphStatInputViewModel : ViewModel() {
             return
         }
 
-        val existingId = when (graphStat.type) {
-            GraphStatType.LINE_GRAPH -> tryInitLineGraph(graphStat)
-            GraphStatType.PIE_CHART -> tryInitPieChart(graphStat)
-            GraphStatType.TIME_SINCE -> tryInitFromTimeSinceStat(graphStat)
-            GraphStatType.AVERAGE_TIME_BETWEEN -> tryInitFromAverageTimeBetweenStat(graphStat)
-        }
+        val configData = graphStatTypes[graphStat.type]
+            ?.dataSourceAdapter!!.getConfigData(dataSource!!, graphStatId)
 
-        if (existingId != null) withContext(Dispatchers.Main) {
-            this@GraphStatInputViewModel._graphName.value = graphStat.name
-            this@GraphStatInputViewModel._graphStatType.value = graphStat.type
-            this@GraphStatInputViewModel.graphStatId = graphStat.id
-            this@GraphStatInputViewModel.graphStatDisplayIndex = graphStat.displayIndex
-            this@GraphStatInputViewModel.id = existingId
-            this@GraphStatInputViewModel._updateMode.value = true
+        configData?.first?.let {
+            withContext(Dispatchers.Main) {
+                this@GraphStatInputViewModel._graphName.value = graphStat.name
+                this@GraphStatInputViewModel._graphStatType.value = graphStat.type
+                this@GraphStatInputViewModel.graphStatId = graphStat.id
+                this@GraphStatInputViewModel.graphStatDisplayIndex = graphStat.displayIndex
+                this@GraphStatInputViewModel._updateMode.value = true
+                this@GraphStatInputViewModel._configData.value = configData.second
+            }
         }
         withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
-    }
-
-    private suspend fun tryInitPieChart(graphStat: GraphOrStat): Long? {
-        val pieChart = dataSource!!.getPieChartByGraphStatId(graphStat.id) ?: return null
-        withContext(Dispatchers.Main) { this@GraphStatInputViewModel._configData.value = pieChart }
-        return pieChart.id
-    }
-
-    private suspend fun tryInitFromAverageTimeBetweenStat(graphStat: GraphOrStat): Long? {
-        val ats = dataSource!!.getAverageTimeBetweenStatByGraphStatId(graphStat.id) ?: return null
-        withContext(Dispatchers.Main) { this@GraphStatInputViewModel._configData.value = ats }
-        return ats.id
-    }
-
-    private suspend fun tryInitFromTimeSinceStat(graphStat: GraphOrStat): Long? {
-        val tss = dataSource!!.getTimeSinceLastStatByGraphStatId(graphStat.id) ?: return null
-        withContext(Dispatchers.Main) { this@GraphStatInputViewModel._configData.value = tss }
-        return tss.id
-    }
-
-    private suspend fun tryInitLineGraph(graphStat: GraphOrStat): Long? {
-        val lineGraph = dataSource!!.getLineGraphByGraphStatId(graphStat.id) ?: return null
-        withContext(Dispatchers.Main) { this@GraphStatInputViewModel._configData.value = lineGraph }
-        return lineGraph.id
     }
 
     fun setGraphName(name: String) {
@@ -342,27 +313,10 @@ class GraphStatInputViewModel : ViewModel() {
         withContext(Dispatchers.Main) {
             _demoViewData.value = IGraphStatViewData.loading(graphOrStat)
         }
-        val demoData = when (_graphStatType.value) {
-            GraphStatType.LINE_GRAPH -> {
-                LineGraphDataFactory(dataSource!!, graphOrStat)
-                    .getViewData(_configData.value as LineGraphWithFeatures) {}
-            }
-            GraphStatType.PIE_CHART -> {
-                PieChartDataFactory(dataSource!!, constructGraphOrStat())
-                    .getViewData(_configData.value as PieChart) {}
-            }
-            GraphStatType.AVERAGE_TIME_BETWEEN -> {
-                AverageTimeBetweenDataFactory(dataSource!!, constructGraphOrStat())
-                    .getViewData(_configData.value as AverageTimeBetweenStat) {}
-            }
-            GraphStatType.TIME_SINCE -> {
-                TimeSinceViewDataFactory(dataSource!!, constructGraphOrStat())
-                    .getViewData(_configData.value as TimeSinceLastStat) {}
-            }
-            null -> null
-        }
-        withContext(Dispatchers.Main)
-        { demoData?.let { _demoViewData.value = it } }
+        val graphStatType = graphStatTypes[graphOrStat.type]
+        val demoData = graphStatType?.dataFactory
+            ?.getViewData(dataSource!!, graphOrStat, _configData.value!!) {}
+        withContext(Dispatchers.Main) { demoData?.let { _demoViewData.value = it } }
     }
 
     private fun validateConfiguration() {
@@ -388,30 +342,9 @@ class GraphStatInputViewModel : ViewModel() {
                     dataSource!!.insertGraphOrStat(constructGraphOrStat())
                 }
 
-                //TODO it would be really nice to not be using entities here but rather
-                // an object with a generic interface to avoid all this when stuff
-                when (_graphStatType.value) {
-                    GraphStatType.LINE_GRAPH -> {
-                        val config = (_configData.value as LineGraphWithFeatures)
-                            .copy(graphStatId = graphStatId)
-                        addLineGraph(config)
-                    }
-                    GraphStatType.PIE_CHART -> {
-                        val config = (_configData.value as PieChart)
-                            .copy(graphStatId = graphStatId)
-                        addPieChart(config)
-                    }
-                    GraphStatType.AVERAGE_TIME_BETWEEN -> {
-                        val config = (_configData.value as AverageTimeBetweenStat)
-                            .copy(graphStatId = graphStatId)
-                        addAvTimeBetween(config)
-                    }
-                    GraphStatType.TIME_SINCE -> {
-                        val config = (_configData.value as TimeSinceLastStat)
-                            .copy(graphStatId = graphStatId)
-                        addTimeSince(config)
-                    }
-                }
+                graphStatTypes[_graphStatType.value]?.dataSourceAdapter?.writeConfig(
+                    dataSource!!, graphStatId, _configData.value!!, _updateMode.value!!
+                )
             }
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
         }
@@ -422,34 +355,6 @@ class GraphStatInputViewModel : ViewModel() {
             it.copy(displayIndex = it.displayIndex + 1)
         }
         dataSource!!.updateGraphStats(newList)
-    }
-
-    private fun addLineGraph(lineGraph: LineGraphWithFeatures) {
-        val newLineGraphId = if (_updateMode.value!!) {
-            id?.let { dataSource!!.deleteFeaturesForLineGraph(it) }
-            dataSource!!.updateLineGraph(lineGraph.toLineGraph())
-            lineGraph.id
-        } else {
-            dataSource!!.insertLineGraph(lineGraph.toLineGraph())
-        }
-        val lineGraphFeatures = lineGraph.features
-            .map { it.copy(lineGraphId = newLineGraphId) }
-        dataSource!!.insertLineGraphFeatures(lineGraphFeatures)
-    }
-
-    private fun addPieChart(pieChart: PieChart) {
-        if (_updateMode.value!!) dataSource!!.updatePieChart(pieChart)
-        else dataSource!!.insertPieChart(pieChart)
-    }
-
-    private fun addAvTimeBetween(averageTimeBetweenStat: AverageTimeBetweenStat) {
-        if (_updateMode.value!!) dataSource!!.updateAverageTimeBetweenStat(averageTimeBetweenStat)
-        else dataSource!!.insertAverageTimeBetweenStat(averageTimeBetweenStat)
-    }
-
-    private fun addTimeSince(timeSinceLastStat: TimeSinceLastStat) {
-        if (_updateMode.value!!) dataSource!!.updateTimeSinceLastStat(timeSinceLastStat)
-        else dataSource!!.insertTimeSinceLastStat(timeSinceLastStat)
     }
 
     private fun constructGraphOrStat() = GraphOrStat.create(

@@ -198,9 +198,13 @@ internal class LineGraphConfigView @JvmOverloads constructor(
                 if (configData.features.any { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }) {
                     binding.yRangeFromToDurationLayout.visibility = View.VISIBLE
                     binding.yRangeFromToLayout.visibility = View.GONE
+                    binding.yRangeFromDuration.setTimeInSeconds(configData.yFrom.toLong())
+                    binding.yRangeToDuration.setTimeInSeconds(configData.yTo.toLong())
                 } else {
                     binding.yRangeFromToDurationLayout.visibility = View.GONE
                     binding.yRangeFromToLayout.visibility = View.VISIBLE
+                    binding.yRangeFrom.setText(configData.yFrom.toString())
+                    binding.yRangeTo.setText(configData.yTo.toString())
                 }
             }
         }

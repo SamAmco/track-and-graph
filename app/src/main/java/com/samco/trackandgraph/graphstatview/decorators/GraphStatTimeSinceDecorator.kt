@@ -20,7 +20,6 @@ package com.samco.trackandgraph.graphstatview.decorators
 import android.content.Context
 import android.view.View
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
@@ -28,7 +27,8 @@ import kotlinx.coroutines.delay
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-class GraphStatTimeSinceDecorator : IGraphStatViewDecorator<ITimeSinceViewData> {
+class GraphStatTimeSinceDecorator(listMode: Boolean) :
+    GraphStatViewDecorator<ITimeSinceViewData>(listMode) {
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
     private var data: ITimeSinceViewData? = null

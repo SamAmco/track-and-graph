@@ -31,20 +31,21 @@ import com.samco.trackandgraph.statistics.*
 import kotlinx.coroutines.yield
 import org.threeten.bp.OffsetDateTime
 
-class LineGraphDataFactory(
-    dataSource: TrackAndGraphDatabaseDao,
-    graphOrStat: GraphOrStat
-) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(
-    dataSource,
-    graphOrStat
-) {
+class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>() {
+    companion object {
+        val instance = LineGraphDataFactory()
+    }
+
     override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
         config: LineGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData {
         val endTime = config.endDate ?: OffsetDateTime.now()
         val allReferencedDataPoints = mutableListOf<DataPoint>()
         val plottableData = generatePlottingData(
+            dataSource,
             config,
             allReferencedDataPoints,
             endTime
@@ -72,36 +73,44 @@ class LineGraphDataFactory(
             override val state: IGraphStatViewData.State
                 get() = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat
-                get() = this@LineGraphDataFactory.graphOrStat
+                get() = graphOrStat
         }
     }
 
-    override suspend fun createViewData(onDataSampled: (List<DataPoint>) -> Unit): ILineGraphViewData {
+    override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): ILineGraphViewData {
         val lineGraph = dataSource.getLineGraphByGraphStatId(graphOrStat.id)
             ?: return object : ILineGraphViewData {
                 override val state: IGraphStatViewData.State
                     get() = IGraphStatViewData.State.ERROR
                 override val graphOrStat: GraphOrStat
-                    get() = this@LineGraphDataFactory.graphOrStat
+                    get() = graphOrStat
                 override val error: GraphStatInitException?
                     get() = GraphStatInitException(R.string.graph_stat_view_not_found)
             }
-        return createViewData(lineGraph, onDataSampled)
+        return createViewData(dataSource, graphOrStat, lineGraph, onDataSampled)
     }
 
     private suspend fun generatePlottingData(
+        dataSource: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
         allReferencedDataPoints: MutableList<DataPoint>,
         endTime: OffsetDateTime
     ): Map<LineGraphFeature, FastXYSeries?> {
         return lineGraph.features.map { lgf ->
             yield()
-            val plottingData = tryGetPlottingData(lineGraph, allReferencedDataPoints, lgf)
+            val plottingData =
+                tryGetPlottingData(dataSource, lineGraph, allReferencedDataPoints, lgf)
             lgf to plottingData?.let { getXYSeriesFromDataSample(it, endTime, lgf) }
         }.toMap()
     }
 
+    //TODO can we get more efficiency by running some of this on the default dispatcher?
     private suspend fun tryGetPlottingData(
+        dataSource: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
         allReferencedDataPoints: MutableList<DataPoint>,
         lineGraphFeature: LineGraphFeature
@@ -164,5 +173,4 @@ class LineGraphDataFactory(
         }
         return bounds
     }
-
 }
