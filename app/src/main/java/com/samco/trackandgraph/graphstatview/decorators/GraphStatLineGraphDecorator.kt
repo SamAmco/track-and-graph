@@ -48,8 +48,8 @@ import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.max
 
-class GraphStatLineGraphDecorator(private val listViewMode: Boolean) :
-    IGraphStatViewDecorator<ILineGraphViewData> {
+class GraphStatLineGraphDecorator(listMode: Boolean) :
+    GraphStatViewDecorator<ILineGraphViewData>(listMode) {
     private val lineGraphHourMinuteSecondFromat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm:ss")
         .withZone(ZoneId.systemDefault())
@@ -197,7 +197,7 @@ class GraphStatLineGraphDecorator(private val listViewMode: Boolean) :
 
     private suspend fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
         val seriesFormat =
-            if (listViewMode && lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
+            if (listMode && lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
                 getFastLineAndPointFormatter(lineGraphFeature)
             else getLineAndPointFormatter(lineGraphFeature)
         yield()

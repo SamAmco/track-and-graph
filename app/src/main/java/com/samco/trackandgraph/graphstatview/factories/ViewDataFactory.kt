@@ -31,24 +31,37 @@ import kotlinx.coroutines.withContext
  * I is the store of configuration options that tells the factory how to generate the data
  * T is the type of data produced by this factory
  */
-abstract class ViewDataFactory<in I, out T : IGraphStatViewData>(
-    protected val dataSource: TrackAndGraphDatabaseDao,
-    protected val graphOrStat: GraphOrStat
-) {
-    protected abstract suspend fun createViewData(onDataSampled: (List<DataPoint>) -> Unit): T
+abstract class ViewDataFactory<in I, out T : IGraphStatViewData> {
+    protected abstract suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): T
 
     protected abstract suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
         config: I,
         onDataSampled: (List<DataPoint>) -> Unit
     ): T
 
-    suspend fun getViewData(config: I, onDataSampled: (List<DataPoint>) -> Unit = {}): T =
+    @Suppress("UNCHECKED_CAST")
+    suspend fun getViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        config: Any,
+        onDataSampled: (List<DataPoint>) -> Unit = {}
+    ): T =
         withContext(Dispatchers.IO) {
-            return@withContext createViewData(config, onDataSampled)
+            return@withContext createViewData(dataSource, graphOrStat, config as I, onDataSampled)
         }
 
-    suspend fun getViewData(onDataSampled: (List<DataPoint>) -> Unit = {}): T =
+    suspend fun getViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        onDataSampled: (List<DataPoint>) -> Unit = {}
+    ): T =
         withContext(Dispatchers.IO) {
-            return@withContext createViewData(onDataSampled)
+            return@withContext createViewData(dataSource, graphOrStat, onDataSampled)
         }
 }

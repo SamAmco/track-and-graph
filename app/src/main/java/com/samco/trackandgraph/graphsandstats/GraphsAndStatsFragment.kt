@@ -36,12 +36,9 @@ import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.entity.GraphStatType
+import com.samco.trackandgraph.database.entity.graphStatTypes
 import com.samco.trackandgraph.databinding.GraphsAndStatsFragmentBinding
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
-import com.samco.trackandgraph.graphstatview.factories.AverageTimeBetweenDataFactory
-import com.samco.trackandgraph.graphstatview.factories.LineGraphDataFactory
-import com.samco.trackandgraph.graphstatview.factories.PieChartDataFactory
-import com.samco.trackandgraph.graphstatview.factories.TimeSinceViewDataFactory
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.ui.*
 import kotlinx.coroutines.*
@@ -248,18 +245,7 @@ class GraphsAndStatsViewModel : ViewModel() {
 
     private suspend fun preenGraphStats() {
         val graphStats = dataSource!!.getAllGraphStatsSync()
-        graphStats.forEach {
-            when (it.type) {
-                GraphStatType.LINE_GRAPH ->
-                    if (preenLineGraph(it)) dataSource!!.deleteGraphOrStat(it)
-                GraphStatType.PIE_CHART ->
-                    if (preenPieChart(it)) dataSource!!.deleteGraphOrStat(it)
-                GraphStatType.AVERAGE_TIME_BETWEEN ->
-                    if (preenAverageTimeBetween(it)) dataSource!!.deleteGraphOrStat(it)
-                GraphStatType.TIME_SINCE ->
-                    if (preenTimeSince(it)) dataSource!!.deleteGraphOrStat(it)
-            }
-        }
+        graphStats.forEach { graphStatTypes[it.type]?.dataSourceAdapter?.preen(dataSource!!, it) }
         val numFeatures = dataSource!!.getNumFeatures()
         withContext(Dispatchers.Main) {
             if (numFeatures <= 0) _state.value = GraphsAndStatsViewState.NO_FEATURES
@@ -287,13 +273,7 @@ class GraphsAndStatsViewModel : ViewModel() {
             iterateGraphStatDataFactories(graphsAndStats, true)
         } else {
             val loadingStates = graphsAndStats.map {
-                when (it.type) {
-                    GraphStatType.LINE_GRAPH -> Pair(Instant.now(), ILineGraphViewData.loading(it))
-                    GraphStatType.PIE_CHART -> Pair(Instant.now(), IPieChartViewData.loading(it))
-                    GraphStatType.TIME_SINCE -> Pair(Instant.now(), ITimeSinceViewData.loading(it))
-                    GraphStatType.AVERAGE_TIME_BETWEEN ->
-                        Pair(Instant.now(), IAverageTimeBetweenViewData.loading(it))
-                }
+                Pair(Instant.now(), IGraphStatViewData.loading(it))
             }
             withContext(Dispatchers.Main) { _graphStats.value = loadingStates }
             iterateGraphStatDataFactories(graphsAndStats, false)
@@ -307,14 +287,8 @@ class GraphsAndStatsViewModel : ViewModel() {
         val batch = mutableListOf<IGraphStatViewData>()
         for (index in graphsAndStats.indices) {
             val graphOrStat = graphsAndStats[index]
-            val factory = when (graphOrStat.type) {
-                GraphStatType.LINE_GRAPH -> LineGraphDataFactory(dataSource!!, graphOrStat)
-                GraphStatType.PIE_CHART -> PieChartDataFactory(dataSource!!, graphOrStat)
-                GraphStatType.TIME_SINCE -> TimeSinceViewDataFactory(dataSource!!, graphOrStat)
-                GraphStatType.AVERAGE_TIME_BETWEEN ->
-                    AverageTimeBetweenDataFactory(dataSource!!, graphOrStat)
-            }
-            val viewData = factory.getViewData()
+            val viewData = graphStatTypes[graphOrStat.type]
+                ?.dataFactory!!.getViewData(dataSource!!, graphOrStat)
             if (batchUpdate) batch.add(index, viewData)
             else withContext(Dispatchers.Main) { updateGraphStatData(index, viewData) }
         }
@@ -335,23 +309,6 @@ class GraphsAndStatsViewModel : ViewModel() {
         }
     }
 
-    private fun preenLineGraph(graphOrStat: GraphOrStat): Boolean {
-        val lineGraph = dataSource!!.getLineGraphByGraphStatId(graphOrStat.id) ?: return true
-        return lineGraph.features.any { dataSource!!.tryGetFeatureByIdSync(it.featureId) == null }
-    }
-
-    private fun preenPieChart(graphOrStat: GraphOrStat): Boolean {
-        return dataSource!!.getPieChartByGraphStatId(graphOrStat.id) == null
-    }
-
-    private fun preenAverageTimeBetween(graphOrStat: GraphOrStat): Boolean {
-        return dataSource!!.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id) == null
-    }
-
-    private fun preenTimeSince(graphOrStat: GraphOrStat): Boolean {
-        return dataSource!!.getTimeSinceLastStatByGraphStatId(graphOrStat.id) == null
-    }
-
     fun deleteGraphStat(graphOrStat: IGraphStatViewData) {
         ioScope.launch { dataSource?.deleteGraphOrStat(graphOrStat.graphOrStat) }
     }
@@ -359,42 +316,8 @@ class GraphsAndStatsViewModel : ViewModel() {
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         ioScope.launch {
             database?.withTransaction {
-                duplicateGraphOrStat(graphOrStatViewData.graphOrStat)
-            }
-        }
-    }
-
-    private fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        val originalId = graphOrStat.id
-        val newId = dataSource!!.insertGraphOrStat(graphOrStat.copy(id = 0))
-        when (graphOrStat.type) {
-            GraphStatType.LINE_GRAPH -> {
-                val lineGraph = dataSource!!.getLineGraphByGraphStatId(originalId)
-                lineGraph?.let {
-                    val copy = it.toLineGraph().copy(id = 0, graphStatId = newId)
-                    val newLineGraphId = dataSource!!.insertLineGraph(copy)
-                    val newFeatures = lineGraph.features.map { f ->
-                        f.copy(id = 0, lineGraphId = newLineGraphId)
-                    }
-                    dataSource!!.insertLineGraphFeatures(newFeatures)
-                }
-            }
-            GraphStatType.PIE_CHART -> {
-                val pieChart = dataSource!!.getPieChartByGraphStatId(originalId)
-                val copy = pieChart?.copy(id = 0, graphStatId = newId)
-                copy?.let { dataSource!!.insertPieChart(it) }
-            }
-            GraphStatType.AVERAGE_TIME_BETWEEN -> {
-                val avTimeStat =
-                    dataSource!!.getAverageTimeBetweenStatByGraphStatId(originalId)
-                val copy = avTimeStat?.copy(id = 0, graphStatId = newId)
-                copy?.let { dataSource!!.insertAverageTimeBetweenStat(it) }
-            }
-            GraphStatType.TIME_SINCE -> {
-                val timeSinceStat =
-                    dataSource!!.getTimeSinceLastStatByGraphStatId(originalId)
-                val copy = timeSinceStat?.copy(id = 0, graphStatId = newId)
-                copy?.let { dataSource!!.insertTimeSinceLastStat(it) }
+                val gs = graphOrStatViewData.graphOrStat
+                graphStatTypes[gs.type]?.dataSourceAdapter?.duplicateGraphOrStat(dataSource!!, gs)
             }
         }
     }

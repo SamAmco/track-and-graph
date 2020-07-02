@@ -26,15 +26,29 @@ import com.samco.trackandgraph.database.entity.TimeSinceLastStat
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
-import org.threeten.bp.OffsetDateTime
 
-class TimeSinceViewDataFactory(
-    dataSource: TrackAndGraphDatabaseDao,
-    graphOrStat: GraphOrStat
-) : ViewDataFactory<TimeSinceLastStat, ITimeSinceViewData>(
-    dataSource, graphOrStat
-) {
+class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceViewData>() {
     override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): ITimeSinceViewData {
+        val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
+            ?: return object : ITimeSinceViewData {
+                override val state: IGraphStatViewData.State
+                    get() = IGraphStatViewData.State.ERROR
+                override val graphOrStat: GraphOrStat
+                    get() = graphOrStat
+                override val error: GraphStatInitException?
+                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
+
+            }
+        return createViewData(dataSource, graphOrStat, timeSinceStat, onDataSampled)
+    }
+
+    override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
         config: TimeSinceLastStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
@@ -46,22 +60,8 @@ class TimeSinceViewDataFactory(
             override val state: IGraphStatViewData.State
                 get() = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat
-                get() = this@TimeSinceViewDataFactory.graphOrStat
+                get() = graphOrStat
         }
-    }
-
-    override suspend fun createViewData(onDataSampled: (List<DataPoint>) -> Unit): ITimeSinceViewData {
-        val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
-            ?: return object : ITimeSinceViewData {
-                override val state: IGraphStatViewData.State
-                    get() = IGraphStatViewData.State.ERROR
-                override val graphOrStat: GraphOrStat
-                    get() = this@TimeSinceViewDataFactory.graphOrStat
-                override val error: GraphStatInitException?
-                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
-
-            }
-        return createViewData(timeSinceStat, onDataSampled)
     }
 
     private fun getLastDataPoint(

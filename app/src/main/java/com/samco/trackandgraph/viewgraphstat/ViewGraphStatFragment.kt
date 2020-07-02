@@ -296,20 +296,8 @@ class ViewGraphStatViewModel : ViewModel() {
 
     private suspend fun initFromGraphStatId(graphStatId: Long) {
         val graphStat = dataSource!!.getGraphStatById(graphStatId)
-
-        val viewData = when (graphStat.type) {
-            GraphStatType.LINE_GRAPH -> LineGraphDataFactory(dataSource!!, graphStat)
-                .getViewData(this::onSampledDataPoints)
-            GraphStatType.PIE_CHART -> PieChartDataFactory(dataSource!!, graphStat)
-                .getViewData(this::onSampledDataPoints)
-            GraphStatType.TIME_SINCE -> TimeSinceViewDataFactory(dataSource!!, graphStat)
-                .getViewData(this::onSampledDataPoints)
-            GraphStatType.AVERAGE_TIME_BETWEEN -> AverageTimeBetweenDataFactory(
-                dataSource!!,
-                graphStat
-            ).getViewData(this::onSampledDataPoints)
-        }
-
+        val viewData = graphStatTypes[graphStat.type]
+            ?.dataFactory!!.getViewData(dataSource!!, graphStat, this::onSampledDataPoints)
         withContext(Dispatchers.Main) { _graphStatViewData.value = viewData }
     }
 

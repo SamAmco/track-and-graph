@@ -31,20 +31,36 @@ import com.samco.trackandgraph.statistics.sampleData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class PieChartDataFactory(
-    dataSource: TrackAndGraphDatabaseDao,
-    graphOrStat: GraphOrStat
-) : ViewDataFactory<PieChart, IPieChartViewData>(
-    dataSource,
-    graphOrStat
-) {
-    override suspend fun createViewData(config: PieChart, onDataSampled: (List<DataPoint>) -> Unit): IPieChartViewData {
-        val plottingData = tryGetPlottableDataForPieChart(config)
+class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
+    override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): IPieChartViewData {
+        val pieChart = dataSource.getPieChartByGraphStatId(graphOrStat.id)
+            ?: return object : IPieChartViewData {
+                override val state: IGraphStatViewData.State
+                    get() = IGraphStatViewData.State.ERROR
+                override val graphOrStat: GraphOrStat
+                    get() = graphOrStat
+                override val error: GraphStatInitException?
+                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
+            }
+        return createViewData(dataSource, graphOrStat, pieChart, onDataSampled)
+    }
+
+    override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        config: PieChart,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): IPieChartViewData {
+        val plottingData = tryGetPlottableDataForPieChart(dataSource, config)
             ?: return object : IPieChartViewData {
                 override val state: IGraphStatViewData.State
                     get() = IGraphStatViewData.State.READY
                 override val graphOrStat: GraphOrStat
-                    get() = this@PieChartDataFactory.graphOrStat
+                    get() = graphOrStat
                 override val segments: List<Segment>?
                     get() = null
             }
@@ -65,24 +81,14 @@ class PieChartDataFactory(
             override val state: IGraphStatViewData.State
                 get() = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat
-                get() = this@PieChartDataFactory.graphOrStat
+                get() = graphOrStat
         }
     }
 
-    override suspend fun createViewData(onDataSampled: (List<DataPoint>) -> Unit): IPieChartViewData {
-        val pieChart = dataSource.getPieChartByGraphStatId(graphOrStat.id)
-            ?: return object : IPieChartViewData {
-                override val state: IGraphStatViewData.State
-                    get() = IGraphStatViewData.State.ERROR
-                override val graphOrStat: GraphOrStat
-                    get() = this@PieChartDataFactory.graphOrStat
-                override val error: GraphStatInitException?
-                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
-            }
-        return createViewData(pieChart, onDataSampled)
-    }
-
-    private suspend fun tryGetPlottableDataForPieChart(pieChart: PieChart): DataSample? {
+    private suspend fun tryGetPlottableDataForPieChart(
+        dataSource: TrackAndGraphDatabaseDao,
+        pieChart: PieChart
+    ): DataSample? {
         val feature = withContext(Dispatchers.IO) {
             dataSource.getFeatureById(pieChart.featureId)
         }
@@ -98,4 +104,5 @@ class PieChartDataFactory(
             .groupingBy { dp -> dp.label }
             .eachCount()
             .map { b -> Segment(b.key, b.value) }
+
 }
