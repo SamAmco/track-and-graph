@@ -23,12 +23,16 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.database.dto.YRangeType
 import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
-@Entity(tableName = "line_graphs_table2",
-    foreignKeys = [ForeignKey(entity = GraphOrStat::class,
+@Entity(
+    tableName = "line_graphs_table3",
+    foreignKeys = [ForeignKey(
+        entity = GraphOrStat::class,
         parentColumns = arrayOf("id"),
         childColumns = arrayOf("graph_stat_id"),
-        onDelete = ForeignKey.CASCADE)]
+        onDelete = ForeignKey.CASCADE
+    )]
 )
 data class LineGraph(
     @PrimaryKey(autoGenerate = true)
@@ -48,18 +52,24 @@ data class LineGraph(
     val yFrom: Double,
 
     @ColumnInfo(name = "y_to")
-    val yTo: Double
+    val yTo: Double,
+
+    @ColumnInfo(name = "end_date")
+    val endDate: OffsetDateTime?
 ) {
     companion object {
-        fun create(id: Long, graphStatId: Long, duration: Duration?,
-                   yRangeType: YRangeType, yFrom: Double, yTo: Double): LineGraph {
+        fun create(
+            id: Long, graphStatId: Long, duration: Duration?,
+            yRangeType: YRangeType, yFrom: Double, yTo: Double, endDate: OffsetDateTime?
+        ): LineGraph {
             return LineGraph(
                 id,
                 graphStatId,
                 duration,
                 yRangeType,
                 yFrom,
-                yTo
+                yTo,
+                endDate
             )
         }
     }

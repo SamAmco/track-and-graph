@@ -30,4 +30,13 @@ interface IGraphStatViewData {
     val graphOrStat: GraphOrStat
     val error: GraphStatInitException?
         get() = null
+
+    companion object {
+        fun loading(graphOrStat: GraphOrStat) = object: IGraphStatViewData {
+            override val state: State
+                get() = State.LOADING
+            override val graphOrStat: GraphOrStat
+                get() = graphOrStat
+        }
+    }
 }

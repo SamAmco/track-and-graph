@@ -26,19 +26,33 @@ import com.samco.trackandgraph.database.entity.TimeSinceLastStat
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
-import org.threeten.bp.OffsetDateTime
 
-class TimeSinceViewDataFactory(
-    dataSource: TrackAndGraphDatabaseDao,
-    graphOrStat: GraphOrStat
-) : ViewDataFactory<ITimeSinceViewData>(
-    dataSource, graphOrStat
-) {
-    fun createViewData(
-        timeSinceStat: TimeSinceLastStat,
+class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceViewData>() {
+    override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
-        val dataPoint = getLastDataPoint(dataSource, graphOrStat, timeSinceStat)
+        val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
+            ?: return object : ITimeSinceViewData {
+                override val state: IGraphStatViewData.State
+                    get() = IGraphStatViewData.State.ERROR
+                override val graphOrStat: GraphOrStat
+                    get() = graphOrStat
+                override val error: GraphStatInitException?
+                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
+
+            }
+        return createViewData(dataSource, graphOrStat, timeSinceStat, onDataSampled)
+    }
+
+    override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        config: TimeSinceLastStat,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): ITimeSinceViewData {
+        val dataPoint = getLastDataPoint(dataSource, config)
         onDataSampled.invoke(dataPoint?.let { listOf(dataPoint) } ?: emptyList())
         return object : ITimeSinceViewData {
             override val lastDataPoint: DataPoint?
@@ -46,47 +60,27 @@ class TimeSinceViewDataFactory(
             override val state: IGraphStatViewData.State
                 get() = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat
-                get() = this@TimeSinceViewDataFactory.graphOrStat
-            override val endDate: OffsetDateTime?
-                get() = graphOrStat.endDate
+                get() = graphOrStat
         }
-    }
-
-    override suspend fun createViewData(onDataSampled: (List<DataPoint>) -> Unit): ITimeSinceViewData {
-        val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
-            ?: return object : ITimeSinceViewData {
-                override val state: IGraphStatViewData.State
-                    get() = IGraphStatViewData.State.ERROR
-                override val graphOrStat: GraphOrStat
-                    get() = this@TimeSinceViewDataFactory.graphOrStat
-                override val error: GraphStatInitException?
-                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
-
-            }
-        return createViewData(timeSinceStat, onDataSampled)
     }
 
     private fun getLastDataPoint(
         dataSource: TrackAndGraphDatabaseDao,
-        graphOrStat: GraphOrStat,
         timeSinceLastStat: TimeSinceLastStat
     ): DataPoint? {
         val feature = dataSource.getFeatureById(timeSinceLastStat.featureId)
-        val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
         return when (feature.featureType) {
             FeatureType.CONTINUOUS, FeatureType.DURATION -> {
                 dataSource.getLastDataPointBetween(
                     timeSinceLastStat.featureId,
                     timeSinceLastStat.fromValue,
-                    timeSinceLastStat.toValue,
-                    endDate
+                    timeSinceLastStat.toValue
                 )
             }
             else -> {
                 dataSource.getLastDataPointWithValue(
                     timeSinceLastStat.featureId,
-                    timeSinceLastStat.discreteValues,
-                    endDate
+                    timeSinceLastStat.discreteValues
                 )
             }
         }

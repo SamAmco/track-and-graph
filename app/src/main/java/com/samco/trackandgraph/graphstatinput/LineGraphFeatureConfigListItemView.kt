@@ -43,8 +43,8 @@ class LineGraphFeatureConfigListItemView(
 ) : LinearLayout(context) {
     private val binding =
         ListItemLineGraphFeatureBinding.inflate(LayoutInflater.from(context), this, true)
-    private var onRemoveListener: ((LineGraphFeatureConfigListItemView) -> Unit)? = null
-    private var onUpdatedListener: ((LineGraphFeatureConfigListItemView) -> Unit)? = null
+    private var onRemoveListener: ((LineGraphFeature) -> Unit)? = null
+    private var onUpdatedListener: ((LineGraphFeature) -> Unit)? = null
     private val decimalFormat = DecimalFormat("0.###############")
     private var pointStyleSpinnerAdapter: PointStyleSpinnerAdapter? = null
 
@@ -69,7 +69,7 @@ class LineGraphFeatureConfigListItemView(
         binding.lineGraphFeatureName.addTextChangedListener { text ->
             if (lineGraphFeature.name != text.toString()) {
                 lineGraphFeature.name = text.toString()
-                onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                onUpdatedListener?.invoke(LineGraphFeatureConfig.toLineGraphFeature(lineGraphFeature))
             }
         }
     }
@@ -81,7 +81,7 @@ class LineGraphFeatureConfigListItemView(
             override fun onNothingSelected(p0: AdapterView<*>?) {}
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                 lineGraphFeature.colorIndex = index
-                onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                onUpdatedListener?.invoke(LineGraphFeatureConfig.toLineGraphFeature(lineGraphFeature))
             }
         }
     }
@@ -100,15 +100,18 @@ class LineGraphFeatureConfigListItemView(
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                     lineGraphFeature.pointStyle = pointStyleImages.keys.elementAt(index)
-                    onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                    onUpdatedListener?.invoke(
+                        LineGraphFeatureConfig.toLineGraphFeature(
+                            lineGraphFeature
+                        )
+                    )
                 }
             }
     }
 
     private fun setupRemoveButton() {
         binding.removeButton.setOnClickListener {
-            onRemoveListener?.invoke(this)
-            onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+            onRemoveListener?.invoke(LineGraphFeatureConfig.toLineGraphFeature(lineGraphFeature))
         }
     }
 
@@ -116,7 +119,7 @@ class LineGraphFeatureConfigListItemView(
         binding.scaleInput.setText(decimalFormat.format(lineGraphFeature.scale))
         binding.scaleInput.addTextChangedListener { text ->
             lineGraphFeature.scale = getDoubleFromText(text.toString())
-            onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+            onUpdatedListener?.invoke(LineGraphFeatureConfig.toLineGraphFeature(lineGraphFeature))
         }
     }
 
@@ -124,7 +127,7 @@ class LineGraphFeatureConfigListItemView(
         binding.offsetInput.setText(decimalFormat.format(lineGraphFeature.offset))
         binding.offsetInput.addTextChangedListener { text ->
             lineGraphFeature.offset = getDoubleFromText(text.toString())
-            onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+            onUpdatedListener?.invoke(LineGraphFeatureConfig.toLineGraphFeature(lineGraphFeature))
         }
     }
 
@@ -138,7 +141,11 @@ class LineGraphFeatureConfigListItemView(
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                     lineGraphFeature.plottingMode = LineGraphPlottingModes.values()[index]
-                    onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                    onUpdatedListener?.invoke(
+                        LineGraphFeatureConfig.toLineGraphFeature(
+                            lineGraphFeature
+                        )
+                    )
                 }
             }
     }
@@ -153,7 +160,11 @@ class LineGraphFeatureConfigListItemView(
                 override fun onNothingSelected(p0: AdapterView<*>?) {}
                 override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
                     lineGraphFeature.averagingMode = LineGraphAveraginModes.values()[index]
-                    onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                    onUpdatedListener?.invoke(
+                        LineGraphFeatureConfig.toLineGraphFeature(
+                            lineGraphFeature
+                        )
+                    )
                 }
             }
     }
@@ -180,7 +191,11 @@ class LineGraphFeatureConfigListItemView(
                     lineGraphFeature.featureId = items[index].first.id
                     lineGraphFeature.durationPlottingMode = items[index].second
                     adjustPointStyleSpinnerForFeature()
-                    onUpdatedListener?.invoke(this@LineGraphFeatureConfigListItemView)
+                    onUpdatedListener?.invoke(
+                        LineGraphFeatureConfig.toLineGraphFeature(
+                            lineGraphFeature
+                        )
+                    )
                 }
             }
     }
@@ -228,11 +243,11 @@ class LineGraphFeatureConfigListItemView(
         }
     }
 
-    fun setOnUpdateListener(onUpdatedListener: (LineGraphFeatureConfigListItemView) -> Unit) {
+    fun setOnUpdateListener(onUpdatedListener: (LineGraphFeature) -> Unit) {
         this.onUpdatedListener = onUpdatedListener
     }
 
-    fun setOnRemoveListener(onRemoveListener: (LineGraphFeatureConfigListItemView) -> Unit) {
+    fun setOnRemoveListener(onRemoveListener: (LineGraphFeature) -> Unit) {
         this.onRemoveListener = onRemoveListener
     }
 

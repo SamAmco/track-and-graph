@@ -24,20 +24,26 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-class AverageTimeBetweenDataFactory(
-    dataSource: TrackAndGraphDatabaseDao,
-    graphOrStat: GraphOrStat
-) : ViewDataFactory<IAverageTimeBetweenViewData>(
-    dataSource,
-    graphOrStat
-) {
-    fun createViewData(
-        timeBetweenStat: AverageTimeBetweenStat,
+class AverageTimeBetweenDataFactory : ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
+    override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
-        val feature = dataSource.getFeatureById(timeBetweenStat.featureId)
-        val dataPoints = getRelevantDataPoints(timeBetweenStat, feature)
-        if (dataPoints.size < 2) return notEnoughData()
+        val timeBetweenStat = dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
+            ?: return notEnoughData(graphOrStat)
+        return createViewData(dataSource, graphOrStat, timeBetweenStat, onDataSampled)
+    }
+
+    override suspend fun createViewData(
+        dataSource: TrackAndGraphDatabaseDao,
+        graphOrStat: GraphOrStat,
+        config: AverageTimeBetweenStat,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): IAverageTimeBetweenViewData {
+        val feature = dataSource.getFeatureById(config.featureId)
+        val dataPoints = getRelevantDataPoints(dataSource, config, feature)
+        if (dataPoints.size < 2) return notEnoughData(graphOrStat)
         val totalMillis = Duration.between(
             dataPoints.first().timestamp,
             dataPoints.last().timestamp
@@ -55,7 +61,7 @@ class AverageTimeBetweenDataFactory(
             override val state: IGraphStatViewData.State
                 get() = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat
-                get() = this@AverageTimeBetweenDataFactory.graphOrStat
+                get() = graphOrStat
             override val averageMillis: Double
                 get() = averageMillis
             override val hasEnoughData: Boolean
@@ -63,24 +69,19 @@ class AverageTimeBetweenDataFactory(
         }
     }
 
-    override suspend fun createViewData(onDataSampled: (List<DataPoint>) -> Unit): IAverageTimeBetweenViewData {
-        val timeBetweenStat = dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
-            ?: return notEnoughData()
-        return createViewData(timeBetweenStat, onDataSampled)
-    }
-
-    private fun notEnoughData() = object : IAverageTimeBetweenViewData {
+    private fun notEnoughData(graphOrStat: GraphOrStat) = object : IAverageTimeBetweenViewData {
         override val state: IGraphStatViewData.State
             get() = IGraphStatViewData.State.READY
         override val graphOrStat: GraphOrStat
-            get() = this@AverageTimeBetweenDataFactory.graphOrStat
+            get() = graphOrStat
     }
 
     private fun getRelevantDataPoints(
+        dataSource: TrackAndGraphDatabaseDao,
         timeBetweenStat: AverageTimeBetweenStat,
         feature: Feature
     ): List<DataPoint> {
-        val endDate = graphOrStat.endDate ?: OffsetDateTime.now()
+        val endDate = timeBetweenStat.endDate ?: OffsetDateTime.now()
         val startDate =
             timeBetweenStat.duration?.let { endDate.minus(it) } ?: OffsetDateTime.MIN
         return when (feature.featureType) {
@@ -103,5 +104,4 @@ class AverageTimeBetweenDataFactory(
             }
         }
     }
-
 }

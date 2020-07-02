@@ -20,10 +20,11 @@ package com.samco.trackandgraph.graphstatview.decorators
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import org.threeten.bp.OffsetDateTime
 
-interface IGraphStatViewDecoratorBase {
+interface IGraphStatViewDecorator {
     fun setTimeMarker(time: OffsetDateTime)
 }
 
-interface IGraphStatViewDecorator<T : IGraphStatViewData> : IGraphStatViewDecoratorBase {
-    suspend fun decorate(view: IDecoratableGraphStatView, data: T)
+abstract class GraphStatViewDecorator<T : IGraphStatViewData>(protected val listMode: Boolean) :
+    IGraphStatViewDecorator {
+    abstract suspend fun decorate(view: IDecoratableGraphStatView, data: T)
 }
