@@ -21,8 +21,9 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
-@Entity(tableName = "pie_chart_table",
+@Entity(tableName = "pie_charts_table2",
     foreignKeys = [
         ForeignKey(
             entity = GraphOrStat::class,
@@ -49,5 +50,8 @@ data class PieChart(
     val featureId: Long,
 
     @ColumnInfo(name = "duration")
-    val duration: Duration?
+    val duration: Duration?,
+
+    @ColumnInfo(name = "end_date")
+    val endDate: OffsetDateTime?
 )

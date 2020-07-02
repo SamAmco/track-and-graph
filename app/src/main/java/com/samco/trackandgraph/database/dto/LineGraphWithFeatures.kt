@@ -22,6 +22,7 @@ import androidx.room.Relation
 import com.samco.trackandgraph.database.entity.LineGraph
 import com.samco.trackandgraph.database.entity.LineGraphFeature
 import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
 enum class YRangeType {
     DYNAMIC,
@@ -48,7 +49,10 @@ data class LineGraphWithFeatures(
     val yFrom: Double,
 
     @ColumnInfo(name = "y_to")
-    val yTo: Double
+    val yTo: Double,
+
+    @ColumnInfo(name = "end_date")
+    val endDate: OffsetDateTime?
 ) {
-    fun toLineGraph() = LineGraph(id, graphStatId, duration, yRangeType, yFrom, yTo)
+    fun toLineGraph() = LineGraph(id, graphStatId, duration, yRangeType, yFrom, yTo, endDate)
 }

@@ -26,8 +26,8 @@ import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import org.threeten.bp.OffsetDateTime
 
-class GraphStatAverageTimeBetweenDecorator :
-    IGraphStatViewDecorator<IAverageTimeBetweenViewData> {
+class GraphStatAverageTimeBetweenDecorator(listMode: Boolean) :
+    GraphStatViewDecorator<IAverageTimeBetweenViewData>(listMode) {
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
     private var data: IAverageTimeBetweenViewData? = null

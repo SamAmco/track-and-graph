@@ -29,14 +29,13 @@ import com.androidplot.xy.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.decorators.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
 import java.text.DecimalFormat
+import kotlin.reflect.full.primaryConstructor
 
 class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
@@ -49,11 +48,10 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     private var viewScope: CoroutineScope? = null
     private var decorJob: Job? = null
 
-    private var currentDecorator: IGraphStatViewDecoratorBase? = null
+    private var currentDecorator: IGraphStatViewDecorator? = null
 
     init {
         basicLineGraphSetup()
-        initError(R.string.graph_stat_view_invalid_setup)
     }
 
     private fun resetJob() {
@@ -133,20 +131,23 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun <T : IGraphStatViewData> trySetDecorator(
-        decorator: IGraphStatViewDecorator<T>,
-        data: T
+        decorator: GraphStatViewDecorator<T>,
+        data: Any
     ) {
         resetJob()
+        var graphOrStat: GraphOrStat? = null
         decorJob = viewScope?.launch {
             cleanAllViews()
             try {
+                graphOrStat = (data as T).graphOrStat
                 decorate(data.graphOrStat, decorator, data)
             } catch (exception: Exception) {
                 if (exception !is GraphStatInitException) return@launch
                 cleanAllViews()
                 currentDecorator = null
-                val headerText = data.graphOrStat.name
+                val headerText = graphOrStat?.name ?: ""
                 binding.headerText.text = headerText
                 binding.errorMessage.visibility = View.VISIBLE
                 binding.errorMessage.text = context.getString(exception.errorTextId)
@@ -156,13 +157,13 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
 
     private suspend fun <T : IGraphStatViewData> decorate(
         graphOrStat: GraphOrStat,
-        decorator: IGraphStatViewDecorator<T>,
+        decorator: GraphStatViewDecorator<T>,
         data: T
     ) {
         currentDecorator = decorator
         val headerText = graphOrStat.name
         binding.headerText.text = headerText
-        when (data.state) {
+        when (data.state) { //Shouldn't really be loading state here but just for completeness
             IGraphStatViewData.State.LOADING -> binding.progressBar.visibility = View.VISIBLE
             IGraphStatViewData.State.READY -> decorator.decorate(this@GraphStatView, data)
             IGraphStatViewData.State.ERROR -> throw data.error!!
@@ -179,31 +180,16 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     }
 
     fun initFromGraphStat(data: IGraphStatViewData, listMode: Boolean = false) {
-        when (data.graphOrStat.type) {
-            GraphStatType.LINE_GRAPH -> {
-                trySetDecorator(
-                    GraphStatLineGraphDecorator(listMode),
-                    data as ILineGraphViewData
-                )
-            }
-            GraphStatType.PIE_CHART -> {
-                trySetDecorator(
-                    GraphStatPieChartDecorator(),
-                    data as IPieChartViewData
-                )
-            }
-            GraphStatType.AVERAGE_TIME_BETWEEN -> {
-                trySetDecorator(
-                    GraphStatAverageTimeBetweenDecorator(),
-                    data as IAverageTimeBetweenViewData
-                )
-            }
-            GraphStatType.TIME_SINCE -> {
-                trySetDecorator(
-                    GraphStatTimeSinceDecorator(),
-                    data as ITimeSinceViewData
-                )
-            }
+        if (data.state == IGraphStatViewData.State.LOADING) {
+            currentDecorator = null
+            val headerText = data.graphOrStat.name
+            binding.headerText.text = headerText
+            binding.progressBar.visibility = View.VISIBLE
+        } else {
+            val decorator = graphStatTypes[data.graphOrStat.type]
+                ?.decoratorClass
+                ?.primaryConstructor!!.call(listMode)
+            trySetDecorator(decorator, data)
         }
     }
 
