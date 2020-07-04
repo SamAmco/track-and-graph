@@ -341,4 +341,12 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateGraphStats(graphStat: List<GraphOrStat>)
 
+    @Update
+    fun updateTimeHistogram(timeHistogram: TimeHistogram)
+
+    @Insert
+    fun insertTimeHistogram(timeHistogram: TimeHistogram)
+
+    @Query("SELECT * FROM time_histograms_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 }

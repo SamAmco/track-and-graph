@@ -17,24 +17,17 @@
 
 package com.samco.trackandgraph
 
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
 import androidx.room.Room
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import androidx.room.testing.MigrationTestHelper
 import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.YRangeType
-import com.samco.trackandgraph.database.entity.*
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
-import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)

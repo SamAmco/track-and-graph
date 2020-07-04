@@ -388,6 +388,29 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
     }
 }
 
+val MIGRATION_41_42 = object : Migration(41, 42) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+            CREATE TABLE IF NOT EXISTS `time_histograms_table` (
+                `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                `graph_stat_id` INTEGER NOT NULL,
+                `feature_id` INTEGER NOT NULL, 
+                `duration` TEXT, 
+                `number_of_splits` INTEGER NOT NULL, 
+                `sum_discrete_by_index` INTEGER NOT NULL, 
+                `end_date` TEXT, 
+                FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , 
+                FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
+            )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_id` ON `time_histograms_table` (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_graph_stat_id` ON `time_histograms_table` (`graph_stat_id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_histograms_table_feature_id` ON `time_histograms_table` (`feature_id`)")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -400,5 +423,6 @@ val allMigrations = arrayOf(
     MIGRATION_37_38,
     MIGRATION_38_39,
     MIGRATION_39_40,
-    MIGRATION_40_41
+    MIGRATION_40_41,
+    MIGRATION_41_42
 )
