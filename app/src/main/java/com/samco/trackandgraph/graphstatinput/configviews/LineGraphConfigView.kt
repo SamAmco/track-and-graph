@@ -74,7 +74,7 @@ internal class LineGraphConfigView @JvmOverloads constructor(
         binding.endDateSpinner.setSelection(if (configData.endDate == null) 0 else 1)
         listenToEndDate(this, binding.endDateSpinner, { configData.endDate }) {
             configData = configData.copy(endDate = it)
-            updateEndDateText(this@LineGraphConfigView, binding.customEndDateText, it)
+            updateEndDateText(this, binding.customEndDateText, it)
         }
 
         createLineGraphFeatureViews()

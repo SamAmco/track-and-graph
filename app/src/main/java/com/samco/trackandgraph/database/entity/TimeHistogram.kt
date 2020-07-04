@@ -24,6 +24,16 @@ import androidx.room.PrimaryKey
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
+enum class TimeHistogramWindow {
+    HOUR,
+    DAY,
+    WEEK,
+    MONTH,
+    THREE_MONTHS,
+    SIX_MONTHS,
+    YEAR
+}
+
 @Entity(
     tableName = "time_histograms_table",
     foreignKeys = [
@@ -55,8 +65,8 @@ data class TimeHistogram (
     @ColumnInfo(name = "duration")
     val duration: Duration?,
 
-    @ColumnInfo(name = "number_of_splits")
-    val numSplits: Int,
+    @ColumnInfo(name = "window")
+    val window: TimeHistogramWindow,
 
     @ColumnInfo(name = "sum_discrete_by_index")
     val sumDiscreteByIndex: Boolean,
