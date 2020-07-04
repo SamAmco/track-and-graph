@@ -36,7 +36,13 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import org.threeten.bp.Duration
 import kotlin.reflect.KClass
 
-enum class GraphStatType { LINE_GRAPH, PIE_CHART, AVERAGE_TIME_BETWEEN, TIME_SINCE }
+enum class GraphStatType {
+    LINE_GRAPH,
+    PIE_CHART,
+    AVERAGE_TIME_BETWEEN,
+    TIME_SINCE,
+    TIME_HISTOGRAM
+}
 
 data class GraphStatTypeConfig<
         J : GraphStatConfigView,
@@ -83,7 +89,15 @@ val graphStatTypes = mapOf<GraphStatType, GraphStatTypeConfig<*, *, *, *>>(
         TimeSinceViewDataFactory(),
         ITimeSinceViewData::class,
         GraphStatTimeSinceDecorator::class
-    )
+    )//,
+    /*GraphStatType.TIME_HISTOGRAM to GraphStatTypeConfig(
+        TimeHistogramDataSourceAdapter(),
+        TODO("Write a config view"),
+        TimeHistogram::class,
+        TODO("Write a data factory"),
+        TODO("Write a view data class"),
+        TODO("Write a decorator")
+    )*/
 )
 
 val maxGraphPeriodDurations = listOf(
