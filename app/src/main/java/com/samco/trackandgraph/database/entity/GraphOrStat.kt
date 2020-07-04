@@ -92,7 +92,7 @@ val graphStatTypes = mapOf<GraphStatType, GraphStatTypeConfig<*, *, *, *>>(
     )//,
     /*GraphStatType.TIME_HISTOGRAM to GraphStatTypeConfig(
         TimeHistogramDataSourceAdapter(),
-        TODO("Write a config view"),
+        TimeHistogramConfigView::class,
         TimeHistogram::class,
         TODO("Write a data factory"),
         TODO("Write a view data class"),

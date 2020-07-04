@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-<layout>
-
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -71,7 +70,7 @@
             tools:ignore="ContentDescription" />
 
         <LinearLayout
-            android:id="@+id/pieChartSelectFeatureLayout"
+            android:id="@+id/selectFeatureLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/input_spacing_large"
@@ -85,7 +84,7 @@
                 android:textAppearance="@style/TextAppearance.Body" />
 
             <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/pieChartFeatureSpinner"
+                android:id="@+id/featureSpinner"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dialog_input_spacing"
@@ -93,5 +92,34 @@
                 android:spinnerMode="dialog" />
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/selectWindowLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/input_spacing_large"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/selectWindowLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/time_window_size"
+                android:textAppearance="@style/TextAppearance.Body" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/selectWindowSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dialog_input_spacing"
+                android:entries="@array/time_histogram_windows"
+                android:spinnerMode="dialog" />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/sumDiscreteByValueCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/input_spacing_large"
+            android:text="@string/sum_by_discrete_value_checkbox_label" />
     </LinearLayout>
 </layout>

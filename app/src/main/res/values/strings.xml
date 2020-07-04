@@ -60,7 +60,7 @@
     <string name="graphs_and_statistics"><![CDATA[Graphs & Statistics]]></string>
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
     <string name="graph_type_label">Graph type:</string>
-    <string name="maximum_sample_duration">Sample length:</string>
+    <string name="maximum_sample_duration">Sample size:</string>
     <string name="select_a_discrete_feature">Select a multiple choice data set: </string>
     <string name="no_discrete_features_pie_chart">You can not currently create a pie chart because you are not tracking anything multiple choice.</string>
     <string name="select_a_feature">Select a data set:</string>
@@ -73,6 +73,15 @@
     <string name="days">Days</string>
     <string name="day">Day</string>
 
+    <string-array name="time_histogram_windows">
+        <item>Hourly</item>
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+        <item>Quaterly</item>
+        <item>Biyearly</item>
+        <item>Yearly</item>
+    </string-array>
     <string-array name="date_formats">
         <item>dd/mm/yy</item>
         <item>mm/dd/yy</item>
@@ -103,6 +112,7 @@
         <item>Pie Chart</item>
         <item>Average Time Between</item>
         <item>Time Since</item>
+        <item>Time Histogram</item>
     </string-array>
     <string-array name="line_graph_feature_modes">
         <item>No Averaging</item>
@@ -302,7 +312,7 @@
     <string name="edit_data_point_button_content_description">Edit data point button</string>
     <string name="add_line_button_content_description">Add line button</string>
     <string name="add_multiple_choice_answer_button_content_description">Add multiple choice answer button</string>
-    <string name="ending_at_colon">Ending at:</string>
+    <string name="ending_at_colon">Sample ending at:</string>
     <string name="duplicate">Duplicate</string>
     <string name="no_notes_hint_text">Notes added when tracking will show up here. You can also add global notes using the + button.</string>
     <string name="add_a_global_note">Add a global note:</string>
@@ -318,4 +328,7 @@
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">You can not mix time durations with other types of data. Consider plotting hours, minutes or seconds</string>
     <string name="time_duration">Time duration</string>
     <string name="select_a_duration_range">Select a duration range</string>
+    <string name="number_of_bins">Number of bins:</string>
+    <string name="sum_by_discrete_value_checkbox_label">Multiple choice answers have numerical values. Check here to count the number of items tracked rather than the total of the values.</string>
+    <string name="time_window_size">Time window size:</string>
 </resources>

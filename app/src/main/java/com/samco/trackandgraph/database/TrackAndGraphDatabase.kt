@@ -191,6 +191,12 @@ class Converters {
 
     @TypeConverter
     fun intToDurationPlottingMode(index: Int) = DurationPlottingMode.values()[index]
+
+    @TypeConverter
+    fun timeHistogramWindowToInt(window: TimeHistogramWindow) = window.ordinal
+
+    @TypeConverter
+    fun intToTimeHistogramWindow(index: Int) = TimeHistogramWindow.values()[index]
 }
 
 fun odtFromString(value: String): OffsetDateTime? =
