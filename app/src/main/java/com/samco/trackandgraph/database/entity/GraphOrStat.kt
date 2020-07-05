@@ -89,15 +89,15 @@ val graphStatTypes = mapOf<GraphStatType, GraphStatTypeConfig<*, *, *, *>>(
         TimeSinceViewDataFactory(),
         ITimeSinceViewData::class,
         GraphStatTimeSinceDecorator::class
-    )//,
-    /*GraphStatType.TIME_HISTOGRAM to GraphStatTypeConfig(
+    ),
+    GraphStatType.TIME_HISTOGRAM to GraphStatTypeConfig(
         TimeHistogramDataSourceAdapter(),
         TimeHistogramConfigView::class,
         TimeHistogram::class,
-        TODO("Write a data factory"),
-        TODO("Write a view data class"),
+        TimeHistogramDataFactory(),
+        ITimeHistogramViewData::class,
         TODO("Write a decorator")
-    )*/
+    )
 )
 
 val maxGraphPeriodDurations = listOf(
