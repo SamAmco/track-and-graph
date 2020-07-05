@@ -71,19 +71,9 @@ class TimeHistogramConfigView @JvmOverloads constructor(
         }
         listenToFeatureSpinner(this, binding.featureSpinner, configData.featureId) {
             configData = configData.copy(featureId = it.id)
-            setSumByDiscreteValueCheckboxVisibility()
         }
-        setSumByDiscreteValueCheckboxVisibility()
         listenToTimeWindowSize()
         listenToSumByDiscreteValueCheckbox()
-    }
-
-    private fun setSumByDiscreteValueCheckboxVisibility() {
-        val currFeature = allFeatures.firstOrNull { it.id == configData.featureId }
-        binding.sumDiscreteByValueCheckBox.visibility =
-            if (currFeature?.featureType == FeatureType.DISCRETE)
-                View.VISIBLE
-            else View.GONE
     }
 
     private fun listenToTimeWindowSize() {
@@ -100,9 +90,9 @@ class TimeHistogramConfigView @JvmOverloads constructor(
     }
 
     private fun listenToSumByDiscreteValueCheckbox() {
-        binding.sumDiscreteByValueCheckBox.isChecked = !configData.sumDiscreteByIndex
-        binding.sumDiscreteByValueCheckBox.setOnCheckedChangeListener { _, checked ->
-            configData = configData.copy(sumDiscreteByIndex = !checked)
+        binding.sumByCountCheckbox.isChecked = configData.sumByCount
+        binding.sumByCountCheckbox.setOnCheckedChangeListener { _, checked ->
+            configData = configData.copy(sumByCount = checked)
             emitConfigChange()
         }
     }

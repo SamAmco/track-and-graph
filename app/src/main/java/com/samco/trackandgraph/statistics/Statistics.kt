@@ -22,9 +22,7 @@ import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DurationPlottingMode
-import com.samco.trackandgraph.database.entity.LineGraphFeature
+import com.samco.trackandgraph.database.entity.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -132,7 +130,7 @@ internal suspend fun calculateDurationAccumulatedValues(
             sampleDuration
         )
     var currentTimeStamp =
-        findFirstPlotDateTime(
+        findBeginningOfTemporal(
             firstDataPointTime,
             plotTotalTime
         )
@@ -176,40 +174,98 @@ private fun getEndTimeNowOrLatest(rawData: DataSample, endTime: OffsetDateTime?)
 }
 
 /**
- * Finds the first ending of plotTotalTime before startDateTime. For example if plotTotalTime is a
- * week then it will find the very end of the sunday before startDateTime.
+ * Finds the first ending of temporalAmount before dateTime. For example if temporalAmount is a
+ * week then it will find the very end of the sunday before dateTime.
+ *
+ * temporalAmount supports the use of duration instead of Period.
+ * In this case the function will try to approximate the behaviour as closely as possible as though
+ * temporalAmount was a period. For example if you pass in a duration of 7 days it will try to find
+ * the last day of the week before the week containing dateTime. It is always the largest recognised
+ * duration that is used when deciding what the start of the period should be. The recognised durations
+ * are:
+ *
+ *  Duration.ofHours(1)
+ *  Duration.ofHours(24)
+ *  Duration.ofDays(7)
+ *  Duration.ofDays(30)
+ *  Duration.ofDays(365 / 4) or 3 months
+ *  Duration.ofDays(365 / 2) or 6 months
+ *  Duration.ofDays(365) or a year
+ *
  */
-private fun findFirstPlotDateTime(
-    startDateTime: OffsetDateTime,
-    plotTotalTime: TemporalAmount
+private fun findBeginningOfTemporal(
+    dateTime: OffsetDateTime,
+    temporalAmount: TemporalAmount
 ): OffsetDateTime {
-    return when (plotTotalTime) {
-        is Duration -> {
-            //For now we assume the duration is 1 hour for simplicity since this is the
-            // only available duration option anyway
-            startDateTime.withMinute(0).withSecond(0)
-                .withNano(0).minusNanos(1)
-        }
-        is Period -> {
-            var dt = startDateTime
-            val minusAWeek = plotTotalTime.minus(Period.ofWeeks(1))
-            val minusAMonth = plotTotalTime.minus(Period.ofMonths(1))
-            val minusAYear = plotTotalTime.minus(Period.ofYears(1))
-            if (minusAYear.days >= 0 && !minusAYear.isNegative) {
-                dt = startDateTime.withDayOfYear(1)
-            } else if (minusAMonth.days >= 0 && !minusAMonth.isNegative) {
-                dt = startDateTime.withDayOfMonth(1)
-            } else if (minusAWeek.days >= 0 && !minusAWeek.isNegative) {
-                dt = startDateTime.with(
-                    TemporalAdjusters.previousOrSame(
-                        WeekFields.of(Locale.getDefault()).firstDayOfWeek
-                    )
-                )
-            }
-            dt.withHour(0).withMinute(0).withSecond(0).minusSeconds(1)
-        }
-        else -> startDateTime
+    return when (temporalAmount) {
+        is Duration -> findBeginningOfDuration(dateTime, temporalAmount)
+        is Period -> findBeginningOfPeriod(dateTime, temporalAmount)
+        else -> dateTime
     }
+}
+
+private fun findBeginningOfDuration(
+    dateTime: OffsetDateTime,
+    duration: Duration
+): OffsetDateTime {
+    val dt = dateTime
+        .withMinute(0)
+        .withSecond(0)
+        .withNano(0)
+        .minusNanos(1)
+    return when {
+        duration.minus(Duration.ofDays(366)).isNegative -> {
+            dt.withDayOfYear(1)
+        }
+        duration.minus(Duration.ofDays((365 / 2) + 1)).isNegative -> {
+            val month = (dt.monthValue / 6) * 6
+            dt.withMonth(month).withDayOfYear(1)
+        }
+        duration.minus(Duration.ofDays((365 / 4) + 1)).isNegative -> {
+            val month = (dt.monthValue / 3) * 4
+            dt.withMonth(month).withDayOfYear(1)
+        }
+        duration.minus(Duration.ofDays(32)).isNegative -> {
+            dt.withDayOfMonth(1)
+        }
+        duration.minus(Duration.ofDays(8)).isNegative -> {
+            dt.with(
+                TemporalAdjusters.previousOrSame(
+                    WeekFields.of(Locale.getDefault()).firstDayOfWeek
+                )
+            )
+        }
+        duration.minus(Duration.ofHours(25)).isNegative -> {
+            dt.withHour(0)
+        }
+        else -> dt
+    }
+}
+
+private fun findBeginningOfPeriod(
+    dateTime: OffsetDateTime,
+    period: Period
+): OffsetDateTime {
+    var dt = dateTime
+    val minusAWeek = period.minus(Period.ofWeeks(1))
+    val minusAMonth = period.minus(Period.ofMonths(1))
+    val minusAYear = period.minus(Period.ofYears(1))
+    if (minusAYear.days >= 0 && !minusAYear.isNegative) {
+        dt = dateTime.withDayOfYear(1)
+    } else if (minusAMonth.days >= 0 && !minusAMonth.isNegative) {
+        dt = dateTime.withDayOfMonth(1)
+    } else if (minusAWeek.days >= 0 && !minusAWeek.isNegative) {
+        dt = dateTime.with(
+            TemporalAdjusters.previousOrSame(
+                WeekFields.of(Locale.getDefault()).firstDayOfWeek
+            )
+        )
+    }
+    return dt.withHour(0)
+        .withMinute(0)
+        .withSecond(0)
+        .withNano(0)
+        .minusNanos(1)
 }
 
 /**
@@ -257,9 +313,7 @@ internal suspend fun calculateMovingAverages(
         currentCount--
     }
 
-    return DataSample(
-        movingAverages
-    )
+    return DataSample(movingAverages)
 }
 
 /**
@@ -322,3 +376,104 @@ internal fun getXYSeriesFromDataSample(
     }
 }
 
+//TODO test this
+internal fun getNextEndOfDuration(
+    window: TimeHistogramWindow,
+    endDate: OffsetDateTime?
+): OffsetDateTime {
+    val end = endDate ?: OffsetDateTime.now()
+    return findBeginningOfTemporal(
+        end.plus(window.period),
+        window.period
+    )
+}
+
+//TODO test this
+//TODO document this
+internal fun getHistogramBinsForSample(
+    sample: DataSample,
+    window: TimeHistogramWindow,
+    endTime: OffsetDateTime,
+    featureType: FeatureType,
+    sumByCount: Boolean
+): List<Map<Int, Double>>? {
+    return when {
+        sample.dataPoints.isEmpty() -> null
+        featureType == FeatureType.DISCRETE && sumByCount ->
+            getHistogramBinsForSample(
+                sample.dataPoints, window,
+                endTime, ::addOneDiscreteValueToBin
+            )
+        featureType == FeatureType.DISCRETE ->
+            getHistogramBinsForSample(sample.dataPoints, window, endTime, ::addDiscreteValueToBin)
+        sumByCount -> getHistogramBinsForSample(sample.dataPoints, window, endTime, ::addOneToBin)
+        else -> getHistogramBinsForSample(sample.dataPoints, window, endTime, ::addValueToBin)
+    }
+}
+
+//TODO document this
+private fun getHistogramBinsForSample(
+    sample: List<DataPoint>,
+    window: TimeHistogramWindow,
+    endTime: OffsetDateTime,
+    addFunction: (DataPoint, MutableMap<Int, Double>) -> Unit
+): List<Map<Int, Double>> {
+    val binTotalMaps = calculateBinTotals(sample, window, endTime, addFunction)
+    val binTotals = binTotalMaps.map { it.values.sum() }
+    val total = binTotals.sum()
+    return binTotalMaps.mapIndexed { index, bin ->
+        val binTotalRatio = binTotals[index] / total
+        bin.mapValues { kvp -> kvp.value * binTotalRatio }
+    }
+}
+
+//TODO document this
+private fun calculateBinTotals(
+    sample: List<DataPoint>,
+    window: TimeHistogramWindow,
+    endTime: OffsetDateTime,
+    addFunction: (DataPoint, MutableMap<Int, Double>) -> Unit
+): List<Map<Int, Double>> {
+    val binTotalMaps = List(window.numBins) { mutableMapOf<Int, Double>() }
+    var currEnd = endTime
+    var currStart = currEnd - window.period
+    var binned = 0
+    val reversed = sample.asReversed()
+    var nextPoint = reversed[0]
+    while (binned < sample.size) {
+        val binDuration = Duration
+            .between(currStart, currEnd)
+            .dividedBy(window.numBins.toLong())
+            .seconds
+            .toDouble()
+        while (nextPoint.timestamp > currStart) {
+            val distance = Duration.between(currStart, nextPoint.timestamp).seconds.toDouble()
+            val binIndex = (window.numBins * (distance / binDuration)).toInt()
+            addFunction(nextPoint, binTotalMaps[binIndex])
+            nextPoint = reversed[++binned]
+        }
+        currEnd -= window.period
+        currStart -= window.period
+    }
+    return binTotalMaps
+}
+
+//TODO document this
+private fun addValueToBin(dataPoint: DataPoint, bin: MutableMap<Int, Double>) {
+    bin[0] = (bin[0] ?: 0.0) + dataPoint.value
+}
+
+//TODO document this
+private fun addOneToBin(dataPoint: DataPoint, bin: MutableMap<Int, Double>) {
+    bin[0] = (bin[0] ?: 0.0) + 1.0
+}
+
+//TODO document this
+private fun addDiscreteValueToBin(dataPoint: DataPoint, bin: MutableMap<Int, Double>) {
+    bin[dataPoint.value.toInt()] = (bin[dataPoint.value.toInt()] ?: 0.0) + dataPoint.value
+}
+
+//TODO document this
+private fun addOneDiscreteValueToBin(dataPoint: DataPoint, bin: MutableMap<Int, Double>) {
+    bin[dataPoint.value.toInt()] = (bin[dataPoint.value.toInt()] ?: 0.0) + 1.0
+}

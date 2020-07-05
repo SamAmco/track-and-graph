@@ -329,6 +329,6 @@
     <string name="time_duration">Time duration</string>
     <string name="select_a_duration_range">Select a duration range</string>
     <string name="number_of_bins">Number of bins:</string>
-    <string name="sum_by_discrete_value_checkbox_label">Multiple choice answers have numerical values. Check here to count the number of items tracked rather than the total of the values.</string>
+    <string name="sum_by_count_checkbox_label">Check here to count the number of data points tracked rather than the total of their values.</string>
     <string name="time_window_size">Time window size:</string>
 </resources>

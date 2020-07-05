@@ -398,7 +398,7 @@ val MIGRATION_41_42 = object : Migration(41, 42) {
                 `feature_id` INTEGER NOT NULL, 
                 `duration` TEXT, 
                 `window` INTEGER NOT NULL, 
-                `sum_discrete_by_index` INTEGER NOT NULL, 
+                `sum_by_count` INTEGER NOT NULL, 
                 `end_date` TEXT, 
                 FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , 
                 FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 

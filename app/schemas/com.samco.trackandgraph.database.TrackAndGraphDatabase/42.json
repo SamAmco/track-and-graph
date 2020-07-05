@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 42,
-    "identityHash": "444731527f88f6bc742a5d4c20ad084b",
+    "identityHash": "58a249f655889ddad44b4db97473297e",
     "entities": [
       {
         "tableName": "track_groups_table",
@@ -908,7 +908,7 @@
       },
       {
         "tableName": "time_histograms_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `duration` TEXT, `number_of_splits` INTEGER NOT NULL, `sum_discrete_by_index` INTEGER NOT NULL, `end_date` TEXT, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `duration` TEXT, `window` INTEGER NOT NULL, `sum_by_count` INTEGER NOT NULL, `end_date` TEXT, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -935,14 +935,14 @@
             "notNull": false
           },
           {
-            "fieldPath": "numSplits",
-            "columnName": "number_of_splits",
+            "fieldPath": "window",
+            "columnName": "window",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "sumDiscreteByIndex",
-            "columnName": "sum_discrete_by_index",
+            "fieldPath": "sumByCount",
+            "columnName": "sum_by_count",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -1014,7 +1014,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '444731527f88f6bc742a5d4c20ad084b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '58a249f655889ddad44b4db97473297e')"
     ]
   }
 }
