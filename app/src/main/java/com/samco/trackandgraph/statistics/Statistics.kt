@@ -204,6 +204,7 @@ private fun findBeginningOfTemporal(
     }
 }
 
+//TODO test this
 private fun findBeginningOfDuration(
     dateTime: OffsetDateTime,
     duration: Duration
@@ -212,21 +213,10 @@ private fun findBeginningOfDuration(
         .withMinute(0)
         .withSecond(0)
         .withNano(0)
-        .minusNanos(1)
     return when {
-        duration.minus(Duration.ofDays(366)).isNegative -> {
-            dt.withDayOfYear(1)
-        }
-        duration.minus(Duration.ofDays((365 / 2) + 1)).isNegative -> {
-            val month = (dt.monthValue / 6) * 6
-            dt.withMonth(month).withDayOfYear(1)
-        }
-        duration.minus(Duration.ofDays((365 / 4) + 1)).isNegative -> {
-            val month = (dt.monthValue / 3) * 4
-            dt.withMonth(month).withDayOfYear(1)
-        }
-        duration.minus(Duration.ofDays(32)).isNegative -> {
-            dt.withDayOfMonth(1)
+        duration.minus(Duration.ofMinutes(61)).isNegative -> dt
+        duration.minus(Duration.ofHours(25)).isNegative -> {
+            dt.withHour(0)
         }
         duration.minus(Duration.ofDays(8)).isNegative -> {
             dt.with(
@@ -235,13 +225,25 @@ private fun findBeginningOfDuration(
                 )
             )
         }
-        duration.minus(Duration.ofHours(25)).isNegative -> {
-            dt.withHour(0)
+        duration.minus(Duration.ofDays(32)).isNegative -> {
+            dt.withDayOfMonth(1)
+        }
+        duration.minus(Duration.ofDays((365 / 4) + 1)).isNegative -> {
+            val month = (dt.monthValue / 3) * 4
+            dt.withMonth(month).withDayOfMonth(1)
+        }
+        duration.minus(Duration.ofDays((365 / 2) + 1)).isNegative -> {
+            val month = (dt.monthValue / 6) * 6
+            dt.withMonth(month).withDayOfMonth(1)
+        }
+        duration.minus(Duration.ofDays(366)).isNegative -> {
+            dt.withDayOfYear(1)
         }
         else -> dt
     }
 }
 
+//TODO test this
 private fun findBeginningOfPeriod(
     dateTime: OffsetDateTime,
     period: Period
@@ -394,20 +396,30 @@ internal fun getHistogramBinsForSample(
     sample: DataSample,
     window: TimeHistogramWindow,
     endTime: OffsetDateTime,
-    featureType: FeatureType,
+    feature: Feature,
     sumByCount: Boolean
-): List<Map<Int, Double>>? {
+): Map<Int, List<Double>>? {
+    val keys = feature.discreteValues
+        .map { it.index }
+        .let { if (it.isEmpty()) listOf(0) else it }
+        .toSet()
+
     return when {
         sample.dataPoints.isEmpty() -> null
-        featureType == FeatureType.DISCRETE && sumByCount ->
+        feature.featureType == FeatureType.DISCRETE && sumByCount ->
             getHistogramBinsForSample(
-                sample.dataPoints, window,
-                endTime, ::addOneDiscreteValueToBin
+                sample.dataPoints, window, keys, endTime, ::addOneDiscreteValueToBin
             )
-        featureType == FeatureType.DISCRETE ->
-            getHistogramBinsForSample(sample.dataPoints, window, endTime, ::addDiscreteValueToBin)
-        sumByCount -> getHistogramBinsForSample(sample.dataPoints, window, endTime, ::addOneToBin)
-        else -> getHistogramBinsForSample(sample.dataPoints, window, endTime, ::addValueToBin)
+        feature.featureType == FeatureType.DISCRETE ->
+            getHistogramBinsForSample(
+                sample.dataPoints, window, keys, endTime, ::addDiscreteValueToBin
+            )
+        sumByCount -> getHistogramBinsForSample(
+            sample.dataPoints, window, keys, endTime, ::addOneToBin
+        )
+        else -> getHistogramBinsForSample(
+            sample.dataPoints, window, keys, endTime, ::addValueToBin
+        )
     }
 }
 
@@ -415,65 +427,85 @@ internal fun getHistogramBinsForSample(
 private fun getHistogramBinsForSample(
     sample: List<DataPoint>,
     window: TimeHistogramWindow,
+    keys: Set<Int>,
     endTime: OffsetDateTime,
-    addFunction: (DataPoint, MutableMap<Int, Double>) -> Unit
-): List<Map<Int, Double>> {
-    val binTotalMaps = calculateBinTotals(sample, window, endTime, addFunction)
-    val binTotals = binTotalMaps.map { it.values.sum() }
-    val total = binTotals.sum()
-    return binTotalMaps.mapIndexed { index, bin ->
-        val binTotalRatio = binTotals[index] / total
-        bin.mapValues { kvp -> kvp.value * binTotalRatio }
-    }
+    addFunction: (DataPoint, Map<Int, MutableList<Double>>, Int) -> Unit
+): Map<Int, List<Double>> {
+    val binTotalMaps = calculateBinTotals(sample, window, keys, endTime, addFunction)
+    val total = binTotalMaps.map { it.value.sum() }.sum()
+    return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { it / total } }.toMap()
 }
 
 //TODO document this
 private fun calculateBinTotals(
     sample: List<DataPoint>,
     window: TimeHistogramWindow,
+    keys: Set<Int>,
     endTime: OffsetDateTime,
-    addFunction: (DataPoint, MutableMap<Int, Double>) -> Unit
-): List<Map<Int, Double>> {
-    val binTotalMaps = List(window.numBins) { mutableMapOf<Int, Double>() }
+    addFunction: (DataPoint, Map<Int, MutableList<Double>>, Int) -> Unit
+): Map<Int, List<Double>> {
+    val binTotalMap = keys.map { it to MutableList(window.numBins) { 0.0 } }.toMap()
     var currEnd = endTime
     var currStart = currEnd - window.period
     var binned = 0
     val reversed = sample.asReversed()
     var nextPoint = reversed[0]
     while (binned < sample.size) {
-        val binDuration = Duration
+        val periodDuration = Duration
             .between(currStart, currEnd)
-            .dividedBy(window.numBins.toLong())
             .seconds
             .toDouble()
         while (nextPoint.timestamp > currStart) {
             val distance = Duration.between(currStart, nextPoint.timestamp).seconds.toDouble()
-            val binIndex = (window.numBins * (distance / binDuration)).toInt()
-            addFunction(nextPoint, binTotalMaps[binIndex])
-            nextPoint = reversed[++binned]
+            val binIndex = (window.numBins * (distance / periodDuration)).toInt()
+            addFunction(nextPoint, binTotalMap, binIndex)
+            if (++binned == sample.size) break
+            nextPoint = reversed[binned]
         }
         currEnd -= window.period
         currStart -= window.period
     }
-    return binTotalMaps
+    return binTotalMap
 }
 
 //TODO document this
-private fun addValueToBin(dataPoint: DataPoint, bin: MutableMap<Int, Double>) {
-    bin[0] = (bin[0] ?: 0.0) + dataPoint.value
+private fun addValueToBin(dataPoint: DataPoint, bin: Map<Int, MutableList<Double>>, binIndex: Int) {
+    bin[0]?.set(binIndex, (bin[0]?.get(binIndex) ?: 0.0) + dataPoint.value)
 }
 
 //TODO document this
-private fun addOneToBin(dataPoint: DataPoint, bin: MutableMap<Int, Double>) {
-    bin[0] = (bin[0] ?: 0.0) + 1.0
+private fun addOneToBin(dataPoint: DataPoint, bin: Map<Int, MutableList<Double>>, binIndex: Int) {
+    bin[0]?.set(binIndex, (bin[0]?.get(binIndex) ?: 0.0) + 1.0)
 }
 
 //TODO document this
-private fun addDiscreteValueToBin(dataPoint: DataPoint, bin: MutableMap<Int, Double>) {
-    bin[dataPoint.value.toInt()] = (bin[dataPoint.value.toInt()] ?: 0.0) + dataPoint.value
+private fun addDiscreteValueToBin(
+    dataPoint: DataPoint,
+    bin: Map<Int, MutableList<Double>>,
+    binIndex: Int
+) {
+    val i = dataPoint.value.toInt()
+    bin[i]?.set(binIndex, (bin[i]?.get(binIndex) ?: 0.0) + dataPoint.value)
 }
 
 //TODO document this
-private fun addOneDiscreteValueToBin(dataPoint: DataPoint, bin: MutableMap<Int, Double>) {
-    bin[dataPoint.value.toInt()] = (bin[dataPoint.value.toInt()] ?: 0.0) + 1.0
+private fun addOneDiscreteValueToBin(
+    dataPoint: DataPoint,
+    bin: Map<Int, MutableList<Double>>,
+    binIndex: Int
+) {
+    val i = dataPoint.value.toInt()
+    bin[i]?.set(binIndex, (bin[i]?.get(binIndex) ?: 0.0) + 1.0)
 }
+
+//TODO document this
+//TODO test this
+internal fun getLargestBin(bins: List<List<Double>>?): Double? {
+    return bins
+        ?.getOrElse(0) { null }
+        ?.size
+        ?.downTo(1)
+        ?.map { index -> bins.sumByDouble { it[index-1] } }
+        ?.max()
+}
+

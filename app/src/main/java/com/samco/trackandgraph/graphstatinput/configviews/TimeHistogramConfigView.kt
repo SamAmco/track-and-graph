@@ -55,7 +55,7 @@ class TimeHistogramConfigView @JvmOverloads constructor(
         allFeatures.getOrElse(0) { null }?.id ?: -1,
         null,
         TimeHistogramWindow.DAY,
-        true,
+        false,
         null
     )
 

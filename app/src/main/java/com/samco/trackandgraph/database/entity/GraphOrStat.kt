@@ -96,7 +96,7 @@ val graphStatTypes = mapOf<GraphStatType, GraphStatTypeConfig<*, *, *, *>>(
         TimeHistogram::class,
         TimeHistogramDataFactory(),
         ITimeHistogramViewData::class,
-        TODO("Write a decorator")
+        GraphStatTimeHistogramDecorator::class
     )
 )
 

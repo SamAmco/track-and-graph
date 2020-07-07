@@ -25,6 +25,8 @@ interface ITimeHistogramViewData : IGraphStatViewData {
         get() = null
     val discreteValues: List<DiscreteValue>?
         get() = null
-    val barValues: List<Map<Int, Double>>?
+    val barValues: Map<Int, List<Double>>?
         get() = null
+    val maxDisplayHeight: Double?
+        get() = 0.0
 }
