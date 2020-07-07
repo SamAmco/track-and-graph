@@ -73,10 +73,10 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {
-        binding!!.lineGraph.removeMarkers()
+        binding!!.xyPlot.removeMarkers()
         val markerPaint = getMarkerPaint()
         val millis = Duration.between(data!!.endTime, time).toMillis()
-        binding!!.lineGraph.addMarker(
+        binding!!.xyPlot.addMarker(
             XValueMarker(
                 millis,
                 null,
@@ -85,13 +85,13 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
                 null
             )
         )
-        binding!!.lineGraph.redraw()
+        binding!!.xyPlot.redraw()
     }
 
     private suspend fun initFromLineGraphBody() {
         yield()
         withContext(Dispatchers.Main) {
-            binding!!.lineGraph.visibility = View.INVISIBLE
+            binding!!.xyPlot.visibility = View.INVISIBLE
             binding!!.progressBar.visibility = View.VISIBLE
         }
         if (data!!.hasPlottableData) {
@@ -99,9 +99,9 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
             setUpLineGraphXAxis()
             setUpLineGraphYAxis()
             setLineGraphBounds()
-            binding!!.lineGraph.redraw()
+            binding!!.xyPlot.redraw()
             withContext(Dispatchers.Main) {
-                binding!!.lineGraph.visibility = View.VISIBLE
+                binding!!.xyPlot.visibility = View.VISIBLE
                 binding!!.progressBar.visibility = View.GONE
             }
         } else {
@@ -112,10 +112,10 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     private suspend fun setLineGraphBounds() {
         val bounds = data!!.bounds
         if (data!!.yRangeType == YRangeType.FIXED) {
-            binding!!.lineGraph.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
+            binding!!.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
         }
-        binding!!.lineGraph.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
-        binding!!.lineGraph.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+        binding!!.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+        binding!!.xyPlot.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
         setLineGraphPaddingFromBounds(bounds)
     }
 
@@ -125,14 +125,14 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         val maxBound = max(abs(minY), abs(maxY))
         val numDigits = log10(maxBound).toFloat() + 3
         yield()
-        binding!!.lineGraph.graph.paddingLeft =
+        binding!!.xyPlot.graph.paddingLeft =
             (numDigits - 1) * (context!!.resources.displayMetrics.scaledDensity) * 3.5f
-        binding!!.lineGraph.graph.refreshLayout()
+        binding!!.xyPlot.graph.refreshLayout()
     }
 
     private fun setUpLineGraphYAxis() {
         if (data!!.durationBasedRange) {
-            binding!!.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
+            binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
                 object : Format() {
                     override fun format(
                         obj: Any,
@@ -149,7 +149,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun setUpLineGraphXAxis() {
-        binding!!.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
+        binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
             object : Format() {
                 override fun format(
                     obj: Any,
@@ -160,8 +160,8 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
                     val duration = Duration.ofMillis(millis)
                     val timeStamp = data!!.endTime.plus(duration)
                     val formattedTimestamp = getDateTimeFormattedForDuration(
-                        binding!!.lineGraph.bounds.minX,
-                        binding!!.lineGraph.bounds.maxX,
+                        binding!!.xyPlot.bounds.minX,
+                        binding!!.xyPlot.bounds.maxX,
                         timeStamp
                     )
                     return toAppendTo.append(formattedTimestamp)
@@ -201,7 +201,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
                 getFastLineAndPointFormatter(lineGraphFeature)
             else getLineAndPointFormatter(lineGraphFeature)
         yield()
-        binding!!.lineGraph.addSeries(series, seriesFormat)
+        binding!!.xyPlot.addSeries(series, seriesFormat)
     }
 
     private fun getLineAndPointFormatter(lineGraphFeature: LineGraphFeature): LineAndPointFormatter {

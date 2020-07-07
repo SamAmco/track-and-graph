@@ -24,8 +24,10 @@ import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.statistics.getHistogramBinsForSample
+import com.samco.trackandgraph.statistics.getLargestBin
 import com.samco.trackandgraph.statistics.getNextEndOfDuration
 import com.samco.trackandgraph.statistics.sampleData
+import org.threeten.bp.OffsetDateTime
 
 class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramViewData>() {
     override suspend fun createViewData(
@@ -51,8 +53,11 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         config: TimeHistogram,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
+        val endTime = getNextEndOfDuration(config.window, config.endDate)
         val discreteValue = getDiscreteValues(dataSource, config)
-        val barValues = getBarValues(dataSource, config, onDataSampled)
+        val barValues = getBarValues(dataSource, config, endTime, onDataSampled)
+        val largestBin = getLargestBin(barValues?.values?.toList())
+        val maxDisplayHeight = largestBin?.times(10.0)?.toInt()?.plus(1)?.div(10.0)
 
         return object : ITimeHistogramViewData {
             override val state: IGraphStatViewData.State
@@ -63,8 +68,10 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
                 get() = config.window
             override val discreteValues: List<DiscreteValue>?
                 get() = discreteValue
-            override val barValues: List<Map<Int, Double>>?
+            override val barValues: Map<Int, List<Double>>?
                 get() = barValues
+            override val maxDisplayHeight: Double?
+                get() = maxDisplayHeight
         }
     }
 
@@ -82,10 +89,10 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
     private suspend fun getBarValues(
         dataSource: TrackAndGraphDatabaseDao,
         config: TimeHistogram,
+        endTime: OffsetDateTime,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): List<Map<Int, Double>>? {
+    ): Map<Int, List<Double>>? {
         val feature = dataSource.getFeatureById(config.featureId)
-        val endTime = getNextEndOfDuration(config.window, config.endDate)
         val sample = sampleData(
             dataSource, config.featureId, config.duration,
             endTime, null, null
@@ -94,7 +101,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
             sample,
             config.window,
             endTime,
-            feature.featureType,
+            feature,
             config.sumByCount
         )
         onDataSampled(sample.dataPoints)

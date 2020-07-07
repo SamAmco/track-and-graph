@@ -21,7 +21,7 @@
             tools:text="The name of the graph" />
 
         <com.androidplot.xy.XYPlot
-            android:id="@+id/lineGraph"
+            android:id="@+id/xyPlot"
             style="@style/APDefacto.Light"
             android:layout_width="match_parent"
             android:layout_height="0dp"

@@ -63,53 +63,53 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     }
 
     private fun basicLineGraphSetup() {
-        binding.lineGraph.layoutManager.remove(binding.lineGraph.domainTitle)
-        binding.lineGraph.layoutManager.remove(binding.lineGraph.rangeTitle)
-        binding.lineGraph.layoutManager.remove(binding.lineGraph.title)
-        binding.lineGraph.setBorderStyle(Plot.BorderStyle.NONE, null, null)
-        binding.lineGraph.graph.size = Size.FILL
-        binding.lineGraph.graph.position(
+        binding.xyPlot.layoutManager.remove(binding.xyPlot.domainTitle)
+        binding.xyPlot.layoutManager.remove(binding.xyPlot.rangeTitle)
+        binding.xyPlot.layoutManager.remove(binding.xyPlot.title)
+        binding.xyPlot.setBorderStyle(Plot.BorderStyle.NONE, null, null)
+        binding.xyPlot.graph.size = Size.FILL
+        binding.xyPlot.graph.position(
             0f,
             HorizontalPositioning.ABSOLUTE_FROM_LEFT,
             0f,
             VerticalPositioning.ABSOLUTE_FROM_TOP
         )
-        binding.lineGraph.setPlotMargins(0f, 0f, 0f, 0f)
-        binding.lineGraph.setPlotPadding(0f, 0f, 0f, 0f)
-        binding.lineGraph.graph.setPadding(0f, 0f, 0f, 0f)
-        binding.lineGraph.graph.setMargins(0f, 20f, 0f, 50f)
+        binding.xyPlot.setPlotMargins(0f, 0f, 0f, 0f)
+        binding.xyPlot.setPlotPadding(0f, 0f, 0f, 0f)
+        binding.xyPlot.graph.setPadding(0f, 0f, 0f, 0f)
+        binding.xyPlot.graph.setMargins(0f, 20f, 0f, 50f)
 
         val colorOnSurface = context.getColorFromAttr(R.attr.colorOnSurface)
         val colorSurface = context.getColorFromAttr(R.attr.colorSurface)
-        binding.lineGraph.graph.domainGridLinePaint.color = colorOnSurface
-        binding.lineGraph.graph.rangeGridLinePaint.color = colorOnSurface
-        binding.lineGraph.graph.domainSubGridLinePaint.color = colorOnSurface
-        binding.lineGraph.graph.rangeSubGridLinePaint.color = colorOnSurface
-        binding.lineGraph.graph.domainOriginLinePaint.color = colorOnSurface
-        binding.lineGraph.graph.domainOriginLinePaint.strokeWidth = 1f
-        binding.lineGraph.graph.rangeOriginLinePaint.color = colorOnSurface
-        binding.lineGraph.graph.rangeOriginLinePaint.strokeWidth = 1f
+        binding.xyPlot.graph.domainGridLinePaint.color = colorOnSurface
+        binding.xyPlot.graph.rangeGridLinePaint.color = colorOnSurface
+        binding.xyPlot.graph.domainSubGridLinePaint.color = colorOnSurface
+        binding.xyPlot.graph.rangeSubGridLinePaint.color = colorOnSurface
+        binding.xyPlot.graph.domainOriginLinePaint.color = colorOnSurface
+        binding.xyPlot.graph.domainOriginLinePaint.strokeWidth = 1f
+        binding.xyPlot.graph.rangeOriginLinePaint.color = colorOnSurface
+        binding.xyPlot.graph.rangeOriginLinePaint.strokeWidth = 1f
 
-        binding.lineGraph.graph.gridBackgroundPaint.color = colorSurface
+        binding.xyPlot.graph.gridBackgroundPaint.color = colorSurface
     }
 
     fun addLineGraphPanAndZoom() {
-        PanZoom.attach(binding.lineGraph, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.STRETCH_HORIZONTAL)
+        PanZoom.attach(binding.xyPlot, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.STRETCH_HORIZONTAL)
     }
 
     private fun cleanAllViews() {
         binding.legendFlexboxLayout.removeAllViews()
-        binding.lineGraph.clear()
-        binding.lineGraph.removeMarkers()
-        binding.lineGraph.graph.paddingLeft = 0f
-        binding.lineGraph.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
-        binding.lineGraph.setDomainBoundaries(0, 1, BoundaryMode.GROW)
-        binding.lineGraph.graph.refreshLayout()
-        binding.lineGraph.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
+        binding.xyPlot.clear()
+        binding.xyPlot.removeMarkers()
+        binding.xyPlot.graph.paddingLeft = 0f
+        binding.xyPlot.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
+        binding.xyPlot.setDomainBoundaries(0, 1, BoundaryMode.GROW)
+        binding.xyPlot.graph.refreshLayout()
+        binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
             DecimalFormat("0.0")
         binding.pieChart.clear()
         binding.progressBar.visibility = View.GONE
-        binding.lineGraph.visibility = View.GONE
+        binding.xyPlot.visibility = View.GONE
         binding.pieChart.visibility = View.GONE
         binding.errorMessage.visibility = View.GONE
         binding.statMessage.visibility = View.GONE
