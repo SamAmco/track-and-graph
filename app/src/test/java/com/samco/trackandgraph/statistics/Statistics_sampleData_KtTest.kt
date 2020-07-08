@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.statistics
 
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
@@ -23,7 +23,6 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.graphstatview.decorators.sampleData
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -33,7 +32,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
-class GraphStatViewDecoratorHelpers_sampleData_KtTest {
+class Statistics_sampleData_KtTest {
     @Test
     fun sampleData_no_duration_or_endTime() {
         runBlocking {

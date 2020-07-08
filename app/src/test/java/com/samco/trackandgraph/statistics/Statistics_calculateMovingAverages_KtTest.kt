@@ -15,17 +15,16 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.statistics
 
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.graphstatview.decorators.DataSample
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-class GraphStatViewDecoratorHelpers_calculateMovingAverages_KtTest {
+class Statistics_calculateMovingAverages_KtTest {
 
     @Test
     fun calculateMovingAverages() {
@@ -46,13 +45,7 @@ class GraphStatViewDecoratorHelpers_calculateMovingAverages_KtTest {
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
-            val answer =
-                com.samco.trackandgraph.graphstatview.decorators.calculateMovingAverages(
-                    DataSample(
-                        dataPoints
-                    ),
-                    averagingDuration
-                )
+            val answer = calculateMovingAverages(DataSample(dataPoints), averagingDuration)
 
             //THEN
             val expected = listOf(5.0, 0.0, 2.0, 2.0, 1.5, 2.0, 8.0, 7.5, 5.0)
@@ -60,6 +53,7 @@ class GraphStatViewDecoratorHelpers_calculateMovingAverages_KtTest {
             assertEquals(expected, actual)
         }
     }
+
     @Test
 
     fun calculateMovingAverages_empty_data() {
@@ -69,13 +63,7 @@ class GraphStatViewDecoratorHelpers_calculateMovingAverages_KtTest {
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
-            val answer =
-                com.samco.trackandgraph.graphstatview.decorators.calculateMovingAverages(
-                    DataSample(
-                        dataPoints
-                    ),
-                    averagingDuration
-                )
+            val answer = calculateMovingAverages(DataSample(dataPoints), averagingDuration)
 
             //THEN
             assertEquals(0, answer.dataPoints.size)
