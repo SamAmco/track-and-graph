@@ -131,6 +131,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun setUpLineGraphYAxis() {
+        binding!!.xyPlot.setRangeStep(StepMode.SUBDIVIDE, 11.0)
         if (data!!.durationBasedRange) {
             binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
                 object : Format() {
@@ -149,6 +150,8 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun setUpLineGraphXAxis() {
+        binding!!.xyPlot.domainTitle.text = ""
+        binding!!.xyPlot.setDomainStep(StepMode.SUBDIVIDE, 11.0)
         binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
             object : Format() {
                 override fun format(

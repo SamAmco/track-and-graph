@@ -457,7 +457,8 @@ private fun calculateBinTotals(
             .toDouble()
         while (nextPoint.timestamp > currStart) {
             val distance = Duration.between(currStart, nextPoint.timestamp).seconds.toDouble()
-            val binIndex = (window.numBins * (distance / periodDuration)).toInt()
+            var binIndex = (window.numBins * (distance / periodDuration)).toInt()
+            if (binIndex == window.numBins) binIndex--
             addFunction(nextPoint, binTotalMap, binIndex)
             if (++binned == sample.size) break
             nextPoint = reversed[binned]
