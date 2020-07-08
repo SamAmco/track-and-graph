@@ -25,16 +25,20 @@ import com.androidplot.xy.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dataVisColorGenerator
 import com.samco.trackandgraph.database.dataVisColorList
+import com.samco.trackandgraph.database.entity.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.WeekFields
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
+import java.util.*
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -46,6 +50,14 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
 
     private lateinit var legendKeys: List<Int>
     private lateinit var nameMap: Map<Int, String>
+
+    private fun getLabelInterval(window: TimeHistogramWindow) = when (window) {
+        TimeHistogramWindow.HOUR -> 5
+        TimeHistogramWindow.DAY -> 2
+        TimeHistogramWindow.MONTH -> 5
+        TimeHistogramWindow.SIX_MONTHS -> 2
+        else -> 1
+    }
 
     override suspend fun decorate(
         view: IDecoratableGraphStatView,
@@ -67,6 +79,7 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
         if (!data!!.barValues.isNullOrEmpty()) {
             drawLegend()
             setUpXAxis()
+            setUpXAxisTitle()
             setUpYAxis()
             setUpBounds()
             drawBars()
@@ -80,18 +93,36 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
         }
     }
 
-    //TODO we will need to reset the number of divisions when initing a line graph
+    private fun setUpXAxisTitle() {
+        var title = context!!.getString(data!!.window!!.subTitleId)
+        if (data!!.window!! == TimeHistogramWindow.WEEK) {
+            val weekDayNameIds = mapOf(
+                DayOfWeek.MONDAY to R.string.mon,
+                DayOfWeek.TUESDAY to R.string.tue,
+                DayOfWeek.WEDNESDAY to R.string.wed,
+                DayOfWeek.THURSDAY to R.string.thu,
+                DayOfWeek.FRIDAY to R.string.fri,
+                DayOfWeek.SATURDAY to R.string.sat,
+                DayOfWeek.SUNDAY to R.string.sun
+            )
+            val firstDay = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+            val firstDayName = context!!.getString(weekDayNameIds[firstDay] ?: error(""))
+            var lastDayIndex = DayOfWeek.values().indexOf(firstDay) - 1
+            if (lastDayIndex < 0) lastDayIndex = DayOfWeek.values().size - 1
+            val lastDay = DayOfWeek.values()[lastDayIndex]
+            val lastDayName = context!!.getString(weekDayNameIds[lastDay] ?: error(""))
+            title += " ($firstDayName-$lastDayName)"
+        }
+        binding!!.xyPlot.domainTitle.text = title
+    }
+
     private fun setUpYAxis() {
         val divisions = ((data!!.maxDisplayHeight ?: 0.0) * 10) + 1
         binding!!.xyPlot.setRangeStep(StepMode.SUBDIVIDE, max(2.0, divisions))
     }
 
-    //TODO we will need to reset the number of divisions when initing a line graph
-    //TODO we need a subtitle explaining what the numbers mean
-    //TODO 24 seems to be too many subdivides, at a certain point we need to divide the number by 2
-    // or possibly change the angle of the text
     private fun setUpXAxis() {
-        binding!!.xyPlot.setDomainStep(StepMode.SUBDIVIDE, data!!.window!!.numBins.toDouble() + 2)
+        binding!!.xyPlot.setDomainStep(StepMode.SUBDIVIDE, data!!.window!!.numBins + 2.0)
         binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
             object : Format() {
                 override fun format(
@@ -100,9 +131,14 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
                     pos: FieldPosition
                 ): StringBuffer {
                     val index = (obj as Double).roundToInt() + 1
-                    val str =
-                        if (index > 0 && index <= data!!.window!!.numBins) index.toString()
+                    val str = if (index > 0 && index <= data!!.window!!.numBins) {
+                        val labelInterval = getLabelInterval(data!!.window!!)
+                        if (index == 1
+                            || index == data!!.window!!.numBins
+                            || index % labelInterval == 0
+                        ) index.toString()
                         else ""
+                    } else ""
                     return toAppendTo.append(str)
                 }
 

@@ -22,9 +22,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.LinearLayout
 import com.androidplot.Plot
-import com.androidplot.ui.HorizontalPositioning
-import com.androidplot.ui.Size
-import com.androidplot.ui.VerticalPositioning
+import com.androidplot.ui.*
 import com.androidplot.xy.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
@@ -51,7 +49,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     private var currentDecorator: IGraphStatViewDecorator? = null
 
     init {
-        basicLineGraphSetup()
+        xyPlotSetup()
     }
 
     private fun resetJob() {
@@ -62,12 +60,18 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         viewScope = CoroutineScope(Dispatchers.Main + viewJob!!)
     }
 
-    private fun basicLineGraphSetup() {
-        binding.xyPlot.layoutManager.remove(binding.xyPlot.domainTitle)
+    private fun xyPlotSetup() {
+        binding.xyPlot.layoutManager.remove(binding.xyPlot.legend)
         binding.xyPlot.layoutManager.remove(binding.xyPlot.rangeTitle)
         binding.xyPlot.layoutManager.remove(binding.xyPlot.title)
+        binding.xyPlot.domainTitle.position(
+            0f,
+            HorizontalPositioning.ABSOLUTE_FROM_CENTER,
+            0f,
+            VerticalPositioning.ABSOLUTE_FROM_BOTTOM,
+            Anchor.BOTTOM_MIDDLE
+        )
         binding.xyPlot.setBorderStyle(Plot.BorderStyle.NONE, null, null)
-        binding.xyPlot.graph.size = Size.FILL
         binding.xyPlot.graph.position(
             0f,
             HorizontalPositioning.ABSOLUTE_FROM_LEFT,
@@ -76,11 +80,13 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         )
         binding.xyPlot.setPlotMargins(0f, 0f, 0f, 0f)
         binding.xyPlot.setPlotPadding(0f, 0f, 0f, 0f)
-        binding.xyPlot.graph.setPadding(0f, 0f, 0f, 0f)
-        binding.xyPlot.graph.setMargins(0f, 20f, 0f, 50f)
+        binding.xyPlot.graph.setPadding(0f, 0f, 0f, 10f)
+        binding.xyPlot.graph.setMargins(0f, 20f, 0f, 0f)
 
         val colorOnSurface = context.getColorFromAttr(R.attr.colorOnSurface)
         val colorSurface = context.getColorFromAttr(R.attr.colorSurface)
+
+        binding.xyPlot.domainTitle.labelPaint.color = colorOnSurface
         binding.xyPlot.graph.domainGridLinePaint.color = colorOnSurface
         binding.xyPlot.graph.rangeGridLinePaint.color = colorOnSurface
         binding.xyPlot.graph.domainSubGridLinePaint.color = colorOnSurface

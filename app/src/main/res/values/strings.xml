@@ -70,7 +70,6 @@
     <string name="to">To:</string>
     <string name="select_a_value_range">Select a value range:</string>
     <string name="graph_name_hint">e.g. Exercise: weekly moving average</string>
-    <string name="days">Days</string>
     <string name="day">Day</string>
 
     <string-array name="time_histogram_windows">
@@ -316,6 +315,9 @@
     <string name="duplicate">Duplicate</string>
     <string name="no_notes_hint_text">Notes added when tracking will show up here. You can also add global notes using the + button.</string>
     <string name="add_a_global_note">Add a global note:</string>
+    <string name="weeks">Weeks</string>
+    <string name="months">Months</string>
+    <string name="days">Days</string>
     <string name="hours">Hours</string>
     <string name="minutes">Minutes</string>
     <string name="seconds">Seconds</string>
