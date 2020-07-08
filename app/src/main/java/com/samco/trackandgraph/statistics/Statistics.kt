@@ -34,6 +34,7 @@ import org.threeten.bp.temporal.TemporalAmount
 import org.threeten.bp.temporal.WeekFields
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.min
 
 class DataSample(val dataPoints: List<DataPoint>)
 
@@ -117,23 +118,9 @@ internal suspend fun calculateDurationAccumulatedValues(
     plotTotalTime: TemporalAmount
 ): DataSample {
     val newData = mutableListOf<DataPoint>()
-    val latest =
-        getEndTimeNowOrLatest(
-            sampleData,
-            endTime
-        )
-    val firstDataPointTime =
-        getStartTimeOrFirst(
-            sampleData,
-            latest,
-            endTime,
-            sampleDuration
-        )
-    var currentTimeStamp =
-        findBeginningOfTemporal(
-            firstDataPointTime,
-            plotTotalTime
-        )
+    val latest = getEndTimeNowOrLatest(sampleData, endTime)
+    val firstDataPointTime = getStartTimeOrFirst(sampleData, latest, endTime, sampleDuration)
+    var currentTimeStamp = findBeginningOfTemporal(firstDataPointTime, plotTotalTime).minusNanos(1)
     var index = 0
     while (currentTimeStamp.isBefore(latest)) {
         currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(plotTotalTime) }
@@ -193,7 +180,7 @@ private fun getEndTimeNowOrLatest(rawData: DataSample, endTime: OffsetDateTime?)
  *  Duration.ofDays(365) or a year
  *
  */
-private fun findBeginningOfTemporal(
+internal fun findBeginningOfTemporal(
     dateTime: OffsetDateTime,
     temporalAmount: TemporalAmount
 ): OffsetDateTime {
@@ -204,7 +191,6 @@ private fun findBeginningOfTemporal(
     }
 }
 
-//TODO test this
 private fun findBeginningOfDuration(
     dateTime: OffsetDateTime,
     duration: Duration
@@ -213,62 +199,80 @@ private fun findBeginningOfDuration(
         .withMinute(0)
         .withSecond(0)
         .withNano(0)
+    val nano = Duration.ofNanos(1)
+    val day = Duration.ofDays(1)
     return when {
-        duration.minus(Duration.ofMinutes(61)).isNegative -> dt
-        duration.minus(Duration.ofHours(25)).isNegative -> {
+        duration.minus(nano.plus(Duration.ofMinutes(60))).isNegative -> dt
+        duration.minus(nano.plus(Duration.ofHours(24))).isNegative -> {
             dt.withHour(0)
         }
-        duration.minus(Duration.ofDays(8)).isNegative -> {
+        duration.minus(nano.plus(Duration.ofDays(7))).isNegative -> {
             dt.with(
                 TemporalAdjusters.previousOrSame(
                     WeekFields.of(Locale.getDefault()).firstDayOfWeek
                 )
-            )
+            ).withHour(0)
         }
-        duration.minus(Duration.ofDays(32)).isNegative -> {
-            dt.withDayOfMonth(1)
+        duration.minus(nano.plus(Duration.ofDays(31))).isNegative -> {
+            dt.withDayOfMonth(1).withHour(0)
         }
-        duration.minus(Duration.ofDays((365 / 4) + 1)).isNegative -> {
-            val month = (dt.monthValue / 3) * 4
-            dt.withMonth(month).withDayOfMonth(1)
+        duration.minus(day.plus(Duration.ofDays(365 / 4))).isNegative -> {
+            val month = getQuaterForMonthValue(dt.monthValue)
+            dt.withMonth(month).withDayOfMonth(1).withHour(0)
         }
-        duration.minus(Duration.ofDays((365 / 2) + 1)).isNegative -> {
-            val month = (dt.monthValue / 6) * 6
-            dt.withMonth(month).withDayOfMonth(1)
+        duration.minus(day.plus(Duration.ofDays(365 / 2))).isNegative -> {
+            val month = getBiYearForMonthValue(dt.monthValue)
+            dt.withMonth(month).withDayOfMonth(1).withHour(0)
         }
-        duration.minus(Duration.ofDays(366)).isNegative -> {
-            dt.withDayOfYear(1)
-        }
-        else -> dt
+        else -> dt.withDayOfYear(1).withHour(0)
     }
 }
 
-//TODO test this
+/**
+ * Given a number representing a month in the range 1 to 12, this function will return you the
+ * integer value of the month starting the quater of the year containing that month.
+ */
+internal fun getQuaterForMonthValue(monthValue: Int) = (3 * ((monthValue - 1) / 3)) + 1
+
+/**
+ * Given a number representing a month in the range 1 to 12, this function will return you the
+ * integer value of the month starting the bi year containing that month.
+ */
+internal fun getBiYearForMonthValue(monthValue: Int) = (5 * ((monthValue - 1) / 6)) + 1
+
 private fun findBeginningOfPeriod(
     dateTime: OffsetDateTime,
     period: Period
 ): OffsetDateTime {
-    var dt = dateTime
-    val minusAWeek = period.minus(Period.ofWeeks(1))
-    val minusAMonth = period.minus(Period.ofMonths(1))
-    val minusAYear = period.minus(Period.ofYears(1))
-    if (minusAYear.days >= 0 && !minusAYear.isNegative) {
-        dt = dateTime.withDayOfYear(1)
-    } else if (minusAMonth.days >= 0 && !minusAMonth.isNegative) {
-        dt = dateTime.withDayOfMonth(1)
-    } else if (minusAWeek.days >= 0 && !minusAWeek.isNegative) {
-        dt = dateTime.with(
-            TemporalAdjusters.previousOrSame(
-                WeekFields.of(Locale.getDefault()).firstDayOfWeek
-            )
-        )
-    }
-    return dt.withHour(0)
+    val dt = dateTime.withHour(0)
         .withMinute(0)
         .withSecond(0)
         .withNano(0)
-        .minusNanos(1)
+
+    return when {
+        isPeriodNegativeOrZero(period.minus(Period.ofDays(1))) -> dt
+        isPeriodNegativeOrZero(period.minus(Period.ofWeeks(1))) -> {
+            val firstDay = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+            dt.with(TemporalAdjusters.previousOrSame(firstDay))
+        }
+        isPeriodNegativeOrZero(period.minus(Period.ofMonths(1))) -> {
+            dt.withDayOfMonth(1)
+        }
+        isPeriodNegativeOrZero(period.minus(Period.ofMonths(3))) -> {
+            val month = getQuaterForMonthValue(dateTime.monthValue)
+            dt.withMonth(month).withDayOfMonth(1)
+        }
+        isPeriodNegativeOrZero(period.minus(Period.ofMonths(6))) -> {
+            val month = getBiYearForMonthValue(dateTime.monthValue)
+            dt.withMonth(month).withDayOfMonth(1)
+        }
+        else -> dt.withDayOfYear(1)
+    }
 }
+
+private fun isPeriodNegativeOrZero(period: Period) = period.years < 0
+        || (period.years == 0 && period.months < 0)
+        || (period.years == 0 && period.months == 0 && period.days <= 0)
 
 /**
  * Calculate the moving averages of all of the data points given over the moving average duration given.
@@ -506,7 +510,7 @@ internal fun getLargestBin(bins: List<List<Double>>?): Double? {
         ?.getOrElse(0) { null }
         ?.size
         ?.downTo(1)
-        ?.map { index -> bins.sumByDouble { it[index-1] } }
+        ?.map { index -> bins.sumByDouble { it[index - 1] } }
         ?.max()
 }
 

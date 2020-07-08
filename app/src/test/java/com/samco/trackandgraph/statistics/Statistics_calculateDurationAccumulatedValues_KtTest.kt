@@ -15,11 +15,9 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview
+package com.samco.trackandgraph.statistics
 
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.graphstatview.decorators.DataSample
-import com.samco.trackandgraph.graphstatview.decorators.calculateDurationAccumulatedValues
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -29,7 +27,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAmount
 
-class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
+class Statistics_calculateDurationAccumulatedValues_KtTest {
 
     @Test
     fun calculateDurationAccumulatedValues_hourly_plot_totals() {
@@ -157,23 +155,19 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             //GIVEN
             val sampleDuration = Duration.ofHours(1)
             val endTime = OffsetDateTime.now()
-            val plotTotalTime: TemporalAmount = Duration.ofHours(3)
+            val plotTotalTime: TemporalAmount = Duration.ofHours(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData =
-                DataSample(
-                    dataPoints
-                )
+            val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    sampleDuration,
-                    null,
-                    plotTotalTime
-                )
+            val answer = calculateDurationAccumulatedValues(
+                rawData,
+                0L,
+                sampleDuration,
+                null,
+                plotTotalTime
+            )
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -189,10 +183,7 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofHours(1)
             val plotTotalTime: TemporalAmount = Period.ofDays(1)
             val dataPoints = emptyList<DataPoint>()
-            val rawData =
-                DataSample(
-                    dataPoints
-                )
+            val rawData = DataSample(dataPoints)
 
             //WHEN
             val answer =
@@ -285,10 +276,7 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData =
-                DataSample(
-                    dataPoints
-                )
+            val rawData = DataSample(dataPoints)
 
             //WHEN
             val answer =
@@ -475,7 +463,8 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
             //THEN we should go back to the beginning of endTime-sampleDuration
             val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
             assertEquals(plotTotals, answerTotals)
-            assertTrue(answer.dataPoints.takeLast(3).all { dp -> dp.timestamp > OffsetDateTime.now() })
+            assertTrue(
+                answer.dataPoints.takeLast(3).all { dp -> dp.timestamp > OffsetDateTime.now() })
             assertTrue(answer.dataPoints.take(3).all { dp -> dp.timestamp < OffsetDateTime.now() })
         }
     }
@@ -491,7 +480,8 @@ class GraphStatViewDecoratorHelpers_calculateDurationAccumulatedValues_KtTest {
         for (element in clusters.reversed()) {
             for (y in 0 until element) {
                 val dataPointTime = currentTime.minusSeconds(y + 1L)
-                dataPoints.add(0,
+                dataPoints.add(
+                    0,
                     DataPoint(
                         dataPointTime,
                         0L,
