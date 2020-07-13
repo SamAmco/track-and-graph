@@ -382,8 +382,14 @@ internal fun getXYSeriesFromDataSample(
     }
 }
 
-//TODO test this
-internal fun getNextEndOfDuration(
+/**
+ * Get the end of the window with respect to the given endDate. For example if the window
+ * size is a week and the endDate is on a Wednesday then the returned date/time will be
+ * 00:00 on the following monday.
+ *
+ * If the endDate is null then the current date/time is used in its place
+ */
+internal fun getNextEndOfWindow(
     window: TimeHistogramWindow,
     endDate: OffsetDateTime?
 ): OffsetDateTime {
@@ -399,17 +405,17 @@ internal fun getNextEndOfDuration(
 internal fun getHistogramBinsForSample(
     sample: DataSample,
     window: TimeHistogramWindow,
-    endTime: OffsetDateTime,
     feature: Feature,
     sumByCount: Boolean
 ): Map<Int, List<Double>>? {
+    if (sample.dataPoints.isEmpty()) return null
+    val endTime = getNextEndOfWindow(window, sample.dataPoints.maxBy { it.timestamp }!!.timestamp)
     val keys = feature.discreteValues
         .map { it.index }
         .let { if (it.isEmpty()) listOf(0) else it }
         .toSet()
 
     return when {
-        sample.dataPoints.isEmpty() -> null
         feature.featureType == FeatureType.DISCRETE && sumByCount ->
             getHistogramBinsForSample(
                 sample.dataPoints, window, keys, endTime, ::addOneDiscreteValueToBin
