@@ -25,7 +25,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.statistics.getHistogramBinsForSample
 import com.samco.trackandgraph.statistics.getLargestBin
-import com.samco.trackandgraph.statistics.getNextEndOfDuration
+import com.samco.trackandgraph.statistics.getNextEndOfWindow
 import com.samco.trackandgraph.statistics.sampleData
 import org.threeten.bp.OffsetDateTime
 
@@ -53,9 +53,8 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         config: TimeHistogram,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
-        val endTime = getNextEndOfDuration(config.window, config.endDate)
         val discreteValue = getDiscreteValues(dataSource, config)
-        val barValues = getBarValues(dataSource, config, endTime, onDataSampled)
+        val barValues = getBarValues(dataSource, config, config.endDate, onDataSampled)
         val largestBin = getLargestBin(barValues?.values?.toList())
         val maxDisplayHeight = largestBin?.times(10.0)?.toInt()?.plus(1)?.div(10.0)
 
@@ -89,18 +88,17 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
     private suspend fun getBarValues(
         dataSource: TrackAndGraphDatabaseDao,
         config: TimeHistogram,
-        endTime: OffsetDateTime,
+        endDate: OffsetDateTime?,
         onDataSampled: (List<DataPoint>) -> Unit
     ): Map<Int, List<Double>>? {
         val feature = dataSource.getFeatureById(config.featureId)
         val sample = sampleData(
             dataSource, config.featureId, config.duration,
-            endTime, null, null
+            endDate, null, null
         )
         val barValues = getHistogramBinsForSample(
             sample,
             config.window,
-            endTime,
             feature,
             config.sumByCount
         )
