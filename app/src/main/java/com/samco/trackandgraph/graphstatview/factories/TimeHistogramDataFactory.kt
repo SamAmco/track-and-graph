@@ -28,6 +28,7 @@ import com.samco.trackandgraph.statistics.getLargestBin
 import com.samco.trackandgraph.statistics.getNextEndOfWindow
 import com.samco.trackandgraph.statistics.sampleData
 import org.threeten.bp.OffsetDateTime
+import kotlin.math.min
 
 class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramViewData>() {
     override suspend fun createViewData(
@@ -53,10 +54,15 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         config: TimeHistogram,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
-        val discreteValue = getDiscreteValues(dataSource, config)
+        val discreteValue = getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
         val barValues = getBarValues(dataSource, config, config.endDate, onDataSampled)
         val largestBin = getLargestBin(barValues?.values?.toList())
-        val maxDisplayHeight = largestBin?.times(10.0)?.toInt()?.plus(1)?.div(10.0)
+        val maxDisplayHeight = largestBin?.let {
+            min(
+                it.times(10.0).toInt().plus(1).div(10.0),
+                1.0
+            )
+        }
 
         return object : ITimeHistogramViewData {
             override val state: IGraphStatViewData.State
