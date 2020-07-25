@@ -238,7 +238,7 @@ internal fun getQuaterForMonthValue(monthValue: Int) = (3 * ((monthValue - 1) / 
  * Given a number representing a month in the range 1 to 12, this function will return you the
  * integer value of the month starting the bi year containing that month.
  */
-internal fun getBiYearForMonthValue(monthValue: Int) = (5 * ((monthValue - 1) / 6)) + 1
+internal fun getBiYearForMonthValue(monthValue: Int) = if (monthValue < 7) 1 else 7
 
 private fun findBeginningOfPeriod(
     dateTime: OffsetDateTime,
@@ -410,20 +410,18 @@ internal fun getHistogramBinsForSample(
 ): Map<Int, List<Double>>? {
     if (sample.dataPoints.isEmpty()) return null
     val endTime = getNextEndOfWindow(window, sample.dataPoints.maxBy { it.timestamp }!!.timestamp)
-    val keys = feature.discreteValues
-        .map { it.index }
-        .let { if (it.isEmpty()) listOf(0) else it }
-        .toSet()
+    val isDiscrete = feature.featureType == FeatureType.DISCRETE
+    val keys =
+        if (isDiscrete) feature.discreteValues.map { it.index }.toSet()
+        else listOf(0).toSet()
 
     return when {
-        feature.featureType == FeatureType.DISCRETE && sumByCount ->
-            getHistogramBinsForSample(
-                sample.dataPoints, window, keys, endTime, ::addOneDiscreteValueToBin
-            )
-        feature.featureType == FeatureType.DISCRETE ->
-            getHistogramBinsForSample(
-                sample.dataPoints, window, keys, endTime, ::addDiscreteValueToBin
-            )
+        isDiscrete && sumByCount -> getHistogramBinsForSample(
+            sample.dataPoints, window, keys, endTime, ::addOneDiscreteValueToBin
+        )
+        isDiscrete -> getHistogramBinsForSample(
+            sample.dataPoints, window, keys, endTime, ::addDiscreteValueToBin
+        )
         sumByCount -> getHistogramBinsForSample(
             sample.dataPoints, window, keys, endTime, ::addOneToBin
         )

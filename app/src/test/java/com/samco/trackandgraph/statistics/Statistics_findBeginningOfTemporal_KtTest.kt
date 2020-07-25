@@ -469,7 +469,7 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testGetBiYearForMonthValue() {
         assertEquals(
-            listOf(1,1,1,1,1,1,6,6,6,6,6,6),
+            listOf(1,1,1,1,1,1,7,7,7,7,7,7),
             IntProgression.fromClosedRange(1, 12, 1)
                 .map { getBiYearForMonthValue(it) }
         )

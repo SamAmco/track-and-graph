@@ -32,6 +32,7 @@ import com.samco.trackandgraph.graphstatview.decorators.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 import java.text.DecimalFormat
 import kotlin.reflect.full.primaryConstructor
 
@@ -150,6 +151,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
                 graphOrStat = (data as T).graphOrStat
                 decorate(data.graphOrStat, decorator, data)
             } catch (exception: Exception) {
+                Timber.e(exception)
                 if (exception !is GraphStatInitException) return@launch
                 cleanAllViews()
                 currentDecorator = null
