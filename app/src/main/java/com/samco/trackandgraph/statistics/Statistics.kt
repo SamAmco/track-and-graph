@@ -400,8 +400,28 @@ internal fun getNextEndOfWindow(
     )
 }
 
-//TODO test this
-//TODO document this
+/**
+ * This function essentially loops over the data sample and puts every input data point into a bin
+ * depending on where its timestamp falls within the given input window. For example if the window
+ * represents a week then each data point may be put into one of 7 bins depending on which day of the
+ * week it was tracked.
+ *
+ * A map is generated with a data structure similar to a Matrix whereby each value in the map is a list of the
+ * same length. The keys in the map are the integer values of the discrete values of the {@param feature}
+ * or just {0} if the feature is not Discrete. The length of the lists is the number of bins of the
+ * given {@param window}. The lists represent the sum of all values in each bin of the histogram
+ * normalised such that the sum of all values in all lists is 1.
+ *
+ * If {@param sumByCount} is false then the value of each data point is added to the total value of
+ * the histogram bin it belongs in before normalisation. If sumByCount is true then the value of each
+ * histogram bin before normalisation is the number of data points that fall in that bin.
+ *
+ * {@param sample} - The data points to generate a histogram for
+ * {@param window} - The TimeHistogramWindow specifying the domain and number of bins of the histogram
+ * {@param feature} - The Feature for which the histogram is being generated
+ * {@param sumByCount} - Whether this histogram represents the number of data points tracked or
+ * the sum of their values
+ */
 internal fun getHistogramBinsForSample(
     sample: DataSample,
     window: TimeHistogramWindow,
@@ -431,7 +451,6 @@ internal fun getHistogramBinsForSample(
     }
 }
 
-//TODO document this
 private fun getHistogramBinsForSample(
     sample: List<DataPoint>,
     window: TimeHistogramWindow,
@@ -444,7 +463,9 @@ private fun getHistogramBinsForSample(
     return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { it / total } }.toMap()
 }
 
-//TODO document this
+/**
+ * Create a map structure and place every data point in it using the provided addFunction
+ */
 private fun calculateBinTotals(
     sample: List<DataPoint>,
     window: TimeHistogramWindow,
@@ -477,17 +498,24 @@ private fun calculateBinTotals(
     return binTotalMap
 }
 
-//TODO document this
+/**
+ * Add the value of the given data point to the bin at the given binIndex
+ */
 private fun addValueToBin(dataPoint: DataPoint, bin: Map<Int, MutableList<Double>>, binIndex: Int) {
     bin[0]?.set(binIndex, (bin[0]?.get(binIndex) ?: 0.0) + dataPoint.value)
 }
 
-//TODO document this
+/**
+ * Add one to the bin at the given binIndex
+ */
 private fun addOneToBin(dataPoint: DataPoint, bin: Map<Int, MutableList<Double>>, binIndex: Int) {
     bin[0]?.set(binIndex, (bin[0]?.get(binIndex) ?: 0.0) + 1.0)
 }
 
-//TODO document this
+/**
+ * Add the value of the given data point to the bin at the given binIndex within the histogram
+ * specific to its discrete value.
+ */
 private fun addDiscreteValueToBin(
     dataPoint: DataPoint,
     bin: Map<Int, MutableList<Double>>,
@@ -497,7 +525,9 @@ private fun addDiscreteValueToBin(
     bin[i]?.set(binIndex, (bin[i]?.get(binIndex) ?: 0.0) + dataPoint.value)
 }
 
-//TODO document this
+/**
+ * Add one to the bin at the given binIndex within the histogram specific to its discrete value.
+ */
 private fun addOneDiscreteValueToBin(
     dataPoint: DataPoint,
     bin: Map<Int, MutableList<Double>>,
@@ -507,8 +537,12 @@ private fun addOneDiscreteValueToBin(
     bin[i]?.set(binIndex, (bin[i]?.get(binIndex) ?: 0.0) + 1.0)
 }
 
-//TODO document this
-//TODO test this
+/**
+ * Given an input list of lists where each list represents the discrete value of a feature and each
+ * sub-list has the same size and represents the values of each histogram bin for that discrete value.
+ * Calculate the largest bin by summing the values of each discrete value for each bin and returning
+ * the largest of those sums.
+ */
 internal fun getLargestBin(bins: List<List<Double>>?): Double? {
     return bins
         ?.getOrElse(0) { null }
