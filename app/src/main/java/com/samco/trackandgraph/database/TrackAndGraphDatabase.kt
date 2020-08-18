@@ -60,7 +60,7 @@ const val splitChars2 = "!!"
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class, GlobalNote::class, LineGraphFeature::class],
-    version = 41
+    version = 42
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -106,6 +106,18 @@ class Converters {
 
     @TypeConverter
     fun featureTypeToInt(featureType: FeatureType): Int = featureType.ordinal
+
+    @TypeConverter
+    fun intToFeatureShowCountPeriod(i : Int): FeatureShowCountPeriod = FeatureShowCountPeriod.values()[i]
+
+    @TypeConverter
+    fun featureShowCountPeriodToInt(featureShowCountPeriod: FeatureShowCountPeriod): Int = featureShowCountPeriod.ordinal
+
+    @TypeConverter
+    fun intToFeatureShowCountMethod(i : Int): FeatureShowCountMethod = FeatureShowCountMethod.values()[i]
+
+    @TypeConverter
+    fun featureShowCountMethodToInt(featureShowCountMethod: FeatureShowCountMethod): Int = featureShowCountMethod.ordinal
 
     @TypeConverter
     fun intToGraphStatType(i: Int): GraphStatType = GraphStatType.values()[i]

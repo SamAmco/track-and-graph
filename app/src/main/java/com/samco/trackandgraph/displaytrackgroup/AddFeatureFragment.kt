@@ -50,6 +50,8 @@ import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.FeatureShowCountPeriod
+import com.samco.trackandgraph.database.entity.FeatureShowCountMethod
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -655,10 +657,16 @@ class AddFeatureViewModel : ViewModel() {
 
         val feature = Feature.create(
             existingFeature!!.id,
-            featureName, trackGroupId,
-            featureType.value!!, newDiscVals,
-            featureHasDefaultValue.value!!, featureDefaultValue.value!!,
-            existingFeature!!.displayIndex, featureDescription
+            featureName,
+            trackGroupId,
+            featureType.value!!,
+            newDiscVals,
+            featureHasDefaultValue.value!!,
+            featureDefaultValue.value!!,
+            existingFeature!!.displayIndex,
+            featureDescription,
+            existingFeature!!.showCountPeriod,
+            existingFeature!!.showCountMethod
         )
         dao!!.updateFeature(feature)
     }
@@ -777,7 +785,9 @@ class AddFeatureViewModel : ViewModel() {
             featureName, trackGroupId,
             featureType.value!!, discVals,
             featureHasDefaultValue.value!!, featureDefaultValue.value!!,
-            0, featureDescription
+            0, featureDescription,
+            FeatureShowCountPeriod.ALL,
+            FeatureShowCountMethod.COUNT_ENTRIES
         )
         dao!!.insertFeature(feature)
     }

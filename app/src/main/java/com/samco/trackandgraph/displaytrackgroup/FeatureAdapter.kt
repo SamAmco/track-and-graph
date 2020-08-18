@@ -128,6 +128,7 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
                 R.id.delete -> clickListener?.onDelete(it)
                 R.id.moveTo -> clickListener?.onMoveTo(it)
                 R.id.description -> clickListener?.onDescription(it)
+                R.id.customiseCard -> clickListener?.onCustomiseCard(it)
                 else -> {
                 }
             }
@@ -159,6 +160,7 @@ class FeatureClickListener(
     private val onDeleteListener: (feature: DisplayFeature) -> Unit,
     private val onMoveToListener: (feature: DisplayFeature) -> Unit,
     private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
+    private val onCustomiseCardListener: (feature: DisplayFeature) -> Unit,
     private val onAddListener: (feature: DisplayFeature) -> Unit,
     private val onHistoryListener: (feature: DisplayFeature) -> Unit
 ) {
@@ -166,6 +168,7 @@ class FeatureClickListener(
     fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
     fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
     fun onDescription(feature: DisplayFeature) = onDescriptionListener(feature)
+    fun onCustomiseCard(feature: DisplayFeature) = onCustomiseCardListener(feature)
     fun onAdd(feature: DisplayFeature) = onAddListener(feature)
     fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
 }

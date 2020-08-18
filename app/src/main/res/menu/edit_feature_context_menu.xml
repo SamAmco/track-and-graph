@@ -25,6 +25,9 @@
         android:id="@+id/moveTo"
         android:title="@string/move_to" />
     <item
+        android:id="@+id/customiseCard"
+        android:title="Customise card" />
+    <item
         android:id="@+id/description"
         android:title="@string/description" />
 </menu>

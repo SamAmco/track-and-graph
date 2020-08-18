@@ -59,7 +59,14 @@ data class Feature(
     val defaultValue: Double,
 
     @ColumnInfo(name = "feature_description")
-    val description: String
+    val description: String,
+
+    @ColumnInfo(name = "show_count_for_period")
+    val showCountPeriod: FeatureShowCountPeriod,
+
+    @ColumnInfo(name = "show_count_using_method")
+    val showCountMethod: FeatureShowCountMethod
+
 ) {
     fun getDefaultLabel(): String =
         if (featureType == FeatureType.DISCRETE)
@@ -70,7 +77,9 @@ data class Feature(
         fun create(
             id: Long, name: String, trackGroupId: Long, featureType: FeatureType,
             discreteValues: List<DiscreteValue>, hasDefaultValue: Boolean, defaultValue: Double,
-            displayIndex: Int, description: String
+            displayIndex: Int, description: String, 
+            showCountPeriod: FeatureShowCountPeriod, 
+            showCountMethod: FeatureShowCountMethod
         ): Feature {
             discreteValues.forEach { dv ->
                 validateDiscreteValue(
@@ -83,13 +92,16 @@ data class Feature(
                 .replace(splitChars2, " ")
             return Feature(
                 id, validName, trackGroupId, featureType, discreteValues,
-                displayIndex, hasDefaultValue, defaultValue, description
+                displayIndex, hasDefaultValue, defaultValue, description,
+                showCountPeriod, showCountMethod
             )
         }
     }
 }
 
 enum class FeatureType { DISCRETE, CONTINUOUS, DURATION }
+enum class FeatureShowCountPeriod { ALL, YEARLY, MONTHLY, WEEKLY, DAILY }
+enum class FeatureShowCountMethod { COUNT_ENTRIES, SUM_VALUES }
 
 data class DiscreteValue(val index: Int, val label: String) {
     override fun toString() = "$index:$label"

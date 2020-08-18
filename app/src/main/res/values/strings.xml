@@ -98,6 +98,17 @@
         <item>Numerical</item>
         <item>Time duration</item>
     </string-array>
+    <string-array name="feature_show_count_periods">
+        <item>All</item>
+        <item>Yearly</item>
+        <item>Monthly</item>
+        <item>Weekly</item>
+        <item>Daily</item>
+    </string-array>
+    <string-array name="feature_show_count_methods">
+        <item>Count entries</item>
+        <item>Sum values</item>
+    </string-array>
     <string-array name="graph_types">
         <item>Line Graph</item>
         <item>Pie Chart</item>
@@ -318,4 +329,6 @@
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">You can not mix time durations with other types of data. Consider plotting hours, minutes or seconds</string>
     <string name="time_duration">Time duration</string>
     <string name="select_a_duration_range">Select a duration range</string>
+    <string name="customise_card_s">Customise card\'s:</string>
+    <string name="close">close</string>
 </resources>

@@ -35,9 +35,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.DisplayFeature
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.database.entity.FeatureShowCountPeriod
+import com.samco.trackandgraph.database.entity.FeatureShowCountMethod
 import com.samco.trackandgraph.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.widgets.TrackWidgetProvider
@@ -69,6 +69,7 @@ class DisplayTrackGroupFragment : Fragment(),
             this::onFeatureDeleteClicked,
             this::onFeatureMoveToClicked,
             this::onFeatureDescriptionClicked,
+            this::onFeatureCustomiseCardClicked,
             this::onFeatureAddClicked,
             this::onFeatureHistoryClicked
         ))
@@ -151,6 +152,14 @@ class DisplayTrackGroupFragment : Fragment(),
             DisplayTrackGroupFragmentDirections
                 .actionAddFeature(args.trackGroup, featureNames)
         )
+    }
+
+    private fun onFeatureCustomiseCardClicked(feature: DisplayFeature) {
+        val dialog = CustomiseCardDialogFragment()
+        val args = Bundle()
+        args.putLong(CUSTOMISE_CARD_DIALOG_FEATURE_KEY, feature.id)
+        dialog.arguments = args
+        childFragmentManager.let { dialog.show(it, "customise_card_dialog") }
     }
 
     private fun onFeatureMoveToClicked(feature: DisplayFeature) {
@@ -317,6 +326,8 @@ class DisplayTrackGroupViewModel : ViewModel() {
     private fun toFeature(df: DisplayFeature) = Feature.create(
         df.id, df.name, df.trackGroupId,
         df.featureType, df.discreteValues, df.hasDefaultValue, df.defaultValue, df.displayIndex,
-        df.description
+        df.description,
+        df.showCountPeriod,
+        df.showCountMethod
     )
 }

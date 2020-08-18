@@ -22,6 +22,8 @@ import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.FeatureShowCountPeriod
+import com.samco.trackandgraph.database.entity.FeatureShowCountMethod
 import kotlinx.coroutines.yield
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
@@ -361,7 +363,8 @@ object CSVReadWriter {
             else listOf()
         val newFeature = Feature.create(
             0, rec.featureName, trackGroupId, featureType,
-            discreteValues, false, 1.0, 0, ""
+            discreteValues, false, 1.0, 0, "",
+            FeatureShowCountPeriod.ALL, FeatureShowCountMethod.COUNT_ENTRIES
         )
         val featureId = dataSource.insertFeature(newFeature)
         return newFeature.copy(id = featureId)

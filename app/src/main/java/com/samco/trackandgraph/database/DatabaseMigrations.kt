@@ -388,6 +388,13 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
     }
 }
 
+val MIGRATION_41_42 = object : Migration(41, 42) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE features_table ADD show_count_for_period INTEGER NOT NULL DEFAULT  0")
+        database.execSQL("ALTER TABLE features_table ADD show_count_using_method INTEGER NOT NULL DEFAULT  0")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -400,5 +407,6 @@ val allMigrations = arrayOf(
     MIGRATION_37_38,
     MIGRATION_38_39,
     MIGRATION_39_40,
-    MIGRATION_40_41
+    MIGRATION_40_41,
+    MIGRATION_41_42
 )

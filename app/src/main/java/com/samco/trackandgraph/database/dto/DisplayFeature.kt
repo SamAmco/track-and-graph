@@ -18,6 +18,8 @@ package com.samco.trackandgraph.database.dto
 
 import androidx.room.ColumnInfo
 import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.samco.trackandgraph.database.entity.FeatureShowCountMethod
+import com.samco.trackandgraph.database.entity.FeatureShowCountPeriod
 import com.samco.trackandgraph.database.entity.FeatureType
 import org.threeten.bp.OffsetDateTime
 
@@ -53,5 +55,11 @@ data class DisplayFeature(
     val displayIndex: Int,
 
     @ColumnInfo(name = "feature_description")
-    val description: String
+    val description: String,
+
+    @ColumnInfo(name = "show_count_for_period")
+    val showCountPeriod: FeatureShowCountPeriod = FeatureShowCountPeriod.ALL,
+
+    @ColumnInfo(name = "show_count_using_method")
+    val showCountMethod: FeatureShowCountMethod = FeatureShowCountMethod.COUNT_ENTRIES
 )

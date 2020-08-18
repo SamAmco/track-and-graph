@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/customiseCardDialog"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="@dimen/card_padding"
+        android:theme="@style/AppTheme.AlertDialogTheme">
+
+        <TextView
+            android:id="@+id/customiseCardTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_header_top_margin"
+            android:text="Customise card"
+            android:textAppearance="@style/TextAppearance.Headline6"
+            app:layout_constraintBottom_toTopOf="@id/customiseCardScrollView"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:layout_editor_absoluteX="10dp" />
+
+        <ScrollView
+            android:id="@+id/customiseCardScrollView"
+            android:layout_width="398dp"
+            android:layout_height="160dp"
+            android:layout_marginTop="@dimen/input_spacing_large"
+            app:layout_constraintBottom_toTopOf="@id/closeButton"
+            app:layout_constraintTop_toBottomOf="@id/customiseCardTitleTextView"
+            tools:layout_editor_absoluteX="-1dp">
+
+            <LinearLayout
+                android:id="@+id/customiseCardLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:alpha="0.4"
+                    android:contentDescription=""
+                    android:tint="?attr/colorOnSurface"
+                    app:srcCompat="@drawable/left_to_right_gradient" />
+
+                <TextView
+                    android:id="@+id/customiseCardPeriodLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/input_spacing_large"
+                    android:text="Periodicity for the shown count:"
+                    android:textAppearance="@style/TextAppearance.Body" />
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/featureShowCountPeriodSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:entries="@array/feature_show_count_periods"
+                    android:spinnerMode="dropdown" />
+
+                <TextView
+                    android:id="@+id/customiseCardMethodLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/input_spacing_large"
+                    android:text="Calculation method for the shown count:"
+                    android:textAppearance="@style/TextAppearance.Body" />
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/featureShowCountMethodSpinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:entries="@array/feature_show_count_methods"
+                    android:spinnerMode="dropdown" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <Button
+            android:id="@+id/closeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_header_top_margin"
+            android:background="@null"
+            android:text="@string/close"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/customiseCardScrollView" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>
