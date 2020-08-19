@@ -51,6 +51,14 @@ data class DisplayFeature(
     @ColumnInfo(name = "num_data_points")
     val numDataPoints: Long?,
 
+    // TODO confirm if we should not just
+    //  change the meaning of num_data_points instead
+    //  but at this point maybe it is best
+    //  if num_data_points represent total COUNT(*)
+    //  regardless of showCountPeriod and showCountMethod
+    @ColumnInfo(name = "shown_count")
+    val shownCount: Long?,
+
     @ColumnInfo(name = "display_index")
     val displayIndex: Int,
 

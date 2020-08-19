@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayFeature
+import com.samco.trackandgraph.database.entity.FeatureShowCountPeriod
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
@@ -87,11 +88,20 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
 
     private fun setNumEntriesText() {
         val numDataPoints = feature?.numDataPoints
-        binding.numEntriesText.text = if (numDataPoints != null) {
-            binding.numEntriesText.context.getString(R.string.data_points, numDataPoints)
-        } else {
-            binding.numEntriesText.context.getString(R.string.no_data)
-        }
+        val shownCount = feature?.shownCount
+        binding.numEntriesText.text =
+            if (shownCount == null) {
+                binding.numEntriesText.context.getString(R.string.no_data)
+            }
+            else when (feature?.showCountPeriod) {
+                FeatureShowCountPeriod.ALL ->
+                    binding.numEntriesText.context.getString(R.string.data_points, numDataPoints)
+                FeatureShowCountPeriod.YEARLY -> shownCount.toString() + " Yearly"
+                FeatureShowCountPeriod.MONTHLY -> shownCount.toString() + " Monthly"
+                FeatureShowCountPeriod.WEEKLY -> shownCount.toString() + " Weekly"
+                FeatureShowCountPeriod.DAILY -> shownCount.toString() + " Today"
+                else -> "Invalid count period"
+            }
     }
 
     private fun onQuickAddClicked() {

@@ -123,6 +123,7 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateFeatures(features: List<Feature>)
 
+    /*
     @Query(
         """SELECT features_table.*, num_data_points, last_timestamp from features_table 
         LEFT JOIN (
@@ -133,6 +134,49 @@ interface TrackAndGraphDatabaseDao {
 		WHERE track_group_id = :trackGroupId
         ORDER BY features_table.display_index ASC, id DESC"""
     )
+    fun getDisplayFeaturesForTrackGroup_old(trackGroupId: Long): LiveData<List<DisplayFeature>>
+    */
+
+    @Query(
+        """
+        SELECT 
+            features_table.*, 
+            IFNULL(num_data_points, 0) AS num_data_points,
+            IFNULL(shown_count, 0) AS shown_count,
+            last_timestamp 
+        FROM features_table
+        LEFT JOIN (
+            SELECT 
+                feature_id AS id,
+                MAX(timestamp) AS last_timestamp,
+                CASE A.type
+                    WHEN 0 OR 1 THEN /* DISCRETE or CONTINUOUS */
+                        CASE A.show_count_using_method
+                            WHEN 0 OR 1 THEN SUM(value)
+                            ELSE COUNT(value)
+                        END
+                    ELSE /* TODO: DURATION, if it uses similar way */
+                        COUNT(*)
+                END AS shown_count,
+                COUNT(*) AS num_data_points
+            FROM data_points_table
+            LEFT JOIN features_table AS A
+            ON feature_id = A.id
+            WHERE
+                data_points_table.timestamp >=
+                    CASE A.show_count_for_period
+                        WHEN 0 THEN 0
+                        WHEN 1 THEN date('now', '-1 year')
+                        WHEN 2 THEN date('now', '-1 month')
+                        WHEN 3 THEN date('now', '-7 days')
+                        ELSE date('now')
+                    END
+            GROUP BY feature_id
+        ) AS feature_data
+        ON feature_data.id == features_table.id
+        WHERE track_group_id = :trackGroupId
+        ORDER BY features_table.display_index ASC, id DESC
+    """)
     fun getDisplayFeaturesForTrackGroup(trackGroupId: Long): LiveData<List<DisplayFeature>>
 
     @Query("SELECT features_table.* FROM features_table WHERE track_group_id = :trackGroupId ORDER BY features_table.display_index ASC")
