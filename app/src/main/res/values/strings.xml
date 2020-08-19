@@ -99,15 +99,15 @@
         <item>Time duration</item>
     </string-array>
     <string-array name="feature_show_count_periods">
-        <item>All</item>
-        <item>Yearly</item>
-        <item>Monthly</item>
-        <item>Weekly</item>
-        <item>Daily</item>
+        <item>All data</item>
+        <item>Today</item>
+        <item>This Week</item>
+        <item>This Month</item>
+        <item>This Year</item>
     </string-array>
     <string-array name="feature_show_count_methods">
-        <item>Count entries</item>
-        <item>Sum values</item>
+        <item>Number of data points</item>
+        <item>Sum of data points</item>
     </string-array>
     <string-array name="graph_types">
         <item>Line Graph</item>

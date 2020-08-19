@@ -123,20 +123,6 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateFeatures(features: List<Feature>)
 
-    /*
-    @Query(
-        """SELECT features_table.*, num_data_points, last_timestamp from features_table 
-        LEFT JOIN (
-            SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
-            FROM data_points_table GROUP BY feature_id
-        ) as feature_data 
-        ON feature_data.id = features_table.id
-		WHERE track_group_id = :trackGroupId
-        ORDER BY features_table.display_index ASC, id DESC"""
-    )
-    fun getDisplayFeaturesForTrackGroup_old(trackGroupId: Long): LiveData<List<DisplayFeature>>
-    */
-
     @Query(
         """
         SELECT 
@@ -150,10 +136,15 @@ interface TrackAndGraphDatabaseDao {
                 feature_id AS id,
                 MAX(timestamp) AS last_timestamp,
                 CASE A.type
-                    WHEN 0 OR 1 THEN /* DISCRETE or CONTINUOUS */
+                    WHEN 0 THEN /* DISCRETE */
                         CASE A.show_count_using_method
-                            WHEN 0 OR 1 THEN SUM(value)
-                            ELSE COUNT(value)
+                            WHEN 0 THEN COUNT(value)
+                            ELSE SUM(value)
+                        END
+                    WHEN 1 THEN /* CONTINUOUS */
+                        CASE A.show_count_using_method
+                            WHEN 0 THEN COUNT(value) 
+                            ELSE SUM(value)
                         END
                     ELSE /* TODO: DURATION, if it uses similar way */
                         COUNT(*)
@@ -166,10 +157,10 @@ interface TrackAndGraphDatabaseDao {
                 data_points_table.timestamp >=
                     CASE A.show_count_for_period
                         WHEN 0 THEN 0
-                        WHEN 1 THEN date('now', '-1 year')
-                        WHEN 2 THEN date('now', '-1 month')
-                        WHEN 3 THEN date('now', '-7 days')
-                        ELSE date('now')
+                        WHEN 1 THEN date('now')
+                        WHEN 2 THEN date('now', '-7 days')
+                        WHEN 3 THEN date('now', '-1 month')
+                        ELSE date('now', '-1 year')
                     END
             GROUP BY feature_id
         ) AS feature_data

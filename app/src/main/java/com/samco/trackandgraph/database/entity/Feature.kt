@@ -100,7 +100,7 @@ data class Feature(
 }
 
 enum class FeatureType { DISCRETE, CONTINUOUS, DURATION }
-enum class FeatureShowCountPeriod { ALL, YEARLY, MONTHLY, WEEKLY, DAILY }
+enum class FeatureShowCountPeriod { ALL, DAILY, WEEKLY, MONTHLY, YEARLY }
 enum class FeatureShowCountMethod { COUNT_ENTRIES, SUM_VALUES }
 
 data class DiscreteValue(val index: Int, val label: String) {

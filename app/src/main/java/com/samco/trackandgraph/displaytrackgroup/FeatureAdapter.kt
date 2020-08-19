@@ -96,10 +96,10 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
             else when (feature?.showCountPeriod) {
                 FeatureShowCountPeriod.ALL ->
                     binding.numEntriesText.context.getString(R.string.data_points, numDataPoints)
-                FeatureShowCountPeriod.YEARLY -> shownCount.toString() + " Yearly"
-                FeatureShowCountPeriod.MONTHLY -> shownCount.toString() + " Monthly"
-                FeatureShowCountPeriod.WEEKLY -> shownCount.toString() + " Weekly"
                 FeatureShowCountPeriod.DAILY -> shownCount.toString() + " Today"
+                FeatureShowCountPeriod.WEEKLY -> shownCount.toString() + " This Week"
+                FeatureShowCountPeriod.MONTHLY -> shownCount.toString() + " This Month"
+                FeatureShowCountPeriod.YEARLY -> shownCount.toString() + " This Year"
                 else -> "Invalid count period"
             }
     }

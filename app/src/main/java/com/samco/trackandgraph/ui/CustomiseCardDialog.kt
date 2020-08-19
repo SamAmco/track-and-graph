@@ -41,10 +41,10 @@ class CustomiseCardDialogFragment : DialogFragment() {
     private lateinit var binding: CustomiseCardDialogBinding
     private val featurePeriodList = listOf(
         FeatureShowCountPeriod.ALL,
-        FeatureShowCountPeriod.YEARLY,
-        FeatureShowCountPeriod.MONTHLY,
+        FeatureShowCountPeriod.DAILY,
         FeatureShowCountPeriod.WEEKLY,
-        FeatureShowCountPeriod.DAILY
+        FeatureShowCountPeriod.MONTHLY,
+        FeatureShowCountPeriod.YEARLY
     )
     private val featureMethodList = listOf(
         FeatureShowCountMethod.COUNT_ENTRIES,
