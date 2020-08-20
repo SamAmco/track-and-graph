@@ -95,7 +95,7 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
             }
             else when (feature?.showCountPeriod) {
                 FeatureShowCountPeriod.ALL ->
-                    binding.numEntriesText.context.getString(R.string.data_points, numDataPoints)
+                    binding.numEntriesText.context.getString(R.string.data_points, shownCount)
                 FeatureShowCountPeriod.DAILY -> shownCount.toString() + " Today"
                 FeatureShowCountPeriod.WEEKLY -> shownCount.toString() + " This Week"
                 FeatureShowCountPeriod.MONTHLY -> shownCount.toString() + " This Month"
