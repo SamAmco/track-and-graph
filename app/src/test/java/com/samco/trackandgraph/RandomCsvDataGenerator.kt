@@ -34,7 +34,7 @@ class RandomCsvDataGenerator {
         else -> LineData("disc2", randFeatureValue())
     }
 
-    @Test
+    //@Test
     fun generate_random_data() {
         val numRecords = 1000000
         PrintWriter(File("./$numRecords-test.csv")).use {
@@ -89,7 +89,7 @@ class RandomCsvDataGenerator {
         }
     }
 
-    @Test
+    //@Test
     fun generate_wheat_pain_correlated_data() {
         val numRecords = 100
         PrintWriter(File("./wheat-pain-test.csv")).use {
