@@ -110,49 +110,6 @@ class CustomiseCardDialogFragment : DialogFragment() {
         binding.closeButton.setOnClickListener { dismiss() }
     }
 
-    // this seems useless after all
-    /*private fun initSpinners() {
-        val itemPeriodList = resources.getStringArray(R.array.feature_show_count_periods)
-            .map { s -> s as CharSequence }.toTypedArray()
-        val itemMethodList = resources.getStringArray(R.array.feature_show_count_methods)
-            .map { s -> s as CharSequence }.toTypedArray()
-
-        binding.featureShowCountPeriodSpinner.adapter = object : ArrayAdapter<CharSequence>(
-            requireContext(),
-            android.R.layout.simple_spinner_dropdown_item, itemPeriodList
-        ) {
-            override fun isEnabled(position: Int): Boolean {
-                return featurePeriodList[position] == viewModel.featurePeriod
-            }
-            override fun getDropDownView( position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getDropDownView(position, convertView, parent)
-                val textView = view as TextView
-                val color =
-                    if (isEnabled(position)) view.context.getColorFromAttr(android.R.attr.textColorPrimary)
-                    else view.context.getColorFromAttr(android.R.attr.textColorHint)
-                textView.setTextColor(color)
-                return view
-            }
-        }
-        binding.featureShowCountMethodSpinner.adapter = object : ArrayAdapter<CharSequence>(
-            requireContext(),
-            android.R.layout.simple_spinner_dropdown_item, itemMethodList
-        ) {
-            override fun isEnabled(position: Int): Boolean {
-                return featureMethodList[position] == viewModel.featureMethod
-            }
-            override fun getDropDownView( position: Int, convertView: View?, parent: ViewGroup): View {
-                val view = super.getDropDownView(position, convertView, parent)
-                val textView = view as TextView
-                val color =
-                    if (isEnabled(position)) view.context.getColorFromAttr(android.R.attr.textColorPrimary)
-                    else view.context.getColorFromAttr(android.R.attr.textColorHint)
-                textView.setTextColor(color)
-                return view
-            }
-        }
-    }
-    */
 }
 
 enum class CustomiseCardDialogState { INITIALIZING, WAITING, UPDATING }  // UPDATING then WAITING again
