@@ -81,7 +81,7 @@
                 android:id="@+id/pieChartSingleFeatureSelectLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/select_a_feature"
+                android:text="@string/select_a_discrete_feature"
                 android:textAppearance="@style/TextAppearance.Body" />
 
             <androidx.appcompat.widget.AppCompatSpinner
