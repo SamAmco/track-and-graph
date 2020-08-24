@@ -11,12 +11,8 @@
 
         <TextView
             android:id="@+id/faq1"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="@string/faq_1"
-            android:textAppearance="@style/TextAppearance.Subtitle2"
-            android:textStyle="bold" />
+            style="@style/Style.FAQMenuItem"
+            android:text="@string/faq_1" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -26,12 +22,8 @@
 
         <TextView
             android:id="@+id/faq2"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="@string/faq_2"
-            android:textAppearance="@style/TextAppearance.Subtitle2"
-            android:textStyle="bold" />
+            style="@style/Style.FAQMenuItem"
+            android:text="@string/faq_2" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -41,12 +33,8 @@
 
         <TextView
             android:id="@+id/faq3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="@string/faq_3"
-            android:textAppearance="@style/TextAppearance.Subtitle2"
-            android:textStyle="bold" />
+            style="@style/Style.FAQMenuItem"
+            android:text="@string/faq_3" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -56,12 +44,8 @@
 
         <TextView
             android:id="@+id/faq4"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="@string/faq_4"
-            android:textAppearance="@style/TextAppearance.Subtitle2"
-            android:textStyle="bold" />
+            style="@style/Style.FAQMenuItem"
+            android:text="@string/faq_4" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -71,12 +55,8 @@
 
         <TextView
             android:id="@+id/faq5"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="@string/faq_5"
-            android:textAppearance="@style/TextAppearance.Subtitle2"
-            android:textStyle="bold" />
+            style="@style/Style.FAQMenuItem"
+            android:text="@string/faq_5" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -86,12 +66,8 @@
 
         <TextView
             android:id="@+id/faq6"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="@string/faq_6"
-            android:textAppearance="@style/TextAppearance.Subtitle2"
-            android:textStyle="bold" />
+            style="@style/Style.FAQMenuItem"
+            android:text="@string/faq_6" />
 
         <ImageView
             android:layout_width="match_parent"
@@ -101,12 +77,8 @@
 
         <TextView
             android:id="@+id/faq7"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="20dp"
-            android:text="@string/faq_7"
-            android:textAppearance="@style/TextAppearance.Subtitle2"
-            android:textStyle="bold" />
+            style="@style/Style.FAQMenuItem"
+            android:text="@string/faq_7" />
 
         <ImageView
             android:layout_width="match_parent"
