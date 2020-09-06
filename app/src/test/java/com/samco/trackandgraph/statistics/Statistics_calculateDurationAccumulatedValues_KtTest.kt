@@ -310,10 +310,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData =
-                DataSample(
-                    dataPoints
-                )
+            val rawData = DataSample(dataPoints)
 
             //WHEN
             val answer =
@@ -322,6 +319,37 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                     0L,
                     null,
                     OffsetDateTime.now(),
+                    plotTotalTime
+                )
+
+            //THEN
+            assertTrue(answer.dataPoints.size > 4)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals.subList(0, 4))
+            assertTrue(answerTotals.drop(4).all { i -> i == 0 })
+        }
+    }
+
+    @Test
+    fun calculateDurationAccumulatedValues_no_duration_no_end_time_data_before_now() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+                .withYear(2020)
+                .withMonth(5)
+                .withDayOfMonth(15)
+            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotals = listOf(8, 3, 1, 7)
+            val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    null,
                     plotTotalTime
                 )
 
@@ -408,15 +436,11 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
     fun calculateDurationAccumulatedValues_with_data_after_end_time_with_duration() {
         runBlocking {
             //GIVEN
-            val endTime = OffsetDateTime.now()
-                .plusMonths(1)
+            val endTime = OffsetDateTime.now().plusWeeks(4)
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData =
-                DataSample(
-                    dataPoints
-                )
+            val rawData = DataSample(dataPoints)
             val sampleDuration = Duration.ofDays(7 * 4)
 
             //WHEN

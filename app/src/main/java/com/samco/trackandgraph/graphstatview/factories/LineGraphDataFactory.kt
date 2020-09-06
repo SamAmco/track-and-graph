@@ -29,6 +29,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.statistics.*
 import kotlinx.coroutines.yield
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
 class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>() {
@@ -138,7 +139,9 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             else -> calculateDurationAccumulatedValues(
                 rawDataSample,
                 lineGraphFeature.featureId,
-                lineGraph.duration,
+                //We have to add movingAvDuration if it exists to make sure we're going back far enough
+                // to get correct averaging
+                lineGraph.duration?.plus(movingAvDuration ?: Duration.ZERO),
                 lineGraph.endDate,
                 plottingPeriod!!
             )
