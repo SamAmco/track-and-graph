@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This file is part of Track & Graph
+  ~ 
+  ~ Track & Graph is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~ 
+  ~ Track & Graph is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ 
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<resources>
+    <string name="home">Startseite</string>
+    <string name="track_group">Track-Gruppe</string>
+    <string name="graph_group">Diagramm-Gruppe</string>
+    <string name="add_track_group">Eine Trackgruppe hinzufügen: </string>
+    <string name="add_feature">Etwas tracken:</string>
+    <string name="add">Hinzufügen</string>
+    <string name="group_name">z.B. Tägliche Aktivitäten</string>
+    <string name="add_graph_stat_group">Eine Diagrammgruppe hinzufügen: </string>
+    <string name="delete">Löschen</string>
+    <string name="rename">Umbenennen</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="update">Aktualisieren</string>
+    <string name="new_name">Neuer Name: </string>
+    <string name="graph_or_stat_name">Diagramm Name: </string>
+    <string name="feature_name">Was möchten Sie tracken?</string>
+    <string name="feature_type">Welche Art von Daten sind das?</string>
+    <string name="yes">Ja</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="select_file">Datei wählen</string>
+    <string name="no_groups_hint">Willkommen bei Track &amp; Graph!\n\n Tippen Sie hier, um Ihre erste Track-Gruppe zu erstellen und loszulegen.</string>
+    <string name="no_features_hint">Tippen Sie auf das + Symbol, um die Tracking-Funktion zu starten..</string>
+    <string name="no_graph_stats_hint">Tippen Sie auf das + Symbol, um ein neues Diagramm oder eine neue Statistik zu erstellen..</string>
+    <string name="no_features_graph_stats_hint">Hier gibt es noch nichts zu tun. Bitte erstellen Sie eine Track-Gruppe und verfolgen Sie einige Daten, bevor Sie irgendwelche Diagramme erstellen..</string>
+    <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
+    <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
+    <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
+    <string name="export_file_name_suffix">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
+    <string name="backup_file_name_suffix">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.db</string>
+    <string name="discrete_values">Fügen Sie unten einige Auswahlmöglichkeiten hinzu.</string>
+    <string name="feature_name_cannot_be_null">Bitte einen Namen angeben</string>
+    <string name="feature_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
+    <string name="discrete_value_must_have_name">Bitte vergewissern Sie sich, dass alle Ihre Auswahlmöglichkeiten Namen haben</string>
+    <string name="discrete_feature_needs_at_least_two_values">Bitte fügen Sie mindestens zwei Multiple-Choice-Antworten hinzu</string>
+    <string name="data_points">%1$d Getrackt</string>
+    <string name="no_data">Keine Daten</string>
+    <string name="add_data_point_hint">Einen Wert eingeben für:</string>
+    <string name="skip">Überspringen</string>
+    <string name="exportButton">Exportieren</string>
+    <string name="importButton">Importieren</string>
+    <string name="export_to">Exportieren nach:</string>
+    <string name="import_from">Importieren von:</string>
+    <string name="import_warning">Warnung: Der Import ist irreversibel. Track &amp; Graph wird versuchen, alle importierten Daten mit den vorhandenen Daten in dieser Trackgruppe namentlich zusammenzuführen.</string>
+    <string name="graphs_and_statistics"><![CDATA[Diagramme & Statistiken]]></string>
+    <string name="add_a_graph_or_stat">Ein Diagramm oder eine Statistik hinzufügen</string>
+    <string name="graph_type_label">Diagrammtyp:</string>
+    <string name="maximum_sample_duration">Größe des Samples:</string>
+    <string name="select_a_discrete_feature">Wählen Sie einen Multiple-Choice-Datensatz aus: </string>
+    <string name="no_discrete_features_pie_chart">Sie können derzeit kein Tortendiagramm erstellen, da Sie nichts mit Multiple-Choice tracken..</string>
+    <string name="select_a_feature">Wählen Sie einen Datensatz:</string>
+    <string name="offset">Offset:</string>
+    <string name="scale">Skalieren:</string>
+    <string name="from">Von:</string>
+    <string name="to">Zu:</string>
+    <string name="select_a_value_range">Wählen Sie einen Wertebereich:</string>
+    <string name="graph_name_hint">z.B. Übung: wöchentlicher beweglicher Durchschnitt</string>
+    <string name="day">Tag</string>
+
+    <string-array name="time_histogram_windows">
+        <item>Stündlich</item>
+        <item>Täglich</item>
+        <item>Wöchentlich</item>
+        <item>Monatlich</item>
+        <item>Vierteljährlich</item>
+        <item>Halbjährlich</item>
+        <item>Jährlich</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>dd/mm/yy</item>
+        <item>mm/dd/yy</item>
+        <item>yy/mm/dd</item>
+    </string-array>
+    <string-array name="theme_names_pre_Q">
+        <item>Akku schonend</item>
+        <item>Hell</item>
+        <item>Dunkel</item>
+    </string-array>
+    <string-array name="theme_names_Q">
+        <item>System Standard</item>
+        <item>Hell</item>
+        <item>Dunkel</item>
+    </string-array>
+    <string-array name="numeric_duration_conversion_modes">
+        <item>Anzahl Stunden</item>
+        <item>Anzahl Minuten</item>
+        <item>Anzahl Sekunden</item>
+    </string-array>
+    <string-array name="feature_types">
+        <item>Multiple-Choice</item>
+        <item>Numerisch</item>
+        <item>Dauer</item>
+    </string-array>
+    <string-array name="graph_types">
+        <item>Liniendiagramm</item>
+        <item>Tortendiagramm</item>
+        <item>Durchschnittszeit zwischen</item>
+        <item>Zeit seitdem</item>
+        <item>Histogramm Zeit</item>
+    </string-array>
+    <string-array name="line_graph_feature_modes">
+        <item>Keine Durchschnittsermittlung</item>
+        <item>Dynamischer Tagesdurchschnitt</item>
+        <item>Dynamischer dreitägiger Durchschnitt</item>
+        <item>Dynamischer wöchentlicher Durchschnitt</item>
+        <item>Dynamischer monatlicher Durchschnitt</item>
+        <item>Dynamischer vierteljährlicher Durchschnitt</item>
+        <item>Dynamischer halbjährlicher Durchschnitt</item>
+        <item>Dynamischer jährlicher Durchschnitt</item>
+    </string-array>
+    <string-array name="line_graph_generation_modes">
+        <item>Gesamtanzahl wenn getrackt</item>
+        <item>Gesamtanzahl stündlich</item>
+        <item>Gesamtanzahl täglich</item>
+        <item>Gesamtanzahl wöchentlich</item>
+        <item>Gesamtanzahl monatlich</item>
+        <item>Gesamtanzahl jährlich</item>
+    </string-array>
+    <string-array name="graph_time_durations">
+        <item>Alle Daten</item>
+        <item>Einen Tag</item>
+        <item>Eine Woche</item>
+        <item>Einen Monat</item>
+        <item>Drei Monate</item>
+        <item>Sechs Monate</item>
+        <item>Ein Jahr</item>
+    </string-array>
+    <string-array name="y_range_styles">
+        <item>Dynamisch</item>
+        <item>Fixiert</item>
+    </string-array>
+    <string-array name="ending_at_values">
+        <item>Aktuellste</item>
+        <item>Benutzerdefiniertes Datum…</item>
+    </string-array>
+
+
+    <string name="import_exception_unknown">Import fehlgeschlagen: Ein unbekannter Fehler ist aufgetreten</string>
+    <string name="import_exception_bad_headers">Import fehlgeschlagen: Kopfzeilen stimmten nicht mit den erwarteten Kopfzeilen überein: %1$s</string>
+    <string name="import_exception_inconsistent_record">Import fehlgeschlagen: Datensatz in Zeile %1$s stimmt nicht mit den erforderlichen Kopfzeilen überein: %1$s</string>
+    <string name="import_exception_bad_timestamp">Import fehlgeschlagen: Konnte den Zeitstempel für Eintrag in Zeile nicht interpretieren: %1$s </string>
+    <string name="import_exception_inconsistent_data_type">Import fehlgeschlagen: Inkonsistenter Datentyp in der Zeile enthalten: %1$s</string>
+    <string name="import_exception_bad_discrete_value">Import fehlgeschlagen: Lesen des Multiple-Choice-Wertes in der Zeile fehlgeschlagen: %1$s</string>
+    <string name="import_exception_discrete_value_conflict">Import fehlgeschlagen: Multiple-Choice-Wertekonflikt in der Zeile: %1$s</string>
+    <string name="import_exception_discrete_value_index_exists">Import fehlgeschlagen: Lesen des Multiple-Choice-Wertes in der Zeile fehlgeschlagen: %1$s, Index %2$s bereits vorhanden</string>
+    <string name="import_exception_discrete_value_label_exists">Import fehlgeschlagen: Lesen des Multiple-Choice-Wertes in der Zeile fehlgeschlagen: %1$s, das Label %2$s existiert mit einem anderen Index</string>
+    <string name="import_exception_feature_name_too_long">Import fehlgeschlagen: Name zu lang in der Zeile: %1$s</string>
+    <string name="import_exception_max_discrete_values_reached">Import fehlgeschlagen: Der maximale Multiple-Choice-Wert für ein Feature ist: %1$s</string>
+
+    <string name="graph_stat_validation_unknown">Ein unbekannter Fehler ist aufgetreten</string>
+    <string name="graph_stat_validation_no_name">Geben Sie bitte einen Namen an</string>
+    <string name="graph_stat_validation_no_line_graph_features">Bitte fügen Sie dem Diagramm etwas hinzu</string>
+    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Bitte wählen Sie mindestens eine Multiple-Choice-Antwort aus</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Bitte stellen Sie sicher, dass "Von" kleiner oder gleich "Bis" ist.</string>
+    <string name="graph_stat_validation_unrecognised_color">Bitte stellen Sie sicher, dass alle Datensätze eine Farbe haben</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Ungültiger Liniendiagramm-Datensatz entdeckt</string>
+    <string name="graph_stat_validation_bad_fixed_range">Bitte stellen Sie sicher, dass "Von" kleiner ist als "Bis".</string>
+
+    <string name="graph_stat_view_invalid_setup">Vervollständigen Sie die Konfiguration, um eine Vorschau zu sehen</string>
+    <string name="graph_stat_view_not_found">Beim Auswerten dieses Diagramms ist ein Fehler aufgetreten.</string>
+    <string name="graph_stat_view_not_enough_data_stat">Diese Statistik wird angezeigt, wenn genügend Daten erfasst wurden, um sie zu verarbeiten.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Dieses Diagramm wird angezeigt, wenn genügend Daten erfasst wurden, um sie zu verarbeiten.</string>
+    <string name="finish">Beenden</string>
+    <string name="about_description"><![CDATA[Track & Graph ist freie und quelloffene Software unter der GPL 3.0-Lizenz.]]></string>
+    <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
+    <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="about_libraries_message">Folgende Open-Source-Bibliotheken wurden verwendet:</string>
+    <string name="androidplot">Androidplot</string>
+    <string name="apache_2_0">Apache 2.0</string>
+    <string name="apache_commons_csv">Apache Commons CSV</string>
+    <string name="three_ten_android_backport">Three Ten Android Backport</string>
+    <string name="timber">Timber</string>
+    <string name="about">Über</string>
+    <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
+
+    <string name="faq_1">Wie beginne ich, etwas zu tracken?</string>
+    <string name="faq_2">Wie importiere / exportiere ich, was ich getrackt habe?</string>
+    <string name="faq_3">Wie funktionieren die Multiple-Choice-Daten?</string>
+    <string name="faq_4">Wie beginne ich mit der Erstellung von Diagrammen?</string>
+    <string name="faq_5">Wie werden gleitende Mittelwerte und Plot-Summen berechnet?</string>
+    <string name="faq_6">Wie funktionieren die Notizen?</string>
+    <string name="faq">FAQ</string>
+    <string name="faq_text_1_1">Um mit dem Tracking zu beginnen, müssen Sie mindestens eine Tracking-Gruppe erstellen. Track-Gruppen ermöglichen es Ihnen, Gruppen von Dingen zu trennen, die Sie gleichzeitig verfolgen möchten. Sie können zum Beispiel eine Gruppe für Ihre Übungsroutine und eine andere für Nahrungsmittelarten erstellen.</string>
+    <string name="faq_text_1_2">Ihre Track-Gruppen erscheinen in Ihrer Liste der Gruppen. Sie können sie ganz einfach sortieren, indem Sie den Gegenstand, den Sie verschieben möchten, gedrückt halten und ihn dann an eine neue Position ziehen.</string>
+    <string name="faq_text_1_3">Wenn Sie Ihre Tracking-Gruppe erstellt haben, wählen Sie sie aus und klicken Sie dann auf das Symbol +, um etwas zum Tracking neu einzurichten.</string>
+    <string name="faq_text_1_4">Geben Sie den Namen des gewünschten Tracks ein und wählen Sie einen Eingabestil:</string>
+    <string name="faq_text_1_5">Es gibt drei Eingabearten, die Sie wählen können: \n\n- Multiple Choice erfordert, dass Sie manuell vordefinierte Antworten einrichten, die Ihnen beim Tracken als Schaltflächen präsentiert werden.\n\n- Numerisch fordert Sie beim Tracken auf, eine Zahl einzugeben.\n\n- Zeitdauer fordert Sie beim Tracken auf, eine Zeitspanne in Stunden, Minuten und Sekunden einzugeben. \n\n Wenn Sie einen Standardwert hinzufügen, werden Sie nicht jedes Mal nach einem Wert gefragt, wenn Sie auf die Schaltfläche + tippen, sondern es wird stattdessen Ihr Standardwert verwendet. Sie können jedoch wieder zurück gehen und den Wert ändern, indem Sie den betreffenden Datenpunkt nachträglich bearbeiten (wie später erklärt wird).</string>
+    <string name="faq_text_1_6">Um Multiple-Choice-Antworten zu erstellen, klicken Sie unten auf die +-Schaltfläche.</string>
+    <string name="faq_text_1_8">Wenn Sie mit der Einrichtung zufrieden sind, klicken Sie auf die Schaltfläche BEENDEN.</string>
+    <string name="faq_text_1_9">Sie sollten nun Karten in Ihrer Tracking-Gruppe sehen. Sie können sie ganz einfach anordnen, indem Sie das gewünschte Element gedrückt halten und es dann an eine neue Position ziehen.</string>
+    <string name="faq_text_1_10">Sie können Elemente einzeln durch Verwendung ihrer +-Schaltflächen überwachen oder alles in der Gruppe schneller verfolgen, indem Sie die Aktions-Schaltfläche verwenden:</string>
+    <string name="faq_text_1_11">Machen Sie sich keine Sorgen, wenn Sie einen Fehler machen. Sie können Ihre Tracking-Chronik jederzeit einsehen, überprüfen und bearbeiten, indem Sie einfach auf die Karte tippen.</string>
+    <string name="faq_text_2_1">Um Ihre Tracking-Daten zu importieren/exportieren, wählen Sie zunächst eine Tracking-Gruppe und wählen Sie dann die Menüschaltflächen oben:</string>
+    <string name="faq_text_2_2">Verwenden Sie diese Schaltfläche, um eine csv-Datei in diese Tracking-Gruppe zu importieren.</string>
+    <string name="faq_text_2_3">Verwenden Sie diese Schaltfläche, um diese Tracking-Gruppe in eine csv-Datei zu exportieren.</string>
+    <string name="faq_text_3_1">Die Verwendung des Multiple-Choice-Eingabetyps wird empfohlen, wo immer dies möglich ist. Wenn Sie jemals ein Tortendiagramm aus Ihren Daten erzeugen möchten, benötigen Sie es in Multiple-Choice-Form. Sie können auch ein Liniendiagramm Ihrer Daten über die Dauer erstellen, wenn Ihre vordefinierten Antworten eine natürliche Ordnung haben. Nehmen wir zum Beispiel an, Sie sollen Folgendes einrichten:</string>
+    <string name="faq_text_3_2">Und dann haben Sie einige Daten wie folgt getrackt:</string>
+    <string name="faq_text_3_3">Sie könnten diese Daten dann entweder mit einem Liniendiagramm über die Dauer oder mit einem Tortendiagramm wie unten dargestellt visualisieren:</string>
+    <string name="faq_text_4_1"><![CDATA[Um mit der Erstellung von Diagrammen zu beginnen, müssen Sie zunächst einige Daten erfassen. Gehen Sie dann auf die Startseite und erstellen Sie eine neue Diagrammgruppe. Ihre Diagrammgruppen müssen in keiner Weise mit Ihren Track-Gruppen übereinstimmen, Sie können sie so einrichten, wie Sie möchten.]]></string>
+    <string name="faq_text_4_3">Ihre Diagrammgruppen erscheinen in Ihrer Gruppenliste. Sie können sie ganz einfach anordnen, indem Sie das Element, das Sie verschieben möchten, gedrückt halten und es dann an eine neue Position ziehen.</string>
+    <string name="faq_text_4_4">Wenn Sie Ihre Diagrammgruppe erstellt haben, wählen Sie sie aus und klicken Sie dann auf das + Symbol, um ein neues Diagramm oder eine neue Statistik einzurichten.</string>
+    <string name="faq_text_4_5">Beginnen Sie mit der Eingabe eines Namens für Ihr neues Diagramm und wählen Sie dann einen Diagrammtyp aus. Hier werden wir das Liniendiagramm demonstrieren, da andere Diagrammtypen relativ simpel einzurichten sind. Ein zu beachtender Haken ist jedoch, dass Sie Tortendiagramme nur aus Multiple-Choice-Daten erstellen können.</string>
+    <string name="faq_text_4_6">Der Dynamik-Bereich Stil berechnet automatisch den minimalen und maximalen Wert für die Y-Achse. Nun fügen wir einige Linien zu unserem Diagramm hinzu, indem wir die Schaltfläche + am unteren Rand verwenden:</string>
+    <string name="faq_text_4_7">Da es sich bei unseren Getreidewerten um Multiple-Choice-Antworten im Bereich von 0-2 und bei unseren Magenschmerzwerten um Zahlen im Bereich von 1-8 handelt, haben wir unsere Getreidewerte mit 4 multipliziert, um die Bereiche vergleichbar zu machen. Wir haben einen drei-Tages-Mittelwert verwendet, um Anomalien zu bereinigen und das Rauschen in der Ergebnisgrafik zu reduzieren. Wir haben ebenfalls "Gesamtanzahl wenn getrackt" gewählt, weil diese Daten relativ kontinuierlich getrackt wurden. Mehr darüber, wie sich diese Einstellungen auf die Liniendiagramme auswirken, können Sie in der FAQ nachlesen: "Wie werden gleitende Mittelwerte und Plot-Summen berechnet?"</string>
+    <string name="faq_text_4_8">Als nächstes klicken wir auf die Schaltfläche BEENDEN, um die Einrichtung abzuschließen. Beachten Sie, wie unser neues Diagramm als Karte in unserer Diagrammgruppe erscheint:</string>
+    <string name="faq_text_4_9">Um das Diagramm genauer zu erkunden, können Sie auf die Karte tippen, um sie in einer Vollbildansicht zu öffnen, und dann die Linien anklicken und ziehen:</string>
+    <string name="faq_text_4_10">Wenn wir weitere Diagramme und Statistiken zu unserer Diagrammgruppe hinzufügen, erscheinen sie als eine Liste von Karten. Sie können sie jederzeit neu anordnen, indem Sie eine Karte mit gedrückter Maustaste an eine neue Position ziehen.</string>
+    <string name="faq_text_5_1">Gleitende Mittelwerte:</string>
+    <string name="faq_text_5_2">Angenommen, wir wollen etwas einfach als eine Ja- oder Nein-Frage tracken, zum Beispiel:</string>
+    <string name="faq_text_5_3">Wenn wir diese Daten über die Zeit verfolgen würden, ohne einen gleitenden Mittelwert zu verwenden, könnte es so aussehen:</string>
+    <string name="faq_text_5_4">Diese Ausgabe ist sehr genau, aber nicht sehr hilfreich. Um die Daten leichter verständlich zu machen, könnten wir einen monatlichen gleitenden Mittelwert verwenden:</string>
+    <string name="faq_text_5_5">Anstatt nun jeden Datenpunkt mit dem aufgezeichneten Y-Wert (0 oder 1) aufzuzeichnen, wird jeder Y-Wert als Mittelwert aus sich selbst und allen vorherigen Datenpunkten innerhalb des gewählten Zeitbereichs davor berechnet.</string>
+    <string name="faq_text_5_6">Im Allgemeinen gilt: Je länger die gewählte Mittelungsperiode, desto glatter erscheint die Kurve. Beachten Sie jedoch, dass gleitende Mittelwerte nachlaufende Indikatoren sind. Je länger die Mittelungsperiode ist, desto weiter liegt die Kurve hinter dem realen Wert zurück.</string>
+    <string name="faq_text_5_7">Plottsummen:</string>
+    <string name="faq_text_5_8">Manche Dinge möchten Sie vielleicht nur selten überwachen. Zum Beispiel möchten Sie vielleicht nachvollziehen, wann Sie ein Buch zu Ende gelesen haben:</string>
+    <string name="faq_text_5_9">Angenommen, Sie haben Folgendes verfolgt:</string>
+    <string name="faq_text_5_10">Vielleicht überrascht es Sie dann oder auch nicht, dass Ihre Grafik wie folgt aussieht:</string>
+    <string name="faq_text_5_11">Das Problem besteht darin, dass nur Linien von jedem aufgetragenen Wert zum nächsten aufgetragenen Wert gezeichnet werden. Da alle aufgezeichneten Werte als 1 interpretiert werden, sehen Sie nur am Punkt 1 auf der Y-Achse eine gerade Linie.</string>
+    <string name="faq_text_5_12">Wir können dies mit Hilfe von Plot-Summen beheben. Wenn wir beispielsweise monatliche Summen aufzeichnen, sehen wir das folgende Diagramm:</string>
+    <string name="faq_text_5_13">Beachten Sie, dass am Ende eines jeden Monats ein Punkt aufgetragen wird, der die Summe aller in diesem Monat verfolgten Werte darstellt.</string>
+    <string name="faq_text_5_14">Sie können Skalierung, Offset, Mittelwertbildung und Summen auf einmal verwenden. Die Rangfolge ist wie folgt:</string>
+    <string name="faq_text_5_15">• Zuerst werden Ihre Daten in Gesamtwerte umgewandelt\n\n- Dann wird jeder Punkt in seinen gleitenden Mittelwert umgewandelt\n\n- Dann werden Ihre Punkte mit dem Skalenwert multipliziert\n\n- Schließlich wird der Offset zu jedem Punkt hinzugefügt</string>
+    <string name="faq_text_6_1">Notizen ermöglichen es Ihnen, neben Ihren quantitativen Daten auch qualitative Daten zu verfolgen. Es gibt zwei Arten von Notizen:\n\n- Globale Notizen (direkt im Menü Notizen hinzugefügt)\n\n- Datenpunktnotizen (an bestimmte Datenpunkte angehängt)\n\n Beim Hinzufügen eines Datenpunktes möchten Sie vielleicht eine wichtige Information verfolgen, die spezifisch für diesen Datensatz ist. Zum Beispiel:</string>
+    <string name="faq_text_6_2">Nachdem Sie diese Notiz hinzugefügt haben, werden Sie feststellen, dass sie in einer Liste unter jedem Diagramm dieses Datensatzes angezeigt wird. Wenn Sie auf die Notiz tippen, wird sie in einem Dialogfenster geöffnet und eine Markierung wird dem Diagramm hinzugefügt.</string>
+    <string name="faq_text_6_3">Einige Informationen könnten jedoch für alle Ihre Daten relevant sein. In diesem Fall können Sie eine globale Notiz hinzufügen, indem Sie auf die Plus-Schaltfläche im Menü für globale Notizen tippen:</string>
+    <string name="faq_text_6_4">Sie werden feststellen, dass dieser Hinweis jetzt unter allen Diagrammen angezeigt wird.</string>
+    <string name="faq_text_6_5">Sie können jede Notiz über das Notizen-Menü bearbeiten oder löschen. Wenn Sie eine Datenpunktnotiz aus dem Notizen-Menü löschen, wird nicht der Datenpunkt selbst gelöscht, sondern nur die angehängte Notiz.</string>
+    <string name="tutorial_text_1"><![CDATA[Alles in Track & Graph ist in blaue Trackgruppen und orangefarbene Diagrammgruppen unterteilt.]]></string>
+    <string name="tutorial_text_2">Verwenden Sie Track-Gruppen, um schnell viele Dinge gleichzeitig zu verfolgen.</string>
+    <string name="tutorial_text_3">Verwenden Sie Diagrammgruppen, um Daten aus mehreren Trackgruppen zu untersuchen.</string>
+    <string name="got_it">Got it</string>
+    <string name="move_to_colon">Weiter zu:</string>
+    <string name="move_to">Weiter zu</string>
+
+    <string name="feature_add_or_update_error_occurred">Es ist ein Fehler aufgetreten, Ihre Änderungen konnten nicht durchgeführt werden.</string>
+    <string name="ru_sure_update_feature">Diese Aktualisierung kann die Daten, die Sie bereits verfolgt haben, irreversibel verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\n Möchten Sie fortfahren?</string>
+    <string name="warning">Warnung</string>
+    <string name="ok">OK</string>
+    <string name="on_feature_type_change_numerical_warning">Wenn Sie Ihren Eingabetyp auf numerisch ändern, verlieren Ihre vorhandenen verfolgten Daten ihre Beschriftungen.</string>
+    <string name="on_feature_delete_discrete_value_warning">Beim Löschen von Multiple-Choice-Antworten werden alle vorhandenen verfolgten Datenpunkte für diesen Wert gelöscht.</string>
+
+    <string name="my_first_track_group">Meine erste Trackgruppe</string>
+    <string name="rate_the_app">Bewerten Sie uns</string>
+    <string name="reminders">Erinnerungen</string>
+    <string name="no_reminders_hint">Tippen Sie auf das + Symbol, um eine neue Tracking-Erinnerungsbenachrichtigung zu erstellen.</string>
+    <string name="mon">Mo</string>
+    <string name="tue">Di</string>
+    <string name="wed">Mi</string>
+    <string name="thu">Do</string>
+    <string name="fri">Fr</string>
+    <string name="sat">Sa</string>
+    <string name="sun">So</string>
+    <string name="reminders_notifications_channel_name">Erinnerungen</string>
+    <string name="reminders_notifications_channel_description">Benutzerdefinierte Benachrichtigungen um Sie daran zu erinnern, wenn eine Verfolgung erfolgen soll</string>
+    <string name="default_reminder_name">Zeit loszulegen!</string>
+    <string name="range_style">Bereichsstil:</string>
+
+    <string name="track_widget_configure_no_data_error">Bitte erstellen Sie eine Track-Gruppe und erfassen Sie zunächst einige Daten.</string>
+    <string name="track_widget_configure_no_data_selected_error">Sie müssen einen gültigen Datensatz auswählen, um ein Tracking-Widget zu erstellen.</string>
+    <string name="create">Erstellen</string>
+    <string name="use_default_value">Einen Standardwert festlegen</string>
+    <string name="default_value_description_hint">(Ihr Standardwert wird automatisch verwendet, wenn Sie einen Datenpunkt hinzufügen, aber Sie können jederzeit zurückgehen und ihn ändern).</string>
+    <string name="check_all_relevant_values">Überprüfe alle relevanten Werte: </string>
+    <string name="backup_and_restore">Sichern und Wiederherstellen</string>
+    <string name="backup_hint_text">Die Sicherung sichert alle Ihre Anwendungsdaten einschließlich aller verfolgten Daten, Grafiken und Erinnerungen. Sie sollten Ihre Daten regelmäßig auf ein externes Gerät oder einen Cloud Speicher sichern, für den Fall, dass Ihr Gerät verloren geht oder kaputt geht.</string>
+    <string name="restore_hint_text">WARNUNG: Das Wiederherstellen aus einer Sicherung löscht alle Daten und Einstellungen, die sich derzeit in der App befinden. Track &amp; Graph wird nach Abschluss der Wiederherstellung neu gestartet.</string>
+    <string name="backup_data">Sicherung</string>
+    <string name="restore_data">Wiederherstellung</string>
+    <string name="backup_successful">Sicherung war erfolgreich!</string>
+    <string name="backup_failed">Sicherung fehlgeschlagen. %1$s</string>
+    <string name="backup_error_could_not_write_to_file">Konnte die ausgewählte Datei nicht finden oder sie kann nicht geschrieben werden.</string>
+    <string name="restore_error_could_not_write_to_database">Konnte die ausgewählte Datenbank nicht finden oder sie kann nicht geschrieben werden.</string>
+    <string name="restore_error_could_not_read_from_database_file">Konnte die ausgewählte Datenbank nicht finden oder sie kann nicht gelesen werden.</string>
+    <string name="backup_error_could_not_find_database_file">Konnte die ausgewählte Datenbank nicht finden oder lesen.</string>
+    <string name="backup_error_failed_to_copy_database">Beim Kopieren der Datenbankdatei ging etwas schief.</string>
+    <string name="restore_error_failed_to_copy_database">Beim Wiederherstellen der Datenbankdatei ging etwas schief.</string>
+    <string name="restore_failed">Wiederherstellung fehlgeschlagen. %1$s</string>
+    <string name="feature_description_input_hint">Eine längere Beschreibung hinzufügen (optional)</string>
+    <string name="no_data_points_history_fragment_hint">Ihr Tracking-Verlauf wird hier angezeigt, wenn Sie einige Daten eingegeben haben.</string>
+    <string name="info">Info</string>
+    <string name="no_description">Keine Beschreibung</string>
+    <string name="description">Beschreibung</string>
+    <string name="note_input_hint">Notizen…</string>
+    <string name="add_a_note">Notiz hinzufügen</string>
+    <string name="notes">Notizen</string>
+    <string name="faq_text_2_4">Es gibt auch eine Option Sichern &amp; Wiederherstellen im Menü. Damit wird die gesamte Datenbankdatei mit allen verfolgten Daten, Grafiken, Erinnerungen usw. exportiert und wiederhergestellt. Dabei handelt es sich um eine unverschlüsselte Sqlite3-Datenbankdatei, die auch mit frei verfügbarer Software geöffnet und modifiziert werden kann. Dies wird jedoch nicht für nicht-technische Benutzer empfohlen, da Sie die Integrität der Datenbank beschädigen könnten.</string>
+    <string name="delete_reminder_content_description">Erinnerung löschen</string>
+    <string name="theme_colon">Thema:</string>
+    <string name="date_format_colon">Datumsformat:</string>
+    <string name="add_data_point_button_content_description">Button zum Hinzufügen eines Datenpunktes</string>
+    <string name="tracked_data_menu_button_content_description">Button Verfolgte Daten</string>
+    <string name="tracked_data_history_button_content_description">Button Verlauf verfolgter Daten</string>
+    <string name="delete_line_button_content_description">Linie löschen Button</string>
+    <string name="delete_data_point_button_content_description">Lösche Datenpunkt Button</string>
+    <string name="edit_data_point_button_content_description">Datenpunkt bearbeiten Button</string>
+    <string name="add_line_button_content_description">Linie hinzufügen Button</string>
+    <string name="add_multiple_choice_answer_button_content_description">Multiple Choice Antwort Button hinzufügen</string>
+    <string name="ending_at_colon">Beispiel endet ab:</string>
+    <string name="duplicate">Kopie</string>
+    <string name="no_notes_hint_text">Beim Tracking hinzugefügte Notizen werden hier angezeigt. Sie können auch globale Notizen mit der + Taste hinzufügen.</string>
+    <string name="add_a_global_note">Globale Notiz hinzufügen:</string>
+    <string name="weeks">Wochen</string>
+    <string name="months">Monate</string>
+    <string name="days">Tage</string>
+    <string name="hours">Stunden</string>
+    <string name="minutes">Minuten</string>
+    <string name="seconds">Sekunden</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="default_value">Standard Wert</string>
+    <string name="numeric_to_duration_mode_header">Zuvor getrackte Werte darstellen:</string>
+    <string name="duration_to_numeric_mode_header">In was sollen zuvor getrackte Werte konvertiert werden:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">Sie können die Zeitdauer nicht mit anderen Datentypen mischen. Beachten Sie die Darstellung von Stunden, Minuten oder Sekunden.</string>
+    <string name="time_duration">Zeitraum</string>
+    <string name="select_a_duration_range">Wählen Sie einen Zeitdauerbereich</string>
+    <string name="number_of_bins">Anzahl Boxen:</string>
+    <string name="sum_by_count_checkbox_label">Klicken Sie hier, um die Anzahl der getrackten Datenpunkte zu zählen und nicht die Summe ihrer Werte.</string>
+    <string name="time_window_size">Größe der Zeitfenster:</string>
+    <string name="faq_7">Wie funktionieren Zeit-Histogramme?</string>
+    <string name="faq_text_7_1"><![CDATA[Histogramme sind nützlich, um zu zeigen, wie die Daten in einem bestimmten Bereich verteilt sind. Mit Zeit-Histogrammen in Track & Graph können Sie sehen, wie Ihre Daten über verschiedene Zeiträume verteilt sind.]]></string>
+    <string name="faq_text_7_2">Stellen Sie sich zum Beispiel vor, Sie hätten 7 Wochen lang Daten darüber gesammelt, wie viel Zeit Sie mit dem Lesen verbracht haben. Vielleicht möchten Sie wissen, an welchen Tagen in der Woche Sie normalerweise die meiste Zeit mit Lesen verbringen. Hier könnten Sie ein Zeit-Histogramm mit folgendem Aufbau verwenden:</string>
+    <string name="faq_text_7_3">So erzeugen Sie das folgende Histogramm:</string>
+    <string name="faq_text_7_4">Das Histogramm wird einfach berechnet, indem jeder Datenpunkt innerhalb des Samples genommen und sein Wert zu einem \"bin\" addiert wird, basierend darauf, an welchem Wochentag dieser Wert verfolgt wurde. Der \"bin\" stellt also die Summe aller montags verfolgten Datenpunkte geteilt durch die Summe aller Datenpunkte in der Stichprobe dar. Histogramme sind \"normalisiert\", was bedeutet, dass die Summe aller Höhen der Balken (oder der Fläche unter dem Diagramm) genau 1 ergeben sollte. Wenn Sie also z.B. immer nur freitags lesen, können Sie davon ausgehen, dass Ihr Histogramm nur einen Balken für Freitag mit der Höhe 1 zeigt.</string>
+    <string name="faq_text_7_5">Wenn Sie am Samstag 50% der Zeit und am Freitag 50% der Zeit lesen, dann können Sie davon ausgehen, dass Ihr Histogramm so aussieht:</string>
+    <string name="faq_text_7_6"><![CDATA[Wenn es sich bei den Daten, die Sie verfolgen, um Multiple-Choice-Daten handelt, dann zeigt Ihnen Track & Graph die Verteilung des Anteils, den jede so verfolgte Auswahl ausmacht, innerhalb jedes Balkens an:]]></string>
+    <string name="faq_text_7_7">Standardmäßig ist die Höhe jedes Balkens relativ zur Summe aller Datenpunktwerte, die in diesen Zeitbereich fallen. Wenn jedoch der Wert jeder Ihrer Auswahlmöglichkeiten derselbe sein sollte (d.h. die Auswahlmöglichkeiten stellen ungeordnete diskrete Daten dar), dann wird Ihr Histogramm fälschlicherweise so verzerrt:</string>
+    <string name="faq_text_7_8">(beachten Sie, dass der Index des Balkens 0 ist, so dass er nicht im Histogramm auftaucht)</string>
+    <string name="faq_text_7_9">Um dies zu beheben, können Sie das markierte Kästchen anhaken: \"Kreuzen Sie hier an, um die Anzahl der verfolgten Datenpunkte zu zählen und nicht die Summe ihrer Werte.\"</string>
+    <string name="faq_text_7_10">Eine letzte Anmerkung, die Sie nicht vergessen sollten, ist, dass Ihre Daten dadurch verzerrt sein können, dass Sie die Daten noch nicht für jedes Histogrammfeld nachverfolgt haben oder noch nicht alle gleichermaßen nachverfolgt haben. Wenn Sie zum Beispiel ein Jahreshistogramm zeichnen, aber erst seit 6 Monaten nachverfolgen, könnte Ihr Histogramm wie folgt aussehen::</string>
+    <string name="faq_text_7_12">Und ein Jahr später könnte es so aussehen:</string>
+    <string name="faq_text_7_13">Im Laufe der Zeit wird diese Abweichung jedoch gegen 0 tendieren. Daher wird das Histogramm umso genauer sein, je mehr Daten Sie verfolgt haben.</string>
+    <string name="faq_text_7_11">Ein letzter Hinweis, den Sie beachten sollten, ist, dass Ihre Daten möglicherweise durch die Tatsache verzerrt sind, dass Sie noch nicht die Daten für jeden Histogrammfach oder noch nicht alle gleich verfolgt haben. Wenn Sie beispielsweise ein jährliches Histogramm zeichnen, aber erst seit 6 Monaten nachverfolgen, sieht Ihr Histogramm möglicherweise folgendermaßen aus:</string>
+</resources>
