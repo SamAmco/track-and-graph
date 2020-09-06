@@ -102,9 +102,13 @@ private fun getLastTrackedTimeOrNow(
  * The currently supported plotTotalTime values are: Duration.ofHours(1), Period.ofDays(1),
  * Period.ofWeeks(1), Period.ofMonths(1), Period.ofYears(1)
  *
- * If end time is provided then there will be a maximum of one data point in the returned sample with
- * a date/time after endTime. So for example if end time was a Friday and the plot total time was a
- * week then the last data point returned would be the following Sunday.
+ * If sampleDuration is provided then totals will be generated at least as far back as now minus the
+ * sampleDuration. However if there is more data before this period then it that data will also be
+ * totalled. For clipping see clipDataSample.
+ *
+ * If end time is provided then totals will be generated at least up to this time. However if there
+ * is more data after the end time in the input sample then that data will also be totalled. For
+ * clipping see clipDataSample.
  *
  * All notes and labels will be lost in the output data.
  *
@@ -155,7 +159,8 @@ private fun getEndTimeNowOrLatest(rawData: DataSample, endTime: OffsetDateTime?)
     val now = OffsetDateTime.now()
     val last = rawData.dataPoints.lastOrNull()?.timestamp
     return when {
-        last == null && endTime == null -> now
+        //last == null && endTime == null -> now
+        endTime == null -> listOf(last, now).maxBy { t -> t ?: OffsetDateTime.MIN }!!
         else -> listOf(last, endTime).maxBy { t -> t ?: OffsetDateTime.MIN }!!
     }
 }
