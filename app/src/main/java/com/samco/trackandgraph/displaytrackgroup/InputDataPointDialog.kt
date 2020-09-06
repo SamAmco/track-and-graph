@@ -177,7 +177,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 
     private fun setupViewFeature(feature: Feature, index: Int) {
         if (feature.featureType != FeatureType.DISCRETE) binding.addButton.visibility = View.VISIBLE
-        else binding.addButton.visibility = View.VISIBLE
+        else binding.addButton.visibility = View.INVISIBLE
         indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
