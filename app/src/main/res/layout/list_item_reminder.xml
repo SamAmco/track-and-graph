@@ -38,7 +38,7 @@
                         android:hint="@string/default_reminder_name"
                         android:imeOptions="actionDone"
                         android:importantForAutofill="no"
-                        android:inputType="text"
+                        android:inputType="textCapSentences"
                         android:maxLines="1" />
 
                     <TextView

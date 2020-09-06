@@ -33,12 +33,13 @@
                     android:id="@+id/featureNameText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="text"
+                    android:inputType="textCapSentences"
                     android:maxLines="1" />
 
                 <androidx.appcompat.widget.AppCompatEditText
                     android:id="@+id/featureDescriptionText"
                     style="@style/Style.ExpansiveTextInputStyle"
+                    android:inputType="textCapSentences"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:hint="@string/feature_description_input_hint" />
 

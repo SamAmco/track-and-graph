@@ -49,7 +49,7 @@
                     android:layout_height="wrap_content"
                     android:hint="@string/graph_name_hint"
                     android:importantForAutofill="no"
-                    android:inputType="text"
+                    android:inputType="textCapSentences"
                     android:maxLines="2" />
 
                 <LinearLayout
