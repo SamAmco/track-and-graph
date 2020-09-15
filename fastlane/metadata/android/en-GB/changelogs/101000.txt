@@ -1,0 +1,7 @@
+- Fixed average time between algorithm to include time between last tracked and now
+
+- Fixed plot totals bugs
+
+- Added german version
+
+- Time histograms
