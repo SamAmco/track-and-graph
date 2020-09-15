@@ -24,7 +24,8 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-class AverageTimeBetweenDataFactory : ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
+class AverageTimeBetweenDataFactory :
+    ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
@@ -44,11 +45,16 @@ class AverageTimeBetweenDataFactory : ViewDataFactory<AverageTimeBetweenStat, IA
         val feature = dataSource.getFeatureById(config.featureId)
         val dataPoints = getRelevantDataPoints(dataSource, config, feature)
         if (dataPoints.size < 2) return notEnoughData(graphOrStat)
-        val totalMillis = Duration.between(
-            dataPoints.first().timestamp,
-            dataPoints.last().timestamp
-        ).toMillis().toDouble()
+        val now = OffsetDateTime.now()
+        val last = dataPoints.last().timestamp
+        val latest = listOf(now, last).max() ?: now
+        val start = config.duration?.let { latest.minus(it) } ?: dataPoints.first().timestamp
+        val totalMillis = Duration.between(start, latest).toMillis().toDouble()
         val durationMillis = when (feature.featureType) {
+            //TODO We want to exclude time tracked but the first data point may overlap the beginning
+            // and in fact will necessarily always be entirely before the beginning of the period
+            // if the duration passed in is null. This does mean the accuracy may be poor under certain
+            // conditions. This could be fixed by clipping the first data point duration.
             FeatureType.DURATION -> dataPoints.drop(1).sumByDouble { it.value }
             else -> 0.0
         }
