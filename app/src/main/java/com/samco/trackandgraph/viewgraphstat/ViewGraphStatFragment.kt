@@ -40,11 +40,8 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
+import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.GraphStatView
-import com.samco.trackandgraph.graphstatview.factories.AverageTimeBetweenDataFactory
-import com.samco.trackandgraph.graphstatview.factories.LineGraphDataFactory
-import com.samco.trackandgraph.graphstatview.factories.PieChartDataFactory
-import com.samco.trackandgraph.graphstatview.factories.TimeSinceViewDataFactory
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
