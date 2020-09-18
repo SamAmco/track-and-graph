@@ -30,14 +30,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.withTransaction
-
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.GraphStatType
-import com.samco.trackandgraph.database.entity.graphStatTypes
 import com.samco.trackandgraph.databinding.GraphsAndStatsFragmentBinding
+import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.ui.*
