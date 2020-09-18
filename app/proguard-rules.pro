@@ -22,3 +22,5 @@
 
 -keep class com.androidplot.** { *; }
 -keepnames class androidx.navigation.fragment.NavHostFragment
+-dontobfuscate
+-dontshrink
