@@ -44,62 +44,6 @@ enum class GraphStatType {
     TIME_HISTOGRAM
 }
 
-data class GraphStatTypeConfig<
-        J : GraphStatConfigView,
-        L : Any,
-        T : IGraphStatViewData,
-        K : GraphStatViewDecorator<T>>(
-    val dataSourceAdapter: GraphStatDataSourceAdapter<L>,
-    val configViewClass: KClass<J>,
-    val configClass: KClass<L>,//TODO Would be real nice to have some type safety on this
-    val dataFactory: ViewDataFactory<L, T>,
-    val viewDataClass: KClass<T>,
-    val decoratorClass: KClass<K>
-)
-
-val graphStatTypes = mapOf<GraphStatType, GraphStatTypeConfig<*, *, *, *>>(
-    GraphStatType.LINE_GRAPH to GraphStatTypeConfig(
-        LineGraphDataSourceAdapter(),
-        LineGraphConfigView::class,
-        LineGraphWithFeatures::class,
-        LineGraphDataFactory(),
-        ILineGraphViewData::class,
-        GraphStatLineGraphDecorator::class
-    ),
-    GraphStatType.PIE_CHART to GraphStatTypeConfig(
-        PieChartDataSourceAdapter(),
-        PieChartConfigView::class,
-        PieChart::class,
-        PieChartDataFactory(),
-        IPieChartViewData::class,
-        GraphStatPieChartDecorator::class
-    ),
-    GraphStatType.AVERAGE_TIME_BETWEEN to GraphStatTypeConfig(
-        AverageTimeBetweenDataSourceAdapter(),
-        AverageTimeBetweenConfigView::class,
-        AverageTimeBetweenStat::class,
-        AverageTimeBetweenDataFactory(),
-        IAverageTimeBetweenViewData::class,
-        GraphStatAverageTimeBetweenDecorator::class
-    ),
-    GraphStatType.TIME_SINCE to GraphStatTypeConfig(
-        TimeSinceDataSourceAdapter(),
-        TimeSinceConfigView::class,
-        TimeSinceLastStat::class,
-        TimeSinceViewDataFactory(),
-        ITimeSinceViewData::class,
-        GraphStatTimeSinceDecorator::class
-    ),
-    GraphStatType.TIME_HISTOGRAM to GraphStatTypeConfig(
-        TimeHistogramDataSourceAdapter(),
-        TimeHistogramConfigView::class,
-        TimeHistogram::class,
-        TimeHistogramDataFactory(),
-        ITimeHistogramViewData::class,
-        GraphStatTimeHistogramDecorator::class
-    )
-)
-
 val maxGraphPeriodDurations = listOf(
     null,
     Duration.ofDays(1),
