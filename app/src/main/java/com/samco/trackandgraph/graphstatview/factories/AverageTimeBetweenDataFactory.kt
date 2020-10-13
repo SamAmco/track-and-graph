@@ -23,6 +23,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetwe
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import kotlin.math.max
 
 class AverageTimeBetweenDataFactory :
     ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
@@ -30,7 +31,7 @@ class AverageTimeBetweenDataFactory :
     companion object {
         /**
          * Calculates the average duration between the timestamps of a set of data points. This is
-         * simply the duration divided by the number of points minus 1. The duration is calculated
+         * simply the duration divided by the number of points plus 1. The duration is calculated
          * as start -> end. Start is end minus [duration] if it exists and first [dataPoints]
          * timestamp otherwise. End is [endDate] if given and last [dataPoints] timestamp or [now]
          * (whichever is later) otherwise. If there are not 2 or more elements in [dataPoints] with
@@ -42,21 +43,22 @@ class AverageTimeBetweenDataFactory :
             duration: Duration?,
             dataPoints: List<DataPoint>
         ): Double? {
-            if (dataPoints.size < 2) return null
-            val last = dataPoints.last().timestamp
-            val latest = endDate ?: listOf(now, last).max() ?: now
-            val start = duration?.let { latest.minus(it) } ?: dataPoints.first().timestamp
+            if (duration == null && dataPoints.size < 2) return null
+            val last = dataPoints.lastOrNull()?.timestamp
+            val first = dataPoints.firstOrNull()?.timestamp
+            val latest = endDate ?: last?.let { listOf(now, it).max() } ?: now
+            val start = duration?.let { latest.minus(it) } ?: first
             //Although we will have only sampled points likely to be in the duration it is possible that
-            // we could have been passed points that start before latest-duration
+            // we could have been passed points that start before (latest - duration). So this is a good
+            // final check.
             val clippedPoints = dataPoints
                 .dropWhile { it.timestamp.isBefore(start) }
                 .dropLastWhile { it.timestamp.isAfter(latest) }
-            if (clippedPoints.size < 2) return null
             val totalMillis = Duration.between(start, latest).toMillis().toDouble()
-            val divisor = clippedPoints.size -
-                    (if (latest == last) 1 else 0) +
-                    (if (start == clippedPoints.first().timestamp) 0 else 1)
-            return totalMillis / divisor.toDouble()
+            var divisor = clippedPoints.size + 1
+            if (latest == last) divisor -= 1
+            if (start == first) divisor -= 1
+            return totalMillis / max(1.0, divisor.toDouble())
         }
     }
 
@@ -110,7 +112,19 @@ class AverageTimeBetweenDataFactory :
         timeBetweenStat: AverageTimeBetweenStat,
         feature: Feature
     ): List<DataPoint> {
-        val endDate = timeBetweenStat.endDate ?: OffsetDateTime.MAX
+        val endDate = timeBetweenStat.endDate ?: when (feature.featureType) {
+            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
+                dataSource.getLastDataPointBetween(
+                    feature.id,
+                    timeBetweenStat.fromValue,
+                    timeBetweenStat.toValue
+                )
+            }
+            FeatureType.DISCRETE -> {
+                dataSource.getLastDataPointWithValue(feature.id, timeBetweenStat.discreteValues)
+            }
+        }?.timestamp?.plusSeconds(1) ?: return emptyList()
+
         val startDate =
             timeBetweenStat.duration?.let { endDate.minus(it) } ?: OffsetDateTime.MIN
         return when (feature.featureType) {

@@ -26,7 +26,7 @@ import org.threeten.bp.OffsetDateTime
 class AverageTimeBetweenDataFactoryTest {
 
     @Test
-    fun test_returns_null_for_less_than_two_data_points() {
+    fun test_returns_null_for_less_than_two_data_points_and_no_duration() {
         //PREPARE
         val dataPoints1 = listOf(
             DataPoint(
@@ -44,19 +44,258 @@ class AverageTimeBetweenDataFactoryTest {
         val ans1 = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
             OffsetDateTime.now(),
             null,
-            Duration.ofDays(3),
+            null,
             dataPoints1
         )
         val ans2 = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
             OffsetDateTime.now(),
             null,
-            Duration.ofDays(3),
+            null,
             dataPoints2
         )
 
         //VERIFY
         Assert.assertNull(ans1)
         Assert.assertNull(ans2)
+    }
+
+    @Test
+    fun test_returns_duration_if_only_two_data_points() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(1)),
+            unitDataPoint(now)
+        )
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            null,
+            null,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(Duration.ofSeconds(1).toMillis().toDouble(), ans)
+    }
+
+    @Test
+    fun test_returns_duration_if_only_one_data_point() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now)
+        )
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            null,
+            Duration.ofSeconds(1),
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(Duration.ofSeconds(1).toMillis().toDouble(), ans)
+    }
+
+    @Test
+    fun test_2_data_points_firstStart_secondMiddle_endDate() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val endDate = now.minusSeconds(10)
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(20)),
+            unitDataPoint(now.minusSeconds(11))
+        )
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            endDate,
+            null,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(
+            Duration.between(
+                dataPoints.first().timestamp,
+                endDate
+            ).toMillis().toDouble() / 2.0,
+            ans
+        )
+    }
+
+    @Test
+    fun test_2_data_points_firstMiddle_secondEnd_noEndDate() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(20)),
+            unitDataPoint(now)
+        )
+        val duration = Duration.ofSeconds(30)
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            null,
+            duration,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(duration.toMillis().toDouble() / 2.0, ans)
+    }
+
+    @Test
+    fun test_2_data_points_firstStart_secondEnd_noEndDate() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(20)),
+            unitDataPoint(now)
+        )
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            null,
+            null,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(
+            Duration.between(
+                dataPoints.first().timestamp,
+                dataPoints.last().timestamp
+            ).toMillis().toDouble(), ans
+        )
+    }
+
+    @Test
+    fun test_2_data_points_firstClipped_secondMiddle_endDate() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(20)),
+            unitDataPoint(now.minusSeconds(10))
+        )
+        val duration = Duration.ofSeconds(10)
+        val endDate = now.minusSeconds(5)
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            endDate,
+            duration,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(duration.toMillis().toDouble() / 2.0, ans)
+    }
+
+    @Test
+    fun test_2_data_points_firstMiddle_secondClipped_endDate() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(5)),
+            unitDataPoint(now.minusSeconds(1))
+        )
+        val duration = Duration.ofSeconds(10)
+        val endDate = now.minusSeconds(5)
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            endDate,
+            duration,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(duration.toMillis().toDouble() / 2.0, ans)
+    }
+
+    @Test
+    fun test_2_data_points_firstMiddle_secondMiddle_endDate() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(5)),
+            unitDataPoint(now.minusSeconds(2))
+        )
+        val duration = Duration.ofSeconds(10)
+        val endDate = now.minusSeconds(1)
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            endDate,
+            duration,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(duration.toMillis().toDouble() / 3.0, ans)
+    }
+
+    @Test
+    fun test_2_data_points_firstStart_secondClipped_endDate() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(5)),
+            unitDataPoint(now.minusSeconds(1))
+        )
+        val endDate = now.minusSeconds(3)
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            endDate,
+            null,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(
+            Duration.between(
+                dataPoints.first().timestamp,
+                endDate
+            ).toMillis().toDouble(),
+            ans
+        )
+    }
+
+    @Test
+    fun test_2_data_points_firstClipped_secondEnd_noEndDate() {
+        //PREPARE
+        val now = OffsetDateTime.now()
+        val dataPoints = listOf(
+            unitDataPoint(now.minusSeconds(11)),
+            unitDataPoint(now)
+        )
+        val duration = Duration.ofSeconds(10)
+
+        //EXECUTE
+        val ans = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
+            now,
+            null,
+            duration,
+            dataPoints
+        )
+
+        //VERIFY
+        Assert.assertEquals(
+            duration.toMillis().toDouble(),
+            ans
+        )
     }
 
     @Test
