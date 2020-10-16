@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.graphstatview.decorators
 
 import android.content.Context
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.ui.GraphLegendItemView
@@ -34,4 +35,23 @@ internal fun inflateGraphLegendItem(
             label
         )
     )
+}
+
+internal fun formatTimeToDaysHoursMinutesSeconds(context: Context, millis: Long): String {
+    val totalSeconds = millis / 1000
+    val daysNum = (totalSeconds / 86400).toInt()
+    val days = daysNum.toString()
+    val hours = ((totalSeconds % 86400) / 3600).toInt()
+    val minutes = ((totalSeconds % 3600) / 60).toInt()
+    val seconds = (totalSeconds % 60).toInt()
+    val hoursStr = "%02d".format(((totalSeconds % 86400) / 3600).toInt())
+    val minutesStr = "%02d".format(((totalSeconds % 3600) / 60).toInt())
+    val secondsStr = "%02d".format((totalSeconds % 60).toInt())
+    val hasHms = (hours + minutes + seconds) > 0
+    val hms = "$hoursStr:$minutesStr:$secondsStr"
+    return when {
+        daysNum == 1 -> "$days ${context.getString(R.string.day)}${if (hasHms) "\n"+hms else ""}"
+        daysNum > 0 -> "$days ${context.getString(R.string.days)}${if (hasHms) "\n"+hms else ""}"
+        else -> hms
+    }
 }
