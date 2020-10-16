@@ -52,23 +52,9 @@ class GraphStatTimeSinceDecorator(listMode: Boolean) :
         if (dataPoint == null) {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
         } else while (true) {
-            setTimeSinceStatText(Duration.between(dataPoint.timestamp, OffsetDateTime.now()))
+            val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
+            binding!!.statMessage.text = formatTimeToDaysHoursMinutesSeconds(context!!, duration.toMillis())
             delay(1000)
-        }
-    }
-
-    private fun setTimeSinceStatText(duration: Duration) {
-        val totalSeconds = duration.toMillis() / 1000.toDouble()
-        val daysNum = (totalSeconds / 86400).toInt()
-        val days = daysNum.toString()
-        val hours = "%02d".format(((totalSeconds % 86400) / 3600).toInt())
-        val minutes = "%02d".format(((totalSeconds % 3600) / 60).toInt())
-        val seconds = "%02d".format((totalSeconds % 60).toInt())
-        val hms = "$hours:$minutes:$seconds"
-        binding!!.statMessage.text = when {
-            daysNum == 1 -> "$days ${context!!.getString(R.string.day)}\n$hms"
-            daysNum > 0 -> "$days ${context!!.getString(R.string.days)}\n$hms"
-            else -> hms
         }
     }
 }

@@ -23,9 +23,45 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetwe
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import kotlin.math.max
 
 class AverageTimeBetweenDataFactory :
     ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
+
+    companion object {
+        /**
+         * Calculates the average duration between the timestamps of a set of data points. This is
+         * simply the duration divided by the number of points plus 1. The duration is calculated
+         * as start -> end. Start is end minus [duration] if it exists and first [dataPoints]
+         * timestamp otherwise. End is [endDate] if given and last [dataPoints] timestamp or [now]
+         * (whichever is later) otherwise. If there are not 2 or more elements in [dataPoints] with
+         * timestamps falling in this range then null is returned.
+         */
+        internal fun calculateAverageTimeBetweenOrNull(
+            now: OffsetDateTime,
+            endDate: OffsetDateTime?,
+            duration: Duration?,
+            dataPoints: List<DataPoint>
+        ): Double? {
+            if (duration == null && dataPoints.size < 2) return null
+            val last = dataPoints.lastOrNull()?.timestamp
+            val first = dataPoints.firstOrNull()?.timestamp
+            val latest = endDate ?: last?.let { listOf(now, it).max() } ?: now
+            val start = duration?.let { latest.minus(it) } ?: first
+            //Although we will have only sampled points likely to be in the duration it is possible that
+            // we could have been passed points that start before (latest - duration). So this is a good
+            // final check.
+            val clippedPoints = dataPoints
+                .dropWhile { it.timestamp.isBefore(start) }
+                .dropLastWhile { it.timestamp.isAfter(latest) }
+            val totalMillis = Duration.between(start, latest).toMillis().toDouble()
+            var divisor = clippedPoints.size + 1
+            if (latest == last) divisor -= 1
+            if (start == first) divisor -= 1
+            return totalMillis / max(1.0, divisor.toDouble())
+        }
+    }
+
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
@@ -44,24 +80,13 @@ class AverageTimeBetweenDataFactory :
     ): IAverageTimeBetweenViewData {
         val feature = dataSource.getFeatureById(config.featureId)
         val dataPoints = getRelevantDataPoints(dataSource, config, feature)
-        if (dataPoints.size < 2) return notEnoughData(graphOrStat)
-        val now = OffsetDateTime.now()
-        val last = dataPoints.last().timestamp
-        val latest = listOf(now, last).max() ?: now
-        val start = config.duration?.let { latest.minus(it) } ?: dataPoints.first().timestamp
-        val totalMillis = Duration.between(start, latest).toMillis().toDouble()
-        val durationMillis = when (feature.featureType) {
-            //TODO We want to exclude time tracked but the first data point may overlap the beginning
-            // and in fact will necessarily always be entirely before the beginning of the period
-            // if the duration passed in is null. This does mean the accuracy may be poor under certain
-            // conditions. This could be fixed by clipping the first data point duration.
-            FeatureType.DURATION -> dataPoints.drop(1).sumByDouble { it.value }
-            else -> 0.0
-        }
-        val totalGapMillis =
-            if (durationMillis > totalMillis) totalMillis
-            else totalMillis - durationMillis
-        val averageMillis = totalGapMillis / (dataPoints.size - 1).toDouble()
+        val averageMillis =
+            calculateAverageTimeBetweenOrNull(
+                OffsetDateTime.now(),
+                config.endDate,
+                config.duration,
+                dataPoints
+            ) ?: return notEnoughData(graphOrStat)
         onDataSampled(dataPoints)
         return object : IAverageTimeBetweenViewData {
             override val state: IGraphStatViewData.State
@@ -87,7 +112,19 @@ class AverageTimeBetweenDataFactory :
         timeBetweenStat: AverageTimeBetweenStat,
         feature: Feature
     ): List<DataPoint> {
-        val endDate = timeBetweenStat.endDate ?: OffsetDateTime.now()
+        val endDate = timeBetweenStat.endDate ?: when (feature.featureType) {
+            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
+                dataSource.getLastDataPointBetween(
+                    feature.id,
+                    timeBetweenStat.fromValue,
+                    timeBetweenStat.toValue
+                )
+            }
+            FeatureType.DISCRETE -> {
+                dataSource.getLastDataPointWithValue(feature.id, timeBetweenStat.discreteValues)
+            }
+        }?.timestamp?.plusSeconds(1) ?: return emptyList()
+
         val startDate =
             timeBetweenStat.duration?.let { endDate.minus(it) } ?: OffsetDateTime.MIN
         return when (feature.featureType) {
