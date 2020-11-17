@@ -27,6 +27,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.text.DecimalFormat
 
+const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
 const val MAX_FEATURE_NAME_LENGTH = 40
 const val MAX_LABEL_LENGTH = 30
 const val MAX_DISCRETE_VALUES_PER_FEATURE = 10
