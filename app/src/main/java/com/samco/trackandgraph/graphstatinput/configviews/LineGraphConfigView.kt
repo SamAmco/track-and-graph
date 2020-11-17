@@ -50,6 +50,8 @@ internal class LineGraphConfigView @JvmOverloads constructor(
 
     private lateinit var configData: LineGraphWithFeatures
 
+    private val lgfConfigIndices = mutableListOf<LineGraphFeatureConfigListItemView>()
+
     override fun initFromConfigData(configData: Any?) {
         this.configData = configData as LineGraphWithFeatures? ?: createEmptyConfig()
         initFromLineGraph()
@@ -158,17 +160,22 @@ internal class LineGraphConfigView @JvmOverloads constructor(
     private fun inflateLineGraphFeatureView(index: Int, lineGraphFeature: LineGraphFeature) {
         val featureConfig = LineGraphFeatureConfig.fromLineGraphFeature(lineGraphFeature)
         val view = LineGraphFeatureConfigListItemView(context, allFeatures, featureConfig)
-        view.setOnRemoveListener { lgf ->
+        lgfConfigIndices.add(index, view)
+        view.setOnRemoveListener {
             binding.lineGraphFeaturesLayout.removeView(view)
             binding.addFeatureButton.isEnabled = true
-            configData = configData.copy(features = configData.features.minus(lgf))
+            val viewIndex = lgfConfigIndices.indexOf(view)
+            val features = configData.features.toMutableList()
+            features.removeAt(viewIndex)
+            configData = configData.copy(features = features)
+            lgfConfigIndices.remove(view)
             emitConfigChange()
-            configData = configData.copy(features = configData.features.minus(lgf))
         }
         view.setOnUpdateListener {
             val newFeatures = configData.features.toMutableList()
-            newFeatures.removeAt(index)
-            newFeatures.add(index, it)
+            val viewIndex = lgfConfigIndices.indexOf(view)
+            newFeatures.removeAt(viewIndex)
+            newFeatures.add(viewIndex, it)
             configData = configData.copy(features = newFeatures)
             updateYRangeInputType()
             emitConfigChange()
