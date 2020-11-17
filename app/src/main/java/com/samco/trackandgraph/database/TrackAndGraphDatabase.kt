@@ -21,10 +21,14 @@ import androidx.room.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
+import java.lang.Exception
 import java.text.DecimalFormat
 
 const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
@@ -54,15 +58,12 @@ val dataVisColorList = listOf(
     R.color.visColor12
 )
 
-const val splitChars1 = "||"
-const val splitChars2 = "!!"
-
 @Database(
     entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class, GlobalNote::class, LineGraphFeature::class,
         TimeHistogram::class],
-    version = 42
+    version = 43
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -93,15 +94,37 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
 }
 
 class Converters {
-    @TypeConverter
-    fun stringToListOfDiscreteValues(value: String): List<DiscreteValue> {
-        return if (value.isEmpty()) listOf()
-        else value.split(splitChars1).map { s -> DiscreteValue.fromString(s) }.toList()
+
+    private val moshi = Moshi.Builder().build()
+
+    private fun <T> toJson(adapter: JsonAdapter<T>, value: T): String {
+        return try {
+            adapter.toJson(value) ?: ""
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    private fun <T> fromJson(adapter: JsonAdapter<T>, value: String, onError: () -> T): T {
+        return try {
+            adapter.fromJson(value) ?: onError()
+        } catch (e: Exception) {
+            onError()
+        }
     }
 
     @TypeConverter
-    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String =
-        values.joinToString(splitChars1) { v -> v.toString() }
+    fun stringToListOfDiscreteValues(value: String): List<DiscreteValue> {
+        if (value.isBlank()) return emptyList()
+        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
+        return fromJson(moshi.adapter(listType), value) { emptyList() }
+    }
+
+    @TypeConverter
+    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String {
+        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
+        return toJson(moshi.adapter(listType), values)
+    }
 
     @TypeConverter
     fun intToFeatureType(i: Int): FeatureType = FeatureType.values()[i]
@@ -140,14 +163,21 @@ class Converters {
     fun localTimeFromString(value: String) = LocalTime.parse(value)
 
     @TypeConverter
-    fun checkedDaysToString(value: CheckedDays) = value.toList().joinToString(splitChars1)
+    fun checkedDaysToString(value: CheckedDays): String =
+        toJson(moshi.adapter(CheckedDays::class.java), value)
 
     @TypeConverter
-    fun checkedDaysFromString(value: String): CheckedDays {
-        return CheckedDays.fromList(
-            value.split(splitChars1)
-                .map { s -> s.toBoolean() }
-        )
+    fun checkedDaysFromString(value: String): CheckedDays =
+        fromJson(moshi.adapter(CheckedDays::class.java), value) { CheckedDays.none() }
+
+    //This use of || to concat Ints is here for legacy reasons. It avoids migrating old databases.
+    // If it ain't broke don't fix it. It should probably use Moshi for consistency though.
+    @TypeConverter
+    fun listOfIntsToString(ints: List<Int>) = ints.joinToString("||") { it.toString() }
+
+    @TypeConverter
+    fun stringToListOfInts(intsString: String) = intsString.split("||").mapNotNull {
+        it.toIntOrNull()
     }
 
     @TypeConverter
@@ -160,35 +190,28 @@ class Converters {
     fun intToNoteType(index: Int) = NoteType.values()[index]
 
     @TypeConverter
-    fun listOfIntsToString(ints: List<Int>) = ints.joinToString(splitChars1) { i ->
-        i.toString()
-    }
-
-    @TypeConverter
-    fun stringToListOfInts(intsString: String) = intsString.split(splitChars1).mapNotNull {
-        it.toIntOrNull()
-    }
-
-    @TypeConverter
-    fun averagingModeToInt(averaginMode: LineGraphAveraginModes) = averaginMode.ordinal
+    fun averagingModeToInt(averagingMode: LineGraphAveraginModes) = averagingMode.ordinal
 
     @TypeConverter
     fun intToAveragingMode(index: Int) = LineGraphAveraginModes.values()[index]
 
     @TypeConverter
-    fun lineGraphPlottingModeToInt(lineGraphPlottingMode: LineGraphPlottingModes) = lineGraphPlottingMode.ordinal
+    fun lineGraphPlottingModeToInt(lineGraphPlottingMode: LineGraphPlottingModes) =
+        lineGraphPlottingMode.ordinal
 
     @TypeConverter
     fun intToLineGraphPlottingMode(index: Int) = LineGraphPlottingModes.values()[index]
 
     @TypeConverter
-    fun lineGraphPointStyleToInt(lineGraphPointStyle: LineGraphPointStyle) = lineGraphPointStyle.ordinal
+    fun lineGraphPointStyleToInt(lineGraphPointStyle: LineGraphPointStyle) =
+        lineGraphPointStyle.ordinal
 
     @TypeConverter
     fun intToLineGraphPointStyle(index: Int) = LineGraphPointStyle.values()[index]
 
     @TypeConverter
-    fun durationPlottingModeToInt(durationPlottingMode: DurationPlottingMode) = durationPlottingMode.ordinal
+    fun durationPlottingModeToInt(durationPlottingMode: DurationPlottingMode) =
+        durationPlottingMode.ordinal
 
     @TypeConverter
     fun intToDurationPlottingMode(index: Int) = DurationPlottingMode.values()[index]
