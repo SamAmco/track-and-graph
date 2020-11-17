@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.aboutpage
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,6 +29,8 @@ import com.samco.trackandgraph.R
 import timber.log.Timber
 
 class AboutPageFragment : Fragment() {
+    //We can set text from code here because it's language independent
+    @SuppressLint("SetTextI18n")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val binding = AboutPageBinding.inflate(inflater, container, false)
         val url = getString(R.string.github_link)

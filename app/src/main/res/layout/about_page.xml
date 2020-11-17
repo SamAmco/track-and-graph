@@ -137,6 +137,23 @@
                     android:layout_marginTop="5dp"
                     android:text="@string/apache_2_0"
                     android:textAppearance="@style/TextAppearance.Body" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnSpan="1"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/moshi"
+                    android:textAppearance="@style/TextAppearance.Body" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_columnSpan="1"
+                    android:layout_marginStart="40dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/apache_2_0"
+                    android:textAppearance="@style/TextAppearance.Body" />
             </GridLayout>
         </LinearLayout>
     </ScrollView>

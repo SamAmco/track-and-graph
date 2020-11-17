@@ -20,8 +20,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.database.MAX_GROUP_NAME_LENGTH
-import com.samco.trackandgraph.database.splitChars1
-import com.samco.trackandgraph.database.splitChars2
 
 @Entity(tableName = "track_groups_table")
 data class TrackGroup(
@@ -38,8 +36,6 @@ data class TrackGroup(
     companion object {
         fun create(id: Long, name: String, displayIndex: Int): TrackGroup {
             val validName = name.take(MAX_GROUP_NAME_LENGTH)
-                .replace(splitChars1, " ")
-                .replace(splitChars2, " ")
             return TrackGroup(
                 id,
                 validName,

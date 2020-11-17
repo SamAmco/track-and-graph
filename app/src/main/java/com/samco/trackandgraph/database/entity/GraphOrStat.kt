@@ -21,20 +21,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.database.MAX_GRAPH_STAT_NAME_LENGTH
-import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.database.splitChars1
-import com.samco.trackandgraph.database.splitChars2
-import com.samco.trackandgraph.graphstatinput.configviews.*
-import com.samco.trackandgraph.graphstatinput.configviews.AverageTimeBetweenConfigView
-import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigView
-import com.samco.trackandgraph.graphstatinput.configviews.PieChartConfigView
-import com.samco.trackandgraph.graphstatinput.configviews.TimeSinceConfigView
-import com.samco.trackandgraph.graphstatinput.datasourceadapters.*
-import com.samco.trackandgraph.graphstatview.decorators.*
-import com.samco.trackandgraph.graphstatview.factories.*
-import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import org.threeten.bp.Duration
-import kotlin.reflect.KClass
 
 enum class GraphStatType {
     LINE_GRAPH,
@@ -86,8 +73,6 @@ data class GraphOrStat(
             type: GraphStatType, displayIndex: Int
         ): GraphOrStat {
             val validName = name.take(MAX_GRAPH_STAT_NAME_LENGTH)
-                .replace(splitChars1, " ")
-                .replace(splitChars2, " ")
             return GraphOrStat(
                 id,
                 graphStatGroupId,
