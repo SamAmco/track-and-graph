@@ -111,7 +111,7 @@ class BackupAndRestoreFragment : Fragment() {
             val now = OffsetDateTime.now()
             val generatedName = getString(
                 R.string.backup_file_name_suffix,
-                "TrackAndGraphBackup", now.year, now.monthValue + 1,
+                "TrackAndGraphBackup", now.year, now.monthValue,
                 now.dayOfMonth, now.hour, now.minute, now.second
             )
             putExtra(Intent.EXTRA_TITLE, generatedName)
