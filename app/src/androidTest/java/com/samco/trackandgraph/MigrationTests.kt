@@ -151,7 +151,7 @@ class MigrationTest {
         assertEquals(avCursor.getString(5), "PT2232H")
         assertEquals(
             avCursor.getString(6),
-            listOf(0, 1).joinToString(splitChars1) { i -> i.toString() })
+            listOf(0, 1).joinToString("||") { i -> i.toString() })
 
         val tsCursor = db.query("SELECT * FROM time_since_last_stat_table")
         tsCursor.moveToNext()
@@ -162,7 +162,7 @@ class MigrationTest {
         assertEquals(tsCursor.getString(4), "10")
         assertEquals(
             tsCursor.getString(5),
-            listOf(-5, 10).joinToString(splitChars1) { i -> i.toString() })
+            listOf(-5, 10).joinToString("||") { i -> i.toString() })
     }
 
     @Test

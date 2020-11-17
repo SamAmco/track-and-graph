@@ -21,6 +21,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.database.*
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import java.lang.Exception
 
 @Entity(
@@ -72,15 +74,8 @@ data class Feature(
             discreteValues: List<DiscreteValue>, hasDefaultValue: Boolean, defaultValue: Double,
             displayIndex: Int, description: String
         ): Feature {
-            discreteValues.forEach { dv ->
-                validateDiscreteValue(
-                    dv
-                )
-            }
-            val validName = name
-                .take(MAX_FEATURE_NAME_LENGTH)
-                .replace(splitChars1, " ")
-                .replace(splitChars2, " ")
+            discreteValues.forEach { validateDiscreteValue(it) }
+            val validName = name.take(MAX_FEATURE_NAME_LENGTH)
             return Feature(
                 id, validName, trackGroupId, featureType, discreteValues,
                 displayIndex, hasDefaultValue, defaultValue, description
@@ -91,7 +86,13 @@ data class Feature(
 
 enum class FeatureType { DISCRETE, CONTINUOUS, DURATION }
 
-data class DiscreteValue(val index: Int, val label: String) {
+@JsonClass(generateAdapter = true)
+data class DiscreteValue(
+    val index: Int,
+    val label: String
+) {
+
+    //Ideally we wouldn't need fromString and toString here but they are still used by CSVReadWriter.
     override fun toString() = "$index:$label"
 
     companion object {
@@ -119,10 +120,6 @@ data class DiscreteValue(val index: Int, val label: String) {
 }
 
 fun validateDiscreteValue(discreteValue: DiscreteValue) {
-    if (discreteValue.label.contains(splitChars1) || discreteValue.label.contains(
-            splitChars2
-        ))
-        throw Exception("Illegal discrete value name")
     if (discreteValue.label.length > MAX_LABEL_LENGTH)
         throw Exception("label size exceeded the maximum size allowed")
 }

@@ -2,6 +2,10 @@ package com.samco.trackandgraph.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.samco.trackandgraph.database.entity.CheckedDays
+import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 
 val MIGRATION_29_30 = object : Migration(29, 30) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -35,13 +39,13 @@ val MIGRATION_31_32 = object : Migration(31, 32) {
         while (lineGraphsCursor.moveToNext()) {
             val id = lineGraphsCursor.getLong(0)
             val oldFeaturesString = lineGraphsCursor.getString(2)
-            val oldFeatures = oldFeaturesString.split(splitChars1)
+            val oldFeatures = oldFeaturesString.split("||")
             val newFeatures = oldFeatures.map { f ->
-                val params = f.split(splitChars2).toMutableList()
+                val params = f.split("!!").toMutableList()
                 params.add(5, "0")
-                params.joinToString(splitChars2)
+                params.joinToString("!!")
             }
-            val newFeaturesString = newFeatures.joinToString(splitChars1)
+            val newFeaturesString = newFeatures.joinToString("||")
             updates.add(
                 Pair(
                     "UPDATE line_graphs_table SET features=? WHERE id=?",
@@ -65,15 +69,15 @@ val MIGRATION_32_33 = object : Migration(32, 33) {
         while (lineGraphsCursor.moveToNext()) {
             val id = lineGraphsCursor.getLong(0)
             val oldFeaturesString = lineGraphsCursor.getString(2)
-            val oldFeatures = oldFeaturesString.split(splitChars1)
+            val oldFeatures = oldFeaturesString.split("||")
             val newFeatures = oldFeatures.map { f ->
-                val params = f.split(splitChars2).toMutableList()
+                val params = f.split("!!").toMutableList()
                 var plottingMode = params[4].toInt()
                 if (plottingMode > 0) plottingMode += 1
                 params[4] = plottingMode.toString()
-                params.joinToString(splitChars2)
+                params.joinToString("!!")
             }
-            val newFeaturesString = newFeatures.joinToString(splitChars1)
+            val newFeaturesString = newFeatures.joinToString("||")
             updates.add(
                 Pair(
                     "UPDATE line_graphs_table SET features=? WHERE id=?",
@@ -108,7 +112,7 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             val id = avTimeCursor.getLong(0)
             val from = avTimeCursor.getString(3)
             val to = avTimeCursor.getString(4)
-            val discreteValues = from + splitChars1 + to
+            val discreteValues = from + "||" + to
             val query = "UPDATE average_time_between_stat_table SET discrete_values=? WHERE id=?"
             val args = listOf(discreteValues, id.toString())
             updates.add(Pair(query, args))
@@ -118,7 +122,7 @@ val MIGRATION_34_35 = object : Migration(34, 35) {
             val id = timeSinceCursor.getLong(0)
             val from = timeSinceCursor.getString(3)
             val to = timeSinceCursor.getString(4)
-            val discreteValues = from + splitChars1 + to
+            val discreteValues = from + "||" + to
             val query = "UPDATE time_since_last_stat_table SET discrete_values=? WHERE id=?"
             val args = listOf(discreteValues, id.toString())
             updates.add(Pair(query, args))
@@ -217,9 +221,9 @@ val MIGRATION_39_40 = object : Migration(39, 40) {
             """.trimIndent()
         while (lineGraphsCursor.moveToNext()) {
             val id = lineGraphsCursor.getString(0)
-            val features = lineGraphsCursor.getString(2).split(splitChars1)
+            val features = lineGraphsCursor.getString(2).split("||")
             for (featureString in features) {
-                val featureProperties = featureString.split(splitChars2)
+                val featureProperties = featureString.split("!!")
                 if (featureProperties.size >= 8) {
                     val params = mutableListOf(index++.toString(), id)
                     params.addAll(featureProperties)
@@ -341,7 +345,8 @@ val MIGRATION_40_41 = object : Migration(40, 41) {
                 `end_date` TEXT,
                 FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE ,
                 FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
-        )""".trimIndent())
+        )""".trimIndent()
+        )
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_id` ON `average_time_between_stat_table2` (`id`)")
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_graph_stat_id` ON `average_time_between_stat_table2` (`graph_stat_id`)")
         database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table2_feature_id` ON `average_time_between_stat_table2` (`feature_id`)")
@@ -411,6 +416,64 @@ val MIGRATION_41_42 = object : Migration(41, 42) {
     }
 }
 
+val MIGRATION_42_43 = object : Migration(42, 43) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        val moshi = Moshi.Builder().build()
+        updateDiscreteValues(database, moshi)
+        updateCheckedDays(database, moshi)
+    }
+
+    private fun updateCheckedDays(database: SupportSQLiteDatabase, moshi: Moshi) {
+        val remindersCursor = database.query("SELECT * FROM reminders_table")
+        val updates = mutableListOf<List<String>>()
+        while (remindersCursor.moveToNext()) {
+            val id = remindersCursor.getString(0)
+            val checkedDays = CheckedDays.fromList(
+                remindersCursor.getString(4)
+                    .split("||")
+                    .map { it.toBoolean() }
+            )
+
+            val jsonString = moshi.adapter(CheckedDays::class.java).toJson(checkedDays) ?: ""
+            updates.add(listOf(jsonString, id))
+        }
+        if (updates.size > 0) updates.forEach {
+            val featureUpdateStatement =
+                """UPDATE reminders_table 
+                    SET checked_days = ?
+                    WHERE id = ?
+            """.trimIndent()
+            database.execSQL(featureUpdateStatement, it.toTypedArray())
+        }
+    }
+
+    private fun updateDiscreteValues(database: SupportSQLiteDatabase, moshi: Moshi) {
+        val featureCursor = database.query("SELECT * FROM features_table WHERE type = 0")
+        val updates = mutableListOf<List<String>>()
+        while (featureCursor.moveToNext()) {
+            val id = featureCursor.getString(0)
+            val discreteValuesString = featureCursor.getString(4)
+            val discreteValues = discreteValuesString
+                .split("||")
+                .map { DiscreteValue.fromString(it) }
+
+            val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
+            val jsonString =
+                moshi.adapter<List<DiscreteValue>>(listType).toJson(discreteValues) ?: ""
+            updates.add(listOf(jsonString, id))
+        }
+        if (updates.size > 0) updates.forEach {
+            val featureUpdateStatement =
+                """UPDATE features_table 
+                    SET discrete_values = ?
+                    WHERE id = ?
+            """.trimIndent()
+            database.execSQL(featureUpdateStatement, it.toTypedArray())
+        }
+    }
+}
+
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -424,5 +487,6 @@ val allMigrations = arrayOf(
     MIGRATION_38_39,
     MIGRATION_39_40,
     MIGRATION_40_41,
-    MIGRATION_41_42
+    MIGRATION_41_42,
+    MIGRATION_42_43
 )

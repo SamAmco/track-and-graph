@@ -347,4 +347,5 @@
     <string name="faq_text_7_11">One final note to bare in mind is that your data may be skewed by the fact that you have not tracked data for each histogram bin yet or have not tracked them all equally yet. So for example if you are drawing a yearly histogram but have only been tracking for 6 months then your histogram may look like this:</string>
     <string name="faq_text_7_12">And a year later it may look like this:</string>
     <string name="faq_text_7_13">Over time however this skew will tend to 0. Therefore the more data you have tracked the more accurate the histogram will be.</string>
+    <string name="moshi">Moshi</string>
 </resources>

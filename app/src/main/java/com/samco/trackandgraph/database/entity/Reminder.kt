@@ -20,6 +20,7 @@ package com.samco.trackandgraph.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.squareup.moshi.JsonClass
 import org.threeten.bp.LocalTime
 
 @Entity(tableName = "reminders_table")
@@ -41,6 +42,7 @@ data class Reminder(
     val checkedDays: CheckedDays
 )
 
+@JsonClass(generateAdapter = true)
 data class CheckedDays (
     val monday: Boolean,
     val tuesday: Boolean,
