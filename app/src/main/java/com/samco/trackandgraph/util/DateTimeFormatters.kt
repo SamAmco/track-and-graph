@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.util
 
 import android.content.Context
-import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
 
@@ -31,9 +30,8 @@ private fun getDateTimePref(context: Context): DateFormatSetting {
     return DateFormatSetting.values()[datePrefIndex]
 }
 
-fun formatDate(format: String, date: Temporal) = DateTimeFormatter
+private fun formatDate(format: String, date: Temporal): String = DateTimeFormatter
     .ofPattern(format)
-    .withZone(ZoneId.systemDefault())
     .format(date)
 
 fun formatDayMonthYearHourMinute(context: Context, temporal: Temporal): String {
