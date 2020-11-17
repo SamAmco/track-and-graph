@@ -190,7 +190,7 @@ internal class LineGraphConfigView @JvmOverloads constructor(
             onScrollListener?.invoke(View.FOCUS_DOWN)
             view.requestFocus()
         }
-        if (index + 1 >= MAX_LINE_GRAPH_FEATURES) {
+        if (index + 1 >= dataVisColorList.size) {
             binding.addFeatureButton.isEnabled = false
         }
     }

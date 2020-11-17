@@ -45,8 +45,6 @@ import kotlinx.coroutines.*
 import java.lang.Exception
 import kotlin.reflect.full.primaryConstructor
 
-const val MAX_LINE_GRAPH_FEATURES = 10
-const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
 
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
