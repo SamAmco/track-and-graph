@@ -93,7 +93,7 @@ internal class PieChartConfigView @JvmOverloads constructor(
         }
         val currFeature = getCurrentFeature()
         if (currFeature == null || currFeature.featureType != FeatureType.DISCRETE) {
-            throw ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+            return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         }
         return null
     }
