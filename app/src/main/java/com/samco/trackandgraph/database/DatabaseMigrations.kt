@@ -6,6 +6,7 @@ import com.samco.trackandgraph.database.entity.CheckedDays
 import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
+import java.lang.Exception
 
 val MIGRATION_29_30 = object : Migration(29, 30) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -450,17 +451,25 @@ val MIGRATION_42_43 = object : Migration(42, 43) {
     private fun updateDiscreteValues(database: SupportSQLiteDatabase, moshi: Moshi) {
         val featureCursor = database.query("SELECT * FROM features_table WHERE type = 0")
         val updates = mutableListOf<List<String>>()
+        val deletes = mutableListOf<String>()
         while (featureCursor.moveToNext()) {
             val id = featureCursor.getString(0)
             val discreteValuesString = featureCursor.getString(4)
-            val discreteValues = discreteValuesString
-                .split("||")
-                .map { DiscreteValue.fromString(it) }
-
+            val discreteValues = try {
+                discreteValuesString
+                    .split("||")
+                    .map { DiscreteValue.fromString(it) }
+            } catch (e: Exception) {
+                deletes.add(id)
+                continue
+            }
             val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
             val jsonString =
                 moshi.adapter<List<DiscreteValue>>(listType).toJson(discreteValues) ?: ""
             updates.add(listOf(jsonString, id))
+        }
+        if (deletes.size > 0) deletes.forEach {
+            database.execSQL("""DELETE FROM features_table WHERE id = ?""", arrayOf(it))
         }
         if (updates.size > 0) updates.forEach {
             val featureUpdateStatement =
