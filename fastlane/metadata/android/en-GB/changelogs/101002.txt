@@ -1,0 +1,9 @@
+- Allow any characters in tracker multi-choice answers
+
+- Allow for 12 lines on a graph not 10
+
+- Various minor bug fixes
+
+- Fix wrong date/times over daylight savings
+
+- Fix bad backup file names
