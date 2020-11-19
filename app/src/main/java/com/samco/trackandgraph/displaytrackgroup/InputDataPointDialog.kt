@@ -156,6 +156,11 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             return view
         }
 
+        override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
+            super.setPrimaryItem(container, position, `object`)
+            if (`object` is DataPointInputView) `object`.requestFocus()
+        }
+
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
             if (existingViews.contains(`object`)) existingViews.remove(`object`)
             container.removeView(`object` as View)
@@ -187,7 +192,6 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             InputMethodManager.HIDE_IMPLICIT_ONLY
         )
         else imm.hideSoftInputFromWindow(view?.windowToken, 0)
-        requireActivity().currentFocus?.clearFocus()
     }
 
     override fun onResume() {
