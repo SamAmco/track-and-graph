@@ -20,6 +20,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -118,14 +119,19 @@ class DataPointInputView : FrameLayout {
         addNoteButton.setOnClickListener {
             addNoteButton.visibility = View.GONE
             noteInput.visibility = View.VISIBLE
-            noteInput.requestFocus()
             val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
             imm.toggleSoftInput(
                 InputMethodManager.SHOW_FORCED,
                 InputMethodManager.HIDE_IMPLICIT_ONLY
             )
+            noteInput.post { noteInput.requestFocus() }
         }
         noteInput.addTextChangedListener { state.note = it.toString() }
+    }
+
+    override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
+        return if (state.feature.featureType == FeatureType.CONTINUOUS) numberInput.requestFocus()
+        else super.requestFocus(direction, previouslyFocusedRect)
     }
 
     private fun initDiscrete() {
@@ -159,7 +165,6 @@ class DataPointInputView : FrameLayout {
         }
         val text = if (state.value == 1.0) "" else doubleFormatter.format(state.value)
         numberInput.setText(text)
-        numberInput.requestFocus()
         numberInput.setSelection(numberInput.text.length)
     }
 
