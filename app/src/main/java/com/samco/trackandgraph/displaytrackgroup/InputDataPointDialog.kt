@@ -136,6 +136,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         val inputViews: MutableMap<Int, DataPointInputView>
     ) : PagerAdapter() {
         private val existingViews = mutableListOf<DataPointInputView>()
+        private var currentPosition = -1
 
         override fun isViewFromObject(view: View, `object`: Any): Boolean {
             return view == `object`
@@ -158,7 +159,10 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 
         override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
             super.setPrimaryItem(container, position, `object`)
-            if (`object` is DataPointInputView) `object`.requestFocus()
+            if (currentPosition != position && `object` is DataPointInputView) {
+                currentPosition = position
+                `object`.requestFocus()
+            }
         }
 
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
@@ -192,6 +196,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             InputMethodManager.HIDE_IMPLICIT_ONLY
         )
         else imm.hideSoftInputFromWindow(view?.windowToken, 0)
+        requireActivity().currentFocus?.clearFocus()
     }
 
     override fun onResume() {
