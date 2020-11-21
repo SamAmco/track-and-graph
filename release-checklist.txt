@@ -1,12 +1,12 @@
 1. Update the build.gradle version code and name
 
-2. Copy and paste a fastlane changelog file and add the changelog there e.g. 
+2. Build an aab for the release (using Android Studio)
+
+3. Copy and paste a fastlane changelog file and add the changelog there e.g. 
 
 	# cp fastlane/metadata/android/en-GB/changelogs/10403.txt fastlane/metadata/android/en-GB/changelogs/10404.txt
 
 also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.
-
-3. Build an aab for the release (using Android Studio)
 
 4. Use fastlane to upload the new aab to the play store e.g.
 
