@@ -1,6 +1,6 @@
 # Track & Graph
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 An android app for tracking personal data and creating custom graphs
 
@@ -53,15 +53,17 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/pizzapim"><img src="https://avatars3.githubusercontent.com/u/23135512?v=4" width="100px;" alt=""/><br /><sub><b>pizzapim</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=pizzapim" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/Poussinou"><img src="https://avatars2.githubusercontent.com/u/19646549?v=4" width="100px;" alt=""/><br /><sub><b>Poussinou</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=Poussinou" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/xerus2000"><img src="https://avatars3.githubusercontent.com/u/13354331?v=4" width="100px;" alt=""/><br /><sub><b>Janek</b></sub></a><br /><a href="#ideas-xerus2000" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Axerus2000" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://android.izzysoft.de/"><img src="https://avatars3.githubusercontent.com/u/6781438?v=4" width="100px;" alt=""/><br /><sub><b>Izzy</b></sub></a><br /><a href="#infra-IzzySoft" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://github.com/pizzapim"><img src="https://avatars3.githubusercontent.com/u/23135512?v=4?s=100" width="100px;" alt=""/><br /><sub><b>pizzapim</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=pizzapim" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Poussinou"><img src="https://avatars2.githubusercontent.com/u/19646549?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Poussinou</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=Poussinou" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/xerus2000"><img src="https://avatars3.githubusercontent.com/u/13354331?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Janek</b></sub></a><br /><a href="#ideas-xerus2000" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Axerus2000" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://android.izzysoft.de/"><img src="https://avatars3.githubusercontent.com/u/6781438?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Izzy</b></sub></a><br /><a href="#infra-IzzySoft" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://github.com/hhpmmd"><img src="https://avatars0.githubusercontent.com/u/77058867?v=4?s=100" width="100px;" alt=""/><br /><sub><b>hhpmmd</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=hhpmmd" title="Code">💻</a> <a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Ahhpmmd" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
-<!-- markdownlint-enable -->
+<!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
