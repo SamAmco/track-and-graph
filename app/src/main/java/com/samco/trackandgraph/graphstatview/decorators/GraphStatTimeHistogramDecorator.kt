@@ -131,10 +131,21 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
                     toAppendTo: StringBuffer,
                     pos: FieldPosition
                 ): StringBuffer {
-                    val index = (obj as Double).roundToInt() + 1
-                    val str = if (index > 0 && index <= data!!.window!!.numBins) {
+                    val zeroIndexOffset =
+                        // The bins we get start at index 0. The bin index can represent minutes, hours,
+                        // day of the week or day of the month, etc.
+                        // Since there is a hour 0 and a minute 0, but not a day or week 0 we have
+                        // to add an offset of 1 to the labels if talking about days or weeks.
+                        if (data!!.window!! == TimeHistogramWindow.DAY
+                            || data!!.window!! == TimeHistogramWindow.HOUR)
+                            0  // there is a minute 0 and a hour 0: index 0 -> label 0
+                        else 1 // but there is no day 0 or week 0:  index 0 -> label 1
+
+                    val index = (obj as Double).roundToInt() + zeroIndexOffset
+                    val str = if (index >= zeroIndexOffset
+                                    && index <= data!!.window!!.numBins) {
                         val labelInterval = getLabelInterval(data!!.window!!)
-                        if (index == 1
+                        if (index == zeroIndexOffset
                             || index == data!!.window!!.numBins
                             || index % labelInterval == 0
                         ) index.toString()
