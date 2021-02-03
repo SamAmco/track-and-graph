@@ -131,7 +131,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun setUpLineGraphYAxis() {
-        binding!!.xyPlot.setRangeStep(StepMode.SUBDIVIDE, 11.0)
+        binding!!.xyPlot.setRangeStep(data!!.yAxisRangeParameters.first, data!!.yAxisRangeParameters.second)
         if (data!!.durationBasedRange) {
             binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
                 object : Format() {
