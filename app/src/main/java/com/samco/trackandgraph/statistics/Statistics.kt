@@ -304,20 +304,20 @@ internal suspend fun calculateMovingAverages(
     when it comes to the averaging window. E.g. when i use the daily averaging window and track data
     at 13:01 one day, 13:00 the next day and 13:02 the day after that, the second entry gets averaged,
     but the third does not etc.
-    If one were to implement this, it would be possible to simply check whether the time-difference
+    One way to check whether the input is aggregated is to check if the time-differences
     between all consecutive datasamples are exactly the same which likely is only the case if a computer
     aggregated it.
-    The code below *tries* to implement this approach. It does *not* work and causes the app to crash,
-    but might be a starting point.
+    The code below implements this approach, but is commented out since a use for this would have to
+    be discussed first.
 
     val input_is_aggregated_total_data = when (dataPoints.size) {
-            1 -> false
+            1, 2 -> false // return false for 2, bc there is no comparison if there is only one time-difference
             else -> {
                 val inital_time_difference = Duration.between(
                         dataPoints[0].timestamp,
                         dataPoints[1].timestamp
                 )
-                (1..dataPoints.size).map( { Duration.between(
+                (1..dataPoints.size-1).map( { Duration.between(
                         dataPoints[it-1].timestamp,
                         dataPoints[it].timestamp) }).filter( { it != inital_time_difference }).size == 0
             }
