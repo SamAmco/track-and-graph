@@ -304,7 +304,7 @@ internal suspend fun calculateMovingAverages(
             && Duration.between(
                 dataPoints[addIndex].timestamp,
                 current.timestamp
-            ) <= movingAvDuration
+            ) < movingAvDuration
         ) {
             currentAccumulation += dataPoints[addIndex++].value
             currentCount++
