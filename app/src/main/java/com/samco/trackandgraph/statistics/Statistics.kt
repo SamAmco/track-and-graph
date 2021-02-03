@@ -297,6 +297,33 @@ internal suspend fun calculateMovingAverages(
     var currentCount = 0
     var addIndex = 0
     val dataPoints = dataSample.dataPoints.reversed()
+
+    /*
+    Maybe sometime in the future it is desired to know here whether the input is aggregated using a
+    daily+ totals aggregator, with the intent to treat data that is *not* aggregated more lenient
+    when it comes to the averaging window. E.g. when i use the daily averaging window and track data
+    at 13:01 one day, 13:00 the next day and 13:02 the day after that, the second entry gets averages,
+    but the third does not etc.
+    If one where to implement this, it would be possible to simply check whether the time-difference
+    between all consecutive datasamples are exactly the same which likely is only the case if a computer
+    aggregated it.
+    The code below *tries* to implement this approach. It does *not* work and causes the app to crash,
+    but might be a starting point.
+
+    val input_is_aggregated_total_data = when (dataPoints.size) {
+            1 -> false
+            else -> {
+                val inital_time_difference = Duration.between(
+                        dataPoints[0].timestamp,
+                        dataPoints[1].timestamp
+                )
+                (1..dataPoints.size).map( { Duration.between(
+                        dataPoints[it-1].timestamp,
+                        dataPoints[it].timestamp) }).filter( { it != inital_time_difference }).size == 0
+            }
+    }
+    */
+
     for (index in dataPoints.indices) {
         yield()
         val current = dataPoints[index]
