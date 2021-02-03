@@ -302,9 +302,9 @@ internal suspend fun calculateMovingAverages(
     Maybe sometime in the future it is desired to know here whether the input is aggregated using a
     daily+ totals aggregator, with the intent to treat data that is *not* aggregated more lenient
     when it comes to the averaging window. E.g. when i use the daily averaging window and track data
-    at 13:01 one day, 13:00 the next day and 13:02 the day after that, the second entry gets averages,
+    at 13:01 one day, 13:00 the next day and 13:02 the day after that, the second entry gets averaged,
     but the third does not etc.
-    If one where to implement this, it would be possible to simply check whether the time-difference
+    If one were to implement this, it would be possible to simply check whether the time-difference
     between all consecutive datasamples are exactly the same which likely is only the case if a computer
     aggregated it.
     The code below *tries* to implement this approach. It does *not* work and causes the app to crash,
