@@ -28,6 +28,10 @@ class Statistics_calculateMovingAverages_KtTest {
 
     @Test
     fun calculateMovingAverages() {
+        /* The test assumes that datapoints will only be averages when the time between is
+           smaller than the given window, NOT smaller or equal, e.g. the last two points will not be
+           averaged together since they are exactly 10 hours apart, not less.
+         */
         runBlocking {
             //GIVEN
             val now = OffsetDateTime.now()
@@ -48,7 +52,7 @@ class Statistics_calculateMovingAverages_KtTest {
             val answer = calculateMovingAverages(DataSample(dataPoints), averagingDuration)
 
             //THEN
-            val expected = listOf(5.0, 0.0, 2.0, 2.0, 1.5, 2.0, 8.0, 7.5, 5.0)
+            val expected = listOf(5.0, 0.0, 2.0, 2.0, 1.5, 2.0, 8.0, 7.0, 3.0)
             val actual = answer.dataPoints.map { dp -> dp.value }
             assertEquals(expected, actual)
         }
