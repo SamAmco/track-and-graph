@@ -21,6 +21,7 @@ import com.androidplot.Region
 import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
+import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.entity.*
 import kotlinx.coroutines.Dispatchers
@@ -32,9 +33,9 @@ import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 import org.threeten.bp.temporal.WeekFields
+import java.lang.Exception
 import java.util.*
-import kotlin.math.abs
-import kotlin.math.min
+import kotlin.math.*
 
 class DataSample(val dataPoints: List<DataPoint>)
 
@@ -555,5 +556,124 @@ internal fun getLargestBin(bins: List<List<Double>>?): Double? {
         ?.downTo(1)
         ?.map { index -> bins.sumByDouble { it[index - 1] } }
         ?.max()
+}
+
+
+/**
+ * Code to calculate nice y-intervals
+ */
+
+data class PossibleIntervalBase (val interval: Double, val preferred: Boolean,
+                                 val base: Double)
+data class PossibleInterval     (val interval: Double, val preferred: Boolean,
+                                 val n_lines: Int    , val percentage_range_used: Double,
+                                 val bounds_min: Double, val bounds_max: Double,
+                                 )
+
+data class YAxisParameters (    val step_mode: StepMode, val n_intervals: Double,
+                                val bounds_min: Double, val bounds_max: Double,)
+
+fun getYParameters(y_min: Double, y_max: Double, time_data: Boolean,
+                   fixedBounds: Boolean,
+                   throw_exc_if_non_found: Boolean = false) : YAxisParameters {
+    val MIN_INTERVALS = 6
+    val MAX_INTERVALS = 12
+    val MIN_USED_RANGE_STEPS = listOf<Double>(0.849, 0.79, 0.749, 0.7)
+
+    // fallback if we don't find any solution. According to the test, never get's used.
+    val FALLBACK = YAxisParameters(StepMode.SUBDIVIDE, 11.0, y_min, y_max)
+
+    val y_range = y_max - y_min
+
+    val (base, preferred_divisors, all_divisors) = when (time_data) {
+        false -> Triple(10, setOf(1,2,4,5),
+                                 setOf(1,2,4,5,8))
+        true  -> Triple(60, setOf(1,2,3,4,6,12,24,30),
+                                    setOf(1,2,3,4,6,12,24,30))
+    }
+
+    // We want to treat a y_range of 60 the same way as a range of 600 or 6, just times 10 or 0.1
+    val norm_exponent = round(log(y_range, base.toDouble()))
+    val normed_base = Math.pow(base.toDouble(), norm_exponent.toDouble())
+
+
+    fun base2actual_helper ( base: PossibleIntervalBase ): PossibleInterval {
+        var bounds_min = floor(y_min/base.interval) * base.interval
+        var bounds_max = ceil(y_max/base.interval) * base.interval
+
+        // check whether there is a large gap between bounds and data and if its larger
+        // than half the base on both sides, remove it
+        // it can only be this large if the divisor is 1
+        val offset = base.base / 2
+        if (y_min - bounds_min >= offset && bounds_max - y_max >= offset) {
+            bounds_min += offset
+            bounds_max -= offset
+        }
+
+        val bounds_range = bounds_max - bounds_min
+        val n_lines = round(bounds_range/base.interval).toInt() + 1
+        val percentage_range_used = y_range / bounds_range
+
+        return PossibleInterval(base.interval, base.preferred,
+            n_lines, percentage_range_used,
+            bounds_min, bounds_max)
+    }
+
+    fun base2actual_fixedBounds (base: PossibleIntervalBase) : PossibleInterval{
+        // if we can't evenly divide the y_range we can't do anything, so return a bad dummy interval, which will get filtered out
+        // this is a little more complex than it should be because of floating point errors
+        if (y_range.div(base.interval).rem(1) != 0.0 ) return PossibleInterval(0.0, false, 999, 0.0, 0.0, 0.0)
+
+        return PossibleInterval(base.interval, base.preferred, round(y_range/base.interval).toInt()+1,
+                        1.0, y_min, y_max)
+    }
+
+    fun base2actual ( base: PossibleIntervalBase): PossibleInterval {
+        if (fixedBounds) return base2actual_fixedBounds(base)
+
+        return base2actual_helper(base)
+    }
+
+    fun actual2YAxisParameters(actual: PossibleInterval): YAxisParameters {
+        return YAxisParameters(StepMode.SUBDIVIDE, actual.n_lines.toDouble(),
+                actual.bounds_min, actual.bounds_max)
+    }
+
+    val reasonable_intervals = all_divisors
+            .flatMap { div ->
+                    (-1..1).map { exp_offset ->
+                        PossibleIntervalBase(
+                        normed_base * Math.pow(base.toDouble(), exp_offset.toDouble()) /div,
+                                div in preferred_divisors,
+                            base = normed_base * Math.pow(base.toDouble(), exp_offset.toDouble()))
+                    } }
+            // so after we generate a lot of possible intervals, in this first filter we get rid of all the
+            // ones who just are not plausible at all. We'll do a second check with the exact data further below
+            .filter { interval -> ceil(y_range / interval.interval) >= MIN_INTERVALS - 1 &&
+                                            ceil(y_range / interval.interval) <= MAX_INTERVALS + 1 }
+            .map { base -> base2actual(base) }
+            .filter { interval -> interval.n_lines >= MIN_INTERVALS &&
+                    interval.n_lines <= MAX_INTERVALS}
+
+    if (reasonable_intervals.isEmpty()) {
+        if (throw_exc_if_non_found) throw Exception("No solution found! No intervals passed the initial filtering. ymin: $y_min, ymax: $y_max")
+        return FALLBACK
+    }
+
+    for (MIN_USED_RANGE in MIN_USED_RANGE_STEPS) {
+        // gradually have lower expectations in our output
+
+        for (pref in listOf(true, false)) {
+            // prefer the 'preferred' intervals when it comes to each used_range step
+            reasonable_intervals
+                    .filter { it.preferred == pref}
+                    .filter { it.percentage_range_used >= MIN_USED_RANGE }
+                    .sortedBy { it.interval }                       // prefer larger intervals
+                    .forEach { return actual2YAxisParameters(it) }  // returns the first element, if there is one
+        }
+    }
+
+    if (throw_exc_if_non_found) throw Exception("No solution found! No intervals passed the range_used check. ymin: $y_min, ymax: $y_max")
+    return FALLBACK
 }
 
