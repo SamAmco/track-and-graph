@@ -53,11 +53,12 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             endTime
         )
         val hasPlottableData = plottableData.any { kvp -> kvp.value != null }
-        val bounds = getBounds(config, plottableData.values)
 
         val durationBasedRange =
             config.features.any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
-        val yAxisParameters = getYAxisParameters(bounds, durationBasedRange)
+        val (bounds, yAxisParameters) = getYAxisParameters(config, plottableData.values, durationBasedRange)
+        //val bounds = getBounds(config, plottableData.values)
+        //val yAxisParameters = getYAxisParameters(bounds, durationBasedRange)
 
         onDataSampled(allReferencedDataPoints)
 
@@ -168,6 +169,34 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         return if (plottingData.dataPoints.size >= 2) plottingData else null
     }
 
+
+    private suspend fun getYAxisParameters(
+            lineGraph: LineGraphWithFeatures,
+            series: Collection<FastXYSeries?>,
+            timeBasedRange: Boolean ) : Pair< RectRegion, Pair<StepMode, Double> > {
+        val fixed = lineGraph.yRangeType == YRangeType.FIXED;
+
+        val bounds = RectRegion()
+        series.forEach { it?.let { bounds.union(it.minMax()) } }
+
+        val (y_min, y_max) = when(fixed) {
+            true  -> Pair(lineGraph.yFrom, lineGraph.yTo)
+            false -> {
+                Pair(bounds.minY, bounds.maxY)
+            }
+        }
+
+        val parameters = getYParameters(y_min.toDouble(), y_max.toDouble(), timeBasedRange, fixed)
+
+        bounds.minY = parameters.bounds_min
+        bounds.maxY = parameters.bounds_max
+
+        val intervalParameters = Pair(parameters.step_mode, parameters.n_intervals)
+
+        return Pair(bounds, intervalParameters)
+    }
+
+
     private suspend fun getBounds(
         lineGraph: LineGraphWithFeatures,
         series: Collection<FastXYSeries?>
@@ -182,7 +211,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         return bounds
     }
 
-    private suspend fun getYAxisParameters(
+    private suspend fun getYAxisParameters_old(
         bounds: RectRegion,
         durationBasedRange: Boolean
     ): Pair<StepMode, Double> {

@@ -111,9 +111,9 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
 
     private suspend fun setLineGraphBounds() {
         val bounds = data!!.bounds
-        if (data!!.yRangeType == YRangeType.FIXED) {
+        // if (data!!.yRangeType == YRangeType.FIXED) {
             binding!!.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
-        }
+        // }
         binding!!.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
         binding!!.xyPlot.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
         setLineGraphPaddingFromBounds(bounds)
