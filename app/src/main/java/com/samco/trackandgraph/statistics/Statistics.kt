@@ -650,7 +650,7 @@ fun getYParametersInternal(y_min: Double, y_max: Double, time_data: Boolean,
     val (base, preferred_divisors, all_divisors) = when (time_data) {
         false -> Triple(10, setOf(1,2,4,5),
                                  setOf(1,2,3,4,5,8))
-        true  -> Triple(60, setOf(1,2,3,4,6,12,24,30),
+        true  -> Triple(60, setOf(1,2,3,4,6,12,24),
                                     setOf(1,2,3,4,6,12,24,30))
     }
 
@@ -686,7 +686,7 @@ fun getYParametersInternal(y_min: Double, y_max: Double, time_data: Boolean,
             reasonable_intervals
                     .filter { it.preferred == pref}
                     .filter { it.percentage_range_used >= MIN_USED_RANGE }
-                    .sortedBy { it.interval }                       // prefer larger intervals
+                    .sortedByDescending { it.interval }   // prefer larger intervals
                     .forEach { return it }  // returns the first element, if there is one
         }
     }

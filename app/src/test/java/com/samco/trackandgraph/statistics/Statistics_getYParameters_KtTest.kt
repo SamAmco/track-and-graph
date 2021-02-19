@@ -124,8 +124,8 @@ class Statistics_getYParameters_KtTest {
             true  -> (1..72000).map { it.toDouble() } // one second to 20 hours
         }
 
-        for (start in startValues.shuffled().slice(0..1000)) {
-            for (length in lengthValues.shuffled().slice(0..5000)) {
+        for (start in startValues.shuffled().slice(0..10000)) {
+            for (length in lengthValues.shuffled().slice(0..500)) {
                 try {
                     val interval = getYParametersInternal(start, start+length,
                             time_data = time_data,
@@ -185,32 +185,32 @@ class Statistics_getYParameters_KtTest {
              * Output from 2021.02.19:
             minimum range used: 0.79
 
-            1.00 -> 0.97:  5.04%
-            0.97 -> 0.94: 13.95%
-            0.94 -> 0.91: 22.18%
-            0.91 -> 0.88: 28.73%
-            0.88 -> 0.85: 22.78%
-            0.85 -> 0.82:  5.51%
-            0.82 -> 0.79:  1.80%
+            1.00 -> 0.97:  3.15%
+            0.97 -> 0.94:  9.67%
+            0.94 -> 0.91: 23.16%
+            0.91 -> 0.88: 29.49%
+            0.88 -> 0.85: 26.87%
+            0.85 -> 0.82:  6.02%
+            0.82 -> 0.79:  1.63%
             0.79 -> 0.76:  0.00%
             0.76 -> 0.73:  0.00%
             0.73 -> 0.70:  0.00%
-            Didn't find a good solution for 0.06582356483621137%
-            How many lines are drawn how often [%]:
-            6:  1.01%
-            7:  5.64%
-            8: 12.13%
-            9: 13.81%
-            10: 20.51%
-            11: 25.88%
-            12: 21.02%
-            Which divisors are chosen how often [%]:
-            1: 11.98%
-            2: 45.47%
-            3:  8.43%
-            4: 13.54%
-            5: 19.23%
-            8:  1.35%
+            Didn't find a good solution for 0.050559418398955745%
+            How many lines are drawn how often:
+            6: 13.56%
+            7: 16.09%
+            8: 21.75%
+            9: 20.28%
+            10: 12.51%
+            11:  5.42%
+            12: 10.39%
+            Which divisors are chosen how often:
+            1: 45.72%
+            2: 26.16%
+            3:  5.60%
+            4: 14.19%
+            5:  5.91%
+            8:  2.42%
              */
         }
     }
@@ -223,35 +223,34 @@ class Statistics_getYParameters_KtTest {
              * Output from 2021.02.19:
             minimum range used: 0.79
 
-            1.00 -> 0.97:  5.03%
-            0.97 -> 0.94: 14.10%
-            0.94 -> 0.91: 23.95%
-            0.91 -> 0.88: 27.15%
-            0.88 -> 0.85: 19.65%
-            0.85 -> 0.82:  7.82%
-            0.82 -> 0.79:  2.29%
-            0.79 -> 0.76:  0.00%
+            1.00 -> 0.97:  3.45%
+            0.97 -> 0.94: 11.98%
+            0.94 -> 0.91: 20.93%
+            0.91 -> 0.88: 26.81%
+            0.88 -> 0.85: 26.58%
+            0.85 -> 0.82:  7.53%
+            0.82 -> 0.79:  2.71%
+            0.79 -> 0.76:  0.01%
             0.76 -> 0.73:  0.00%
             0.73 -> 0.70:  0.00%
-            Didn't find a good solution for 0.5568272737700084%
-            How many lines are drawn how often [%]:
-            6:  0.41%
-            7:  7.57%
-            8: 15.76%
-            9: 20.14%
-            10: 22.12%
-            11: 16.92%
-            12: 17.08%
-            Which divisors are chosen how often [%]:
-            1: 38.29%
-            2: 21.79%
-            3: 11.06%
-            4: 10.59%
-            6:  9.92%
-            12:  5.19%
-            24:  1.28%
-            30:  1.89%
-
+            Didn't find a good solution for 0.570686596271549%
+            How many lines are drawn how often:
+            6:  8.60%
+            7: 13.30%
+            8: 22.38%
+            9: 23.07%
+            10: 15.94%
+            11:  8.27%
+            12:  8.43%
+            Which divisors are chosen how often:
+             1: 31.23%
+             2:  8.99%
+             3:  4.70%
+             4:  2.76%
+             6:  2.43%
+            12:  1.94%
+            24: 31.63%
+            30: 16.32%
              */
         }
     }
@@ -277,7 +276,7 @@ class Statistics_getYParameters_KtTest {
             println("$label")
         }
         print("Data range: [$start -> $end] ")
-        print("interval: ${interval} x ${parameters.n_intervals} | ")
+        print("interval: ${interval} x ${parameters.n_intervals.toInt()-1} | ")
         println("range used = %.1f".format(100*(end-start)/boundsRange))
         //return interval
     }
@@ -296,7 +295,7 @@ class Statistics_getYParameters_KtTest {
             println(label)
         }
         print("Data range: [${duration2string(start.seconds)} -> ${duration2string(end.seconds)}] ")
-        print("interval: ${duration2string(interval.seconds)} x ${parameters.n_intervals.toInt()} | ")
+        print("interval: ${duration2string(interval.seconds)} x ${parameters.n_intervals.toInt()-1} | ")
         println("range used = ${round(100*(end-start)/boundsRange)}%")
         return parameters
     }
