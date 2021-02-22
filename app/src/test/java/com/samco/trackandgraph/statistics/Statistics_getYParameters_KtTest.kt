@@ -30,6 +30,17 @@ import kotlin.time.seconds
 
 class Statistics_getYParameters_KtTest {
 
+    private fun getYParametersInternalWithFallback(y_min: Double, y_max: Double, time_data: Boolean,
+                                           fixedBounds: Boolean, throw_exc_if_non_found: Boolean) : PossibleInterval {
+        val parameters = getYParametersInternal(y_min, y_max, time_data, fixedBounds, throw_exc_if_non_found)
+        if (parameters != null) {
+            return parameters
+        }
+        return PossibleInterval((y_max - y_min) / 10.0, false, 11, 1.0,
+                y_min, y_max, 1.0)
+    }
+
+
     // these first four ones aren't really tests, but declaring them as tests makes it easier to run them
 
     @Test
@@ -64,12 +75,7 @@ class Statistics_getYParameters_KtTest {
                 val length = Random.nextInt(1, 10 * 60 * 60).toDouble()
                 val end = start + length
 
-                val interval = try {
-                    getYParametersInternal(start, end, time_data = true, fixedBounds = false)
-                } catch (e: Exception) {
-                    PossibleInterval((end - start) / 10.0, false, 11, 1.0,
-                            start, end, 1.0)
-                }
+                val interval = getYParametersInternalWithFallback(start, end, time_data = true, fixedBounds = false, throw_exc_if_non_found = false)
 
                 if (interval.percentage_range_used > RANGE_USED_BELOW) continue
 
@@ -90,14 +96,10 @@ class Statistics_getYParameters_KtTest {
                 val length = Random.nextInt(1, 500).toDouble() / 10
                 val end = start + length
 
-                val interval = try {
-                    getYParametersInternal(start, end, time_data = false, fixedBounds = false)
-                } catch (e: Exception) {
-                    PossibleInterval((end - start) / 10.0, false, 11, 1.0,
-                            start, end, 1.0)
-                }
+                val interval = getYParameters(start, end, time_data = false, fixedBounds = false, throw_exc_if_non_found = true)
 
-                if (interval.percentage_range_used > RANGE_USED_BELOW) continue
+                val range_used = length / (interval.bounds_max-interval.bounds_min)
+                if (range_used > RANGE_USED_BELOW) continue
 
                 printExampleNumerical(start, end)
                 break
@@ -106,7 +108,7 @@ class Statistics_getYParameters_KtTest {
         }
     }
 
-    fun find_solution_for_everything(time_data: Boolean) {
+    fun find_solution_for_everything(time_data: Boolean, long_test: Boolean) {
         var errors = 0
         val allowed_error_percentage = when (time_data) {
             false -> 0.1 // it's ok if one   in 1000 doesn't have a good solution
@@ -124,17 +126,22 @@ class Statistics_getYParameters_KtTest {
             true  -> (1..72000).map { it.toDouble() } // one second to 20 hours
         }
 
-        for (start in startValues.shuffled().slice(0..10000)) {
-            for (length in lengthValues.shuffled().slice(0..500)) {
-                try {
-                    val interval = getYParametersInternal(start, start+length,
-                            time_data = time_data,
-                            fixedBounds = false)
+        val (numberOfStartValues, numberOfLengthValues) = when (long_test) {
+            true -> Pair(10000,500)
+            false -> Pair(1000,50)
+        }
 
+        for (start in startValues.shuffled().slice(0..numberOfStartValues)) {
+            for (length in lengthValues.shuffled().slice(0..numberOfLengthValues)) {
+                val interval = getYParametersInternal(start, start+length,
+                        time_data = time_data,
+                        fixedBounds = false, throw_exc_if_non_found = false)
+
+                if (interval != null) {
                     val range_used = length / (interval.bounds_max-interval.bounds_min)
                     assert(range_used - interval.percentage_range_used < 0.001)
                     intervalList.add(interval)
-                } catch (e: Exception) {
+                } else {
                     no_solution_vals.add(Pair(start, start+length))
                     //throw Exception("min: $start, max: ${start + length}")
                     errors += 1
@@ -142,10 +149,13 @@ class Statistics_getYParameters_KtTest {
 
             }
         }
-
         val range_used_list = intervalList.map { it.percentage_range_used }
-        print("minimum range used: ${range_used_list.minOrNull()}\n\n")
         val nRuns = range_used_list.count()
+
+        println("Tested $nRuns combinations.")
+
+        print("minimum range used: ${range_used_list.minOrNull()}\n\n")
+
         for (i in 0..9) {
             val top = 1-i*0.03
             val bot = 1-(i+1)*0.03
@@ -180,7 +190,7 @@ class Statistics_getYParameters_KtTest {
     @Test
     fun find_solution_for_everything_numerical() {
         runBlocking {
-            find_solution_for_everything(time_data = false)
+            find_solution_for_everything(time_data = false, long_test = false)
             /**
              * Output from 2021.02.19:
             minimum range used: 0.79
@@ -218,7 +228,7 @@ class Statistics_getYParameters_KtTest {
     @Test
     fun find_solution_for_everything_time() {
         runBlocking {
-            find_solution_for_everything(time_data = true)
+            find_solution_for_everything(time_data = true, long_test = false)
             /**
              * Output from 2021.02.19:
             minimum range used: 0.79
