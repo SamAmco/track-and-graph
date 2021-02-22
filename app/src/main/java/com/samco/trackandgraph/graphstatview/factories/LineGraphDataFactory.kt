@@ -196,44 +196,4 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         return Pair(bounds, intervalParameters)
     }
 
-
-    private suspend fun getBounds(
-        lineGraph: LineGraphWithFeatures,
-        series: Collection<FastXYSeries?>
-    ): RectRegion {
-        val bounds = RectRegion()
-        series.forEach { it?.let { bounds.union(it.minMax()) } }
-        yield()
-        if (lineGraph.yRangeType == YRangeType.FIXED) {
-            bounds.minY = lineGraph.yFrom
-            bounds.maxY = lineGraph.yTo
-        }
-        return bounds
-    }
-
-    private suspend fun getYAxisParameters_old(
-        bounds: RectRegion,
-        durationBasedRange: Boolean
-    ): Pair<StepMode, Double> {
-        val targetIntervals: Double = 11.0
-
-        if (bounds.minY == null) // when there's not enough data to plot
-            return Pair(StepMode.SUBDIVIDE, targetIntervals)
-
-        val y_range = bounds.height.toDouble()
-
-        val moduloVal = when(durationBasedRange) {
-            false -> 1
-            true -> 60*5
-        }
-
-        val max_divergence = 4
-        for (d in 0..max_divergence) {
-            if ( y_range / (targetIntervals -1 -d) %moduloVal == 0.0)
-                return Pair(StepMode.SUBDIVIDE, targetIntervals-d)
-            if ( y_range / (targetIntervals -1 +d) %moduloVal == 0.0)
-                return Pair(StepMode.SUBDIVIDE, targetIntervals+d)
-        }
-        return Pair(StepMode.SUBDIVIDE, targetIntervals)
-    }
 }
