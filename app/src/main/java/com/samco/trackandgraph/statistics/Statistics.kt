@@ -612,7 +612,7 @@ private fun finishProtoFixedBounds (proto: PossibleIntervalProto, y_min: Double,
     val y_range = y_min - y_max
     // if we can't evenly divide the y_range we can't do anything, so return a bad dummy interval, which will get filtered out
     // this is a little more complex than it should be because of floating point errors
-    if (y_range.div(proto.interval).rem(1) != 0.0 ) null //return PossibleInterval(0.0, false, 999, 0.0, 0.0, 0.0, 1.0)
+    if (y_range.div(proto.interval).rem(1) != 0.0 ) return null //PossibleInterval(0.0, false, 999, 0.0, 0.0, 0.0, 1.0)
 
     return PossibleInterval(proto.interval, proto.preferred, round(y_range/proto.interval).toInt()+1,
             1.0, y_min, y_max, proto.base)
