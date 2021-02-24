@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
+import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.entity.GraphOrStat
 
@@ -77,8 +78,24 @@ abstract class GraphStatDataSourceAdapter<I> {
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat
     ) {
+        if (BuildConfig.DEBUG) return duplicateGraphOrStatDEBUG(dataSource, graphOrStat)
         val originalId = graphOrStat.id
         val newId = dataSource.insertGraphOrStat(graphOrStat.copy(id = 0))
         duplicate(dataSource, originalId, newId)
+    }
+
+    private suspend fun duplicateGraphOrStatDEBUG(
+            dataSource: TrackAndGraphDatabaseDao,
+            graphOrStat: GraphOrStat
+    ) {
+
+        val originalId = graphOrStat.id
+        for (i in 0..32) {
+            val newId = dataSource.insertGraphOrStat(graphOrStat.copy(id = 0))
+            duplicate(dataSource, originalId, newId)
+        }
+
+        //val newId2 = dataSource.insertGraphOrStat(graphOrStat.copy(id = 0))
+        //duplicate(dataSource, originalId, newId2)
     }
 }
