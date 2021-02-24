@@ -17,9 +17,11 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
+import com.samco.trackandgraph.BuildConfig
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.database.entity.GraphOrStat
+import kotlin.random.Random
 
 class LineGraphDataSourceAdapter : GraphStatDataSourceAdapter<LineGraphWithFeatures>() {
     override suspend fun writeConfigToDatabase(
@@ -61,12 +63,33 @@ class LineGraphDataSourceAdapter : GraphStatDataSourceAdapter<LineGraphWithFeatu
         oldGraphId: Long,
         newGraphId: Long
     ) {
+        if (BuildConfig.DEBUG) return duplicateRandomOffsetAndScale(dataSource, oldGraphId, newGraphId)
+
         val lineGraph = dataSource.getLineGraphByGraphStatId(oldGraphId)
         lineGraph?.let {
             val copy = it.toLineGraph().copy(id = 0, graphStatId = newGraphId)
             val newLineGraphId = dataSource.insertLineGraph(copy)
             val newFeatures = lineGraph.features.map { f ->
                 f.copy(id = 0, lineGraphId = newLineGraphId)
+            }
+            dataSource.insertLineGraphFeatures(newFeatures)
+        }
+    }
+
+    suspend fun duplicateRandomOffsetAndScale(
+            dataSource: TrackAndGraphDatabaseDao,
+            oldGraphId: Long,
+            newGraphId: Long
+    ) {
+        val offset = Random.nextInt(15,5000).toDouble() / 10.0
+        val scale = 1 + Random.nextDouble()*500
+
+        val lineGraph = dataSource.getLineGraphByGraphStatId(oldGraphId)
+        lineGraph?.let {
+            val copy = it.toLineGraph().copy(id = 0, graphStatId = newGraphId)
+            val newLineGraphId = dataSource.insertLineGraph(copy)
+            val newFeatures = lineGraph.features.map { f ->
+                f.copy(id = 0, lineGraphId = newLineGraphId, offset = offset, scale = scale )
             }
             dataSource.insertLineGraphFeatures(newFeatures)
         }

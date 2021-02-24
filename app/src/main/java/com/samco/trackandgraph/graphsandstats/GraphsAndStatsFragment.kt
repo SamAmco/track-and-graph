@@ -39,6 +39,7 @@ import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.ui.*
+import kotlinx.android.synthetic.main.graph_stat_card_view.*
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 
@@ -69,9 +70,10 @@ class GraphsAndStatsFragment : Fragment() {
                 this::onEditGraphStat,
                 this::onGraphStatClicked,
                 this::onMoveGraphStatClicked,
-                viewModel::duplicateGraphOrStat
+                viewModel::duplicateGraphOrStat,
             )
         )
+
         binding.graphStatList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.graphStatList)
         binding.graphStatList.layoutManager =
