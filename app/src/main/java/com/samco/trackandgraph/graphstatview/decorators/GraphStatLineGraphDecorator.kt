@@ -50,7 +50,7 @@ import kotlin.math.max
 
 class GraphStatLineGraphDecorator(listMode: Boolean) :
     GraphStatViewDecorator<ILineGraphViewData>(listMode) {
-    private val lineGraphHourMinuteSecondFromat: DateTimeFormatter = DateTimeFormatter
+    private val lineGraphHourMinuteSecondFormat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm:ss")
         .withZone(ZoneId.systemDefault())
     private val lineGraphHoursDateFormat: DateTimeFormatter = DateTimeFormatter
@@ -69,7 +69,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         context = view.getContext()
 
         yield()
-        withContext(Dispatchers.Default) { initFromLineGraphBody() }
+        withContext(Dispatchers.Default) { initFromLineGraphBody(listMode) }
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {
@@ -88,7 +88,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         binding!!.xyPlot.redraw()
     }
 
-    private suspend fun initFromLineGraphBody() {
+    private suspend fun initFromLineGraphBody(listMode: Boolean) {
         yield()
         withContext(Dispatchers.Main) {
             binding!!.xyPlot.visibility = View.INVISIBLE
@@ -98,7 +98,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
             drawLineGraphFeatures()
             setUpLineGraphXAxis()
             setUpLineGraphYAxis()
-            setLineGraphBounds()
+            setLineGraphBounds(listMode)
             binding!!.xyPlot.redraw()
             withContext(Dispatchers.Main) {
                 binding!!.xyPlot.visibility = View.VISIBLE
@@ -109,9 +109,12 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         }
     }
 
-    private suspend fun setLineGraphBounds() {
+    private suspend fun setLineGraphBounds(listMode: Boolean) {
+        // since we now calculate the bounds to fit the number of intervals we almost always want
+        // to set the rangeBoundaries to the bounds.
+        // The only exceotion is when the graph is viewed fullscreen-mode (listMode == False) while dynamic
         val bounds = data!!.bounds
-        if (data!!.yRangeType == YRangeType.FIXED) {
+         if (data!!.yRangeType == YRangeType.FIXED || listMode) {
             binding!!.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
         }
         binding!!.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
@@ -131,7 +134,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun setUpLineGraphYAxis() {
-        binding!!.xyPlot.setRangeStep(StepMode.SUBDIVIDE, 11.0)
+        binding!!.xyPlot.setRangeStep(data!!.yAxisRangeParameters.first, data!!.yAxisRangeParameters.second)
         if (data!!.durationBasedRange) {
             binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
                 object : Format() {
@@ -182,7 +185,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         if (minX == null || maxX == null) return formatDayMonth(context!!, timestamp)
         val duration = Duration.ofMillis(abs(maxX.toLong() - minX.toLong()))
         return when {
-            duration.toMinutes() < 5L -> lineGraphHourMinuteSecondFromat.format(timestamp)
+            duration.toMinutes() < 5L -> lineGraphHourMinuteSecondFormat.format(timestamp)
             duration.toDays() >= 304 -> formatMonthYear(context!!, timestamp)
             duration.toDays() >= 1 -> formatDayMonth(context!!, timestamp)
             else -> lineGraphHoursDateFormat.format(timestamp)
