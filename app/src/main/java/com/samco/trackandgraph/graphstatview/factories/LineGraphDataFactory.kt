@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
+import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
@@ -52,9 +53,12 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             endTime
         )
         val hasPlottableData = plottableData.any { kvp -> kvp.value != null }
-        val bounds = getBounds(config, plottableData.values)
+
         val durationBasedRange =
             config.features.any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
+        val (bounds, yAxisParameters) = getYAxisParameters(config, plottableData.values, durationBasedRange)
+        //val bounds = getBounds(config, plottableData.values)
+        //val yAxisParameters = getYAxisParameters(bounds, durationBasedRange)
 
         onDataSampled(allReferencedDataPoints)
 
@@ -75,6 +79,8 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
                 get() = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat
                 get() = graphOrStat
+            override val yAxisRangeParameters: Pair<StepMode, Double>
+                get() = yAxisParameters
         }
     }
 
@@ -163,17 +169,31 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         return if (plottingData.dataPoints.size >= 2) plottingData else null
     }
 
-    private suspend fun getBounds(
-        lineGraph: LineGraphWithFeatures,
-        series: Collection<FastXYSeries?>
-    ): RectRegion {
+
+    private suspend fun getYAxisParameters(
+            lineGraph: LineGraphWithFeatures,
+            series: Collection<FastXYSeries?>,
+            timeBasedRange: Boolean ) : Pair< RectRegion, Pair<StepMode, Double> > {
+        val fixed = lineGraph.yRangeType == YRangeType.FIXED;
+
         val bounds = RectRegion()
         series.forEach { it?.let { bounds.union(it.minMax()) } }
-        yield()
-        if (lineGraph.yRangeType == YRangeType.FIXED) {
-            bounds.minY = lineGraph.yFrom
-            bounds.maxY = lineGraph.yTo
+
+        val (y_min, y_max) = when(fixed) {
+            true  -> Pair(lineGraph.yFrom, lineGraph.yTo)
+            false -> {
+                Pair(bounds.minY, bounds.maxY)
+            }
         }
-        return bounds
+
+        val parameters = getYParameters(y_min.toDouble(), y_max.toDouble(), timeBasedRange, fixed)
+
+        bounds.minY = parameters.bounds_min
+        bounds.maxY = parameters.bounds_max
+
+        val intervalParameters = Pair(parameters.step_mode, parameters.n_intervals)
+
+        return Pair(bounds, intervalParameters)
     }
+
 }

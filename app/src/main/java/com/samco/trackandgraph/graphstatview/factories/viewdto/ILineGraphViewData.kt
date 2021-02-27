@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
+import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.database.dto.YRangeType
 import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.entity.LineGraphFeature
@@ -37,6 +38,8 @@ interface ILineGraphViewData : IGraphStatViewData {
         get() = OffsetDateTime.MIN
     val plottableData: Map<LineGraphFeature, FastXYSeries?>
         get() = emptyMap()
+    val yAxisRangeParameters: Pair<StepMode, Double>
+        get() = Pair(StepMode.SUBDIVIDE, 11.0)
 
     companion object {
         fun loading(graphOrStat: GraphOrStat) = object : ILineGraphViewData {
