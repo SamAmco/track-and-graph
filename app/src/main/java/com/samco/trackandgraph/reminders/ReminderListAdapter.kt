@@ -22,6 +22,7 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.entity.CheckedDays
@@ -70,10 +71,11 @@ internal class ReminderViewHolder private constructor(
 
     private fun listenToName() {
         binding.reminderNameText.setText(reminder!!.alarmName)
+        binding.reminderNameText.addTextChangedListener {
+            clickListener?.nameChanged(reminder!!, it.toString())
+        }
         binding.reminderNameText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                val newName = binding.reminderNameText.text.toString()
-                clickListener?.nameChanged(reminder!!, newName)
                 binding.cardView.requestFocus()
                 clickListener?.hideKeyboard()
                 return@setOnEditorActionListener true

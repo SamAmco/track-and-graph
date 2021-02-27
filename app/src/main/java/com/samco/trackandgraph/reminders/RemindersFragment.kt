@@ -19,6 +19,7 @@ package com.samco.trackandgraph.reminders
 
 import android.app.*
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.*
@@ -37,10 +38,8 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.entity.CheckedDays
 import com.samco.trackandgraph.database.entity.Reminder
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
-import com.samco.trackandgraph.reminders.RemindersHelper.Companion.createAlarms
-import com.samco.trackandgraph.reminders.RemindersHelper.Companion.deleteAlarms
-import kotlinx.coroutines.*
 import org.threeten.bp.LocalTime
+import java.util.concurrent.Executors
 
 const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
 
@@ -49,7 +48,11 @@ class RemindersFragment : Fragment() {
     private val viewModel by viewModels<RemindersViewModel>()
     private lateinit var adapter: ReminderListAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = RemindersFragmentBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
@@ -64,7 +67,8 @@ class RemindersFragment : Fragment() {
         )
         binding.remindersList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.remindersList)
-        binding.remindersList.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
+        binding.remindersList.layoutManager =
+            LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         registerForContextMenu(binding.remindersList)
 
         setHasOptionsMenu(true)
@@ -96,25 +100,55 @@ class RemindersFragment : Fragment() {
         listenToViewModel()
     }
 
-    private fun onHideKeyboard() {
-        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(requireActivity().window.decorView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+    override fun onStop() {
+        super.onStop()
+        val syncRemindersIntent = Intent(requireActivity(), RecreateAlarms::class.java).apply {
+            action = "action.REMINDERS_CHANGED"
+        }
+        requireContext().sendBroadcast(syncRemindersIntent)
     }
 
-    private fun onDeleteClicked(reminder: Reminder) { viewModel.deleteReminder(reminder, requireContext()) }
+    private fun onHideKeyboard() {
+        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(
+            requireActivity().window.decorView.windowToken,
+            InputMethodManager.HIDE_NOT_ALWAYS
+        )
+    }
 
-    private fun onDaysChanged(reminder: Reminder, checkedDays: CheckedDays) { viewModel.daysChanged(reminder, checkedDays, requireContext()) }
+    private fun onDeleteClicked(reminder: Reminder) {
+        adapter.submitList(adapter.currentList.minus(reminder).toMutableList())
+        viewModel.deleteReminder(reminder)
+    }
 
-    private fun onTimeChanged(reminder: Reminder, localTime: LocalTime) { viewModel.onTimeChanged(reminder, localTime, requireContext()) }
+    private fun onDaysChanged(reminder: Reminder, checkedDays: CheckedDays) {
+        viewModel.daysChanged(reminder, checkedDays)
+    }
 
-    private fun onNameChanged(reminder: Reminder, name: String) { viewModel.onNameChanged(reminder, name, requireContext()) }
+    private fun onTimeChanged(reminder: Reminder, localTime: LocalTime) {
+        viewModel.onTimeChanged(reminder, localTime)
+    }
+
+    private fun onNameChanged(reminder: Reminder, name: String) {
+        viewModel.onNameChanged(reminder, name)
+    }
 
     private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
-        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-            return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.UP or ItemTouchHelper.DOWN)
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            return makeFlag(
+                ItemTouchHelper.ACTION_STATE_DRAG,
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            )
         }
 
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
             adapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
             return true
         }
@@ -132,7 +166,7 @@ class RemindersFragment : Fragment() {
             viewModel.adjustDisplayIndexes(adapter.getItems())
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { }
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
     }
 
     private fun listenToViewModel() {
@@ -143,9 +177,14 @@ class RemindersFragment : Fragment() {
 
     private fun observeAndUpdateReminders() {
         viewModel.allReminders.observe(viewLifecycleOwner, Observer {
-            it?.let { adapter.submitList(it.toMutableList()) }
-            if (it.isNullOrEmpty()) binding.noRemindersHintText.visibility = View.VISIBLE
-            else binding.noRemindersHintText.visibility = View.GONE
+            val displayIndexesAreTheSame =
+                adapter.currentList.map { item -> item.displayIndex } == it.map { item -> item.displayIndex }
+
+            if (adapter.currentList.size != it.size || !displayIndexesAreTheSame) {
+                it?.let { adapter.submitList(it.toMutableList()) }
+                if (it.isNullOrEmpty()) binding.noRemindersHintText.visibility = View.VISIBLE
+                else binding.noRemindersHintText.visibility = View.GONE
+            }
         })
     }
 
@@ -176,73 +215,79 @@ class RemindersFragment : Fragment() {
 
 enum class RemindersViewModelState { INITIALIZING, WAITING }
 class RemindersViewModel : ViewModel() {
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
+    //I use an executor here rather than kotlin co-routines because I want everything executed in the
+    // order that it is called
+    private val executor = Executors.newSingleThreadExecutor()
     private var dataSource: TrackAndGraphDatabaseDao? = null
 
     lateinit var allReminders: LiveData<List<Reminder>>
         private set
 
-    val state: LiveData<RemindersViewModelState> get() { return _state }
+    val state: LiveData<RemindersViewModelState>
+        get() {
+            return _state
+        }
     private val _state = MutableLiveData(RemindersViewModelState.INITIALIZING)
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return
-        dataSource = TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
+        dataSource =
+            TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
         allReminders = dataSource!!.getAllReminders()
         _state.value = RemindersViewModelState.WAITING
     }
 
-    fun addReminder(defaultName: String) = ioScope.launch {
-        dataSource?.insertReminder(
-            Reminder(
-                0,
-                0,
-                defaultName,
-                LocalTime.now(),
-                CheckedDays.none()
-            )
-        )
-    }
-
     override fun onCleared() {
         super.onCleared()
-        ioScope.cancel()
+        executor.shutdown()
     }
 
-    fun adjustDisplayIndexes(reminders: List<Reminder>) = ioScope.launch {
-        allReminders.value?.let { oldList ->
-            val newList = reminders.mapIndexed { i, r ->
-                oldList.first { or -> or.id == r.id }.copy(displayIndex = i)
-            }
-            dataSource!!.updateReminders(newList)
+    fun addReminder(defaultName: String) {
+        executor.submit {
+            dataSource?.insertReminder(
+                Reminder(
+                    0,
+                    0,
+                    defaultName,
+                    LocalTime.now(),
+                    CheckedDays.none()
+                )
+            )
         }
     }
 
-    fun deleteReminder(reminder: Reminder, context: Context) = ioScope.launch {
-        deleteAlarms(reminder, context)
-        dataSource?.deleteReminder(reminder)
+    fun deleteReminder(reminder: Reminder) {
+        executor.submit { dataSource?.deleteReminder(reminder) }
     }
 
-    fun daysChanged(reminder: Reminder, checkedDays: CheckedDays, context: Context) = ioScope.launch {
-        val newReminder = reminder.copy(checkedDays = checkedDays)
-        deleteAlarms(reminder, context)
-        createAlarms(newReminder, context)
-        dataSource?.updateReminder(newReminder)
+    fun adjustDisplayIndexes(reminders: List<Reminder>) {
+        executor.submit {
+            val newList = allReminders.value?.let { oldList ->
+                reminders.mapIndexed { i, r ->
+                    oldList.firstOrNull { or -> or.id == r.id }?.copy(displayIndex = i)
+                }.filterNotNull()
+            }
+            newList?.let {
+                dataSource!!.updateReminders(it)
+            }
+        }
     }
 
-    fun onTimeChanged(reminder: Reminder, localTime: LocalTime, context: Context) = ioScope.launch {
-        val newReminder = reminder.copy(time = localTime)
-        deleteAlarms(reminder, context)
-        createAlarms(newReminder, context)
-        dataSource?.updateReminder(newReminder)
-    }
+    fun daysChanged(reminder: Reminder, checkedDays: CheckedDays) =
+        updateReminder(reminder) { it.copy(checkedDays = checkedDays) }
 
-    //TODO add a maximum name size
-    fun onNameChanged(reminder: Reminder, name: String, context: Context) = ioScope.launch {
-        val newReminder = reminder.copy(alarmName = name)
-        deleteAlarms(reminder, context)
-        createAlarms(newReminder, context)
-        dataSource?.updateReminder(newReminder)
+    fun onTimeChanged(reminder: Reminder, localTime: LocalTime) =
+        updateReminder(reminder) { it.copy(time = localTime) }
+
+    fun onNameChanged(reminder: Reminder, name: String) =
+        updateReminder(reminder) { it.copy(alarmName = name) }
+
+    private fun updateReminder(reminder: Reminder, onFound: (Reminder) -> Reminder) {
+        executor.submit {
+            allReminders.value?.firstOrNull { it.id == reminder.id }?.let {
+                val newReminder = onFound(it)
+                dataSource?.updateReminder(newReminder)
+            }
+        }
     }
 }
