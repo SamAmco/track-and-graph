@@ -1,40 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.samco.trackandgraph"
-          android:installLocation="internalOnly">
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    package="com.samco.trackandgraph"
+    android:installLocation="internalOnly">
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
-            android:allowBackup="false"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:supportsRtl="true"
-            android:name="com.samco.trackandgraph.TrackAndGraphApplication"
-            android:theme="@style/AppTheme">
+        android:name="com.samco.trackandgraph.TrackAndGraphApplication"
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
         <activity
-                android:theme="@style/AppTheme"
-                android:name="com.samco.trackandgraph.MainActivity"
-                android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-                >
+            android:name="com.samco.trackandgraph.MainActivity"
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
+
         <activity
             android:name=".widgets.TrackWidgetInputDataPointActivity"
-            android:theme="@style/TransparentTheme"
             android:excludeFromRecents="true"
-            android:noHistory="true">
-        </activity>
-        
-        <activity android:name=".widgets.TrackWidgetConfigureActivity"
+            android:noHistory="true"
+            android:theme="@style/TransparentTheme" />
+
+        <activity
+            android:name=".widgets.TrackWidgetConfigureActivity"
             android:label="Configure widget"
             android:theme="@style/TransparentTheme">
             <intent-filter>
@@ -44,8 +44,11 @@
         </activity>
 
         <receiver android:name=".reminders.AlarmReceiver" />
-        <receiver android:name=".reminders.RecreateAlarms">
+        <receiver
+            android:name=".reminders.RecreateAlarms"
+            android:enabled="true">
             <intent-filter>
+                <action android:name="action.REMINDERS_CHANGED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
@@ -55,10 +58,13 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
+            <meta-data
+                android:name="android.appwidget.provider"
                 android:resource="@xml/track_widget_info" />
         </receiver>
-        <service android:name=".widgets.TrackWidgetJobIntentService"
+
+        <service
+            android:name=".widgets.TrackWidgetJobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 
