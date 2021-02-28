@@ -16,11 +16,9 @@
 */
 package com.samco.trackandgraph
 
-import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
@@ -169,20 +167,12 @@ class MainActivity : AppCompatActivity() {
         drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerStateChanged(newState: Int) {}
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-                val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(
-                    window.decorView.windowToken,
-                    InputMethodManager.HIDE_NOT_ALWAYS
-                )
+                window.hideKeyboard()
             }
 
             override fun onDrawerClosed(drawerView: View) {}
             override fun onDrawerOpened(drawerView: View) {
-                val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.hideSoftInputFromWindow(
-                    window.decorView.windowToken,
-                    InputMethodManager.HIDE_NOT_ALWAYS
-                )
+                window.hideKeyboard()
             }
         })
     }

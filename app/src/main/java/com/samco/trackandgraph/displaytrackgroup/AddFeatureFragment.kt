@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.displaytrackgroup
 
-import android.app.Activity
 import android.app.AlertDialog
 import android.app.Application
 import android.appwidget.AppWidgetManager
@@ -40,7 +39,6 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.AddFeatureFragmentBinding
 import com.samco.trackandgraph.databinding.FeatureDiscreteValueListItemBinding
 import kotlinx.coroutines.*
-import android.view.inputmethod.InputMethodManager
 import androidx.core.view.children
 import androidx.core.view.forEachIndexed
 import androidx.core.widget.addTextChangedListener
@@ -53,6 +51,8 @@ import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
+import com.samco.trackandgraph.util.hideKeyboard
+import com.samco.trackandgraph.util.showKeyboard
 import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import java.lang.Exception
 import kotlin.math.absoluteValue
@@ -89,16 +89,12 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
     override fun onResume() {
         super.onResume()
-        val imm =
-            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.showSoftInput(binding.featureNameText, 0)
+        requireContext().showKeyboard()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        val imm =
-            requireActivity().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view?.windowToken, 0)
+        requireActivity().window.hideKeyboard()
     }
 
     private fun listenToViewModelState() {
@@ -204,12 +200,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
             viewModel.featureDefaultValue.value = it.toDouble()
         }
         binding.defaultDurationInput.setDoneListener {
-            val imm =
-                activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(
-                requireActivity().window.decorView.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS
-            )
+            requireActivity().window.hideKeyboard()
         }
         binding.durationNumericConversionModeSpinner.onItemSelectedListener =
             getOnDurationNumericConversionModeSelectedListener()
