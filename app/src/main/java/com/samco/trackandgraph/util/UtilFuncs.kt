@@ -17,10 +17,15 @@
 
 package com.samco.trackandgraph.util
 
+import android.app.Activity
 import android.content.Context
+import android.os.IBinder
 import android.util.TypedValue
+import android.view.Window
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import com.samco.trackandgraph.database.entity.FeatureType
 import java.lang.NumberFormatException
 
 /**
@@ -52,7 +57,9 @@ fun getDoubleFromText(text: String): Double {
         val before = dotsOnly.substring(0, lastDot).replace(".", "")
         val after = dotsOnly.substring(lastDot)
         return "$before$after".toDouble()
-    } catch (e: NumberFormatException) { return 0.0 }
+    } catch (e: NumberFormatException) {
+        return 0.0
+    }
 }
 
 @ColorInt
@@ -63,4 +70,14 @@ fun Context.getColorFromAttr(
 ): Int {
     theme.resolveAttribute(attrColor, typedValue, resolveRefs)
     return typedValue.data
+}
+
+fun Window.hideKeyboard(windowToken: IBinder? = null, flags: Int = 0) {
+    val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.hideSoftInputFromWindow(windowToken ?: decorView.windowToken, flags)
+}
+
+fun Context.showKeyboard() {
+    val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 }

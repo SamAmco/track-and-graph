@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.graphstatinput
 
-import android.app.Activity
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputFilter
@@ -24,7 +23,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -41,6 +39,7 @@ import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.util.hideKeyboard
 import kotlinx.coroutines.*
 import java.lang.Exception
 import kotlin.reflect.full.primaryConstructor
@@ -100,12 +99,7 @@ class GraphStatInputFragment : Fragment() {
         currentConfigView.setConfigChangedListener(viewModel::onNewConfigData)
         currentConfigView.setOnScrollListener { binding.scrollView.fullScroll(it) }
         currentConfigView.setOnHideKeyboardListener {
-            val imm =
-                requireContext().getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(
-                requireActivity().window.decorView.windowToken,
-                InputMethodManager.HIDE_NOT_ALWAYS
-            )
+            requireActivity().window.hideKeyboard()
         }
     }
 
@@ -195,8 +189,7 @@ class GraphStatInputFragment : Fragment() {
     override fun onDestroyView() {
         binding.demoGraphStatCardView.graphStatView.dispose()
         super.onDestroyView()
-        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(view?.windowToken, 0)
+        requireActivity().window.hideKeyboard()
     }
 }
 
