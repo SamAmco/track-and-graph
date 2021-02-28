@@ -29,6 +29,7 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
+import com.samco.trackandgraph.util.hideKeyboard
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -75,6 +76,11 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
         supportFragmentManager.let {
             dialog.show(it, "input_data_points_dialog")
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        window.hideKeyboard()
     }
 }
 

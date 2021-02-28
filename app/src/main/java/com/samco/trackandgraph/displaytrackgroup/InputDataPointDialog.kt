@@ -38,6 +38,8 @@ import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
+import com.samco.trackandgraph.util.hideKeyboard
+import com.samco.trackandgraph.util.showKeyboard
 import kotlinx.android.synthetic.main.data_point_input_dialog.*
 import kotlinx.coroutines.*
 
@@ -190,12 +192,8 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
-        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        if (feature.featureType != FeatureType.DISCRETE) imm.toggleSoftInput(
-            InputMethodManager.SHOW_FORCED,
-            InputMethodManager.HIDE_IMPLICIT_ONLY
-        )
-        else imm.hideSoftInputFromWindow(view?.windowToken, 0)
+        if (feature.featureType != FeatureType.DISCRETE) context?.showKeyboard()
+        else activity?.window?.hideKeyboard(view?.windowToken, 0)
         requireActivity().currentFocus?.clearFocus()
     }
 
@@ -221,11 +219,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         requireActivity().currentFocus?.clearFocus()
-        val imm = activity?.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(
-            requireActivity().window.decorView.windowToken,
-            InputMethodManager.HIDE_NOT_ALWAYS
-        )
+        requireActivity().window?.hideKeyboard(flags = InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
