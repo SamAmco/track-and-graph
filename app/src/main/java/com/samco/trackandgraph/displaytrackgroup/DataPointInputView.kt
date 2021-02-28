@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.displaytrackgroup
 
-import android.app.Activity
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.content.Context
@@ -25,7 +24,6 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.*
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
@@ -38,6 +36,7 @@ import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.util.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText
+import com.samco.trackandgraph.util.showKeyboard
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
@@ -119,11 +118,7 @@ class DataPointInputView : FrameLayout {
         addNoteButton.setOnClickListener {
             addNoteButton.visibility = View.GONE
             noteInput.visibility = View.VISIBLE
-            val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.toggleSoftInput(
-                InputMethodManager.SHOW_FORCED,
-                InputMethodManager.HIDE_IMPLICIT_ONLY
-            )
+            context.showKeyboard()
             noteInput.post { noteInput.requestFocus() }
         }
         noteInput.addTextChangedListener { state.note = it.toString() }
