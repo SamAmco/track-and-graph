@@ -346,10 +346,6 @@ object CSVReadWriter {
         trackGroupId: Long,
         lineNumber: Int
     ): Feature {
-        if (rec.featureName.length > MAX_FEATURE_NAME_LENGTH) throw ImportFeaturesException(
-            R.string.import_exception_feature_name_too_long,
-            listOf(lineNumber.toString())
-        )
         val featureType = getFeatureTypeForValue(rec.value)
         val discreteValues =
             if (featureType == FeatureType.DISCRETE) listOf(

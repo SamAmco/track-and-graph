@@ -39,11 +39,18 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
         context.getString(R.string.no_description)
     else description
 
-    val bodyView = getBodyTextView(context, descriptionOrNone)
+    val descriptionView = LayoutInflater.from(context)
+        .inflate(R.layout.feature_description_layout, null, false)
+
+    descriptionView.findViewById<TextView>(R.id.tv_title).let {
+        it.text = name
+    }
+    descriptionView.findViewById<TextView>(R.id.tv_description).let {
+        it.text = descriptionOrNone
+    }
 
     AlertDialog.Builder(context)
-        .setTitle(name)
-        .setView(bodyView)
+        .setView(descriptionView)
         .create()
         .show()
 }
@@ -57,10 +64,6 @@ private fun getBodyTextView(context: Context, text: String): TextView {
     val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
     val topBottomPadding = res.getDimension(R.dimen.card_padding).toInt()
     bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
-    bodyView.setTextSize(
-        TypedValue.COMPLEX_UNIT_PX,
-        res.getDimension(R.dimen.text_body_size)
-    )
     return bodyView
 }
 
