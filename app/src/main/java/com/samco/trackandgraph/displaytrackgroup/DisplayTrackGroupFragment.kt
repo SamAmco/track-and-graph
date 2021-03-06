@@ -72,7 +72,7 @@ class DisplayTrackGroupFragment : Fragment(),
             this::onFeatureAddClicked,
             this::onFeatureHistoryClicked
         ))
-        observeFeatureDataAndUpdate(viewModel, adapter)
+        observeFeatureDataAndUpdate()
         binding.featureList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.featureList)
         registerForContextMenu(binding.featureList)
@@ -126,8 +126,8 @@ class DisplayTrackGroupFragment : Fragment(),
         binding.featureList.layoutManager = gridLayout
     }
 
-    private fun observeFeatureDataAndUpdate(displayTrackGroupViewModel: DisplayTrackGroupViewModel, adapter: FeatureAdapter) {
-        displayTrackGroupViewModel.features.observe(viewLifecycleOwner, Observer {
+    private fun observeFeatureDataAndUpdate() {
+        viewModel.features.observe(viewLifecycleOwner, Observer {
             it?.let { adapter.submitList(it.toMutableList()) }
             if (it.isNullOrEmpty()) {
                 binding.noFeaturesHintText.text = getString(R.string.no_features_hint)
