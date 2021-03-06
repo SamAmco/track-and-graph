@@ -75,9 +75,8 @@ data class Feature(
             displayIndex: Int, description: String
         ): Feature {
             discreteValues.forEach { validateDiscreteValue(it) }
-            val validName = name.take(MAX_FEATURE_NAME_LENGTH)
             return Feature(
-                id, validName, trackGroupId, featureType, discreteValues,
+                id, name, trackGroupId, featureType, discreteValues,
                 displayIndex, hasDefaultValue, defaultValue, description
             )
         }

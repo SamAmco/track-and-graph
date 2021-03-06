@@ -136,7 +136,6 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         binding.durationNumericConversionModeSpinner.visibility = View.INVISIBLE
         binding.durationToNumericModeHeader.visibility = View.INVISIBLE
         binding.numericToDurationModeHeader.visibility = View.INVISIBLE
-        binding.featureNameText.filters = arrayOf(InputFilter.LengthFilter(MAX_FEATURE_NAME_LENGTH))
     }
 
     private fun updateAnyExistingWidgets() {
