@@ -5,7 +5,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/demoCardView"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/graph_height"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/card_margin_small"
         android:layout_marginTop="@dimen/card_margin_small"
         android:layout_marginRight="@dimen/card_margin_small"
