@@ -56,7 +56,11 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
 
         val durationBasedRange =
             config.features.any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
-        val (bounds, yAxisParameters) = getYAxisParameters(config, plottableData.values, durationBasedRange)
+        val (bounds, yAxisParameters) = getYAxisParameters(
+            config,
+            plottableData.values,
+            durationBasedRange
+        )
         //val bounds = getBounds(config, plottableData.values)
         //val yAxisParameters = getYAxisParameters(bounds, durationBasedRange)
 
@@ -171,21 +175,22 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
 
 
     private suspend fun getYAxisParameters(
-            lineGraph: LineGraphWithFeatures,
-            series: Collection<FastXYSeries?>,
-            timeBasedRange: Boolean ) : Pair< RectRegion, Pair<StepMode, Double> > {
+        lineGraph: LineGraphWithFeatures,
+        series: Collection<FastXYSeries?>,
+        timeBasedRange: Boolean
+    ): Pair<RectRegion, Pair<StepMode, Double>> {
         val fixed = lineGraph.yRangeType == YRangeType.FIXED;
 
         val bounds = RectRegion()
         series.forEach { it?.let { bounds.union(it.minMax()) } }
 
-        val (y_min, y_max) = when(fixed) {
-            true  -> Pair(lineGraph.yFrom, lineGraph.yTo)
-            false -> {
-                Pair(bounds.minY, bounds.maxY)
-            }
-        }
+        val (y_min, y_max) =
+            if (fixed) Pair(lineGraph.yFrom, lineGraph.yTo)
+            else Pair(bounds.minY, bounds.maxY)
 
+        if (y_min == null || y_max == null) {
+            return Pair(bounds, Pair(StepMode.SUBDIVIDE, 11.0))
+        }
         val parameters = getYParameters(y_min.toDouble(), y_max.toDouble(), timeBasedRange, fixed)
 
         bounds.minY = parameters.bounds_min
