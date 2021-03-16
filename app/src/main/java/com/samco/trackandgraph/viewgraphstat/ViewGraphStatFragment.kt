@@ -265,7 +265,7 @@ class ViewGraphStatViewModel : ViewModel() {
         val mergedList = _notes.value
             ?.union(globalNotes)
             ?.sortedByDescending { it -> it.timestamp }
-        withContext(Dispatchers.Main) { _notes.value = mergedList }
+        withContext(Dispatchers.Main) { _notes.value = mergedList ?: emptyList() }
     }
 
     private fun getAllFeatureAttributes() {
@@ -287,7 +287,7 @@ class ViewGraphStatViewModel : ViewModel() {
             val mergedList = _notes.value
                 ?.union(dataPointNotes)
                 ?.sortedByDescending { it -> it.timestamp }
-            withContext(Dispatchers.Main) { _notes.value = mergedList }
+            withContext(Dispatchers.Main) { _notes.value = mergedList ?: emptyList() }
         }
     }
 
