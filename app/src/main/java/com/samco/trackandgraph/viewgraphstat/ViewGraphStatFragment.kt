@@ -14,6 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package com.samco.trackandgraph.viewgraphstat
 
 import android.animation.ValueAnimator
@@ -205,7 +206,7 @@ class ViewGraphStatFragment : Fragment() {
 
     private fun observeGraphStatViewData() {
         viewModel.graphStatViewData.observe(viewLifecycleOwner, Observer {
-            graphStatView.initFromGraphStat(it)
+            graphStatView.initFromGraphStat(it, false)
         })
     }
 }
@@ -252,8 +253,7 @@ class ViewGraphStatViewModel : ViewModel() {
             getAllFeatureAttributes()
             getAllGlobalNotes()
             withContext(Dispatchers.Main) {
-                _state.value =
-                    ViewGraphStatViewModelState.WAITING
+                _state.value = ViewGraphStatViewModelState.WAITING
             }
         }
     }
@@ -265,7 +265,7 @@ class ViewGraphStatViewModel : ViewModel() {
         val mergedList = _notes.value
             ?.union(globalNotes)
             ?.sortedByDescending { it -> it.timestamp }
-        withContext(Dispatchers.Main) { _notes.value = mergedList }
+        withContext(Dispatchers.Main) { _notes.value = mergedList ?: emptyList() }
     }
 
     private fun getAllFeatureAttributes() {
@@ -287,7 +287,7 @@ class ViewGraphStatViewModel : ViewModel() {
             val mergedList = _notes.value
                 ?.union(dataPointNotes)
                 ?.sortedByDescending { it -> it.timestamp }
-            withContext(Dispatchers.Main) { _notes.value = mergedList }
+            withContext(Dispatchers.Main) { _notes.value = mergedList ?: emptyList() }
         }
     }
 

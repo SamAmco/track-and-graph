@@ -186,7 +186,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         }
     }
 
-    fun initFromGraphStat(data: IGraphStatViewData, listMode: Boolean = false) {
+    fun initFromGraphStat(data: IGraphStatViewData, listMode: Boolean) {
         if (data.state == IGraphStatViewData.State.LOADING) {
             currentDecorator = null
             val headerText = data.graphOrStat.name
