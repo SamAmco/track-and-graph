@@ -112,7 +112,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     private suspend fun setLineGraphBounds(listMode: Boolean) {
         // since we now calculate the bounds to fit the number of intervals we almost always want
         // to set the rangeBoundaries to the bounds.
-        // The only exceotion is when the graph is viewed fullscreen-mode (listMode == False) while dynamic
+        // The only exception is when the graph is viewed fullscreen-mode (listMode == False) while dynamic
         val bounds = data!!.bounds
          if (data!!.yRangeType == YRangeType.FIXED || listMode) {
             binding!!.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)

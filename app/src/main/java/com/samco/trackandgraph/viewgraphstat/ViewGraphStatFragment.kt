@@ -14,6 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package com.samco.trackandgraph.viewgraphstat
 
 import android.animation.ValueAnimator
@@ -205,7 +206,7 @@ class ViewGraphStatFragment : Fragment() {
 
     private fun observeGraphStatViewData() {
         viewModel.graphStatViewData.observe(viewLifecycleOwner, Observer {
-            graphStatView.initFromGraphStat(it)
+            graphStatView.initFromGraphStat(it, false)
         })
     }
 }
@@ -252,8 +253,7 @@ class ViewGraphStatViewModel : ViewModel() {
             getAllFeatureAttributes()
             getAllGlobalNotes()
             withContext(Dispatchers.Main) {
-                _state.value =
-                    ViewGraphStatViewModelState.WAITING
+                _state.value = ViewGraphStatViewModelState.WAITING
             }
         }
     }
