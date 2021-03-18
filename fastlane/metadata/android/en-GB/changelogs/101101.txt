@@ -1,0 +1,4 @@
+Fix reminders names not changing
+Fix CSV export file names wrong
+Improve line graph Y intervals
+Fix crash when creating graph with no data
