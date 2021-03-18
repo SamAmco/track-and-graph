@@ -181,7 +181,7 @@ class GraphStatInputFragment : Fragment() {
                     R.string.graph_stat_view_invalid_setup
                 )
             } else {
-                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data)
+                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, true)
             }
         }, 500)
     }
