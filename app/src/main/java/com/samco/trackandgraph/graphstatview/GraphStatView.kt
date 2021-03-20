@@ -61,6 +61,15 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         viewScope = CoroutineScope(Dispatchers.Main + viewJob!!)
     }
 
+    fun setGraphHeight(height: Int) {
+        binding.xyPlot.layoutParams.height = height
+        binding.pieChart.layoutParams.height = height.coerceAtMost(width)
+        requestLayout()
+        invalidate()
+    }
+
+    fun getGraphHeight(): Int = binding.xyPlot.layoutParams.height
+
     private fun xyPlotSetup() {
         binding.xyPlot.layoutManager.remove(binding.xyPlot.legend)
         binding.xyPlot.layoutManager.remove(binding.xyPlot.rangeTitle)
