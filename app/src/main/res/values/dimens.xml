@@ -29,7 +29,7 @@
     <dimen name="move_to_dialog_max_height">400dp</dimen>
     <dimen name="list_item_group_item_height">45dp</dimen>
     <dimen name="spinner_circle_item_size">65dp</dimen>
-    <dimen name="graph_height">300dp</dimen>
+    <dimen name="graph_height">220dp</dimen>
     <dimen name="design_navigation_icon_size" tools:override="true">20dp</dimen>
     <dimen name="widget_width">180dp</dimen>
     <dimen name="widget_resize_width">110dp</dimen>

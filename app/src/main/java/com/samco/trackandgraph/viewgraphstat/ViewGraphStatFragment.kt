@@ -21,6 +21,7 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.res.Configuration
+import android.graphics.Point
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -55,6 +56,11 @@ class ViewGraphStatFragment : Fragment() {
     private lateinit var binding: FragmentViewGraphStatBinding
     private lateinit var adapter: NotesAdapter
     private val args: ViewGraphStatFragmentArgs by navArgs()
+    private val windowSize = Point()
+    private val maxGraphHeightRatioPortrait = 0.77f
+    private val minGraphHeightRatioPortrait = 0.3f
+    private val maxGraphHeightRatioLandscape = 0.7f
+    private val minGraphHeightRatioLandscape = 0f
 
     private var showHideNotesAnimator: ValueAnimator? = null
 
@@ -71,6 +77,13 @@ class ViewGraphStatFragment : Fragment() {
         listenToState()
         listenToBinding()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().windowManager.defaultDisplay.getSize(windowSize)
+        val heightRatio = if (isPortrait()) maxGraphHeightRatioPortrait else maxGraphHeightRatioLandscape
+        graphStatView.setGraphHeight((windowSize.y * heightRatio).toInt())
     }
 
     private fun setViewInitialState() {
@@ -164,29 +177,37 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
-        val largeSize =
-            if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 1.4f
-            else 10000f
-        val toValue = if (showNotes) largeSize else 0f
-        animateNotesRecycler(toValue)
+        val maxGraphHeightRatio = if (isPortrait()) maxGraphHeightRatioPortrait else maxGraphHeightRatioLandscape
+        val minGraphHeightRatio = if (isPortrait()) minGraphHeightRatioPortrait else minGraphHeightRatioLandscape
+        val maxNotesHeight = windowSize.y * (maxGraphHeightRatio - minGraphHeightRatio)
+        val targetNotesHeight = if (showNotes) maxNotesHeight else 0
+        val targetGraphHeight = windowSize.y * (if (showNotes) minGraphHeightRatio else maxGraphHeightRatio)
+
+        animateViewHeights(targetNotesHeight.toInt(), targetGraphHeight.toInt())
         binding.notesPopupUpButton.visibility = if (showNotes) View.GONE else View.VISIBLE
         binding.notesPopupDownButton.visibility = if (showNotes) View.VISIBLE else View.GONE
     }
 
-    private fun animateNotesRecycler(toValue: Float) {
+    private fun isPortrait() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+
+    private fun animateViewHeights(notesTargetHeight: Int, graphTargetHeight: Int) {
         showHideNotesAnimator?.cancel()
-        val currentWeight =
-            (binding.notesRecyclerView.layoutParams as LinearLayout.LayoutParams).weight
-        showHideNotesAnimator = ValueAnimator.ofFloat(currentWeight, toValue)
-        showHideNotesAnimator!!.duration =
-            resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
-        showHideNotesAnimator!!.interpolator = LinearInterpolator()
-        showHideNotesAnimator!!.addUpdateListener { animation ->
-            (binding.notesRecyclerView.layoutParams as LinearLayout.LayoutParams).weight =
-                animation.animatedValue as Float
-            binding.notesRecyclerView.requestLayout()
-        }
-        showHideNotesAnimator!!.start()
+        val startingNotesHeight =
+            (binding.notesRecyclerView.layoutParams as LinearLayout.LayoutParams).height
+        val startingGraphHeight = graphStatView.getGraphHeight()
+        showHideNotesAnimator = ValueAnimator.ofFloat(0f, 1f)
+        showHideNotesAnimator?.apply {
+            duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
+            interpolator = LinearInterpolator()
+            addUpdateListener { animation ->
+                val nextRatio = animation.animatedValue as Float
+                val nextGraphHeight = startingGraphHeight + ((graphTargetHeight - startingGraphHeight) * nextRatio)
+                val nextNotesHeight = startingNotesHeight + ((notesTargetHeight - startingNotesHeight) * nextRatio)
+                graphStatView.setGraphHeight(nextGraphHeight.toInt())
+                (binding.notesRecyclerView.layoutParams as LinearLayout.LayoutParams).height = nextNotesHeight.toInt()
+                binding.notesRecyclerView.requestLayout()
+            }
+        }?.start()
     }
 
     override fun onResume() {
