@@ -83,7 +83,10 @@
         <FrameLayout
             android:id="@+id/preview_overlay"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btn_preivew"
+            >
 
             <View
                 android:layout_width="match_parent"
@@ -91,11 +94,17 @@
                 android:alpha="0.9"
                 android:background="?android:attr/windowBackground" />
 
-            <com.samco.trackandgraph.graphstatview.GraphStatCardView
-                android:id="@+id/demoGraphStatCardView"
+            <ScrollView
+                android:id="@+id/preview_scroll_view"
+                android:paddingVertical="@dimen/dialog_header_top_margin"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dialog_header_top_margin" />
+                android:layout_height="wrap_content">
+
+                <com.samco.trackandgraph.graphstatview.GraphStatCardView
+                    android:id="@+id/demoGraphStatCardView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </ScrollView>
         </FrameLayout>
 
         <TextView
@@ -111,8 +120,8 @@
             android:textAllCaps="true"
             android:textAppearance="@style/TextAppearance.Subtitle2"
             android:textStyle="bold"
-            app:layout_constraintTop_toBottomOf="@id/scrollView"
-            app:layout_constraintBottom_toTopOf="@id/addBar" />
+            app:layout_constraintBottom_toTopOf="@id/addBar"
+            app:layout_constraintTop_toBottomOf="@id/scrollView" />
 
         <include
             android:id="@+id/addBar"
