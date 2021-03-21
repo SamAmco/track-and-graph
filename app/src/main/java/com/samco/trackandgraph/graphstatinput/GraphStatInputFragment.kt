@@ -57,6 +57,8 @@ class GraphStatInputFragment : Fragment() {
 
     private lateinit var currentConfigView: GraphStatConfigView
 
+    private var lastPreviewButtonDownPosY = 0f
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -108,9 +110,13 @@ class GraphStatInputFragment : Fragment() {
     private fun listenToPreviewButton() {
         binding.btnPreivew.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN && binding.btnPreivew.isEnabled) {
+                lastPreviewButtonDownPosY = event.y
                 v.isPressed = true
                 binding.previewOverlay.visibility = View.VISIBLE
                 return@setOnTouchListener true
+            } else if (event.action == MotionEvent.ACTION_MOVE) {
+                val diff = event.y - lastPreviewButtonDownPosY
+                binding.previewScrollView.scrollY = diff.toInt()
             } else if (event.action == MotionEvent.ACTION_UP) {
                 v.isPressed = false
                 binding.previewOverlay.visibility = View.GONE
