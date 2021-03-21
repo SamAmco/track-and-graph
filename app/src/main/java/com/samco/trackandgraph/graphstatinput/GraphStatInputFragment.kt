@@ -16,11 +16,13 @@
 */
 package com.samco.trackandgraph.graphstatinput
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.text.InputFilter
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -59,7 +61,7 @@ class GraphStatInputFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         this.navController = container?.findNavController()
         binding = FragmentGraphStatInputBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
@@ -70,9 +72,15 @@ class GraphStatInputFragment : Fragment() {
             args.graphStatGroupId,
             args.graphStatId
         )
-        binding.demoGraphStatCardView.hideMenuButton()
         listenToViewModelState()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.previewOverlay.visibility = View.GONE
+        binding.btnPreivew.visibility = View.GONE
+        binding.demoGraphStatCardView.hideMenuButton()
     }
 
     private fun listenToViewModelState() {
@@ -88,11 +96,28 @@ class GraphStatInputFragment : Fragment() {
                     listenToFormValid()
                     listenToDemoViewData()
                     listenToAddButton()
+                    listenToPreviewButton()
                 }
                 GraphStatInputState.ADDING -> binding.inputProgressBar.visibility = View.VISIBLE
                 else -> navController?.popBackStack()
             }
         })
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    private fun listenToPreviewButton() {
+        binding.btnPreivew.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN && binding.btnPreivew.isEnabled) {
+                v.isPressed = true
+                binding.previewOverlay.visibility = View.VISIBLE
+                return@setOnTouchListener true
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                v.isPressed = false
+                binding.previewOverlay.visibility = View.GONE
+                return@setOnTouchListener true
+            }
+            return@setOnTouchListener false
+        }
     }
 
     private fun listenToConfigView() {
@@ -176,12 +201,17 @@ class GraphStatInputFragment : Fragment() {
     private fun updateDemoView(data: IGraphStatViewData?) {
         updateDemoHandler.removeCallbacksAndMessages(null)
         updateDemoHandler.postDelayed(Runnable {
-            if (viewModel.formValid.value != null || data == null) {
+            if (data == null) {
+                binding.btnPreivew.visibility = View.GONE
+                binding.previewOverlay.visibility = View.GONE
+            } else {
+                binding.btnPreivew.visibility = View.VISIBLE
+                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, true)
+            }
+            if (viewModel.formValid.value != null) {
                 binding.demoGraphStatCardView.graphStatView.initError(
                     R.string.graph_stat_view_invalid_setup
                 )
-            } else {
-                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, true)
             }
         }, 500)
     }
@@ -286,6 +316,7 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     internal fun onNewConfigData(config: Any?, exception: ValidationException?) {
+        workScope.coroutineContext.cancelChildren()
         _configData.value = config
         configCache[_graphStatType.value!!] = config
         subConfigException = exception

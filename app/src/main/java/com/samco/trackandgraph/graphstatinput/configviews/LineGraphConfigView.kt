@@ -150,7 +150,6 @@ internal class LineGraphConfigView @JvmOverloads constructor(
             inflateLineGraphFeatureView(nextIndex, newLgf)
             emitConfigChange()
         }
-        onScrollListener?.invoke(View.FOCUS_DOWN)
     }
 
     private fun createLineGraphFeatureViews() {
@@ -186,10 +185,12 @@ internal class LineGraphConfigView @JvmOverloads constructor(
         )
         view.layoutParams = params
         binding.lineGraphFeaturesLayout.addView(view, index)
-        binding.lineGraphFeaturesLayout.post {
+        //Using post delayed is a bit of a hack and doesn't guarantee it will work but it seems
+        // to work most of the time and I'm not sure what the better solution is right now.
+        binding.lineGraphFeaturesLayout.postDelayed({
             onScrollListener?.invoke(View.FOCUS_DOWN)
             view.requestFocus()
-        }
+        }, 100)
         if (index + 1 >= dataVisColorList.size) {
             binding.addFeatureButton.isEnabled = false
         }
