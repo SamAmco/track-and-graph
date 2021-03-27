@@ -20,7 +20,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.samco.trackandgraph.database.MAX_GRAPH_STAT_NAME_LENGTH
 import org.threeten.bp.Duration
 
 enum class GraphStatType {
@@ -72,14 +71,7 @@ data class GraphOrStat(
             id: Long, graphStatGroupId: Long, name: String,
             type: GraphStatType, displayIndex: Int
         ): GraphOrStat {
-            val validName = name.take(MAX_GRAPH_STAT_NAME_LENGTH)
-            return GraphOrStat(
-                id,
-                graphStatGroupId,
-                validName,
-                type,
-                displayIndex
-            )
+            return GraphOrStat(id, graphStatGroupId, name, type, displayIndex)
         }
     }
 }

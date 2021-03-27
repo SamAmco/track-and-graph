@@ -347,4 +347,5 @@
     <string name="faq_text_7_12">Und ein Jahr später könnte es so aussehen:</string>
     <string name="faq_text_7_13">Im Laufe der Zeit wird diese Abweichung jedoch gegen 0 tendieren. Daher wird das Histogramm umso genauer sein, je mehr Daten Sie verfolgt haben.</string>
     <string name="faq_text_7_11">Ein letzter Hinweis, den Sie beachten sollten, ist, dass Ihre Daten möglicherweise durch die Tatsache verzerrt sind, dass Sie noch nicht die Daten für jeden Histogrammfach oder noch nicht alle gleich verfolgt haben. Wenn Sie beispielsweise ein jährliches Histogramm zeichnen, aber erst seit 6 Monaten nachverfolgen, sieht Ihr Histogramm möglicherweise folgendermaßen aus:</string>
+    <string name="hold_to_preview">Vorschau</string>
 </resources>
