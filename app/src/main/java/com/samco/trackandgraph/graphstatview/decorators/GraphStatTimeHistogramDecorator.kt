@@ -35,7 +35,6 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.WeekFields
-import timber.log.Timber
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition

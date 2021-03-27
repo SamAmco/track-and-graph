@@ -74,7 +74,6 @@ data class Feature(
             discreteValues: List<DiscreteValue>, hasDefaultValue: Boolean, defaultValue: Double,
             displayIndex: Int, description: String
         ): Feature {
-            discreteValues.forEach { validateDiscreteValue(it) }
             return Feature(
                 id, name, trackGroupId, featureType, discreteValues,
                 displayIndex, hasDefaultValue, defaultValue, description
@@ -99,15 +98,7 @@ data class DiscreteValue(
             if (!value.contains(':')) throw Exception("value did not contain a colon")
             val label = value.substring(value.indexOf(':') + 1).trim()
             val index = value.substring(0, value.indexOf(':')).trim().toInt()
-            val discreteValue =
-                DiscreteValue(
-                    index,
-                    label
-                )
-            validateDiscreteValue(
-                discreteValue
-            )
-            return discreteValue
+            return DiscreteValue(index, label)
         }
 
         fun fromDataPoint(dataPoint: DataPoint) =
@@ -116,9 +107,4 @@ data class DiscreteValue(
                 dataPoint.label
             )
     }
-}
-
-fun validateDiscreteValue(discreteValue: DiscreteValue) {
-    if (discreteValue.label.length > MAX_LABEL_LENGTH)
-        throw Exception("label size exceeded the maximum size allowed")
 }

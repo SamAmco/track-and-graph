@@ -31,11 +31,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import java.lang.Exception
 import java.text.DecimalFormat
 
-const val MAX_LINE_GRAPH_FEATURE_NAME_LENGTH = 20
-const val MAX_FEATURE_NAME_LENGTH = 40
-const val MAX_LABEL_LENGTH = 30
-const val MAX_DISCRETE_VALUES_PER_FEATURE = 10
-const val MAX_GRAPH_STAT_NAME_LENGTH = 100
+//TODO we can remove this if the group cards wrap the text properly
 const val MAX_GROUP_NAME_LENGTH = 40
 
 val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
