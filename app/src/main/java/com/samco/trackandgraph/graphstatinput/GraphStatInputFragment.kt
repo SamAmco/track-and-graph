@@ -113,8 +113,8 @@ class GraphStatInputFragment : Fragment() {
                 binding.previewOverlay.visibility = View.VISIBLE
                 return@setOnTouchListener true
             } else if (event.action == MotionEvent.ACTION_MOVE) {
-                val diff = event.y - lastPreviewButtonDownPosY
-                binding.previewScrollView.scrollY = diff.toInt()
+                val diff = lastPreviewButtonDownPosY - event.y
+                binding.previewScrollView.scrollY = (diff * 3f).toInt()
             } else if (event.action == MotionEvent.ACTION_UP) {
                 v.isPressed = false
                 binding.previewOverlay.visibility = View.GONE
