@@ -114,7 +114,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         // to set the rangeBoundaries to the bounds.
         // The only exception is when the graph is viewed fullscreen-mode (listMode == False) while dynamic
         val bounds = data!!.bounds
-         if (data!!.yRangeType == YRangeType.FIXED || listMode) {
+        if (data!!.yRangeType == YRangeType.FIXED || listMode) {
             binding!!.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
         }
         binding!!.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
@@ -123,6 +123,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private suspend fun setLineGraphPaddingFromBounds(bounds: RectRegion) {
+        //Set up Y padding
         val minY = bounds.minY.toDouble()
         val maxY = bounds.maxY.toDouble()
         val maxBound = max(abs(minY), abs(maxY))
@@ -130,11 +131,24 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         yield()
         binding!!.xyPlot.graph.paddingLeft =
             (numDigits - 1) * (context!!.resources.displayMetrics.scaledDensity) * 3.5f
+
+        //Set up X padding
+        val formattedTimestamp = getDateTimeFormattedForDuration(
+            binding!!.xyPlot.bounds.minX,
+            binding!!.xyPlot.bounds.maxX,
+            data!!.endTime
+        )
+        binding!!.xyPlot.graph.paddingBottom =
+            formattedTimestamp.length * (context!!.resources.displayMetrics.scaledDensity)
+
         binding!!.xyPlot.graph.refreshLayout()
     }
 
     private fun setUpLineGraphYAxis() {
-        binding!!.xyPlot.setRangeStep(data!!.yAxisRangeParameters.first, data!!.yAxisRangeParameters.second)
+        binding!!.xyPlot.setRangeStep(
+            data!!.yAxisRangeParameters.first,
+            data!!.yAxisRangeParameters.second
+        )
         if (data!!.durationBasedRange) {
             binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
                 object : Format() {

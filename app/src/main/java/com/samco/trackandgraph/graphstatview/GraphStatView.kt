@@ -118,6 +118,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         binding.xyPlot.clear()
         binding.xyPlot.removeMarkers()
         binding.xyPlot.graph.paddingLeft = 0f
+        binding.xyPlot.graph.paddingBottom = 0f
         binding.xyPlot.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
         binding.xyPlot.setDomainBoundaries(0, 1, BoundaryMode.GROW)
         binding.xyPlot.graph.refreshLayout()
