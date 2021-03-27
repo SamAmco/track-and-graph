@@ -168,7 +168,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
     private fun initViewFromViewModel() {
         viewModel.discreteValues.forEach { v -> inflateDiscreteValue(v) }
-        if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
+        if (viewModel.discreteValues.size == dataVisColorList.size)
             binding.addDiscreteValueButton.isEnabled = false
         if (viewModel.updateMode) initSpinnerInUpdateMode()
 
@@ -348,7 +348,6 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
             false
         )
         val inputText = item.discreteValueNameText
-        inputText.filters = arrayOf(InputFilter.LengthFilter(MAX_LABEL_LENGTH))
         inputText.addTextChangedListener {
             label.value = it.toString().trim()
             updateDefaultValueButtonsText()
@@ -378,7 +377,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         val label = AddFeatureViewModel.MutableLabel()
         viewModel.discreteValues.add(label)
         inflateDiscreteValue(label)
-        if (viewModel.discreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
+        if (viewModel.discreteValues.size == dataVisColorList.size)
             binding.addDiscreteValueButton.isEnabled = false
     }
 

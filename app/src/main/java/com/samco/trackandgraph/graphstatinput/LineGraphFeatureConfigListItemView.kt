@@ -61,8 +61,6 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupGraphFeatureName() {
-        binding.lineGraphFeatureName.filters =
-            arrayOf(InputFilter.LengthFilter(MAX_LINE_GRAPH_FEATURE_NAME_LENGTH))
         if (lineGraphFeature.name.isNotEmpty()) binding.lineGraphFeatureName.setText(
             lineGraphFeature.name
         )

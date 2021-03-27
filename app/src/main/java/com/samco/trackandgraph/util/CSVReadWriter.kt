@@ -381,10 +381,10 @@ object CSVReadWriter {
         lineNumber: Int
     ): Feature {
         val newDiscreteValues = feature.discreteValues.toMutableList()
-        if (newDiscreteValues.size == MAX_DISCRETE_VALUES_PER_FEATURE)
+        if (newDiscreteValues.size == dataVisColorList.size)
             throw ImportFeaturesException(
                 R.string.import_exception_max_discrete_values_reached,
-                listOf(MAX_DISCRETE_VALUES_PER_FEATURE.toString())
+                listOf(dataVisColorList.size.toString())
             )
         if (newDiscreteValues.map { dv -> dv.index }.contains(discreteValue.index))
             throw ImportFeaturesException(
