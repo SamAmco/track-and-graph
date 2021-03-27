@@ -67,8 +67,6 @@ class GraphStatInputFragment : Fragment() {
         this.navController = container?.findNavController()
         binding = FragmentGraphStatInputBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        binding.graphStatNameInput.filters =
-            arrayOf(InputFilter.LengthFilter(MAX_GRAPH_STAT_NAME_LENGTH))
         viewModel.initViewModel(
             TrackAndGraphDatabase.getInstance(requireContext()),
             args.graphStatGroupId,

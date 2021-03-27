@@ -162,7 +162,6 @@ internal class LineGraphConfigView @JvmOverloads constructor(
         lgfConfigIndices.add(index, view)
         view.setOnRemoveListener {
             binding.lineGraphFeaturesLayout.removeView(view)
-            binding.addFeatureButton.isEnabled = true
             val viewIndex = lgfConfigIndices.indexOf(view)
             val features = configData.features.toMutableList()
             features.removeAt(viewIndex)
@@ -191,9 +190,6 @@ internal class LineGraphConfigView @JvmOverloads constructor(
             onScrollListener?.invoke(View.FOCUS_DOWN)
             view.requestFocus()
         }, 100)
-        if (index + 1 >= dataVisColorList.size) {
-            binding.addFeatureButton.isEnabled = false
-        }
     }
 
     private fun updateYRangeInputType() {
