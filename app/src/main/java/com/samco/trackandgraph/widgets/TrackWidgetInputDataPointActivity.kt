@@ -19,7 +19,11 @@ package com.samco.trackandgraph.widgets
 import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.VibrationEffect.DEFAULT_AMPLITUDE
+import android.os.Vibrator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -30,6 +34,7 @@ import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
+import com.samco.trackandgraph.util.performTrackVibrate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -62,6 +67,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
         else when (feature.hasDefaultValue) {
             true -> {
                 viewModel.addDefaultDataPoint()
+                performTrackVibrate()
                 finish()
             }
             else -> showDialog(feature.id)
