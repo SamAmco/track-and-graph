@@ -19,7 +19,11 @@ package com.samco.trackandgraph.widgets
 import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.VibrationEffect.DEFAULT_AMPLITUDE
+import android.os.Vibrator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
@@ -62,6 +66,10 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
         else when (feature.hasDefaultValue) {
             true -> {
                 viewModel.addDefaultDataPoint()
+                val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(100, DEFAULT_AMPLITUDE))
+                } else vibrator.vibrate(100)
                 finish()
             }
             else -> showDialog(feature.id)
