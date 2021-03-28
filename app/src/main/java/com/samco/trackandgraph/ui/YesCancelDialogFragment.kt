@@ -33,22 +33,16 @@ class YesCancelDialogFragment : DialogFragment() {
         fun onDialogYes(dialog: YesCancelDialogFragment)
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         title = arguments?.getString("title") ?: ""
         return activity?.let {
             listener = parentFragment as YesCancelDialogListener
-            var builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
-            builder.setMessage(title)
-                .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this) }
-                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
-            val alertDialog = builder.create()
-            alertDialog.setOnShowListener {
-                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                positiveButton.setTextColor(positiveButton.context.getColorFromAttr(R.attr.colorSecondary))
-                val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                negativeButton.setTextColor(negativeButton.context.getColorFromAttr(R.attr.colorControlNormal))
-            }
-            alertDialog
+            AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme).apply {
+                setMessage(title)
+                    .setCancelable(true)
+                    .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this@YesCancelDialogFragment) }
+                    .setNegativeButton(R.string.cancel) { _, _ -> run {} }
+            }.create()
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 }
