@@ -40,6 +40,7 @@ import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.FragmentDisplayTrackGroupBinding
 import com.samco.trackandgraph.ui.*
+import com.samco.trackandgraph.util.performTrackVibrate
 import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
@@ -196,6 +197,7 @@ class DisplayTrackGroupFragment : Fragment(),
 
     private fun onFeatureAddClicked(feature: DisplayFeature) {
         if (feature.hasDefaultValue) {
+            requireContext().performTrackVibrate()
             viewModel.addDefaultValue(feature)
         } else {
             val argBundle = Bundle()
