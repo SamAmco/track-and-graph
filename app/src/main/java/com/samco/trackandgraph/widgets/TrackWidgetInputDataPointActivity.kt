@@ -34,6 +34,7 @@ import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
+import com.samco.trackandgraph.util.performTrackVibrate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -66,10 +67,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
         else when (feature.hasDefaultValue) {
             true -> {
                 viewModel.addDefaultDataPoint()
-                val vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    vibrator.vibrate(VibrationEffect.createOneShot(100, DEFAULT_AMPLITUDE))
-                } else vibrator.vibrate(100)
+                performTrackVibrate()
                 finish()
             }
             else -> showDialog(feature.id)

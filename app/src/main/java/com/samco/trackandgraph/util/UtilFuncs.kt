@@ -19,12 +19,16 @@ package com.samco.trackandgraph.util
 
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.util.TypedValue
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.appcompat.app.AppCompatActivity
 import com.samco.trackandgraph.database.entity.FeatureType
 import java.lang.NumberFormatException
 
@@ -80,4 +84,11 @@ fun Window.hideKeyboard(windowToken: IBinder? = null, flags: Int = 0) {
 fun Context.showKeyboard() {
     val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
+}
+
+fun Context.performTrackVibrate() {
+    val vibrator = getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+    } else vibrator.vibrate(100)
 }
