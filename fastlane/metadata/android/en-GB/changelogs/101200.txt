@@ -1,0 +1,9 @@
+- Fix incorrect graph bounds in preview mode
+- Adaptive graph card size
+- Fix cancel button invisible
+- Fix German input dialog overlapping text
+- Add vibration when tracking with default values
+- Remove limit on maximum lines on a graph
+- Remove limit on maximum multiple choice name lengths
+- Remove limit on maximum graph name length
+- Remove limit on maximum graph line name length
