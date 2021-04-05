@@ -111,7 +111,7 @@
             android:id="@+id/btn_preivew"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/bg_hold_to_preview"
+            android:background="@drawable/bg_hold_to_preview"
             android:clickable="true"
             android:focusable="true"
             android:paddingVertical="@dimen/card_padding"
