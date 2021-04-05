@@ -51,6 +51,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "Kozonak",
+      "name": "Kozonak",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3283978?v=4",
+      "profile": "https://github.com/Kozonak",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
