@@ -29,6 +29,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.util.getColorFromAttr
+import com.samco.trackandgraph.util.showKeyboard
 
 abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
     private lateinit var editText: EditText
@@ -40,7 +41,6 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
     abstract fun getNameInputHint() : String
     abstract fun getTitleText() : String
     abstract fun getNameInputText() : String
-    abstract fun getMaxChars() : Int
 
     override fun onCreateDialog(savedInstanceState: Bundle?) : Dialog {
         return activity?.let {
@@ -51,7 +51,6 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
             editText.setText(getNameInputText())
             editText.setSelection(editText.text.length)
             editText.addTextChangedListener(this)
-            editText.filters = arrayOf(InputFilter.LengthFilter(getMaxChars()))
             view.findViewById<TextView>(R.id.prompt_text).text = getTitleText()
             var builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setView(view)
@@ -77,13 +76,9 @@ abstract class NameInputDialogFragment : DialogFragment(), TextWatcher {
 
     override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, length: Int) { }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE)
-    }
-
     override fun onStart() {
         super.onStart()
+        requireContext().showKeyboard()
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = editText.text.isNotEmpty()
     }
 }
