@@ -31,7 +31,6 @@ import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.GlobalNote
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
-import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
 import org.threeten.bp.OffsetDateTime
 
 fun showFeatureDescriptionDialog(context: Context, name: String, description: String) {
@@ -95,7 +94,8 @@ fun getNoteDialogHeader(
     displayValue: String?, featureDispalayName: String?
 ): View {
     val headerView = ShowNoteDialogHeaderBinding.inflate(inflater)
-    headerView.dateTimeText.text = formatDayMonthYearHourMinute(context, timestamp)
+    headerView.dateTimeText.text =
+        formatDayWeekDayMonthYearHourMinuteOneLine(context, getWeekDayNames(context), timestamp)
     headerView.valueText.visibility = if (displayValue.isNullOrEmpty()) View.GONE else View.VISIBLE
     displayValue?.let { headerView.valueText.text = it }
     headerView.featureDisplayNameText.visibility =

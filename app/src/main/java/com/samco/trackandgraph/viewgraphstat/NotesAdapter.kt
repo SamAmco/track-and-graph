@@ -27,11 +27,13 @@ import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
-import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
 
 class NotesAdapter(
     private val featureDisplayNames: Map<Long, String>,
     private val featureTypes: Map<Long, FeatureType>,
+    private val weekDayNames: List<String>,
     private val clickListener: NoteClickListener
 ) : ListAdapter<GraphNote, NotesAdapter.ViewHolder>(
     NoteDiffCallback()
@@ -41,6 +43,7 @@ class NotesAdapter(
         return ViewHolder.from(
             parent,
             featureDisplayNames,
+            weekDayNames,
             featureTypes,
             clickListener
         )
@@ -53,6 +56,7 @@ class NotesAdapter(
     class ViewHolder private constructor(
         private val binding: ListItemNoteBinding,
         private val featureDisplayNames: Map<Long, String>,
+        private val weekDayNames: List<String>,
         private val featureTypes: Map<Long, FeatureType>,
         private val clickListener: NoteClickListener
     ) : RecyclerView.ViewHolder(binding.root) {
@@ -62,7 +66,11 @@ class NotesAdapter(
         fun bind(note: GraphNote) {
             this.note = note
             binding.timestampText.text =
-                formatDayMonthYearHourMinute(binding.timestampText.context, note.timestamp)
+                formatDayWeekDayMonthYearHourMinuteOneLine(
+                    binding.timestampText.context,
+                    weekDayNames,
+                    note.timestamp
+                )
             when (note.noteType) {
                 NoteType.DATA_POINT -> initFromDataPointNote()
                 NoteType.GLOBAL_NOTE -> initFromGlobalNote()
@@ -94,6 +102,7 @@ class NotesAdapter(
             fun from(
                 parent: ViewGroup,
                 featureDisplayNames: Map<Long, String>,
+                weekDayNames: List<String>,
                 featureTypes: Map<Long, FeatureType>,
                 clickListener: NoteClickListener
             ): ViewHolder {
@@ -102,6 +111,7 @@ class NotesAdapter(
                 return ViewHolder(
                     binding,
                     featureDisplayNames,
+                    weekDayNames,
                     featureTypes,
                     clickListener
                 )

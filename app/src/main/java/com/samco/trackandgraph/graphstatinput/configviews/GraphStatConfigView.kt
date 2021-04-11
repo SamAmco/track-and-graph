@@ -30,7 +30,7 @@ import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
 import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.ExtendedSpinner
-import com.samco.trackandgraph.util.formatDayMonthYear
+import com.samco.trackandgraph.ui.formatDayMonthYear
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
