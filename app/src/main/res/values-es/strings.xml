@@ -348,4 +348,5 @@
     <string name="faq_text_7_12">Y un año después puede tener este aspecto:</string>
     <string name="faq_text_7_13">Con el tiempo, sin embargo, este sesgo tenderá a 0. Por lo tanto, cuantos más datos se han trazado, más preciso será el histograma.</string>
     <string name="moshi">Moshi</string>
+    <string name="hold_to_preview">Avance</string>
 </resources>
