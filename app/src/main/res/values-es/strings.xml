@@ -1,0 +1,351 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This file is part of Track & Graph
+  ~ 
+  ~ Track & Graph is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~ 
+  ~ Track & Graph is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ 
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<resources>
+    <string name="home">Inicio</string>
+    <string name="track_group">Grupo de trazas</string>
+    <string name="graph_group">Grupo de gráficos</string>
+    <string name="add_track_group">Añade un grupo de trazas: </string>
+    <string name="add_feature">Añade líneas:</string>
+    <string name="add">Añadir</string>
+    <string name="group_name">Por ejemplo, las actividades diarias</string>
+    <string name="add_graph_stat_group">Añadir un grupo de diagramas: </string>
+    <string name="delete">Borrar</string>
+    <string name="rename">Renombrar</string>
+    <string name="edit">Editar</string>
+    <string name="update">Actualizar</string>
+    <string name="new_name">Nuevo nombre: </string>
+    <string name="graph_or_stat_name">Nombre del gráfico: </string>
+    <string name="feature_name">¿Qué le gustaría rastrear?</string>
+    <string name="feature_type">¿Qué tipo de datos son?
+    <string name="yes">Sí</string>
+    <string name="cancel">Cancelar</string>
+    <string name="select_file">Seleccionar archivo</string>
+    <string name="no_groups_hint">¡Bienvenido a Track &amp; Graph!\n\n Toca aquí para crear tu primer grupo de trazas y empezar.</string>
+    <string name="no_features_hint">Toca el icono + para empezar a registrar algo.</string>
+    <string name="no_graph_stats_hint">Toca el icono + para crear un nuevo gráfico o estadística.</string>
+    <string name="no_features_graph_stats_hint">Aquí no hay nada que hacer todavía.\n\nPor favor, crea un Grupo de trazas y registra algunos datos antes de crear cualquier gráfico.</string>
+    <string name="ru_sure_del_group">¿Estás seguro de que quieres borrar este grupo y todo lo que contiene? Este proceso no es reversible.</string>
+    <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
+    <string name="ru_sure_del_data_point">¿Está seguro de querer eliminar este punto de datos?</string>
+    <string name="export_file_name_suffix">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
+    <string name="backup_file_name_suffix">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.db</string>
+    <string name="discrete_values">Añade algunas opciones a continuación.</string>
+    <string name="feature_name_cannot_be_null">Por favor, añade un nombre</string>
+    <string name="feature_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
+    <string name="discrete_value_must_have_name">Por favor, asegúrate de que todas tus opciones tienen nombre</string>
+    <string name="discrete_feature_needs_at_least_wo_values">Por favor, añade al menos dos respuestas de opción múltiple</string>
+    <string name="data_points">%1$d trazado</string>
+    <string name="no_data">Sin datos</string>
+    <string name="add_data_point_hint">Introducir un valor para:</string>
+    <string name="skip">Saltar</string>
+    <string name="exportButton">Exportar</string>
+    <string name="importButton">Importar</string>
+    <string name="export_to">Exportar a:</string>
+    <string name="import_from">Importar desde:</string>
+    <string name="import_warning">Atención: La importación es irreversible. Track &amp; Graph intentará fusionar cualquier dato importado con los datos existentes en este grupo de trazas por nombre.</string>
+    <string name="graphs_and_statistics"><![CDATA[Gráficas y estadísticas]]></string>
+    <string name="add_a_graph_or_stat">Añadir un gráfico o estadística</string>
+    <string name="graph_type_label">Tipo de gráfico:</string>
+    <string name="maximum_sample_duration">Tamaño de la muestra:</string>
+    <string name="select_a_discrete_feature">Seleccione un conjunto de datos de elección múltiple: </string>
+    <string name="no_discrete_features_pie_chart">Actualmente no puede crear un gráfico circular porque no está haciendo una traza de ninguna elección múltiple.</string>
+    <string name="select_a_feature">Seleccione un conjunto de datos:</string>
+    <string name="offset">Desplazamiento:</string>
+    <string name="scale">Escala:</string>
+    <string name="from">Desde:</string>
+    <string name="to">Hasta:</string>
+    <string name="select_a_value_range">Selecciona un rango de valores:</string>
+    <string name="graph_name_hint">por ejemplo, Ejercicio: media de móvil semanal</string>
+    <string name="day">Día</string>
+
+    <string-array name="time_histogram_windows">
+        <item>Hora</item>
+        <item>Diario</item>
+        <item>Semanal</item>
+        <item>Mensual</item>
+        <item>Cuatrimestral</item>
+        <item>Semanal</item>
+        <item>Anual</item>
+    </string-array>
+    <string-array name="date_formats">
+        <item>dd/mm/yy</item>
+        <item>mm/dd/yy</item>
+        <item>yy/mm/dd</item>
+    </string-array>
+    <cuerda-array name="theme_names_pre_Q">
+        <item>Ahorro de batería</item>
+        <item>Claro</item>
+        <item>Oscuro</item>
+    </string-array>
+    <cuerda-array name="theme_names_Q">
+        <item>Sistema por defecto</item>
+        <item>Claro</item>
+        <item>Oscuro</item>
+    </string-array>
+    <string-array name="numeric_duration_conversion_modes">
+        <item>Número de horas</item>
+        <item>Número de minutos</item>
+        <item>Número de segundos</item>
+    </string-array>
+    <string-array name="feature_types">
+        <item>Selección múltiple</item>
+        <item>Numérico</item>
+        <item>Duración del tiempo</item>
+    </string-array>
+    <string-array name="graph_types">
+        <item>Gráfico de líneas</item>
+        <item>Gráfico de pastel</item>
+        <item>Tiempo medio entre</item>
+        <item>Tiempo desde</item>
+        <item>Histograma de tiempo</item>
+    </string-array>
+    <string-array name="line_graph_feature_modes">
+        <item>Sin promedio</item>
+        <item>Media móvil diaria</item>
+        <item>Media móvil de tres días</item>
+        <item>Media móvil semanal</item>
+        <item>Media móvil mensual</item>
+        <item>Media móvil trimestral/item>
+        <item>Media móvil semestral</item>
+        <item>Media móvil anual</item>
+    </string-array>
+    <string-array name="line_graph_generation_modes">
+        <item>Generar cuando se hace un registro</item>
+        <item>Generar totales por hora</item>
+        <item>Generar totales diarios</item>
+        <item>Generar totales semanales</item>
+        <item>Generar totales mensuales</item>
+        <item>Generar los totales anuales</item>
+    </string-array>
+    <string-array name="graph_time_durations">
+        <item>Todos los datos</item>
+        <item>Un día</item>
+        <item>Una semana</item>
+        <item>Un mes</item>
+        <item>Tres meses</item>
+        <item>Seis meses</item>
+        <item>Un año</item>
+    </string-array>
+    <string-array name="y_range_styles">
+        <item>Dinámico</item>
+        <item>Fijo</item>
+    </string-array>
+    <cuerda-array name="ending_at_values">
+        <item>Reciente</item>
+        <item>Fecha personalizada...</item>
+    </string-array>
+
+
+    <string name="import_exception_unknown">Error de importación: Se ha producido un error desconocido</string>
+    <string name="import_exception_bad_headers">Error de importación: Las cabeceras no coinciden con las esperadas: %1$s</string>
+    <string name="import_exception_inconsistent_record">Error de importación: Lq traza de la línea %1$s no es consistente con las cabeceras requeridas</string>
+    <string name="import_exception_bad_timestamp">Error de importación: No se pudo interpretar la marca de tiempo para la traza en la línea: %1$s</string>
+    <string name="import_exception_inconsistent_data_type">Error de importación: Se ha recibido un tipo de datos inconsistente en la línea: %1$s</string>
+    <string name="import_exception_bad_discrete_value">Fallo en la importación: Fallo en la lectura del valor de elección múltiple en la línea: %1$s</string>
+    <string name="import_exception_discrete_value_conflict">Error de importación: Conflicto de valores de elección múltiple en la línea: %1$s</string>
+    <string name="import_exception_discrete_value_index_exists">Error de importación: Fallo al leer el valor de elección múltiple en la línea: %1$s, el índice %2$s ya existe</string>
+    <string name="import_exception_discrete_value_label_exists">Error de importación: Ha fallado la lectura del valor de elección múltiple en la línea: %1$s, la etiqueta %2$s existe con un índice diferente</string>
+    <string name="import_exception_feature_name_too_long">Error de importación: nombre demasiado largo en la línea: %1$s</string>
+    <string name="import_exception_max_discrete_values_reached">Error de importación: El máximo de valores de opción múltiple para una característica es: %1$s</string>
+
+    <string name="graph_stat_validation_unknown">Se ha producido un error desconocido</string>
+    <string name="graph_stat_validation_no_name">Por favor, proporciona un nombre</string>
+    <string name="graph_stat_validation_no_line_graph_features">Por favor, añade este detalle al gráfico</string>
+    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Por favor, selecciona al menos una respuesta de opción múltiple</string>
+    <string name="graph_stat_validation_invalid_value_stat_from_to">Asegúrate de que "From" es menor o igual que "To"</string>
+    <string name="graph_stat_validation_unrecognised_color">Asegúrate de que todos los conjuntos de datos tienen un color</string>
+    <string name="graph_stat_validation_invalid_line_graph_feature">Se ha detectado un conjunto inválido de datos de gráfico de líneas</string>
+    <string name="graph_stat_validation_bad_fixed_range">Asegúrate de que "Desde" tiene menor valor que "Hasta"</string>
+
+    <string name="graph_stat_view_invalid_setup">Completa los ajustes para ver una vista previa</string>
+    <string name="graph_stat_view_not_found">Se ha producido un error al encontrar este gráfico</string>
+    <string name="graph_stat_view_not_enough_data_stat">Esta estadística se mostrará cuando se hayan registrado suficientes datos para generarla.</string>
+    <string name="graph_stat_view_not_enough_data_graph">Este gráfico mostrará cuando se hayan registrado suficientes datos para generarlo.</string>
+    <string name="finish">Finalizar</string>
+    <string name="about_description"><![CDATA[Track & Graph es un software libre y de código abierto bajo la licencia GPL 3.0.]]></string>
+    <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
+    <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
+    <string name="about_libraries_message">Se han utilizado las siguientes bibliotecas de código abierto:</string>
+    <string name="androidplot">Androidplot</string>
+    <string name="apache_2_0">Apache 2.0</string>
+    <string name="apache_commons_csv">Apache Commons CSV</string>
+    <string name="three_ten_android_backport">Three Ten Android Backport</string>
+    <string name="timber">Timber</string>
+    <string name="about">Acerca de</string>
+    <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
+
+    <string name="faq_1">¿Cómo empiezo a trazar algo?</string>
+    <string name="faq_2">¿Cómo importo/exporto lo que he trazado?</string>
+    <string name="faq_3">¿Cómo funcionan los datos de elección múltiple?</string>
+    <string name="faq_4">¿Cómo empiezo a crear gráficos?</string>
+    <string name="faq_5">¿Cómo se calculan las medias móviles y los totales de los gráficos?</string>
+    <string name="faq_6">¿Cómo funcionan las notas?</string>
+    <string name="faq">FAQ</string>
+    <string name="faq_text_1_1">Para empezar a hacer un trazado, tendrás que crear al menos un grupo de trazas. Los grupos de trazas te permiten separar grupos de cosas de las que podrías querer hacer un registro al mismo tiempo. Por ejemplo, puedes crear un grupo para tu rutina de ejercicios y otro para los tipos de alimentos.</string>
+    <string name="faq_text_1_2">Tus grupos de trazas aparecerán en la lista de grupos. Puedes ordenarlos fácilmente manteniendo pulsado el elemento que quieras mover y arrastrándolo a una nueva posición.</string>
+    <string name="faq_text_1_3">Una vez que hayas creado tu grupo de seguimiento, selecciónalo y haz clic en el icono + para configurar algo nuevo para el trazamiento.</string>
+    <string name="faq_text_1_4">Escribe el nombre de lo que quieres trazar y selecciona un estilo de entrada:</string>
+    <string name="faq_text_1_5">Hay tres estilos de entrada que puedes elegir: \n\n• Opción múltiple requiere que configures manualmente las respuestas predefinidas que se te presentarán como botones al realizar el seguimiento. \n\n• Numérico te pedirá que introduzcas un número al realizar el seguimiento. \n\n• Duración del tiempo te pedirá que introduzcas una cantidad de tiempo en horas, minutos y segundos al realizar el seguimiento. \n\n•Si añades un valor por defecto, no se le pedirá un valor cada vez que pulse el botón + y se utilizará su valor por defecto. Sin embargo, puedes volver atrás y cambiar el valor editando el punto de datos después (como se explica más adelante).</string>
+    <string name="faq_text_1_6">Para crear respuestas de opción múltiple haz clic en el botón + de la parte inferior.</string>
+    <string name="faq_text_1_8">Cuando estés satisfecho con la configuración, haz clic en el botón FINALIZAR.</string>
+    <string name="faq_text_1_9">Ahora deberías ver las tarjetas en tu grupo de trazas. Puedes ordenarlas fácilmente manteniendo pulsado el elemento que quieras mover y arrastrándolo a una nueva posición.</string>
+    <string name="faq_text_1_10">Puedes trazar cosas individualmente utilizando sus botones + o trazar todo en el grupo rápidamente utilizando el botón de acción:</string>
+    <string name="faq_text_1_11">No te preocupes si te equivocas, siempre puedes ver, revisar y editar tu historial de trazado simplemente tocando la tarjeta.</string>
+    <string name="faq_text_2_1">Para importar/exportar tus datos de trazado primero selecciona un grupo de seguimiento y fíjate en los botones del menú de la parte superior:</string>
+    <string name="faq_text_2_2">Usa este botón para importar un csv a este grupo de trazas.</string>
+    <string name="faq_text_2_3">Usa este botón para exportar este grupo de trazas a un csv.</string>
+    <string name="faq_text_3_1">Se recomienda utilizar el tipo de entrada de opción múltiple siempre que sea posible. Si alguna vez quieres dibujar un gráfico circular a partir de tus datos, necesitarás que estén en forma de opción múltiple. También puede dibujar un gráfico de líneas de sus datos a lo largo del tiempo si sus respuestas predefinidas tienen un orden natural. Por ejemplo, digamos que usted va a configurar lo siguiente:</string>
+    <string name="faq_text_3_2">Y luego traza algunos datos de la siguiente manera:</string>
+    <string name="faq_text_3_3">Podrías visualizar esos datos mediante un gráfico de líneas a lo largo del tiempo o mediante un gráfico circular como el que se muestra a continuación:</string>
+    <string name="faq_text_4_1"><![CDATA[Para empezar a crear gráficos necesitarás primero tener algunos datos trazados. A continuación, visita a la página de inicio y crea un nuevo grupo de gráficos. Tus grupos de gráficos no tienen que estar alineados de ninguna manera con tus grupos de traza, puedes organizarlos como quieras.]]></string>
+    <string name="faq_text_4_3">Tus grupos de gráficos aparecerán en tu lista de grupos. Puedes ordenarlos fácilmente manteniendo pulsado el elemento que quieras mover y arrastrándolo a una nueva posición.</string>
+    <string name="faq_text_4_4">Una vez que hayas creado tu grupo de gráficos, selecciónalo y haz clic en el icono + para configurar un nuevo gráfico o estadística.</string>
+    <string name="faq_text_4_5">Comienza introduciendo un nombre para tu nuevo gráfico y luego selecciona un tipo de gráfico. Aquí demostraremos el gráfico de líneas, ya que otros tipos de gráficos son relativamente triviales de configurar. Sin embargo, hay que tener en cuenta que sólo se pueden crear gráficos circulares a partir de datos de elección múltiple.</string>
+    <string name="faq_text_4_6">El estilo Rango dinámico calculará automáticamente el valor mínimo y máximo para el eje Y. Ahora añadiremos algunas líneas a nuestro gráfico utilizando el botón + de la parte inferior:</string>
+    <string name="faq_text_4_7">Como nuestros valores de trigo son respuestas de opción múltiple que van de 0 a 2 y nuestros valores de dolor de estómago son números que van de 1 a 8, hemos multiplicado nuestros valores de trigo por 4 para que los rangos sean similares. Hemos utilizado una media móvil de tres días para suavizar las anomalías y reducir el ruido en el gráfico de salida. También hemos seleccionado trazar cuando se traza porque estos datos se trazaron de forma relativamente consistente. Puede leer más sobre cómo estos ajustes afectan a los gráficos de líneas en las preguntas frecuentes: "¿Cómo se calculan las medias móviles y los totales de los gráficos?"</string>
+    <string name="faq_text_4_8">A continuación, hacemos clic en el botón FINALIZAR para completar la configuración. Observa cómo nuestro nuevo gráfico aparece como una tarjeta en nuestro grupo de gráficos:</string>
+    <string name="faq_text_4_9">Para explorar el gráfico con más detalle, puedes tocar la tarjeta para abrirla en una vista de pantalla completa y luego pellizcar y arrastrar las líneas:</string>
+    <string name="faq_text_4_10">A medida que añadimos más gráficos y estadísticas a nuestro grupo de gráficos, aparecen como una lista de tarjetas. Puedes reordenarlas en cualquier momento manteniendo pulsado y arrastrando una tarjeta a una nueva posición.</string>
+    <string name="faq_text_5_1">Moviendo promedios:</string>
+    <string name="faq_text_5_2">Supongamos que queremos trazar algo simplemente como una pregunta de sí o no, por ejemplo:</string>
+    <string name="faq_text_5_3">Si trazáramos estos datos a lo largo del tiempo sin utilizar una media móvil, podría tener este aspecto:</string>
+    <string name="faq_text_5_4">Este resultado es muy preciso pero no muy útil. Para facilitar la comprensión de los datos podríamos utilizar una media móvil mensual:</string>
+    <string name="faq_text_5_5">Ahora, en lugar de trazar cada punto de datos con el valor Y trazado (0 o 1), cada valor Y se calcula como la media de sí mismo y de todos los puntos de datos anteriores dentro del rango de tiempo seleccionado antes.</string>
+    <string name="faq_text_5_6">En general, cuanto más largo sea el período de promedio seleccionado, más suave será la curva. Sin embargo, ten en cuenta que las medias móviles son indicadores de retraso. Cuanto más largo sea el periodo de promediación, más se retrasará la curva con respecto al valor real.</string>
+    <string name="faq_text_5_7">Totales del gráfico:</string>
+    <string name="faq_text_5_8">Algunas cosas sólo querrás trazarlas en contadas ocasiones. Por ejemplo, puedes querer trazar cuando termines de leer un libro:</strong>
+    <string name="faq_text_5_9">Supón que haces un seguimiento de lo siguiente:</string>
+    <string name="faq_text_5_10">Puede que te sorprendas o no al ver que tu gráfico aparece de la siguiente manera:</string>
+    <string name="faq_text_5_11">El problema es que las líneas se dibujan sólo desde cada valor trazado hasta el siguiente valor trazado. Como todos los valores trazados se interpretan como 1, sólo se ve una línea recta en el punto 1 del eje Y.</string>
+    <string name="faq_text_5_12">Podemos solucionar esto utilizando los totales de los gráficos. Por ejemplo, si trazamos los totales mensuales veríamos el siguiente gráfico:</string>
+    <string name="faq_text_5_13">Nota que se traza un punto al final de cada mes que representa el total de todos los valores rastreados en ese mes.</string>
+    <string name="faq_text_5_14">Puedes utilizar la escala, el desplazamiento, el promedio y los totales a la vez. El orden de precedencia es el siguiente:</string>
+    <string name="faq_text_5_15">• Primero tus datos se convierten en totales\n\n• Luego cada punto se convierte en su media móvil\n\n• Luego tus puntos se multiplican por el valor de la escala\n\n• Por último se añade el desplazamiento a cada punto</string>
+    <string name="faq_text_6_1">Las notas le permiten hacer un registro de los datos cualitativos junto con los cuantitativos. Hay dos tipos de notas:\n\n• Notas globales (añadidas directamente en el menú de notas)\n\n•  Notas de puntos de datos (adjuntadas a puntos de datos específicos)\n\n•  Al añadir un punto de datos, es posible que desee hacer un registro de un dato importante específico de ese conjunto de datos. Por ejemplo:</string>
+    <string name="faq_text_6_2">Después de añadir esta nota, verás que aparece en una lista debajo de cualquier gráfico de ese conjunto de datos. Si tocas la nota se abrirá en una ventana de diálogo y se añadirá un marcador al gráfico.</string>
+    <string name="faq_text_6_3">Sin embargo, algunas piezas de información pueden ser relevantes para todos tus datos. En este caso, puedes añadir una nota global tocando el botón más en el menú de notas globales:</string>
+    <string name="faq_text_6_4">Verás que esta nota aparece ahora debajo de todos los gráficos.</string>
+    <string name="faq_text_6_5">Puedes editar o eliminar cualquier nota desde el menú de notas. Al eliminar una nota de un punto de datos desde el menú de notas, no se eliminará el punto de datos en sí, sino la nota adjunta.</string>
+    <string name="tutorial_text_1"><![CDATA[Todo en Track & Graph está organizado en grupos de trazas azules y grupos de gráficos naranjas.]]></string>
+    <string name="tutorial_text_2">Usa los grupos de trazas para elaborar un registro rápido de muchas cosas al mismo tiempo.</string>
+    <string name="tutorial_text_3">Utiliza los grupos de trazas para investigar los datos de varios grupos de trazas.</string>
+    <string name="got_it">Aceptar</string>
+    <string name="move_to_colon">Mover a:</string>
+    <string name="move_to">Mover a</string>
+
+    <string name="feature_add_or_update_error_occurred">Se ha producido un error, no se han podido realizar los cambios.</string>
+    <string name="ru_sure_update_feature">Esta actualización puede modificar irreversiblemente los datos que ya has trazado. Se recomienda encarecidamente hacer una copia de seguridad de los datos existentes antes de continuar.</string> <string name="ru_sure_update_feature">¿Desea continuar?
+    <string name="warning">Atención</string>
+    <string name="ok">Aceptar</string>
+    <string name="on_feature_type_change_numerical_warning">Si actualiza su tipo de entrada a numérico sus datos trazados existentes perderán sus etiquetas.</string>
+    <string name="on_feature_delete_discrete_value_warning">Si se borran las respuestas de opción múltiple se borrarán todos los puntos de datos rastreados existentes para ese valor.</string>
+
+    <string name="my_first_track_group">Mi primer grupo de traza</string>
+    <string name="rate_the_app">Calificar la aplicación</string>
+    <string name="reminders">Recordatorios</string>
+    <string name="no_reminders_hint">Toca el icono + para crear una nueva notificación de recordatorio de traza.</string>
+    <string name="mon">Lun</string>
+    <string name="tue">Mar</string>
+    <string name="wed">Mie</string>
+    <string name="thu">Jue</string>
+    <string name="fri">Vie</string>
+    <string name="sat">Sab</string>
+    <string name="sun">Dom</string>
+    <string name="reminders_notifications_channel_name">Recordatorios</string>
+    <string name="reminders_notifications_channel_description">Notificaciones creadas por el usuario para recordarle cuándo debe trazar</string>
+    <string name="default_reminder_name">¡Hora de hacer la traza!</string>
+    <string name="range_style">Estilo de rango:</string>
+
+    <string name="track_widget_configure_no_data_error">Por favor, crea un grupo de trazas y registra algunos datos primero.</string>
+    <string name="track_widget_configure_no_data_selected_error">Debes seleccionar un grupo de datos válido para crear un widget de traza.</string>
+    <string name="create">Crear</string>
+    <string name="use_default_value" >Establece un valor por defecto</string>
+    <string name="default_value_description_hint">(Su valor predeterminado se utilizará automáticamente cuando añada un punto de datos, pero siempre puede volver atrás y cambiarlo.)</string>
+    <string name="check_all_relevant_values">Comprueba todos los valores relevantes: </string>
+    <string name="backup_and_restore">Respaldo y restauración</string>
+    <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluyendo todos los datos trazados, los gráficos y los recordatorios. Deberías hacer una copia de seguridad de tus datos en un dispositivo externo o en un almacenamiento en la nube con regularidad en caso de que tu dispositivo se pierda o se rompa.</string>
+    <string name="restore_hint_text">ADVERTENCIA: La restauración desde una copia de seguridad borrará todos los datos y la configuración actual de la aplicación. Track &amp; Graph se reiniciará una vez completada la restauración.</string>
+    <string name="backup_data">Respaldar datos</string>
+    <string name="restore_data">Restaurar datos</string>
+    <string name="backup_successful">¡Respaldado con éxito!</string>
+    <string name="backup_failed">Error de respaldo. %1$s</string>
+    <string name="backup_error_could_not_write_to_file">No se pudo encontrar o escribir en el archivo seleccionado.</string>
+    <string name="restore_error_could_not_write_to_database">No se pudo encontrar o escribir en la base de datos.</string>
+    <string name="restore_error_could_not_read_from_database_file">No se ha podido encontrar o leer el archivo de base de datos seleccionado.</string>
+    <string name="backup_error_could_not_find_database_file">No se ha podido encontrar o leer el archivo de la base de datos.</string>
+    <string name="backup_error_failed_to_copy_database">Algo salió mal mientras se copiaba el archivo de la base de datos.</string>
+    <string name="restore_error_failed_to_copy_database">Algo salió mal al restaurar la base de datos.</string>
+    <string name="restore_failed">Fallo en la restauración. %1$s</string>
+    <string name="feature_description_input_hint">Añadir una descripción más larga (opcional)</string>
+    <string name="no_data_points_history_fragment_hint">Su historial de traza se mostrará aquí cuando haya introducido algunos datos.</string>
+    <string name="info">Info</string>
+    <string name="no_description">Sin descripción</string>
+    <string name="description">Descripción</string>
+    <string name="note_input_hint">Notas...</string>
+    <string name="add_a_note">Añadir una nota</string>
+    <string name="notes">Notas</string>
+    <string name="faq_text_2_4">También hay una opción de respaldo y restauración en el menú. Esto exportará y restaurará todo el archivo de la base de datos que contiene todos los datos de traza, gráficos, recordatorios, etc. Se trata de un archivo de base de datos Sqlite3 sin cifrar, que también puede abrirse y modificarse mediante un software de libre acceso. Sin embargo, esto no se recomienda para los usuarios no técnicos, ya que podría romper la integridad de la base de datos.</string>
+    <string name="delete_reminder_content_description">Borrar recordatorio</string>
+    <string name="theme_colon">Tema:</string>
+    <string name="date_format_colon">Formato de fecha:</string>
+    <string name="add_data_point_button_content_description">Añadir un botón de punto de datos</string>
+    <string name="tracked_data_menu_button_content_description">Botón de menú de datos trazados</string>
+    <string name="tracked_data_history_button_content_description">Botón de historial de datos rastreados</string>
+    <string name="delete_line_button_content_description">Botón para borrar línea</string>
+    <string name="delete_data_point_button_content_description">Botón para borrar punto de datos</string>
+    <string name="edit_data_point_button_content_description">Botón para editar punto de datos</string>
+    <string name="add_line_button_content_description">Botón de añadir línea</string>
+    <string name="add_multiple_choice_answer_button_content_description">Añadir botón de respuesta de opción múltiple</string>
+    <string name="ending_at_colon">Muestra que termina en:</string>
+    <string name="duplicate">Duplicar</string>
+    <string name="no_notes_hint_text">Las notas añadidas durante la traza aparecerán aquí. También puedes añadir notas globales usando el botón +.</string>
+    <string name="add_a_global_note">Añadir una nota global:</string>
+    <string name="semanas">Semanas</string>
+    <string name="meses">Meses</string>
+    <string name="días">Días</string>
+    <string name="horas">Horas</string>
+    <string name="minutos">Minutos</string>
+    <string name="seconds">Segundos</string>
+    <string name="hours_suffix">h</string>
+    <string name="minutes_suffix">m</string>
+    <string name="seconds_suffix">s</string>
+    <string name="default_value">Valor por defecto</string>
+    <string name="numeric_to_duration_mode_header">Los valores trazados anteriormente representan:</string>
+    <string name="duration_to_numeric_mode_header">Los valores trazados anteriormente deben convertirse en:</string>
+    <string name="graph_stat_validation_mixed_time_value_line_graph_features">No puede mezclar duraciones de tiempo con otros tipos de datos. Considera la posibilidad de trazar horas, minutos o segundos</string>
+    <string name="time_duration">Duración del tiempo</string>
+    <string name="select_a_duration_range">Seleccione un rango de duración</string>
+    <string name="number_of_bins">Número de bins:</string>
+    <string name="sum_by_count_checkbox_label">Marca aquí para contar el número de puntos de datos trazados en lugar del total de sus valores.</string>
+    <string name="time_window_size">Tamaño de la ventana de tiempo:</string>
+    <string name="faq_7">¿Cómo funcionan los histogramas de tiempo?</string>
+    <string name="faq_text_7_1"><![CDATA[Los histogramas son útiles para mostrar cómo se distribuyen los datos en un dominio determinado. Los histogramas de tiempo en Traza y Gráfico te permiten ver cómo se distribuyen tus datos en varios periodos de tiempo]]></string>
+    <string name="faq_text_7_2">Por ejemplo, imagina que has trazado datos de 7 semanas sobre el tiempo que has pasado leyendo. Puede que quieras saber en qué días de la semana sueles pasar más tiempo leyendo. En este caso podría utilizar un histograma de tiempo con la siguiente configuración:</string>
+    <string name="faq_text_7_3">Para generar el siguiente histograma:</string>
+    <string name="faq_text_7_4">El histograma se calcula simplemente tomando cada punto de datos dentro de la muestra y añadiendo su valor a un \"bin\" basado en el día de la semana en que se trazó ese valor. Así, la casilla del día 1 representa el total de todos los puntos de datos trazados los lunes dividido por el total de todos los puntos de datos de la muestra. Los histogramas están "normalizados", lo que significa que la suma de todas las alturas de las barras (o el área debajo del gráfico) debe sumar exactamente 1. Así que, por ejemplo, si sólo lees los viernes, esperarías que tu histograma sólo mostrara una barra para el viernes con altura 1.</string>
+    <string name="faq_text_7_5">Si lees los sábados el 50% de las veces y los viernes el 50% de las veces, tu histograma debería tener este aspecto:</string>
+    <string name="faq_text_7_6"><![CDATA[Si los datos que rastreas son de opción múltiple, Track & Graph te mostrará la distribución dentro de cada barra de la cantidad formada por cada opción rastreada así:]]></string>
+    <string name="faq_text_7_7">Por defecto, la altura de cada barra es relativa a la suma de todos los valores de los puntos de datos que caen en ese rango de tiempo. Sin embargo, si el valor de cada una de tus opciones debe ser el mismo (es decir, las opciones representan datos discretos no ordenados), tu histograma estará incorrectamente sesgado así:</string>
+    <string name="faq_text_7_8">(observa que el índice de Sparrow es 0, por lo que ni siquiera aparece en el histograma)</string>
+    <string name="faq_text_7_9">Para arreglar esto puedes marcar la casilla marcada: \"Marca aquí para contar el número de puntos de datos trazados en lugar del total de sus valores\".</string>
+    <string name="faq_text_7_10">De este modo, cada respuesta de opción múltiple se considerará que tiene el mismo peso en el histograma, así:</string>
+    <string name="faq_text_7_11">Una última nota a tener en cuenta es que tus datos pueden estar sesgados por el hecho de que aún no has trazado los datos de cada casilla del histograma o no los has trazado todos por igual. Así que, por ejemplo, si está dibujando un histograma anual pero sólo ha realizado el seguimiento durante 6 meses, su histograma puede tener el siguiente aspecto:</string>
+    <string name="faq_text_7_12">Y un año después puede tener este aspecto:</string>
+    <string name="faq_text_7_13">Con el tiempo, sin embargo, este sesgo tenderá a 0. Por lo tanto, cuantos más datos se han trazado, más preciso será el histograma.</string>
+    <string name="moshi">Moshi</string>
+</resources>
