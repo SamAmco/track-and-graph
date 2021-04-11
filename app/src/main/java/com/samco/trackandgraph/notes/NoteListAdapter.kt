@@ -29,13 +29,16 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayNote
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
-import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
+import java.util.*
 
 internal class NoteListAdapter(
-    private val clickListener: NoteClickListener
+    private val clickListener: NoteClickListener,
+    private val weekDayNames: List<String>
 ) : ListAdapter<DisplayNote, NoteViewHolder>(NoteDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
-        return NoteViewHolder.from(parent)
+        return NoteViewHolder.from(parent, weekDayNames)
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
@@ -53,8 +56,10 @@ internal class NoteDiffCallback : DiffUtil.ItemCallback<DisplayNote>() {
     }
 }
 
-internal class NoteViewHolder private constructor(private val binding: ListItemGlobalNoteBinding) :
-    RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+internal class NoteViewHolder private constructor(
+    private val binding: ListItemGlobalNoteBinding,
+    private val weekDayNames: List<String>
+) : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
     private var clickListener: NoteClickListener? = null
     private var note: DisplayNote? = null
@@ -63,7 +68,7 @@ internal class NoteViewHolder private constructor(private val binding: ListItemG
         this.note = note
         this.clickListener = clickListener
         binding.timestampText.text =
-            formatDayMonthYearHourMinute(binding.root.context, note.timestamp)
+            formatDayWeekDayMonthYearHourMinuteOneLine(binding.root.context, weekDayNames, note.timestamp)
         binding.noteText.text = note.note
         binding.featureAndTrackGroupText.text = when (note.noteType) {
             NoteType.DATA_POINT -> "${note.trackGroupName} -> ${note.featureName}"
@@ -81,10 +86,10 @@ internal class NoteViewHolder private constructor(private val binding: ListItemG
     }
 
     companion object {
-        fun from(parent: ViewGroup): NoteViewHolder {
+        fun from(parent: ViewGroup, weekDayNames: List<String>): NoteViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ListItemGlobalNoteBinding.inflate(layoutInflater, parent, false)
-            return NoteViewHolder(binding)
+            return NoteViewHolder(binding, weekDayNames)
         }
     }
 

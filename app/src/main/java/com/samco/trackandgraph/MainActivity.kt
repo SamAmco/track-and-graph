@@ -38,6 +38,7 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
+import com.samco.trackandgraph.ui.DateFormatSetting
 import com.samco.trackandgraph.util.*
 
 class MainActivity : AppCompatActivity() {

@@ -31,9 +31,9 @@ import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
-import com.samco.trackandgraph.util.formatDayMonth
-import com.samco.trackandgraph.util.formatMonthYear
-import com.samco.trackandgraph.util.formatTimeDuration
+import com.samco.trackandgraph.ui.formatDayMonth
+import com.samco.trackandgraph.ui.formatMonthYear
+import com.samco.trackandgraph.ui.formatTimeDuration
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration

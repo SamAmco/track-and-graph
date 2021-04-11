@@ -35,6 +35,7 @@ import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
+import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
 import kotlinx.coroutines.*
@@ -98,6 +99,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
                     this::onDeleteDataPointClicked,
                     this::onViewDataPointClicked
                 ),
+                getWeekDayNames(requireContext()),
                 it.featureType
             )
             binding.dataPointList.adapter = adapter
