@@ -28,10 +28,7 @@ class RenameGroupDialogFragment : NameInputDialogFragment() {
         fun getGroupItem() : GroupItem
         fun onRenameGroupItem(groupItem: GroupItem)
         fun getRenameDialogHintText(): String
-        fun getGroupNameMaxLength(): Int
     }
-
-    override fun getMaxChars(): Int = listener.getGroupNameMaxLength()
 
     override fun registerListener(parentFragment: Fragment?) {
         listener = parentFragment as RenameGroupDialogListener
