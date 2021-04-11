@@ -45,6 +45,7 @@ import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.GraphStatView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
 import kotlinx.coroutines.*
@@ -167,6 +168,7 @@ class ViewGraphStatFragment : Fragment() {
         adapter = NotesAdapter(
             featureDisplayNames,
             featureTypes,
+            getWeekDayNames(requireContext()),
             NoteClickListener(this::onViewNoteClicked)
         )
         binding.notesRecyclerView.adapter = adapter

@@ -23,6 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/list_item_data_point_height"
                 android:gravity="center"
+                android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.Body"
                 android:paddingStart="10dp"
                 android:paddingEnd="10dp"

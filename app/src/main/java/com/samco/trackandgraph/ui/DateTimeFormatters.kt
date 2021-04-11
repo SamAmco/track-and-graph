@@ -15,9 +15,14 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.util
+package com.samco.trackandgraph.ui
 
 import android.content.Context
+import com.samco.trackandgraph.R
+import com.samco.trackandgraph.util.DATE_FORMAT_SETTING_PREF_KEY
+import com.samco.trackandgraph.util.getPrefs
+import org.threeten.bp.DayOfWeek
+import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
 
@@ -33,6 +38,38 @@ private fun getDateTimePref(context: Context): DateFormatSetting {
 private fun formatDate(format: String, date: Temporal): String = DateTimeFormatter
     .ofPattern(format)
     .format(date)
+
+fun getWeekDayNames(context: Context) = listOf(
+    context.getString(R.string.mon),
+    context.getString(R.string.tue),
+    context.getString(R.string.wed),
+    context.getString(R.string.thu),
+    context.getString(R.string.fri),
+    context.getString(R.string.sat),
+    context.getString(R.string.sun)
+)
+
+private fun weekDayPart(dateTime: OffsetDateTime, weekDayNames: List<String>) =
+    " (${weekDayNames[dateTime.dayOfWeek.value - 1]}) "
+
+fun formatDayWeekDayMonthYearHourMinuteOneLine(
+    context: Context,
+    weekDayNames: List<String>,
+    dateTime: OffsetDateTime
+) = formatDayMonthYear(context, dateTime) +
+        weekDayPart(dateTime, weekDayNames) +
+        formatHourMinute(dateTime)
+
+fun formatDayMonthYearHourMinuteWeekDayTwoLines(
+    context: Context,
+    weekDayNames: List<String>,
+    dateTime: OffsetDateTime
+) = formatDayMonthYear(context, dateTime) +
+        formatHourMinute(dateTime) +
+        "\n" +
+        weekDayPart(dateTime, weekDayNames)
+
+fun formatHourMinute(temporal: Temporal) = formatDate("HH:mm", temporal)
 
 fun formatDayMonthYearHourMinute(context: Context, temporal: Temporal): String {
     val format = when (getDateTimePref(context)) {

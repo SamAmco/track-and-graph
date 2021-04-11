@@ -29,7 +29,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
-import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 
 
 private val getIdForDisplayFeature = { df: DisplayFeature -> df.id }
