@@ -22,34 +22,43 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
-import com.samco.trackandgraph.util.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.ui.formatDayMonthYearHourMinuteWeekDayTwoLines
+import org.threeten.bp.DayOfWeek
 
 class DataPointAdapter(
     private val clickListener: DataPointClickListener,
+    private val weekDayNames: List<String>,
     private val featureType: FeatureType
 ) : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(DataPointDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, clickListener, featureType)
+        return ViewHolder.from(parent, clickListener, weekDayNames, featureType)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.bind(getItem(position))
     }
 
+
     class ViewHolder private constructor(
         private val binding: ListItemDataPointBinding,
         private val clickListener: DataPointClickListener,
+        private val weekDayNames: List<String>,
         private val featureType: FeatureType
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(dataPoint: DataPoint) {
             binding.valueText.text = DataPoint.getDisplayValue(dataPoint, featureType)
-            binding.timestampText.text =
-                formatDayMonthYearHourMinute(binding.timestampText.context, dataPoint.timestamp)
+            binding.timestampText.text = formatDayMonthYearHourMinuteWeekDayTwoLines(
+                binding.timestampText.context,
+                weekDayNames,
+                dataPoint.timestamp
+            )
             binding.editButton.setOnClickListener { clickListener.editClicked(dataPoint) }
             binding.deleteButton.setOnClickListener { clickListener.deleteClicked(dataPoint) }
             if (dataPoint.note.isEmpty()) {
@@ -68,11 +77,12 @@ class DataPointAdapter(
             fun from(
                 parent: ViewGroup,
                 clickListener: DataPointClickListener,
+                weekDayNames: List<String>,
                 featureType: FeatureType
             ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemDataPointBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding, clickListener, featureType)
+                return ViewHolder(binding, clickListener, weekDayNames, featureType)
             }
         }
     }

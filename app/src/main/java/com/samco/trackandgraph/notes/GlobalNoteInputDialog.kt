@@ -35,7 +35,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.odtFromString
 import com.samco.trackandgraph.databinding.GlobalNoteInputDialogBinding
-import com.samco.trackandgraph.util.formatDayMonthYear
+import com.samco.trackandgraph.ui.formatDayMonthYear
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId

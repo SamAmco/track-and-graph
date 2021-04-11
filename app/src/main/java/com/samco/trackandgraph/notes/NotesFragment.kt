@@ -33,6 +33,7 @@ import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
+import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showNoteDialog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -96,7 +97,8 @@ class NotesFragment : Fragment() {
                 this::onNoteClicked,
                 this::onEditNote,
                 this::onDeleteNote
-            )
+            ),
+            getWeekDayNames(requireContext())
         )
         binding.notesList.adapter = adapter
         binding.notesList.layoutManager =
