@@ -224,8 +224,6 @@ class SelectGroupFragment : Fragment(),
         GroupItemType.GRAPH -> getString(R.string.add_graph_stat_group)
     }
 
-    override fun getGroupNameMaxLength(): Int = MAX_GROUP_NAME_LENGTH
-
     override fun onAddGroup(name: String) {
         viewModel.addGroup(
             GroupItem(
@@ -254,7 +252,7 @@ class SelectGroupViewModel : ViewModel() {
         private set
 
     val state: LiveData<SelectGroupViewModelState> get() { return _state }
-    private val _state = MutableLiveData<SelectGroupViewModelState>(SelectGroupViewModelState.INITIALIZING)
+    private val _state = MutableLiveData(SelectGroupViewModelState.INITIALIZING)
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return
@@ -278,7 +276,7 @@ class SelectGroupViewModel : ViewModel() {
     }
 
     fun addFirstTrackGroup(name: String) = ioScope.launch {
-        firstTrackGroupId = dataSource!!.insertTrackGroup(TrackGroup.create(0, name, 0))
+        firstTrackGroupId = dataSource!!.insertTrackGroup(TrackGroup(0, name, 0))
         withContext(Dispatchers.Main) {
             _state.value = SelectGroupViewModelState.CREATED_FIRST_GROUP
             _state.value = SelectGroupViewModelState.WAITING
@@ -318,8 +316,8 @@ class SelectGroupViewModel : ViewModel() {
         }
     }
 
-    private fun toTG(gi: GroupItem, di: Int) = TrackGroup.create(gi.id, gi.name, di)
-    private fun toTG(gi: GroupItem) = TrackGroup.create(gi.id, gi.name, gi.displayIndex)
-    private fun toGSG(gi: GroupItem, di: Int) = GraphStatGroup.create(gi.id, gi.name, di)
-    private fun toGSG(gi: GroupItem) = GraphStatGroup.create(gi.id, gi.name, gi.displayIndex)
+    private fun toTG(gi: GroupItem, di: Int) = TrackGroup(gi.id, gi.name, di)
+    private fun toTG(gi: GroupItem) = TrackGroup(gi.id, gi.name, gi.displayIndex)
+    private fun toGSG(gi: GroupItem, di: Int) = GraphStatGroup(gi.id, gi.name, di)
+    private fun toGSG(gi: GroupItem) = GraphStatGroup(gi.id, gi.name, gi.displayIndex)
 }
