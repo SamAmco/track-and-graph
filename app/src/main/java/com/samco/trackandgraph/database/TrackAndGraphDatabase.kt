@@ -31,9 +31,6 @@ import org.threeten.bp.format.DateTimeFormatter
 import java.lang.Exception
 import java.text.DecimalFormat
 
-//TODO we can remove this if the group cards wrap the text properly
-const val MAX_GROUP_NAME_LENGTH = 40
-
 val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 val doubleFormatter = DecimalFormat("#.##################")
 

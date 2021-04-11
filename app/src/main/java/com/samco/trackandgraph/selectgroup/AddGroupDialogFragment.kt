@@ -29,14 +29,11 @@ class AddGroupDialogFragment : NameInputDialogFragment() {
         fun onAddGroup(name: String)
         fun getAddGroupHintText(): String
         fun getAddGroupTitleText(): String
-        fun getGroupNameMaxLength(): Int
     }
 
     override fun registerListener(parentFragment: Fragment?) {
         listener = parentFragment as AddGroupDialogListener
     }
-
-    override fun getMaxChars(): Int = listener.getGroupNameMaxLength()
 
     override fun getPositiveButtonName(): String = getString(R.string.add)
 
