@@ -19,7 +19,7 @@
     <string name="track_group">Grupo de trazas</string>
     <string name="graph_group">Grupo de gráficos</string>
     <string name="add_track_group">Añade un grupo de trazas: </string>
-    <string name="add_feature">Añade líneas:</string>
+    <string name="add_feature">Añadir trazas:</string>
     <string name="add">Añadir</string>
     <string name="group_name">Por ejemplo, las actividades diarias</string>
     <string name="add_graph_stat_group">Añadir un grupo de diagramas: </string>
@@ -30,7 +30,7 @@
     <string name="new_name">Nuevo nombre: </string>
     <string name="graph_or_stat_name">Nombre del gráfico: </string>
     <string name="feature_name">¿Qué le gustaría rastrear?</string>
-    <string name="feature_type">¿Qué tipo de datos son?
+    <string name="feature_type">¿Qué tipo de datos son?</string>
     <string name="yes">Sí</string>
     <string name="cancel">Cancelar</string>
     <string name="select_file">Seleccionar archivo</string>
@@ -47,7 +47,7 @@
     <string name="feature_name_cannot_be_null">Por favor, añade un nombre</string>
     <string name="feature_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
     <string name="discrete_value_must_have_name">Por favor, asegúrate de que todas tus opciones tienen nombre</string>
-    <string name="discrete_feature_needs_at_least_wo_values">Por favor, añade al menos dos respuestas de opción múltiple</string>
+    <string name="discrete_feature_needs_at_least_two_values">Por favor, añade al menos dos respuestas de opción múltiple</string>
     <string name="data_points">%1$d trazado</string>
     <string name="no_data">Sin datos</string>
     <string name="add_data_point_hint">Introducir un valor para:</string>
@@ -78,7 +78,7 @@
         <item>Semanal</item>
         <item>Mensual</item>
         <item>Cuatrimestral</item>
-        <item>Semanal</item>
+        <item>Semestral</item>
         <item>Anual</item>
     </string-array>
     <string-array name="date_formats">
@@ -86,12 +86,12 @@
         <item>mm/dd/yy</item>
         <item>yy/mm/dd</item>
     </string-array>
-    <cuerda-array name="theme_names_pre_Q">
+    <string-array name="theme_names_pre_Q">
         <item>Ahorro de batería</item>
         <item>Claro</item>
         <item>Oscuro</item>
     </string-array>
-    <cuerda-array name="theme_names_Q">
+    <string-array name="theme_names_Q">
         <item>Sistema por defecto</item>
         <item>Claro</item>
         <item>Oscuro</item>
@@ -119,7 +119,7 @@
         <item>Media móvil de tres días</item>
         <item>Media móvil semanal</item>
         <item>Media móvil mensual</item>
-        <item>Media móvil trimestral/item>
+        <item>Media móvil trimestral</item>
         <item>Media móvil semestral</item>
         <item>Media móvil anual</item>
     </string-array>
@@ -144,9 +144,9 @@
         <item>Dinámico</item>
         <item>Fijo</item>
     </string-array>
-    <cuerda-array name="ending_at_values">
+    <string-array name="ending_at_values">
         <item>Reciente</item>
-        <item>Fecha personalizada...</item>
+        <item>Fecha personalizada…</item>
     </string-array>
 
 
@@ -228,7 +228,7 @@
     <string name="faq_text_5_5">Ahora, en lugar de trazar cada punto de datos con el valor Y trazado (0 o 1), cada valor Y se calcula como la media de sí mismo y de todos los puntos de datos anteriores dentro del rango de tiempo seleccionado antes.</string>
     <string name="faq_text_5_6">En general, cuanto más largo sea el período de promedio seleccionado, más suave será la curva. Sin embargo, ten en cuenta que las medias móviles son indicadores de retraso. Cuanto más largo sea el periodo de promediación, más se retrasará la curva con respecto al valor real.</string>
     <string name="faq_text_5_7">Totales del gráfico:</string>
-    <string name="faq_text_5_8">Algunas cosas sólo querrás trazarlas en contadas ocasiones. Por ejemplo, puedes querer trazar cuando termines de leer un libro:</strong>
+    <string name="faq_text_5_8">Algunas cosas sólo querrás trazarlas en contadas ocasiones. Por ejemplo, puedes querer trazar cuando termines de leer un libro:</string>
     <string name="faq_text_5_9">Supón que haces un seguimiento de lo siguiente:</string>
     <string name="faq_text_5_10">Puede que te sorprendas o no al ver que tu gráfico aparece de la siguiente manera:</string>
     <string name="faq_text_5_11">El problema es que las líneas se dibujan sólo desde cada valor trazado hasta el siguiente valor trazado. Como todos los valores trazados se interpretan como 1, sólo se ve una línea recta en el punto 1 del eje Y.</string>
@@ -243,13 +243,13 @@
     <string name="faq_text_6_5">Puedes editar o eliminar cualquier nota desde el menú de notas. Al eliminar una nota de un punto de datos desde el menú de notas, no se eliminará el punto de datos en sí, sino la nota adjunta.</string>
     <string name="tutorial_text_1"><![CDATA[Todo en Track & Graph está organizado en grupos de trazas azules y grupos de gráficos naranjas.]]></string>
     <string name="tutorial_text_2">Usa los grupos de trazas para elaborar un registro rápido de muchas cosas al mismo tiempo.</string>
-    <string name="tutorial_text_3">Utiliza los grupos de trazas para investigar los datos de varios grupos de trazas.</string>
+    <string name="tutorial_text_3">Utiliza los grupos de gráficos para investigar los datos de varios grupos de trazas.</string>
     <string name="got_it">Aceptar</string>
     <string name="move_to_colon">Mover a:</string>
     <string name="move_to">Mover a</string>
 
     <string name="feature_add_or_update_error_occurred">Se ha producido un error, no se han podido realizar los cambios.</string>
-    <string name="ru_sure_update_feature">Esta actualización puede modificar irreversiblemente los datos que ya has trazado. Se recomienda encarecidamente hacer una copia de seguridad de los datos existentes antes de continuar.</string> <string name="ru_sure_update_feature">¿Desea continuar?
+    <string name="ru_sure_update_feature">Esta actualización puede modificar irreversiblemente los datos que ya has trazado. Se recomienda encarecidamente hacer una copia de seguridad de los datos existentes antes de continuar. ¿Desea continuar?</string>
     <string name="warning">Atención</string>
     <string name="ok">Aceptar</string>
     <string name="on_feature_type_change_numerical_warning">Si actualiza su tipo de entrada a numérico sus datos trazados existentes perderán sus etiquetas.</string>
@@ -296,7 +296,7 @@
     <string name="info">Info</string>
     <string name="no_description">Sin descripción</string>
     <string name="description">Descripción</string>
-    <string name="note_input_hint">Notas...</string>
+    <string name="note_input_hint">Notas…</string>
     <string name="add_a_note">Añadir una nota</string>
     <string name="notes">Notas</string>
     <string name="faq_text_2_4">También hay una opción de respaldo y restauración en el menú. Esto exportará y restaurará todo el archivo de la base de datos que contiene todos los datos de traza, gráficos, recordatorios, etc. Se trata de un archivo de base de datos Sqlite3 sin cifrar, que también puede abrirse y modificarse mediante un software de libre acceso. Sin embargo, esto no se recomienda para los usuarios no técnicos, ya que podría romper la integridad de la base de datos.</string>
@@ -315,11 +315,11 @@
     <string name="duplicate">Duplicar</string>
     <string name="no_notes_hint_text">Las notas añadidas durante la traza aparecerán aquí. También puedes añadir notas globales usando el botón +.</string>
     <string name="add_a_global_note">Añadir una nota global:</string>
-    <string name="semanas">Semanas</string>
-    <string name="meses">Meses</string>
-    <string name="días">Días</string>
-    <string name="horas">Horas</string>
-    <string name="minutos">Minutos</string>
+    <string name="weeks">Semanas</string>
+    <string name="months">Meses</string>
+    <string name="days">Días</string>
+    <string name="hours">Horas</string>
+    <string name="minutes">Minutos</string>
     <string name="seconds">Segundos</string>
     <string name="hours_suffix">h</string>
     <string name="minutes_suffix">m</string>
