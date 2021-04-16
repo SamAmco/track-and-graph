@@ -47,6 +47,7 @@ import java.text.ParsePosition
 import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.max
+import kotlin.math.roundToLong
 
 class GraphStatLineGraphDecorator(listMode: Boolean) :
     GraphStatViewDecorator<ILineGraphViewData>(listMode) {
@@ -157,7 +158,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
                         toAppendTo: StringBuffer,
                         pos: FieldPosition
                     ): StringBuffer {
-                        val sec = (obj as Number).toLong()
+                        val sec = (obj as Number).toDouble().roundToLong()
                         return toAppendTo.append(formatTimeDuration(sec))
                     }
 
