@@ -64,7 +64,7 @@ fun formatDayMonthYearHourMinuteWeekDayTwoLines(
     context: Context,
     weekDayNames: List<String>,
     dateTime: OffsetDateTime
-) = formatDayMonthYear(context, dateTime) +
+) = formatDayMonthYear(context, dateTime) + " " +
         formatHourMinute(dateTime) +
         "\n" +
         weekDayPart(dateTime, weekDayNames)
