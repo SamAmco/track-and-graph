@@ -1,6 +1,6 @@
 # Track & Graph
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-7-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 An android app for tracking personal data and creating custom graphs
 
@@ -59,6 +59,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://android.izzysoft.de/"><img src="https://avatars3.githubusercontent.com/u/6781438?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Izzy</b></sub></a><br /><a href="#infra-IzzySoft" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="https://github.com/hhpmmd"><img src="https://avatars0.githubusercontent.com/u/77058867?v=4?s=100" width="100px;" alt=""/><br /><sub><b>hhpmmd</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=hhpmmd" title="Code">💻</a> <a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Ahhpmmd" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/Kozonak"><img src="https://avatars.githubusercontent.com/u/3283978?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kozonak</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3AKozonak" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/tifriis208"><img src="https://avatars.githubusercontent.com/u/40381365?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tifriis</b></sub></a><br /><a href="#translation-tifriis208" title="Translation">🌍</a></td>
   </tr>
 </table>
 
