@@ -69,6 +69,15 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "sguinetti",
+      "name": "Diego",
+      "avatar_url": "https://avatars.githubusercontent.com/u/5572928?v=4",
+      "profile": "http://sguinetti.gitlab.io",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
