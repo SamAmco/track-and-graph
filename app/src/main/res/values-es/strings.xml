@@ -41,8 +41,6 @@
     <string name="ru_sure_del_group">¿Estás seguro de que quieres borrar este grupo y todo lo que contiene? Este proceso no es reversible.</string>
     <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
     <string name="ru_sure_del_data_point">¿Está seguro de querer eliminar este punto de datos?</string>
-    <string name="export_file_name_suffix">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
-    <string name="backup_file_name_suffix">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.db</string>
     <string name="discrete_values">Añade algunas opciones a continuación.</string>
     <string name="feature_name_cannot_be_null">Por favor, añade un nombre</string>
     <string name="feature_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
@@ -80,11 +78,6 @@
         <item>Cuatrimestral</item>
         <item>Semestral</item>
         <item>Anual</item>
-    </string-array>
-    <string-array name="date_formats">
-        <item>dd/mm/yy</item>
-        <item>mm/dd/yy</item>
-        <item>yy/mm/dd</item>
     </string-array>
     <string-array name="theme_names_pre_Q">
         <item>Ahorro de batería</item>
@@ -181,11 +174,6 @@
     <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">Se han utilizado las siguientes bibliotecas de código abierto:</string>
-    <string name="androidplot">Androidplot</string>
-    <string name="apache_2_0">Apache 2.0</string>
-    <string name="apache_commons_csv">Apache Commons CSV</string>
-    <string name="three_ten_android_backport">Three Ten Android Backport</string>
-    <string name="timber">Timber</string>
     <string name="about">Acerca de</string>
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
@@ -347,6 +335,5 @@
     <string name="faq_text_7_11">Una última nota a tener en cuenta es que tus datos pueden estar sesgados por el hecho de que aún no has trazado los datos de cada casilla del histograma o no los has trazado todos por igual. Así que, por ejemplo, si está dibujando un histograma anual pero sólo ha realizado el seguimiento durante 6 meses, su histograma puede tener el siguiente aspecto:</string>
     <string name="faq_text_7_12">Y un año después puede tener este aspecto:</string>
     <string name="faq_text_7_13">Con el tiempo, sin embargo, este sesgo tenderá a 0. Por lo tanto, cuantos más datos se han trazado, más preciso será el histograma.</string>
-    <string name="moshi">Moshi</string>
     <string name="hold_to_preview">Avance</string>
 </resources>
