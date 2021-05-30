@@ -41,8 +41,6 @@
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
-    <string name="export_file_name_suffix">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
-    <string name="backup_file_name_suffix">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.db</string>
     <string name="discrete_values">Fügen Sie unten einige Auswahlmöglichkeiten hinzu.</string>
     <string name="feature_name_cannot_be_null">Bitte einen Namen angeben</string>
     <string name="feature_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
@@ -80,11 +78,6 @@
         <item>Vierteljährlich</item>
         <item>Halbjährlich</item>
         <item>Jährlich</item>
-    </string-array>
-    <string-array name="date_formats">
-        <item>dd/mm/yy</item>
-        <item>mm/dd/yy</item>
-        <item>yy/mm/dd</item>
     </string-array>
     <string-array name="theme_names_pre_Q">
         <item>Akku schonend</item>
@@ -181,11 +174,6 @@
     <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">Folgende Open-Source-Bibliotheken wurden verwendet:</string>
-    <string name="androidplot">Androidplot</string>
-    <string name="apache_2_0">Apache 2.0</string>
-    <string name="apache_commons_csv">Apache Commons CSV</string>
-    <string name="three_ten_android_backport">Three Ten Android Backport</string>
-    <string name="timber">Timber</string>
     <string name="about">Über</string>
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
