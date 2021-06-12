@@ -192,6 +192,28 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/lineGraphDataModificationLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/lineGraphDataModificationLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/line_graph_data_modification_mode"
+                android:textAppearance="@style/TextAppearance.Body" />
+
+            <androidx.appcompat.widget.AppCompatSpinner
+                android:id="@+id/lineGraphDataModificationSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/dialog_input_spacing"
+                android:entries="@array/line_graph_data_modifications" />
+        </LinearLayout>
+
         <ImageView
             android:id="@+id/divider0"
             android:layout_width="match_parent"

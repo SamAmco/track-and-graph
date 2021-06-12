@@ -59,6 +59,7 @@
     <string name="add_a_graph_or_stat">Ajouter un Graphique ou une Statistique</string>
     <string name="graph_type_label">Type de Graphique : </string>
     <string name="maximum_sample_duration">Taille de l\'échantillon : </string>
+    <string name="line_graph_data_modification_mode">Modification des dates : </string>
     <string name="select_a_discrete_feature">Sélectionnez un ensemble de données à choix multiple : </string>
     <string name="no_discrete_features_pie_chart">Impossible de créer un camembert car il n\'y a pas donnée suivie à choix multiples.</string>
     <string name="select_a_feature">Sélectionnez un ensemble de données : </string>

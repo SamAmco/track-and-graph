@@ -25,6 +25,12 @@ import com.samco.trackandgraph.database.dto.YRangeType
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
+enum class LineGraphDataModificationMode {
+    NONE,
+    STACKED,
+    SUM
+}
+
 @Entity(
     tableName = "line_graphs_table3",
     foreignKeys = [ForeignKey(
@@ -55,12 +61,16 @@ data class LineGraph(
     val yTo: Double,
 
     @ColumnInfo(name = "end_date")
-    val endDate: OffsetDateTime?
+    val endDate: OffsetDateTime?,
+
+    @ColumnInfo(name = "data_modification_mode")
+    val dataModificationMode: LineGraphDataModificationMode,
 ) {
     companion object {
         fun create(
             id: Long, graphStatId: Long, duration: Duration?,
-            yRangeType: YRangeType, yFrom: Double, yTo: Double, endDate: OffsetDateTime?
+            yRangeType: YRangeType, yFrom: Double, yTo: Double, endDate: OffsetDateTime?,
+            dataModificationMode: LineGraphDataModificationMode,
         ): LineGraph {
             return LineGraph(
                 id,
@@ -69,7 +79,8 @@ data class LineGraph(
                 yRangeType,
                 yFrom,
                 yTo,
-                endDate
+                endDate,
+                dataModificationMode
             )
         }
     }
