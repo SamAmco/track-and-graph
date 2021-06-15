@@ -195,8 +195,11 @@ class DisplayTrackGroupFragment : Fragment(),
         activity?.sendBroadcast(intent)
     }
 
-    private fun onFeatureAddClicked(feature: DisplayFeature) {
-        if (feature.hasDefaultValue) {
+    private fun onFeatureAddClicked(feature: DisplayFeature, useDefault: Boolean = true) {
+        /**
+         * @param useDefault: if false the default value will be ignored and the user will be queried for the value
+         */
+        if (feature.hasDefaultValue && useDefault) {
             requireContext().performTrackVibrate()
             viewModel.addDefaultValue(feature)
         } else {
