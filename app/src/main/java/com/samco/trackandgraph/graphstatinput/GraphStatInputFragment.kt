@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatinput
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
-import android.text.InputFilter
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -267,7 +266,7 @@ class GraphStatInputViewModel : ViewModel() {
     val demoViewData: LiveData<IGraphStatViewData?> get() = _demoViewData
     private val _demoViewData = MutableLiveData<IGraphStatViewData?>(null)
 
-    lateinit var allFeatures: List<FeatureAndTrackGroup> private set
+    lateinit var allFeatures: List<FeatureAndGroup> private set
 
     fun initViewModel(database: TrackAndGraphDatabase, graphStatGroupId: Long, graphStatId: Long) {
         if (this.database != null) return

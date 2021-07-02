@@ -20,15 +20,15 @@ import androidx.room.ColumnInfo
 import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.samco.trackandgraph.database.entity.FeatureType
 
-data class FeatureAndTrackGroup(
+data class FeatureAndGroup(
     @ColumnInfo(name = "id")
     var id: Long,
 
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "track_group_id")
-    val trackGroupId: Long,
+    @ColumnInfo(name = "group_id")
+    val groupId: Long,
 
     @ColumnInfo(name = "display_index")
     val displayIndex: Int,
@@ -39,6 +39,6 @@ data class FeatureAndTrackGroup(
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
 
-    @ColumnInfo(name = "track_group_name")
+    @ColumnInfo(name = "group_name")
     val trackGroupName: String
 )

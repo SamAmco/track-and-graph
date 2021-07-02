@@ -38,8 +38,8 @@ data class DisplayNote(
     @ColumnInfo(name = "feature_name")
     val featureName: String?,
 
-    @ColumnInfo(name = "track_group_name")
-    val trackGroupName: String?,
+    @ColumnInfo(name = "group_name")
+    val groupName: String?,
 
     @ColumnInfo(name = "note")
     val note: String

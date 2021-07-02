@@ -30,7 +30,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
+import com.samco.trackandgraph.database.dto.FeatureAndGroup
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
@@ -98,7 +98,7 @@ class TrackWidgetConfigureDialog : DialogFragment() {
 
 class TrackWidgetConfigureDialogViewModel : ViewModel() {
     private var dataSource: TrackAndGraphDatabaseDao? = null
-    lateinit var allFeatures: LiveData<List<FeatureAndTrackGroup>> private set
+    lateinit var allFeatures: LiveData<List<FeatureAndGroup>> private set
     var featureId: Long? = null
 
     fun init(application: Application) {

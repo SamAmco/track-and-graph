@@ -147,9 +147,6 @@ class Converters {
         if (value.isEmpty()) null else Duration.parse(value)
 
     @TypeConverter
-    fun intToGroupItemType(i: Int) = GroupItemType.values()[i]
-
-    @TypeConverter
     fun localTimeToString(value: LocalTime) = value.toString()
 
     @TypeConverter

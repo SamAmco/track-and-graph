@@ -28,20 +28,20 @@ import org.threeten.bp.OffsetDateTime
 
 private const val getAllFeaturesAndTrackGroupsQuery = """
         SELECT features_table.id, features_table.name, features_table.display_index,
-            features_table.type, features_table.discrete_values, track_groups_table.id as track_group_id,
-            track_groups_table.name as track_group_name 
+            features_table.type, features_table.discrete_values, groups_table.id as group_id,
+            groups_table.name as group_name
         FROM features_table 
-        LEFT JOIN track_groups_table 
-        ON features_table.track_group_id = track_groups_table.id
-        ORDER BY track_groups_table.display_index ASC, features_table.display_index ASC, features_table.id ASC"""
+        LEFT JOIN groups_table 
+        ON features_table.group_id = groups_table.id
+        ORDER BY groups_table.display_index ASC, features_table.display_index ASC, features_table.id ASC"""
 
 private const val getFeatureAndTrackGroupByFeatureId = """
     SELECT features_table.id, features_table.name, features_table.display_index,
-            features_table.type, features_table.discrete_values, track_groups_table.id as track_group_id,
-            track_groups_table.name as track_group_name
+            features_table.type, features_table.discrete_values, groups_table.id as group_id,
+            groups_table.name as group_name
     FROM features_table
-    LEFT JOIN track_groups_table
-    ON features_table.track_group_id = track_groups_table.id
+    LEFT JOIN groups_table
+    ON features_table.group_id = groups_table.id
     WHERE features_table.id = :featureId LIMIT 1"""
 
 private const val getFeatureByIdQuery =
@@ -53,10 +53,16 @@ interface TrackAndGraphDatabaseDao {
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery?): Int
 
     @Insert
-    fun insertTrackGroup(trackGroup: TrackGroup): Long
+    fun insertGroup(group: Group): Long
 
     @Delete
-    fun deleteTrackGroup(trackGroup: TrackGroup)
+    fun deleteGroup(group: Group)
+
+    @Update
+    fun updateGroup(group: Group)
+
+    @Update
+    fun updateGroups(groups: List<Group>)
 
     @Query("""SELECT COUNT(*) FROM features_table""")
     fun getNumFeatures(): Long
@@ -67,37 +73,11 @@ interface TrackAndGraphDatabaseDao {
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
     fun getAllRemindersSync(): List<Reminder>
 
-    @Query(
-        """SELECT track_groups_table.*, 0 as type FROM track_groups_table 
-        UNION SELECT graph_stat_groups_table.*, 1 as type FROM graph_stat_groups_table
-        ORDER BY display_index ASC"""
-    )
-    fun getAllGroups(): LiveData<List<GroupItem>>
+    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC""")
+    fun getAllGroups(): LiveData<List<Group>>
 
-    @Query(
-        """SELECT track_groups_table.*, 0 as type FROM track_groups_table 
-        UNION SELECT graph_stat_groups_table.*, 1 as type FROM graph_stat_groups_table
-        ORDER BY display_index ASC"""
-    )
-    fun getAllGroupsSync(): List<GroupItem>
-
-    @Query("SELECT * FROM track_groups_table ORDER BY display_index ASC")
-    fun getTrackGroups(): LiveData<List<TrackGroup>>
-
-    @Query("SELECT * FROM graph_stat_groups_table ORDER BY display_index ASC")
-    fun getGraphStatGroups(): LiveData<List<GraphStatGroup>>
-
-    @Delete
-    fun deleteGraphStatGroup(graphStatGroup: GraphStatGroup)
-
-    @Update
-    fun updateGraphStatGroup(graphStatGroup: GraphStatGroup)
-
-    @Update
-    fun updateGraphStatGroups(graphStatGroups: List<GraphStatGroup>)
-
-    @Insert
-    fun insertGraphStatGroup(graphStatGroup: GraphStatGroup)
+    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC""")
+    fun getAllGroupsSync(): List<Group>
 
     @Insert
     fun insertReminder(reminder: Reminder)
@@ -111,14 +91,8 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateReminders(reminders: List<Reminder>)
 
-    @Query("SELECT * FROM track_groups_table WHERE id = :id LIMIT 1")
-    fun getTrackGroupById(id: Int): TrackGroup
-
-    @Update
-    fun updateTrackGroup(trackGroup: TrackGroup)
-
-    @Update
-    fun updateTrackGroups(trackGroups: List<TrackGroup>)
+    @Query("SELECT * FROM groups_table WHERE id = :id LIMIT 1")
+    fun getGroupById(id: Int): Group
 
     @Update
     fun updateFeatures(features: List<Feature>)
@@ -130,13 +104,13 @@ interface TrackAndGraphDatabaseDao {
             FROM data_points_table GROUP BY feature_id
         ) as feature_data 
         ON feature_data.id = features_table.id
-		WHERE track_group_id = :trackGroupId
+		WHERE group_id = :groupId
         ORDER BY features_table.display_index ASC, id DESC"""
     )
-    fun getDisplayFeaturesForTrackGroup(trackGroupId: Long): LiveData<List<DisplayFeature>>
+    fun getDisplayFeaturesForGroup(groupId: Long): LiveData<List<DisplayFeature>>
 
-    @Query("SELECT features_table.* FROM features_table WHERE track_group_id = :trackGroupId ORDER BY features_table.display_index ASC")
-    fun getFeaturesForTrackGroupSync(trackGroupId: Long): List<Feature>
+    @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
+    fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
     @Query(getFeatureByIdQuery)
     fun getFeatureById(featureId: Long): Feature
@@ -148,13 +122,13 @@ interface TrackAndGraphDatabaseDao {
     fun tryGetFeatureById(featureId: Long): LiveData<Feature?>
 
     @Query(getAllFeaturesAndTrackGroupsQuery)
-    fun getAllFeaturesAndTrackGroups(): LiveData<List<FeatureAndTrackGroup>>
+    fun getAllFeaturesAndTrackGroups(): LiveData<List<FeatureAndGroup>>
 
     @Query(getAllFeaturesAndTrackGroupsQuery)
-    fun getAllFeaturesAndTrackGroupsSync(): List<FeatureAndTrackGroup>
+    fun getAllFeaturesAndTrackGroupsSync(): List<FeatureAndGroup>
 
     @Query(getFeatureAndTrackGroupByFeatureId)
-    fun getFeatureAndTrackGroupByFeatureId(featureId: Long): FeatureAndTrackGroup?
+    fun getFeatureAndTrackGroupByFeatureId(featureId: Long): FeatureAndGroup?
 
     @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
@@ -254,6 +228,7 @@ interface TrackAndGraphDatabaseDao {
     fun tryGetGraphStatById(graphStatId: Long): GraphOrStat?
 
     @Query("SELECT * FROM line_graphs_table3 WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Transaction
     fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
 
     @Query("SELECT * FROM pie_charts_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
@@ -265,8 +240,8 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM time_since_last_stat_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
-    @Query("SELECT * FROM graphs_and_stats_table2 WHERE graph_stat_group_id = :graphStatGroupId ORDER BY display_index ASC")
-    fun getGraphsAndStatsByGroupId(graphStatGroupId: Long): LiveData<List<GraphOrStat>>
+    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC")
+    fun getGraphsAndStatsByGroupId(groupId: Long): LiveData<List<GraphOrStat>>
 
     @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
@@ -274,13 +249,13 @@ interface TrackAndGraphDatabaseDao {
     @Query(
         """
             SELECT * FROM (
-                SELECT dp.timestamp as timestamp, 0 as note_type, dp.feature_id as feature_id, f.name as feature_name, t.name as track_group_name, dp.note as note
+                SELECT dp.timestamp as timestamp, 0 as note_type, dp.feature_id as feature_id, f.name as feature_name, t.name as group_name, dp.note as note
                 FROM data_points_table as dp 
                 LEFT JOIN features_table as f ON dp.feature_id = f.id
-                LEFT JOIN track_groups_table as t ON f.track_group_id = t.id
+                LEFT JOIN groups_table as t ON f.group_id = t.id
                 WHERE dp.note IS NOT NULL AND dp.note != ""
             ) UNION SELECT * FROM (
-                SELECT n.timestamp as timestamp, 1 as note_type, NULL as feature_id, NULL as feature_name, NULL as track_group_name, n.note as note
+                SELECT n.timestamp as timestamp, 1 as note_type, NULL as feature_id, NULL as feature_name, NULL as group_name, n.note as note
                 FROM notes_table as n
             ) ORDER BY timestamp DESC
         """

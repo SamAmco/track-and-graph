@@ -22,7 +22,7 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
+import com.samco.trackandgraph.database.dto.FeatureAndGroup
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.PieChart
 import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
@@ -48,11 +48,11 @@ internal class PieChartConfigView @JvmOverloads constructor(
         initFromPieChart()
     }
 
-    private fun discreteFeatures(): List<FeatureAndTrackGroup> {
+    private fun discreteFeatures(): List<FeatureAndGroup> {
         return allFeatures.filter { ftg -> ftg.featureType == FeatureType.DISCRETE }
     }
 
-    private fun getCurrentFeature(): FeatureAndTrackGroup? {
+    private fun getCurrentFeature(): FeatureAndGroup? {
         return allFeatures.firstOrNull { it.id == configData.featureId }
     }
 
