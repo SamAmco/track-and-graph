@@ -33,8 +33,6 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.GroupItem
 import com.samco.trackandgraph.database.dto.GroupItemType
-import com.samco.trackandgraph.database.entity.GraphStatGroup
-import com.samco.trackandgraph.database.entity.TrackGroup
 import com.samco.trackandgraph.databinding.FragmentSelectGroupBinding
 import com.samco.trackandgraph.ui.RenameGroupDialogFragment
 import com.samco.trackandgraph.ui.YesCancelDialogFragment

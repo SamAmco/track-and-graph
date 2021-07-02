@@ -151,10 +151,10 @@ class MoveToDialogViewModel : ViewModel() {
         if (_state.value != MoveToDialogState.WAITING) return@launch
         withContext(Dispatchers.Main) { _state.value = MoveToDialogState.MOVING }
         if (mode == GroupItemType.TRACK) {
-            val newFeature = feature.copy(trackGroupId = newGroupId)
+            val newFeature = feature.copy(groupId = newGroupId)
             dao.updateFeature(newFeature)
         } else {
-            val newGraphStat = graphStat.copy(graphStatGroupId = newGroupId)
+            val newGraphStat = graphStat.copy(groupId = newGroupId)
             dao.updateGraphOrStat(newGraphStat)
         }
         withContext(Dispatchers.Main) { _state.value = MoveToDialogState.MOVED }

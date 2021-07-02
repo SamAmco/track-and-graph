@@ -52,11 +52,11 @@ val dataVisColorList = listOf(
 )
 
 @Database(
-    entities = [TrackGroup::class, Feature::class, DataPoint::class, GraphStatGroup::class,
+    entities = [Feature::class, DataPoint::class, Group::class,
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class, GlobalNote::class, LineGraphFeature::class,
         TimeHistogram::class],
-    version = 43
+    version = 44
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
