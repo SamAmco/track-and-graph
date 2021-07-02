@@ -65,13 +65,4 @@ data class GraphOrStat(
 
     @ColumnInfo(name = "display_index")
     val displayIndex: Int
-) {
-    companion object {
-        fun create(
-            id: Long, graphStatGroupId: Long, name: String,
-            type: GraphStatType, displayIndex: Int
-        ): GraphOrStat {
-            return GraphOrStat(id, graphStatGroupId, name, type, displayIndex)
-        }
-    }
-}
+)

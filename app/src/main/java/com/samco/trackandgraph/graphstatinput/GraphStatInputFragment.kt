@@ -382,7 +382,7 @@ class GraphStatInputViewModel : ViewModel() {
         dataSource!!.updateGraphStats(newList)
     }
 
-    private fun constructGraphOrStat() = GraphOrStat.create(
+    private fun constructGraphOrStat() = GraphOrStat(
         graphStatId ?: 0L, graphStatGroupId, _graphName.value!!, _graphStatType.value!!,
         graphStatDisplayIndex ?: 0
     )

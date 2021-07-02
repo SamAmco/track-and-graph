@@ -320,9 +320,8 @@ class DisplayTrackGroupViewModel : ViewModel() {
         }
     }
 
-    private fun toFeature(df: DisplayFeature) = Feature.create(
-        df.id, df.name, df.groupId,
-        df.featureType, df.discreteValues, df.hasDefaultValue, df.defaultValue, df.displayIndex,
-        df.description
+    private fun toFeature(df: DisplayFeature) = Feature(
+        df.id, df.name, df.groupId, df.featureType, df.discreteValues,
+        df.displayIndex, df.hasDefaultValue, df.defaultValue, df.description
     )
 }

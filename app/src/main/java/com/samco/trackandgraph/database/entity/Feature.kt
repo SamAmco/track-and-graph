@@ -61,25 +61,12 @@ data class Feature(
     val defaultValue: Double,
 
     @ColumnInfo(name = "feature_description")
-    val description: String
+    val description: String,
 ) {
     fun getDefaultLabel(): String =
         if (featureType == FeatureType.DISCRETE)
             discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
         else ""
-
-    companion object {
-        fun create(
-            id: Long, name: String, trackGroupId: Long, featureType: FeatureType,
-            discreteValues: List<DiscreteValue>, hasDefaultValue: Boolean, defaultValue: Double,
-            displayIndex: Int, description: String
-        ): Feature {
-            return Feature(
-                id, name, trackGroupId, featureType, discreteValues,
-                displayIndex, hasDefaultValue, defaultValue, description
-            )
-        }
-    }
 }
 
 enum class FeatureType { DISCRETE, CONTINUOUS, DURATION }
