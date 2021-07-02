@@ -243,6 +243,9 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC")
     fun getGraphsAndStatsByGroupId(groupId: Long): LiveData<List<GraphOrStat>>
 
+    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC")
+    fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
+
     @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
 
