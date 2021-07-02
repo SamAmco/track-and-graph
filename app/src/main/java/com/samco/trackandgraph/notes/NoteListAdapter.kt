@@ -29,9 +29,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayNote
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
-import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
-import java.util.*
 
 internal class NoteListAdapter(
     private val clickListener: NoteClickListener,
@@ -70,8 +68,8 @@ internal class NoteViewHolder private constructor(
         binding.timestampText.text =
             formatDayWeekDayMonthYearHourMinuteOneLine(binding.root.context, weekDayNames, note.timestamp)
         binding.noteText.text = note.note
-        binding.featureAndTrackGroupText.text = when (note.noteType) {
-            NoteType.DATA_POINT -> "${note.trackGroupName} -> ${note.featureName}"
+        binding.featureAndGroupText.text = when (note.noteType) {
+            NoteType.DATA_POINT -> "${note.groupName} -> ${note.featureName}"
             NoteType.GLOBAL_NOTE -> ""
         }
         binding.editButton.setOnClickListener { createContextMenu(binding.editButton) }

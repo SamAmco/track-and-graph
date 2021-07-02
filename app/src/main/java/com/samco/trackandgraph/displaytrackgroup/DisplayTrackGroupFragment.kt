@@ -45,8 +45,8 @@ import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 
-const val TRACK_GROUP_ID_KEY = "TRACK_GROUP_ID_KEY"
-const val TRACK_GROUP_NAME_KEY = "TRACK_GROUP_NAME_KEY"
+const val GROUP_ID_KEY = "GROUP_ID_KEY"
+const val GROUP_NAME_KEY = "GROUP_NAME_KEY"
 
 class DisplayTrackGroupFragment : Fragment(),
     YesCancelDialogFragment.YesCancelDialogListener {
@@ -234,8 +234,8 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun onExportClicked() {
         val dialog = ExportFeaturesDialog()
         val argBundle = Bundle()
-        argBundle.putLong(TRACK_GROUP_ID_KEY, args.trackGroup)
-        argBundle.putString(TRACK_GROUP_NAME_KEY, args.trackGroupName)
+        argBundle.putLong(GROUP_ID_KEY, args.trackGroup)
+        argBundle.putString(GROUP_NAME_KEY, args.trackGroupName)
         dialog.arguments = argBundle
         childFragmentManager.let { dialog.show(it, "export_features_dialog") }
     }
@@ -243,8 +243,8 @@ class DisplayTrackGroupFragment : Fragment(),
     private fun onImportClicked() {
         val dialog = ImportFeaturesDialog()
         val argBundle = Bundle()
-        argBundle.putLong(TRACK_GROUP_ID_KEY, args.trackGroup)
-        argBundle.putString(TRACK_GROUP_NAME_KEY, args.trackGroupName)
+        argBundle.putLong(GROUP_ID_KEY, args.trackGroup)
+        argBundle.putString(GROUP_NAME_KEY, args.trackGroupName)
         dialog.arguments = argBundle
         childFragmentManager.let { dialog.show(it, "import_features_dialog") }
     }
@@ -266,7 +266,8 @@ class DisplayTrackGroupFragment : Fragment(),
 
 class DisplayTrackGroupViewModel : ViewModel() {
     private var dataSource: TrackAndGraphDatabaseDao? = null
-    private var trackGroupId: Long = -1
+    //TODO can be nullable now
+    private var groupId: Long = -1
 
     var numFeatures = -1
 
@@ -277,11 +278,11 @@ class DisplayTrackGroupViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    fun initViewModel(activity: Activity, trackGroupId: Long) {
+    fun initViewModel(activity: Activity, groupId: Long) {
         if (dataSource != null) return
-        this.trackGroupId = trackGroupId
+        this.groupId = groupId
         dataSource = TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
-        features = dataSource!!.getDisplayFeaturesForTrackGroup(trackGroupId)
+        features = dataSource!!.getDisplayFeaturesForGroup(groupId)
     }
 
     override fun onCleared() {
@@ -320,7 +321,7 @@ class DisplayTrackGroupViewModel : ViewModel() {
     }
 
     private fun toFeature(df: DisplayFeature) = Feature.create(
-        df.id, df.name, df.trackGroupId,
+        df.id, df.name, df.groupId,
         df.featureType, df.discreteValues, df.hasDefaultValue, df.defaultValue, df.displayIndex,
         df.description
     )

@@ -31,8 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.GroupItem
-import com.samco.trackandgraph.database.dto.GroupItemType
+import com.samco.trackandgraph.database.entity.Group
 import com.samco.trackandgraph.databinding.FragmentSelectGroupBinding
 import com.samco.trackandgraph.ui.RenameGroupDialogFragment
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
@@ -43,25 +42,26 @@ import kotlinx.coroutines.*
 class SelectGroupFragment : Fragment(),
     YesCancelDialogFragment.YesCancelDialogListener,
     AddGroupDialogFragment.AddGroupDialogListener,
-    RenameGroupDialogFragment.RenameGroupDialogListener
-{
+    RenameGroupDialogFragment.RenameGroupDialogListener {
     private var navController: NavController? = null
     private lateinit var binding: FragmentSelectGroupBinding
     private val viewModel by viewModels<SelectGroupViewModel>()
     private lateinit var adapter: GroupListAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         this.navController = container?.findNavController()
-        binding = DataBindingUtil.inflate(inflater, R.layout.fragment_select_group, container, false)
+        binding =
+            DataBindingUtil.inflate(inflater, R.layout.fragment_select_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.initViewModel(requireActivity())
         listenToViewModel()
 
         binding.noGroupsHintText.visibility = View.INVISIBLE
-        binding.noGroupsHintText.setOnClickListener {
-            viewModel.addFirstTrackGroup(getString(R.string.my_first_track_group))
-        }
 
         adapter = GroupListAdapter(
             GroupClickListener(
@@ -91,7 +91,18 @@ class SelectGroupFragment : Fragment(),
                             viewModel.firstTrackGroupId, getString(R.string.my_first_track_group)
                         )
                     )
-                } catch (e: Exception) {}
+                } catch (e: Exception) {
+                }
+            } else if (it == SelectGroupViewModelState.TRACK_GROUP_SELECTED) {
+                SelectGroupFragmentDirections.actionSelectTackGroup(
+                    viewModel.currentActionGroupItem!!.id,
+                    viewModel.currentActionGroupItem!!.name
+                )
+            } else if (it == SelectGroupViewModelState.GRAPH_GROUP_SELECTED) {
+                SelectGroupFragmentDirections.actionSelectGraphStatGroup(
+                    viewModel.currentActionGroupItem!!.id,
+                    viewModel.currentActionGroupItem!!.name
+                )
             }
         })
     }
@@ -104,16 +115,27 @@ class SelectGroupFragment : Fragment(),
     override fun onStop() {
         super.onStop()
         if (navController?.currentDestination?.id != R.id.selectGroupFragment) {
-            requireActivity().toolbar.overflowIcon = getDrawable(requireContext(), R.drawable.list_menu_icon)
+            requireActivity().toolbar.overflowIcon =
+                getDrawable(requireContext(), R.drawable.list_menu_icon)
         }
     }
 
     private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
-        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
-            return makeFlag(ItemTouchHelper.ACTION_STATE_DRAG, ItemTouchHelper.UP or ItemTouchHelper.DOWN)
+        override fun getMovementFlags(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder
+        ): Int {
+            return makeFlag(
+                ItemTouchHelper.ACTION_STATE_DRAG,
+                ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            )
         }
 
-        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        override fun onMove(
+            recyclerView: RecyclerView,
+            viewHolder: RecyclerView.ViewHolder,
+            target: RecyclerView.ViewHolder
+        ): Boolean {
             adapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
             return true
         }
@@ -131,11 +153,11 @@ class SelectGroupFragment : Fragment(),
             viewModel.adjustDisplayIndexes(adapter.getItems())
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) { }
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
     }
 
     private fun observeGroupDataAndUpdate(adapter: GroupListAdapter) {
-        adapter.registerAdapterDataObserver(object: RecyclerView.AdapterDataObserver() {
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 binding.groupList.smoothScrollToPosition(0)
             }
@@ -149,20 +171,23 @@ class SelectGroupFragment : Fragment(),
         })
     }
 
-    private fun onRenameClicked(groupItem: GroupItem) {
-        viewModel.currentActionGroupItem = groupItem
+    private fun onRenameClicked(group: Group) {
+        viewModel.currentActionGroupItem = group
         val dialog = RenameGroupDialogFragment()
         childFragmentManager.let { dialog.show(it, "rename_group_dialog") }
     }
 
     override fun getGroupItem() = viewModel.currentActionGroupItem!!
 
-    override fun onRenameGroupItem(groupItem: GroupItem) { viewModel.updateGroup(groupItem) }
+    override fun onRenameGroup(group: Group) {
+        viewModel.updateGroup(group)
+    }
+
     override fun getRenameDialogHintText() = getRenameDialogHint()
     private fun getRenameDialogHint() = getString(R.string.group_name)
 
-    private fun onDeleteClicked(groupItem: GroupItem) {
-        viewModel.currentActionGroupItem = groupItem
+    private fun onDeleteClicked(group: Group) {
+        viewModel.currentActionGroupItem = group
         val dialog = YesCancelDialogFragment()
         val args = Bundle()
         args.putString("title", getDeleteDialogTitle())
@@ -180,15 +205,17 @@ class SelectGroupFragment : Fragment(),
         }
     }
 
-    private fun onGroupSelected(groupItem: GroupItem) {
-        when (groupItem.type) {
-            GroupItemType.TRACK -> navController?.navigate(
-                SelectGroupFragmentDirections.actionSelectTackGroup(groupItem.id, groupItem.name)
-            )
-            GroupItemType.GRAPH -> navController?.navigate(
-                SelectGroupFragmentDirections.actionSelectGraphStatGroup(groupItem.id, groupItem.name)
-            )
-        }
+    private fun onGroupSelected(group: Group) {
+        viewModel.currentActionGroupItem = group
+        viewModel.onGroupSelected(group)
+        //when (groupItem.type) {
+        //    GroupItemType.TRACK -> navController?.navigate(
+        //        SelectGroupFragmentDirections.actionSelectTackGroup(groupItem.id, groupItem.name)
+        //    )
+        //    GroupItemType.GRAPH -> navController?.navigate(
+        //        SelectGroupFragmentDirections.actionSelectGraphStatGroup(groupItem.id, groupItem.name)
+        //    )
+        //}
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -197,16 +224,16 @@ class SelectGroupFragment : Fragment(),
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.add_track_group -> {
-                viewModel.currentActionGroupType = GroupItemType.TRACK
-                onAddClicked()
-            }
-            R.id.add_graph_group -> {
-                viewModel.currentActionGroupType = GroupItemType.GRAPH
-                onAddClicked()
-            }
-        }
+        //when (item.itemId) {
+        //    R.id.add_track_group -> {
+        //        viewModel.currentActionGroupType = GroupItemType.TRACK
+        //        onAddClicked()
+        //    }
+        //    R.id.add_graph_group -> {
+        //        viewModel.currentActionGroupType = GroupItemType.GRAPH
+        //        onAddClicked()
+        //    }
+        //}
         return super.onOptionsItemSelected(item)
     }
 
@@ -217,46 +244,55 @@ class SelectGroupFragment : Fragment(),
 
     override fun getAddGroupHintText() = getString(R.string.group_name)
 
-    override fun getAddGroupTitleText() = when (viewModel.currentActionGroupType) {
-        GroupItemType.TRACK -> getString(R.string.add_track_group)
-        GroupItemType.GRAPH -> getString(R.string.add_graph_stat_group)
-    }
+    override fun getAddGroupTitleText() = getString(R.string.add_group)
 
     override fun onAddGroup(name: String) {
         viewModel.addGroup(
-            GroupItem(
+            Group(
                 0,
                 name,
                 viewModel.allGroups.value?.size ?: 0,
-                viewModel.currentActionGroupType
+                null,//TODO implement these
+                0
             )
         )
     }
 }
 
-enum class SelectGroupViewModelState { INITIALIZING, WAITING, CREATED_FIRST_GROUP }
+enum class SelectGroupViewModelState { INITIALIZING, WAITING, CREATED_FIRST_GROUP, TRACK_GROUP_SELECTED, GRAPH_GROUP_SELECTED }
 class SelectGroupViewModel : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
     private var dataSource: TrackAndGraphDatabaseDao? = null
 
-    var currentActionGroupItem: GroupItem? = null
-    var currentActionGroupType: GroupItemType = GroupItemType.TRACK
+    var currentActionGroupItem: Group? = null
 
     var firstTrackGroupId: Long = -1
         private set
 
-    lateinit var allGroups: LiveData<List<GroupItem>>
+    lateinit var allGroups: LiveData<List<Group>>
         private set
 
-    val state: LiveData<SelectGroupViewModelState> get() { return _state }
+    val state: LiveData<SelectGroupViewModelState>
+        get() {
+            return _state
+        }
     private val _state = MutableLiveData(SelectGroupViewModelState.INITIALIZING)
 
     fun initViewModel(activity: Activity) {
         if (dataSource != null) return
-        dataSource = TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
+        dataSource =
+            TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
         allGroups = dataSource!!.getAllGroups()
         _state.value = SelectGroupViewModelState.WAITING
+    }
+
+    fun onGroupSelected(group: Group) {
+        ioScope.launch {
+            val graphs = dataSource?.getGraphsAndStatsByGroupId(group.id)?.value?.size ?: 0
+            if (graphs > 0) _state.value = SelectGroupViewModelState.GRAPH_GROUP_SELECTED
+            else _state.value = SelectGroupViewModelState.TRACK_GROUP_SELECTED
+        }
     }
 
     override fun onCleared() {
@@ -264,58 +300,14 @@ class SelectGroupViewModel : ViewModel() {
         ioScope.cancel()
     }
 
-    fun deleteGroup(groupItem: GroupItem) = when (groupItem.type) {
-        GroupItemType.TRACK -> ioScope.launch {
-            dataSource!!.deleteTrackGroup(toTG(groupItem))
-        }
-        GroupItemType.GRAPH -> ioScope.launch {
-            dataSource!!.deleteGraphStatGroup(toGSG(groupItem))
-        }
-    }
+    fun deleteGroup(groupItem: Group) = dataSource!!.deleteGroup(groupItem)
 
-    fun addFirstTrackGroup(name: String) = ioScope.launch {
-        firstTrackGroupId = dataSource!!.insertTrackGroup(TrackGroup(0, name, 0))
-        withContext(Dispatchers.Main) {
-            _state.value = SelectGroupViewModelState.CREATED_FIRST_GROUP
-            _state.value = SelectGroupViewModelState.WAITING
-        }
-    }
+    fun addGroup(group: Group) = ioScope.launch { dataSource!!.insertGroup(group) }
 
-    fun addGroup(groupItem: GroupItem) = when (groupItem.type) {
-        GroupItemType.TRACK -> ioScope.launch {
-            dataSource!!.insertTrackGroup(toTG(groupItem))
-        }
-        GroupItemType.GRAPH -> ioScope.launch {
-            dataSource!!.insertGraphStatGroup(toGSG(groupItem))
-        }
-    }
+    fun updateGroup(group: Group) = ioScope.launch { dataSource!!.updateGroup(group) }
 
-    fun updateGroup(groupItem: GroupItem) = when (groupItem.type) {
-        GroupItemType.TRACK -> ioScope.launch {
-            dataSource!!.updateTrackGroup(toTG(groupItem))
-        }
-        GroupItemType.GRAPH -> ioScope.launch {
-            dataSource!!.updateGraphStatGroup(toGSG(groupItem))
-        }
+    fun adjustDisplayIndexes(groups: List<Group>) {
+        val newGroups = groups.mapIndexed { i, group -> group.copy(displayIndex = i) }
+        ioScope.launch { dataSource!!.updateGroups(newGroups) }
     }
-
-    fun adjustDisplayIndexes(groupItems: List<GroupItem>) {
-        val newTrackGroups = mutableListOf<TrackGroup>()
-        val newGraphGroups = mutableListOf<GraphStatGroup>()
-        groupItems.forEachIndexed { i, groupItem ->
-            when(groupItem.type) {
-                GroupItemType.TRACK -> newTrackGroups.add(toTG(groupItem, i))
-                GroupItemType.GRAPH -> newGraphGroups.add(toGSG(groupItem, i))
-            }
-        }
-        ioScope.launch {
-            dataSource!!.updateTrackGroups(newTrackGroups)
-            dataSource!!.updateGraphStatGroups(newGraphGroups)
-        }
-    }
-
-    private fun toTG(gi: GroupItem, di: Int) = TrackGroup(gi.id, gi.name, di)
-    private fun toTG(gi: GroupItem) = TrackGroup(gi.id, gi.name, gi.displayIndex)
-    private fun toGSG(gi: GroupItem, di: Int) = GraphStatGroup(gi.id, gi.name, di)
-    private fun toGSG(gi: GroupItem) = GraphStatGroup(gi.id, gi.name, gi.displayIndex)
 }

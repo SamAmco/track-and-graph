@@ -18,7 +18,7 @@
     <string name="home">Home</string>
     <string name="track_group">Track Group</string>
     <string name="graph_group">Graph Group</string>
-    <string name="add_track_group">Add A Track Group: </string>
+    <string name="add_group">Add A Group: </string>
     <string name="add_feature">Track something:</string>
     <string name="add">Add</string>
     <string name="group_name">e.g. Daily Activities</string>

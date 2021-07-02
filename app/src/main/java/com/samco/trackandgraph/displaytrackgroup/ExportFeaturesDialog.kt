@@ -45,8 +45,8 @@ const val CREATE_FILE_REQUEST_CODE = 123
 enum class ExportState { LOADING, WAITING, EXPORTING, DONE }
 class ExportFeaturesDialog : DialogFragment() {
 
-    private var trackGroupName: String? = null
-    private var trackGroupId: Long? = null
+    private var groupName: String? = null
+    private var groupId: Long? = null
 
     private val viewModel by viewModels<ExportFeaturesViewModel>()
 
@@ -59,8 +59,8 @@ class ExportFeaturesDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val view = it.layoutInflater.inflate(R.layout.export_features_dialog, null)
-            trackGroupName = requireArguments().getString(TRACK_GROUP_NAME_KEY)
-            trackGroupId = requireArguments().getLong(TRACK_GROUP_ID_KEY)
+            groupName = requireArguments().getString(GROUP_NAME_KEY)
+            groupId = requireArguments().getLong(GROUP_ID_KEY)
 
             fileButton = view.findViewById(R.id.fileButton)
             progressBar = view.findViewById(R.id.progressBar)
@@ -87,7 +87,7 @@ class ExportFeaturesDialog : DialogFragment() {
         alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
             .setTextColor(alertDialog.context.getColorFromAttr(R.attr.colorControlNormal))
         positiveButton.isEnabled = false
-        viewModel.loadFeatures(requireActivity(), trackGroupId!!)
+        viewModel.loadFeatures(requireActivity(), groupId!!)
         listenToState()
         setUriListeners()
         listenToFeatures()
@@ -133,7 +133,7 @@ class ExportFeaturesDialog : DialogFragment() {
             addCategory(Intent.CATEGORY_OPENABLE)
             val now = OffsetDateTime.now()
             val generatedName = getString( R.string.export_file_name_suffix,
-                "TrackAndGraph", trackGroupName, now.year, now.monthValue,
+                "TrackAndGraph", groupName, now.year, now.monthValue,
                 now.dayOfMonth, now.hour, now.minute, now.second)
             putExtra(Intent.EXTRA_TITLE, generatedName)
             type = "text/csv"
@@ -200,14 +200,14 @@ class ExportFeaturesViewModel : ViewModel() {
         return@lazy loaded
     }
 
-    fun loadFeatures(activity: Activity, trackGroupId: Long) {
+    fun loadFeatures(activity: Activity, groupId: Long) {
         if (_featuresLoaded.value == false) {
             uiScope.launch {
                 _exportState.value = ExportState.LOADING
                 val application = activity.application
                 val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
                 withContext(Dispatchers.IO) {
-                    features = dao.getFeaturesForTrackGroupSync(trackGroupId).toMutableList()
+                    features = dao.getFeaturesForGroupSync(groupId).toMutableList()
                 }
                 selectedFeatures = features.toMutableList()
                 _featuresLoaded.value = true

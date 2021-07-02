@@ -27,8 +27,6 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
@@ -39,7 +37,6 @@ import com.samco.trackandgraph.util.CSVReadWriter
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
-import timber.log.Timber
 
 const val OPEN_FILE_REQUEST_CODE = 124
 
@@ -56,8 +53,8 @@ class ImportFeaturesDialog : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val view = it.layoutInflater.inflate(R.layout.import_features_dialog, null)
-            trackGroupName = requireArguments().getString(TRACK_GROUP_NAME_KEY)
-            trackGroupId = requireArguments().getLong(TRACK_GROUP_ID_KEY)
+            trackGroupName = requireArguments().getString(GROUP_NAME_KEY)
+            trackGroupId = requireArguments().getLong(GROUP_ID_KEY)
 
             fileButton = view.findViewById(R.id.fileButton)
             progressBar = view.findViewById(R.id.progressBar)

@@ -77,7 +77,7 @@ fun showNoteDialog(inflater: LayoutInflater, context: Context, note: GlobalNote)
 
 fun showNoteDialog(inflater: LayoutInflater, context: Context, note: DisplayNote) {
     val featureDispalayName = when (note.noteType) {
-        NoteType.DATA_POINT -> "${note.trackGroupName} -> ${note.featureName}"
+        NoteType.DATA_POINT -> "${note.groupName} -> ${note.featureName}"
         NoteType.GLOBAL_NOTE -> ""
     }
     val headerView =
