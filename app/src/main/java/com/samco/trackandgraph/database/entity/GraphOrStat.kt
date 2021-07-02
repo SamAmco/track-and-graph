@@ -43,9 +43,9 @@ val maxGraphPeriodDurations = listOf(
 @Entity(
     tableName = "graphs_and_stats_table2",
     foreignKeys = [ForeignKey(
-        entity = GraphStatGroup::class,
+        entity = Group::class,
         parentColumns = arrayOf("id"),
-        childColumns = arrayOf("graph_stat_group_id"),
+        childColumns = arrayOf("group_id"),
         onDelete = ForeignKey.CASCADE
     )]
 )
@@ -54,8 +54,8 @@ data class GraphOrStat(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
-    @ColumnInfo(name = "graph_stat_group_id", index = true)
-    val graphStatGroupId: Long,
+    @ColumnInfo(name = "group_id", index = true)
+    val groupId: Long?,
 
     @ColumnInfo(name = "name")
     val name: String,

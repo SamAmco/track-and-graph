@@ -28,9 +28,9 @@ import java.lang.Exception
 @Entity(
     tableName = "features_table",
     foreignKeys = [ForeignKey(
-        entity = TrackGroup::class,
+        entity = Group::class,
         parentColumns = arrayOf("id"),
-        childColumns = arrayOf("track_group_id"),
+        childColumns = arrayOf("group_id"),
         onDelete = ForeignKey.CASCADE
     )]
 )
@@ -42,8 +42,8 @@ data class Feature(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "track_group_id", index = true)
-    val trackGroupId: Long,
+    @ColumnInfo(name = "group_id", index = true)
+    val groupId: Long?,
 
     @ColumnInfo(name = "type")
     val featureType: FeatureType,
