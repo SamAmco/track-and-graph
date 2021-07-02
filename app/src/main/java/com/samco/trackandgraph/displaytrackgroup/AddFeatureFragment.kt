@@ -642,12 +642,12 @@ class AddFeatureViewModel : ViewModel() {
                 )
             }
 
-        val feature = Feature.create(
+        val feature = Feature(
             existingFeature!!.id,
             featureName, trackGroupId,
-            featureType.value!!, newDiscVals,
+            featureType.value!!, newDiscVals, existingFeature!!.displayIndex,
             featureHasDefaultValue.value!!, featureDefaultValue.value!!,
-            existingFeature!!.displayIndex, featureDescription
+            featureDescription
         )
         dao!!.updateFeature(feature)
     }
@@ -761,12 +761,12 @@ class AddFeatureViewModel : ViewModel() {
             val index = if (discreteValues.size == 1) 1 else i
             DiscreteValue(index, s.value)
         }
-        val feature = Feature.create(
+        val feature = Feature(
             0,
             featureName, trackGroupId,
-            featureType.value!!, discVals,
+            featureType.value!!, discVals, 0,
             featureHasDefaultValue.value!!, featureDefaultValue.value!!,
-            0, featureDescription
+            featureDescription
         )
         dao!!.insertFeature(feature)
     }

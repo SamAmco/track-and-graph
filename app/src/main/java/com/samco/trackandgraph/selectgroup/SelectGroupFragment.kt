@@ -94,14 +94,18 @@ class SelectGroupFragment : Fragment(),
                 } catch (e: Exception) {
                 }
             } else if (it == SelectGroupViewModelState.TRACK_GROUP_SELECTED) {
-                SelectGroupFragmentDirections.actionSelectTackGroup(
-                    viewModel.currentActionGroupItem!!.id,
-                    viewModel.currentActionGroupItem!!.name
+                navController?.navigate(
+                    SelectGroupFragmentDirections.actionSelectTackGroup(
+                        viewModel.currentActionGroupItem!!.id,
+                        viewModel.currentActionGroupItem!!.name
+                    )
                 )
             } else if (it == SelectGroupViewModelState.GRAPH_GROUP_SELECTED) {
-                SelectGroupFragmentDirections.actionSelectGraphStatGroup(
-                    viewModel.currentActionGroupItem!!.id,
-                    viewModel.currentActionGroupItem!!.name
+                navController?.navigate(
+                    SelectGroupFragmentDirections.actionSelectGraphStatGroup(
+                        viewModel.currentActionGroupItem!!.id,
+                        viewModel.currentActionGroupItem!!.name
+                    )
                 )
             }
         })
@@ -290,8 +294,11 @@ class SelectGroupViewModel : ViewModel() {
     fun onGroupSelected(group: Group) {
         ioScope.launch {
             val graphs = dataSource?.getGraphsAndStatsByGroupId(group.id)?.value?.size ?: 0
-            if (graphs > 0) _state.value = SelectGroupViewModelState.GRAPH_GROUP_SELECTED
-            else _state.value = SelectGroupViewModelState.TRACK_GROUP_SELECTED
+            withContext(Dispatchers.Main) {
+                if (graphs > 0) _state.value = SelectGroupViewModelState.GRAPH_GROUP_SELECTED
+                else _state.value = SelectGroupViewModelState.TRACK_GROUP_SELECTED
+
+            }
         }
     }
 

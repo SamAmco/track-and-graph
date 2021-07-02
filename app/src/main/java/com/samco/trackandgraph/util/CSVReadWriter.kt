@@ -355,9 +355,9 @@ object CSVReadWriter {
                 )
             )
             else listOf()
-        val newFeature = Feature.create(
+        val newFeature = Feature(
             0, rec.featureName, trackGroupId, featureType,
-            discreteValues, false, 1.0, 0, ""
+            discreteValues, 0, false, 1.0, ""
         )
         val featureId = dataSource.insertFeature(newFeature)
         return newFeature.copy(id = featureId)
