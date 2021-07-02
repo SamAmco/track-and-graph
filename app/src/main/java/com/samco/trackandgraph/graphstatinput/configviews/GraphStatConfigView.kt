@@ -26,7 +26,7 @@ import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSpinner
-import com.samco.trackandgraph.database.dto.FeatureAndTrackGroup
+import com.samco.trackandgraph.database.dto.FeatureAndGroup
 import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.ExtendedSpinner
@@ -45,7 +45,7 @@ abstract class GraphStatConfigView constructor(
     attrs,
     defStyleAttr
 ) {
-    protected lateinit var allFeatures: List<FeatureAndTrackGroup>
+    protected lateinit var allFeatures: List<FeatureAndGroup>
 
     private var configChangedListener: ((Any?, ValidationException?) -> Unit)? = null
     protected var onScrollListener: ((Int) -> Unit)? = null
@@ -53,7 +53,7 @@ abstract class GraphStatConfigView constructor(
 
     abstract fun initFromConfigData(configData: Any?)
 
-    internal fun initFromConfigData(configData: Any?, features: List<FeatureAndTrackGroup>) {
+    internal fun initFromConfigData(configData: Any?, features: List<FeatureAndGroup>) {
         this.allFeatures = features
         initFromConfigData(configData)
     }
@@ -84,8 +84,8 @@ abstract class GraphStatConfigView constructor(
             view: GraphStatConfigView,
             spinner: AppCompatSpinner,
             selectedId: Long,
-            featureFilter: (FeatureAndTrackGroup) -> Boolean,
-            onItemSelected: (FeatureAndTrackGroup) -> Unit
+            featureFilter: (FeatureAndGroup) -> Boolean,
+            onItemSelected: (FeatureAndGroup) -> Unit
         ) {
             val allFeatures = view.allFeatures.filter(featureFilter)
             val context = view.context
@@ -114,7 +114,7 @@ abstract class GraphStatConfigView constructor(
             view: GraphStatConfigView,
             spinner: AppCompatSpinner,
             selectedId: Long,
-            onItemSelected: (FeatureAndTrackGroup) -> Unit
+            onItemSelected: (FeatureAndGroup) -> Unit
         ) {
             listenToFeatureSpinner(view, spinner, selectedId, { true }, onItemSelected)
         }

@@ -88,18 +88,19 @@ val pointStyleDrawableResources = listOf(
 
 @Entity(
     tableName = "line_graph_features_table2",
-    foreignKeys = [ForeignKey(
-        entity = LineGraph::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("line_graph_id"),
-        onDelete = ForeignKey.CASCADE
-    ),
-    ForeignKey(
-        entity = Feature::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("feature_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
+    foreignKeys = [
+        ForeignKey(
+            entity = LineGraph::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("line_graph_id"),
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Feature::class,
+            parentColumns = arrayOf("id"),
+            childColumns = arrayOf("feature_id"),
+            onDelete = ForeignKey.CASCADE
+        )]
 )
 data class LineGraphFeature(
     @PrimaryKey(autoGenerate = true)
@@ -109,7 +110,7 @@ data class LineGraphFeature(
     @ColumnInfo(name = "line_graph_id", index = true)
     val lineGraphId: Long,
 
-    @ColumnInfo(name = "feature_id")
+    @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,
 
     @ColumnInfo(name = "name")

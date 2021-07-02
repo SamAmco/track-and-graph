@@ -28,8 +28,8 @@ data class DisplayFeature(
     @ColumnInfo(name = "name")
     val name: String,
 
-    @ColumnInfo(name = "track_group_id")
-    val trackGroupId: Long,
+    @ColumnInfo(name = "group_id")
+    val groupId: Long,
 
     @ColumnInfo(name = "type")
     val featureType: FeatureType = FeatureType.CONTINUOUS,

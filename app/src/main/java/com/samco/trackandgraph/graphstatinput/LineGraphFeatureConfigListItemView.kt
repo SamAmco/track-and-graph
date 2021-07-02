@@ -18,7 +18,6 @@ package com.samco.trackandgraph.graphstatinput
 
 import android.content.Context
 
-import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +37,7 @@ import java.text.DecimalFormat
 
 class LineGraphFeatureConfigListItemView(
     context: Context,
-    private val features: List<FeatureAndTrackGroup>,
+    private val features: List<FeatureAndGroup>,
     private val lineGraphFeature: LineGraphFeatureConfig
 ) : LinearLayout(context) {
     private val binding =
@@ -210,8 +209,8 @@ class LineGraphFeatureConfigListItemView(
         }
     }
 
-    private fun getSpinnerItemsForFeature(feature: FeatureAndTrackGroup)
-            : List<Triple<FeatureAndTrackGroup, DurationPlottingMode, String>> {
+    private fun getSpinnerItemsForFeature(feature: FeatureAndGroup)
+            : List<Triple<FeatureAndGroup, DurationPlottingMode, String>> {
         val name = "${feature.trackGroupName} -> ${feature.name}"
         return if (feature.featureType == FeatureType.DURATION) {
             val time = context.getString(R.string.time_duration)
