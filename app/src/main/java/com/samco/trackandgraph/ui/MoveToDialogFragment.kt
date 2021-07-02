@@ -30,10 +30,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.GroupItem
-import com.samco.trackandgraph.database.dto.GroupItemType
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.database.entity.Group
 import com.samco.trackandgraph.databinding.ListItemMoveToGroupBinding
 import com.samco.trackandgraph.databinding.MoveToGroupDialogBinding
 import kotlinx.coroutines.*
@@ -45,6 +44,8 @@ const val MOVE_DIALOG_TYPE_KEY = "move_dialog_type"
 const val MOVE_DIALOG_GROUP_KEY = "move_dialog_group"
 const val MOVE_DIALOG_TYPE_TRACK = "track"
 const val MOVE_DIALOG_TYPE_GRAPH = "graph"
+
+enum class MoveDialogType { TRACKER, GRAPH }
 
 class MoveToDialogFragment : DialogFragment() {
     private val viewModel by viewModels<MoveToDialogViewModel>()
@@ -71,8 +72,8 @@ class MoveToDialogFragment : DialogFragment() {
 
     private fun initViewModel() {
         val mode = when (requireArguments().getString(MOVE_DIALOG_TYPE_KEY)) {
-            MOVE_DIALOG_TYPE_TRACK -> GroupItemType.TRACK
-            MOVE_DIALOG_TYPE_GRAPH -> GroupItemType.GRAPH
+            MOVE_DIALOG_TYPE_TRACK -> MoveDialogType.TRACKER
+            MOVE_DIALOG_TYPE_GRAPH -> MoveDialogType.GRAPH
             else -> throw Exception("Unrecognised move dialog mode")
         }
         val id = requireArguments().getLong(MOVE_DIALOG_GROUP_KEY)
@@ -90,7 +91,7 @@ class MoveToDialogFragment : DialogFragment() {
         })
     }
 
-    private fun inflateGroupItems(items: List<GroupItem>) {
+    private fun inflateGroupItems(items: List<Group>) {
         val inflater = LayoutInflater.from(context)
         for (item in items) {
             val groupItemView = ListItemMoveToGroupBinding.inflate(inflater, binding.groupsLayout, false)
@@ -118,27 +119,27 @@ enum class MoveToDialogState { INITIALIZING, WAITING, MOVING, MOVED }
 
 class MoveToDialogViewModel : ViewModel() {
     private lateinit var dao: TrackAndGraphDatabaseDao
-    private lateinit var mode: GroupItemType
+    private lateinit var mode: MoveDialogType
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
     val state: LiveData<MoveToDialogState> get() { return _state }
     private val _state = MutableLiveData<MoveToDialogState>(MoveToDialogState.INITIALIZING)
 
-    val availableGroups: LiveData<List<GroupItem>?> get() { return _availableGroups }
-    private val _availableGroups = MutableLiveData<List<GroupItem>?>(null)
+    val availableGroups: LiveData<List<Group>?> get() { return _availableGroups }
+    private val _availableGroups = MutableLiveData<List<Group>?>(null)
 
     private lateinit var feature: Feature
     private lateinit var graphStat: GraphOrStat
 
-    fun init(activity: Activity, mode: GroupItemType, id: Long) {
+    fun init(activity: Activity, mode: MoveDialogType, id: Long) {
         if (_state.value != MoveToDialogState.INITIALIZING) return
         this.mode = mode
         val application = activity.application
         dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
         ioScope.launch {
-            val groups = dao.getAllGroupsSync().filter { item -> item.type == mode }
-            if (mode == GroupItemType.TRACK) feature = dao.getFeatureById(id)
+            val groups = dao.getAllGroupsSync()
+            if (mode == MoveDialogType.TRACKER) feature = dao.getFeatureById(id)
             else graphStat = dao.getGraphStatById(id)
             withContext(Dispatchers.Main) {
                 _availableGroups.value = groups
@@ -150,7 +151,7 @@ class MoveToDialogViewModel : ViewModel() {
     fun moveTo(newGroupId: Long) = ioScope.launch {
         if (_state.value != MoveToDialogState.WAITING) return@launch
         withContext(Dispatchers.Main) { _state.value = MoveToDialogState.MOVING }
-        if (mode == GroupItemType.TRACK) {
+        if (mode == MoveDialogType.TRACKER) {
             val newFeature = feature.copy(groupId = newGroupId)
             dao.updateFeature(newFeature)
         } else {

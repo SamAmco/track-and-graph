@@ -21,20 +21,15 @@ import android.widget.PopupMenu
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dto.GroupItem
-import com.samco.trackandgraph.database.dto.GroupItemType
+import com.samco.trackandgraph.database.entity.Group
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 import com.samco.trackandgraph.ui.OrderedListAdapter
 
-private val getIdForGroupItem = { gi: GroupItem ->
-    if (gi.type == GroupItemType.TRACK) gi.id * 2
-    else (gi.id * 2) + 1
-}
-
-class GroupListAdapter(private val clickListener: GroupClickListener,
-                       private val trackColor: Int,
-                       private val graphStatColor: Int)
-    : OrderedListAdapter<GroupItem, GroupViewHolder>(getIdForGroupItem, GroupItemDiffCallback()) {
+class GroupListAdapter(
+    private val clickListener: GroupClickListener,
+    private val trackColor: Int,
+    private val graphStatColor: Int
+) : OrderedListAdapter<Group, GroupViewHolder>({ it.id }, GroupItemDiffCallback()) {
     override fun onBindViewHolder(holder: GroupViewHolder, position: Int) {
         holder.bind(getItem(position), clickListener, trackColor, graphStatColor)
     }
@@ -44,13 +39,18 @@ class GroupListAdapter(private val clickListener: GroupClickListener,
     }
 }
 
-class GroupViewHolder private constructor(private val binding: ListItemGroupBinding)
-    : RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+class GroupViewHolder private constructor(private val binding: ListItemGroupBinding) :
+    RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
     private var clickListener: GroupClickListener? = null
     private var dropElevation = 0f
-    private var groupItem: GroupItem? = null
+    private var groupItem: Group? = null
 
-    fun bind(groupItem: GroupItem, clickListener: GroupClickListener, trackColor: Int, graphStatColor: Int) {
+    fun bind(
+        groupItem: Group,
+        clickListener: GroupClickListener,
+        trackColor: Int,
+        graphStatColor: Int
+    ) {
         this.groupItem = groupItem
         this.clickListener = clickListener
         dropElevation = binding.cardView.cardElevation
@@ -61,18 +61,9 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
     }
 
     private fun initCorner(trackColor: Int, graphStatColor: Int) {
-        when(groupItem!!.type) {
-            GroupItemType.TRACK -> {
-                binding.cornerTabImage.setColorFilter(trackColor)
-                binding.trackIcon.visibility = View.VISIBLE
-                binding.graphIcon.visibility = View.INVISIBLE
-            }
-            GroupItemType.GRAPH -> {
-                binding.cornerTabImage.setColorFilter(graphStatColor)
-                binding.graphIcon.visibility = View.VISIBLE
-                binding.trackIcon.visibility = View.INVISIBLE
-            }
-        }
+        binding.cornerTabImage.setColorFilter(trackColor)
+        binding.trackIcon.visibility = View.VISIBLE
+        binding.graphIcon.visibility = View.INVISIBLE
     }
 
     fun elevateCard() {
@@ -97,7 +88,8 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
             when (item?.itemId) {
                 R.id.rename -> clickListener?.onRename(it)
                 R.id.delete -> clickListener?.onDelete(it)
-                else -> {}
+                else -> {
+                }
             }
         }
         return false
@@ -112,20 +104,23 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
     }
 }
 
-class GroupItemDiffCallback : DiffUtil.ItemCallback<GroupItem>() {
-    override fun areItemsTheSame(oldItem: GroupItem, newItem: GroupItem): Boolean {
-        return oldItem.id == newItem.id && oldItem.type == newItem.type
+class GroupItemDiffCallback : DiffUtil.ItemCallback<Group>() {
+    override fun areItemsTheSame(oldItem: Group, newItem: Group): Boolean {
+        return oldItem.id == newItem.id
     }
-    override fun areContentsTheSame(oldItem: GroupItem, newItem: GroupItem): Boolean {
+
+    override fun areContentsTheSame(oldItem: Group, newItem: Group): Boolean {
         return oldItem == newItem
     }
 }
 
 
-class GroupClickListener(val clickListener: (groupItem: GroupItem) -> Unit,
-                         val onRenameListener: (groupItem: GroupItem) -> Unit,
-                         val onDeleteListener: (groupItem: GroupItem) -> Unit) {
-    fun onClick(groupItem: GroupItem) = clickListener(groupItem)
-    fun onRename(groupItem: GroupItem) = onRenameListener(groupItem)
-    fun onDelete(groupItem: GroupItem) = onDeleteListener(groupItem)
+class GroupClickListener(
+    val clickListener: (group: Group) -> Unit,
+    val onRenameListener: (group: Group) -> Unit,
+    val onDeleteListener: (group: Group) -> Unit
+) {
+    fun onClick(group: Group) = clickListener(group)
+    fun onRename(group: Group) = onRenameListener(group)
+    fun onDelete(group: Group) = onDeleteListener(group)
 }

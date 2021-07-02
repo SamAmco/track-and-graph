@@ -18,15 +18,15 @@ package com.samco.trackandgraph.ui
 
 import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dto.GroupItem
+import com.samco.trackandgraph.database.entity.Group
 
 class RenameGroupDialogFragment : NameInputDialogFragment() {
     private lateinit var listener: RenameGroupDialogListener
-    private lateinit var groupItem: GroupItem
+    private lateinit var groupItem: Group
 
     interface RenameGroupDialogListener {
-        fun getGroupItem() : GroupItem
-        fun onRenameGroupItem(groupItem: GroupItem)
+        fun getGroupItem() : Group
+        fun onRenameGroup(groupItem: Group)
         fun getRenameDialogHintText(): String
     }
 
@@ -40,13 +40,14 @@ class RenameGroupDialogFragment : NameInputDialogFragment() {
     }
 
     override fun onPositiveClicked(name: String) {
-        val newGroupItem = GroupItem(
+        val newGroupItem = Group(
             groupItem.id,
             name,
             groupItem.displayIndex,
-            groupItem.type
+            groupItem.parentGroupId,
+            groupItem.colorIndex//TODO we should feed the new colour in here
         )
-        listener.onRenameGroupItem(newGroupItem)
+        listener.onRenameGroup(newGroupItem)
     }
 
     override fun getNameInputHint() = listener.getRenameDialogHintText()

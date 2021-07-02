@@ -105,7 +105,7 @@ object CSVReadWriter {
         records: Iterable<CSVRecord>,
         trackGroupId: Long
     ) {
-        val existingFeatures = dataSource.getFeaturesForTrackGroupSync(trackGroupId).toMutableList()
+        val existingFeatures = dataSource.getFeaturesForGroupSync(trackGroupId).toMutableList()
         val existingFeaturesByName = existingFeatures.map { it.name to it }.toMap().toMutableMap()
         val newDataPoints = mutableListOf<DataPoint>()
 
