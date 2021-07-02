@@ -293,11 +293,11 @@ class SelectGroupViewModel : ViewModel() {
 
     fun onGroupSelected(group: Group) {
         ioScope.launch {
-            val graphs = dataSource?.getGraphsAndStatsByGroupId(group.id)?.value?.size ?: 0
+            val graphs = dataSource?.getGraphsAndStatsByGroupIdSync(group.id)?.size ?: 0
             withContext(Dispatchers.Main) {
                 if (graphs > 0) _state.value = SelectGroupViewModelState.GRAPH_GROUP_SELECTED
                 else _state.value = SelectGroupViewModelState.TRACK_GROUP_SELECTED
-
+                _state.value = SelectGroupViewModelState.WAITING
             }
         }
     }
