@@ -18,6 +18,7 @@ package com.samco.trackandgraph.database
 
 import android.content.Context
 import androidx.room.*
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
@@ -69,18 +70,35 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
             synchronized(this) {
                 var instance = INSTANCE
                 if (instance == null) {
-                    instance = Room
-                        .databaseBuilder(
-                            context.applicationContext,
-                            TrackAndGraphDatabase::class.java,
-                            "trackandgraph_database"
-                        )
-                        .addMigrations(*allMigrations)
-                        .fallbackToDestructiveMigration()
-                        .build()
+                    instance = createRoomInstance(context)
                     INSTANCE = instance
                 }
                 return instance
+            }
+        }
+
+        private fun createRoomInstance(context: Context): TrackAndGraphDatabase {
+            return Room.databaseBuilder(
+                context.applicationContext,
+                TrackAndGraphDatabase::class.java,
+                "trackandgraph_database"
+            )
+                .addMigrations(*allMigrations)
+                .fallbackToDestructiveMigration()
+                .addCallback(databaseCallback())
+                .build()
+        }
+
+        private fun databaseCallback() = object : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                db.execSQL(
+                    """
+                    INSERT OR REPLACE INTO 
+                    groups_table(id, name, display_index, parent_group_id, color_index) 
+                    VALUES(0, '', 0, NULL, 0)
+                    """.trimMargin()
+                )
             }
         }
     }
