@@ -55,8 +55,8 @@ interface TrackAndGraphDatabaseDao {
     @Insert
     fun insertGroup(group: Group): Long
 
-    @Delete
-    fun deleteGroup(group: Group)
+    @Query("DELETE FROM groups_table WHERE id = :id")
+    fun deleteGroup(id: Long)
 
     @Update
     fun updateGroup(group: Group)
@@ -148,8 +148,8 @@ interface TrackAndGraphDatabaseDao {
     @Query("DELETE FROM data_points_table WHERE feature_id = :featureId AND value = :index")
     fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double)
 
-    @Delete
-    fun deleteGraphOrStat(graphOrStat: GraphOrStat)
+    @Query("DELETE FROM graphs_and_stats_table2 WHERE id = :id")
+    fun deleteGraphOrStat(id: Long)
 
     @Query("DELETE FROM features_table WHERE id = :id")
     fun deleteFeature(id: Long)
@@ -327,4 +327,7 @@ interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM time_histograms_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
+
+    @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
+    fun getGroupsForGroup(id: Long): LiveData<List<Group>>
 }
