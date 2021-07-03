@@ -26,21 +26,20 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.util.getColorFromAttr
 
 class YesCancelDialogFragment : DialogFragment() {
-    lateinit var title: String
-    private lateinit var listener: YesCancelDialogListener
+    val title = arguments?.getString("title") ?: ""
 
     interface YesCancelDialogListener {
-        fun onDialogYes(dialog: YesCancelDialogFragment)
+        fun onDialogYes(dialog: YesCancelDialogFragment, id: String?)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        title = arguments?.getString("title") ?: ""
+        val id = arguments?.getString("id")
         return activity?.let {
-            listener = parentFragment as YesCancelDialogListener
+            val listener = parentFragment as YesCancelDialogListener
             AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme).apply {
                 setMessage(title)
                     .setCancelable(true)
-                    .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this@YesCancelDialogFragment) }
+                    .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this@YesCancelDialogFragment, id) }
                     .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             }.create()
         } ?: throw IllegalStateException("Activity cannot be null")

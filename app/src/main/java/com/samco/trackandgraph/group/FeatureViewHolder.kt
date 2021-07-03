@@ -1,20 +1,21 @@
-/* 
-* This file is part of Track & Graph
-* 
-* Track & Graph is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Track & Graph is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-*/
-package com.samco.trackandgraph.displaytrackgroup
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.samco.trackandgraph.group
 
 import android.graphics.drawable.RippleDrawable
 import android.os.Build
@@ -23,34 +24,13 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
-import com.samco.trackandgraph.ui.OrderedListAdapter
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 
-
-private val getIdForDisplayFeature = { df: DisplayFeature -> df.id }
-
-class FeatureAdapter(private val clickListener: FeatureClickListener) :
-    OrderedListAdapter<DisplayFeature, FeatureViewHolder>(
-        getIdForDisplayFeature,
-        DisplayFeatureDiffCallback()
-    ) {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeatureViewHolder {
-        return FeatureViewHolder.from(parent)
-    }
-
-    override fun onBindViewHolder(holder: FeatureViewHolder, position: Int) {
-        holder.bind(getItem(position), clickListener)
-    }
-}
-
 class FeatureViewHolder private constructor(private val binding: ListItemFeatureBinding) :
-    RecyclerView.ViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+    GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
     private var clickListener: FeatureClickListener? = null
     private var feature: DisplayFeature? = null
@@ -105,13 +85,13 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         feature?.let { clickListener?.onAdd(it) }
     }
 
-    fun elevateCard() {
+    override fun elevateCard() {
         binding.cardView.postDelayed({
             binding.cardView.cardElevation = binding.cardView.cardElevation * 3f
         }, 10)
     }
 
-    fun dropCard() {
+    override fun dropCard() {
         binding.cardView.cardElevation = dropElevation
     }
 
@@ -145,12 +125,18 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
     }
 }
 
-class DisplayFeatureDiffCallback : DiffUtil.ItemCallback<DisplayFeature>() {
-    override fun areItemsTheSame(oldItem: DisplayFeature, newItem: DisplayFeature): Boolean {
-        return oldItem.id == newItem.id
-    }
-
-    override fun areContentsTheSame(oldItem: DisplayFeature, newItem: DisplayFeature): Boolean {
-        return oldItem == newItem
-    }
+class FeatureClickListener(
+    private val onEditListener: (feature: DisplayFeature) -> Unit,
+    private val onDeleteListener: (feature: DisplayFeature) -> Unit,
+    private val onMoveToListener: (feature: DisplayFeature) -> Unit,
+    private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
+    private val onAddListener: (feature: DisplayFeature, useDefault:Boolean) -> Unit,
+    private val onHistoryListener: (feature: DisplayFeature) -> Unit
+) {
+    fun onEdit(feature: DisplayFeature) = onEditListener(feature)
+    fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
+    fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
+    fun onDescription(feature: DisplayFeature) = onDescriptionListener(feature)
+    fun onAdd(feature: DisplayFeature, useDefault:Boolean=true) = onAddListener(feature, useDefault)
+    fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
 }

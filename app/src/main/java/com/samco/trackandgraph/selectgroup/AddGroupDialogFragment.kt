@@ -26,9 +26,7 @@ class AddGroupDialogFragment : NameInputDialogFragment() {
     private lateinit var listener: AddGroupDialogListener
 
     interface AddGroupDialogListener {
-        fun onAddGroup(name: String)
-        fun getAddGroupHintText(): String
-        fun getAddGroupTitleText(): String
+        fun onAddGroup(name: String, colorIndex: Int)
     }
 
     override fun registerListener(parentFragment: Fragment?) {
@@ -37,11 +35,11 @@ class AddGroupDialogFragment : NameInputDialogFragment() {
 
     override fun getPositiveButtonName(): String = getString(R.string.add)
 
-    override fun onPositiveClicked(name: String) = listener.onAddGroup(name)
+    override fun onPositiveClicked(name: String) = listener.onAddGroup(name, 0) //TODO implement color selector
 
-    override fun getNameInputHint(): String = listener.getAddGroupHintText()
+    override fun getNameInputHint(): String = arguments?.getString("hint") ?: ""
 
-    override fun getTitleText(): String = listener.getAddGroupTitleText()
+    override fun getTitleText(): String = arguments?.getString("title") ?: ""
 
     override fun getNameInputText(): String = ""
 }

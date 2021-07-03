@@ -19,51 +19,57 @@
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools"
             android:id="@+id/navigation"
-            app:startDestination="@id/selectGroupFragment">
+            app:startDestination="@id/groupFragment">
 
-    <fragment android:id="@+id/selectGroupFragment"
-              android:name="com.samco.trackandgraph.selectgroup.SelectGroupFragment"
-              android:label="@string/app_name"
-              tools:layout="@layout/fragment_select_group">
-        <action
-                android:id="@+id/action_select_tack_group"
-                app:destination="@id/displayTrackGroupFragment"
-                app:enterAnim="@anim/slide_in_left"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_right"
-                app:popExitAnim="@anim/slide_out_right" />
-        <action
-                android:id="@+id/action_select_graph_stat_group"
-                app:destination="@id/graphsAndStatsFragment"
-                app:enterAnim="@anim/slide_in_left"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_right"
-                app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
-    <fragment android:id="@+id/displayTrackGroupFragment"
-            android:name="com.samco.trackandgraph.displaytrackgroup.DisplayTrackGroupFragment"
-            tools:layout="@layout/fragment_display_track_group">
+    <fragment android:id="@+id/groupFragment"
+        android:name="com.samco.trackandgraph.group.GroupFragment"
+        android:label="@string/app_name"
+        tools:layout="@layout/fragment_group">
         <argument
-                android:name="trackGroup"
-                app:argType="long" />
-        <action
-                android:id="@+id/action_feature_history"
-                app:destination="@id/featureHistoryFragment"
-                app:enterAnim="@anim/slide_in_left"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_right"
-                app:popExitAnim="@anim/slide_out_right" />
+            android:name="groupId"
+            app:argType="long"
+            android:defaultValue="0L" />
         <argument
-                android:name="trackGroupName"
-                app:argType="string" />
+            android:name="groupName"
+            app:argType="string"
+            app:nullable="true" />
         <action
-                android:id="@+id/action_add_feature"
-                app:destination="@id/addFeatureFragment"
-                app:enterAnim="@anim/slide_in_left"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_right"
-                app:popExitAnim="@anim/slide_out_right" />
+            android:id="@+id/action_select_group"
+            app:destination="@id/groupFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_feature_history"
+            app:destination="@id/featureHistoryFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_add_feature"
+            app:destination="@id/addFeatureFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_graph_stat_input"
+            app:destination="@id/graphStatInputFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
+            android:id="@+id/action_view_graph_stat"
+            app:destination="@id/viewGraphStatFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
+
     <fragment android:id="@+id/featureHistoryFragment"
             android:name="com.samco.trackandgraph.featurehistory.FragmentFeatureHistory"
             tools:layout="@layout/fragment_feature_history">
@@ -72,32 +78,6 @@
                 app:argType="long" />
         <argument
                 android:name="featureName"
-                app:argType="string" />
-    </fragment>
-    <fragment
-            android:id="@+id/graphsAndStatsFragment"
-            android:name="com.samco.trackandgraph.graphsandstats.GraphsAndStatsFragment"
-            android:label="@string/graphs_and_statistics"
-            tools:layout="@layout/graphs_and_stats_fragment" >
-        <action
-                android:id="@+id/action_graph_stat_input"
-                app:destination="@id/graphStatInputFragment"
-                app:enterAnim="@anim/slide_in_left"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_right"
-                app:popExitAnim="@anim/slide_out_right" />
-        <action
-                android:id="@+id/action_view_graph_stat"
-                app:destination="@id/viewGraphStatFragment"
-                app:enterAnim="@anim/slide_in_left"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_right"
-                app:popExitAnim="@anim/slide_out_right" />
-        <argument
-                android:name="graphStatGroupId"
-                app:argType="long" />
-        <argument
-                android:name="graphStatGroupName"
                 app:argType="string" />
     </fragment>
     <fragment
@@ -110,7 +90,7 @@
                 app:argType="long"
                 android:defaultValue="-1L" />
         <argument
-                android:name="graphStatGroupId"
+                android:name="groupId"
                 app:argType="long" />
     </fragment>
     <fragment
@@ -118,7 +98,7 @@
             android:name="com.samco.trackandgraph.displaytrackgroup.AddFeatureFragment"
             android:label="@string/add_feature">
         <argument
-                android:name="trackGroupId"
+                android:name="groupId"
                 app:argType="long" />
         <argument
                 android:name="existingFeatureNames"
