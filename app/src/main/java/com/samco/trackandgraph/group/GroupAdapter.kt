@@ -53,6 +53,9 @@ class GroupAdapter(
         }
     }
 
+    private fun extractGraphViewData(obj: Any): IGraphStatViewData =
+        (obj as Pair<*, *>).second as IGraphStatViewData
+
     override fun getItemViewType(position: Int): Int {
         return groupChildren.getOrNull(position)?.type?.ordinal ?: -1
     }
@@ -85,9 +88,6 @@ class GroupAdapter(
     }
 }
 
-private fun extractGraphViewData(obj: Any): IGraphStatViewData =
-    (obj as Pair<*, *>).second as IGraphStatViewData
-
 private class ListDiffCallback(
     private val oldList: List<GroupChild>,
     private val newList: List<GroupChild>
@@ -99,7 +99,7 @@ private class ListDiffCallback(
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val old = oldList[oldItemPosition]
         val new = newList[newItemPosition]
-        return old.type == new.type && old.id == new.id
+        return old.type == new.type && old.id() == new.id()
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
@@ -108,7 +108,11 @@ private class ListDiffCallback(
         return when (old.type) {
             GroupChildType.GROUP -> (old.obj as Group) == (new.obj as Group)
             GroupChildType.FEATURE -> (old.obj as DisplayFeature) == (new.obj as DisplayFeature)
-            GroupChildType.GRAPH -> extractGraphViewData(old.obj) == extractGraphViewData(new.obj)
+            GroupChildType.GRAPH -> {
+                val oldPair = old.obj as Pair<*, *>
+                val newPair = new.obj as Pair<*, *>
+                return (oldPair.first as Instant) == (newPair.first as Instant)
+            }
         }
     }
 }
