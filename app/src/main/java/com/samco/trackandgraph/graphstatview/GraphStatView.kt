@@ -20,6 +20,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
 import com.androidplot.Plot
 import com.androidplot.ui.*
@@ -156,10 +157,14 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         resetJob()
         var graphOrStat: GraphOrStat? = null
         decorJob = viewScope?.launch {
+            //We fix the view height while we prepare the view to avoid the layout jumping around in the
+            //scroll view
+            fixViewHeight()
             cleanAllViews()
             try {
                 graphOrStat = (data as T).graphOrStat
                 decorate(data.graphOrStat, decorator, data)
+                setDynamicViewHeight()
             } catch (exception: Exception) {
                 if (exception !is GraphStatInitException) return@launch
                 cleanAllViews()
@@ -168,8 +173,17 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
                 binding.headerText.text = headerText
                 binding.errorMessage.visibility = View.VISIBLE
                 binding.errorMessage.text = context.getString(exception.errorTextId)
+                setDynamicViewHeight()
             }
         }
+    }
+
+    private fun fixViewHeight() {
+        layoutParams = layoutParams.apply { height = getHeight() }
+    }
+
+    private fun setDynamicViewHeight() {
+        layoutParams = layoutParams.apply { height = WRAP_CONTENT }
     }
 
     private suspend fun <T : IGraphStatViewData> decorate(
