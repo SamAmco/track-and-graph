@@ -149,7 +149,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         childFragmentManager.let { dialog.show(it, "ru_sure_del_data_point_fragment") }
     }
 
-    override fun onDialogYes(dialog: YesCancelDialogFragment) {
+    override fun onDialogYes(dialog: YesCancelDialogFragment, id: String?) {
         when (dialog.title) {
             getString(R.string.ru_sure_del_data_point) -> viewModel.deleteDataPoint()
         }

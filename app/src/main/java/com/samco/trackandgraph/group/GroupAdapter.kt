@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.dto.DisplayFeature
 import com.samco.trackandgraph.database.entity.Group
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import org.threeten.bp.Instant
 
 class GroupAdapter(
     private val featureClickListener: FeatureClickListener,
@@ -44,7 +45,7 @@ class GroupAdapter(
         val item = groupChildren[position]
         when (item.type) {
             GroupChildType.GRAPH -> (holder as GraphStatViewHolder)
-                .bind(item.obj as IGraphStatViewData, graphStatClickListener)
+                .bind(extractGraphViewData(item.obj), graphStatClickListener)
             GroupChildType.FEATURE -> (holder as FeatureViewHolder)
                 .bind(item.obj as DisplayFeature, featureClickListener)
             GroupChildType.GROUP -> (holder as GroupViewHolder)
@@ -74,7 +75,18 @@ class GroupAdapter(
         groupChildren.add(end, child)
         notifyItemMoved(start, end)
     }
+
+    fun getSpanSizeAtPosition(position: Int): Int {
+        if (position < 0 || position > groupChildren.size) return 0
+        return when (groupChildren[position].type) {
+            GroupChildType.FEATURE -> 1
+            else -> 2
+        }
+    }
 }
+
+private fun extractGraphViewData(obj: Any): IGraphStatViewData =
+    (obj as Pair<*, *>).second as IGraphStatViewData
 
 private class ListDiffCallback(
     private val oldList: List<GroupChild>,
@@ -96,7 +108,7 @@ private class ListDiffCallback(
         return when (old.type) {
             GroupChildType.GROUP -> (old.obj as Group) == (new.obj as Group)
             GroupChildType.FEATURE -> (old.obj as DisplayFeature) == (new.obj as DisplayFeature)
-            GroupChildType.GRAPH -> (old.obj as IGraphStatViewData) == (new.obj as IGraphStatViewData)
+            GroupChildType.GRAPH -> extractGraphViewData(old.obj) == extractGraphViewData(new.obj)
         }
     }
 }

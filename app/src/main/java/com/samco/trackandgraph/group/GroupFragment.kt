@@ -42,7 +42,6 @@ import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.selectgroup.AddGroupDialogFragment
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
 import kotlinx.android.synthetic.main.activity_main.*
@@ -50,6 +49,7 @@ import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
+//TODO there are two todo's in this class
 class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener,
     AddGroupDialogFragment.AddGroupDialogListener {
     private var navController: NavController? = null
@@ -66,7 +66,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     ): View {
         this.navController = container?.findNavController()
         binding = DataBindingUtil
-            .inflate(inflater, R.layout.fragment_select_group, container, false)
+            .inflate(inflater, R.layout.fragment_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
         val database = TrackAndGraphDatabase
@@ -232,6 +232,11 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         val screenWidth = dm.widthPixels / dm.density
         val itemSize = 180f
         val gridLayout = GridLayoutManager(context, (screenWidth / itemSize).toInt())
+        gridLayout.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return adapter.getSpanSizeAtPosition(position)
+            }
+        }
         binding.itemList.layoutManager = gridLayout
     }
 

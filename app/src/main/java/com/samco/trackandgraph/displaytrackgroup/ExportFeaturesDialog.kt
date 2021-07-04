@@ -40,6 +40,8 @@ import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 
+const val GROUP_ID_KEY = "GROUP_ID_KEY"
+const val GROUP_NAME_KEY = "GROUP_NAME_KEY"
 const val CREATE_FILE_REQUEST_CODE = 123
 
 enum class ExportState { LOADING, WAITING, EXPORTING, DONE }
