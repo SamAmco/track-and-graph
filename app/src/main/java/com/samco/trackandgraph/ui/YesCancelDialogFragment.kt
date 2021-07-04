@@ -26,13 +26,14 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.util.getColorFromAttr
 
 class YesCancelDialogFragment : DialogFragment() {
-    val title = arguments?.getString("title") ?: ""
+    lateinit var title: String
 
     interface YesCancelDialogListener {
         fun onDialogYes(dialog: YesCancelDialogFragment, id: String?)
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        title = arguments?.getString("title") ?: ""
         val id = arguments?.getString("id")
         return activity?.let {
             val listener = parentFragment as YesCancelDialogListener
