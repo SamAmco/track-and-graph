@@ -241,6 +241,12 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun listenToViewModel() {
+        var skippedFirstDataPointsUpdate = false
+        viewModel.dataPoints.observe(viewLifecycleOwner) {
+            if (skippedFirstDataPointsUpdate)
+                viewModel.updateAllGraphs()
+            else skippedFirstDataPointsUpdate = true
+        }
         viewModel.groupChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             updateShowQueueTrackButton()
@@ -362,11 +368,9 @@ class GroupViewModel : ViewModel() {
     private var database: TrackAndGraphDatabase? = null
     private lateinit var dataSource: TrackAndGraphDatabaseDao
 
-    private lateinit var _features: LiveData<List<DisplayFeature>>
-    private lateinit var _groups: LiveData<List<Group>>
-    private lateinit var _graphStats: GraphStatLiveData
+    lateinit var dataPoints: LiveData<Instant>
 
-    lateinit var groupChildren: LiveData<List<GroupChild>>
+    lateinit var groupChildren: GroupChildrenLiveData
 
     val features
         get() = groupChildren.value
@@ -379,72 +383,9 @@ class GroupViewModel : ViewModel() {
         this.database
         this.dataSource = database.trackAndGraphDatabaseDao
 
-        _features = dataSource.getDisplayFeaturesForGroup(groupId)
-        _groups = dataSource.getGroupsForGroup(groupId)
-        _graphStats = GraphStatLiveData(updateJob, groupId, dataSource)
+        dataPoints = Transformations.map(dataSource.getAllDataPoints()) { Instant.now() }
 
-        initGroupChildren()
-    }
-
-    private fun initGroupChildren() {
-        val groupChildrenUnsorted =
-            Transformations.map(_features, this::featuresToGroupChildren)
-                .combineWith(
-                    Transformations.map(_groups, this::groupsToGroupChildren),
-                    this::combindLists
-                )
-                .combineWith(
-                    Transformations.map(_graphStats, this::graphsToGroupChildren),
-                    this::combindLists
-                )
-
-        groupChildren = Transformations.map(groupChildrenUnsorted) { x ->
-            x.sortedBy { it.displayIndex() }
-        }
-    }
-
-    private fun <T, K, R> LiveData<T>.combineWith(
-        liveData: LiveData<K>,
-        block: (T?, K?) -> R
-    ): LiveData<R> {
-        val result = MediatorLiveData<R>()
-        result.addSource(this) {
-            result.value = block(this.value, liveData.value)
-        }
-        result.addSource(liveData) {
-            result.value = block(this.value, liveData.value)
-        }
-        return result
-    }
-
-    private fun combindLists(l1: List<GroupChild>?, l2: List<GroupChild>?): List<GroupChild> {
-        val newList = mutableListOf<GroupChild>()
-        l1?.let { newList.addAll(it) }
-        l2?.let { newList.addAll(it) }
-        return newList
-    }
-
-    private fun graphsToGroupChildren(graphs: List<Pair<Instant, IGraphStatViewData>>): List<GroupChild> {
-        return graphs.map {
-            GroupChild(
-                GroupChildType.GRAPH,
-                it,
-                { it.second.graphOrStat.id },
-                { it.second.graphOrStat.displayIndex }
-            )
-        }
-    }
-
-    private fun groupsToGroupChildren(groups: List<Group>): List<GroupChild> {
-        return groups.map {
-            GroupChild(GroupChildType.GROUP, it, it::id, it::displayIndex)
-        }
-    }
-
-    private fun featuresToGroupChildren(displayFeatures: List<DisplayFeature>): List<GroupChild> {
-        return displayFeatures.map {
-            GroupChild(GroupChildType.FEATURE, it, it::id, it::displayIndex)
-        }
+        groupChildren = GroupChildrenLiveData(updateJob, groupId, dataSource)
     }
 
     fun addDefaultFeatureValue(feature: DisplayFeature) = ioScope.launch {
@@ -459,19 +400,20 @@ class GroupViewModel : ViewModel() {
             ""
         )
         dataSource.insertDataPoint(newDataPoint)
-        _graphStats.updateAllGraphStats()
     }
 
     fun onDeleteFeature(id: Long) = ioScope.launch {
         dataSource.deleteFeature(id)
-        _graphStats.preenGraphStats()
+        groupChildren.graphStatLiveData.preenGraphStats()
     }
 
     fun addGroup(group: Group) = ioScope.launch { dataSource.insertGroup(group) }
 
+    //TODO implement adjustDisplayIndexes
     fun adjustDisplayIndexes(items: List<GroupChild>) {
-        TODO("Not yet implemented")
     }
+
+    fun updateAllGraphs() = groupChildren.graphStatLiveData.updateAllGraphStats()
 
     fun onDeleteGraphStat(id: Long) = ioScope.launch { dataSource.deleteGraphOrStat(id) }
 

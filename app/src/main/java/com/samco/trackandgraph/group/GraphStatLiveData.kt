@@ -68,13 +68,22 @@ class GraphStatLiveData(
         }
     }
 
-    //TODO update all graphs when something is tracked
     fun updateAllGraphStats() {
-        //TODO implement iterate and re-calculate all data
+        workScope.launch {
+            iterateGraphStatDataFactories(
+                value?.map { it.second.graphOrStat } ?: emptyList(),
+                false
+            )
+        }
     }
 
     suspend fun preenGraphStats() {
-        sourceData.value?.forEach { graphStatTypes[it.type]?.dataSourceAdapter?.preen(dataSource, it) }
+        sourceData.value?.forEach {
+            graphStatTypes[it.type]?.dataSourceAdapter?.preen(
+                dataSource,
+                it
+            )
+        }
     }
 
     private suspend fun iterateGraphStatDataFactories(

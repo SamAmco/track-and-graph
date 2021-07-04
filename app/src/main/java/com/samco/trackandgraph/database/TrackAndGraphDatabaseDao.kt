@@ -79,6 +79,9 @@ interface TrackAndGraphDatabaseDao {
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC""")
     fun getAllGroupsSync(): List<Group>
 
+    @Query("""SELECT * FROM data_points_table""")
+    fun getAllDataPoints(): LiveData<List<DataPoint>>
+
     @Insert
     fun insertReminder(reminder: Reminder)
 
