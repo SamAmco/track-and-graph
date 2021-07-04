@@ -35,9 +35,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.DisplayFeature
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
-import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
@@ -380,7 +378,7 @@ class GroupViewModel : ViewModel() {
 
     fun initViewModel(database: TrackAndGraphDatabase, groupId: Long) {
         if (this.database != null) return
-        this.database
+        this.database = database
         this.dataSource = database.trackAndGraphDatabaseDao
 
         dataPoints = Transformations.map(dataSource.getAllDataPoints()) { Instant.now() }
@@ -409,9 +407,33 @@ class GroupViewModel : ViewModel() {
 
     fun addGroup(group: Group) = ioScope.launch { dataSource.insertGroup(group) }
 
-    //TODO implement adjustDisplayIndexes
-    fun adjustDisplayIndexes(items: List<GroupChild>) {
+    fun adjustDisplayIndexes(items: List<GroupChild>) = ioScope.launch {
+        val displayFeatures = mutableListOf<DisplayFeature>()
+        val groups = mutableListOf<Group>()
+        val graphs = mutableListOf<GraphOrStat>()
+        items.forEachIndexed { index, groupChild ->
+            when (groupChild.type) {
+                GroupChildType.GROUP -> groups.add(toGroupWithIndex(groupChild.obj, index))
+                GroupChildType.FEATURE -> displayFeatures.add(toDisplayFeatureWithIndex(groupChild.obj, index))
+                GroupChildType.GRAPH -> graphs.add(toGraphStatViewDataWithIndex(groupChild.obj, index))
+            }
+        }
+        database?.withTransaction {
+            dataSource.updateFeatures(displayFeatures.map { it.asFeature() })
+            dataSource.updateGraphStats(graphs)
+            dataSource.updateGroups(groups)
+        }
     }
+
+    private fun toGraphStatViewDataWithIndex(obj: Any, index: Int): GraphOrStat {
+        val pair = obj as Pair<*, *>
+        val viewData = pair.second as IGraphStatViewData
+        return viewData.graphOrStat.copy(displayIndex = index)
+    }
+
+    private fun toDisplayFeatureWithIndex(obj: Any, index: Int) = (obj as DisplayFeature).copy(displayIndex = index)
+
+    private fun toGroupWithIndex(obj: Any, index: Int) = (obj as Group).copy(displayIndex = index)
 
     fun updateAllGraphs() = groupChildren.graphStatLiveData.updateAllGraphStats()
 

@@ -24,7 +24,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.DisplayFeature
 import com.samco.trackandgraph.database.entity.Group
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 
 class GroupChildrenLiveData(
@@ -32,6 +32,9 @@ class GroupChildrenLiveData(
     groupId: Long,
     dataSource: TrackAndGraphDatabaseDao
 ) : LiveData<List<GroupChild>>() {
+    private val workScope = CoroutineScope(Dispatchers.Default + updateJob)
+    private var job: Job? = null
+
     val graphStatLiveData = GraphStatLiveData(updateJob, groupId, dataSource)
 
     private val graphStatData = Transformations.map(
@@ -53,27 +56,37 @@ class GroupChildrenLiveData(
 
     private val featureDataObserver = Observer<List<GroupChild>> {
         latestFeatures = it
-        considerPost()
+        schedulePost()
     }
     private val graphStatDataObserver = Observer<List<GroupChild>> {
         latestGraphs = it
-        considerPost()
+        schedulePost()
     }
     private val groupDataObserver = Observer<List<GroupChild>> {
         latestGroups = it
-        considerPost()
+        schedulePost()
+    }
+
+    //We schedule a delayed post to avoid UI glitches in situations where multiple data sources
+    // are changed at once in the database and we have no way of knowing that we are about to
+    // receive several updates in quick succession
+    @Synchronized
+    private fun schedulePost() {
+        job?.cancel()
+        job = workScope.launch {
+            delay(200)
+            if (isActive) postLatest()
+        }
     }
 
     @Synchronized
-    private fun considerPost() {
-        if (latestFeatures != null && latestGroups != null && latestGraphs != null) {
-            val combined = mutableListOf<GroupChild>()
-            latestFeatures?.let { combined.addAll(it) }
-            latestGraphs?.let { combined.addAll(it) }
-            latestGroups?.let { combined.addAll(it) }
-            combined.sortBy { it.displayIndex() }
-            postValue(combined)
-        }
+    private fun postLatest() {
+        val combined = mutableListOf<GroupChild>()
+        latestFeatures?.let { combined.addAll(it) }
+        latestGraphs?.let { combined.addAll(it) }
+        latestGroups?.let { combined.addAll(it) }
+        combined.sortBy { it.displayIndex() }
+        postValue(combined)
     }
 
     override fun onActive() {

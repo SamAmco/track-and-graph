@@ -18,6 +18,7 @@ package com.samco.trackandgraph.database.dto
 
 import androidx.room.ColumnInfo
 import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
 import org.threeten.bp.OffsetDateTime
 
@@ -54,4 +55,11 @@ data class DisplayFeature(
 
     @ColumnInfo(name = "feature_description")
     val description: String
-)
+) {
+    fun asFeature(): Feature {
+        return Feature(
+            id, name, groupId, featureType, discreteValues, displayIndex,
+            hasDefaultValue, defaultValue, description
+        )
+    }
+}

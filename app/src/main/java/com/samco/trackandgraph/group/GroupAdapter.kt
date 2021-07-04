@@ -106,8 +106,16 @@ private class ListDiffCallback(
         val old = oldList[oldItemPosition]
         val new = newList[newItemPosition]
         return when (old.type) {
-            GroupChildType.GROUP -> (old.obj as Group) == (new.obj as Group)
-            GroupChildType.FEATURE -> (old.obj as DisplayFeature) == (new.obj as DisplayFeature)
+            GroupChildType.GROUP -> {
+                val oldObj = (old.obj as Group).copy(displayIndex = 0)
+                val newObj =(new.obj as Group).copy(displayIndex = 0)
+                oldObj == newObj
+            }
+            GroupChildType.FEATURE -> {
+                val oldObj = (old.obj as DisplayFeature).copy(displayIndex = 0)
+                val newObj = (new.obj as DisplayFeature).copy( displayIndex = 0 )
+                oldObj == newObj
+            }
             GroupChildType.GRAPH -> {
                 val oldPair = old.obj as Pair<*, *>
                 val newPair = new.obj as Pair<*, *>

@@ -43,15 +43,10 @@ class GraphStatLiveData(
 
     override fun onChanged(graphsAndStats: List<GraphOrStat>?) {
         if (graphsAndStats == null) return
-        val value = this.value
-        if (!value.isNullOrEmpty() && graphsAndStats.size <= value.size) {
-            workScope.launch { iterateGraphStatDataFactories(graphsAndStats, true) }
-        } else {
-            val loadingStates = graphsAndStats
-                .map { Pair(Instant.now(), IGraphStatViewData.loading(it)) }
-            updateGraphStats(loadingStates)
-            workScope.launch { iterateGraphStatDataFactories(graphsAndStats, false) }
-        }
+        val loadingStates = graphsAndStats
+            .map { Pair(Instant.now(), IGraphStatViewData.loading(it)) }
+        updateGraphStats(loadingStates)
+        workScope.launch { iterateGraphStatDataFactories(graphsAndStats, false) }
     }
 
     private fun updateGraphStats(graphStats: List<Pair<Instant, IGraphStatViewData>>) {
