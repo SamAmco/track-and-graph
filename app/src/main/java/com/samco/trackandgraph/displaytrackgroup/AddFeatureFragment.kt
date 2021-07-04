@@ -78,7 +78,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
         viewModel.init(
             requireActivity().application,
-            args.trackGroupId,
+            args.groupId,
             args.existingFeatureNames.toList(),
             args.editFeatureId
         )
@@ -522,7 +522,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         }
     }
 
-    override fun onDialogYes(dialog: YesCancelDialogFragment) {
+    override fun onDialogYes(dialog: YesCancelDialogFragment, id: String?) {
         when (dialog.title) {
             getString(R.string.ru_sure_update_feature) -> viewModel.onAddOrUpdate()
         }

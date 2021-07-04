@@ -68,7 +68,7 @@ class GraphStatInputFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel.initViewModel(
             TrackAndGraphDatabase.getInstance(requireContext()),
-            args.graphStatGroupId,
+            args.groupId,
             args.graphStatId
         )
         listenToViewModelState()

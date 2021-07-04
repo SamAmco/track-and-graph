@@ -151,6 +151,9 @@ interface TrackAndGraphDatabaseDao {
     @Query("DELETE FROM graphs_and_stats_table2 WHERE id = :id")
     fun deleteGraphOrStat(id: Long)
 
+    @Delete
+    fun deleteGraphOrStat(graphOrStat: GraphOrStat)
+
     @Query("DELETE FROM features_table WHERE id = :id")
     fun deleteFeature(id: Long)
 
