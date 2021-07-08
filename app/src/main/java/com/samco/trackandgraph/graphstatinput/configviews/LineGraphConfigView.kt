@@ -65,7 +65,8 @@ internal class LineGraphConfigView @JvmOverloads constructor(
         YRangeType.DYNAMIC,
         0.0,
         1.0,
-        null
+        null,
+        LineGraphDataModificationMode.NONE
     )
 
     private fun initFromLineGraph() {
@@ -83,8 +84,26 @@ internal class LineGraphConfigView @JvmOverloads constructor(
         listenToAddLineGraphFeatureButton()
         initYRangeFromTo()
         listenToYRangeFixedFromTo()
+        initDataModificationModeSpinner()
+        listenToDataModificationModeSpinner()
         initYRangeSpinner()
         listenToYRangeTypeSpinner()
+    }
+
+    private fun initDataModificationModeSpinner() {
+        binding.lineGraphDataModificationSpinner.setSelection(configData.dataModificationMode.ordinal)
+    }
+
+    private fun listenToDataModificationModeSpinner() {
+        binding.lineGraphDataModificationSpinner.onItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
+                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                    configData = configData.copy(dataModificationMode = LineGraphDataModificationMode.values()[index])
+                    emitConfigChange()
+                    updateYRangeInputType()
+                }
+            }
     }
 
     private fun initYRangeSpinner() {
@@ -175,7 +194,6 @@ internal class LineGraphConfigView @JvmOverloads constructor(
             newFeatures.removeAt(viewIndex)
             newFeatures.add(viewIndex, it)
             configData = configData.copy(features = newFeatures)
-            updateYRangeInputType()
             emitConfigChange()
         }
         val params = LayoutParams(

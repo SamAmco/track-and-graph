@@ -105,18 +105,70 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         return createViewData(dataSource, graphOrStat, lineGraph, onDataSampled)
     }
 
+    //TODO: this is really inefficient, but "good enough for now" :)
+    private fun getDatapoint(list: List<DataPoint>?, timestamp: OffsetDateTime): DataPoint? {
+        var foundPoint: DataPoint? = null
+        for (dp in (list ?: emptyList())) {
+            if (dp.timestamp.isBefore(timestamp.plusSeconds(1)))
+                foundPoint = dp
+        }
+        return foundPoint
+    }
+
+    private fun stackGraphs(map: Map<LineGraphFeature, DataSample?>): Map<LineGraphFeature, DataSample?> {
+        var prevDatapoints: List<DataPoint>? = null
+        return map.mapValues { (key, sample) ->
+            val datapoints = sample?.dataPoints ?: emptyList()
+            prevDatapoints = datapoints.map {
+                it.copy(value = it.value + (getDatapoint(prevDatapoints, it.timestamp)?.value ?: 0.0))
+            }
+            prevDatapoints?.let{DataSample(it)}
+        }
+    }
+
+    private fun sumGraphs(map: Map<LineGraphFeature, DataSample?>): Map<LineGraphFeature, DataSample?> {
+        var prevDatapoints: List<DataPoint>? = null
+        lateinit var lastKey: LineGraphFeature
+        var combinedKey: LineGraphFeature? = null
+        return map.mapValues { (key, sample) ->
+            lastKey = key
+            if (combinedKey == null) {
+                combinedKey = key
+            } else {
+                combinedKey = combinedKey!!.copy(name = "${combinedKey!!.name} + ${key.name}")
+            }
+
+            val datapoints = sample?.dataPoints ?: emptyList()
+            prevDatapoints = datapoints.map {
+                it.copy(value = it.value + (getDatapoint(prevDatapoints, it.timestamp)?.value ?: 0.0))
+            }
+            prevDatapoints?.let{DataSample(it)}
+        }.filterKeys { it == lastKey }.mapKeys { combinedKey!! }
+    }
+
     private suspend fun generatePlottingData(
         dataSource: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
         allReferencedDataPoints: MutableList<DataPoint>,
         endTime: OffsetDateTime
     ): Map<LineGraphFeature, FastXYSeries?> {
-        return lineGraph.features.map { lgf ->
+        val dataMap: Map<LineGraphFeature, DataSample?> = lineGraph.features.map { lgf ->
             yield()
             val plottingData =
                 tryGetPlottingData(dataSource, lineGraph, allReferencedDataPoints, lgf)
-            lgf to plottingData?.let { getXYSeriesFromDataSample(it, endTime, lgf) }
+            lgf to plottingData
         }.toMap()
+
+        val modifiedData = when(lineGraph.dataModificationMode) {
+            LineGraphDataModificationMode.NONE -> dataMap
+            LineGraphDataModificationMode.STACKED -> stackGraphs(dataMap)
+            LineGraphDataModificationMode.SUM -> sumGraphs(dataMap)
+        }
+
+        val fastDataMap: Map<LineGraphFeature, FastXYSeries?> = modifiedData.mapValues { (key, plottingData) ->
+            plottingData?.let { getXYSeriesFromDataSample(it, endTime, key) }
+        }
+        return fastDataMap
     }
 
     //TODO can we get more efficiency by running some of this on the default dispatcher?

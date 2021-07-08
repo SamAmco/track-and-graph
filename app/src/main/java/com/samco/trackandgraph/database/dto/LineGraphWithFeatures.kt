@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.samco.trackandgraph.database.entity.LineGraph
+import com.samco.trackandgraph.database.entity.LineGraphDataModificationMode
 import com.samco.trackandgraph.database.entity.LineGraphFeature
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -52,7 +53,10 @@ data class LineGraphWithFeatures(
     val yTo: Double,
 
     @ColumnInfo(name = "end_date")
-    val endDate: OffsetDateTime?
+    val endDate: OffsetDateTime?,
+
+    @ColumnInfo(name = "data_modification_mode")
+    val dataModificationMode: LineGraphDataModificationMode,
 ) {
-    fun toLineGraph() = LineGraph(id, graphStatId, duration, yRangeType, yFrom, yTo, endDate)
+    fun toLineGraph() = LineGraph(id, graphStatId, duration, yRangeType, yFrom, yTo, endDate, dataModificationMode)
 }

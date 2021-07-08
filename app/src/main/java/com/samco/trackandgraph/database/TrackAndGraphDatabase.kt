@@ -56,7 +56,7 @@ val dataVisColorList = listOf(
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class, GlobalNote::class, LineGraphFeature::class,
         TimeHistogram::class],
-    version = 43
+    version = 44
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -214,6 +214,12 @@ class Converters {
 
     @TypeConverter
     fun intToTimeHistogramWindow(index: Int) = TimeHistogramWindow.values()[index]
+
+    @TypeConverter
+    fun dataModificationModeToInt(mode: LineGraphDataModificationMode) = mode.ordinal
+
+    @TypeConverter
+    fun intToDataModificationMode(index: Int) = LineGraphDataModificationMode.values()[index]
 }
 
 fun odtFromString(value: String): OffsetDateTime? =

@@ -59,6 +59,7 @@
     <string name="add_a_graph_or_stat">Ein Diagramm oder eine Statistik hinzufügen</string>
     <string name="graph_type_label">Diagrammtyp:</string>
     <string name="maximum_sample_duration">Größe des Samples:</string>
+    <string name="line_graph_data_modification_mode">Datenmodifizierung:</string>
     <string name="select_a_discrete_feature">Wählen Sie einen Multiple-Choice-Datensatz aus: </string>
     <string name="no_discrete_features_pie_chart">Sie können derzeit kein Tortendiagramm erstellen, da Sie nichts mit Multiple-Choice tracken..</string>
     <string name="select_a_feature">Wählen Sie einen Datensatz:</string>
@@ -132,6 +133,11 @@
         <item>Drei Monate</item>
         <item>Sechs Monate</item>
         <item>Ein Jahr</item>
+    </string-array>
+    <string-array name="line_graph_data_modifications">
+        <item>Keine</item>
+        <item>Graphen stapeln</item>
+        <item>Graphen summieren</item>
     </string-array>
     <string-array name="y_range_styles">
         <item>Dynamisch</item>
@@ -233,8 +239,8 @@
     <string name="tutorial_text_2">Verwenden Sie Track-Gruppen, um schnell viele Dinge gleichzeitig zu verfolgen.</string>
     <string name="tutorial_text_3">Verwenden Sie Diagrammgruppen, um Daten aus mehreren Trackgruppen zu untersuchen.</string>
     <string name="got_it">Got it</string>
-    <string name="move_to_colon">Weiter zu:</string>
-    <string name="move_to">Weiter zu</string>
+    <string name="move_to_colon">Verschiebe nach:</string>
+    <string name="move_to">Verschiebe nach</string>
 
     <string name="feature_add_or_update_error_occurred">Es ist ein Fehler aufgetreten, Ihre Änderungen konnten nicht durchgeführt werden.</string>
     <string name="ru_sure_update_feature">Diese Aktualisierung kann die Daten, die Sie bereits verfolgt haben, irreversibel verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\n Möchten Sie fortfahren?</string>

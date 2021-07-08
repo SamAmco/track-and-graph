@@ -59,6 +59,7 @@
     <string name="add_a_graph_or_stat">Añadir un gráfico o estadística</string>
     <string name="graph_type_label">Tipo de gráfico:</string>
     <string name="maximum_sample_duration">Tamaño de la muestra:</string>
+    <string name="line_graph_data_modification_mode">Modificación de datos:</string>
     <string name="select_a_discrete_feature">Seleccione un conjunto de datos de elección múltiple: </string>
     <string name="no_discrete_features_pie_chart">Actualmente no puede crear un gráfico circular porque no está haciendo una traza de ninguna elección múltiple.</string>
     <string name="select_a_feature">Seleccione un conjunto de datos:</string>
