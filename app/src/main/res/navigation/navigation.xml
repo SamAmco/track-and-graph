@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of Track & Graph
   ~ 
   ~ Track & Graph is free software: you can redistribute it and/or modify
@@ -16,24 +15,24 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/navigation"
-            app:startDestination="@id/groupFragment">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation"
+    app:startDestination="@id/groupFragment">
 
-    <fragment android:id="@+id/groupFragment"
+    <fragment
+        android:id="@+id/groupFragment"
         android:name="com.samco.trackandgraph.group.GroupFragment"
-        android:label="@string/app_name"
         tools:layout="@layout/fragment_group">
         <argument
             android:name="groupId"
-            app:argType="long"
-            android:defaultValue="0L" />
+            android:defaultValue="0L"
+            app:argType="long" />
         <argument
             android:name="groupName"
+            android:defaultValue="@null"
             app:argType="string"
-            app:nullable="true"
-            android:defaultValue="@null" />
+            app:nullable="true" />
         <action
             android:id="@+id/action_select_group"
             app:destination="@id/groupFragment"
@@ -71,64 +70,59 @@
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 
-    <fragment android:id="@+id/featureHistoryFragment"
-            android:name="com.samco.trackandgraph.featurehistory.FragmentFeatureHistory"
-            tools:layout="@layout/fragment_feature_history">
+    <fragment
+        android:id="@+id/featureHistoryFragment"
+        android:name="com.samco.trackandgraph.featurehistory.FragmentFeatureHistory"
+        tools:layout="@layout/fragment_feature_history">
         <argument
-                android:name="feature"
-                app:argType="long" />
+            android:name="feature"
+            app:argType="long" />
         <argument
-                android:name="featureName"
-                app:argType="string" />
+            android:name="featureName"
+            app:argType="string" />
     </fragment>
     <fragment
-            android:id="@+id/graphStatInputFragment"
-            android:name="com.samco.trackandgraph.graphstatinput.GraphStatInputFragment"
-            android:label="@string/add_a_graph_or_stat"
-            tools:layout="@layout/fragment_graph_stat_input" >
+        android:id="@+id/graphStatInputFragment"
+        android:name="com.samco.trackandgraph.graphstatinput.GraphStatInputFragment"
+        tools:layout="@layout/fragment_graph_stat_input">
         <argument
-                android:name="graphStatId"
-                app:argType="long"
-                android:defaultValue="-1L" />
+            android:name="graphStatId"
+            android:defaultValue="-1L"
+            app:argType="long" />
         <argument
-                android:name="groupId"
-                app:argType="long" />
+            android:name="groupId"
+            app:argType="long" />
     </fragment>
     <fragment
-            android:id="@+id/addFeatureFragment"
-            android:name="com.samco.trackandgraph.displaytrackgroup.AddFeatureFragment"
-            android:label="@string/add_feature">
+        android:id="@+id/addFeatureFragment"
+        android:name="com.samco.trackandgraph.displaytrackgroup.AddFeatureFragment">
         <argument
-                android:name="groupId"
-                app:argType="long" />
+            android:name="groupId"
+            app:argType="long" />
         <argument
-                android:name="existingFeatureNames"
-                app:argType="string[]" />
+            android:name="existingFeatureNames"
+            app:argType="string[]" />
         <argument
             android:name="editFeatureId"
-            app:argType="long"
-            android:defaultValue="-1L" />
+            android:defaultValue="-1L"
+            app:argType="long" />
     </fragment>
     <fragment
-            android:id="@+id/viewGraphStatFragment"
-            android:name="com.samco.trackandgraph.viewgraphstat.ViewGraphStatFragment"
-            android:label="ViewGraphStatFragment" >
+        android:id="@+id/viewGraphStatFragment"
+        android:name="com.samco.trackandgraph.viewgraphstat.ViewGraphStatFragment">
         <argument
-                android:name="graphStatId"
-                app:argType="long" />
+            android:name="graphStatId"
+            app:argType="long" />
     </fragment>
     <fragment
         android:id="@+id/backupAndRestoreFragment"
-        android:name="com.samco.trackandgraph.backupandrestore.BackupAndRestoreFragment"
-        android:label="@string/backup_and_restore" />
+        android:name="com.samco.trackandgraph.backupandrestore.BackupAndRestoreFragment" />
     <fragment
         android:id="@+id/aboutPageFragment"
-        android:name="com.samco.trackandgraph.aboutpage.AboutPageFragment"
-        android:label="@string/about" />
+        android:name="com.samco.trackandgraph.aboutpage.AboutPageFragment" />
     <fragment
         android:id="@+id/FAQFragment"
-        android:name="com.samco.trackandgraph.faq.FAQFragment"
-        android:label="@string/faq" >
+        android:name="com.samco.trackandgraph.faq.FAQFragment">
         <action
             android:id="@+id/action_faq1"
             app:destination="@id/FAQ1Fragment"
@@ -181,42 +175,32 @@
     </fragment>
     <fragment
         android:id="@+id/FAQ1Fragment"
-        android:name="com.samco.trackandgraph.faq.FAQ1Fragment"
-        android:label="@string/faq_1" />
+        android:name="com.samco.trackandgraph.faq.FAQ1Fragment" />
     <fragment
         android:id="@+id/FAQ2Fragment"
-        android:name="com.samco.trackandgraph.faq.FAQ2Fragment"
-        android:label="@string/faq_2" />
+        android:name="com.samco.trackandgraph.faq.FAQ2Fragment" />
     <fragment
         android:id="@+id/FAQ3Fragment"
-        android:name="com.samco.trackandgraph.faq.FAQ3Fragment"
-        android:label="@string/faq_3" />
+        android:name="com.samco.trackandgraph.faq.FAQ3Fragment" />
     <fragment
         android:id="@+id/FAQ4Fragment"
-        android:name="com.samco.trackandgraph.faq.FAQ4Fragment"
-        android:label="@string/faq_4" />
+        android:name="com.samco.trackandgraph.faq.FAQ4Fragment" />
     <fragment
         android:id="@+id/FAQ5Fragment"
-        android:name="com.samco.trackandgraph.faq.FAQ5Fragment"
-        android:label="@string/faq_5" />
+        android:name="com.samco.trackandgraph.faq.FAQ5Fragment" />
     <fragment
         android:id="@+id/FAQ6Fragment"
-        android:name="com.samco.trackandgraph.faq.FAQ6Fragment"
-        android:label="@string/faq_6" />
+        android:name="com.samco.trackandgraph.faq.FAQ6Fragment" />
     <fragment
         android:id="@+id/FAQ7Fragment"
-        android:name="com.samco.trackandgraph.faq.FAQ7Fragment"
-        android:label="@string/faq_7" />
+        android:name="com.samco.trackandgraph.faq.FAQ7Fragment" />
     <fragment
         android:id="@+id/rateAppRedirectFragment"
-        android:name="com.samco.trackandgraph.rateapp.RateAppRedirectFragment"
-        android:label="RateAppRedirectFragment" />
+        android:name="com.samco.trackandgraph.rateapp.RateAppRedirectFragment" />
     <fragment
         android:id="@+id/remindersFragment"
-        android:name="com.samco.trackandgraph.reminders.RemindersFragment"
-        android:label="@string/reminders" />
+        android:name="com.samco.trackandgraph.reminders.RemindersFragment" />
     <fragment
         android:id="@+id/notesFragment"
-        android:name="com.samco.trackandgraph.notes.NotesFragment"
-        android:label="@string/notes" />
+        android:name="com.samco.trackandgraph.notes.NotesFragment" />
 </navigation>

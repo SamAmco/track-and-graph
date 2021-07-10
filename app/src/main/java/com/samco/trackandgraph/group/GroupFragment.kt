@@ -19,7 +19,6 @@ package com.samco.trackandgraph.group
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -31,6 +30,8 @@ import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.room.withTransaction
+import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
@@ -47,7 +48,6 @@ import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
-//TODO there are two todo's in this class
 class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener,
     AddGroupDialogFragment.AddGroupDialogListener {
     private var navController: NavController? = null
@@ -90,10 +90,16 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         registerForContextMenu(binding.itemList)
 
         setHasOptionsMenu(true)
-        args.groupName?.let { (activity as AppCompatActivity).supportActionBar?.title = it }
 
         listenToViewModel()
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val activity = (requireActivity() as MainActivity)
+        args.groupName?.let { activity.setActionBarConfig(NavButtonStyle.UP, it) }
+            ?: run { activity.setActionBarConfig(NavButtonStyle.MENU) }
     }
 
     private fun createGroupClickListener() = GroupClickListener(
@@ -414,8 +420,18 @@ class GroupViewModel : ViewModel() {
         items.forEachIndexed { index, groupChild ->
             when (groupChild.type) {
                 GroupChildType.GROUP -> groups.add(toGroupWithIndex(groupChild.obj, index))
-                GroupChildType.FEATURE -> displayFeatures.add(toDisplayFeatureWithIndex(groupChild.obj, index))
-                GroupChildType.GRAPH -> graphs.add(toGraphStatViewDataWithIndex(groupChild.obj, index))
+                GroupChildType.FEATURE -> displayFeatures.add(
+                    toDisplayFeatureWithIndex(
+                        groupChild.obj,
+                        index
+                    )
+                )
+                GroupChildType.GRAPH -> graphs.add(
+                    toGraphStatViewDataWithIndex(
+                        groupChild.obj,
+                        index
+                    )
+                )
             }
         }
         database?.withTransaction {
@@ -431,7 +447,8 @@ class GroupViewModel : ViewModel() {
         return viewData.graphOrStat.copy(displayIndex = index)
     }
 
-    private fun toDisplayFeatureWithIndex(obj: Any, index: Int) = (obj as DisplayFeature).copy(displayIndex = index)
+    private fun toDisplayFeatureWithIndex(obj: Any, index: Int) =
+        (obj as DisplayFeature).copy(displayIndex = index)
 
     private fun toGroupWithIndex(obj: Any, index: Int) = (obj as Group).copy(displayIndex = index)
 

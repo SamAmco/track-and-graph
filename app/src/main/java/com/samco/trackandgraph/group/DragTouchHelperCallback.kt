@@ -30,7 +30,7 @@ class DragTouchHelperCallback(
     ): Int {
         return makeFlag(
             ItemTouchHelper.ACTION_STATE_DRAG,
-            ItemTouchHelper.UP or ItemTouchHelper.DOWN
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN or ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
         )
     }
 

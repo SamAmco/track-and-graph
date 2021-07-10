@@ -18,7 +18,6 @@ package com.samco.trackandgraph.featurehistory
 
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -26,6 +25,8 @@ import androidx.lifecycle.*
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.entity.DataPoint
@@ -62,10 +63,13 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
         observeFeature()
 
-        (activity as AppCompatActivity).supportActionBar?.title = args.featureName
-
         setHasOptionsMenu(true)
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity).setActionBarConfig(NavButtonStyle.UP, args.featureName)
     }
 
     private fun showInfo() {

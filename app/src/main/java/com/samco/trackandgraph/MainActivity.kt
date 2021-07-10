@@ -16,23 +16,25 @@
 */
 package com.samco.trackandgraph
 
+import android.content.res.Configuration
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatSpinner
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
@@ -41,43 +43,101 @@ import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 import com.samco.trackandgraph.ui.DateFormatSetting
 import com.samco.trackandgraph.util.*
 
+enum class NavButtonStyle { UP, MENU }
+
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var navController: NavController
     private lateinit var navView: NavigationView
+    private lateinit var navHostFragment: NavHostFragment
+    private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
 
-    private val navFragments = setOf(
-        R.id.selectGroupFragment,
-        R.id.FAQFragment,
-        R.id.aboutPageFragment,
-        R.id.remindersFragment,
-        R.id.notesFragment,
-        R.id.backupAndRestoreFragment
-    )
+    private lateinit var currentNavBarConfig: NavBarConfig
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         readThemeValue()
         setContentView(R.layout.activity_main)
-
-        drawerLayout = findViewById(R.id.drawer_layout)
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_fragment)!! as NavHostFragment
-        navController = navHostFragment.navController
-        appBarConfiguration = AppBarConfiguration(navFragments, drawerLayout)
-        navView = findViewById(R.id.nav_view)
-
-        setSupportActionBar(findViewById(R.id.toolbar))
-        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
-
+        initializeNav()
+        initializeAppBar()
         onDrawerHideKeyboard()
         initDrawerSpinners()
         RemindersHelper.syncAlarms(this)
-
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
+    }
+
+    private fun initializeNav() {
+        drawerLayout = findViewById(R.id.drawer_layout)
+        navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_fragment)!! as NavHostFragment
+        navController = navHostFragment.navController
+        navView = findViewById(R.id.nav_view)
+        navView.setupWithNavController(navController)
+    }
+
+    private fun initializeAppBar() {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
+        supportActionBar?.let {
+            //The ActionBarDrawerToggle draws the navigation button/back button in the top left of
+            //the action bar
+            actionBarDrawerToggle = ActionBarDrawerToggle(
+                this, drawerLayout, toolbar, R.string.open, R.string.close
+            )
+            //This click listener is called only when the button is "disabled" (i.e. the back button
+            // is showing rather than the hamburger icon)
+            actionBarDrawerToggle.setToolbarNavigationClickListener { onBackPressed() }
+            //This notifies the button of when the drawer is open or closed
+            drawerLayout.addDrawerListener(actionBarDrawerToggle)
+            //This function should be called to synchronise the button with the drawers current state
+            actionBarDrawerToggle.syncState()
+        }
+        //supportActionBar?.setHomeButtonEnabled(true)
+        //supportActionBar?.setDisplayShowHomeEnabled(true)
+        setActionBarConfig(NavBarConfig(NavButtonStyle.MENU))
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onPostCreate(savedInstanceState, persistentState)
+        //See the documentation of syncState for the eplanation of why this is done here
+        actionBarDrawerToggle.syncState()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        //Doing this here was reccomended on stack overflow. See the documentation of syncState
+        actionBarDrawerToggle.syncState()
+    }
+
+    private data class NavBarConfig(
+        val buttonStyle: NavButtonStyle,
+        val title: String? = null
+    )
+
+    /**
+     * Set the title in the action bar and whether to show the menu button or the back button
+     * in the top left. Every fragment should call this.
+     */
+    fun setActionBarConfig(buttonStyle: NavButtonStyle, title: String? = null) {
+        setActionBarConfig(NavBarConfig(buttonStyle, title))
+    }
+
+    private fun setActionBarConfig(config: NavBarConfig) {
+        currentNavBarConfig = config
+        val title = config.title ?: getString(R.string.app_name)
+        supportActionBar?.title = title
+        when (config.buttonStyle) {
+            NavButtonStyle.MENU -> {
+                actionBarDrawerToggle.isDrawerIndicatorEnabled = true
+                supportActionBar?.setDisplayHomeAsUpEnabled(false)
+            }
+            NavButtonStyle.UP -> {
+                actionBarDrawerToggle.isDrawerIndicatorEnabled = false
+                supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            }
+        }
+        actionBarDrawerToggle.syncState()
     }
 
     private fun initDrawerSpinners() {
@@ -216,7 +276,7 @@ class MainActivity : AppCompatActivity() {
     private fun isFirstRun() = getPrefs(applicationContext).getBoolean(FIRST_RUN_PREF_KEY, true)
 
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(appBarConfiguration) || super.onNavigateUp()
+        return navController.navigateUp(drawerLayout) || super.onNavigateUp()
     }
 
     override fun onBackPressed() {

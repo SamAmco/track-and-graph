@@ -25,6 +25,8 @@ import androidx.fragment.app.Fragment
 import com.samco.trackandgraph.databinding.AboutPageBinding
 import android.content.Intent
 import android.net.Uri
+import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import timber.log.Timber
 
@@ -43,5 +45,13 @@ class AboutPageFragment : Fragment() {
             binding.versionText.text = "v${pInfo.versionName}"
         } catch (e: Exception) { Timber.d("Could not get package version name: ${e.message}") }
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity).setActionBarConfig(
+            NavButtonStyle.MENU,
+            getString(R.string.about)
+        )
     }
 }

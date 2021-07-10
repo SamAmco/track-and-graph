@@ -21,7 +21,6 @@ import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputFilter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,6 +42,8 @@ import androidx.core.view.children
 import androidx.core.view.forEachIndexed
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DiscreteValue
@@ -89,6 +90,10 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
     override fun onResume() {
         super.onResume()
+        (requireActivity() as MainActivity).setActionBarConfig(
+            NavButtonStyle.UP,
+            getString(R.string.add_feature)
+        )
         requireContext().showKeyboard()
     }
 
