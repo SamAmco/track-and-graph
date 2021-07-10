@@ -44,8 +44,9 @@ const val MOVE_DIALOG_TYPE_KEY = "move_dialog_type"
 const val MOVE_DIALOG_GROUP_KEY = "move_dialog_group"
 const val MOVE_DIALOG_TYPE_TRACK = "track"
 const val MOVE_DIALOG_TYPE_GRAPH = "graph"
+const val MOVE_DIALOG_TYPE_GROUP = "group"
 
-enum class MoveDialogType { TRACKER, GRAPH }
+enum class MoveDialogType { TRACKER, GRAPH, GROUP }
 
 class MoveToDialogFragment : DialogFragment() {
     private val viewModel by viewModels<MoveToDialogViewModel>()
@@ -74,6 +75,7 @@ class MoveToDialogFragment : DialogFragment() {
         val mode = when (requireArguments().getString(MOVE_DIALOG_TYPE_KEY)) {
             MOVE_DIALOG_TYPE_TRACK -> MoveDialogType.TRACKER
             MOVE_DIALOG_TYPE_GRAPH -> MoveDialogType.GRAPH
+            MOVE_DIALOG_TYPE_GROUP -> MoveDialogType.GROUP
             else -> throw Exception("Unrecognised move dialog mode")
         }
         val id = requireArguments().getLong(MOVE_DIALOG_GROUP_KEY)
@@ -124,13 +126,14 @@ class MoveToDialogViewModel : ViewModel() {
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
     val state: LiveData<MoveToDialogState> get() { return _state }
-    private val _state = MutableLiveData<MoveToDialogState>(MoveToDialogState.INITIALIZING)
+    private val _state = MutableLiveData(MoveToDialogState.INITIALIZING)
 
     val availableGroups: LiveData<List<Group>?> get() { return _availableGroups }
     private val _availableGroups = MutableLiveData<List<Group>?>(null)
 
     private lateinit var feature: Feature
     private lateinit var graphStat: GraphOrStat
+    private lateinit var group: Group
 
     fun init(activity: Activity, mode: MoveDialogType, id: Long) {
         if (_state.value != MoveToDialogState.INITIALIZING) return
@@ -139,8 +142,11 @@ class MoveToDialogViewModel : ViewModel() {
         dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
         ioScope.launch {
             val groups = dao.getAllGroupsSync()
-            if (mode == MoveDialogType.TRACKER) feature = dao.getFeatureById(id)
-            else graphStat = dao.getGraphStatById(id)
+            when (mode) {
+                MoveDialogType.TRACKER -> feature = dao.getFeatureById(id)
+                MoveDialogType.GRAPH -> graphStat = dao.getGraphStatById(id)
+                MoveDialogType.GROUP -> group = dao.getGroupById(id)
+            }
             withContext(Dispatchers.Main) {
                 _availableGroups.value = groups
                 _state.value = MoveToDialogState.WAITING
@@ -151,12 +157,19 @@ class MoveToDialogViewModel : ViewModel() {
     fun moveTo(newGroupId: Long) = ioScope.launch {
         if (_state.value != MoveToDialogState.WAITING) return@launch
         withContext(Dispatchers.Main) { _state.value = MoveToDialogState.MOVING }
-        if (mode == MoveDialogType.TRACKER) {
-            val newFeature = feature.copy(groupId = newGroupId)
-            dao.updateFeature(newFeature)
-        } else {
-            val newGraphStat = graphStat.copy(groupId = newGroupId)
-            dao.updateGraphOrStat(newGraphStat)
+        when (mode) {
+            MoveDialogType.TRACKER -> {
+                val newFeature = feature.copy(groupId = newGroupId)
+                dao.updateFeature(newFeature)
+            }
+            MoveDialogType.GRAPH -> {
+                val newGraphStat = graphStat.copy(groupId = newGroupId)
+                dao.updateGraphOrStat(newGraphStat)
+            }
+            MoveDialogType.GROUP -> {
+                val newGroup = group.copy(parentGroupId = newGroupId)
+                dao.updateGroup(newGroup)
+            }
         }
         withContext(Dispatchers.Main) { _state.value = MoveToDialogState.MOVED }
     }

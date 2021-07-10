@@ -76,6 +76,7 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
             when (item?.itemId) {
                 R.id.rename -> clickListener?.onRename(it)
                 R.id.delete -> clickListener?.onDelete(it)
+                R.id.moveTo -> clickListener?.onMove(it)
                 else -> {
                 }
             }
@@ -95,9 +96,11 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
 class GroupClickListener(
     val clickListener: (group: Group) -> Unit,
     val onRenameListener: (group: Group) -> Unit,
-    val onDeleteListener: (group: Group) -> Unit
+    val onDeleteListener: (group: Group) -> Unit,
+    val onMoveListener: (group: Group) -> Unit
 ) {
     fun onClick(group: Group) = clickListener(group)
     fun onRename(group: Group) = onRenameListener(group)
     fun onDelete(group: Group) = onDeleteListener(group)
+    fun onMove(group: Group) = onMoveListener(group)
 }
