@@ -95,7 +95,7 @@ interface TrackAndGraphDatabaseDao {
     fun updateReminders(reminders: List<Reminder>)
 
     @Query("SELECT * FROM groups_table WHERE id = :id LIMIT 1")
-    fun getGroupById(id: Int): Group
+    fun getGroupById(id: Long): Group
 
     @Update
     fun updateFeatures(features: List<Feature>)

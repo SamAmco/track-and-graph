@@ -105,8 +105,18 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     private fun createGroupClickListener() = GroupClickListener(
         this::onGroupSelected,
         this::onRenameGroupClicked,
-        this::onDeleteGroupClicked
+        this::onDeleteGroupClicked,
+        this::onMoveGroupClicked
     )
+
+    private fun onMoveGroupClicked(group: Group) {
+        val dialog = MoveToDialogFragment()
+        val args = Bundle()
+        args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_GROUP)
+        args.putLong(MOVE_DIALOG_GROUP_KEY, group.id)
+        dialog.arguments = args
+        childFragmentManager.let { dialog.show(it, "move_dialog") }
+    }
 
     private fun onDeleteGroupClicked(group: Group) {
         val dialog = YesCancelDialogFragment()
