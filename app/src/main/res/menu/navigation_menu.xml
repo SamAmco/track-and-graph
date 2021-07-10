@@ -18,7 +18,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/graphAndTrack">
         <item
-            android:id="@+id/selectGroupFragment"
+            android:id="@+id/groupFragment"
             android:icon="@drawable/home_menu_icon"
             android:title="@string/home" />
         <item

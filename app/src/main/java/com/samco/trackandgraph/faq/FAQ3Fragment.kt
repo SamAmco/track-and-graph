@@ -21,10 +21,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.Faq3Binding
 
 class FAQ3Fragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return Faq3Binding.inflate(inflater, container, false).root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity).setActionBarConfig(
+            NavButtonStyle.UP,
+            getString(R.string.faq_3)
+        )
     }
 }

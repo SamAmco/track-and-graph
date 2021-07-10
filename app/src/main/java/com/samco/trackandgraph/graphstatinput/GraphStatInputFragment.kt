@@ -32,6 +32,8 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.room.withTransaction
+import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.*
@@ -73,6 +75,14 @@ class GraphStatInputFragment : Fragment() {
         )
         listenToViewModelState()
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity).setActionBarConfig(
+            NavButtonStyle.UP,
+            getString(R.string.add_a_graph_or_stat)
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -353,4 +353,6 @@
     <string name="faq_text_7_13">Over time however this skew will tend to 0. Therefore the more data you have tracked the more accurate the histogram will be.</string>
     <string name="moshi" translatable="false">Moshi</string>
     <string name="hold_to_preview">Hold to preview</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 </resources>

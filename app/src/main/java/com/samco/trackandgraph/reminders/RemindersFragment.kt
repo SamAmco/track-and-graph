@@ -32,6 +32,8 @@ import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.entity.CheckedDays
@@ -75,6 +77,14 @@ class RemindersFragment : Fragment() {
 
         createNotificationChannel()
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity).setActionBarConfig(
+            NavButtonStyle.MENU,
+            getString(R.string.reminders)
+        )
     }
 
     private fun createNotificationChannel() {

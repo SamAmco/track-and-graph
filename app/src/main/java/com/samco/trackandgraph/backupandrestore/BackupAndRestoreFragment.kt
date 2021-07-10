@@ -8,12 +8,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
@@ -46,6 +46,14 @@ class BackupAndRestoreFragment : Fragment() {
         binding.backupButton.setOnClickListener { onBackupClicked() }
         binding.restoreButton.setOnClickListener { onRestoreClicked() }
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity).setActionBarConfig(
+            NavButtonStyle.MENU,
+            getString(R.string.backup_and_restore)
+        )
     }
 
     private fun listenToViewModel() {

@@ -22,6 +22,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.NavButtonStyle
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.FaqPageBinding
 
 class FAQFragment : Fragment() {
@@ -36,5 +39,13 @@ class FAQFragment : Fragment() {
         binding.faq6.setOnClickListener { navController?.navigate(FAQFragmentDirections.actionFaq6()) }
         binding.faq7.setOnClickListener { navController?.navigate(FAQFragmentDirections.actionFaq7()) }
         return binding.root
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as MainActivity).setActionBarConfig(
+            NavButtonStyle.MENU,
+            getString(R.string.faq)
+        )
     }
 }
