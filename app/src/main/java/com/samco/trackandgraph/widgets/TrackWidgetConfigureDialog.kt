@@ -28,12 +28,12 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.database.dto.FeatureAndGroup
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
+import com.samco.trackandgraph.ui.FeaturePathProvider
 
 class TrackWidgetConfigureDialog : DialogFragment() {
     private val viewModel by viewModels<TrackWidgetConfigureDialogViewModel>()
@@ -68,28 +68,34 @@ class TrackWidgetConfigureDialog : DialogFragment() {
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
-    private fun observeAllFeatures() = viewModel.allFeatures.observe(this, Observer { features ->
-        if (features.isEmpty()) {
-            listener.onNoFeatures()
-        }
-        val itemNames = features.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
-        val adapter =
-            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, itemNames)
-        binding.featureSpinner.adapter = adapter
-        binding.featureSpinner.setSelection(0)
-        binding.featureSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    viewModel.featureId = features[position].id
-                }
+    private fun observeAllFeatures() = viewModel.featurePathProvider.observe(this,
+        { featurePathProvider ->
+            val features = featurePathProvider.features
+            if (features.isEmpty()) {
+                listener.onNoFeatures()
             }
-    })
+            val itemNames = features.map { ft -> featurePathProvider.getPathForFeature(ft.id) }
+            val adapter =
+                ArrayAdapter(
+                    requireContext(),
+                    android.R.layout.simple_spinner_dropdown_item,
+                    itemNames
+                )
+            binding.featureSpinner.adapter = adapter
+            binding.featureSpinner.setSelection(0)
+            binding.featureSpinner.onItemSelectedListener =
+                object : AdapterView.OnItemSelectedListener {
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        viewModel.featureId = features[position].id
+                    }
+                }
+        })
 
     override fun onDismiss(dialog: DialogInterface) {
         listener.onDismiss()
@@ -98,12 +104,30 @@ class TrackWidgetConfigureDialog : DialogFragment() {
 
 class TrackWidgetConfigureDialogViewModel : ViewModel() {
     private var dataSource: TrackAndGraphDatabaseDao? = null
-    lateinit var allFeatures: LiveData<List<FeatureAndGroup>> private set
+    lateinit var featurePathProvider: LiveData<FeaturePathProvider> private set
     var featureId: Long? = null
 
     fun init(application: Application) {
         if (dataSource != null) return
         dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        allFeatures = dataSource!!.getAllFeaturesAndTrackGroups()
+        initFeatureNameProvider()
+    }
+
+    private fun initFeatureNameProvider() {
+        val mediator = MediatorLiveData<FeaturePathProvider>()
+        dataSource?.let {
+            val groups = it.getAllGroups()
+            val features = it.getAllFeatures()
+            val onEmitted = {
+                val featureList = features.value
+                val groupList = groups.value
+                if (groupList != null && featureList != null) {
+                    mediator.value = FeaturePathProvider(featureList, groupList)
+                }
+            }
+            mediator.addSource(groups) { onEmitted() }
+            mediator.addSource(features) { onEmitted() }
+        }
+        featurePathProvider = mediator
     }
 }
