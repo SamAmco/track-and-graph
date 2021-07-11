@@ -42,6 +42,7 @@ import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.util.hideKeyboard
 import kotlinx.coroutines.*
 import java.lang.Exception
@@ -187,7 +188,7 @@ class GraphStatInputFragment : Fragment() {
     private fun updateViewForSelectedGraphStatType(graphStatType: GraphStatType) {
         binding.configLayout.removeAllViews()
         inflateConfigView(graphStatType)
-        currentConfigView.initFromConfigData(viewModel.configData.value, viewModel.allFeatures)
+        currentConfigView.initFromConfigData(viewModel.configData.value, viewModel.featurePathProvider)
         listenToConfigView()
     }
 
@@ -276,7 +277,7 @@ class GraphStatInputViewModel : ViewModel() {
     val demoViewData: LiveData<IGraphStatViewData?> get() = _demoViewData
     private val _demoViewData = MutableLiveData<IGraphStatViewData?>(null)
 
-    lateinit var allFeatures: List<FeatureAndGroup> private set
+    lateinit var featurePathProvider: FeaturePathProvider private set
 
     fun initViewModel(database: TrackAndGraphDatabase, graphStatGroupId: Long, graphStatId: Long) {
         if (this.database != null) return
@@ -285,7 +286,9 @@ class GraphStatInputViewModel : ViewModel() {
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
         ioScope.launch {
-            allFeatures = dataSource!!.getAllFeaturesAndTrackGroupsSync()
+            val allFeatures = dataSource!!.getAllFeaturesSync()
+            val allGroups = dataSource!!.getAllGroupsSync()
+            featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
             else withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
         }

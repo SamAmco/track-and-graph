@@ -158,7 +158,7 @@ internal class LineGraphConfigView @JvmOverloads constructor(
 
     private fun inflateLineGraphFeatureView(index: Int, lineGraphFeature: LineGraphFeature) {
         val featureConfig = LineGraphFeatureConfig.fromLineGraphFeature(lineGraphFeature)
-        val view = LineGraphFeatureConfigListItemView(context, allFeatures, featureConfig)
+        val view = LineGraphFeatureConfigListItemView(context, featurePathProvider, featureConfig)
         lgfConfigIndices.add(index, view)
         view.setOnRemoveListener {
             binding.lineGraphFeaturesLayout.removeView(view)
