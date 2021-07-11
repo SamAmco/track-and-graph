@@ -45,6 +45,7 @@ import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.GraphStatView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
@@ -83,7 +84,8 @@ class ViewGraphStatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         requireActivity().windowManager.defaultDisplay.getSize(windowSize)
-        val heightRatio = if (isPortrait()) maxGraphHeightRatioPortrait else maxGraphHeightRatioLandscape
+        val heightRatio =
+            if (isPortrait()) maxGraphHeightRatioPortrait else maxGraphHeightRatioLandscape
         graphStatView.setGraphHeight((windowSize.y * heightRatio).toInt())
     }
 
@@ -103,7 +105,7 @@ class ViewGraphStatFragment : Fragment() {
             NoteType.DATA_POINT -> {
                 val dataPoint = note.dataPoint!!
                 val featureDisplayName =
-                    viewModel.featureDisplayNames?.getOrElse(dataPoint.featureId) { null }
+                    viewModel.featurePathProvider.getPathForFeature(dataPoint.featureId)
                 val featureType =
                     viewModel.featureTypes?.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
                         ?: FeatureType.CONTINUOUS
@@ -163,10 +165,10 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun initNotesAdapterFromViewModel() {
-        val featureDisplayNames = viewModel.featureDisplayNames ?: emptyMap()
+        val featurePathProvider = viewModel.featurePathProvider
         val featureTypes = viewModel.featureTypes ?: emptyMap()
         adapter = NotesAdapter(
-            featureDisplayNames,
+            featurePathProvider,
             featureTypes,
             getWeekDayNames(requireContext()),
             NoteClickListener(this::onViewNoteClicked)
@@ -179,18 +181,22 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
-        val maxGraphHeightRatio = if (isPortrait()) maxGraphHeightRatioPortrait else maxGraphHeightRatioLandscape
-        val minGraphHeightRatio = if (isPortrait()) minGraphHeightRatioPortrait else minGraphHeightRatioLandscape
+        val maxGraphHeightRatio =
+            if (isPortrait()) maxGraphHeightRatioPortrait else maxGraphHeightRatioLandscape
+        val minGraphHeightRatio =
+            if (isPortrait()) minGraphHeightRatioPortrait else minGraphHeightRatioLandscape
         val maxNotesHeight = windowSize.y * (maxGraphHeightRatio - minGraphHeightRatio)
         val targetNotesHeight = if (showNotes) maxNotesHeight else 0
-        val targetGraphHeight = windowSize.y * (if (showNotes) minGraphHeightRatio else maxGraphHeightRatio)
+        val targetGraphHeight =
+            windowSize.y * (if (showNotes) minGraphHeightRatio else maxGraphHeightRatio)
 
         animateViewHeights(targetNotesHeight.toInt(), targetGraphHeight.toInt())
         binding.notesPopupUpButton.visibility = if (showNotes) View.GONE else View.VISIBLE
         binding.notesPopupDownButton.visibility = if (showNotes) View.VISIBLE else View.GONE
     }
 
-    private fun isPortrait() = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+    private fun isPortrait() =
+        resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
     private fun animateViewHeights(notesTargetHeight: Int, graphTargetHeight: Int) {
         showHideNotesAnimator?.cancel()
@@ -203,10 +209,13 @@ class ViewGraphStatFragment : Fragment() {
             interpolator = LinearInterpolator()
             addUpdateListener { animation ->
                 val nextRatio = animation.animatedValue as Float
-                val nextGraphHeight = startingGraphHeight + ((graphTargetHeight - startingGraphHeight) * nextRatio)
-                val nextNotesHeight = startingNotesHeight + ((notesTargetHeight - startingNotesHeight) * nextRatio)
+                val nextGraphHeight =
+                    startingGraphHeight + ((graphTargetHeight - startingGraphHeight) * nextRatio)
+                val nextNotesHeight =
+                    startingNotesHeight + ((notesTargetHeight - startingNotesHeight) * nextRatio)
                 graphStatView.setGraphHeight(nextGraphHeight.toInt())
-                (binding.notesRecyclerView.layoutParams as LinearLayout.LayoutParams).height = nextNotesHeight.toInt()
+                (binding.notesRecyclerView.layoutParams as LinearLayout.LayoutParams).height =
+                    nextNotesHeight.toInt()
                 binding.notesRecyclerView.requestLayout()
             }
         }?.start()
@@ -236,7 +245,7 @@ class ViewGraphStatFragment : Fragment() {
 
 enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
 class ViewGraphStatViewModel : ViewModel() {
-    var featureDisplayNames: Map<Long, String>? = null
+    var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyList(), emptyList())
         private set
     var featureTypes: Map<Long, FeatureType>? = null
         private set
@@ -292,16 +301,13 @@ class ViewGraphStatViewModel : ViewModel() {
     }
 
     private fun getAllFeatureAttributes() {
-        val allFeatures = dataSource!!.getAllFeaturesAndTrackGroupsSync()
-        featureDisplayNames = allFeatures
-            .map { it.id to "${it.trackGroupName} -> ${it.name}" }
-            .toMap()
-        featureTypes = allFeatures
-            .map { it.id to it.featureType }
-            .toMap()
+        val allFeatures = dataSource!!.getAllFeaturesSync()
+        val allGroups = dataSource!!.getAllGroupsSync()
+        featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
+        featureTypes = allFeatures.map { it.id to it.featureType }.toMap()
     }
 
-    fun onSampledDataPoints(dataPoints: List<DataPoint>) {
+    private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
         ioScope.launch {
             val dataPointNotes = dataPoints
                 .filter { dp -> dp.note.isNotEmpty() }
