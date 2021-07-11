@@ -29,18 +29,20 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayNote
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
 
 internal class NoteListAdapter(
     private val clickListener: NoteClickListener,
-    private val weekDayNames: List<String>
+    private val weekDayNames: List<String>,
+    private val featurePathProvider: FeaturePathProvider
 ) : ListAdapter<DisplayNote, NoteViewHolder>(NoteDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         return NoteViewHolder.from(parent, weekDayNames)
     }
 
     override fun onBindViewHolder(holder: NoteViewHolder, position: Int) {
-        holder.bind(getItem(position), clickListener)
+        holder.bind(getItem(position), featurePathProvider, clickListener)
     }
 }
 
@@ -62,14 +64,18 @@ internal class NoteViewHolder private constructor(
     private var clickListener: NoteClickListener? = null
     private var note: DisplayNote? = null
 
-    fun bind(note: DisplayNote, clickListener: NoteClickListener) {
+    fun bind(
+        note: DisplayNote,
+        featurePathProvider: FeaturePathProvider,
+        clickListener: NoteClickListener
+    ) {
         this.note = note
         this.clickListener = clickListener
         binding.timestampText.text =
             formatDayWeekDayMonthYearHourMinuteOneLine(binding.root.context, weekDayNames, note.timestamp)
         binding.noteText.text = note.note
         binding.featureAndGroupText.text = when (note.noteType) {
-            NoteType.DATA_POINT -> "${note.groupName} -> ${note.featureName}"
+            NoteType.DATA_POINT -> note.featureId?.let { featurePathProvider.getPathForFeature(it) } ?: ""
             NoteType.GLOBAL_NOTE -> ""
         }
         binding.editButton.setOnClickListener { createContextMenu(binding.editButton) }

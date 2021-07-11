@@ -568,7 +568,7 @@ val MIGRATION_43_44 = object : Migration(43, 44) {
                 CREATE TABLE IF NOT EXISTS `features_table2` (
                 `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                 `name` TEXT NOT NULL, 
-                `group_id` INTEGER, 
+                `group_id` INTEGER NOT NULL, 
                 `type` INTEGER NOT NULL, 
                 `discrete_values` TEXT NOT NULL, 
                 `display_index` INTEGER NOT NULL, 
@@ -631,7 +631,7 @@ val MIGRATION_43_44 = object : Migration(43, 44) {
             """
             CREATE TABLE IF NOT EXISTS `graphs_and_stats_table3` (
             `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-            `group_id` INTEGER, 
+            `group_id` INTEGER NOT NULL, 
             `name` TEXT NOT NULL, 
             `graph_stat_type` INTEGER NOT NULL, 
             `display_index` INTEGER NOT NULL, 

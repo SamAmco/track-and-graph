@@ -43,7 +43,7 @@ data class Feature(
     val name: String,
 
     @ColumnInfo(name = "group_id", index = true)
-    val groupId: Long?,
+    val groupId: Long,
 
     @ColumnInfo(name = "type")
     val featureType: FeatureType,

@@ -15,32 +15,17 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.database.dto
+package com.samco.trackandgraph.ui
 
-import androidx.room.ColumnInfo
-import org.threeten.bp.OffsetDateTime
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.Group
 
-enum class NoteType {
-    DATA_POINT,
-    GLOBAL_NOTE
+class FeaturePathProvider(features: List<Feature>, groups: List<Group>) :
+    GroupPathProvider(groups) {
+    private val featuresById = features.map { it.id to it }.toMap()
+
+    fun getPathForFeature(id: Long): String {
+        val feature = featuresById[id] ?: return ""
+        return getPathForGroup(feature.groupId) + separator + feature.name
+    }
 }
-
-data class DisplayNote(
-    @ColumnInfo(name = "timestamp")
-    val timestamp: OffsetDateTime = OffsetDateTime.now(),
-
-    @ColumnInfo(name = "note_type")
-    val noteType: NoteType,
-
-    @ColumnInfo(name = "feature_id")
-    val featureId: Long?,
-
-    @ColumnInfo(name = "feature_name")
-    val featureName: String?,
-
-    @ColumnInfo(name = "group_id")
-    val groupId: Long?,
-
-    @ColumnInfo(name = "note")
-    val note: String
-)

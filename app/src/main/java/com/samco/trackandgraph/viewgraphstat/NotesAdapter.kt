@@ -92,6 +92,7 @@ class NotesAdapter(
             val featureType = featureTypes.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
             binding.valueText.text = DataPoint.getDisplayValue(note!!.dataPoint!!, featureType)
             binding.featureNameText.visibility = View.VISIBLE
+            //TODO 2
             binding.featureNameText.text = featureDisplayNames.getOrElse(dataPoint.featureId) { "" }
             binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
             binding.noteText.visibility = View.VISIBLE

@@ -35,6 +35,7 @@ import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showNoteDialog
 import kotlinx.coroutines.CoroutineScope
@@ -54,12 +55,11 @@ class NotesFragment : Fragment() {
     ): View? {
         binding = FragmentNotesBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        initListAdapter()
         val dataSource =
             TrackAndGraphDatabase.getInstance(requireActivity().applicationContext).trackAndGraphDatabaseDao
         viewModel.init(dataSource)
 
-        listenToViewModel()
+        listenToFeatureNameProvdier()
 
         setHasOptionsMenu(true)
 
@@ -87,7 +87,14 @@ class NotesFragment : Fragment() {
         return super.onOptionsItemSelected(item)
     }
 
-    private fun listenToViewModel() {
+    private fun listenToFeatureNameProvdier() {
+        viewModel.featureNameProvider.observe(viewLifecycleOwner, Observer {
+            initListAdapter(it)
+            listenToNotes()
+        })
+    }
+
+    private fun listenToNotes() {
         viewModel.notes.observe(viewLifecycleOwner, Observer { notes ->
             if (notes == null) return@Observer
             if (notes.isNotEmpty()) binding.noNotesHintText.visibility = View.GONE
@@ -101,14 +108,15 @@ class NotesFragment : Fragment() {
         })
     }
 
-    private fun initListAdapter() {
+    private fun initListAdapter(featurePathProvider: FeaturePathProvider) {
         adapter = NoteListAdapter(
             NoteClickListener(
                 this::onNoteClicked,
                 this::onEditNote,
                 this::onDeleteNote
             ),
-            getWeekDayNames(requireContext())
+            getWeekDayNames(requireContext()),
+            featurePathProvider
         )
         binding.notesList.adapter = adapter
         binding.notesList.layoutManager =
@@ -152,6 +160,8 @@ class NotesViewModel : ViewModel() {
     lateinit var notes: LiveData<List<DisplayNote>>
         private set
 
+    lateinit var featureNameProvider: LiveData<FeaturePathProvider>
+
     private var topNote: DisplayNote? = null
     private var notesObserver: Observer<List<DisplayNote>>? = null
     private val _onNoteInsertedTop = MutableLiveData(false)
@@ -162,6 +172,25 @@ class NotesViewModel : ViewModel() {
         this.dataSource = dataSource
         notes = dataSource.getAllDisplayNotes()
         initOnNoteInsertedTop()
+        initFeatureNameProvider()
+    }
+
+    private fun initFeatureNameProvider() {
+        val mediator = MediatorLiveData<FeaturePathProvider>()
+        dataSource?.let {
+            val groups = it.getAllGroups()
+            val features = it.getAllFeatures()
+            val onEmitted = {
+                val featureList = features.value
+                val groupList = groups.value
+                if (groupList != null && featureList != null) {
+                    mediator.value = FeaturePathProvider(featureList, groupList)
+                }
+            }
+            mediator.addSource(groups) { onEmitted() }
+            mediator.addSource(features) { onEmitted() }
+        }
+        featureNameProvider = mediator
     }
 
     private fun initOnNoteInsertedTop() {
