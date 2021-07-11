@@ -19,7 +19,9 @@ package com.samco.trackandgraph.ui
 
 import com.samco.trackandgraph.database.entity.Group
 
-open class GroupPathProvider(groups: List<Group>) {
+open class GroupPathProvider(
+    val groups: List<Group>
+) {
     protected val separator = "/"
 
     protected val groupsById = groups.map { it.id to it }.toMap()

@@ -84,25 +84,24 @@ class MoveToDialogFragment : DialogFragment() {
     }
 
     private fun listenToViewModel() {
-        viewModel.availableGroups.observe(this, Observer {
+        viewModel.availableGroups.observe(this, {
             if (it != null) inflateGroupItems(it)
         })
 
-        viewModel.state.observe(this, Observer {
+        viewModel.state.observe(this, {
             if (it == MoveToDialogState.MOVED) dismiss()
         })
     }
 
-    private fun inflateGroupItems(items: List<Group>) {
+    private fun inflateGroupItems(groupPathProvider: GroupPathProvider) {
         val inflater = LayoutInflater.from(context)
-        for (item in items) {
+        for (item in groupPathProvider.groups) {
             val groupItemView = ListItemMoveToGroupBinding.inflate(inflater, binding.groupsLayout, false)
-            //TODO 4
-            groupItemView.groupNameText.text = item.name
+            groupItemView.groupNameText.text = groupPathProvider.getPathForGroup(item.id)
             groupItemView.itemBackground.setOnClickListener { viewModel.moveTo(item.id) }
             binding.groupsLayout.addView(groupItemView.root)
         }
-        setDialogHeight(items.size)
+        setDialogHeight(groupPathProvider.groups.size)
     }
 
     private fun setDialogHeight(numItems: Int) {
@@ -129,8 +128,8 @@ class MoveToDialogViewModel : ViewModel() {
     val state: LiveData<MoveToDialogState> get() { return _state }
     private val _state = MutableLiveData(MoveToDialogState.INITIALIZING)
 
-    val availableGroups: LiveData<List<Group>?> get() { return _availableGroups }
-    private val _availableGroups = MutableLiveData<List<Group>?>(null)
+    val availableGroups: LiveData<GroupPathProvider?> get() { return _availableGroups }
+    private val _availableGroups = MutableLiveData<GroupPathProvider?>(null)
 
     private lateinit var feature: Feature
     private lateinit var graphStat: GraphOrStat
@@ -142,14 +141,16 @@ class MoveToDialogViewModel : ViewModel() {
         val application = activity.application
         dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
         ioScope.launch {
-            val groups = dao.getAllGroupsSync()
+            val groups = dao.getAllGroupsSync().toMutableList()
+            if (mode == MoveDialogType.GROUP) groups.removeAll { it.id == id }
+            val groupPathProvider = GroupPathProvider(groups)
             when (mode) {
                 MoveDialogType.TRACKER -> feature = dao.getFeatureById(id)
                 MoveDialogType.GRAPH -> graphStat = dao.getGraphStatById(id)
                 MoveDialogType.GROUP -> group = dao.getGroupById(id)
             }
             withContext(Dispatchers.Main) {
-                _availableGroups.value = groups
+                _availableGroups.value = groupPathProvider
                 _state.value = MoveToDialogState.WAITING
             }
         }
