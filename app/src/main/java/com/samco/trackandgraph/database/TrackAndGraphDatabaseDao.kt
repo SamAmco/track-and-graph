@@ -79,6 +79,9 @@ interface TrackAndGraphDatabaseDao {
     @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC""")
     fun getAllFeatures(): LiveData<List<Feature>>
 
+    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC""")
+    fun getAllFeaturesSync(): List<Feature>
+
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC""")
     fun getAllGroupsSync(): List<Group>
 

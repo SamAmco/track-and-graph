@@ -26,12 +26,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.dto.NoteType
+import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
 
 class NotesAdapter(
-    private val featureDisplayNames: Map<Long, String>,
+    private val featurePathProvider: FeaturePathProvider,
     private val featureTypes: Map<Long, FeatureType>,
     private val weekDayNames: List<String>,
     private val clickListener: NoteClickListener
@@ -42,7 +44,7 @@ class NotesAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(
             parent,
-            featureDisplayNames,
+            featurePathProvider,
             weekDayNames,
             featureTypes,
             clickListener
@@ -55,7 +57,7 @@ class NotesAdapter(
 
     class ViewHolder private constructor(
         private val binding: ListItemNoteBinding,
-        private val featureDisplayNames: Map<Long, String>,
+        private val featurePathProvider: FeaturePathProvider,
         private val weekDayNames: List<String>,
         private val featureTypes: Map<Long, FeatureType>,
         private val clickListener: NoteClickListener
@@ -92,8 +94,7 @@ class NotesAdapter(
             val featureType = featureTypes.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
             binding.valueText.text = DataPoint.getDisplayValue(note!!.dataPoint!!, featureType)
             binding.featureNameText.visibility = View.VISIBLE
-            //TODO 2
-            binding.featureNameText.text = featureDisplayNames.getOrElse(dataPoint.featureId) { "" }
+            binding.featureNameText.text = featurePathProvider.getPathForFeature(dataPoint.featureId)
             binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
             binding.noteText.visibility = View.VISIBLE
             binding.noteText.text = dataPoint.note
@@ -102,7 +103,7 @@ class NotesAdapter(
         companion object {
             fun from(
                 parent: ViewGroup,
-                featureDisplayNames: Map<Long, String>,
+                featurePathProvider: FeaturePathProvider,
                 weekDayNames: List<String>,
                 featureTypes: Map<Long, FeatureType>,
                 clickListener: NoteClickListener
@@ -111,7 +112,7 @@ class NotesAdapter(
                 val binding = ListItemNoteBinding.inflate(layoutInflater, parent, false)
                 return ViewHolder(
                     binding,
-                    featureDisplayNames,
+                    featurePathProvider,
                     weekDayNames,
                     featureTypes,
                     clickListener
