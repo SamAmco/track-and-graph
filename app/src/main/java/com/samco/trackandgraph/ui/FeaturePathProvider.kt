@@ -20,8 +20,10 @@ package com.samco.trackandgraph.ui
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.Group
 
-class FeaturePathProvider(features: List<Feature>, groups: List<Group>) :
-    GroupPathProvider(groups) {
+class FeaturePathProvider(
+    val features: List<Feature>,
+    groups: List<Group>
+) : GroupPathProvider(groups) {
     private val featuresById = features.map { it.id to it }.toMap()
 
     fun getPathForFeature(id: Long): String {

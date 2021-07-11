@@ -32,12 +32,13 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
 
 class LineGraphFeatureConfigListItemView(
     context: Context,
-    private val features: List<FeatureAndGroup>,
+    private val featurePathProvider: FeaturePathProvider,
     private val lineGraphFeature: LineGraphFeatureConfig
 ) : LinearLayout(context) {
     private val binding =
@@ -167,7 +168,7 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupFeatureSpinner() {
-        val items = features.flatMap { getSpinnerItemsForFeature(it) }
+        val items = featurePathProvider.features.flatMap { getSpinnerItemsForFeature(it) }
         val itemNames = items.map { it.third }
         val adapter =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
@@ -209,10 +210,9 @@ class LineGraphFeatureConfigListItemView(
         }
     }
 
-    private fun getSpinnerItemsForFeature(feature: FeatureAndGroup)
-            : List<Triple<FeatureAndGroup, DurationPlottingMode, String>> {
-        //TODO 3
-        val name = "${feature.trackGroupName} -> ${feature.name}"
+    private fun getSpinnerItemsForFeature(feature: Feature)
+            : List<Triple<Feature, DurationPlottingMode, String>> {
+        val name = featurePathProvider.getPathForFeature(feature.id)
         return if (feature.featureType == FeatureType.DURATION) {
             val time = context.getString(R.string.time_duration)
             val hours = context.getString(R.string.hours)
@@ -235,7 +235,8 @@ class LineGraphFeatureConfigListItemView(
         if (oldFeatureId == -1L || oldFeatureName == "") binding.lineGraphFeatureName.setText(
             newFeatureName
         )
-        val oldFeatureDBName = features.firstOrNull { f -> f.id == oldFeatureId }?.name ?: return
+        val oldFeatureDBName =
+            featurePathProvider.features.firstOrNull { f -> f.id == oldFeatureId }?.name ?: return
         if (oldFeatureDBName == oldFeatureName || oldFeatureName == "") {
             binding.lineGraphFeatureName.setText(newFeatureName)
         }

@@ -26,10 +26,11 @@ import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSpinner
-import com.samco.trackandgraph.database.dto.FeatureAndGroup
+import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.ExtendedSpinner
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.formatDayMonthYear
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -45,7 +46,9 @@ abstract class GraphStatConfigView constructor(
     attrs,
     defStyleAttr
 ) {
-    protected lateinit var allFeatures: List<FeatureAndGroup>
+    protected lateinit var featurePathProvider: FeaturePathProvider
+
+    protected val allFeatures: List<Feature> get() = featurePathProvider.features
 
     private var configChangedListener: ((Any?, ValidationException?) -> Unit)? = null
     protected var onScrollListener: ((Int) -> Unit)? = null
@@ -53,8 +56,8 @@ abstract class GraphStatConfigView constructor(
 
     abstract fun initFromConfigData(configData: Any?)
 
-    internal fun initFromConfigData(configData: Any?, features: List<FeatureAndGroup>) {
-        this.allFeatures = features
+    internal fun initFromConfigData(configData: Any?, featurePathProvider: FeaturePathProvider) {
+        this.featurePathProvider = featurePathProvider
         initFromConfigData(configData)
     }
 
@@ -84,12 +87,12 @@ abstract class GraphStatConfigView constructor(
             view: GraphStatConfigView,
             spinner: AppCompatSpinner,
             selectedId: Long,
-            featureFilter: (FeatureAndGroup) -> Boolean,
-            onItemSelected: (FeatureAndGroup) -> Unit
+            featureFilter: (Feature) -> Boolean,
+            onItemSelected: (Feature) -> Unit
         ) {
-            val allFeatures = view.allFeatures.filter(featureFilter)
+            val allFeatures = view.featurePathProvider.features.filter(featureFilter)
             val context = view.context
-            val itemNames = allFeatures.map { ft -> "${ft.trackGroupName} -> ${ft.name}" }
+            val itemNames = allFeatures.map { ft -> view.featurePathProvider.getPathForFeature(ft.id) }
             val adapter =
                 ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
             spinner.adapter = adapter
@@ -114,7 +117,7 @@ abstract class GraphStatConfigView constructor(
             view: GraphStatConfigView,
             spinner: AppCompatSpinner,
             selectedId: Long,
-            onItemSelected: (FeatureAndGroup) -> Unit
+            onItemSelected: (Feature) -> Unit
         ) {
             listenToFeatureSpinner(view, spinner, selectedId, { true }, onItemSelected)
         }

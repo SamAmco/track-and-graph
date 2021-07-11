@@ -28,7 +28,7 @@ import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.doubleFormatter
-import com.samco.trackandgraph.database.dto.FeatureAndGroup
+import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.DurationInputView
@@ -62,7 +62,7 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
     protected abstract fun onNewToValue(value: Double)
     protected abstract fun onNewFromValue(value: Double)
 
-    private fun getCurrentFeature(): FeatureAndGroup? {
+    private fun getCurrentFeature(): Feature? {
         val featId = getCurrentFeatureId()
         return allFeatures.firstOrNull { it.id == featId }
     }
@@ -92,7 +92,7 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
         }
     }
 
-    private fun updateInputView(feature: FeatureAndGroup?) {
+    private fun updateInputView(feature: Feature?) {
         when (feature?.featureType) {
             FeatureType.DISCRETE -> {
                 sanitizeValueStatDiscreteValues()
