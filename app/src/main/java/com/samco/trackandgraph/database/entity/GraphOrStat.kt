@@ -55,7 +55,7 @@ data class GraphOrStat(
     val id: Long,
 
     @ColumnInfo(name = "group_id", index = true)
-    val groupId: Long?,
+    val groupId: Long,
 
     @ColumnInfo(name = "name")
     val name: String,

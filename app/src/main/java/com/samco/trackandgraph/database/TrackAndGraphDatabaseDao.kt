@@ -76,6 +76,9 @@ interface TrackAndGraphDatabaseDao {
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC""")
     fun getAllGroups(): LiveData<List<Group>>
 
+    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC""")
+    fun getAllFeatures(): LiveData<List<Feature>>
+
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC""")
     fun getAllGroupsSync(): List<Group>
 
@@ -258,13 +261,13 @@ interface TrackAndGraphDatabaseDao {
     @Query(
         """
             SELECT * FROM (
-                SELECT dp.timestamp as timestamp, 0 as note_type, dp.feature_id as feature_id, f.name as feature_name, t.name as group_name, dp.note as note
+                SELECT dp.timestamp as timestamp, 0 as note_type, dp.feature_id as feature_id, f.name as feature_name, t.id as group_id, dp.note as note
                 FROM data_points_table as dp 
                 LEFT JOIN features_table as f ON dp.feature_id = f.id
                 LEFT JOIN groups_table as t ON f.group_id = t.id
                 WHERE dp.note IS NOT NULL AND dp.note != ""
             ) UNION SELECT * FROM (
-                SELECT n.timestamp as timestamp, 1 as note_type, NULL as feature_id, NULL as feature_name, NULL as group_name, n.note as note
+                SELECT n.timestamp as timestamp, 1 as note_type, NULL as feature_id, NULL as feature_name, NULL as group_id, n.note as note
                 FROM notes_table as n
             ) ORDER BY timestamp DESC
         """

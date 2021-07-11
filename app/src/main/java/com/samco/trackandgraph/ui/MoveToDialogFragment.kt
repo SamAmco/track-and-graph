@@ -97,6 +97,7 @@ class MoveToDialogFragment : DialogFragment() {
         val inflater = LayoutInflater.from(context)
         for (item in items) {
             val groupItemView = ListItemMoveToGroupBinding.inflate(inflater, binding.groupsLayout, false)
+            //TODO 4
             groupItemView.groupNameText.text = item.name
             groupItemView.itemBackground.setOnClickListener { viewModel.moveTo(item.id) }
             binding.groupsLayout.addView(groupItemView.root)

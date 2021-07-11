@@ -211,6 +211,7 @@ class LineGraphFeatureConfigListItemView(
 
     private fun getSpinnerItemsForFeature(feature: FeatureAndGroup)
             : List<Triple<FeatureAndGroup, DurationPlottingMode, String>> {
+        //TODO 3
         val name = "${feature.trackGroupName} -> ${feature.name}"
         return if (feature.featureType == FeatureType.DURATION) {
             val time = context.getString(R.string.time_duration)

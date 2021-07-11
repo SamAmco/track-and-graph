@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 44,
-    "identityHash": "9f6156b5a1ba59987a4b46de05cb3210",
+    "identityHash": "f150d7e7d8dfd23905ecb2fa32a4a6f8",
     "entities": [
       {
         "tableName": "features_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `group_id` INTEGER, `type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, `display_index` INTEGER NOT NULL, `has_default_value` INTEGER NOT NULL, `default_value` REAL NOT NULL, `feature_description` TEXT NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `group_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, `display_index` INTEGER NOT NULL, `has_default_value` INTEGER NOT NULL, `default_value` REAL NOT NULL, `feature_description` TEXT NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -24,7 +24,7 @@
             "fieldPath": "groupId",
             "columnName": "group_id",
             "affinity": "INTEGER",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "featureType",
@@ -242,7 +242,7 @@
       },
       {
         "tableName": "graphs_and_stats_table2",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `group_id` INTEGER, `graph_stat_type` INTEGER NOT NULL, `display_index` INTEGER NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `group_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `graph_stat_type` INTEGER NOT NULL, `display_index` INTEGER NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -251,16 +251,16 @@
             "notNull": true
           },
           {
+            "fieldPath": "groupId",
+            "columnName": "group_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "name",
             "columnName": "name",
             "affinity": "TEXT",
             "notNull": true
-          },
-          {
-            "fieldPath": "groupId",
-            "columnName": "group_id",
-            "affinity": "INTEGER",
-            "notNull": false
           },
           {
             "fieldPath": "type",
@@ -1013,7 +1013,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9f6156b5a1ba59987a4b46de05cb3210')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f150d7e7d8dfd23905ecb2fa32a4a6f8')"
     ]
   }
 }
