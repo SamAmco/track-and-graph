@@ -160,7 +160,7 @@ class NotesViewModel : ViewModel() {
     lateinit var notes: LiveData<List<DisplayNote>>
         private set
 
-    lateinit var featureNameProvider: LiveData<FeaturePathProvider>
+    lateinit var featureNameProvider: LiveData<FeaturePathProvider> private set
 
     private var topNote: DisplayNote? = null
     private var notesObserver: Observer<List<DisplayNote>>? = null

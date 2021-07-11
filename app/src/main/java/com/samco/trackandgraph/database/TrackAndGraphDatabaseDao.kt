@@ -26,24 +26,6 @@ import org.threeten.bp.OffsetDateTime
 //TODO there is a lot of duplication in this file, you should extract all common queries (possibly all queries)
 // to top level constants as below
 
-private const val getAllFeaturesAndTrackGroupsQuery = """
-        SELECT features_table.id, features_table.name, features_table.display_index,
-            features_table.type, features_table.discrete_values, groups_table.id as group_id,
-            groups_table.name as group_name
-        FROM features_table 
-        LEFT JOIN groups_table 
-        ON features_table.group_id = groups_table.id
-        ORDER BY groups_table.display_index ASC, features_table.display_index ASC, features_table.id ASC"""
-
-private const val getFeatureAndTrackGroupByFeatureId = """
-    SELECT features_table.id, features_table.name, features_table.display_index,
-            features_table.type, features_table.discrete_values, groups_table.id as group_id,
-            groups_table.name as group_name
-    FROM features_table
-    LEFT JOIN groups_table
-    ON features_table.group_id = groups_table.id
-    WHERE features_table.id = :featureId LIMIT 1"""
-
 private const val getFeatureByIdQuery =
     """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
 
@@ -129,15 +111,6 @@ interface TrackAndGraphDatabaseDao {
 
     @Query(getFeatureByIdQuery)
     fun tryGetFeatureById(featureId: Long): LiveData<Feature?>
-
-    @Query(getAllFeaturesAndTrackGroupsQuery)
-    fun getAllFeaturesAndTrackGroups(): LiveData<List<FeatureAndGroup>>
-
-    @Query(getAllFeaturesAndTrackGroupsQuery)
-    fun getAllFeaturesAndTrackGroupsSync(): List<FeatureAndGroup>
-
-    @Query(getFeatureAndTrackGroupByFeatureId)
-    fun getFeatureAndTrackGroupByFeatureId(featureId: Long): FeatureAndGroup?
 
     @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
