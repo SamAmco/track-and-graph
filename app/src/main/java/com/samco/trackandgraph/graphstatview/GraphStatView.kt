@@ -165,17 +165,25 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
                 graphOrStat = (data as T).graphOrStat
                 decorate(data.graphOrStat, decorator, data)
                 setDynamicViewHeight()
-            } catch (exception: Exception) {
-                if (exception !is GraphStatInitException) return@launch
-                cleanAllViews()
-                currentDecorator = null
-                val headerText = graphOrStat?.name ?: ""
-                binding.headerText.text = headerText
-                binding.errorMessage.visibility = View.VISIBLE
-                binding.errorMessage.text = context.getString(exception.errorTextId)
-                setDynamicViewHeight()
+                while (true) {
+                    delay(1000)
+                    decorator.update()
+                }
+            } catch (throwable: Throwable) {
+                if (throwable !is GraphStatInitException) return@launch
+                onDecorateThrew(graphOrStat, throwable)
             }
         }
+    }
+
+    private fun onDecorateThrew(graphOrStat: GraphOrStat?, exception: GraphStatInitException) {
+        cleanAllViews()
+        currentDecorator = null
+        val headerText = graphOrStat?.name ?: ""
+        binding.headerText.text = headerText
+        binding.errorMessage.visibility = View.VISIBLE
+        binding.errorMessage.text = context.getString(exception.errorTextId)
+        setDynamicViewHeight()
     }
 
     private fun fixViewHeight() {
