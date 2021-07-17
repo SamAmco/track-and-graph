@@ -34,15 +34,24 @@ class GraphStatLiveData(
     LiveData<List<Pair<Instant, IGraphStatViewData>>>(),
     Observer<List<GraphOrStat>> {
 
+    private var hasPostedFirstValue = false
     private val sourceData = dataSource.getGraphsAndStatsByGroupId(groupId)
 
     override fun onActive() = sourceData.observeForever(this)
-    override fun onInactive() = sourceData.removeObserver(this)
+    override fun onInactive() {
+        sourceData.removeObserver(this)
+        //If this live data is observed again we need to preen the graphs again
+        hasPostedFirstValue = false
+    }
 
     private val workScope = CoroutineScope(Dispatchers.Default + updateJob)
 
     override fun onChanged(graphsAndStats: List<GraphOrStat>?) {
         if (graphsAndStats == null) return
+        //When first receiving the graphs, preen them to remove invalid graphs in case
+        // their dependencies have been removed
+        if (!hasPostedFirstValue) workScope.launch { preenGraphStats(graphsAndStats) }
+        hasPostedFirstValue = true
         val loadingStates = graphsAndStats
             .map { Pair(Instant.now(), IGraphStatViewData.loading(it)) }
         updateGraphStats(loadingStates)
@@ -72,13 +81,17 @@ class GraphStatLiveData(
         }
     }
 
-    suspend fun preenGraphStats() {
-        sourceData.value?.forEach {
+    private suspend fun preenGraphStats(graphsAndStats: List<GraphOrStat>) {
+        graphsAndStats.forEach {
             graphStatTypes[it.type]?.dataSourceAdapter?.preen(
                 dataSource,
                 it
             )
         }
+    }
+
+    suspend fun preenGraphStats() {
+        sourceData.value?.let { preenGraphStats(it) }
     }
 
     private suspend fun iterateGraphStatDataFactories(
