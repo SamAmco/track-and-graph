@@ -53,7 +53,11 @@ class LineGraphDataSourceAdapter : GraphStatDataSourceAdapter<LineGraphWithFeatu
         graphOrStat: GraphOrStat
     ): Boolean {
         val lineGraph = dataSource.getLineGraphByGraphStatId(graphOrStat.id) ?: return true
-        return lineGraph.features.any { dataSource.tryGetFeatureByIdSync(it.featureId) == null }
+        //If the feature was deleted then it should have been deleted via a cascade rule in the db
+        // so the any statement should not strictly be necessary.
+        return lineGraph.features.isEmpty() || lineGraph.features.any {
+            dataSource.tryGetFeatureByIdSync(it.featureId) == null
+        }
     }
 
     override suspend fun duplicate(
