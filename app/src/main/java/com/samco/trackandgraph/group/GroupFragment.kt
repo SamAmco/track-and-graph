@@ -19,6 +19,7 @@ package com.samco.trackandgraph.group
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -269,6 +270,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
     private fun listenToViewModel() {
         var skippedFirstDataPointsUpdate = false
+        viewModel.hasFeatures.observe(viewLifecycleOwner) {}
         viewModel.dataPoints.observe(viewLifecycleOwner) {
             if (skippedFirstDataPointsUpdate)
                 viewModel.updateAllGraphs()
@@ -344,9 +346,16 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun onAddGraphStatClicked() {
-        navController?.navigate(
-            GroupFragmentDirections.actionGraphStatInput(groupId = args.groupId)
-        )
+        if (viewModel.hasFeatures.value != true) {
+            AlertDialog.Builder(requireContext())
+                .setMessage(R.string.no_features_graph_stats_hint)
+                .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
+                .show()
+        } else {
+            navController?.navigate(
+                GroupFragmentDirections.actionGraphStatInput(groupId = args.groupId)
+            )
+        }
     }
 
     private fun onAddGroupClicked() {
@@ -398,6 +407,7 @@ class GroupViewModel : ViewModel() {
     private lateinit var dataSource: TrackAndGraphDatabaseDao
 
     lateinit var dataPoints: LiveData<Instant>
+    lateinit var hasFeatures: LiveData<Boolean>
 
     lateinit var groupChildren: GroupChildrenLiveData
 
@@ -413,6 +423,7 @@ class GroupViewModel : ViewModel() {
         this.dataSource = database.trackAndGraphDatabaseDao
 
         dataPoints = Transformations.map(dataSource.getAllDataPoints()) { Instant.now() }
+        hasFeatures = Transformations.map(dataSource.getAllFeatures()) { it.isNotEmpty() }
 
         groupChildren = GroupChildrenLiveData(updateJob, groupId, dataSource)
     }

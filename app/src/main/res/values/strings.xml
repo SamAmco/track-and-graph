@@ -38,7 +38,7 @@
     <string name="cancel">Cancel</string>
     <string name="select_file">Select File</string>
     <string name="empty_group_hint">Welcome to Track &amp; Graph!\n\n Tap + in the top right and select Tracker to get started.</string>
-    <string name="no_features_graph_stats_hint">There is nothing to do here just yet.\n\nPlease create a Track Group and track some data before creating any graphs.</string>
+    <string name="no_features_graph_stats_hint">Please create a Tracker before creating any graphs.</string>
     <string name="ru_sure_del_group">Are you sure you want to delete this group and everything in it? You can not reverse this.</string>
     <string name="ru_sure_del_graph">Are you sure you want to delete this graph? You can not reverse this. You will not lose any tracked data.</string>
     <string name="ru_sure_del_feature">Are you sure you want to delete this tracked data?</string>
