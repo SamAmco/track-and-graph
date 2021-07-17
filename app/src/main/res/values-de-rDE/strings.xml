@@ -34,7 +34,7 @@
     <string name="yes">Ja</string>
     <string name="cancel">Abbrechen</string>
     <string name="select_file">Datei wählen</string>
-    <string name="no_groups_hint">Willkommen bei Track &amp; Graph!\n\n Tippen Sie hier, um Ihre erste Track-Gruppe zu erstellen und loszulegen.</string>
+    <string name="empty_group_hint">Willkommen bei Track &amp; Graph!\n\n Tippen Sie hier, um Ihre erste Track-Gruppe zu erstellen und loszulegen.</string>
     <string name="no_features_hint">Tippen Sie auf das + Symbol, um die Tracking-Funktion zu starten..</string>
     <string name="no_graph_stats_hint">Tippen Sie auf das + Symbol, um ein neues Diagramm oder eine neue Statistik zu erstellen..</string>
     <string name="no_features_graph_stats_hint">Hier gibt es noch nichts zu tun. Bitte erstellen Sie eine Track-Gruppe und verfolgen Sie einige Daten, bevor Sie irgendwelche Diagramme erstellen..</string>

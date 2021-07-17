@@ -50,7 +50,7 @@
             style="@style/Style.EmptyPageHintTextStyle"
             android:alpha="1"
             android:padding="20dp"
-            android:text="@string/no_groups_hint"
+            android:text="@string/empty_group_hint"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

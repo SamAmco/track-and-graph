@@ -34,7 +34,7 @@
     <string name="yes">Sí</string>
     <string name="cancel">Cancelar</string>
     <string name="select_file">Seleccionar archivo</string>
-    <string name="no_groups_hint">¡Bienvenido a Track &amp; Graph!\n\n Toca aquí para crear tu primer grupo de trazas y empezar.</string>
+    <string name="empty_group_hint">¡Bienvenido a Track &amp; Graph!\n\n Toca aquí para crear tu primer grupo de trazas y empezar.</string>
     <string name="no_features_hint">Toca el icono + para empezar a registrar algo.</string>
     <string name="no_graph_stats_hint">Toca el icono + para crear un nuevo gráfico o estadística.</string>
     <string name="no_features_graph_stats_hint">Aquí no hay nada que hacer todavía.\n\nPor favor, crea un Grupo de trazas y registra algunos datos antes de crear cualquier gráfico.</string>
