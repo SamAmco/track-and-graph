@@ -29,6 +29,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import androidx.room.withTransaction
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
@@ -84,6 +85,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             { viewModel.adjustDisplayIndexes(adapter.getItems()) }
         )).attachToRecyclerView(binding.itemList)
         initializeGridLayout()
+        scrollToTopOnItemAdded()
 
         binding.queueAddAllButton.hide()
         binding.queueAddAllButton.setOnClickListener { onQueueAddAllClicked() }
@@ -93,6 +95,17 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
         listenToViewModel()
         return binding.root
+    }
+
+    private fun scrollToTopOnItemAdded() {
+        adapter.registerAdapterDataObserver(
+            object : RecyclerView.AdapterDataObserver() {
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    super.onItemRangeInserted(positionStart, itemCount)
+                    binding.itemList.smoothScrollToPosition(0)
+                }
+            }
+        )
     }
 
     override fun onResume() {
