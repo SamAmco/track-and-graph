@@ -466,7 +466,10 @@ class GroupViewModel : ViewModel() {
 
     fun onDeleteGraphStat(id: Long) = ioScope.launch { dataSource.deleteGraphOrStat(id) }
 
-    fun onDeleteGroup(id: Long) = ioScope.launch { dataSource.deleteGroup(id) }
+    fun onDeleteGroup(id: Long) = ioScope.launch {
+        dataSource.deleteGroup(id)
+        groupChildren.graphStatLiveData.preenGraphStats()
+    }
 
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         ioScope.launch {
