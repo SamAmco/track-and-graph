@@ -55,16 +55,16 @@ interface TrackAndGraphDatabaseDao {
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
     fun getAllRemindersSync(): List<Reminder>
 
-    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC""")
+    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroups(): LiveData<List<Group>>
 
-    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC""")
+    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeatures(): LiveData<List<Feature>>
 
-    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC""")
+    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeaturesSync(): List<Feature>
 
-    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC""")
+    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroupsSync(): List<Group>
 
     @Query("""SELECT * FROM data_points_table""")
@@ -224,13 +224,13 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM time_since_last_stat_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
-    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC")
+    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
     fun getGraphsAndStatsByGroupId(groupId: Long): LiveData<List<GraphOrStat>>
 
-    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC")
+    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
     fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
-    @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC")
+    @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC, id DESC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
 
     @Query(

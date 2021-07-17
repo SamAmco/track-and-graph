@@ -85,7 +85,23 @@ class GroupChildrenLiveData(
         latestFeatures?.let { combined.addAll(it) }
         latestGraphs?.let { combined.addAll(it) }
         latestGroups?.let { combined.addAll(it) }
-        combined.sortBy { it.displayIndex() }
+        combined.sortWith { a, b ->
+            val aInd = a.displayIndex()
+            val bInd = b.displayIndex()
+            when {
+                aInd < bInd -> -1
+                bInd < aInd -> 1
+                else -> {
+                    val aId = a.id()
+                    val bId = b.id()
+                    when {
+                        aId > bId -> -1
+                        bId > aId -> 1
+                        else -> 0
+                    }
+                }
+            }
+        }
         postValue(combined)
     }
 
