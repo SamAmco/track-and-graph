@@ -26,5 +26,17 @@ interface IGraphStatViewDecorator {
 
 abstract class GraphStatViewDecorator<T : IGraphStatViewData>(protected val listMode: Boolean) :
     IGraphStatViewDecorator {
+    /**
+     * Called as soon as the view and the data are ready to set up and decorate the view
+     */
     abstract suspend fun decorate(view: IDecoratableGraphStatView, data: T)
+
+    /**
+     * This will be called once per second after the initial call to decorate in case the
+     * view should be updated in any way.
+     *
+     * The caller will not necessarily wait for the first call of decorate to complete before
+     * calling update.
+     */
+    open suspend fun update() { }
 }

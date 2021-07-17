@@ -45,16 +45,18 @@ class GraphStatTimeSinceDecorator(listMode: Boolean) :
     override fun setTimeMarker(time: OffsetDateTime) {}
 
     private suspend fun initTimeSinceStatBody() {
-        binding!!.progressBar.visibility = View.VISIBLE
+        update()
         binding!!.statMessage.visibility = View.VISIBLE
         binding!!.progressBar.visibility = View.GONE
+    }
+
+    override suspend fun update() {
         val dataPoint = data!!.lastDataPoint
         if (dataPoint == null) {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
-        } else while (true) {
+        } else {
             val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
             binding!!.statMessage.text = formatTimeToDaysHoursMinutesSeconds(context!!, duration.toMillis())
-            delay(1000)
         }
     }
 }
