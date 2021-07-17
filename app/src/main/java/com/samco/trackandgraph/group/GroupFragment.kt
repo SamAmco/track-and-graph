@@ -277,7 +277,9 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         viewModel.groupChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             updateShowQueueTrackButton()
-            binding.emptyGroupText.visibility = if (it.isEmpty()) View.VISIBLE else View.INVISIBLE
+            binding.emptyGroupText.visibility =
+                if (it.isEmpty() && args.groupId == 0L) View.VISIBLE
+                else View.INVISIBLE
         }
     }
 

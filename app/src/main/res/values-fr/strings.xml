@@ -34,7 +34,7 @@
     <string name="yes">Oui</string>
     <string name="cancel">Annuler</string>
     <string name="select_file">Sélectionner un fichier</string>
-    <string name="no_groups_hint">Bienvenue sur Track &amp; Graph!\n\n Appuyez ici pour créer vos premiers groupes de suivi et graphiques.</string>
+    <string name="empty_group_hint">Bienvenue sur Track &amp; Graph!\n\n Appuyez ici pour créer vos premiers groupes de suivi et graphiques.</string>
     <string name="no_features_hint">Appuyer sur l\'icône + pour commencer à suivre quelquechose.</string>
     <string name="no_graph_stats_hint">Appuyer sur l\'icône + pour créer un nouveau graphique ou une statistique.</string>
     <string name="no_features_graph_stats_hint">Il n\'y a rien à faire ici pour le moment.\n\nVeuillez créer un groupe de suivi et ajouter certaines données avant de créer des graphiques.</string>
