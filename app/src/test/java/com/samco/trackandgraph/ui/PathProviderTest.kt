@@ -17,24 +17,44 @@
 
 package com.samco.trackandgraph.ui
 
+import androidx.room.ColumnInfo
+import androidx.room.PrimaryKey
+import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.Group
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 
-class GroupPathProviderTest {
+class PathProviderTest {
+    private val groups = listOf(
+        group(parentId = null),
+        group("group1", 1),
+        group("group1child1", 2, 1),
+        group("group1child2", 3, 1),
+        group("group2", 4),
+        group("group2child", 5, 4),
+        group("group2childChild", 6, 5),
+    )
+
+    private val features = listOf(
+        Feature(
+            0L, "Test", 0, FeatureType.CONTINUOUS, emptyList(),
+            0, false, 0.0, ""
+        ),
+        Feature(
+            1L, "Test2", 1, FeatureType.CONTINUOUS, emptyList(),
+            0, false, 0.0, ""
+        ),
+        Feature(
+            2L, "Test3", 2, FeatureType.CONTINUOUS, emptyList(),
+            0, false, 0.0, ""
+        )
+    )
 
     @Test
     fun test_group_path_provider() {
         //PREPARE
-        val groups = listOf(
-            group(parentId = null),
-            group("group1", 1),
-            group("group1child1", 2, 1),
-            group("group1child2", 3, 1),
-            group("group2", 4),
-            group("group2child", 5, 4),
-            group("group2childChild", 6, 5),
-        )
         val provider = GroupPathProvider(groups)
 
         //EXECUTE
@@ -54,6 +74,22 @@ class GroupPathProviderTest {
         assertEquals("/group2", ans4)
         assertEquals("/group2/group2child", ans5)
         assertEquals("/group2/group2child/group2childChild", ans6)
+    }
+
+    @Test
+    fun test_feature_path_provider() {
+        //PREPARE
+        val provider = FeaturePathProvider(features, groups)
+
+        //EXECUTE
+        val ans0 = provider.getPathForFeature(0)
+        val ans1 = provider.getPathForFeature(1)
+        val ans2 = provider.getPathForFeature(2)
+
+        //VERIFY
+        assertEquals("/Test", ans0)
+        assertEquals("/group1/Test2", ans1)
+        assertEquals("/group1/group1child1/Test3", ans2)
     }
 
     private fun group(name: String = "", id: Long = 0, parentId: Long? = 0): Group {
