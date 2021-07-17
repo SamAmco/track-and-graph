@@ -28,6 +28,9 @@ class FeaturePathProvider(
 
     fun getPathForFeature(id: Long): String {
         val feature = featuresById[id] ?: return ""
-        return getPathForGroup(feature.groupId) + separator + feature.name
+        val groupPath = getPathForGroup(feature.groupId)
+        var path = groupPath
+        if (groupPath.lastOrNull() != '/') path += '/'
+        return path + feature.name
     }
 }
