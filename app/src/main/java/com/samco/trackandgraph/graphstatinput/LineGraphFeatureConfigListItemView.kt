@@ -32,6 +32,7 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
+import com.samco.trackandgraph.ui.ColorSpinnerAdapter
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
@@ -248,24 +249,6 @@ class LineGraphFeatureConfigListItemView(
 
     fun setOnRemoveListener(onRemoveListener: (LineGraphFeature) -> Unit) {
         this.onRemoveListener = onRemoveListener
-    }
-
-    private class ColorSpinnerAdapter(context: Context, val colorIds: List<Int>) :
-        ArrayAdapter<Int>(context, R.layout.circular_spinner_item) {
-
-        override fun getCount() = colorIds.size
-
-        override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-            val view = convertView ?: LayoutInflater.from(context)
-                .inflate(R.layout.circular_spinner_item, parent, false)
-            view.findViewById<ImageView>(R.id.image)
-                .setColorFilter(getColor(context, colorIds[position]))
-            return view
-        }
-
-        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-            return getView(position, convertView, parent)
-        }
     }
 
     private class PointStyleSpinnerAdapter(
