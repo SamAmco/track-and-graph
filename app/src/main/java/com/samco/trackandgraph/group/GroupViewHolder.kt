@@ -50,8 +50,6 @@ class GroupViewHolder private constructor(private val binding: ListItemGroupBind
     private fun initCorner() {
         val colorId = dataVisColorList[groupItem?.colorIndex ?: 8]
         binding.cornerTabImage.setColorFilter(ContextCompat.getColor(binding.root.context, colorId))
-        binding.trackIcon.visibility = View.VISIBLE
-        binding.graphIcon.visibility = View.INVISIBLE
     }
 
     override fun elevateCard() {
