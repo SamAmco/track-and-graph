@@ -19,13 +19,16 @@ package com.samco.trackandgraph.group
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
@@ -35,7 +38,11 @@ import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.dataVisColorList
 import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.graphstatinput.LineGraphFeatureConfig
+import com.samco.trackandgraph.graphstatinput.LineGraphFeatureConfigListItemView
+import com.samco.trackandgraph.ui.ColorSpinnerAdapter
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.showKeyboard
 import kotlinx.coroutines.*
@@ -47,9 +54,9 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
     private lateinit var alertDialog: AlertDialog
 
     private lateinit var editText: EditText
+    private lateinit var colorSpinner: Spinner
 
     private val viewModel by viewModels<AddGroupDialogViewModel>()
-
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         var groupId: Long? = arguments?.getLong(ADD_GROUP_DIALOG_ID_KEY, -1) ?: -1
@@ -89,6 +96,10 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
                 editText.setSelection(name.length)
             }
         }
+
+        viewModel.colorIndex.observe(this) { index ->
+            if (colorSpinner.selectedItemPosition != index) colorSpinner.setSelection(index)
+        }
     }
 
     private fun initDialog(updateMode: Boolean): Dialog {
@@ -103,19 +114,31 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
             editText.addTextChangedListener(this)
             val builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
             val positiveButtonText = if (updateMode) R.string.update else R.string.add
+            setupColorSpinner(view)
             builder.setView(view)
                 .setPositiveButton(positiveButtonText) { _, _ -> onPositiveClicked() }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             alertDialog = builder.create()
             alertDialog.setCanceledOnTouchOutside(true)
             alertDialog.setOnShowListener {
-                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                positiveButton.setTextColor(requireContext().getColorFromAttr(R.attr.colorSecondary))
                 val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
                 negativeButton.setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
             }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    private fun setupColorSpinner(view: View) {
+        colorSpinner = view.findViewById(R.id.colorSpinner)
+        colorSpinner.adapter = ColorSpinnerAdapter(requireContext(), dataVisColorList)
+        var skippedFirst = false
+        colorSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {}
+            override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
+                if (skippedFirst) viewModel.setColorIndex(index)
+                skippedFirst = true
+            }
+        }
     }
 
     override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -142,7 +165,7 @@ class AddGroupDialogViewModel : ViewModel() {
     private val _groupName = MutableLiveData("")
     val groupName: LiveData<String> get() = _groupName
 
-    private val _colorIndex = MutableLiveData<Int>(0)
+    private val _colorIndex = MutableLiveData(0)
     val colorIndex: LiveData<Int> get() = _colorIndex
 
     private val _state = MutableLiveData(AddGroupDialogViewModelState.INIT)
@@ -170,6 +193,8 @@ class AddGroupDialogViewModel : ViewModel() {
     }
 
     fun setName(name: String) = _groupName.postValue(name)
+
+    fun setColorIndex(index: Int) = _colorIndex.postValue(index)
 
     fun addOrUpdateGroup() = ioScope.launch {
         val newName = _groupName.value
