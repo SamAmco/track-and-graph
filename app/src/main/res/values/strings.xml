@@ -18,7 +18,8 @@
     <string name="home">Home</string>
     <string name="track_group">Track Group</string>
     <string name="graph_group">Graph Group</string>
-    <string name="add_group">Add A Group: </string>
+    <string name="add_group">Add Group: </string>
+    <string name="edit_group">Edit Group: </string>
     <string name="group">Group</string>
     <string name="tracker">Tracker</string>
     <string name="graph_or_stat">Graph or Statistic</string>
@@ -27,7 +28,6 @@
     <string name="group_name">e.g. Daily Activities</string>
     <string name="add_graph_stat_group">Add A Graph Group: </string>
     <string name="delete">Delete</string>
-    <string name="rename">Rename</string>
     <string name="edit">Edit</string>
     <string name="update">Update</string>
     <string name="new_name">New name: </string>

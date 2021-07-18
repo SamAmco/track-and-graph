@@ -50,8 +50,7 @@ import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
-class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener,
-    AddGroupDialogFragment.AddGroupDialogListener {
+class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
 
@@ -118,7 +117,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
     private fun createGroupClickListener() = GroupClickListener(
         this::onGroupSelected,
-        this::onRenameGroupClicked,
+        this::onEditGroupClicked,
         this::onDeleteGroupClicked,
         this::onMoveGroupClicked
     )
@@ -141,8 +140,13 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         childFragmentManager.let { dialog.show(it, "ru_sure_del_group_fragment") }
     }
 
-    private fun onRenameGroupClicked(group: Group) {
-        //TODO implement rename group dialog
+    private fun onEditGroupClicked(group: Group) {
+        val dialog = AddGroupDialog()
+        val args = Bundle()
+        args.putLong(ADD_GROUP_DIALOG_PARENT_ID_KEY, this.args.groupId)
+        args.putLong(ADD_GROUP_DIALOG_ID_KEY, group.id)
+        dialog.arguments = args
+        dialog.show(childFragmentManager, "add_group_dialog")
     }
 
     private fun onGroupSelected(group: Group) {
@@ -359,18 +363,11 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun onAddGroupClicked() {
-        val dialog = AddGroupDialogFragment()
+        val dialog = AddGroupDialog()
         val args = Bundle()
-        args.putString("title", getString(R.string.add_group))
-        args.putString("hint", getString(R.string.group_name))
+        args.putLong(ADD_GROUP_DIALOG_PARENT_ID_KEY, this.args.groupId)
         dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "add_group_dialog") }
-    }
-
-    override fun onAddGroup(name: String, colorIndex: Int) {
-        viewModel.addGroup(
-            Group(0, name, 0, args.groupId, colorIndex)
-        )
+        dialog.show(childFragmentManager, "add_group_dialog")
     }
 
     private fun onFeatureDeleteClicked(feature: DisplayFeature) {
@@ -446,8 +443,6 @@ class GroupViewModel : ViewModel() {
         dataSource.deleteFeature(id)
         groupChildren.graphStatLiveData.preenGraphStats()
     }
-
-    fun addGroup(group: Group) = ioScope.launch { dataSource.insertGroup(group) }
 
     fun adjustDisplayIndexes(items: List<GroupChild>) = ioScope.launch {
         val displayFeatures = mutableListOf<DisplayFeature>()
