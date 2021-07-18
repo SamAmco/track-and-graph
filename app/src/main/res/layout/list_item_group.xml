@@ -41,26 +41,6 @@
                     android:tint="?attr/colorPrimary"
                     app:srcCompat="@drawable/group_tab_corner"
                     tools:ignore="ContentDescription" />
-
-                <ImageView
-                    android:id="@+id/trackIcon"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_gravity="bottom|end"
-                    android:paddingBottom="3dp"
-                    android:tint="@color/ap_white"
-                    app:srcCompat="@drawable/add_box"
-                    tools:ignore="ContentDescription" />
-
-                <ImageView
-                    android:id="@+id/graphIcon"
-                    android:layout_width="35dp"
-                    android:layout_height="35dp"
-                    android:layout_gravity="bottom|end"
-                    android:paddingBottom="3dp"
-                    android:tint="@color/ap_white"
-                    app:srcCompat="@drawable/graph_icon"
-                    tools:ignore="ContentDescription" />
             </androidx.cardview.widget.CardView>
         </FrameLayout>
 
