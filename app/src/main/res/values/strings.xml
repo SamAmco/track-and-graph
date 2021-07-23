@@ -16,8 +16,6 @@
   -->
 <resources>
     <string name="home">Home</string>
-    <string name="track_group">Track Group</string>
-    <string name="graph_group">Graph Group</string>
     <string name="add_group">Add Group: </string>
     <string name="edit_group">Edit Group: </string>
     <string name="group">Group</string>
@@ -26,7 +24,6 @@
     <string name="add_feature">Track something:</string>
     <string name="add">Add</string>
     <string name="group_name">e.g. Daily Activities</string>
-    <string name="add_graph_stat_group">Add A Graph Group: </string>
     <string name="delete">Delete</string>
     <string name="edit">Edit</string>
     <string name="update">Update</string>
@@ -213,15 +210,13 @@
     <string name="faq_text_3_1">Using the multiple choice input type is recommended wherever possible. If you ever want to draw a pie chart from your data you will need it to be in multiple choice form. You can also draw a line graph of your data over time if your predefined answers have a natural order. For example say you were to setup the following:</string>
     <string name="faq_text_3_2">And then you tracked some data as follows:</string>
     <string name="faq_text_3_3">You could then visualise that data using either a line graph over time or using a pie chart as below:</string>
-    <string name="faq_text_4_1"><![CDATA[To begin creating graphs you will need to first have some data tracked. Then go to the home page and create a new graph group. Your graph groups do not have to align in any way with your track groups, you can organise them how you want.]]></string>
-    <string name="faq_text_4_3">Your graph groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
-    <string name="faq_text_4_4">Once you’ve created your graph group select it and then click the + icon to set up a new graph or statistic.</string>
+    <string name="faq_text_4_1">To begin creating graphs you will need to first have some data tracked. Then go to the group where you want to create your graph, tap + in the top right and then select Graph or Statistic.</string>
     <string name="faq_text_4_5">Begin by entering a name for your new graph and then select a graph type. Here we will demonstrate the line graph since other graph types are relatively trivial to set up. One caveat to note however is that you can only create pie charts from multiple choice data.</string>
     <string name="faq_text_4_6">The Dynamic range style will automatically calculate the min and max value for the Y axis. Now we will add some lines to our graph by using the + button at the bottom:</string>
     <string name="faq_text_4_7">Because our wheat values are multiple choice answers ranging from 0–2 and our stomach pain values are numbers ranging from 1–8 we have multiplied our wheat values by 4 to make the ranges similar. We have used a three day moving average to smooth out anomalies and reduce noise in the output graph. We have also selected plot when tracked because this data was tracked relatively consistently. You can read more about how these settings affect line graphs in the FAQ: “How are moving averages and plot totals calculated?”</string>
-    <string name="faq_text_4_8">Next we click the FINISH button to complete the setup. Notice how our new graph appears as a card in our graph group:</string>
+    <string name="faq_text_4_8">Next we click the FINISH button to complete the setup. Notice how our new graph appears as a card in our group:</string>
     <string name="faq_text_4_9">To explore the graph in more detail you can tap the card to open it in a full screen view and then pinch and drag the lines:</string>
-    <string name="faq_text_4_10">As we add more graphs and statistics to our graph group they appear as a list of cards. You can reorder them at any point by holding down and dragging a card to a new position.</string>
+    <string name="faq_text_4_10">As we add more graphs and statistics to our group they appear as a list of cards. You can reorder them at any point by holding down and dragging a card to a new position.</string>
     <string name="faq_text_5_1">Moving averages:</string>
     <string name="faq_text_5_2">Suppose we want to track something simply as a yes or no question, for example:</string>
     <string name="faq_text_5_3">If we were to track this data over time without using a moving average it might look like this:</string>
@@ -256,7 +251,6 @@
     <string name="on_feature_type_change_numerical_warning">If you update your input type to numerical your existing tracked data will lose its labels.</string>
     <string name="on_feature_delete_discrete_value_warning">Deleting multiple choice answers will delete all existing tracked data points for that value.</string>
 
-    <string name="my_first_track_group">My first track group</string>
     <string name="rate_the_app">Rate the app</string>
     <string name="reminders">Reminders</string>
     <string name="no_reminders_hint">Tap the + icon to create a new tracking reminder notification.</string>
@@ -272,7 +266,7 @@
     <string name="default_reminder_name">Time to track!</string>
     <string name="range_style">Range style:</string>
 
-    <string name="track_widget_configure_no_data_error">Please create a track group and track some data first.</string>
+    <string name="track_widget_configure_no_data_error">Please track some data first.</string>
     <string name="track_widget_configure_no_data_selected_error">You must select a valid data set to create a tracking widget.</string>
     <string name="create">Create</string>
     <string name="use_default_value">Set a default value</string>
