@@ -16,15 +16,10 @@
   -->
 <resources>
     <string name="home">Inicio</string>
-    <string name="track_group">Grupo de trazas</string>
-    <string name="graph_group">Grupo de gráficos</string>
-    <string name="add_track_group">Añade un grupo de trazas: </string>
     <string name="add_feature">Añadir trazas:</string>
     <string name="add">Añadir</string>
     <string name="group_name">Por ejemplo, las actividades diarias</string>
-    <string name="add_graph_stat_group">Añadir un grupo de diagramas: </string>
     <string name="delete">Borrar</string>
-    <string name="rename">Renombrar</string>
     <string name="edit">Editar</string>
     <string name="update">Actualizar</string>
     <string name="new_name">Nuevo nombre: </string>
@@ -35,8 +30,6 @@
     <string name="cancel">Cancelar</string>
     <string name="select_file">Seleccionar archivo</string>
     <string name="empty_group_hint">¡Bienvenido a Track &amp; Graph!\n\n Toca aquí para crear tu primer grupo de trazas y empezar.</string>
-    <string name="no_features_hint">Toca el icono + para empezar a registrar algo.</string>
-    <string name="no_graph_stats_hint">Toca el icono + para crear un nuevo gráfico o estadística.</string>
     <string name="no_features_graph_stats_hint">Aquí no hay nada que hacer todavía.\n\nPor favor, crea un Grupo de trazas y registra algunos datos antes de crear cualquier gráfico.</string>
     <string name="ru_sure_del_group">¿Estás seguro de que quieres borrar este grupo y todo lo que contiene? Este proceso no es reversible.</string>
     <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
@@ -185,8 +178,6 @@
     <string name="faq_6">¿Cómo funcionan las notas?</string>
     <string name="faq">FAQ</string>
     <string name="faq_text_1_1">Para empezar a hacer un trazado, tendrás que crear al menos un grupo de trazas. Los grupos de trazas te permiten separar grupos de cosas de las que podrías querer hacer un registro al mismo tiempo. Por ejemplo, puedes crear un grupo para tu rutina de ejercicios y otro para los tipos de alimentos.</string>
-    <string name="faq_text_1_2">Tus grupos de trazas aparecerán en la lista de grupos. Puedes ordenarlos fácilmente manteniendo pulsado el elemento que quieras mover y arrastrándolo a una nueva posición.</string>
-    <string name="faq_text_1_3">Una vez que hayas creado tu grupo de seguimiento, selecciónalo y haz clic en el icono + para configurar algo nuevo para el trazamiento.</string>
     <string name="faq_text_1_4">Escribe el nombre de lo que quieres trazar y selecciona un estilo de entrada:</string>
     <string name="faq_text_1_5">Hay tres estilos de entrada que puedes elegir: \n\n• Opción múltiple requiere que configures manualmente las respuestas predefinidas que se te presentarán como botones al realizar el seguimiento. \n\n• Numérico te pedirá que introduzcas un número al realizar el seguimiento. \n\n• Duración del tiempo te pedirá que introduzcas una cantidad de tiempo en horas, minutos y segundos al realizar el seguimiento. \n\n•Si añades un valor por defecto, no se le pedirá un valor cada vez que pulse el botón + y se utilizará su valor por defecto. Sin embargo, puedes volver atrás y cambiar el valor editando el punto de datos después (como se explica más adelante).</string>
     <string name="faq_text_1_6">Para crear respuestas de opción múltiple haz clic en el botón + de la parte inferior.</string>
@@ -201,8 +192,6 @@
     <string name="faq_text_3_2">Y luego traza algunos datos de la siguiente manera:</string>
     <string name="faq_text_3_3">Podrías visualizar esos datos mediante un gráfico de líneas a lo largo del tiempo o mediante un gráfico circular como el que se muestra a continuación:</string>
     <string name="faq_text_4_1"><![CDATA[Para empezar a crear gráficos necesitarás primero tener algunos datos trazados. A continuación, visita a la página de inicio y crea un nuevo grupo de gráficos. Tus grupos de gráficos no tienen que estar alineados de ninguna manera con tus grupos de traza, puedes organizarlos como quieras.]]></string>
-    <string name="faq_text_4_3">Tus grupos de gráficos aparecerán en tu lista de grupos. Puedes ordenarlos fácilmente manteniendo pulsado el elemento que quieras mover y arrastrándolo a una nueva posición.</string>
-    <string name="faq_text_4_4">Una vez que hayas creado tu grupo de gráficos, selecciónalo y haz clic en el icono + para configurar un nuevo gráfico o estadística.</string>
     <string name="faq_text_4_5">Comienza introduciendo un nombre para tu nuevo gráfico y luego selecciona un tipo de gráfico. Aquí demostraremos el gráfico de líneas, ya que otros tipos de gráficos son relativamente triviales de configurar. Sin embargo, hay que tener en cuenta que sólo se pueden crear gráficos circulares a partir de datos de elección múltiple.</string>
     <string name="faq_text_4_6">El estilo Rango dinámico calculará automáticamente el valor mínimo y máximo para el eje Y. Ahora añadiremos algunas líneas a nuestro gráfico utilizando el botón + de la parte inferior:</string>
     <string name="faq_text_4_7">Como nuestros valores de trigo son respuestas de opción múltiple que van de 0 a 2 y nuestros valores de dolor de estómago son números que van de 1 a 8, hemos multiplicado nuestros valores de trigo por 4 para que los rangos sean similares. Hemos utilizado una media móvil de tres días para suavizar las anomalías y reducir el ruido en el gráfico de salida. También hemos seleccionado trazar cuando se traza porque estos datos se trazaron de forma relativamente consistente. Puede leer más sobre cómo estos ajustes afectan a los gráficos de líneas en las preguntas frecuentes: "¿Cómo se calculan las medias móviles y los totales de los gráficos?"</string>
@@ -243,7 +232,6 @@
     <string name="on_feature_type_change_numerical_warning">Si actualiza su tipo de entrada a numérico sus datos trazados existentes perderán sus etiquetas.</string>
     <string name="on_feature_delete_discrete_value_warning">Si se borran las respuestas de opción múltiple se borrarán todos los puntos de datos rastreados existentes para ese valor.</string>
 
-    <string name="my_first_track_group">Mi primer grupo de traza</string>
     <string name="rate_the_app">Calificar la aplicación</string>
     <string name="reminders">Recordatorios</string>
     <string name="no_reminders_hint">Toca el icono + para crear una nueva notificación de recordatorio de traza.</string>

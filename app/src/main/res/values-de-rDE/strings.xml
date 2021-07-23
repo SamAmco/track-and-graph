@@ -16,15 +16,10 @@
   -->
 <resources>
     <string name="home">Startseite</string>
-    <string name="track_group">Track-Gruppe</string>
-    <string name="graph_group">Diagramm-Gruppe</string>
-    <string name="add_track_group">Eine Trackgruppe hinzufügen: </string>
     <string name="add_feature">Etwas tracken:</string>
     <string name="add">Hinzufügen</string>
     <string name="group_name">z.B. Tägliche Aktivitäten</string>
-    <string name="add_graph_stat_group">Eine Diagrammgruppe hinzufügen: </string>
     <string name="delete">Löschen</string>
-    <string name="rename">Umbenennen</string>
     <string name="edit">Bearbeiten</string>
     <string name="update">Aktualisieren</string>
     <string name="new_name">Neuer Name: </string>
@@ -35,8 +30,6 @@
     <string name="cancel">Abbrechen</string>
     <string name="select_file">Datei wählen</string>
     <string name="empty_group_hint">Willkommen bei Track &amp; Graph!\n\n Tippen Sie hier, um Ihre erste Track-Gruppe zu erstellen und loszulegen.</string>
-    <string name="no_features_hint">Tippen Sie auf das + Symbol, um die Tracking-Funktion zu starten..</string>
-    <string name="no_graph_stats_hint">Tippen Sie auf das + Symbol, um ein neues Diagramm oder eine neue Statistik zu erstellen..</string>
     <string name="no_features_graph_stats_hint">Hier gibt es noch nichts zu tun. Bitte erstellen Sie eine Track-Gruppe und verfolgen Sie einige Daten, bevor Sie irgendwelche Diagramme erstellen..</string>
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
@@ -185,8 +178,6 @@
     <string name="faq_6">Wie funktionieren die Notizen?</string>
     <string name="faq">FAQ</string>
     <string name="faq_text_1_1">Um mit dem Tracking zu beginnen, müssen Sie mindestens eine Tracking-Gruppe erstellen. Track-Gruppen ermöglichen es Ihnen, Gruppen von Dingen zu trennen, die Sie gleichzeitig verfolgen möchten. Sie können zum Beispiel eine Gruppe für Ihre Übungsroutine und eine andere für Nahrungsmittelarten erstellen.</string>
-    <string name="faq_text_1_2">Ihre Track-Gruppen erscheinen in Ihrer Liste der Gruppen. Sie können sie ganz einfach sortieren, indem Sie den Gegenstand, den Sie verschieben möchten, gedrückt halten und ihn dann an eine neue Position ziehen.</string>
-    <string name="faq_text_1_3">Wenn Sie Ihre Tracking-Gruppe erstellt haben, wählen Sie sie aus und klicken Sie dann auf das Symbol +, um etwas zum Tracking neu einzurichten.</string>
     <string name="faq_text_1_4">Geben Sie den Namen des gewünschten Tracks ein und wählen Sie einen Eingabestil:</string>
     <string name="faq_text_1_5">Es gibt drei Eingabearten, die Sie wählen können: \n\n- Multiple Choice erfordert, dass Sie manuell vordefinierte Antworten einrichten, die Ihnen beim Tracken als Schaltflächen präsentiert werden.\n\n- Numerisch fordert Sie beim Tracken auf, eine Zahl einzugeben.\n\n- Zeitdauer fordert Sie beim Tracken auf, eine Zeitspanne in Stunden, Minuten und Sekunden einzugeben. \n\n Wenn Sie einen Standardwert hinzufügen, werden Sie nicht jedes Mal nach einem Wert gefragt, wenn Sie auf die Schaltfläche + tippen, sondern es wird stattdessen Ihr Standardwert verwendet. Sie können jedoch wieder zurück gehen und den Wert ändern, indem Sie den betreffenden Datenpunkt nachträglich bearbeiten (wie später erklärt wird).</string>
     <string name="faq_text_1_6">Um Multiple-Choice-Antworten zu erstellen, klicken Sie unten auf die +-Schaltfläche.</string>
@@ -201,8 +192,6 @@
     <string name="faq_text_3_2">Und dann haben Sie einige Daten wie folgt getrackt:</string>
     <string name="faq_text_3_3">Sie könnten diese Daten dann entweder mit einem Liniendiagramm über die Dauer oder mit einem Tortendiagramm wie unten dargestellt visualisieren:</string>
     <string name="faq_text_4_1"><![CDATA[Um mit der Erstellung von Diagrammen zu beginnen, müssen Sie zunächst einige Daten erfassen. Gehen Sie dann auf die Startseite und erstellen Sie eine neue Diagrammgruppe. Ihre Diagrammgruppen müssen in keiner Weise mit Ihren Track-Gruppen übereinstimmen, Sie können sie so einrichten, wie Sie möchten.]]></string>
-    <string name="faq_text_4_3">Ihre Diagrammgruppen erscheinen in Ihrer Gruppenliste. Sie können sie ganz einfach anordnen, indem Sie das Element, das Sie verschieben möchten, gedrückt halten und es dann an eine neue Position ziehen.</string>
-    <string name="faq_text_4_4">Wenn Sie Ihre Diagrammgruppe erstellt haben, wählen Sie sie aus und klicken Sie dann auf das + Symbol, um ein neues Diagramm oder eine neue Statistik einzurichten.</string>
     <string name="faq_text_4_5">Beginnen Sie mit der Eingabe eines Namens für Ihr neues Diagramm und wählen Sie dann einen Diagrammtyp aus. Hier werden wir das Liniendiagramm demonstrieren, da andere Diagrammtypen relativ simpel einzurichten sind. Ein zu beachtender Haken ist jedoch, dass Sie Tortendiagramme nur aus Multiple-Choice-Daten erstellen können.</string>
     <string name="faq_text_4_6">Der Dynamik-Bereich Stil berechnet automatisch den minimalen und maximalen Wert für die Y-Achse. Nun fügen wir einige Linien zu unserem Diagramm hinzu, indem wir die Schaltfläche + am unteren Rand verwenden:</string>
     <string name="faq_text_4_7">Da es sich bei unseren Getreidewerten um Multiple-Choice-Antworten im Bereich von 0-2 und bei unseren Magenschmerzwerten um Zahlen im Bereich von 1-8 handelt, haben wir unsere Getreidewerte mit 4 multipliziert, um die Bereiche vergleichbar zu machen. Wir haben einen drei-Tages-Mittelwert verwendet, um Anomalien zu bereinigen und das Rauschen in der Ergebnisgrafik zu reduzieren. Wir haben ebenfalls "Gesamtanzahl wenn getrackt" gewählt, weil diese Daten relativ kontinuierlich getrackt wurden. Mehr darüber, wie sich diese Einstellungen auf die Liniendiagramme auswirken, können Sie in der FAQ nachlesen: "Wie werden gleitende Mittelwerte und Plot-Summen berechnet?"</string>
@@ -243,7 +232,6 @@
     <string name="on_feature_type_change_numerical_warning">Wenn Sie Ihren Eingabetyp auf numerisch ändern, verlieren Ihre vorhandenen verfolgten Daten ihre Beschriftungen.</string>
     <string name="on_feature_delete_discrete_value_warning">Beim Löschen von Multiple-Choice-Antworten werden alle vorhandenen verfolgten Datenpunkte für diesen Wert gelöscht.</string>
 
-    <string name="my_first_track_group">Meine erste Trackgruppe</string>
     <string name="rate_the_app">Bewerten Sie uns</string>
     <string name="reminders">Erinnerungen</string>
     <string name="no_reminders_hint">Tippen Sie auf das + Symbol, um eine neue Tracking-Erinnerungsbenachrichtigung zu erstellen.</string>

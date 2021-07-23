@@ -16,15 +16,10 @@
   -->
 <resources>
     <string name="home">Accueil</string>
-    <string name="track_group">Groupe de suivi</string>
-    <string name="graph_group">Groupe de gaphiques</string>
-    <string name="add_track_group">Ajouter un groupe de données : </string>
     <string name="add_feature">Suivre quelquechose : </string>
     <string name="add">Ajouter</string>
     <string name="group_name">ex. Activités quotidiennes</string>
-    <string name="add_graph_stat_group">Ajouter un groupe de graphiques : </string>
     <string name="delete">Supprimer</string>
-    <string name="rename">Renommer</string>
     <string name="edit">Editer</string>
     <string name="update">Mettre à jour</string>
     <string name="new_name">Nouveau nom : </string>
@@ -35,8 +30,6 @@
     <string name="cancel">Annuler</string>
     <string name="select_file">Sélectionner un fichier</string>
     <string name="empty_group_hint">Bienvenue sur Track &amp; Graph!\n\n Appuyez ici pour créer vos premiers groupes de suivi et graphiques.</string>
-    <string name="no_features_hint">Appuyer sur l\'icône + pour commencer à suivre quelquechose.</string>
-    <string name="no_graph_stats_hint">Appuyer sur l\'icône + pour créer un nouveau graphique ou une statistique.</string>
     <string name="no_features_graph_stats_hint">Il n\'y a rien à faire ici pour le moment.\n\nVeuillez créer un groupe de suivi et ajouter certaines données avant de créer des graphiques.</string>
     <string name="ru_sure_del_group">Êtes-vous sûr de vouloir supprimer ce groupe et tout ce qu\'il contient ? Vous ne pouvez pas faire marche arrière.</string>
     <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ces données ?</string>
@@ -185,8 +178,6 @@
     <string name="faq_6">Comment fonctionnent les notes?</string>
     <string name="faq">FAQ</string>
     <string name="faq_text_1_1">Pour commencer le suivi, vous devez créer au moins un groupe de données à suivre. Les groupes de suivi vous permettent de séparer des groupes de choses que vous pourriez vouloir suivre en même temps. Par exemple, vous pouvez créer un groupe pour votre routine d\'exercice et un autre pour les types d\'aliments.</string>
-    <string name="faq_text_1_2">Vos groupes de suivi apparaîtront dans votre liste de groupes. Vous pouvez les ordonner facilement en maintenant le doigt appuyé sur l\'élément que vous voulez déplacer, puis en le faisant glisser vers une nouvelle position.</string>
-    <string name="faq_text_1_3">Une fois que vous avez créé votre groupe de données à suivre, sélectionnez-le, puis cliquez sur l\'icône + pour configurer quelque chose de nouveau à suivre.</string>
     <string name="faq_text_1_4">Tapez le nom de ce que vous voulez suivre et sélectionnez un style d\'entrée : </string>
     <string name="faq_text_1_5">Il existe trois styles de saisie que vous pouvez choisir : \n\n- Le choix multiple vous demande de configurer manuellement des réponses prédéfinies qui vous seront présentées sous forme de boutons lors du suivi.\n\n- Le numérique vous demandera de saisir un nombre lors du suivi.\n\n\n- La durée vous demandera de saisir une quantité de temps en heures, minutes et secondes lors du suivi. \n\n- Si vous ajoutez une valeur par défaut, vous ne serez pas invité à entrer une valeur à chaque fois que vous appuyez sur le bouton + et votre valeur par défaut sera utilisée à la place. Cependant, vous pouvez revenir en arrière et modifier la valeur en éditant le point de données par la suite (comme expliqué plus loin).</string>
     <string name="faq_text_1_6">Pour créer des réponses à choix multiples, cliquez sur le bouton + en bas.</string>
@@ -201,8 +192,6 @@
     <string name="faq_text_3_2">Et puis vous avez suivi certaines données comme suit: </string>
     <string name="faq_text_3_3">Vous pourriez ensuite visualiser ces données à l\'aide d\'un graphique linéaire dans le temps ou à l\'aide d\'un graphique circulaire comme ci-dessous : </string>.
     <string name="faq_text_4_1"><![CDATA[Pour commencer à créer des graphiques, vous devrez d\'abord avoir quelques données suivies. Ensuite, allez sur la page d\'accueil et créez un nouveau groupe de graphiques. Vos groupes de graphiques ne doivent en aucun cas s\'aligner avec vos groupes de suivi, vous pouvez les organiser comme vous le souhaitez.]]></string>
-    <string name="faq_text_4_3">Vos groupes de graphiques apparaîtront dans votre liste de groupes. Vous pouvez les ordonner facilement en maintenant le doigt appuyé sur l\'élément que vous voulez déplacer, puis en le faisant glisser vers une nouvelle position.</string>
-    <string name="faq_text_4_4">Une fois que vous avez créé votre groupe de graphiques, sélectionnez-le, puis cliquez sur l\'icône + pour configurer un nouveau graphique ou une nouvelle statistique.</string>
     <string name="faq_text_4_5">Commencez par saisir un nom pour votre nouveau graphique, puis sélectionnez un type de graphique. Ici, nous ferons la démonstration du graphique linéaire puisque les autres types de graphiques sont relativement triviaux à configurer. Une mise en garde à noter cependant est que vous ne pouvez créer des graphiques circulaires qu\'à partir de données à choix multiples.</string>
     <string name="faq_text_4_6">Le style plage dynamique calculera automatiquement les valeurs min et max pour l\'axe Y. Maintenant, nous allons ajouter quelques lignes à notre graphique en utilisant le bouton + en bas : </string>
     <string name="faq_text_4_7">Parce que nos valeurs de blé sont des réponses à choix multiples allant de 0 à 2 et que nos valeurs de douleur à l\'estomac sont des nombres allant de 1 à 8, nous avons multiplié nos valeurs de blé par 4 pour rendre les plages similaires. Nous avons utilisé une moyenne mobile sur trois jours pour lisser les anomalies et réduire le bruit dans le graphique de sortie. Nous avons également sélectionné l\'option plot when tracked car ces données ont été suivies de manière relativement cohérente. Pour en savoir plus sur la façon dont ces paramètres affectent les graphiques linéaires, consultez la FAQ : "Comment sont calculées les moyennes mobiles et les totaux des tracés ?"</string>.
@@ -243,7 +232,6 @@
     <string name="on_feature_type_change_numerical_warning">Si vous mettez à jour votre type d\'entrée en numérique, vos données suivies existantes perdront leurs étiquettes.</string>
     <string name="on_feature_delete_discrete_value_warning">Si vous supprimez des réponses à choix multiples, tous les points de données suivies existants pour cette valeur seront supprimés.</string>
 
-    <string name="my_first_track_group">Mon premier groupe de suivi</string>
     <string name="rate_the_app">Notez l\'application</string>
     <string name="reminders">Remarques</string>
     <string name="no_reminders_hint">Touchez l\'icône + pour créer une nouvelle notification de rappel de suivi.</string>
