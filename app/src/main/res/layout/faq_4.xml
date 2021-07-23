@@ -40,37 +40,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="20dp"
-                android:text="@string/faq_text_4_3"
-                android:textAppearance="@style/TextAppearance.Body" />
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:padding="20dp"
-                android:scaleType="fitStart"
-                app:srcCompat="@drawable/faq_image_4_3" />
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
-                android:text="@string/faq_text_4_4"
-                android:textAppearance="@style/TextAppearance.Body" />
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:padding="20dp"
-                android:scaleType="fitStart"
-                app:srcCompat="@drawable/faq_image_4_4" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
                 android:text="@string/faq_text_4_5"
                 android:textAppearance="@style/TextAppearance.Body" />
 
