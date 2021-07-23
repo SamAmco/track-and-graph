@@ -18,6 +18,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/dialog_header_top_margin"
+                android:layout_marginHorizontal="@dimen/card_padding"
                 android:text="@string/export_to"
                 android:textAppearance="@style/TextAppearance.Body" />
 
