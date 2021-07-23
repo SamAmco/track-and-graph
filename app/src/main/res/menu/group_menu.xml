@@ -22,13 +22,13 @@
         android:title="@string/importButton"
         android:icon="@drawable/import_icon"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
 
     <item android:id="@+id/export_button"
         android:title="@string/exportButton"
         android:icon="@drawable/export_icon"
         app:iconTint="?attr/colorControlNormal"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/add_tracker"
         android:title="@string/tracker"
