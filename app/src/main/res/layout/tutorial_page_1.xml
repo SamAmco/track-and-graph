@@ -8,11 +8,27 @@
 
     <!--Colors are hardcoded here because these tutorial pages should look the same regardless of theme-->
     <TextView
+        android:id="@+id/welcome_header"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="40dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginRight="40dp"
+        android:text="@string/welcome_to_track_amp_graph_2_0"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.Headline4"
+        android:textColor="@color/blue_black"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/text"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="40dp"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="20dp"
         android:layout_marginRight="40dp"
         android:lineSpacingExtra="5dp"
         android:paddingBottom="30dp"
@@ -22,7 +38,7 @@
         android:textColor="@color/blue_black"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/welcome_header"
         app:layout_constraintVertical_bias="1.0"
         app:layout_constraintVertical_chainStyle="packed" />
 

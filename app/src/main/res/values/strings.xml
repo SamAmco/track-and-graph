@@ -243,9 +243,9 @@
     <string name="faq_text_6_3">However some pieces of information might be relevant to all your data. In this case you can add a global note by tapping the plus button in the global notes menu:</string>
     <string name="faq_text_6_4">You will notice this note now shows up underneath all graphs.</string>
     <string name="faq_text_6_5">You can edit or delete any note from the notes menu. Deleting a data point note from the notes menu will not delete the data point its self, just the attached note.</string>
-    <string name="tutorial_text_1"><![CDATA[Everything in Track & Graph is organised into blue track groups and orange graph groups.]]></string>
-    <string name="tutorial_text_2">Use track groups to quickly track lots of things at the same time.</string>
-    <string name="tutorial_text_3">Use graph groups to investigate data from multiple track groups.</string>
+    <string name="tutorial_text_1">Use trackers to track your data.</string>
+    <string name="tutorial_text_2">Use graphs and statistics to visualise data.</string>
+    <string name="tutorial_text_3">Use groups to organise your trackers, graphs and statistics.</string>
     <string name="got_it">Got it</string>
     <string name="move_to_colon">Move to:</string>
     <string name="move_to">Move to</string>
@@ -353,4 +353,5 @@
     <string name="hold_to_preview">Hold to preview</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="welcome_to_track_amp_graph_2_0">Welcome to\nTrack &amp; Graph 2.0!</string>
 </resources>
