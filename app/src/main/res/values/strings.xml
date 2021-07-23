@@ -198,14 +198,12 @@
     <string name="faq_5">How are moving averages and plot totals calculated?</string>
     <string name="faq_6">How do notes work?</string>
     <string name="faq">FAQ</string>
-    <string name="faq_text_1_1">To begin tracking you will need to create at least one track group. Track groups allow you to separate out groups of things you might want to track at the same time. For example you may wish to create one group for your exercise routine and another for food types.</string>
-    <string name="faq_text_1_2">Your track groups will appear in your list of groups. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
-    <string name="faq_text_1_3">Once you’ve created your track group select it and then click the + icon to set up something new to track.</string>
+    <string name="faq_text_1_1">To begin tracking you will need to create a Tracker.</string>
     <string name="faq_text_1_4">Type in the name of what you want to track and select an input style:</string>
-    <string name="faq_text_1_5">There are three styles of input you can choose: \n\n• Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.\n\n• Numerical will ask you to enter a number when tracking.\n\n• Time duration will ask you to enter an amount of time in hours, minutes and seconds when tracking. \n\nIf you add a default value you will not be asked for a value every time you tap the + button and your default value will be used instead. However you can go back and change the value by editing the data point afterwards (as explained later).</string>
+    <string name="faq_text_1_5">There are three styles of input you can choose: \n\n• Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.\n\n• Numerical will ask you to enter a number when tracking.\n\n• Time duration will ask you to enter an amount of time in hours, minutes and seconds when tracking. \n\nIf you add a default value you will not be asked for a value every time you tap the + button and your default value will be used instead. You can long press the + button to provide a value manually.</string>
     <string name="faq_text_1_6">To create multiple choice answers click the + button at the bottom.</string>
     <string name="faq_text_1_8">When you are happy with the setup click the FINISH button.</string>
-    <string name="faq_text_1_9">You should now see cards in your track group. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
+    <string name="faq_text_1_9">You should now see cards in your group. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
     <string name="faq_text_1_10">You can track things individually by using their + buttons or track everything in the group quickly by using the action button:</string>
     <string name="faq_text_1_11">Don\'t worry if you make a mistake you can always see, review and edit your tracking history by simply tapping on the card.</string>
     <string name="faq_text_2_1">To import/export your tracked data first select a track group and notice the menu buttons at the top:</string>

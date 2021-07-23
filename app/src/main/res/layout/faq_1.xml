@@ -41,43 +41,6 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/faq_text_1_2"
-                android:textAppearance="@style/TextAppearance.Body"
-                android:padding="20dp"
-                />
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingLeft="20dp"
-                android:paddingRight="20dp"
-                android:paddingTop="20dp"
-                android:scaleType="fitStart"
-                android:adjustViewBounds="true"
-                app:srcCompat="@drawable/faq_image_1_2"
-                />
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/faq_text_1_3"
-                android:textAppearance="@style/TextAppearance.Body"
-                android:padding="20dp"
-                />
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="20dp"
-                android:scaleType="fitStart"
-                android:adjustViewBounds="true"
-                app:srcCompat="@drawable/faq_image_1_3"
-                />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
                 android:text="@string/faq_text_1_4"
                 android:textAppearance="@style/TextAppearance.Body"
                 android:padding="20dp"
