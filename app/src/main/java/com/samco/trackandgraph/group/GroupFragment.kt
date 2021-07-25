@@ -28,6 +28,7 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -80,10 +81,8 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             createGroupClickListener()
         )
         binding.itemList.adapter = adapter
-        ItemTouchHelper(DragTouchHelperCallback(
-            { start: Int, end: Int -> adapter.moveItem(start, end) },
-            { viewModel.adjustDisplayIndexes(adapter.getItems()) }
-        )).attachToRecyclerView(binding.itemList)
+        disableChangeAnimations()
+        addItemTouchHelper()
         initializeGridLayout()
         scrollToTopOnItemAdded()
 
@@ -95,6 +94,17 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
         listenToViewModel()
         return binding.root
+    }
+
+    private fun disableChangeAnimations() {
+        (binding.itemList.itemAnimator as DefaultItemAnimator).supportsChangeAnimations = false
+    }
+
+    private fun addItemTouchHelper() {
+        ItemTouchHelper(DragTouchHelperCallback(
+            { start: Int, end: Int -> adapter.moveItem(start, end) },
+            { viewModel.adjustDisplayIndexes(adapter.getItems()) }
+        )).attachToRecyclerView(binding.itemList)
     }
 
     private fun scrollToTopOnItemAdded() {
