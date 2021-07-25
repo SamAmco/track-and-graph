@@ -219,7 +219,7 @@
     <string name="faq_text_6_3">Cependant, certains éléments d\'information peuvent être pertinents pour toutes vos données. Dans ce cas, vous pouvez ajouter une note globale en appuyant sur le bouton plus dans le menu des notes globales : </string>
     <string name="faq_text_6_4">Vous remarquerez que cette note s\'affiche désormais sous tous les graphiques.</string>
     <string name="faq_text_6_5">Vous pouvez modifier ou supprimer toute note à partir du menu des notes. La suppression d\'une note de point de données à partir du menu notes ne supprimera pas le point de données lui-même, mais seulement la note qui y est attachée.</string>
-    <string name="tutorial_text_1">Utilisez des trackers pour suivre vos données.</string>
+    <string name="tutorial_text_1">Utilisez des suivi pour suivre vos données.</string>
     <string name="tutorial_text_2">Utilisez des graphiques et des statistiques pour visualiser les données.</string>
     <string name="tutorial_text_3">Utilisez des groupes pour organiser vos trackers, graphiques et statistiques.</string>
     <string name="got_it">J\'ai compris</string>

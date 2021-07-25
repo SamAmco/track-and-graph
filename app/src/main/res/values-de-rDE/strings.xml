@@ -219,7 +219,7 @@
     <string name="faq_text_6_3">Einige Informationen könnten jedoch für alle Ihre Daten relevant sein. In diesem Fall können Sie eine globale Notiz hinzufügen, indem Sie auf die Plus-Schaltfläche im Menü für globale Notizen tippen:</string>
     <string name="faq_text_6_4">Sie werden feststellen, dass dieser Hinweis jetzt unter allen Diagrammen angezeigt wird.</string>
     <string name="faq_text_6_5">Sie können jede Notiz über das Notizen-Menü bearbeiten oder löschen. Wenn Sie eine Datenpunktnotiz aus dem Notizen-Menü löschen, wird nicht der Datenpunkt selbst gelöscht, sondern nur die angehängte Notiz.</string>
-    <string name="tutorial_text_1">Verwenden Sie Tracker, um Ihre Daten zu verfolgen.</string>
+    <string name="tutorial_text_1">Verwenden Sie Beobachten, um Ihre Daten zu verfolgen.</string>
     <string name="tutorial_text_2">Verwenden Sie Grafiken und Statistiken, um Daten zu visualisieren.</string>
     <string name="tutorial_text_3">Verwenden Sie Gruppen, um Ihre Tracker, Grafiken und Statistiken zu organisieren.</string>
     <string name="got_it">Got it</string>
