@@ -55,28 +55,17 @@ class GraphStatLiveData(
         val loadingStates = graphsAndStats
             .map { Pair(Instant.now(), IGraphStatViewData.loading(it)) }
         updateGraphStats(loadingStates)
-        workScope.launch { iterateGraphStatDataFactories(graphsAndStats, false) }
+        workScope.launch { iterateGraphStatDataFactories(graphsAndStats) }
     }
 
     private fun updateGraphStats(graphStats: List<Pair<Instant, IGraphStatViewData>>) {
         postValue(graphStats)
     }
 
-    @Synchronized
-    private fun updateGraphStatsAtIndex(index: Int, data: IGraphStatViewData) {
-        val value = this.value?.toMutableList() ?: mutableListOf()
-        if (index >= 0 && index < value.size) {
-            value.removeAt(index)
-            value.add(index, Pair(Instant.now(), data))
-            postValue(value)
-        }
-    }
-
     fun updateAllGraphStats() {
         workScope.launch {
             iterateGraphStatDataFactories(
-                value?.map { it.second.graphOrStat } ?: emptyList(),
-                false
+                value?.map { it.second.graphOrStat } ?: emptyList()
             )
         }
     }
@@ -96,7 +85,6 @@ class GraphStatLiveData(
 
     private suspend fun iterateGraphStatDataFactories(
         graphsAndStats: List<GraphOrStat>,
-        batchUpdate: Boolean
     ) {
         val batch = mutableListOf<IGraphStatViewData>()
         for (index in graphsAndStats.indices) {
@@ -106,12 +94,9 @@ class GraphStatLiveData(
             val viewData = workScope.run {
                 graphStatTypes[graphOrStat.type]?.dataFactory!!.getViewData(dataSource, graphOrStat)
             }
-            if (batchUpdate) batch.add(index, viewData)
-            else withContext(Dispatchers.Main) { updateGraphStatsAtIndex(index, viewData) }
+            batch.add(index, viewData)
         }
-        if (batchUpdate) {
-            val newItems = batch.map { Pair(Instant.now(), it) }
-            updateGraphStats(newItems)
-        }
+        val newItems = batch.map { Pair(Instant.now(), it) }
+        updateGraphStats(newItems)
     }
 }
