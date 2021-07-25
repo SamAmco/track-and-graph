@@ -5,7 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "29.0.3"
 
     compileOptions {
@@ -20,8 +20,8 @@ android {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 101400
-        versionName "1.14.0"
+        versionCode 200000
+        versionName "2.00.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {
