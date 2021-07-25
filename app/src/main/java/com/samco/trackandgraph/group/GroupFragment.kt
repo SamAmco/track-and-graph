@@ -112,7 +112,12 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             object : RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                     super.onItemRangeInserted(positionStart, itemCount)
-                    binding.itemList.smoothScrollToPosition(0)
+                    //Scroll to the top when we've added something new to our group,
+                    // but not when the adapter is being re-populated, e.g. when returning
+                    // to this fragment from a nested group
+                    if (itemCount == 1) binding.itemList.postDelayed({
+                        binding.itemList.smoothScrollToPosition(0)
+                    }, 300)
                 }
             }
         )
