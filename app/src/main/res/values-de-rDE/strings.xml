@@ -30,7 +30,7 @@
     <string name="cancel">Abbrechen</string>
     <string name="select_file">Datei wählen</string>
     <string name="empty_group_hint">Willkommen bei Track &amp; Graph!\n\n Tippen Sie hier, um Ihre erste Track-Gruppe zu erstellen und loszulegen.</string>
-    <string name="no_features_graph_stats_hint">Bitte erstellen Sie einen Tracker, bevor Sie Grafiken erstellen.</string>
+    <string name="no_features_graph_stats_hint">Bitte erstellen Sie einen beobachten, bevor Sie Grafiken erstellen.</string>
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
@@ -47,7 +47,7 @@
     <string name="importButton">Importieren</string>
     <string name="export_to">Exportieren Sie nachverfolgte Daten in dieser Gruppe in CSV:</string>
     <string name="import_from">Nachverfolgte Daten aus CSV in diese Gruppe importieren:</string>
-    <string name="import_warning">Achtung: Der Import ist irreversibel. Verfolgen &amp; Graph versucht, alle importierten Daten mit vorhandenen Daten in dieser Gruppe nach Namen zusammenzuführen.</string>
+    <string name="import_warning">Achtung: Der Import ist irreversibel. Track &amp; Graph versucht, alle importierten Daten mit vorhandenen Daten in dieser Gruppe nach Namen zusammenzuführen.</string>
     <string name="graphs_and_statistics"><![CDATA[Diagramme & Statistiken]]></string>
     <string name="add_a_graph_or_stat">Ein Diagramm oder eine Statistik hinzufügen</string>
     <string name="graph_type_label">Diagrammtyp:</string>
@@ -177,8 +177,8 @@
     <string name="faq_5">Wie werden gleitende Mittelwerte und Plot-Summen berechnet?</string>
     <string name="faq_6">Wie funktionieren die Notizen?</string>
     <string name="faq">FAQ</string>
-    <string name="faq_text_1_1">Um mit dem Tracking zu beginnen, müssen Sie einen Tracker erstellen.</string>
-    <string name="faq_text_1_4">Geben Sie den Namen des gewünschten Tracks ein und wählen Sie einen Eingabestil:</string>
+    <string name="faq_text_1_1">Um mit dem verfolgung zu beginnen, müssen Sie einen beobachten erstellen.</string>
+    <string name="faq_text_1_4">Geben Sie den Namen des Elements ein, das Sie verfolgen möchten, und wählen Sie einen Eingabestil:</string>
     <string name="faq_text_1_5">Sie können zwischen drei Eingabearten wählen: \n\n• Bei Multiple-Choice müssen Sie manuell vordefinierte Antworten einrichten, die Ihnen beim Verfolgen als Schaltflächen angezeigt werden.\n\n• Numerical fordert Sie auf, eine Zahl einzugeben, wenn Tracking.\n\n• Die Zeitdauer fordert Sie beim Tracking auf, eine Zeitdauer in Stunden, Minuten und Sekunden einzugeben. \n\nWenn Sie einen Standardwert hinzufügen, werden Sie nicht jedes Mal nach einem Wert gefragt, wenn Sie auf die Schaltfläche + tippen, sondern Ihr Standardwert wird stattdessen verwendet. Sie können die Taste + lange drücken, um manuell einen Wert einzugeben.</string>
     <string name="faq_text_1_6">Um Multiple-Choice-Antworten zu erstellen, klicken Sie unten auf die +-Schaltfläche.</string>
     <string name="faq_text_1_8">Wenn Sie mit der Einrichtung zufrieden sind, klicken Sie auf die Schaltfläche BEENDEN.</string>
@@ -221,7 +221,7 @@
     <string name="faq_text_6_5">Sie können jede Notiz über das Notizen-Menü bearbeiten oder löschen. Wenn Sie eine Datenpunktnotiz aus dem Notizen-Menü löschen, wird nicht der Datenpunkt selbst gelöscht, sondern nur die angehängte Notiz.</string>
     <string name="tutorial_text_1">Verwenden Sie Beobachten, um Ihre Daten zu verfolgen.</string>
     <string name="tutorial_text_2">Verwenden Sie Grafiken und Statistiken, um Daten zu visualisieren.</string>
-    <string name="tutorial_text_3">Verwenden Sie Gruppen, um Ihre Tracker, Grafiken und Statistiken zu organisieren.</string>
+    <string name="tutorial_text_3">Verwenden Sie Gruppen, um Ihre Beobachten, Grafiken und Statistiken zu organisieren.</string>
     <string name="got_it">Got it</string>
     <string name="move_to_colon">Weiter zu:</string>
     <string name="move_to">Weiter zu</string>

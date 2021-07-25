@@ -30,7 +30,7 @@
     <string name="cancel">Annuler</string>
     <string name="select_file">Sélectionner un fichier</string>
     <string name="empty_group_hint">Bienvenue sur Track &amp; Graph!\n\n Appuyez ici pour créer vos premiers groupes de suivi et graphiques.</string>
-    <string name="no_features_graph_stats_hint">Veuillez créer un Tracker avant de créer des graphiques.</string>
+    <string name="no_features_graph_stats_hint">Veuillez créer un suivi avant de créer des graphiques.</string>
     <string name="ru_sure_del_group">Êtes-vous sûr de vouloir supprimer ce groupe et tout ce qu\'il contient ? Vous ne pouvez pas faire marche arrière.</string>
     <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ces données ?</string>
     <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette donnée ?</string>
@@ -47,7 +47,7 @@
     <string name="importButton">Importer</string>
     <string name="export_to">Exportez les données suivies de ce groupe au format CSV :</string>
     <string name="import_from">Importez les données suivies dans ce groupe à partir de CSV:</string>
-    <string name="import_warning">Attention : l\'import est irréversible. Piste &amp; amp; Graph essaiera de fusionner toutes les données importées avec les données existantes dans ce groupe par nom.</string>
+    <string name="import_warning">Attention : l\'import est irréversible. Track &amp; Graph essaiera de fusionner toutes les données importées avec les données existantes dans ce groupe par nom.</string>
     <string name="graphs_and_statistics"><![CDATA[Graphiques & Statistiques]]></string>
     <string name="add_a_graph_or_stat">Ajouter un Graphique ou une Statistique</string>
     <string name="graph_type_label">Type de Graphique : </string>
@@ -177,7 +177,7 @@
     <string name="faq_5">Comment sont calculées les moyennes glissantes et les totaux?</string>
     <string name="faq_6">Comment fonctionnent les notes?</string>
     <string name="faq">FAQ</string>
-    <string name="faq_text_1_1">Pour commencer le suivi, vous devrez créer un Tracker.</string>
+    <string name="faq_text_1_1">Pour commencer le suivi, vous devrez créer un suivi.</string>
     <string name="faq_text_1_4">Tapez le nom de ce que vous voulez suivre et sélectionnez un style d\'entrée : </string>
     <string name="faq_text_1_5">Vous avez le choix entre trois styles de saisie : \n\n• Les choix multiples vous obligent à configurer manuellement des réponses prédéfinies qui vous seront présentées sous forme de boutons lors du suivi.\n\n• Numérique vous demandera de saisir un nombre lorsque suivi.\n\n• La durée vous demandera d\'entrer une durée en heures, minutes et secondes lors du suivi. \n\nSi vous ajoutez une valeur par défaut, aucune valeur ne vous sera demandée à chaque fois que vous appuyez sur le bouton + et votre valeur par défaut sera utilisée à la place. Vous pouvez appuyer longuement sur le bouton + pour fournir une valeur manuellement.</string>
     <string name="faq_text_1_6">Pour créer des réponses à choix multiples, cliquez sur le bouton + en bas.</string>
@@ -221,7 +221,7 @@
     <string name="faq_text_6_5">Vous pouvez modifier ou supprimer toute note à partir du menu des notes. La suppression d\'une note de point de données à partir du menu notes ne supprimera pas le point de données lui-même, mais seulement la note qui y est attachée.</string>
     <string name="tutorial_text_1">Utilisez des suivi pour suivre vos données.</string>
     <string name="tutorial_text_2">Utilisez des graphiques et des statistiques pour visualiser les données.</string>
-    <string name="tutorial_text_3">Utilisez des groupes pour organiser vos trackers, graphiques et statistiques.</string>
+    <string name="tutorial_text_3">Utilisez des groupes pour organiser vos suivie, graphiques et statistiques.</string>
     <string name="got_it">J\'ai compris</string>
     <string name="move_to_colon">Déplacer vers : </string>
     <string name="move_to">Déplacer vers</string>
@@ -325,11 +325,11 @@
     <string name="weeks">Semaines</string>
     <string name="hours">Heures</string>
     <string name="add_group">Ajouter un groupe:</string>
-    <string name="edit_group">Modifier le groupe :</string>
+    <string name="edit_group">Modifier le groupe:</string>
     <string name="group">Grouper</string>
     <string name="tracker">Suivi</string>
     <string name="graph_or_stat">Graphique ou statistique</string>
-    <string name="ru_sure_del_graph">Voulez-vous vraiment supprimer ce graphique ? Vous ne pouvez pas inverser cela. Vous ne perdrez aucune donnée suivie.</string>
+    <string name="ru_sure_del_graph">Voulez-vous vraiment supprimer ce graphique? Vous ne pouvez pas inverser cela. Vous ne perdrez aucune donnée suivie.</string>
     <string name="open">Ouverte</string>
     <string name="close">Fermer</string>
 </resources>
