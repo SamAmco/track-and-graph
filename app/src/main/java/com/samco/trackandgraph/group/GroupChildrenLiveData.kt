@@ -27,6 +27,14 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 
+/**
+ * This live data represents all the children in a given group. The children are retrieved via the
+ * dataSource and observed in 3 separate calls for features, graphs and groups. When any of these
+ * observed live data are changed, this live data will schedule a delayed post which will contain
+ * all children combined and sorted by display index and then ID. If more updates are observed before
+ * that scheduled post executes, it is cancelled and scheduled again to try and minimise the number
+ * of down stream update events.
+ */
 class GroupChildrenLiveData(
     updateJob: Job,
     groupId: Long,
