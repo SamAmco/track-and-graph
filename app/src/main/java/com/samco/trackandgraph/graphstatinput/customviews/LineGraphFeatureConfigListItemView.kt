@@ -1,4 +1,4 @@
-/* 
+/*
 * This file is part of Track & Graph
 * 
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,10 +14,10 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.graphstatinput
+
+package com.samco.trackandgraph.graphstatinput.customviews
 
 import android.content.Context
-
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,11 +25,9 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.LinearLayout
-import androidx.core.content.ContextCompat.getColor
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter

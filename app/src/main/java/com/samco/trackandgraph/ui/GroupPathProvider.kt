@@ -22,9 +22,9 @@ import com.samco.trackandgraph.database.entity.Group
 open class GroupPathProvider(
     val groups: List<Group>
 ) {
-    protected val separator = "/"
+    private val separator = "/"
 
-    protected val groupsById = groups.map { it.id to it }.toMap()
+    private val groupsById = groups.map { it.id to it }.toMap()
 
     protected val groupPaths = groups.map { group ->
         group.id to run {

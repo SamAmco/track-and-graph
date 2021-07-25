@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
 //TODO we're keeping a duplicate list here with the parent list adapter, this could
-// cause bugs.
+// cause bugs. We basically should get rid of this base class and just implement adapter properly.
 abstract class OrderedListAdapter<T, G : RecyclerView.ViewHolder>(
     private val getId: (T) -> Long,
     diffCallback: DiffUtil.ItemCallback<T>

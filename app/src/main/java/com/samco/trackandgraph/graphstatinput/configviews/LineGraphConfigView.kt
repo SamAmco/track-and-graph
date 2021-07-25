@@ -32,8 +32,9 @@ import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.database.dto.YRangeType
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.LineGraphInputViewBinding
-import com.samco.trackandgraph.graphstatinput.*
 import com.samco.trackandgraph.graphstatinput.ValidationException
+import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfig
+import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfigListItemView
 import com.samco.trackandgraph.util.getDoubleFromText
 
 internal class LineGraphConfigView @JvmOverloads constructor(

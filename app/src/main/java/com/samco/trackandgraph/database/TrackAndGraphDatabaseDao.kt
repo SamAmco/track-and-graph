@@ -23,9 +23,6 @@ import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import org.threeten.bp.OffsetDateTime
 
-//TODO there is a lot of duplication in this file, you should extract all common queries (possibly all queries)
-// to top level constants as below
-
 private const val getFeatureByIdQuery =
     """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
 
@@ -45,9 +42,6 @@ interface TrackAndGraphDatabaseDao {
 
     @Update
     fun updateGroups(groups: List<Group>)
-
-    @Query("""SELECT COUNT(*) FROM features_table""")
-    fun getNumFeatures(): Long
 
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
     fun getAllReminders(): LiveData<List<Reminder>>
@@ -122,9 +116,6 @@ interface TrackAndGraphDatabaseDao {
     fun updateFeature(feature: Feature)
 
     @Delete
-    fun deleteFeature(feature: Feature)
-
-    @Delete
     fun deleteDataPoint(dataPoint: DataPoint)
 
     @Query("DELETE FROM data_points_table WHERE feature_id = :featureId AND value = :index")
@@ -144,9 +135,6 @@ interface TrackAndGraphDatabaseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertDataPoints(dataPoint: List<DataPoint>)
-
-    @Update
-    fun updateDataPoint(dataPoint: DataPoint)
 
     @Update
     fun updateDataPoints(dataPoint: List<DataPoint>)
@@ -180,9 +168,6 @@ interface TrackAndGraphDatabaseDao {
         featureId: Long,
         values: List<Int>
     ): DataPoint?
-
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value = :value ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointWithValue(featureId: Long, value: String): DataPoint?
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
@@ -226,9 +211,6 @@ interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
     fun getGraphsAndStatsByGroupId(groupId: Long): LiveData<List<GraphOrStat>>
-
-    @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
-    fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
     @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC, id DESC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
