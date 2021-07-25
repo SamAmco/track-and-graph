@@ -13,13 +13,13 @@ An android app for tracking personal data and creating custom graphs
 
 # Screenshots
 <p align="center">
-	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/1_en-GB.jpeg" width="200px" />
-	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/2_en-GB.jpeg" width="200px" />
-	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/3_en-GB.jpeg" width="200px" />
-	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/4_en-GB.jpeg" width="200px" />
-	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/5_en-GB.jpeg" width="200px" />
-	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/6_en-GB.jpeg" width="200px" />
-	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/7_en-GB.jpeg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/1_en-GB.jpg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/2_en-GB.jpg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/3_en-GB.jpg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/4_en-GB.jpg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/5_en-GB.jpg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/6_en-GB.jpg" width="200px" />
+	<img src="./fastlane/metadata/android/en-GB/images/phoneScreenshots/7_en-GB.jpg" width="200px" />
 </p>
 
 # Privacy Policy
