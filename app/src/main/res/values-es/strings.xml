@@ -47,7 +47,7 @@
     <string name="importButton">Importar</string>
     <string name="export_to">Exportar datos de seguimiento en este grupo a CSV:</string>
     <string name="import_from">Importe datos de seguimiento a este grupo desde CSV:</string>
-    <string name="import_warning">Advertencia: la importación es irreversible. Seguimiento &amp; amp; Graph intentará fusionar los datos importados con los datos existentes en este grupo por nombre.</string>
+    <string name="import_warning">Advertencia: la importación es irreversible. Track &amp; Graph intentará fusionar los datos importados con los datos existentes en este grupo por nombre.</string>
     <string name="graphs_and_statistics"><![CDATA[Gráficas y estadísticas]]></string>
     <string name="add_a_graph_or_stat">Añadir un gráfico o estadística</string>
     <string name="graph_type_label">Tipo de gráfico:</string>
@@ -188,7 +188,7 @@
     <string name="faq_text_2_1">Para importar / exportar solo los datos rastreados en un grupo a un CSV, use los botones de menú en la parte superior:</string>
     <string name="faq_text_2_2">Utilice este botón para importar un csv a este grupo.</string>
     <string name="faq_text_2_3">Utilice este botón para exportar los datos rastreados de este grupo a un csv.</string>
-    <string name="faq_text_2_4">La copia de seguridad &amp; amp; La opción de restauración en el menú es ligeramente diferente. Esto exportará y restaurará todo el archivo de la base de datos que contiene todos los datos rastreados, gráficos, recordatorios y notas. Se recomienda que haga una copia de seguridad de sus datos con regularidad. El archivo de copia de seguridad es un archivo de base de datos Sqlite3 sin cifrar que también se puede abrir y modificar con un software disponible gratuitamente. Sin embargo, esto no se recomienda para usuarios no técnicos, ya que podría romper la integridad de la base de datos.</string>
+    <string name="faq_text_2_4">La copia de seguridad &amp; La opción de restauración en el menú es ligeramente diferente. Esto exportará y restaurará todo el archivo de la base de datos que contiene todos los datos rastreados, gráficos, recordatorios y notas. Se recomienda que haga una copia de seguridad de sus datos con regularidad. El archivo de copia de seguridad es un archivo de base de datos Sqlite3 sin cifrar que también se puede abrir y modificar con un software disponible gratuitamente. Sin embargo, esto no se recomienda para usuarios no técnicos, ya que podría romper la integridad de la base de datos.</string>
     <string name="faq_text_3_1">Se recomienda utilizar el tipo de entrada de opción múltiple siempre que sea posible. Si alguna vez quieres dibujar un gráfico circular a partir de tus datos, necesitarás que estén en forma de opción múltiple. También puede dibujar un gráfico de líneas de sus datos a lo largo del tiempo si sus respuestas predefinidas tienen un orden natural. Por ejemplo, digamos que usted va a configurar lo siguiente:</string>
     <string name="faq_text_3_2">Y luego traza algunos datos de la siguiente manera:</string>
     <string name="faq_text_3_3">Podrías visualizar esos datos mediante un gráfico de líneas a lo largo del tiempo o mediante un gráfico circular como el que se muestra a continuación:</string>
