@@ -291,8 +291,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         var skippedFirstDataPointsUpdate = false
         viewModel.hasFeatures.observe(viewLifecycleOwner) {}
         viewModel.dataPoints.observe(viewLifecycleOwner) {
-            if (skippedFirstDataPointsUpdate)
-                viewModel.updateAllGraphs()
+            if (skippedFirstDataPointsUpdate) viewModel.updateAllGraphs()
             else skippedFirstDataPointsUpdate = true
         }
         viewModel.groupChildren.observe(viewLifecycleOwner) {
