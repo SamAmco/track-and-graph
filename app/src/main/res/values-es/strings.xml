@@ -324,4 +324,12 @@
     <string name="faq_text_7_12">Y un año después puede tener este aspecto:</string>
     <string name="faq_text_7_13">Con el tiempo, sin embargo, este sesgo tenderá a 0. Por lo tanto, cuantos más datos se han trazado, más preciso será el histograma.</string>
     <string name="hold_to_preview">Avance</string>
+    <string name="add_group">Añadir grupo:</string>
+    <string name="edit_group">Editar grupo:</string>
+    <string name="group">Grupo</string>
+    <string name="tracker">Trazar</string>
+    <string name="graph_or_stat">Gráfico o estadística</string>
+    <string name="ru_sure_del_graph">¿Está seguro de que desea eliminar este gráfico? No puedes revertir esto. No perderá ningún dato rastreado.</string>
+    <string name="open">Abierta</string>
+    <string name="close">cerca</string>
 </resources>

@@ -324,4 +324,12 @@
     <string name="faq_text_7_13">Im Laufe der Zeit wird diese Abweichung jedoch gegen 0 tendieren. Daher wird das Histogramm umso genauer sein, je mehr Daten Sie verfolgt haben.</string>
     <string name="faq_text_7_11">Ein letzter Hinweis, den Sie beachten sollten, ist, dass Ihre Daten möglicherweise durch die Tatsache verzerrt sind, dass Sie noch nicht die Daten für jeden Histogrammfach oder noch nicht alle gleich verfolgt haben. Wenn Sie beispielsweise ein jährliches Histogramm zeichnen, aber erst seit 6 Monaten nachverfolgen, sieht Ihr Histogramm möglicherweise folgendermaßen aus:</string>
     <string name="hold_to_preview">Vorschau</string>
+    <string name="add_group">Gruppe hinzufügen:</string>
+    <string name="edit_group">Gruppe bearbeiten:</string>
+    <string name="group">Gruppe</string>
+    <string name="tracker">Beobachten</string>
+    <string name="graph_or_stat">Grafik oder Statistik</string>
+    <string name="ru_sure_del_graph">Möchten Sie diese Grafik wirklich löschen? Sie können dies nicht rückgängig machen. Sie werden keine verfolgten Daten verlieren.</string>
+    <string name="open">Offen</string>
+    <string name="close">Schließen</string>
 </resources>
