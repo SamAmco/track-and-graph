@@ -26,7 +26,7 @@ import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.databinding.DurationInputLayoutBinding
 
 class DurationInputView : FrameLayout {
-    val binding: DurationInputLayoutBinding
+    val binding = DurationInputLayoutBinding.inflate(LayoutInflater.from(context), this, true)
     var seconds = 0L
         private set
     private var listener: ((Long) -> Unit)? = null
@@ -39,7 +39,6 @@ class DurationInputView : FrameLayout {
         attrs,
         defStyleAttr
     ) {
-        binding = DurationInputLayoutBinding.inflate(LayoutInflater.from(context), this, true)
         binding.hoursInput.addTextChangedListener { onDurationTextChanged() }
         binding.minutesInput.addTextChangedListener { onDurationTextChanged() }
         binding.secondsInput.addTextChangedListener { onDurationTextChanged() }

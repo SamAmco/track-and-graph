@@ -19,13 +19,10 @@ package com.samco.trackandgraph.group
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
@@ -40,8 +37,6 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dataVisColorList
 import com.samco.trackandgraph.database.entity.Group
-import com.samco.trackandgraph.graphstatinput.LineGraphFeatureConfig
-import com.samco.trackandgraph.graphstatinput.LineGraphFeatureConfigListItemView
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.showKeyboard
