@@ -219,7 +219,7 @@
     <string name="faq_text_6_3">Sin embargo, algunas piezas de información pueden ser relevantes para todos tus datos. En este caso, puedes añadir una nota global tocando el botón más en el menú de notas globales:</string>
     <string name="faq_text_6_4">Verás que esta nota aparece ahora debajo de todos los gráficos.</string>
     <string name="faq_text_6_5">Puedes editar o eliminar cualquier nota desde el menú de notas. Al eliminar una nota de un punto de datos desde el menú de notas, no se eliminará el punto de datos en sí, sino la nota adjunta.</string>
-    <string name="tutorial_text_1">Utilice rastreadores para rastrear sus datos.</string>
+    <string name="tutorial_text_1">Utilice trazar para rastrear sus datos.</string>
     <string name="tutorial_text_2">Utilice gráficos y estadísticas para visualizar datos.</string>
     <string name="tutorial_text_3">Utilice grupos para organizar sus rastreadores, gráficos y estadísticas.</string>
     <string name="got_it">Aceptar</string>
