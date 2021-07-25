@@ -324,4 +324,12 @@
     <string name="hours_suffix">h</string>
     <string name="weeks">Semaines</string>
     <string name="hours">Heures</string>
+    <string name="add_group">Ajouter un groupe:</string>
+    <string name="edit_group">Modifier le groupe :</string>
+    <string name="group">Grouper</string>
+    <string name="tracker">Suivi</string>
+    <string name="graph_or_stat">Graphique ou statistique</string>
+    <string name="ru_sure_del_graph">Voulez-vous vraiment supprimer ce graphique ? Vous ne pouvez pas inverser cela. Vous ne perdrez aucune donnée suivie.</string>
+    <string name="open">Ouverte</string>
+    <string name="close">Fermer</string>
 </resources>
