@@ -51,6 +51,12 @@ import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
+/**
+ * The group fragment is used on the home page and in any nested group to display the contents of
+ * that group. It must display a list of groups, graphs and features contained within its group.
+ * The default value for args.groupId is 0L representing the root group or home page. The
+ * args.groupName may be null or empty.
+ */
 class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
@@ -401,15 +407,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         }
     }
 }
-
-enum class GroupChildType { GROUP, FEATURE, GRAPH }
-
-data class GroupChild(
-    val type: GroupChildType,
-    val obj: Any,
-    val id: () -> Long,
-    val displayIndex: () -> Int
-)
 
 class GroupViewModel : ViewModel() {
     private var updateJob = Job()

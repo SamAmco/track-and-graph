@@ -26,6 +26,15 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant
 
+/**
+ * This live data observes the graphs and stats in the database, uses their data source adapters
+ * to generate their data in a coroutine and emits an observable list of pairs of [IGraphStatViewData]
+ * objects with the [Instant] that data was calculated so that the observer can determine if a
+ * graph has changed since the last emission. It operates only on the given groupId.
+ *
+ * A list of graph/stats will be emitted as soon as they are observed from the database with
+ * loading state view data, then again later when the data has been calculated.
+ */
 class GraphStatLiveData(
     updateJob: Job,
     groupId: Long,
