@@ -1,6 +1,6 @@
 # Track & Graph
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-9-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-10-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 An android app for tracking personal data and creating custom graphs
 
@@ -64,6 +64,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="http://sguinetti.gitlab.io"><img src="https://avatars.githubusercontent.com/u/5572928?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Diego</b></sub></a><br /><a href="#translation-sguinetti" title="Translation">🌍</a></td>
     <td align="center"><a href="https://github.com/stheid"><img src="https://avatars.githubusercontent.com/u/2736207?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stefan Heid</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=stheid" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Pada0"><img src="https://avatars.githubusercontent.com/u/73777780?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pada0</b></sub></a><br /><a href="#translation-Pada0" title="Translation">🌍</a></td>
   </tr>
 </table>
 
