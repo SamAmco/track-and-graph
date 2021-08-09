@@ -234,7 +234,7 @@
     <string name="on_feature_delete_discrete_value_warning">Si vous supprimez des réponses à choix multiples, tous les points de données suivies existants pour cette valeur seront supprimés.</string>
 
     <string name="rate_the_app">Notez l\'application</string>
-    <string name="reminders">Remarques</string>
+    <string name="reminders">Notifications de rappel</string>
     <string name="no_reminders_hint">Touchez l\'icône + pour créer une nouvelle notification de rappel de suivi.</string>
     <string name="mon">Mon</string>
     <string name="tue">Mar</string>
