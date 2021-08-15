@@ -24,7 +24,10 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -39,7 +42,10 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.DisplayFeature
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.database.entity.Group
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
@@ -47,7 +53,10 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
@@ -309,9 +318,24 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         }
     }
 
+    private val queueAddAllButtonShowHideListener by lazy {
+        object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy > 0) binding.queueAddAllButton.hide()
+                else binding.queueAddAllButton.show()
+            }
+        }
+    }
+
     private fun updateShowQueueTrackButton() {
-        if (viewModel.features.isNotEmpty()) binding.queueAddAllButton.show()
-        else binding.queueAddAllButton.hide()
+        if (viewModel.features.isNotEmpty()) {
+            binding.queueAddAllButton.show()
+            binding.itemList.removeOnScrollListener(queueAddAllButtonShowHideListener)
+            binding.itemList.addOnScrollListener(queueAddAllButtonShowHideListener)
+        } else {
+            binding.itemList.removeOnScrollListener(queueAddAllButtonShowHideListener)
+            binding.queueAddAllButton.hide()
+        }
     }
 
     override fun onStart() {
