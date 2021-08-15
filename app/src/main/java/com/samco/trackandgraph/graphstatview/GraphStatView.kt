@@ -143,10 +143,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     }
 
     fun placeMarker(time: OffsetDateTime) {
-        viewScope?.launch {
-            decorJob?.join()
-            currentDecorator?.setTimeMarker(time)
-        }
+        currentDecorator?.setTimeMarker(time)
     }
 
     @Suppress("UNCHECKED_CAST")
