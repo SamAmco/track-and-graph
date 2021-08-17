@@ -41,6 +41,14 @@ class RemindersHelper {
             }
         }
 
+        fun clearAlarms(context: Context) = CoroutineScope(Dispatchers.IO + Job()).launch {
+            TrackAndGraphDatabase
+                .getInstance(context)
+                .trackAndGraphDatabaseDao
+                .getAllRemindersSync()
+                .forEach { deleteAlarms(it, context) }
+        }
+
         fun createAlarms(reminder: Reminder, context: Context) {
             val allIntents = getAllAlarmIntents(reminder, context, true)
             val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager

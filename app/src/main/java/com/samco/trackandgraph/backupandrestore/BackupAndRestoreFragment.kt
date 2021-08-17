@@ -17,6 +17,7 @@ import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
+import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
@@ -73,6 +74,7 @@ class BackupAndRestoreFragment : Fragment() {
             when (it) {
                 true -> restartApp()
                 false -> {
+                    RemindersHelper.syncAlarms(requireContext())
                     val color = binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.restoreFeedbackText.setTextColor(color)
                     val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
@@ -143,6 +145,7 @@ class BackupAndRestoreFragment : Fragment() {
                 )
             }
             RESTORE_DATABASE_REQUEST_CODE -> {
+                RemindersHelper.clearAlarms(requireContext())
                 viewModel.restoreDatabase(
                     resultData?.data?.let { activity?.contentResolver?.openInputStream(it) }
                 )
