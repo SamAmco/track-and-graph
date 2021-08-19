@@ -59,6 +59,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import java.lang.Float.min
 
 /**
  * The group fragment is used on the home page and in any nested group to display the contents of
@@ -292,8 +293,11 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     private fun initializeGridLayout() {
         val dm = resources.displayMetrics
         val screenWidth = dm.widthPixels / dm.density
-        val itemSize = 180f
-        val gridLayout = GridLayoutManager(context, (screenWidth / itemSize).toInt())
+        val itemSize = (screenWidth / 2f).coerceAtMost(180f)
+        val gridLayout = GridLayoutManager(
+            context,
+            (screenWidth / itemSize).coerceAtLeast(2f).toInt()
+        )
         gridLayout.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return adapter.getSpanSizeAtPosition(position)
