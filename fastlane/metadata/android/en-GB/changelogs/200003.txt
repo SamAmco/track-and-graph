@@ -1,0 +1,10 @@
+- Track groups and graph groups are now just groups
+- Create trackers anywhere
+- Create graphs anywhere
+- Create groups anywhere
+- Create nested groups
+- Long press on default value + to enter value manually
+- Fix can't see cancel buttons on import/export dialogs
+- Hide FAB on scroll
+- Fix crashing on tutorial with OOM
+- Fix layout crashing on small screens

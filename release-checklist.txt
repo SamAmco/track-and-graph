@@ -16,8 +16,8 @@ or for release
 
 	# bundle exec fastlane supply --aab app/release/app-release.aab
 
-5. Commit everything and tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload)
+6. While this is uploading you can build an apk for the release (using Android Studio)
 
-6. Build an apk for the release (using Android Studio)
+5. Commit everything and tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload) as F-droid uses these tags for its own releases
 
 7. On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
