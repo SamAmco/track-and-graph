@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <ScrollView xmlns:app="http://schemas.android.com/apk/res-auto"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -65,7 +66,7 @@
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.Body" />
 
-            <GridLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
@@ -73,13 +74,28 @@
                 android:columnCount="2">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textview_about_1"
+                    android:layout_width="0dp"
+                    app:layout_constraintWidth_percent="0.65"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
                     android:text="@string/androidplot"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+
+                    app:layout_constraintBottom_toTopOf="@+id/textview_about_3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_about_1"
+                    app:layout_constraintBottom_toTopOf="@+id/textview_about_4"
+                    app:layout_constraintStart_toEndOf="@+id/textview_about_1"
+                    app:layout_constraintHorizontal_bias="1"
+                    android:id="@+id/textview_about_2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
@@ -88,7 +104,15 @@
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/textview_about_1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintBottom_toTopOf="@+id/textview_about_5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:id="@+id/textview_about_3"
+                    app:autoSizeTextType="uniform"
+                    android:layout_width="0dp"
+                    app:layout_constraintWidth_percent="0.65"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
@@ -96,6 +120,13 @@
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
+                    android:id="@+id/textview_about_4"
+                    app:layout_constraintTop_toBottomOf="@id/textview_about_2"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_about_3"
+                    app:layout_constraintBottom_toTopOf="@+id/textview_about_6"
+                    app:layout_constraintStart_toEndOf="@+id/textview_about_3"
+                    app:layout_constraintHorizontal_bias="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
@@ -105,7 +136,15 @@
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/textview_about_3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintBottom_toTopOf="@+id/textview_about_7"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:id="@+id/textview_about_5"
+                    app:autoSizeTextType="uniform"
+                    android:layout_width="0dp"
+                    app:layout_constraintWidth_percent="0.65"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
@@ -113,6 +152,13 @@
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
+                    android:id="@+id/textview_about_6"
+                    app:layout_constraintTop_toBottomOf="@id/textview_about_4"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_about_5"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/textview_about_8"
+                    app:layout_constraintStart_toEndOf="@+id/textview_about_5"
+                    app:layout_constraintHorizontal_bias="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
@@ -122,7 +168,16 @@
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/textview_about_5"
+
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintBottom_toTopOf="@+id/textview_about_9"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:id="@+id/textview_about_7"
+                    app:autoSizeTextType="uniform"
+                    android:layout_width="0dp"
+                    app:layout_constraintWidth_percent="0.65"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
@@ -130,6 +185,13 @@
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
+                    android:id="@+id/textview_about_8"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_about_7"
+                    app:layout_constraintTop_toBottomOf="@id/textview_about_6"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@+id/textview_about_10"
+                    app:layout_constraintStart_toEndOf="@+id/textview_about_7"
+                    app:layout_constraintHorizontal_bias="1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
@@ -139,7 +201,15 @@
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@+id/textview_about_7"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    android:id="@+id/textview_about_9"
+                    android:layout_width="0dp"
+                    app:layout_constraintWidth_percent="0.65"
+                    app:autoSizeTextType="uniform"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
@@ -147,6 +217,13 @@
                     android:textAppearance="@style/TextAppearance.Body" />
 
                 <TextView
+                    app:layout_constraintTop_toBottomOf="@id/textview_about_8"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/textview_about_9"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/textview_about_9"
+                    app:layout_constraintHorizontal_bias="1"
+                    android:id="@+id/textview_about_10"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_columnSpan="1"
@@ -154,7 +231,7 @@
                     android:layout_marginTop="5dp"
                     android:text="@string/apache_2_0"
                     android:textAppearance="@style/TextAppearance.Body" />
-            </GridLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
     </ScrollView>
 </layout>
