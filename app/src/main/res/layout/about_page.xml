@@ -65,96 +65,139 @@
                 android:textAlignment="center"
                 android:textAppearance="@style/TextAppearance.Body" />
 
-            <GridLayout
-                android:layout_width="wrap_content"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="40dp"
-                android:columnCount="2">
+                android:layout_marginTop="40dp">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_library_1"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
                     android:text="@string/androidplot"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toStartOf="@id/tv_license_1"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintWidth_max="200dp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_license_1"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
-                    android:layout_marginStart="40dp"
                     android:text="@string/apache_2_0"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@id/tv_library_1"
+                    app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_library_2"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
                     android:text="@string/apache_commons_csv"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toStartOf="@id/tv_license_2"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_license_1"
+                    app:layout_constraintWidth_max="200dp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_license_2"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginTop="5dp"
                     android:text="@string/apache_2_0"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@id/tv_library_2"
+                    app:layout_constraintTop_toTopOf="@id/tv_library_2" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_library_3"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
                     android:text="@string/three_ten_android_backport"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toStartOf="@id/tv_license_3"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_library_2"
+                    app:layout_constraintWidth_max="200dp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_license_3"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginTop="5dp"
                     android:text="@string/apache_2_0"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@id/tv_library_3"
+                    app:layout_constraintTop_toTopOf="@id/tv_library_3" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_library_4"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
                     android:text="@string/timber"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toStartOf="@id/tv_license_4"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_library_3"
+                    app:layout_constraintWidth_max="200dp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_license_4"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginTop="5dp"
                     android:text="@string/apache_2_0"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@id/tv_library_4"
+                    app:layout_constraintTop_toTopOf="@id/tv_library_4" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_library_5"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
                     android:layout_marginTop="5dp"
                     android:text="@string/moshi"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toStartOf="@id/tv_license_5"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintHorizontal_weight="2"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/tv_license_4"
+                    app:layout_constraintWidth_max="200dp" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tv_license_5"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_columnSpan="1"
-                    android:layout_marginStart="40dp"
-                    android:layout_marginTop="5dp"
                     android:text="@string/apache_2_0"
-                    android:textAppearance="@style/TextAppearance.Body" />
-            </GridLayout>
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_chainStyle="spread"
+                    app:layout_constraintHorizontal_weight="1"
+                    app:layout_constraintStart_toEndOf="@id/tv_library_5"
+                    app:layout_constraintTop_toTopOf="@id/tv_library_5" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
         </LinearLayout>
     </ScrollView>
 </layout>
