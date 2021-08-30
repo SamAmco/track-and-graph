@@ -71,10 +71,6 @@ class ImportFeaturesDialog : DialogFragment() {
             alertDialog = builder.create()
             alertDialog.setCanceledOnTouchOutside(true)
             alertDialog.setOnShowListener { setAlertDialogShowListeners() }
-            alertDialog.setOnShowListener {
-                val negativeButton = alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-                negativeButton.setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
-            }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
@@ -88,7 +84,7 @@ class ImportFeaturesDialog : DialogFragment() {
         listenToImportState()
         listenToException()
         val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        negativeButton.setTextColor(negativeButton.context.getColorFromAttr(R.attr.colorControlNormal))
+        negativeButton.setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
         negativeButton.setOnClickListener { dismiss() }
         alertDialog.setOnCancelListener { run {} }
     }

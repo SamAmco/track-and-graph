@@ -79,10 +79,6 @@ class ExportFeaturesDialog : DialogFragment() {
             alertDialog = builder.create()
             alertDialog.setCanceledOnTouchOutside(true)
             alertDialog.setOnShowListener { setAlertDialogShowListeners() }
-            alertDialog.setOnShowListener {
-                val negativeButton = alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-                negativeButton.setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
-            }
             alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
@@ -90,8 +86,8 @@ class ExportFeaturesDialog : DialogFragment() {
     private fun setAlertDialogShowListeners() {
         positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
         positiveButton.setTextColor(positiveButton.context.getColorFromAttr(R.attr.colorSecondary))
-        alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-            .setTextColor(alertDialog.context.getColorFromAttr(R.attr.colorControlNormal))
+        alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
+            .setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
         positiveButton.isEnabled = false
         viewModel.loadFeatures(requireActivity(), groupId!!)
         listenToState()
