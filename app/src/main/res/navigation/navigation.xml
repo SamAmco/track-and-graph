@@ -121,6 +121,10 @@
         android:id="@+id/aboutPageFragment"
         android:name="com.samco.trackandgraph.aboutpage.AboutPageFragment" />
     <fragment
+        android:id="@+id/DEBUG_transformationFragment"
+        android:name="com.samco.trackandgraph.DebugTransformationFragment"
+        android:label="DEBUG TRAFO" />
+    <fragment
         android:id="@+id/FAQFragment"
         android:name="com.samco.trackandgraph.faq.FAQFragment">
         <action

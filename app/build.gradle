@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+//apply plugin: "antlr"
 
 android {
     compileSdkVersion 30
@@ -107,6 +108,17 @@ dependencies {
     //Graph drawing
     implementation 'com.androidplot:androidplot-core:1.5.7'
     implementation 'com.google.android:flexbox:1.1.1'
+
+    //ANTLR
+    implementation "org.antlr:antlr4-runtime:4.9.2"
+
+    //AUTOCOMPLETE ET AL (not sure if useful yet)
+    // implementation 'me.tomassetti.kanvas:kanvas-core:0.2.1'
+
+    //CODE EDITOR
+    implementation 'com.blacksquircle.ui:editorkit:2.0.0'
+    implementation 'com.blacksquircle.ui:language-base:2.0.0' // for custom language
+    implementation 'com.blacksquircle.ui:language-python:2.0.0'
 
 
     testImplementation 'junit:junit:4.13.1'

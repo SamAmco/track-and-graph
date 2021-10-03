@@ -48,6 +48,11 @@
             android:id="@+id/aboutPageFragment"
             android:icon="@drawable/about_icon"
             android:title="@string/about" />
+        <item
+            android:id="@+id/DEBUG_transformationFragment"
+            android:icon="@drawable/about_icon"
+            android:title="DEBUG TRAFO" />
+
     </group>
 
     <group android:id="@+id/settings">

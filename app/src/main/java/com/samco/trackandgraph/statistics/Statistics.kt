@@ -27,6 +27,9 @@ import com.samco.trackandgraph.database.entity.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import org.antlr.v4.runtime.CharStream
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
@@ -36,6 +39,8 @@ import org.threeten.bp.temporal.WeekFields
 import java.lang.Exception
 import java.util.*
 import kotlin.math.*
+
+
 
 class DataSample(val dataPoints: List<DataPoint>)
 
@@ -351,7 +356,6 @@ internal suspend fun calculateMovingAverages(
         currentAccumulation -= current.value
         currentCount--
     }
-
     return DataSample(movingAverages)
 }
 
