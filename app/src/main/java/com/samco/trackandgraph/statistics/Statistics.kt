@@ -124,7 +124,28 @@ internal suspend fun calculateDurationAccumulatedValues(
     plotTotalTime: TemporalAmount,
     aggPreferences: AggregationWindowPreferences? = null
 ): DataSample {
-    val newData = mutableListOf<DataPoint>()
+    return calculateDurationAggregatedValues(sampleData, featureId, sampleDuration, endTime, plotTotalTime, aggPreferences,
+        { points: List<DataPointInterface>, timestamp: OffsetDateTime ->
+            AggregatedDataPoint(
+                value = points.sumByDouble { dp -> dp.value },
+                timestamp = timestamp,
+                featureId = featureId,
+                parents = points
+            )
+        }
+    )
+}
+
+internal suspend fun calculateDurationAggregatedValues(
+    sampleData: DataSample,
+    featureId: Long,
+    sampleDuration: Duration?,
+    endTime: OffsetDateTime?,
+    plotTotalTime: TemporalAmount,
+    aggPreferences: AggregationWindowPreferences? = null,
+    aggFunction: (List<DataPointInterface>, OffsetDateTime) -> AggregatedDataPoint
+): DataSample {
+    val newData = mutableListOf<DataPointInterface>()
     val latest = getEndTimeNowOrLatest(sampleData, endTime)
     val firstDataPointTime = getStartTimeOrFirst(sampleData, latest, endTime, sampleDuration)
     var currentTimeStamp = findBeginningOfTemporal(firstDataPointTime, plotTotalTime, aggPreferences).minusNanos(1)
@@ -133,13 +154,13 @@ internal suspend fun calculateDurationAccumulatedValues(
         currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(plotTotalTime) }
         val points = sampleData.dataPoints.drop(index)
             .takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
-        val total = points.sumByDouble { dp -> dp.value }
         index += points.size
-        newData.add(DataPoint(currentTimeStamp, featureId, total, "", ""))
+        newData.add(aggFunction(points, currentTimeStamp))
         yield()
     }
     return DataSample(newData)
 }
+
 
 private fun getStartTimeOrFirst(
     sampleData: DataSample,
