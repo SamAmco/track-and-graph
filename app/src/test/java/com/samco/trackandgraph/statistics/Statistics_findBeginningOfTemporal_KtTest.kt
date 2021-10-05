@@ -19,12 +19,11 @@ package com.samco.trackandgraph.statistics
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
-import org.threeten.bp.ZoneOffset
+import org.threeten.bp.*
 
 class Statistics_findBeginningOfTemporal_KtTest {
+    private val aggPreferences = AggregationWindowPreferences(DayOfWeek.MONDAY)
+
     @Test
     fun testDurationHour() {
         //GIVEN
@@ -88,7 +87,7 @@ class Statistics_findBeginningOfTemporal_KtTest {
         val temporal = Duration.ofDays(1).plus(Duration.ofNanos(1))
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -106,7 +105,7 @@ class Statistics_findBeginningOfTemporal_KtTest {
         val temporal = Duration.ofDays(7)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -286,7 +285,7 @@ class Statistics_findBeginningOfTemporal_KtTest {
         val temporal = Period.ofWeeks(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences)
 
         //THEN
         val expected = OffsetDateTime.of(

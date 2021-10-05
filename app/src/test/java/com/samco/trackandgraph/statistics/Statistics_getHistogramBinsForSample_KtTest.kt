@@ -20,11 +20,14 @@ package com.samco.trackandgraph.statistics
 import com.samco.trackandgraph.database.entity.*
 import org.junit.Assert.*
 import org.junit.Test
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import kotlin.random.Random
 
 class Statistics_getHistogramBinsForSample_KtTest {
+    private val aggPreferences = AggregationWindowPreferences(DayOfWeek.MONDAY)
+
     @Test
     fun test_getHistogramBinsForSample_sumByVal_week_cont() {
         //GIVEN
@@ -38,7 +41,7 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val sumByCount = false
 
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
+        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount, aggPreferences)
 
         //THEN
         answer!!
