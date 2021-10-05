@@ -23,6 +23,7 @@ import org.threeten.bp.*
 
 class Statistics_findBeginningOfTemporal_KtTest {
     private val aggPreferences = AggregationWindowPreferences(DayOfWeek.MONDAY)
+    private val aggPreferences4AM = AggregationWindowPreferences(DayOfWeek.MONDAY, Duration.ofHours(4))
 
     @Test
     fun testDurationHour() {

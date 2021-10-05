@@ -38,7 +38,7 @@ import java.lang.Exception
 import java.util.*
 import kotlin.math.*
 
-class DataSample(val dataPoints: List<DataPoint>)
+class DataSample(val dataPoints: List<DataPointInterface>)
 
 /**
  * This function will call the dataSource to get a sample of the data points with the given featureId.
@@ -189,8 +189,14 @@ private fun getEndTimeNowOrLatest(rawData: DataSample, endTime: OffsetDateTime?)
  *
  */
 
-internal data class AggregationWindowPreferences(val firstDayOfWeek: DayOfWeek) {
-    constructor() : this(firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+internal fun getFirstDayOfWeekFromLocale() : DayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+
+internal data class AggregationWindowPreferences(val firstDayOfWeek: DayOfWeek, val startTimeOfDay: Duration) {
+    constructor() : this(getFirstDayOfWeekFromLocale(), Duration.ofSeconds(0))
+    constructor(firstDayOfWeek: DayOfWeek) : this(firstDayOfWeek, Duration.ofSeconds(0))
+    constructor(startTimeOfDay: Duration) : this(getFirstDayOfWeekFromLocale(), startTimeOfDay)
+
+
 }
 
 internal fun findBeginningOfTemporal(
@@ -212,36 +218,32 @@ private fun findBeginningOfDuration(
     duration: Duration,
     aggregationWindowPreferences: AggregationWindowPreferences
 ): OffsetDateTime {
-    val dt = dateTime
+    val dtHour = dateTime
         .withMinute(0)
         .withSecond(0)
         .withNano(0)
-    val nano = Duration.ofNanos(1)
-    val day = Duration.ofDays(1)
+
+    if (duration <= Duration.ofMinutes(60)) return dtHour
+
+    val dt = dtHour.withHour(0)
+
     return when {
-        duration.minus(nano.plus(Duration.ofMinutes(60))).isNegative -> dt
-        duration.minus(nano.plus(Duration.ofHours(24))).isNegative -> {
-            dt.withHour(0)
-        }
-        duration.minus(nano.plus(Duration.ofDays(7))).isNegative -> {
+        duration <= Duration.ofDays(1) -> dt
+        duration <= Duration.ofDays(7) -> {
             dt.with(
                 TemporalAdjusters.previousOrSame(
                     aggregationWindowPreferences.firstDayOfWeek
-                )
-            ).withHour(0)
-        }
-        duration.minus(nano.plus(Duration.ofDays(31))).isNegative -> {
-            dt.withDayOfMonth(1).withHour(0)
-        }
-        duration.minus(day.plus(Duration.ofDays(365 / 4))).isNegative -> {
+                ) ) }
+        duration <= Duration.ofDays(31) -> dt.withDayOfMonth(1)
+        duration <= Duration.ofDays(ceil(365.0/4).toLong()) -> {
             val month = getQuaterForMonthValue(dt.monthValue)
-            dt.withMonth(month).withDayOfMonth(1).withHour(0)
+            dt.withMonth(month).withDayOfMonth(1)
         }
-        duration.minus(day.plus(Duration.ofDays(365 / 2))).isNegative -> {
+        duration <= Duration.ofDays(ceil(365.0/2).toLong()) -> {
             val month = getBiYearForMonthValue(dt.monthValue)
             dt.withMonth(month).withDayOfMonth(1).withHour(0)
         }
-        else -> dt.withDayOfYear(1).withHour(0)
+        else -> dt.withDayOfYear(1)
     }
 }
 
@@ -500,11 +502,11 @@ internal fun getHistogramBinsForSample(
 }
 
 private fun getHistogramBinsForSample(
-    sample: List<DataPoint>,
+    sample: List<DataPointInterface>,
     window: TimeHistogramWindow,
     keys: Set<Int>,
     endTime: OffsetDateTime,
-    addFunction: (DataPoint, Map<Int, MutableList<Double>>, Int) -> Unit
+    addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
 ): Map<Int, List<Double>> {
     val binTotalMaps = calculateBinTotals(sample, window, keys, endTime, addFunction)
     val total = binTotalMaps.map { it.value.sum() }.sum()
@@ -515,11 +517,11 @@ private fun getHistogramBinsForSample(
  * Create a map structure and place every data point in it using the provided addFunction
  */
 private fun calculateBinTotals(
-    sample: List<DataPoint>,
+    sample: List<DataPointInterface>,
     window: TimeHistogramWindow,
     keys: Set<Int>,
     endTime: OffsetDateTime,
-    addFunction: (DataPoint, Map<Int, MutableList<Double>>, Int) -> Unit
+    addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
 ): Map<Int, List<Double>> {
     val binTotalMap = keys.map { it to MutableList(window.numBins) { 0.0 } }.toMap()
     var currEnd = endTime
@@ -549,14 +551,14 @@ private fun calculateBinTotals(
 /**
  * Add the value of the given data point to the bin at the given binIndex
  */
-private fun addValueToBin(dataPoint: DataPoint, bin: Map<Int, MutableList<Double>>, binIndex: Int) {
+private fun addValueToBin(dataPoint: DataPointInterface, bin: Map<Int, MutableList<Double>>, binIndex: Int) {
     bin[0]?.set(binIndex, (bin[0]?.get(binIndex) ?: 0.0) + dataPoint.value)
 }
 
 /**
  * Add one to the bin at the given binIndex
  */
-private fun addOneToBin(dataPoint: DataPoint, bin: Map<Int, MutableList<Double>>, binIndex: Int) {
+private fun addOneToBin(dataPoint: DataPointInterface, bin: Map<Int, MutableList<Double>>, binIndex: Int) {
     bin[0]?.set(binIndex, (bin[0]?.get(binIndex) ?: 0.0) + 1.0)
 }
 
@@ -565,7 +567,7 @@ private fun addOneToBin(dataPoint: DataPoint, bin: Map<Int, MutableList<Double>>
  * specific to its discrete value.
  */
 private fun addDiscreteValueToBin(
-    dataPoint: DataPoint,
+    dataPoint: DataPointInterface,
     bin: Map<Int, MutableList<Double>>,
     binIndex: Int
 ) {
@@ -577,7 +579,7 @@ private fun addDiscreteValueToBin(
  * Add one to the bin at the given binIndex within the histogram specific to its discrete value.
  */
 private fun addOneDiscreteValueToBin(
-    dataPoint: DataPoint,
+    dataPoint: DataPointInterface,
     bin: Map<Int, MutableList<Double>>,
     binIndex: Int
 ) {
