@@ -19,10 +19,7 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.database.entity.TimeSinceLastStat
+import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
@@ -31,7 +28,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): ITimeSinceViewData {
         val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
             ?: return object : ITimeSinceViewData {
@@ -50,12 +47,12 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: TimeSinceLastStat,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): ITimeSinceViewData {
         val dataPoint = getLastDataPoint(dataSource, config)
         onDataSampled.invoke(dataPoint?.let { listOf(dataPoint) } ?: emptyList())
         return object : ITimeSinceViewData {
-            override val lastDataPoint: DataPoint?
+            override val lastDataPoint: DataPointInterface?
                 get() = dataPoint
             override val state: IGraphStatViewData.State
                 get() = IGraphStatViewData.State.READY
@@ -67,7 +64,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     private fun getLastDataPoint(
         dataSource: TrackAndGraphDatabaseDao,
         timeSinceLastStat: TimeSinceLastStat
-    ): DataPoint? {
+    ): DataPointInterface? {
         val feature = dataSource.getFeatureById(timeSinceLastStat.featureId)
         return when (feature.featureType) {
             FeatureType.CONTINUOUS, FeatureType.DURATION -> {

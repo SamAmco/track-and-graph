@@ -77,7 +77,7 @@ data class AggregatedDataPoint (
     override val timestamp: OffsetDateTime,
     override val featureId: Long,
     override val value: Double,
-    override val label: String,
-    override val note: String,
-    val parents: List<DataPointInterface>
+    val parents: List<DataPointInterface>,
+    override val label: String = "",
+    override val note: String = "",
         ): DataPointInterface
