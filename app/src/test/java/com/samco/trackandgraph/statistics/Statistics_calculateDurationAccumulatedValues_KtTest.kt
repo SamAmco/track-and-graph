@@ -22,12 +22,14 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAmount
 
 class Statistics_calculateDurationAccumulatedValues_KtTest {
+    private val aggPreferences = AggregationWindowPreferences(DayOfWeek.MONDAY)
 
     @Test
     fun calculateDurationAccumulatedValues_hourly_plot_totals() {
@@ -285,7 +287,8 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                     0L,
                     null,
                     endTime,
-                    plotTotalTime
+                    plotTotalTime,
+                    aggPreferences
                 )
 
             //THEN

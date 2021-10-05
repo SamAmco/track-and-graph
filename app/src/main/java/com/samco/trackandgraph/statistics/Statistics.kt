@@ -27,6 +27,7 @@ import com.samco.trackandgraph.database.entity.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
@@ -120,12 +121,13 @@ internal suspend fun calculateDurationAccumulatedValues(
     featureId: Long,
     sampleDuration: Duration?,
     endTime: OffsetDateTime?,
-    plotTotalTime: TemporalAmount
+    plotTotalTime: TemporalAmount,
+    aggPreferences: AggregationWindowPreferences? = null
 ): DataSample {
     val newData = mutableListOf<DataPoint>()
     val latest = getEndTimeNowOrLatest(sampleData, endTime)
     val firstDataPointTime = getStartTimeOrFirst(sampleData, latest, endTime, sampleDuration)
-    var currentTimeStamp = findBeginningOfTemporal(firstDataPointTime, plotTotalTime).minusNanos(1)
+    var currentTimeStamp = findBeginningOfTemporal(firstDataPointTime, plotTotalTime, aggPreferences).minusNanos(1)
     var index = 0
     while (currentTimeStamp.isBefore(latest)) {
         currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(plotTotalTime) }
@@ -186,20 +188,29 @@ private fun getEndTimeNowOrLatest(rawData: DataSample, endTime: OffsetDateTime?)
  *  Duration.ofDays(365) or a year
  *
  */
+
+internal data class AggregationWindowPreferences(val firstDayOfWeek: DayOfWeek) {
+    constructor() : this(firstDayOfWeek = WeekFields.of(Locale.getDefault()).firstDayOfWeek)
+}
+
 internal fun findBeginningOfTemporal(
     dateTime: OffsetDateTime,
-    temporalAmount: TemporalAmount
+    temporalAmount: TemporalAmount,
+    aggregationWindowPreferences: AggregationWindowPreferences? = null
 ): OffsetDateTime {
+    // if no preferences are give, use the default ones from default constructor
+    val aggPreferences = aggregationWindowPreferences ?: AggregationWindowPreferences()
     return when (temporalAmount) {
-        is Duration -> findBeginningOfDuration(dateTime, temporalAmount)
-        is Period -> findBeginningOfPeriod(dateTime, temporalAmount)
+        is Duration -> findBeginningOfDuration(dateTime, temporalAmount, aggPreferences )
+        is Period -> findBeginningOfPeriod(dateTime, temporalAmount, aggPreferences)
         else -> dateTime
     }
 }
 
 private fun findBeginningOfDuration(
     dateTime: OffsetDateTime,
-    duration: Duration
+    duration: Duration,
+    aggregationWindowPreferences: AggregationWindowPreferences
 ): OffsetDateTime {
     val dt = dateTime
         .withMinute(0)
@@ -215,7 +226,7 @@ private fun findBeginningOfDuration(
         duration.minus(nano.plus(Duration.ofDays(7))).isNegative -> {
             dt.with(
                 TemporalAdjusters.previousOrSame(
-                    WeekFields.of(Locale.getDefault()).firstDayOfWeek
+                    aggregationWindowPreferences.firstDayOfWeek
                 )
             ).withHour(0)
         }
@@ -248,7 +259,8 @@ internal fun getBiYearForMonthValue(monthValue: Int) = if (monthValue < 7) 1 els
 
 private fun findBeginningOfPeriod(
     dateTime: OffsetDateTime,
-    period: Period
+    period: Period,
+    aggregationWindowPreferences: AggregationWindowPreferences
 ): OffsetDateTime {
     val dt = dateTime.withHour(0)
         .withMinute(0)
@@ -258,7 +270,7 @@ private fun findBeginningOfPeriod(
     return when {
         isPeriodNegativeOrZero(period.minus(Period.ofDays(1))) -> dt
         isPeriodNegativeOrZero(period.minus(Period.ofWeeks(1))) -> {
-            val firstDay = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+            val firstDay = aggregationWindowPreferences.firstDayOfWeek
             dt.with(TemporalAdjusters.previousOrSame(firstDay))
         }
         isPeriodNegativeOrZero(period.minus(Period.ofMonths(1))) -> {
@@ -424,12 +436,14 @@ internal fun getXYSeriesFromDataSample(
  */
 internal fun getNextEndOfWindow(
     window: TimeHistogramWindow,
-    endDate: OffsetDateTime?
+    endDate: OffsetDateTime?,
+    aggregationWindowPreferences: AggregationWindowPreferences? = null
 ): OffsetDateTime {
     val end = endDate ?: OffsetDateTime.now()
     return findBeginningOfTemporal(
         end.plus(window.period),
-        window.period
+        window.period,
+        aggregationWindowPreferences
     )
 }
 
@@ -459,10 +473,11 @@ internal fun getHistogramBinsForSample(
     sample: DataSample,
     window: TimeHistogramWindow,
     feature: Feature,
-    sumByCount: Boolean
+    sumByCount: Boolean,
+    aggPreferences: AggregationWindowPreferences? = null
 ): Map<Int, List<Double>>? {
     if (sample.dataPoints.isEmpty()) return null
-    val endTime = getNextEndOfWindow(window, sample.dataPoints.maxBy { it.timestamp }!!.timestamp)
+    val endTime = getNextEndOfWindow(window, sample.dataPoints.maxBy { it.timestamp }!!.timestamp, aggPreferences)
     val isDiscrete = feature.featureType == FeatureType.DISCRETE
     val keys =
         if (isDiscrete) feature.discreteValues.map { it.index }.toSet()
