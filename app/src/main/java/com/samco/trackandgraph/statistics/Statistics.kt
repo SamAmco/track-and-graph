@@ -129,15 +129,18 @@ internal suspend fun calculateDurationAccumulatedValues(
         sampleDuration,
         endTime,
         plotTotalTime,
-        aggPreferences,
-        { points: List<DataPointInterface>, timestamp: OffsetDateTime ->
-            AggregatedDataPoint(
-                value = points.sumByDouble { dp -> dp.value },
-                timestamp = timestamp,
-                featureId = featureId,
-                parents = points
-            )
-        }
+        aggPreferences
+    ).sum()
+}
+
+// Contains list of AggregatedDatapoints which did not have a function called on them yet!
+class RawAggregatedDatapoints(val points: List<AggregatedDataPoint>) {
+    fun sum() = DataSample(
+        this.points.map { point -> point.copy(value = point.parents.sumByDouble { it.value }) }
+    )
+
+    fun max() = DataSample(
+        this.points.map { point -> point.copy(value = point.parents.maxOf { it.value }) }
     )
 }
 
@@ -146,18 +149,17 @@ internal fun DataPointInterface.cutoffTimestampForAggregation(startTimeOfDayOrNu
     return timestamp - startTimeOfDay
 }
 
-internal suspend fun calculateDurationAggregatedValues(
+private suspend fun calculateDurationAggregatedValues(
     sampleData: DataSample,
     featureId: Long,
     sampleDuration: Duration?,
     endTime: OffsetDateTime?,
     plotTotalTime: TemporalAmount,
     aggPreferencesOrNull: AggregationWindowPreferences? = null,
-    aggFunction: (List<DataPointInterface>, OffsetDateTime) -> AggregatedDataPoint
-): DataSample {
+): RawAggregatedDatapoints {
     val aggPref = aggPreferencesOrNull ?: AggregationWindowPreferences()
 
-    val newData = mutableListOf<DataPointInterface>()
+    val newData = mutableListOf<AggregatedDataPoint>()
 
     val firstDataPointTime =
         sampleData.dataPoints.firstOrNull()?.cutoffTimestampForAggregation(aggPref.startTimeOfDay)
@@ -177,10 +179,15 @@ internal suspend fun calculateDurationAggregatedValues(
                     .isBefore(currentTimeStamp)
             }
         index += points.size
-        newData.add(aggFunction(points, currentTimeStamp))
+        newData.add(
+            AggregatedDataPoint(
+            timestamp = currentTimeStamp,
+            value = Double.NaN, // this value gets overwritten when calling a function on RawAggregatedDatapoints
+            featureId = featureId,
+            parents = points))
         yield()
     }
-    return DataSample(newData)
+    return RawAggregatedDatapoints(newData)
 }
 
 
