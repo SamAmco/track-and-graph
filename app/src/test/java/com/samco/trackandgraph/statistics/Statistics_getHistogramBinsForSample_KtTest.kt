@@ -21,12 +21,14 @@ import com.samco.trackandgraph.database.entity.*
 import org.junit.Assert.*
 import org.junit.Test
 import org.threeten.bp.DayOfWeek
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import kotlin.random.Random
 
 class Statistics_getHistogramBinsForSample_KtTest {
     private val aggPreferences = AggregationWindowPreferences(DayOfWeek.MONDAY)
+    private val aggPreferences4AM = AggregationWindowPreferences(DayOfWeek.MONDAY, Duration.ofHours(4))
 
     @Test
     fun test_getHistogramBinsForSample_sumByVal_week_cont() {
@@ -176,6 +178,35 @@ class Statistics_getHistogramBinsForSample_KtTest {
 
         //THEN
         assertNull(answer)
+    }
+
+    @Test
+    fun test_getHistogramBinsForSample_sumByVal_week_cont_StartTime() {
+        // Same test as above, but the points are all one day later but before 4 AM so the result is the same
+
+        //GIVEN
+        val month = OffsetDateTime.of(2020, 7, 1, 3, 30, 0, 0, ZoneOffset.UTC)
+        val sample = makeDataSample(
+            IntProgression.fromClosedRange(7, 22, 1)
+                .map { Pair(1.0, month.withDayOfMonth(it)) }
+        )
+        val window = TimeHistogramWindow.WEEK
+        val feature = makeFeature(FeatureType.CONTINUOUS)
+        val sumByCount = false
+
+        //WHEN
+        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount, aggPreferences4AM)
+
+        //THEN
+        answer!!
+        assertEquals(1, answer.keys.size)
+        val vals = answer[0] ?: error("Key 0 not found")
+        assertEquals(7, vals.size)
+        val total = 3 + 3 + 2 + 2 + 2 + 2 + 2.0
+        assertEquals(
+            listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total),
+            vals
+        )
     }
 
     private fun makeFeature(
