@@ -20,8 +20,11 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.database.doubleFormatter
+import com.samco.trackandgraph.statistics.AggregationWindowPreferences
 import com.samco.trackandgraph.ui.formatTimeDuration
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
 
 
 interface DataPointInterface {
@@ -31,7 +34,6 @@ interface DataPointInterface {
     val label: String
     val note: String
 }
-
 
 @Entity(
     tableName = "data_points_table",

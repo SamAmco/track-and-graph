@@ -136,24 +136,35 @@ internal suspend fun calculateDurationAccumulatedValues(
     )
 }
 
+internal fun DataPointInterface.cutoffTimestampForAggregation(startTimeOfDayOrNull: Duration?) : OffsetDateTime {
+    val startTimeOfDay = startTimeOfDayOrNull ?: Duration.ZERO
+    return timestamp - startTimeOfDay
+}
+
 internal suspend fun calculateDurationAggregatedValues(
     sampleData: DataSample,
     featureId: Long,
     sampleDuration: Duration?,
     endTime: OffsetDateTime?,
     plotTotalTime: TemporalAmount,
-    aggPreferences: AggregationWindowPreferences? = null,
+    aggPreferencesOrNull: AggregationWindowPreferences? = null,
     aggFunction: (List<DataPointInterface>, OffsetDateTime) -> AggregatedDataPoint
 ): DataSample {
+    val aggPref = aggPreferencesOrNull ?: AggregationWindowPreferences()
+
     val newData = mutableListOf<DataPointInterface>()
-    val latest = getEndTimeNowOrLatest(sampleData, endTime)
-    val firstDataPointTime = getStartTimeOrFirst(sampleData, latest, endTime, sampleDuration)
-    var currentTimeStamp = findBeginningOfTemporal(firstDataPointTime, plotTotalTime, aggPreferences).minusNanos(1)
+
+    val firstDataPointTime = sampleData.dataPoints.firstOrNull()?.cutoffTimestampForAggregation(aggPref.startTimeOfDay)
+    val lastDataPointTime  = sampleData.dataPoints.lastOrNull()?. cutoffTimestampForAggregation(aggPref.startTimeOfDay)
+
+    val latest = getEndTimeNowOrLatest(lastDataPointTime, endTime)
+    val earliest = getStartTimeOrFirst(firstDataPointTime, latest, endTime, sampleDuration)
+    var currentTimeStamp = findBeginningOfTemporal(earliest, plotTotalTime, aggPref.firstDayOfWeek).minusNanos(1)
     var index = 0
     while (currentTimeStamp.isBefore(latest)) {
         currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(plotTotalTime) }
         val points = sampleData.dataPoints.drop(index)
-            .takeWhile { dp -> dp.timestamp.isBefore(currentTimeStamp) }
+            .takeWhile { dp -> dp.cutoffTimestampForAggregation(aggPref.startTimeOfDay).isBefore(currentTimeStamp) }
         index += points.size
         newData.add(aggFunction(points, currentTimeStamp))
         yield()
@@ -163,12 +174,11 @@ internal suspend fun calculateDurationAggregatedValues(
 
 
 private fun getStartTimeOrFirst(
-    sampleData: DataSample,
+    firstDataPointTime: OffsetDateTime?,
     latest: OffsetDateTime,
     endTime: OffsetDateTime?,
     sampleDuration: Duration?
 ): OffsetDateTime {
-    val firstDataPointTime = sampleData.dataPoints.firstOrNull()?.timestamp
     val beginningOfDuration = sampleDuration?.let { endTime?.minus(it) }
     val durationBeforeLatest = sampleDuration?.let { latest.minus(it) }
     return listOf(
@@ -179,13 +189,12 @@ private fun getStartTimeOrFirst(
     ).minBy { t -> t ?: OffsetDateTime.MAX }!!
 }
 
-private fun getEndTimeNowOrLatest(rawData: DataSample, endTime: OffsetDateTime?): OffsetDateTime {
+private fun getEndTimeNowOrLatest(lastDataPointTime: OffsetDateTime?, endTime: OffsetDateTime?): OffsetDateTime {
     val now = OffsetDateTime.now()
-    val last = rawData.dataPoints.lastOrNull()?.timestamp
     return when {
         //last == null && endTime == null -> now
-        endTime == null -> listOf(last, now).maxBy { t -> t ?: OffsetDateTime.MIN }!!
-        else -> listOf(last, endTime).maxBy { t -> t ?: OffsetDateTime.MIN }!!
+        endTime == null -> listOf(lastDataPointTime, now).maxBy { t -> t ?: OffsetDateTime.MIN }!!
+        else -> listOf(lastDataPointTime, endTime).maxBy { t -> t ?: OffsetDateTime.MIN }!!
     }
 }
 
@@ -216,20 +225,18 @@ internal data class AggregationWindowPreferences(val firstDayOfWeek: DayOfWeek, 
     constructor() : this(getFirstDayOfWeekFromLocale(), Duration.ofSeconds(0))
     constructor(firstDayOfWeek: DayOfWeek) : this(firstDayOfWeek, Duration.ofSeconds(0))
     constructor(startTimeOfDay: Duration) : this(getFirstDayOfWeekFromLocale(), startTimeOfDay)
-
-
 }
 
 internal fun findBeginningOfTemporal(
     dateTime: OffsetDateTime,
     temporalAmount: TemporalAmount,
-    aggregationWindowPreferences: AggregationWindowPreferences? = null
+    firstDayOfWeekOrNull: DayOfWeek? = null
 ): OffsetDateTime {
-    // if no preferences are give, use the default ones from default constructor
-    val aggPreferences = aggregationWindowPreferences ?: AggregationWindowPreferences()
+    // if no firstDayOfWeek is given, use the default one from default constructor
+    val firstDayOfWeek = firstDayOfWeekOrNull ?: AggregationWindowPreferences().firstDayOfWeek
     return when (temporalAmount) {
-        is Duration -> findBeginningOfDuration(dateTime, temporalAmount, aggPreferences )
-        is Period -> findBeginningOfPeriod(dateTime, temporalAmount, aggPreferences)
+        is Duration -> findBeginningOfDuration(dateTime, temporalAmount, firstDayOfWeek )
+        is Period -> findBeginningOfPeriod(dateTime, temporalAmount, firstDayOfWeek)
         else -> dateTime
     }
 }
@@ -237,7 +244,7 @@ internal fun findBeginningOfTemporal(
 private fun findBeginningOfDuration(
     dateTime: OffsetDateTime,
     duration: Duration,
-    aggregationWindowPreferences: AggregationWindowPreferences
+    firstDayOfWeek: DayOfWeek
 ): OffsetDateTime {
     val dtHour = dateTime
         .withMinute(0)
@@ -253,7 +260,7 @@ private fun findBeginningOfDuration(
         duration <= Duration.ofDays(7) -> {
             dt.with(
                 TemporalAdjusters.previousOrSame(
-                    aggregationWindowPreferences.firstDayOfWeek
+                    firstDayOfWeek
                 ) ) }
         duration <= Duration.ofDays(31) -> dt.withDayOfMonth(1)
         duration <= Duration.ofDays(ceil(365.0/4).toLong()) -> {
@@ -283,7 +290,7 @@ internal fun getBiYearForMonthValue(monthValue: Int) = if (monthValue < 7) 1 els
 private fun findBeginningOfPeriod(
     dateTime: OffsetDateTime,
     period: Period,
-    aggregationWindowPreferences: AggregationWindowPreferences
+    firstDayOfWeek: DayOfWeek
 ): OffsetDateTime {
     val dt = dateTime.withHour(0)
         .withMinute(0)
@@ -293,8 +300,7 @@ private fun findBeginningOfPeriod(
     return when {
         isPeriodNegativeOrZero(period.minus(Period.ofDays(1))) -> dt
         isPeriodNegativeOrZero(period.minus(Period.ofWeeks(1))) -> {
-            val firstDay = aggregationWindowPreferences.firstDayOfWeek
-            dt.with(TemporalAdjusters.previousOrSame(firstDay))
+            dt.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
         }
         isPeriodNegativeOrZero(period.minus(Period.ofMonths(1))) -> {
             dt.withDayOfMonth(1)
@@ -460,13 +466,13 @@ internal fun getXYSeriesFromDataSample(
 internal fun getNextEndOfWindow(
     window: TimeHistogramWindow,
     endDate: OffsetDateTime?,
-    aggregationWindowPreferences: AggregationWindowPreferences? = null
+    firstDayOfWeek: DayOfWeek?
 ): OffsetDateTime {
     val end = endDate ?: OffsetDateTime.now()
     return findBeginningOfTemporal(
         end.plus(window.period),
         window.period,
-        aggregationWindowPreferences
+        firstDayOfWeek
     )
 }
 
@@ -500,7 +506,9 @@ internal fun getHistogramBinsForSample(
     aggPreferences: AggregationWindowPreferences? = null
 ): Map<Int, List<Double>>? {
     if (sample.dataPoints.isEmpty()) return null
-    val endTime = getNextEndOfWindow(window, sample.dataPoints.maxBy { it.timestamp }!!.timestamp, aggPreferences)
+    val endTime = getNextEndOfWindow(window,
+        sample.dataPoints.maxBy { it.timestamp }!!.cutoffTimestampForAggregation(aggPreferences?.startTimeOfDay),
+                                aggPreferences?.firstDayOfWeek)
     val isDiscrete = feature.featureType == FeatureType.DISCRETE
     val keys =
         if (isDiscrete) feature.discreteValues.map { it.index }.toSet()
@@ -508,16 +516,16 @@ internal fun getHistogramBinsForSample(
 
     return when {
         isDiscrete && sumByCount -> getHistogramBinsForSample(
-            sample.dataPoints, window, keys, endTime, ::addOneDiscreteValueToBin
+            sample.dataPoints, window, keys, endTime, aggPreferences?.startTimeOfDay, ::addOneDiscreteValueToBin
         )
         isDiscrete -> getHistogramBinsForSample(
-            sample.dataPoints, window, keys, endTime, ::addDiscreteValueToBin
+            sample.dataPoints, window, keys, endTime, aggPreferences?.startTimeOfDay, ::addDiscreteValueToBin
         )
         sumByCount -> getHistogramBinsForSample(
-            sample.dataPoints, window, keys, endTime, ::addOneToBin
+            sample.dataPoints, window, keys, endTime, aggPreferences?.startTimeOfDay, ::addOneToBin
         )
         else -> getHistogramBinsForSample(
-            sample.dataPoints, window, keys, endTime, ::addValueToBin
+            sample.dataPoints, window, keys, endTime, aggPreferences?.startTimeOfDay, ::addValueToBin
         )
     }
 }
@@ -527,9 +535,10 @@ private fun getHistogramBinsForSample(
     window: TimeHistogramWindow,
     keys: Set<Int>,
     endTime: OffsetDateTime,
+    startTimeOfDay: Duration?,
     addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
 ): Map<Int, List<Double>> {
-    val binTotalMaps = calculateBinTotals(sample, window, keys, endTime, addFunction)
+    val binTotalMaps = calculateBinTotals(sample, window, keys, endTime, startTimeOfDay, addFunction)
     val total = binTotalMaps.map { it.value.sum() }.sum()
     return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { it / total } }.toMap()
 }
@@ -542,6 +551,7 @@ private fun calculateBinTotals(
     window: TimeHistogramWindow,
     keys: Set<Int>,
     endTime: OffsetDateTime,
+    startTimeOfDay: Duration?,
     addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
 ): Map<Int, List<Double>> {
     val binTotalMap = keys.map { it to MutableList(window.numBins) { 0.0 } }.toMap()
@@ -555,8 +565,8 @@ private fun calculateBinTotals(
             .between(currStart, currEnd)
             .seconds
             .toDouble()
-        while (nextPoint.timestamp > currStart) {
-            val distance = Duration.between(currStart, nextPoint.timestamp).seconds.toDouble()
+        while (nextPoint.cutoffTimestampForAggregation(startTimeOfDay) > currStart) {
+            val distance = Duration.between(currStart, nextPoint.cutoffTimestampForAggregation(startTimeOfDay)).seconds.toDouble()
             var binIndex = (window.numBins * (distance / periodDuration)).toInt()
             if (binIndex == window.numBins) binIndex--
             addFunction(nextPoint, binTotalMap, binIndex)

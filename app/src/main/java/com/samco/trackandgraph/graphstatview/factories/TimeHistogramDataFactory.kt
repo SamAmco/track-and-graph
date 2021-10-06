@@ -23,9 +23,9 @@ import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
+import com.samco.trackandgraph.statistics.*
 import com.samco.trackandgraph.statistics.getHistogramBinsForSample
 import com.samco.trackandgraph.statistics.getLargestBin
-import com.samco.trackandgraph.statistics.getNextEndOfWindow
 import com.samco.trackandgraph.statistics.sampleData
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.min

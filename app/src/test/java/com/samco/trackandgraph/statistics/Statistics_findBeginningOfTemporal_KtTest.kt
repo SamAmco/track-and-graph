@@ -23,7 +23,6 @@ import org.threeten.bp.*
 
 class Statistics_findBeginningOfTemporal_KtTest {
     private val aggPreferences = AggregationWindowPreferences(DayOfWeek.MONDAY)
-    private val aggPreferences4AM = AggregationWindowPreferences(DayOfWeek.MONDAY, Duration.ofHours(4))
 
     @Test
     fun testDurationHour() {
@@ -88,7 +87,7 @@ class Statistics_findBeginningOfTemporal_KtTest {
         val temporal = Duration.ofDays(1).plus(Duration.ofNanos(1))
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences)
+        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences.firstDayOfWeek)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -106,7 +105,7 @@ class Statistics_findBeginningOfTemporal_KtTest {
         val temporal = Duration.ofDays(7)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences)
+        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences.firstDayOfWeek)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -286,7 +285,7 @@ class Statistics_findBeginningOfTemporal_KtTest {
         val temporal = Period.ofWeeks(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences)
+        val answer = findBeginningOfTemporal(dateTime, temporal, aggPreferences.firstDayOfWeek)
 
         //THEN
         val expected = OffsetDateTime.of(
