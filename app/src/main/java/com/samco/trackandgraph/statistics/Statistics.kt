@@ -140,18 +140,16 @@ class RawAggregatedDatapoints(private val points: List<AggregatedDataPoint>) {
     )
 
     fun max() = DataSample(
-        this.points.map { it.copy(value = it.parents.maxOfOrNull { par -> par.value } ?: 0.0) }
+        this.points.map { it.copy(value = it.parents.maxOfOrNull { par -> par.value } ?: Double.NaN) }
+            .filter { !it.value.isNaN() }
     )
 
     fun average() = DataSample(
-        this.points.map {
-            it.copy(
-                value = when (it.parents.size) {
-                    0 -> 0.0
-                    else -> it.parents.map { par -> par.value }.average()
-                }
-            )
-        }
+        this.points.map { it.copy(value = it.parents.map { par -> par.value }.average()) }
+            .filter { !it.value.isNaN() }
+        // if the point has no parents, the average call returns NaN. What should the value of an average over
+        // no points be? I think it makes the most sense to just remove these points
+        // Note that raw points from movingAggregation always contain at least one point
     )
 }
 
