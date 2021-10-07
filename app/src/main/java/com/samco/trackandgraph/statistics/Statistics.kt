@@ -134,13 +134,24 @@ internal suspend fun calculateDurationAccumulatedValues(
 }
 
 // Contains list of AggregatedDatapoints which did not have a function called on them yet!
-class RawAggregatedDatapoints(val points: List<AggregatedDataPoint>) {
+class RawAggregatedDatapoints(private val points: List<AggregatedDataPoint>) {
     fun sum() = DataSample(
-        this.points.map { point -> point.copy(value = point.parents.sumByDouble { it.value }) }
+        this.points.map { it.copy(value = it.parents.sumOf { par -> par.value }) }
     )
 
     fun max() = DataSample(
-        this.points.map { point -> point.copy(value = point.parents.maxOf { it.value }) }
+        this.points.map { it.copy(value = it.parents.maxOfOrNull { par -> par.value } ?: 0.0) }
+    )
+
+    fun average() = DataSample(
+        this.points.map {
+            it.copy(
+                value = when (it.parents.size) {
+                    0 -> 0.0
+                    else -> it.parents.map { par -> par.value }.average()
+                }
+            )
+        }
     )
 }
 
@@ -359,14 +370,15 @@ private fun isPeriodNegativeOrZero(period: Period) = period.years < 0
  */
 internal suspend fun calculateMovingAverages(
     dataSample: DataSample,
-    movingAvDuration: Duration
+    movingAvgDuration: Duration
 ): DataSample {
-    val movingAverages = mutableListOf<DataPoint>()
-    var currentAccumulation = 0.0
-    var currentCount = 0
-    var addIndex = 0
-    val dataPoints = dataSample.dataPoints.reversed()
+    return movingAggregation(dataSample, movingAvgDuration).average()
+}
 
+internal suspend fun movingAggregation(
+    dataSample: DataSample,
+    movingAggDuration: Duration
+): RawAggregatedDatapoints {
     /*
     Maybe sometime in the future it is desired to know here whether the input is aggregated using a
     daily+ totals aggregator, with the intent to treat data that is *not* aggregated more lenient
@@ -392,35 +404,30 @@ internal suspend fun calculateMovingAverages(
             }
     }
     */
+    val movingAveragesRaw = mutableListOf<AggregatedDataPoint>()
+    val dataPointsReversed = dataSample.dataPoints.reversed()
 
-    for (index in dataPoints.indices) {
+    for ( (index, current) in dataPointsReversed.mapIndexed { idx, point -> Pair(idx, point) }) {
         yield()
-        val current = dataPoints[index]
-        while (addIndex < dataPoints.size
-            && Duration.between(
-                dataPoints[addIndex].timestamp,
-                current.timestamp
-            ) < movingAvDuration
-        ) {
-            currentAccumulation += dataPoints[addIndex++].value
-            currentCount++
-        }
-        val averageValue = currentAccumulation / currentCount.toDouble()
-        movingAverages.add(
+        val parents = dataPointsReversed.drop(index)
+            .takeWhile { dp ->
+                Duration.between(dp.timestamp, current.timestamp) < movingAggDuration
+            }
+
+        movingAveragesRaw.add(
             0,
-            DataPoint(
+            AggregatedDataPoint(
                 current.timestamp,
                 current.featureId,
-                averageValue,
-                current.label,
-                current.note
+                value = Double.NaN,
+                label = current.label,
+                note = current.note,
+                parents = parents
             )
         )
-        currentAccumulation -= current.value
-        currentCount--
     }
 
-    return DataSample(movingAverages)
+    return RawAggregatedDatapoints(movingAveragesRaw)
 }
 
 /**
