@@ -14,9 +14,8 @@ class TnG2EvalTest {
         val evaluationModel = EvaluationModel()
 
         val code = "var a = 1 + 1"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
 
-        val context = evaluationModel.evaluate(ast)
+        val context = evaluationModel.run(code)
 
         assertEquals(NumberValue(2), context["a"])
 
@@ -28,9 +27,7 @@ class TnG2EvalTest {
         val evaluationModel = EvaluationModel()
 
         val code = "var a = 0 + 5 - 5 + 7 * (2 / 3)"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
-
-        val context = evaluationModel.evaluate(ast)
+        val context = evaluationModel.run(code)
 
         assertEquals(NumberValue(0 + 5 - 5 + 7.0 * (2.0 / 3.0)), context["a"] )
 
@@ -44,9 +41,8 @@ class TnG2EvalTest {
         val evaluationModel = EvaluationModel()
 
         val code = "var a = 2 + 2 * 2"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
 
-        val context = evaluationModel.evaluate(ast)
+        val context = evaluationModel.run(code)
 
         assertEquals(NumberValue(2+2*2.0), context["a"] )
         assertEquals(NumberValue(6.0), context["a"] )
@@ -58,9 +54,8 @@ class TnG2EvalTest {
         val evaluationModel = EvaluationModel()
 
         val code = "var a = 2 * 2 + 2"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
 
-        val context = evaluationModel.evaluate(ast)
+        val context = evaluationModel.run(code)
 
         assertEquals(NumberValue(2*2+2.0), context["a"] )
         assertEquals(NumberValue(6.0), context["a"] )
@@ -72,9 +67,8 @@ class TnG2EvalTest {
         val evaluationModel = EvaluationModel()
 
         val code = "var a = 2 * (2 + 2)"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
 
-        val context = evaluationModel.evaluate(ast)
+        val context = evaluationModel.run(code)
 
         assertEquals(NumberValue(2*(2+2.0)), context["a"] )
         assertEquals(NumberValue(8.0), context["a"] )
@@ -87,9 +81,8 @@ class TnG2EvalTest {
 
         val code = """var a = 1
                      |a = 2""".trimMargin("|")
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
 
-        val context = evaluationModel.evaluate(ast)
+        val context = evaluationModel.run(code)
 
         assertEquals(NumberValue(2), context["a"])
     }

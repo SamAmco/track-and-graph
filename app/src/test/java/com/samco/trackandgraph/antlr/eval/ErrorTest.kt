@@ -13,16 +13,16 @@ class ErrorTest {
         val evaluationModel = EvaluationModel()
 
         val code = "a = 1"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
 
         try {
-            evaluationModel.evaluate(ast)
+            evaluationModel.run(code)
 
             // should never get here bc of the error
             assert(false)
         } catch (e: NotDeclaredError) {
             assertEquals("a", e.varName)
         } catch (e: Exception){
+            println(e)
             // should never get here bc there is no other error
             assert(false)
         }
@@ -34,10 +34,9 @@ class ErrorTest {
 
         val code = """var a = 1
                      |var a =2""".trimMargin("|")
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
 
         try {
-            evaluationModel.evaluate(ast)
+            evaluationModel.run(code)
 
             // should never get here bc of the error
             assert(false)
@@ -45,10 +44,31 @@ class ErrorTest {
             assertEquals("a", e.varName)
             assertEquals(2, e.position.start.line) // locates error on second line
         } catch (e: Exception){
+            println(e)
             // should never get here bc there is no other error
             assert(false)
         }
     }
+
+//    @Test
+//    fun AssignToNumber() {
+//        val evaluationModel = EvaluationModel()
+//
+//        val code = "1 = 1"
+//
+//        try {
+//            evaluationModel.run(code)
+//
+//            // should never get here bc of the error
+//            assert(false)
+//        } catch (e: NotDeclaredError) {
+//            assertEquals("a", e.varName)
+//        } catch (e: Exception){
+//            println(e)
+//            // should never get here bc there is no other error
+//            assert(false)
+//        }
+//    }
 
 //    @Test
 //    fun argTypeTest() {

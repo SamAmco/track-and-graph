@@ -3,6 +3,7 @@ package com.samco.trackandgraph.antlr.evaluation
 
 import com.samco.trackandgraph.antlr.ast.*
 import com.samco.trackandgraph.antlr.generated.TnG2Parser
+import com.samco.trackandgraph.antlr.parsing.DatatransformationFunctionParserFacade
 import com.samco.trackandgraph.database.entity.DataPoint
 import org.antlr.v4.runtime.tree.ParseTree
 import org.threeten.bp.Duration
@@ -17,7 +18,18 @@ fun inferDatatype(data: List<DataPoint>) : DataType {
 
 class EvaluationModel {
 
-    fun evaluate(parsedTree: DatatransformationFunction, inputFeatures: Map<String, List<DataPoint>> = emptyMap<String, List<DataPoint>>()) : Map<String, Value> {
+    fun run(code: String, inputFeatures: Map<String, List<DataPoint>> = emptyMap()) : Map<String, Value> {
+        val parseResult = DatatransformationFunctionParserFacade.parse(code, inputFeatures.keys)
+        when (parseResult.errors.size) {
+            0 -> {}
+            1 -> throw parseResult.errors[0]
+            else -> throw ListOfErrors(parseResult.errors)
+        }
+
+        return this.evaluate(parseResult.root!!, inputFeatures)
+    }
+
+    private fun evaluate(parsedTree: DatatransformationFunction, inputFeatures: Map<String, List<DataPoint>> = emptyMap<String, List<DataPoint>>()) : Map<String, Value> {
         var context : Map<String, Value> = inputFeatures.mapValues { list -> DatapointsValue(list.value, inferDatatype(list.value)) }
         for (statement in parsedTree.statements) {
             context = when (statement) {
@@ -30,9 +42,7 @@ class EvaluationModel {
         }
 
         return context
-
     }
-
 }
 
 abstract class Value {
@@ -84,7 +94,7 @@ private fun emptyPosition() : Position {
 fun throwUnsupportedArgumentTypeError(functionName: String, main: Value, other: Value, allowedTypes: String) : Value {
     throw UnsupportedArgumentTypeError(functionName,
         listOf(main::class.simpleName!!, other::class.simpleName!!),
-        "Numbers", emptyPosition())
+        allowedTypes, emptyPosition())
 
 }
 
@@ -249,7 +259,7 @@ fun Expression.evaluate(context: Map<String, Value>) : Value {
 //                "Number, Variable Reference, Arithmetic", this.position!!
 //            )
         }
-    } catch (e: ThrowableError) {
+    } catch (e: Error) {
         e.position = this.position!!
         throw e
     }
@@ -270,23 +280,29 @@ fun VarDeclaration.evaluate(context: Map<String, Value>) : HashMap<String, Value
 }
 
 class DoubleDeclarationError(val varName: String, position: Position) :
-    ThrowableError("Variable $varName was already declared!", position)
+    Error("Variable '$varName' was already declared!", position)
 
 class NotDeclaredError(val varName: String, position: Position) :
-    ThrowableError("Variable $varName was never declared!", position)
+    Error("Variable '$varName' was never declared!", position)
+
+class UnexistingVariableError(val varName: String, position: Position) :
+    Error("There is no variable named '$varName'!", position)
+
+class ReferencedBeforeDeclarationError(val varName: String, position: Position) :
+    Error("You cannot refer to variable '$varName' before its declaration", position)
 
 //class UnsupportedArgumentTypeError(val argumentName: String, val argumentType: String, val allowedTypes: String, position: Position) :
 //        ThrowableError("Expected argument of type $allowedTypes, got $argumentType [$argumentName]", position)
 
 class UnsupportedArgumentTypeError(val functionName: String, val argumentTypes: List<String>, val allowedTypes: String, position: Position) :
-    ThrowableError("Function $functionName expected argument(s) of type $allowedTypes, got $argumentTypes", position)
+    Error("Function '$functionName' expected argument(s) of type $allowedTypes, got $argumentTypes", position)
 
 class WrongDatatypeError(actual: DataType, expected: List<DataType>) :
-        ThrowableError("The data has to be of type ${expected.map { it.name }}, but was of type ${actual.name}",
+        Error("The data has to be of type ${expected.map { it.name }}, but was of type ${actual.name}",
         position= emptyPosition())
 
 class UnkownFunctionName(functionName: String) :
-        ThrowableError("Unknown function $functionName", emptyPosition())
+        Error("Unknown function '$functionName'", emptyPosition())
 
 
 
@@ -315,10 +331,10 @@ fun callFunction(functionName: String, args: List<Value>) : Value {
 }
 
 class ArgMissingError(message: String) :
-        ThrowableError(message, emptyPosition())
+        Error(message, emptyPosition())
 
 class ArgWrongTypeError(functionName: String, actual: String, expected: String) :
-        ThrowableError("Function $functionName expected an arg of type $expected, but got $actual", emptyPosition())
+        Error("Function $functionName expected an arg of type $expected, but got $actual", emptyPosition())
 
 //fun fromTime(args: List<Value>) : Value {
 //    val data = args.getOrNull(0) ?: throw ArgMissingError("FromTime needs two arguments")

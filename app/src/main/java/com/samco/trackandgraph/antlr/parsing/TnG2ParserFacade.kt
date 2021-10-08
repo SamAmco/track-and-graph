@@ -22,8 +22,6 @@ import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.atn.ATNConfigSet
 import org.antlr.v4.runtime.dfa.DFA
 import java.io.ByteArrayInputStream
-import java.io.File
-import java.io.FileInputStream
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.*
@@ -43,7 +41,7 @@ object DatatransformationFunctionAntlrParserFacade {
 
     fun parse(code: String) : AntlrParsingResult = parse(code.toStream())
 
-    fun parse(file: File) : AntlrParsingResult = parse(FileInputStream(file))
+//    fun parse(file: File) : AntlrParsingResult = parse(FileInputStream(file))
 
     fun parse(inputStream: InputStream) : AntlrParsingResult {
         val lexicalAndSyntaticErrors = LinkedList<Error>()
@@ -72,23 +70,24 @@ object DatatransformationFunctionAntlrParserFacade {
         parser.removeErrorListeners()
         parser.addErrorListener(errorListener)
         val antlrRoot = parser.datatransformationFunction()
-        return AntlrParsingResult(antlrRoot, lexicalAndSyntaticErrors)
+        return AntlrParsingResult(antlrRoot,
+            lexicalAndSyntaticErrors)
     }
 
 }
 
 object DatatransformationFunctionParserFacade {
 
-    fun parse(code: String) : ParsingResult = parse(code.toStream())
+    fun parse(code: String, externalInputNames: Set<String> = emptySet()) : ParsingResult = parse(code.toStream(), externalInputNames)
 
-    fun parse(file: File) : ParsingResult = parse(FileInputStream(file))
+//    fun parse(file: File, externalInputNames: Set<String>) : ParsingResult = parse(FileInputStream(file))
 
-    fun parse(inputStream: InputStream) : ParsingResult {
+    fun parse(inputStream: InputStream, externalInputNames: Set<String> = emptySet()) : ParsingResult {
         val antlrParsingResult = DatatransformationFunctionAntlrParserFacade.parse(inputStream)
-        val lexicalAnsSyntaticErrors = antlrParsingResult.errors
+        val lexicalAnsSyntaticErrors: List<Error> = antlrParsingResult.errors
         val antlrRoot = antlrParsingResult.root
         val astRoot = if (lexicalAnsSyntaticErrors.isEmpty()) {antlrRoot?.toAst(considerPosition = true) } else { null }
-        val semanticErrors: List<Error> = astRoot?.validate() ?: emptyList()
+        val semanticErrors: List<Error> = astRoot?.validate(externalInputNames) ?: emptyList()
 
         return ParsingResult(astRoot, lexicalAnsSyntaticErrors + semanticErrors)
     }

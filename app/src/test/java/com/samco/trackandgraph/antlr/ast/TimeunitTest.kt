@@ -24,9 +24,8 @@ class TimeunitTest {
         val evaluationModel = EvaluationModel()
 
         val code = "var a = DAY * 5"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
 
-        val context = evaluationModel.evaluate(ast)
+        val context = evaluationModel.run(code)
 
         Assert.assertEquals(TimeValue(Duration.ofDays(5)), context["a"])
 

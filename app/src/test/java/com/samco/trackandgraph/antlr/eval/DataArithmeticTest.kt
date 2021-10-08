@@ -17,9 +17,7 @@ class DataArithmeticTest {
         val evaluationModel = EvaluationModel()
 
         val code = "var b = data + 5"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
-
-        val context = evaluationModel.evaluate(ast, mapOf("data" to datapoints))
+        val context = evaluationModel.run(code, mapOf("data" to datapoints))
 
         val processedData = context["b"] as DatapointsValue
         Assert.assertEquals(datapoints.map { dp -> dp.copy(value=dp.value+5)}, processedData.datapoints)

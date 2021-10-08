@@ -17,32 +17,31 @@
 
 package com.samco.trackandgraph.antlr.ast
 
+import com.samco.trackandgraph.antlr.evaluation.DoubleDeclarationError
+import com.samco.trackandgraph.antlr.evaluation.NotDeclaredError
+import com.samco.trackandgraph.antlr.evaluation.ReferencedBeforeDeclarationError
+import com.samco.trackandgraph.antlr.evaluation.UnexistingVariableError
 import java.util.*
 
-interface ErrorInterface{
-    fun getPos() : Position
-    fun getMes(): String
+
+open class Error(message: String, var position: Position) : Exception(message) {
+    fun getPos(): Position = position
+    fun getMes(): String = super.message.toString()
+
+    fun fullMessage() : String = "${this.javaClass.simpleName} at ${this.getPos().start}: ${this.getMes()}"
 }
 
-data class Error(val message: String, val position: Position) : ErrorInterface {
-    override fun getPos(): Position = position
-    override fun getMes(): String = message
-}
+data class ListOfErrors(val errors: List<Error>)
+    : Exception(errors.joinToString(separator = "\n") { it.fullMessage() } )
 
-open class ThrowableError(message: String, var position: Position) : ErrorInterface, Exception(message) {
-    override fun getPos(): Position = position
-    override fun getMes(): String = super.message.toString()
-}
-
-fun DatatransformationFunction.validate() : List<Error> {
+fun DatatransformationFunction.validate(externalInputNames: Set<String> = emptySet()) : List<Error> {
     val errors = LinkedList<Error>()
 
     // check a variable is not duplicated
     val varsByName = HashMap<String, VarDeclaration>()
     this.specificProcess(VarDeclaration::class.java) {
         if (varsByName.containsKey(it.varName)) {
-            errors.add(Error("A variable named '${it.varName}' has been already declared at ${varsByName[it.varName]!!.position!!.start}",
-                    it.position!!))
+            errors.add(DoubleDeclarationError(it.varName, it.position!!))
         } else {
             varsByName[it.varName] = it
         }
@@ -50,17 +49,20 @@ fun DatatransformationFunction.validate() : List<Error> {
 
     // check a variable is not referred before being declared
     this.specificProcess(VarReference::class.java) {
-        if (!varsByName.containsKey(it.varName)) {
-            errors.add(Error("There is no variable named '${it.varName}'", it.position!!))
-        } else if (it.isBefore(varsByName[it.varName]!!)) {
-            errors.add(Error("You cannot refer to variable '${it.varName}' before its declaration", it.position!!))
+        if (it.varName !in externalInputNames) {
+            if (!varsByName.containsKey(it.varName) && !externalInputNames.contains(it.varName)) {
+                errors.add(UnexistingVariableError(it.varName, it.position!!))
+            } else if (it.isBefore(varsByName[it.varName]!!)) {
+                errors.add(ReferencedBeforeDeclarationError(it.varName, it.position!!))
+            }
         }
+
     }
     this.specificProcess(Assignment::class.java) {
         if (!varsByName.containsKey(it.varName)) {
-            errors.add(Error("There is no variable named '${it.varName}'", it.position!!))
+            errors.add(NotDeclaredError(it.varName, it.position!!))
         } else if (it.isBefore(varsByName[it.varName]!!)) {
-            errors.add(Error("You cannot refer to variable '${it.varName}' before its declaration", it.position!!))
+            errors.add(ReferencedBeforeDeclarationError(it.varName, it.position!!))
         }
     }
 

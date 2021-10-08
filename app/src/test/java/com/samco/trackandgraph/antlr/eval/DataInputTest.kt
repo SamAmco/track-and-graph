@@ -19,9 +19,7 @@ class DataInputTest {
         val evaluationModel = EvaluationModel()
 
         val code = "var a = 1"
-        val ast = DatatransformationFunctionAntlrParserFacade.parse(code).root!!.toAst()
-
-        val context = evaluationModel.evaluate(ast, mapOf("data" to datapoints))
+        val context = evaluationModel.run(code, mapOf("data" to datapoints))
 
         assertEquals(NumberValue(1), context["a"])
         assertEquals(DatapointsValue(datapoints, DataType.NUMERICAL), context["data"])
