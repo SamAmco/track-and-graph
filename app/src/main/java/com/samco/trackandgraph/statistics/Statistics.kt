@@ -139,17 +139,20 @@ class RawAggregatedDatapoints(private val points: List<AggregatedDataPoint>) {
         this.points.map { it.copy(value = it.parents.sumOf { par -> par.value }) }
     )
 
+
+    // When using duration based aggregated values, some points can have no parents.
+    // The most intuitive solution is probably to just remove these aggregated points
+    // There might be cases where it can make sense to define a fallback value, e.g. 0
     fun max() = DataSample(
-        this.points.map { it.copy(value = it.parents.maxOfOrNull { par -> par.value } ?: Double.NaN) }
-            .filter { !it.value.isNaN() }
+        this.points
+            .filter { it.parents.isNotEmpty() }
+            .map { it.copy(value = it.parents.maxOf { par -> par.value }) }
     )
 
     fun average() = DataSample(
-        this.points.map { it.copy(value = it.parents.map { par -> par.value }.average()) }
-            .filter { !it.value.isNaN() }
-        // if the point has no parents, the average call returns NaN. What should the value of an average over
-        // no points be? I think it makes the most sense to just remove these points
-        // Note that raw points from movingAggregation always contain at least one point
+        this.points
+            .filter { it.parents.isNotEmpty() }
+            .map { it.copy(value = it.parents.map { par -> par.value }.average()) }
     )
 }
 
@@ -402,7 +405,7 @@ internal suspend fun movingAggregation(
             }
     }
     */
-    val movingAveragesRaw = mutableListOf<AggregatedDataPoint>()
+    val movingAggregationPointsRaw = mutableListOf<AggregatedDataPoint>()
     val dataPointsReversed = dataSample.dataPoints.reversed()
 
     for ( (index, current) in dataPointsReversed.mapIndexed { idx, point -> Pair(idx, point) }) {
@@ -412,7 +415,7 @@ internal suspend fun movingAggregation(
                 Duration.between(dp.timestamp, current.timestamp) < movingAggDuration
             }
 
-        movingAveragesRaw.add(
+        movingAggregationPointsRaw.add(
             0,
             AggregatedDataPoint(
                 current.timestamp,
@@ -425,7 +428,7 @@ internal suspend fun movingAggregation(
         )
     }
 
-    return RawAggregatedDatapoints(movingAveragesRaw)
+    return RawAggregatedDatapoints(movingAggregationPointsRaw)
 }
 
 /**
