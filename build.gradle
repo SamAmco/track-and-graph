@@ -22,6 +22,14 @@ buildscript {
     }
 }
 
+sourceSets {
+    main {
+        antlr {
+            srcDirs = [ "app/src/main/antlr" ]
+        }
+    }
+}
+
 dependencies {
     antlr "org.antlr:antlr4:4.9.1"
     implementation "org.antlr:antlr4-runtime:4.9.1"
@@ -33,6 +41,16 @@ allprojects {
         google()
         jcenter()
 
+    }
+}
+
+generateGrammarSource {
+    outputDirectory = file("app/src/main/java/com/samco/trackandgraph/antlr/generated")
+}
+
+gradle.projectsEvaluated {
+    subprojects{
+        preBuild.dependsOn generateGrammarSource
     }
 }
 

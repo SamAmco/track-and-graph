@@ -15,8 +15,12 @@
 //  Modified
 
 grammar TnG2;
+@header {
+package com.samco.trackandgraph.antlr.generated;
+}
 
-options { tokenVocab=TnG2; }
+
+//options { tokenVocab=TnG2; }
 
 datatransformationFunction : lines=line+ ;
 
