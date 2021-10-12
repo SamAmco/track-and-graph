@@ -28,6 +28,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayNote
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.DataPointInterface
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.GlobalNote
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
@@ -105,7 +106,7 @@ fun getNoteDialogHeader(
 }
 
 fun showDataPointDescriptionDialog(
-    context: Context, inflater: LayoutInflater, dataPoint: DataPoint,
+    context: Context, inflater: LayoutInflater, dataPoint: DataPointInterface,
     featureType: FeatureType, featureDispalayName: String? = null
 ) {
     showDataPointDescriptionDialog(

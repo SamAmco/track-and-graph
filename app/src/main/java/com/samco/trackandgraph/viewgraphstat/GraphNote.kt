@@ -20,15 +20,16 @@ package com.samco.trackandgraph.viewgraphstat
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.GlobalNote
 import com.samco.trackandgraph.database.dto.NoteType
+import com.samco.trackandgraph.database.entity.DataPointInterface
 import org.threeten.bp.OffsetDateTime
 
 class GraphNote {
     val noteType: NoteType
-    val dataPoint: DataPoint?
+    val dataPoint: DataPointInterface?
     val globalNote: GlobalNote?
     val timestamp: OffsetDateTime
 
-    constructor(dataPoint: DataPoint) {
+    constructor(dataPoint: DataPointInterface) {
         this.noteType = NoteType.DATA_POINT
         this.dataPoint = dataPoint
         this.globalNote = null

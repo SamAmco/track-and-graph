@@ -65,7 +65,7 @@ data class DataPoint (
     override val note: String
 )  : DataPointInterface {
     companion object {
-        fun getDisplayValue(dataPoint: DataPoint, featureType: FeatureType): String {
+        fun getDisplayValue(dataPoint: DataPointInterface, featureType: FeatureType): String {
             return when (featureType) {
                 FeatureType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
                 FeatureType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
