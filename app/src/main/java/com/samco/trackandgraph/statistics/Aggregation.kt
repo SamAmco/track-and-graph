@@ -42,22 +42,24 @@ class RawAggregatedDatapoints(private val points: List<AggregatedDataPoint>) {
     )
 }
 
+object GlobalAggregationPreferences {
+    var firstDayOfWeek: DayOfWeek = getFirstDayFromSettings()
+    var startTimeOfDay: Duration  = getStartTimeOfDayFromSettings()
 
-internal fun getFirstDayOfWeekFromLocale(): DayOfWeek =
-    WeekFields.of(Locale.getDefault()).firstDayOfWeek
+    fun restoreDefaults() {
+        firstDayOfWeek = getFirstDayFromSettings()
+        startTimeOfDay = getStartTimeOfDayFromSettings()
 
-internal data class AggregationWindowPreferences(
-    val firstDayOfWeek: DayOfWeek,  // Weekly windows will start with that day
-    val startTimeOfDay: Duration    // Datapoints before this time will be aggregated as if they belong to the previous day
-) {
-    constructor() : this(getFirstDayOfWeekFromLocale(), Duration.ofSeconds(0))
-    constructor(firstDayOfWeek: DayOfWeek) : this(firstDayOfWeek, Duration.ofSeconds(0))
-    constructor(startTimeOfDay: Duration) : this(getFirstDayOfWeekFromLocale(), startTimeOfDay)
+    }
+
+    // we are not using settings here, so just use the values we have been using all along
+    private fun getFirstDayFromSettings() = WeekFields.of(Locale.getDefault()).firstDayOfWeek
+    private fun getStartTimeOfDayFromSettings() = Duration.ofSeconds(0)
+
 }
 
-internal fun DataPointInterface.cutoffTimestampForAggregation(startTimeOfDayOrNull: Duration?): OffsetDateTime {
-    val startTimeOfDay = startTimeOfDayOrNull ?: Duration.ZERO
-    return timestamp - startTimeOfDay
+internal fun DataPointInterface.cutoffTimestampForAggregation(): OffsetDateTime {
+    return timestamp - GlobalAggregationPreferences.startTimeOfDay
 }
 
 
@@ -85,7 +87,6 @@ internal suspend fun calculateDurationAccumulatedValues(
     sampleDuration: Duration?,
     endTime: OffsetDateTime?,
     plotTotalTime: TemporalAmount,
-    aggPreferences: AggregationWindowPreferences? = null
 ): DataSample {
     return fixedBinAggregation(
         sampleData,
@@ -93,7 +94,6 @@ internal suspend fun calculateDurationAccumulatedValues(
         sampleDuration,
         endTime,
         plotTotalTime,
-        aggPreferences
     ).sum()
 }
 
@@ -121,27 +121,21 @@ private suspend fun fixedBinAggregation(
     sampleDuration: Duration?,
     endTime: OffsetDateTime?,
     binSize: TemporalAmount,
-    aggPreferencesOrNull: AggregationWindowPreferences? = null,
 ): RawAggregatedDatapoints {
-    val aggPref = aggPreferencesOrNull ?: AggregationWindowPreferences()
-
     val newData = mutableListOf<AggregatedDataPoint>()
 
-    val firstDataPointTime =
-        sampleData.dataPoints.firstOrNull()?.cutoffTimestampForAggregation(aggPref.startTimeOfDay)
-    val lastDataPointTime =
-        sampleData.dataPoints.lastOrNull()?.cutoffTimestampForAggregation(aggPref.startTimeOfDay)
+    val firstDataPointTime = sampleData.dataPoints.firstOrNull()?.cutoffTimestampForAggregation()
+    val lastDataPointTime = sampleData.dataPoints.lastOrNull()?.cutoffTimestampForAggregation()
 
     val latest = getEndTimeNowOrLatest(lastDataPointTime, endTime)
     val earliest = getStartTimeOrFirst(firstDataPointTime, latest, endTime, sampleDuration)
-    var currentTimeStamp =
-        findBeginningOfTemporal(earliest, binSize, aggPref.firstDayOfWeek).minusNanos(1)
+    var currentTimeStamp = findBeginningOfTemporal(earliest, binSize).minusNanos(1)
     var index = 0
     while (currentTimeStamp.isBefore(latest)) {
         currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(binSize) }
         val points = sampleData.dataPoints.drop(index)
             .takeWhile { dp ->
-                dp.cutoffTimestampForAggregation(aggPref.startTimeOfDay)
+                dp.cutoffTimestampForAggregation()
                     .isBefore(currentTimeStamp)
             }
         index += points.size
@@ -268,13 +262,10 @@ private fun getEndTimeNowOrLatest(
 internal fun findBeginningOfTemporal(
     dateTime: OffsetDateTime,
     temporalAmount: TemporalAmount,
-    firstDayOfWeekOrNull: DayOfWeek? = null
 ): OffsetDateTime {
-    // if no firstDayOfWeek is given, use the default one from default constructor
-    val firstDayOfWeek = firstDayOfWeekOrNull ?: AggregationWindowPreferences().firstDayOfWeek
     return when (temporalAmount) {
-        is Duration -> findBeginningOfDuration(dateTime, temporalAmount, firstDayOfWeek)
-        is Period -> findBeginningOfPeriod(dateTime, temporalAmount, firstDayOfWeek)
+        is Duration -> findBeginningOfDuration(dateTime, temporalAmount)
+        is Period -> findBeginningOfPeriod(dateTime, temporalAmount)
         else -> dateTime
     }
 }
@@ -282,7 +273,6 @@ internal fun findBeginningOfTemporal(
 private fun findBeginningOfDuration(
     dateTime: OffsetDateTime,
     duration: Duration,
-    firstDayOfWeek: DayOfWeek
 ): OffsetDateTime {
     val dtHour = dateTime
         .withMinute(0)
@@ -298,7 +288,7 @@ private fun findBeginningOfDuration(
         duration <= Duration.ofDays(7) -> {
             dt.with(
                 TemporalAdjusters.previousOrSame(
-                    firstDayOfWeek
+                    GlobalAggregationPreferences.firstDayOfWeek
                 )
             )
         }
@@ -329,7 +319,6 @@ internal fun getBiYearForMonthValue(monthValue: Int) = if (monthValue < 7) 1 els
 private fun findBeginningOfPeriod(
     dateTime: OffsetDateTime,
     period: Period,
-    firstDayOfWeek: DayOfWeek
 ): OffsetDateTime {
     val dt = dateTime.withHour(0)
         .withMinute(0)
@@ -339,7 +328,7 @@ private fun findBeginningOfPeriod(
     return when {
         isPeriodNegativeOrZero(period.minus(Period.ofDays(1))) -> dt
         isPeriodNegativeOrZero(period.minus(Period.ofWeeks(1))) -> {
-            dt.with(TemporalAdjusters.previousOrSame(firstDayOfWeek))
+            dt.with(TemporalAdjusters.previousOrSame(GlobalAggregationPreferences.firstDayOfWeek))
         }
         isPeriodNegativeOrZero(period.minus(Period.ofMonths(1))) -> {
             dt.withDayOfMonth(1)

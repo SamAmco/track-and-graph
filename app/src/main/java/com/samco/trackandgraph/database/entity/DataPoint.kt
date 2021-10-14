@@ -20,7 +20,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.database.doubleFormatter
-import com.samco.trackandgraph.statistics.AggregationWindowPreferences
 import com.samco.trackandgraph.ui.formatTimeDuration
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime

@@ -27,8 +27,10 @@ import org.threeten.bp.ZoneOffset
 import kotlin.random.Random
 
 class Statistics_getHistogramBinsForSample_KtTest {
-    private val aggPreferences = AggregationWindowPreferences(DayOfWeek.MONDAY)
-    private val aggPreferences4AM = AggregationWindowPreferences(DayOfWeek.MONDAY, Duration.ofHours(4))
+    init {
+        GlobalAggregationPreferences.firstDayOfWeek = DayOfWeek.MONDAY
+    }
+
 
     @Test
     fun test_getHistogramBinsForSample_sumByVal_week_cont() {
@@ -43,7 +45,7 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val sumByCount = false
 
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount, aggPreferences)
+        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -194,8 +196,10 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val feature = makeFeature(FeatureType.CONTINUOUS)
         val sumByCount = false
 
+        GlobalAggregationPreferences.startTimeOfDay = Duration.ofHours(4)
+
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount, aggPreferences4AM)
+        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -207,6 +211,10 @@ class Statistics_getHistogramBinsForSample_KtTest {
             listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total),
             vals
         )
+
+        // CLEAN UP
+        GlobalAggregationPreferences.startTimeOfDay = Duration.ZERO
+
     }
 
     private fun makeFeature(

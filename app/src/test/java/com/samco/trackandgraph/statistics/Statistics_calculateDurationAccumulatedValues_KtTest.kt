@@ -28,8 +28,9 @@ import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 
 class Statistics_calculateDurationAccumulatedValues_KtTest {
-    private val aggPreferences = AggregationWindowPreferences(DayOfWeek.MONDAY)
-    private val aggPreferences4AM = AggregationWindowPreferences(DayOfWeek.MONDAY, Duration.ofHours(4))
+    init {
+        GlobalAggregationPreferences.firstDayOfWeek = DayOfWeek.MONDAY
+    }
 
     @Test
     fun calculateDurationAccumulatedValues_hourly_plot_totals() {
@@ -288,7 +289,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                     null,
                     endTime,
                     plotTotalTime,
-                    aggPreferences
+//                    aggPreferences
                 )
 
             //THEN
@@ -515,6 +516,8 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                     dataPoints
                 )
 
+            GlobalAggregationPreferences.startTimeOfDay = Duration.ofHours(4)
+
             //WHEN
             val answer =
                 calculateDurationAccumulatedValues(
@@ -523,13 +526,15 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                     null,
                     null,
                     plotTotalTime,
-                    aggPreferences4AM
                 )
 
             //THEN
             assertEquals(2, answer.dataPoints.size)
             val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
             assertEquals(plotTotals, answerTotals)
+
+            // CLEAN UP
+            GlobalAggregationPreferences.startTimeOfDay = Duration.ZERO
         }
     }
 
