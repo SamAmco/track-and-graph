@@ -160,13 +160,11 @@ internal fun getXYSeriesFromDataSample(
 internal fun getNextEndOfWindow(
     window: TimeHistogramWindow,
     endDate: OffsetDateTime?,
-    firstDayOfWeek: DayOfWeek?
 ): OffsetDateTime {
     val end = endDate ?: OffsetDateTime.now()
     return findBeginningOfTemporal(
         end.plus(window.period),
         window.period,
-        firstDayOfWeek
     )
 }
 
@@ -197,14 +195,13 @@ internal fun getHistogramBinsForSample(
     window: TimeHistogramWindow,
     feature: Feature,
     sumByCount: Boolean,
-    aggPreferences: AggregationWindowPreferences? = null
 ): Map<Int, List<Double>>? {
     if (sample.dataPoints.isEmpty()) return null
     val endTime = getNextEndOfWindow(
         window,
         sample.dataPoints.maxBy { it.timestamp }!!
-            .cutoffTimestampForAggregation(aggPreferences?.startTimeOfDay),
-        aggPreferences?.firstDayOfWeek
+            .cutoffTimestampForAggregation(),
+
     )
     val isDiscrete = feature.featureType == FeatureType.DISCRETE
     val keys =
@@ -213,19 +210,19 @@ internal fun getHistogramBinsForSample(
 
     return when {
         isDiscrete && sumByCount ->
-            getHistogramBinsForSample(sample.dataPoints, window, keys, endTime, aggPreferences?.startTimeOfDay,
+            getHistogramBinsForSample(sample.dataPoints, window, keys, endTime,
             ::addOneDiscreteValueToBin
         )
         isDiscrete ->
-            getHistogramBinsForSample(sample.dataPoints, window, keys, endTime, aggPreferences?.startTimeOfDay,
+            getHistogramBinsForSample(sample.dataPoints, window, keys, endTime,
             ::addDiscreteValueToBin
         )
         sumByCount ->
-            getHistogramBinsForSample(sample.dataPoints, window, keys, endTime, aggPreferences?.startTimeOfDay,
+            getHistogramBinsForSample(sample.dataPoints, window, keys, endTime,
             ::addOneToBin
         )
         else ->
-            getHistogramBinsForSample(sample.dataPoints, window, keys, endTime, aggPreferences?.startTimeOfDay,
+            getHistogramBinsForSample(sample.dataPoints, window, keys, endTime,
             ::addValueToBin
         )
     }
@@ -236,11 +233,10 @@ private fun getHistogramBinsForSample(
     window: TimeHistogramWindow,
     keys: Set<Int>,
     endTime: OffsetDateTime,
-    startTimeOfDay: Duration?,
     addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
 ): Map<Int, List<Double>> {
     val binTotalMaps =
-        calculateBinTotals(sample, window, keys, endTime, startTimeOfDay, addFunction)
+        calculateBinTotals(sample, window, keys, endTime, addFunction)
     val total = binTotalMaps.map { it.value.sum() }.sum()
     return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { it / total } }.toMap()
 }
@@ -253,7 +249,6 @@ private fun calculateBinTotals(
     window: TimeHistogramWindow,
     keys: Set<Int>,
     endTime: OffsetDateTime,
-    startTimeOfDay: Duration?,
     addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
 ): Map<Int, List<Double>> {
     val binTotalMap = keys.map { it to MutableList(window.numBins) { 0.0 } }.toMap()
@@ -267,10 +262,10 @@ private fun calculateBinTotals(
             .between(currStart, currEnd)
             .seconds
             .toDouble()
-        while (nextPoint.cutoffTimestampForAggregation(startTimeOfDay) > currStart) {
+        while (nextPoint.cutoffTimestampForAggregation() > currStart) {
             val distance = Duration.between(
                 currStart,
-                nextPoint.cutoffTimestampForAggregation(startTimeOfDay)
+                nextPoint.cutoffTimestampForAggregation()
             ).seconds.toDouble()
             var binIndex = (window.numBins * (distance / periodDuration)).toInt()
             if (binIndex == window.numBins) binIndex--
