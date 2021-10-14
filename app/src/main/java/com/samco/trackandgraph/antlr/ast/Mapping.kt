@@ -51,7 +51,7 @@ fun ExpressionContext.toAst(considerPosition: Boolean = false) : Expression = wh
     is ParenExpressionContext -> expression().toAst(considerPosition)
     is VarReferenceContext -> VarReference(text, toPosition(considerPosition))
 //    is TypeConversionContext -> TypeConversion(expression().toAst(considerPosition), targetType.toAst(considerPosition), toPosition(considerPosition))
-    is FunctionCallContext -> FunctionCall(this.functionName.text, this.args.toAst())
+    is FunctionCallContext -> FunctionCall(this.function_call().functionName.text, this.function_call().args.toAst())
 
     else -> throw UnsupportedOperationException(this.javaClass.canonicalName)
 }

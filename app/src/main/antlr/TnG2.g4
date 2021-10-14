@@ -31,11 +31,15 @@ statement : varDeclaration # varDeclarationStatement
           | print          # printStatement ;
 
 
-//functionCall : FUNCTION_NAME LPAREN argumentList RPAREN;
+function_call : functionName=FUNCTION_NAME LPAREN args=argumentList RPAREN;
 
 argumentList :
 
         | expression ( COMMA expression )* ;
+
+
+casscading_function_calls : targetName=ID calls=casscading_function_calls_calls;
+casscading_function_calls_calls : ( (NEWLINE|) DOT function_call )+;
 
 print : PRINT LPAREN expression RPAREN ;
 
@@ -54,7 +58,9 @@ expression : left=expression operator=(DIVISION|ASTERISK) right=expression # bin
            | time_period                                                   # timePeriod
            | aggregation_function                                          # aggregationFunction
            | STRING                                                        # stringLiteral
-           | functionName=FUNCTION_NAME LPAREN args=argumentList RPAREN    # functionCall
+//           | functionName=FUNCTION_NAME LPAREN args=argumentList RPAREN    # functionCall
+           | function_call                                                 # functionCall
+           | casscading_function_calls                                     # casscadingFunctionCalls
            | LPAREN expression RPAREN                                      # parenExpression ;
 
 
@@ -130,3 +136,4 @@ ID                 : [_]*[a-z][A-Za-z0-9_]* ;
 STRING             : '"' .*? '"' ;
 
 COMMA              : ',' ;
+DOT                : '.' ;
