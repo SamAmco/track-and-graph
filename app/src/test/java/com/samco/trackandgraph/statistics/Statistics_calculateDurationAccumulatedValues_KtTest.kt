@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.statistics
 
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DataPointInterface
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
