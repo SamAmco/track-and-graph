@@ -26,10 +26,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.dto.NoteType
-import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
-import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
 
 class NotesAdapter(

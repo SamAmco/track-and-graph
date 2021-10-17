@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.viewgraphstat
 
-import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.GlobalNote
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.database.entity.DataPointInterface
