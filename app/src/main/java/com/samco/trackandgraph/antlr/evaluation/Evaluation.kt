@@ -63,7 +63,7 @@ fun Expression.evaluate(context: Map<String, Value>) : Value {
 //                "Number, Variable Reference, Arithmetic", this.position!!
 //            )
         }
-    } catch (e: Error) {
+    } catch (e: DatatransformationFunctionError) {
         e.position = this.position!!
         throw e
     }

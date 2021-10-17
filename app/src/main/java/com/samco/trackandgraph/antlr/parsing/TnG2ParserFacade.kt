@@ -27,11 +27,11 @@ import java.nio.charset.Charset
 import java.util.*
 import com.samco.trackandgraph.antlr.generated.*
 
-data class AntlrParsingResult(val root : TnG2Parser.DatatransformationFunctionContext?, val errors: List<Error>) {
+data class AntlrParsingResult(val root : TnG2Parser.DatatransformationFunctionContext?, val errors: List<DatatransformationFunctionError>) {
     fun isCorrect() = errors.isEmpty() && root != null
 }
 
-data class ParsingResult(val root : DatatransformationFunction?, val errors: List<Error>) {
+data class ParsingResult(val root : DatatransformationFunction?, val errors: List<DatatransformationFunctionError>) {
     fun isCorrect() = errors.isEmpty() && root != null
 }
 
@@ -44,7 +44,7 @@ object DatatransformationFunctionAntlrParserFacade {
 //    fun parse(file: File) : AntlrParsingResult = parse(FileInputStream(file))
 
     fun parse(inputStream: InputStream) : AntlrParsingResult {
-        val lexicalAndSyntaticErrors = LinkedList<Error>()
+        val lexicalAndSyntaticErrors = LinkedList<DatatransformationFunctionError>()
         val errorListener = object : ANTLRErrorListener {
             override fun reportAmbiguity(p0: Parser?, p1: DFA?, p2: Int, p3: Int, p4: Boolean, p5: BitSet?, p6: ATNConfigSet?) {
                 // Ignored for now
@@ -55,7 +55,7 @@ object DatatransformationFunctionAntlrParserFacade {
             }
 
             override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int, charPositionInline: Int, msg: String, ex: RecognitionException?) {
-                lexicalAndSyntaticErrors.add(Error(msg, Position(Point(line, charPositionInline), Point(line, charPositionInline+1))))
+                lexicalAndSyntaticErrors.add(DatatransformationFunctionError(msg, Position(Point(line, charPositionInline), Point(line, charPositionInline+1))))
             }
 
             override fun reportContextSensitivity(p0: Parser?, p1: DFA?, p2: Int, p3: Int, p4: Int, p5: ATNConfigSet?) {
@@ -84,10 +84,10 @@ object DatatransformationFunctionParserFacade {
 
     fun parse(inputStream: InputStream, externalInputNames: Set<String> = emptySet()) : ParsingResult {
         val antlrParsingResult = DatatransformationFunctionAntlrParserFacade.parse(inputStream)
-        val lexicalAnsSyntaticErrors: List<Error> = antlrParsingResult.errors
+        val lexicalAnsSyntaticErrors: List<DatatransformationFunctionError> = antlrParsingResult.errors
         val antlrRoot = antlrParsingResult.root
         val astRoot = if (lexicalAnsSyntaticErrors.isEmpty()) {antlrRoot?.toAst(considerPosition = true) } else { null }
-        val semanticErrors: List<Error> = astRoot?.validate(externalInputNames) ?: emptyList()
+        val semanticErrors: List<DatatransformationFunctionError> = astRoot?.validate(externalInputNames) ?: emptyList()
 
         return ParsingResult(astRoot, lexicalAnsSyntaticErrors + semanticErrors)
     }

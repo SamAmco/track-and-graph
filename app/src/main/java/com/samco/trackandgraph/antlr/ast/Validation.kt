@@ -24,18 +24,18 @@ import com.samco.trackandgraph.antlr.evaluation.UnexistingVariableError
 import java.util.*
 
 
-open class Error(message: String, var position: Position) : Exception(message) {
+open class DatatransformationFunctionError(message: String, var position: Position) : Exception(message) {
     fun getPos(): Position = position
     fun getMes(): String = super.message.toString()
 
     fun fullMessage() : String = "${this.javaClass.simpleName} at ${this.getPos().start}: ${this.getMes()}"
 }
 
-data class ListOfErrors(val errors: List<Error>)
+data class ListOfErrors(val errors: List<DatatransformationFunctionError>)
     : Exception(errors.joinToString(separator = "\n") { it.fullMessage() } )
 
-fun DatatransformationFunction.validate(externalInputNames: Set<String> = emptySet()) : List<Error> {
-    val errors = LinkedList<Error>()
+fun DatatransformationFunction.validate(externalInputNames: Set<String> = emptySet()) : List<DatatransformationFunctionError> {
+    val errors = LinkedList<DatatransformationFunctionError>()
 
     // check a variable is not duplicated
     val varsByName = HashMap<String, VarDeclaration>()
