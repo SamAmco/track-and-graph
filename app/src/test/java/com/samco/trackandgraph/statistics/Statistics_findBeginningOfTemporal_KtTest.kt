@@ -19,12 +19,14 @@ package com.samco.trackandgraph.statistics
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
-import org.threeten.bp.ZoneOffset
+import org.threeten.bp.*
 
 class Statistics_findBeginningOfTemporal_KtTest {
+    init {
+        GlobalAggregationPreferences.firstDayOfWeek = DayOfWeek.MONDAY
+    }
+
+
     @Test
     fun testDurationHour() {
         //GIVEN

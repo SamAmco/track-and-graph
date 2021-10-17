@@ -22,13 +22,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
-import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinuteWeekDayTwoLines
-import org.threeten.bp.DayOfWeek
 
 class DataPointAdapter(
     private val clickListener: DataPointClickListener,

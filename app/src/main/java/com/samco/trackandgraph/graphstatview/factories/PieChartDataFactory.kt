@@ -20,7 +20,7 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.androidplot.pie.Segment
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.DataPointInterface
 import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.entity.PieChart
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
@@ -35,7 +35,7 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): IPieChartViewData {
         val pieChart = dataSource.getPieChartByGraphStatId(graphOrStat.id)
             ?: return object : IPieChartViewData {
@@ -53,7 +53,7 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: PieChart,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): IPieChartViewData {
         val plottingData = tryGetPlottableDataForPieChart(dataSource, config)
             ?: return object : IPieChartViewData {
