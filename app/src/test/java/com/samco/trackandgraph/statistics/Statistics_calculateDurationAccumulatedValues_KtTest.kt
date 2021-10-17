@@ -22,12 +22,14 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
+import org.threeten.bp.*
+import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 
 class Statistics_calculateDurationAccumulatedValues_KtTest {
+    init {
+        GlobalAggregationPreferences.firstDayOfWeek = DayOfWeek.MONDAY
+    }
 
     @Test
     fun calculateDurationAccumulatedValues_hourly_plot_totals() {
@@ -285,7 +287,8 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                     0L,
                     null,
                     endTime,
-                    plotTotalTime
+                    plotTotalTime,
+//                    aggPreferences
                 )
 
             //THEN
@@ -493,6 +496,47 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
         }
     }
 
+    @Test
+    fun calculateDurationAccumulatedValues_weekly_plot_totals_StartTime() {
+        runBlocking {
+            //GIVEN
+            val endTime = OffsetDateTime.now()
+            val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
+            val plotTotals = listOf(1, 3)
+            val dataPoints = generateDataPoints2(listOf(
+                Triple(DayOfWeek.MONDAY,  3*60 + 30, 1.0), // before 4AM cutoff -> own bin
+                Triple(DayOfWeek.MONDAY, 13*60 + 30, 1.0), // after  4AM cutoff -> new bin
+                Triple(DayOfWeek.SUNDAY, 13*60 + 30, 1.0), // filler to fill week
+                // this is now next monday
+                Triple(DayOfWeek.MONDAY,  3*60 + 30, 1.0), // before 4AM cutoff on monday, should be same bin
+            ))
+            val rawData =
+                DataSample(
+                    dataPoints
+                )
+
+            GlobalAggregationPreferences.startTimeOfDay = Duration.ofHours(4)
+
+            //WHEN
+            val answer =
+                calculateDurationAccumulatedValues(
+                    rawData,
+                    0L,
+                    null,
+                    null,
+                    plotTotalTime,
+                )
+
+            //THEN
+            assertEquals(2, answer.dataPoints.size)
+            val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
+            assertEquals(plotTotals, answerTotals)
+
+            // CLEAN UP
+            GlobalAggregationPreferences.startTimeOfDay = Duration.ZERO
+        }
+    }
+
 
     private fun generateDataPoints(
         endTime: OffsetDateTime,
@@ -519,4 +563,23 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
         }
         return dataPoints
     }
+
+    private fun generateDataPoints2(
+        points: List<Triple<DayOfWeek, Int, Double>>) : List<DataPoint> {
+        var currentDay = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
+
+        val output = mutableListOf<DataPoint>()
+
+        for (pointData in points) {
+            val (dayOfWeek, timeInMinutes, value) = pointData
+
+            currentDay = currentDay.with(TemporalAdjusters.nextOrSame(dayOfWeek))
+            val timestamp = currentDay + Duration.ofMinutes(timeInMinutes.toLong())
+
+            output.add(DataPoint(timestamp, 0L, value, "", ""))
+        }
+
+        return output
+    }
+
 }

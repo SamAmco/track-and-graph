@@ -42,10 +42,10 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: LineGraphWithFeatures,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): ILineGraphViewData {
         val endTime = config.endDate ?: OffsetDateTime.now()
-        val allReferencedDataPoints = mutableListOf<DataPoint>()
+        val allReferencedDataPoints = mutableListOf<DataPointInterface>()
         val plottableData = generatePlottingData(
             dataSource,
             config,
@@ -91,7 +91,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): ILineGraphViewData {
         val lineGraph = dataSource.getLineGraphByGraphStatId(graphOrStat.id)
             ?: return object : ILineGraphViewData {
@@ -108,7 +108,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
     private suspend fun generatePlottingData(
         dataSource: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
-        allReferencedDataPoints: MutableList<DataPoint>,
+        allReferencedDataPoints: MutableList<DataPointInterface>,
         endTime: OffsetDateTime
     ): Map<LineGraphFeature, FastXYSeries?> {
         return lineGraph.features.map { lgf ->
@@ -123,7 +123,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
     private suspend fun tryGetPlottingData(
         dataSource: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
-        allReferencedDataPoints: MutableList<DataPoint>,
+        allReferencedDataPoints: MutableList<DataPointInterface>,
         lineGraphFeature: LineGraphFeature
     ): DataSample? {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
