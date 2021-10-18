@@ -88,7 +88,7 @@ data class DiscreteValue(
             return DiscreteValue(index, label)
         }
 
-        fun fromDataPoint(dataPoint: DataPoint) =
+        fun fromDataPoint(dataPoint: DataPointInterface) =
             DiscreteValue(
                 dataPoint.value.toInt(),
                 dataPoint.label

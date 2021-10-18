@@ -59,7 +59,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
-import java.lang.Float.min
 
 /**
  * The group fragment is used on the home page and in any nested group to display the contents of

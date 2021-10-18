@@ -96,7 +96,8 @@ class Statistics_getYParameters_KtTest {
                 val length = Random.nextInt(1, 500).toDouble() / 10
                 val end = start + length
 
-                val interval = getYParameters(start, end, time_data = false, fixedBounds = false, throw_exc_if_non_found = true)
+                val interval = getYParameters(start, end, time_data = false, fixedBounds = false,
+                    throw_exc_if_non_found = false)
 
                 val range_used = length / (interval.bounds_max-interval.bounds_min)
                 if (range_used > RANGE_USED_BELOW) continue

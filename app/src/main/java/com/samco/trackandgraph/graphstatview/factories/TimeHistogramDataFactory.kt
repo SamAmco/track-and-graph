@@ -23,9 +23,9 @@ import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
+import com.samco.trackandgraph.statistics.*
 import com.samco.trackandgraph.statistics.getHistogramBinsForSample
 import com.samco.trackandgraph.statistics.getLargestBin
-import com.samco.trackandgraph.statistics.getNextEndOfWindow
 import com.samco.trackandgraph.statistics.sampleData
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.min
@@ -34,7 +34,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): ITimeHistogramViewData {
         val timeHistogram = dataSource.getTimeHistogramByGraphStatId(graphOrStat.id)
             ?: return object : ITimeHistogramViewData {
@@ -52,7 +52,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: TimeHistogram,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): ITimeHistogramViewData {
         val discreteValue = getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
         val barValues = getBarValues(dataSource, config, config.endDate, onDataSampled)
@@ -95,7 +95,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         dataSource: TrackAndGraphDatabaseDao,
         config: TimeHistogram,
         endDate: OffsetDateTime?,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): Map<Int, List<Double>>? {
         val feature = dataSource.getFeatureById(config.featureId)
         val sample = sampleData(

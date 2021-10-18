@@ -21,7 +21,18 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.database.doubleFormatter
 import com.samco.trackandgraph.ui.formatTimeDuration
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
+
+
+interface DataPointInterface {
+    val timestamp: OffsetDateTime
+    val featureId: Long
+    val value: Double
+    val label: String
+    val note: String
+}
 
 @Entity(
     tableName = "data_points_table",
@@ -35,24 +46,25 @@ import org.threeten.bp.OffsetDateTime
         )
     ]
 )
-data class DataPoint(
+
+data class DataPoint (
     @ColumnInfo(name = "timestamp")
-    val timestamp: OffsetDateTime = OffsetDateTime.now(),
+    override val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
     @ColumnInfo(name = "feature_id", index = true)
-    val featureId: Long,
+    override val featureId: Long,
 
     @ColumnInfo(name = "value")
-    val value: Double,
+    override val value: Double,
 
     @ColumnInfo(name = "label")
-    val label: String,
+    override val label: String,
 
     @ColumnInfo(name = "note")
-    val note: String
-) {
+    override val note: String
+)  : DataPointInterface {
     companion object {
-        fun getDisplayValue(dataPoint: DataPoint, featureType: FeatureType): String {
+        fun getDisplayValue(dataPoint: DataPointInterface, featureType: FeatureType): String {
             return when (featureType) {
                 FeatureType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
                 FeatureType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
@@ -61,3 +73,12 @@ data class DataPoint(
         }
     }
 }
+
+data class AggregatedDataPoint (
+    override val timestamp: OffsetDateTime,
+    override val featureId: Long,
+    override val value: Double,
+    val parents: List<DataPointInterface>,
+    override val label: String = "",
+    override val note: String = "",
+        ): DataPointInterface

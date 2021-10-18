@@ -19,11 +19,7 @@ package com.samco.trackandgraph.widgets
 import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.VibrationEffect.DEFAULT_AMPLITUDE
-import android.os.Vibrator
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData

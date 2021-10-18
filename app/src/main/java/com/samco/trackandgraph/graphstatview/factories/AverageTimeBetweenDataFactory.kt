@@ -41,7 +41,7 @@ class AverageTimeBetweenDataFactory :
             now: OffsetDateTime,
             endDate: OffsetDateTime?,
             duration: Duration?,
-            dataPoints: List<DataPoint>
+            dataPoints: List<DataPointInterface>
         ): Double? {
             if (duration == null && dataPoints.size < 2) return null
             val last = dataPoints.lastOrNull()?.timestamp
@@ -65,7 +65,7 @@ class AverageTimeBetweenDataFactory :
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): IAverageTimeBetweenViewData {
         val timeBetweenStat = dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
             ?: return notEnoughData(graphOrStat)
@@ -76,7 +76,7 @@ class AverageTimeBetweenDataFactory :
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: AverageTimeBetweenStat,
-        onDataSampled: (List<DataPoint>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit
     ): IAverageTimeBetweenViewData {
         val feature = dataSource.getFeatureById(config.featureId)
         val dataPoints = getRelevantDataPoints(dataSource, config, feature)
@@ -111,7 +111,7 @@ class AverageTimeBetweenDataFactory :
         dataSource: TrackAndGraphDatabaseDao,
         timeBetweenStat: AverageTimeBetweenStat,
         feature: Feature
-    ): List<DataPoint> {
+    ): List<DataPointInterface> {
         val endDate = timeBetweenStat.endDate ?: when (feature.featureType) {
             FeatureType.CONTINUOUS, FeatureType.DURATION -> {
                 dataSource.getLastDataPointBetween(
