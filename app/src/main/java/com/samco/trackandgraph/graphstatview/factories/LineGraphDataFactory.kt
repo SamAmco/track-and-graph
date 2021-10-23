@@ -124,7 +124,6 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         }.toMap()
     }
 
-    //TODO can we get more efficiency by running some of this on the default dispatcher?
     private suspend fun tryGetPlottingData(
         dataSource: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
