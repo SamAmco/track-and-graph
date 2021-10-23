@@ -209,7 +209,7 @@ class TimeHistogramDataHelperTests {
         val timeHelper = TimeHelper(
             object : AggregationPreferences {
                 override val firstDayOfWeek = DayOfWeek.MONDAY
-                override val startTimeOfDay = Duration.ofSeconds(0)
+                override val startTimeOfDay = Duration.ofHours(4)
             }
         )
 
