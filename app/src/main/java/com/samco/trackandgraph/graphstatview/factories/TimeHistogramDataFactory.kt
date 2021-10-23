@@ -18,15 +18,14 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.calculators.DatabaseSampleHelper
+import com.samco.trackandgraph.calculators.GlobalAggregationPreferences
+import com.samco.trackandgraph.calculators.TimeHelper
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
-import com.samco.trackandgraph.statistics.*
-import com.samco.trackandgraph.statistics.getHistogramBinsForSample
-import com.samco.trackandgraph.statistics.getLargestBin
-import com.samco.trackandgraph.statistics.sampleData
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.min
 
@@ -55,8 +54,11 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         onDataSampled: (List<DataPointInterface>) -> Unit
     ): ITimeHistogramViewData {
         val discreteValue = getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
-        val barValues = getBarValues(dataSource, config, config.endDate, onDataSampled)
-        val largestBin = getLargestBin(barValues?.values?.toList())
+        val timeHistogramDataHelper =
+            TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
+        val barValues =
+            getBarValues(dataSource, config, config.endDate, onDataSampled, timeHistogramDataHelper)
+        val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.values?.toList())
         val maxDisplayHeight = largestBin?.let {
             min(
                 it.times(10.0).toInt().plus(1).div(10.0),
@@ -95,14 +97,15 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         dataSource: TrackAndGraphDatabaseDao,
         config: TimeHistogram,
         endDate: OffsetDateTime?,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<DataPointInterface>) -> Unit,
+        timeHistogramDataHelper: TimeHistogramDataHelper
     ): Map<Int, List<Double>>? {
         val feature = dataSource.getFeatureById(config.featureId)
-        val sample = sampleData(
-            dataSource, config.featureId, config.duration,
+        val sample = DatabaseSampleHelper(dataSource).sampleData(
+            config.featureId, config.duration,
             endDate, null, null
         )
-        val barValues = getHistogramBinsForSample(
+        val barValues = timeHistogramDataHelper.getHistogramBinsForSample(
             sample,
             config.window,
             feature,

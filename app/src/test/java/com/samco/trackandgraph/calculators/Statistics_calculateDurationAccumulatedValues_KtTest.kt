@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.statistics
+package com.samco.trackandgraph.calculators
 
 import com.samco.trackandgraph.database.entity.DataPoint
 import kotlinx.coroutines.runBlocking
@@ -27,9 +27,12 @@ import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 
 class Statistics_calculateDurationAccumulatedValues_KtTest {
-    init {
-        GlobalAggregationPreferences.firstDayOfWeek = DayOfWeek.MONDAY
-    }
+    private val timeHelper = TimeHelper(
+        object : AggregationPreferences {
+            override val firstDayOfWeek = DayOfWeek.MONDAY
+            override val startTimeOfDay = Duration.ofSeconds(0)
+        }
+    )
 
     @Test
     fun calculateDurationAccumulatedValues_hourly_plot_totals() {
@@ -46,13 +49,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
 
             //WHEN
             val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
+                DurationAggregationCalculator(
+                    timeHelper,
                     0L,
                     null,
                     null,
                     plotTotalTime
-                )
+                ).execute(rawData)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -75,14 +78,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    null,
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                null,
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -106,14 +108,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    sampleDuration,
-                    null,
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                sampleDuration,
+                null,
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -135,14 +136,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    sampleDuration,
-                    null,
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                sampleDuration,
+                null,
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -163,13 +163,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = calculateDurationAccumulatedValues(
-                rawData,
+            val answer = DurationAggregationCalculator(
+                timeHelper,
                 0L,
                 sampleDuration,
                 null,
                 plotTotalTime
-            )
+            ).execute(rawData)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -188,14 +188,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    sampleDuration,
-                    null,
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                sampleDuration,
+                null,
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             assertEquals(1, answer.dataPoints.size)
@@ -223,14 +222,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    null,
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                null,
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -251,14 +249,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    null,
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                null,
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             assertEquals(1, answer.dataPoints.size)
@@ -281,15 +278,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    endTime,
-                    plotTotalTime,
-//                    aggPreferences
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                endTime,
+                plotTotalTime,
+            ).execute(rawData)
 
             //THEN
             assertEquals(4, answer.dataPoints.size)
@@ -316,14 +311,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    OffsetDateTime.now(),
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                OffsetDateTime.now(),
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             assertTrue(answer.dataPoints.size > 4)
@@ -347,14 +341,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    null,
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                null,
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             assertTrue(answer.dataPoints.size > 4)
@@ -382,14 +375,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofDays(7 * 4)
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    sampleDuration,
-                    OffsetDateTime.now(),
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                sampleDuration,
+                OffsetDateTime.now(),
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             // (the clipping isn't done by this algorithm it totals everything passed
@@ -416,14 +408,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    OffsetDateTime.now(),
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                OffsetDateTime.now(),
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN
             // (the clipping isn't done by this algorithm it totals everything passed
@@ -447,14 +438,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofDays(7 * 4)
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    sampleDuration,
-                    OffsetDateTime.now(),
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                sampleDuration,
+                OffsetDateTime.now(),
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN we should go back to the beginning of endTime-sampleDuration
             assertEquals(9, answer.dataPoints.size)
@@ -478,14 +468,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    null,
-                    plotTotalTime
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                null,
+                plotTotalTime
+            ).execute(rawData)
 
             //THEN we should go back to the beginning of endTime-sampleDuration
             val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
@@ -503,37 +492,44 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val endTime = OffsetDateTime.now()
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(1, 3)
-            val dataPoints = generateDataPoints2(listOf(
-                Triple(DayOfWeek.MONDAY,  3*60 + 30, 1.0), // before 4AM cutoff -> own bin
-                Triple(DayOfWeek.MONDAY, 13*60 + 30, 1.0), // after  4AM cutoff -> new bin
-                Triple(DayOfWeek.SUNDAY, 13*60 + 30, 1.0), // filler to fill week
-                // this is now next monday
-                Triple(DayOfWeek.MONDAY,  3*60 + 30, 1.0), // before 4AM cutoff on monday, should be same bin
-            ))
+            val dataPoints = generateDataPoints2(
+                listOf(
+                    Triple(DayOfWeek.MONDAY, 3 * 60 + 30, 1.0), // before 4AM cutoff -> own bin
+                    Triple(DayOfWeek.MONDAY, 13 * 60 + 30, 1.0), // after  4AM cutoff -> new bin
+                    Triple(DayOfWeek.SUNDAY, 13 * 60 + 30, 1.0), // filler to fill week
+                    // this is now next monday
+                    Triple(
+                        DayOfWeek.MONDAY,
+                        3 * 60 + 30,
+                        1.0
+                    ), // before 4AM cutoff on monday, should be same bin
+                )
+            )
             val rawData =
                 DataSample(
                     dataPoints
                 )
 
-            GlobalAggregationPreferences.startTimeOfDay = Duration.ofHours(4)
+            val timeHelper = TimeHelper(
+                object : AggregationPreferences {
+                    override val firstDayOfWeek = DayOfWeek.MONDAY
+                    override val startTimeOfDay = Duration.ofHours(4)
+                }
+            )
 
             //WHEN
-            val answer =
-                calculateDurationAccumulatedValues(
-                    rawData,
-                    0L,
-                    null,
-                    null,
-                    plotTotalTime,
-                )
+            val answer = DurationAggregationCalculator(
+                timeHelper,
+                0L,
+                null,
+                null,
+                plotTotalTime,
+            ).execute(rawData)
 
             //THEN
             assertEquals(2, answer.dataPoints.size)
             val answerTotals = answer.dataPoints.map { dp -> dp.value.toInt() }.toList()
             assertEquals(plotTotals, answerTotals)
-
-            // CLEAN UP
-            GlobalAggregationPreferences.startTimeOfDay = Duration.ZERO
         }
     }
 
@@ -565,7 +561,8 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
     }
 
     private fun generateDataPoints2(
-        points: List<Triple<DayOfWeek, Int, Double>>) : List<DataPoint> {
+        points: List<Triple<DayOfWeek, Int, Double>>
+    ): List<DataPoint> {
         var currentDay = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
 
         val output = mutableListOf<DataPoint>()
