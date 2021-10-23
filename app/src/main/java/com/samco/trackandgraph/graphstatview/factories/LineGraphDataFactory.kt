@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.androidplot.Region
+import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.StepMode
@@ -28,10 +30,13 @@ import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
-import com.samco.trackandgraph.statistics.*
+import com.samco.trackandgraph.calculators.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import kotlin.math.abs
 
 class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>() {
     companion object {
@@ -128,26 +133,25 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
     ): DataSample? {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
-        val rawDataSample =
-            sampleData(
-                dataSource,
+        val rawDataSample = withContext(Dispatchers.IO) {
+            val dataSampler = DatabaseSampleHelper(dataSource)
+            dataSampler.sampleData(
                 lineGraphFeature.featureId,
                 lineGraph.duration,
                 lineGraph.endDate,
                 movingAvDuration,
                 plottingPeriod
             )
-        val visibleSection =
-            clipDataSample(
-                rawDataSample,
-                lineGraph.endDate,
-                lineGraph.duration
-            )
+        }
+        val clippingCalculator = DataClippingCalculator(lineGraph.endDate, lineGraph.duration)
+        val visibleSection = clippingCalculator.execute(rawDataSample)
         allReferencedDataPoints.addAll(visibleSection.dataPoints)
-        val plotTotalData = when (lineGraphFeature.plottingMode) {
-            LineGraphPlottingModes.WHEN_TRACKED -> rawDataSample
-            else -> calculateDurationAccumulatedValues(
-                rawDataSample,
+
+        val timeHelper = TimeHelper(GlobalAggregationPreferences)
+        val aggregationCalculator = when (lineGraphFeature.plottingMode) {
+            LineGraphPlottingModes.WHEN_TRACKED -> EmptyCalculator()
+            else -> DurationAggregationCalculator(
+                timeHelper,
                 lineGraphFeature.featureId,
                 //We have to add movingAvDuration if it exists to make sure we're going back far enough
                 // to get correct averaging
@@ -156,25 +160,56 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
                 plottingPeriod!!
             )
         }
-        val averagedData = when (lineGraphFeature.averagingMode) {
-            LineGraphAveraginModes.NO_AVERAGING -> plotTotalData
-            else -> calculateMovingAverages(
-                plotTotalData,
-                movingAvDuration!!
-            )
+        val averageCalculator = when (lineGraphFeature.averagingMode) {
+            LineGraphAveraginModes.NO_AVERAGING -> EmptyCalculator()
+            else -> MovingAverageCalculator(movingAvDuration!!)
         }
-        val plottingData =
-            clipDataSample(
-                averagedData,
-                lineGraph.endDate,
-                lineGraph.duration
-            )
+
+        val plottingData = withContext(Dispatchers.Default) {
+            CompositeCalculator(
+                aggregationCalculator,
+                averageCalculator,
+                clippingCalculator
+            ).execute(rawDataSample)
+        }
 
         return if (plottingData.dataPoints.size >= 2) plottingData else null
     }
 
+    private fun getXYSeriesFromDataSample(
+        dataSample: DataSample,
+        endTime: OffsetDateTime,
+        lineGraphFeature: LineGraphFeature
+    ): FastXYSeries {
+        val scale = lineGraphFeature.scale
+        val offset = lineGraphFeature.offset
+        val durationDivisor = when (lineGraphFeature.durationPlottingMode) {
+            DurationPlottingMode.HOURS -> 3600.0
+            DurationPlottingMode.MINUTES -> 60.0
+            else -> 1.0
+        }
+        val yValues = dataSample.dataPoints.map { dp ->
+            (dp.value * scale / durationDivisor) + offset
+        }
+        val xValues =
+            dataSample.dataPoints.map { dp -> Duration.between(endTime, dp.timestamp).toMillis() }
 
-    private suspend fun getYAxisParameters(
+        var yRegion = SeriesUtils.minMax(yValues)
+        if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1)
+            yRegion = Region(yRegion.min, yRegion.min.toDouble() + 0.1)
+        val xRegion = SeriesUtils.minMax(xValues)
+        val rectRegion = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
+
+        return object : FastXYSeries {
+            override fun minMax() = rectRegion
+            override fun getX(index: Int): Number = xValues[index]
+            override fun getY(index: Int): Number = yValues[index]
+            override fun getTitle() = lineGraphFeature.name
+            override fun size() = dataSample.dataPoints.size
+        }
+    }
+
+    private fun getYAxisParameters(
         lineGraph: LineGraphWithFeatures,
         series: Collection<FastXYSeries?>,
         timeBasedRange: Boolean
@@ -191,7 +226,9 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         if (y_min == null || y_max == null) {
             return Pair(bounds, Pair(StepMode.SUBDIVIDE, 11.0))
         }
-        val parameters = getYParameters(y_min.toDouble(), y_max.toDouble(), timeBasedRange, fixed)
+
+        val parameters = DataDisplayIntervalHelper()
+            .getYParameters(y_min.toDouble(), y_max.toDouble(), timeBasedRange, fixed)
 
         bounds.minY = parameters.bounds_min
         bounds.maxY = parameters.bounds_max
