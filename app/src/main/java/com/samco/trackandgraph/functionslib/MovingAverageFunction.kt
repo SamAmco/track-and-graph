@@ -15,15 +15,15 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.calculators
+package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
 
-class MovingAverageCalculator(
+class MovingAverageFunction(
     private val movingAvgDuration: Duration
-) : DataCalculator {
+) : DataSampleFunction {
     /**
      * Calculate the moving averages of all of the data points given over the moving average duration given.
      * A new DataSample will be returned with one data point for every data point in the input set whose

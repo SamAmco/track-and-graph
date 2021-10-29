@@ -15,15 +15,15 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.calculators
+package com.samco.trackandgraph.functionslib
 
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-class DataClippingCalculator(
+class DataClippingFunction(
     private val endTime: OffsetDateTime?,
     private val sampleDuration: Duration?
-) : DataCalculator {
+) : DataSampleFunction {
     /**
      * Return all the data points in the sample that lie within the sampleDuration leading up to the endTime.
      * If the sampleDuration is null then all data points leading up to the end time will be returned.

@@ -15,25 +15,22 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.calculators
+package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import com.samco.trackandgraph.database.entity.DataPointInterface
 import kotlinx.coroutines.yield
-import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
-import org.threeten.bp.temporal.WeekFields
-import java.util.*
 
-class DurationAggregationCalculator(
+class DurationAggregationFunction(
     private val timeHelper: TimeHelper,
     private val featureId: Long,
     private val sampleDuration: Duration?,
     private val endTime: OffsetDateTime?,
     private val binSize: TemporalAmount,
-) : DataCalculator {
+) : DataSampleFunction {
 
     /**
      * Aggregate all data points into binSize length bins. For example if the bin size is 1 day and the

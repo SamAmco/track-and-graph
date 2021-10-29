@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.calculators.AggregationPreferences
-import com.samco.trackandgraph.calculators.DataSample
-import com.samco.trackandgraph.calculators.TimeHelper
+import com.samco.trackandgraph.functionslib.AggregationPreferences
+import com.samco.trackandgraph.functionslib.DataSample
+import com.samco.trackandgraph.functionslib.TimeHelper
 import com.samco.trackandgraph.database.entity.*
 import org.junit.Assert
 import org.junit.Test

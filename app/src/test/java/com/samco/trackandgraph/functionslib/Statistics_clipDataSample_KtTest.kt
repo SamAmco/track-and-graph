@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.calculators
+package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.entity.DataPoint
 import kotlinx.coroutines.runBlocking
@@ -28,7 +28,7 @@ class Statistics_clipDataSample_KtTest {
     @Test
     fun clipDataSample_empty_sample() = runBlocking {
         //WHEN
-        val answer = DataClippingCalculator(null, null).execute(DataSample(listOf()))
+        val answer = DataClippingFunction(null, null).execute(DataSample(listOf()))
 
         //THEN
         assertEquals(0, answer.dataPoints.size)
@@ -55,7 +55,7 @@ class Statistics_clipDataSample_KtTest {
             )
 
         //WHEN
-        val answer = DataClippingCalculator(null, null).execute(dataSample)
+        val answer = DataClippingFunction(null, null).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
@@ -83,7 +83,7 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofHours(30)
 
         //WHEN
-        val answer = DataClippingCalculator(null, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.takeLast(3), answer.dataPoints)
@@ -108,7 +108,7 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofHours(100)
 
         //WHEN
-        val answer = DataClippingCalculator(null, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
     }
@@ -132,7 +132,7 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofHours(1)
 
         //WHEN
-        val answer = DataClippingCalculator(null, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.takeLast(1), answer.dataPoints)
@@ -157,7 +157,7 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofHours(35)
 
         //WHEN
-        val answer = DataClippingCalculator(null, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.takeLast(5), answer.dataPoints)
@@ -182,7 +182,7 @@ class Statistics_clipDataSample_KtTest {
         val endTime = now.minusDays(20)
 
         //WHEN
-        val answer = DataClippingCalculator(endTime, null).execute(dataSample)
+        val answer = DataClippingFunction(endTime, null).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.take(8), answer.dataPoints)
@@ -206,7 +206,7 @@ class Statistics_clipDataSample_KtTest {
         val dataSample = DataSample(dataPoints)
 
         //WHEN
-        val answer = DataClippingCalculator(OffsetDateTime.now(), null).execute(dataSample)
+        val answer = DataClippingFunction(OffsetDateTime.now(), null).execute(dataSample)
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)
@@ -230,7 +230,7 @@ class Statistics_clipDataSample_KtTest {
         val dataSample = DataSample(dataPoints)
 
         //WHEN
-        val answer = DataClippingCalculator(now, null).execute(dataSample)
+        val answer = DataClippingFunction(now, null).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
@@ -256,7 +256,7 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofDays(30)
 
         //WHEN
-        val answer = DataClippingCalculator(now, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.drop(1).take(6), answer.dataPoints)
@@ -281,7 +281,7 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofDays(3)
 
         //WHEN
-        val answer = DataClippingCalculator(now, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)
@@ -306,7 +306,7 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofDays(20)
 
         //WHEN
-        val answer = DataClippingCalculator(now, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)

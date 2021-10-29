@@ -18,9 +18,9 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.calculators.DatabaseSampleHelper
-import com.samco.trackandgraph.calculators.GlobalAggregationPreferences
-import com.samco.trackandgraph.calculators.TimeHelper
+import com.samco.trackandgraph.functionslib.DatabaseSampleHelper
+import com.samco.trackandgraph.functionslib.GlobalAggregationPreferences
+import com.samco.trackandgraph.functionslib.TimeHelper
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.GraphStatInitException

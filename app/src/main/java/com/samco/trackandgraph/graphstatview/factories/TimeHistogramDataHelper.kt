@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.calculators.*
+import com.samco.trackandgraph.functionslib.*
 import com.samco.trackandgraph.database.entity.DataPointInterface
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
