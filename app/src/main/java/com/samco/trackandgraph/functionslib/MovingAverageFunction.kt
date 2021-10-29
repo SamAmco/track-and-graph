@@ -17,45 +17,24 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.entity.AggregatedDataPoint
-import kotlinx.coroutines.yield
+import com.samco.trackandgraph.functionslib.aggregation.MovingAggregator
 import org.threeten.bp.Duration
 
+/**
+ * Calculate the moving averages of all of the data points given over the moving average duration given.
+ * A new DataSample will be returned with one data point for every data point in the input set whose
+ * timestamp shall be the same but value will be equal to the average of it and all previous data points
+ * within the movingAvDuration.
+ *
+ * The data points in the input sample are expected to be in date order with the oldest data points
+ * earliest in the list
+ */
 class MovingAverageFunction(
     private val movingAvgDuration: Duration
 ) : DataSampleFunction {
-    /**
-     * Calculate the moving averages of all of the data points given over the moving average duration given.
-     * A new DataSample will be returned with one data point for every data point in the input set whose
-     * timestamp shall be the same but value will be equal to the average of it and all previous data points
-     * within the movingAvDuration.
-     *
-     * The data points in the input sample are expected to be in date order with the oldest data points
-     * earliest in the list
-     */
     override suspend fun execute(dataSample: DataSample): DataSample {
-        val movingAggregationPointsRaw = mutableListOf<AggregatedDataPoint>()
-        val dataPointsReversed = dataSample.dataPoints.reversed()
-
-        for ((index, current) in dataPointsReversed.mapIndexed { idx, point -> Pair(idx, point) }) {
-            yield()
-            val parents = dataPointsReversed.drop(index)
-                .takeWhile { dp ->
-                    Duration.between(dp.timestamp, current.timestamp) < movingAvgDuration
-                }
-
-            movingAggregationPointsRaw.add(
-                0,
-                AggregatedDataPoint(
-                    current.timestamp,
-                    current.featureId,
-                    value = Double.NaN,
-                    label = current.label,
-                    note = current.note,
-                    parents = parents
-                )
-            )
-        }
-        return RawAggregatedDatapoints(movingAggregationPointsRaw).average()
+        return MovingAggregator(movingAvgDuration)
+            .aggregate(dataSample)
+            .average()
     }
 }

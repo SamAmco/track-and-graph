@@ -15,9 +15,10 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functionslib
+package com.samco.trackandgraph.functionslib.aggregation
 
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
+import com.samco.trackandgraph.functionslib.DataSample
 
 /**
  * This class represents the initial points clustered into the parent-attribute of the AggregatedDataPoints.
