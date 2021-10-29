@@ -15,9 +15,8 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.calculators
+package com.samco.trackandgraph.functionslib
 
-/** A calculator that just returns the data passed to it **/
-class EmptyCalculator : DataCalculator {
-    override suspend fun execute(dataSample: DataSample) = dataSample
+interface DataSampleFunction {
+    suspend fun execute(dataSample: DataSample): DataSample
 }

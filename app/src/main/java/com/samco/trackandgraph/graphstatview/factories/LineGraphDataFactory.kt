@@ -30,7 +30,7 @@ import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
-import com.samco.trackandgraph.calculators.*
+import com.samco.trackandgraph.functionslib.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -142,14 +142,14 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
                 plottingPeriod
             )
         }
-        val clippingCalculator = DataClippingCalculator(lineGraph.endDate, lineGraph.duration)
+        val clippingCalculator = DataClippingFunction(lineGraph.endDate, lineGraph.duration)
         val visibleSection = clippingCalculator.execute(rawDataSample)
         allReferencedDataPoints.addAll(visibleSection.dataPoints)
 
         val timeHelper = TimeHelper(GlobalAggregationPreferences)
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
-            LineGraphPlottingModes.WHEN_TRACKED -> EmptyCalculator()
-            else -> DurationAggregationCalculator(
+            LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
+            else -> DurationAggregationFunction(
                 timeHelper,
                 lineGraphFeature.featureId,
                 //We have to add movingAvDuration if it exists to make sure we're going back far enough
@@ -160,12 +160,12 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             )
         }
         val averageCalculator = when (lineGraphFeature.averagingMode) {
-            LineGraphAveraginModes.NO_AVERAGING -> EmptyCalculator()
-            else -> MovingAverageCalculator(movingAvDuration!!)
+            LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
+            else -> MovingAverageFunction(movingAvDuration!!)
         }
 
         val plottingData = withContext(Dispatchers.Default) {
-            CompositeCalculator(
+            CompositeFunction(
                 aggregationCalculator,
                 averageCalculator,
                 clippingCalculator

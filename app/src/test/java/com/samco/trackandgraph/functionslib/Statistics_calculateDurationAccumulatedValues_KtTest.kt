@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.calculators
+package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.entity.DataPoint
 import kotlinx.coroutines.runBlocking
@@ -49,7 +49,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
 
             //WHEN
             val answer =
-                DurationAggregationCalculator(
+                DurationAggregationFunction(
                     timeHelper,
                     0L,
                     null,
@@ -78,7 +78,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,
@@ -108,7 +108,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 sampleDuration,
@@ -136,7 +136,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 sampleDuration,
@@ -163,7 +163,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 sampleDuration,
@@ -188,7 +188,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 sampleDuration,
@@ -222,7 +222,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,
@@ -249,7 +249,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,
@@ -278,7 +278,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,
@@ -311,7 +311,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,
@@ -341,7 +341,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData = DataSample(dataPoints)
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,
@@ -375,7 +375,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofDays(7 * 4)
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 sampleDuration,
@@ -408,7 +408,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,
@@ -438,7 +438,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofDays(7 * 4)
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 sampleDuration,
@@ -468,7 +468,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 )
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,
@@ -518,7 +518,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             )
 
             //WHEN
-            val answer = DurationAggregationCalculator(
+            val answer = DurationAggregationFunction(
                 timeHelper,
                 0L,
                 null,

@@ -15,8 +15,8 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.calculators
+package com.samco.trackandgraph.functionslib
 
-interface DataCalculator {
-    suspend fun execute(dataSample: DataSample): DataSample
-}
+import com.samco.trackandgraph.database.entity.DataPointInterface
+
+class DataSample(val dataPoints: List<DataPointInterface>)

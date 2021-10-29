@@ -15,15 +15,9 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.calculators
+package com.samco.trackandgraph.functionslib
 
-/**
- * A calculator that simply applies the operations of all provided calculators in order
- */
-class CompositeCalculator(vararg val calculators: DataCalculator) : DataCalculator {
-    override suspend fun execute(dataSample: DataSample): DataSample {
-        var runningSample = dataSample
-        for (calculator in calculators) runningSample = calculator.execute(runningSample)
-        return runningSample
-    }
+/** A calculator that just returns the data passed to it **/
+class IdentityFunction : DataSampleFunction {
+    override suspend fun execute(dataSample: DataSample) = dataSample
 }

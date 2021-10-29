@@ -26,8 +26,8 @@ import com.samco.trackandgraph.database.entity.PieChart
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.calculators.DataSample
-import com.samco.trackandgraph.calculators.DatabaseSampleHelper
+import com.samco.trackandgraph.functionslib.DataSample
+import com.samco.trackandgraph.functionslib.DatabaseSampleHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
