@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.antlr.parsing
 
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.antlr.ast.*
 import org.antlr.v4.runtime.*
 import org.antlr.v4.runtime.atn.ATNConfigSet
@@ -55,7 +56,8 @@ object DatatransformationFunctionAntlrParserFacade {
             }
 
             override fun syntaxError(recognizer: Recognizer<*, *>?, offendingSymbol: Any?, line: Int, charPositionInline: Int, msg: String, ex: RecognitionException?) {
-                lexicalAndSyntaticErrors.add(DatatransformationFunctionError(msg, Position(Point(line, charPositionInline), Point(line, charPositionInline+1))))
+                lexicalAndSyntaticErrors.add(DatatransformationFunctionError(msg, Position(Point(line, charPositionInline), Point(line, charPositionInline+1)),
+                R.string.errormsg_antlr_synaxerror, offendingSymbol.toString()),)
             }
 
             override fun reportContextSensitivity(p0: Parser?, p1: DFA?, p2: Int, p3: Int, p4: Int, p5: ATNConfigSet?) {

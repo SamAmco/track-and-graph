@@ -17,22 +17,53 @@
 
 package com.samco.trackandgraph.antlr.ast
 
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.antlr.evaluation.DoubleDeclarationError
 import com.samco.trackandgraph.antlr.evaluation.NotDeclaredError
 import com.samco.trackandgraph.antlr.evaluation.ReferencedBeforeDeclarationError
 import com.samco.trackandgraph.antlr.evaluation.UnexistingVariableError
 import java.util.*
+import kotlin.reflect.KFunction2
 
+open class DatatransformationFunctionError(fallbackMessage: String, var position: Position,
+    val messageFunction: (KFunction2<Int, Array<out Any?>, String>) -> String) : Exception(fallbackMessage) {
 
-open class DatatransformationFunctionError(message: String, var position: Position) : Exception(message) {
+    constructor(
+        fallbackMessage: String,
+        position: Position,
+        localizedMessageId: Int,
+        vararg localizedMessageArgs: String
+    ) : this(fallbackMessage, position,
+        { getString -> getString(localizedMessageId, localizedMessageArgs) }
+    )
+
     fun getPos(): Position = position
-    fun getMes(): String = super.message.toString()
+    fun getFallbackMessage(): String = super.message.toString()
+    fun getLocalizedMessage(getString: KFunction2<Int, Array<out Any?>, String>): String =
+        messageFunction(getString)
 
-    fun fullMessage() : String = "${this.javaClass.simpleName} at ${this.getPos().start}: ${this.getMes()}"
+    private fun makeMessageFull(message: String): String =
+        "${this.javaClass.simpleName} at ${this.getPos().start}: $message"
+
+    private fun makeMessageFullLocalized(
+        message: String,
+        getString: KFunction2<Int, Array<out Any?>, String>
+    ): String = getString(
+        R.string.errormsg_error_at_position,
+        arrayOf(this.javaClass.simpleName, this.getPos().start.toString(), message)
+    )
+
+    fun fullFallbackMessage(): String = makeMessageFull(this.getFallbackMessage())
+    fun fullLocalizedMessage(getString: KFunction2<Int, Array<out Any?>, String>): String =
+        makeMessageFullLocalized(this.getLocalizedMessage(getString), getString)
+
 }
 
-data class ListOfErrors(val errors: List<DatatransformationFunctionError>)
-    : Exception(errors.joinToString(separator = "\n") { it.fullMessage() } )
+data class ListOfErrors(val errors: List<DatatransformationFunctionError>) :
+    DatatransformationFunctionError(fallbackMessage = errors.joinToString(separator = "\n") { it.fullFallbackMessage() },
+        position = errors.first().getPos(),
+        { getString -> errors.joinToString(separator = "\n") { it.fullLocalizedMessage(getString) } }
+    )
 
 fun DatatransformationFunction.validate(externalInputNames: Set<String> = emptySet()) : List<DatatransformationFunctionError> {
     val errors = LinkedList<DatatransformationFunctionError>()

@@ -1,11 +1,17 @@
 package com.samco.trackandgraph.antlr.evaluation
 
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.antlr.generated.TnG2Parser
 import com.samco.trackandgraph.database.entity.DataPoint
 import org.antlr.v4.runtime.tree.ParseTree
 import org.threeten.bp.Duration
+import kotlin.reflect.KClass
 
-abstract class Value {
+abstract class Value () {
+    init {
+        val debugNameRes = valueClassToStringResId(this::class)
+    }
+
     open fun _plus(other: Value) : Value = throw NotImplementedError()
 
     open fun _minus(other: Value) : Value = throw NotImplementedError()
@@ -119,7 +125,11 @@ enum class DataType {
     NUMERICAL, TIME, CATEGORICAL,
 }
 
-class DatapointsValue(val datapoints: List<DataPoint>, val dataType: DataType, val regularity: Regularity = Regularity.NONE) : Value() {
+class DatapointsValue(
+    val datapoints: List<DataPoint>,
+    val dataType: DataType,
+    val regularity: Regularity = Regularity.NONE
+) : Value() {
     override fun equals(other: Any?): Boolean {
         if (other is DatapointsValue) return this.datapoints == other.datapoints
         return super.equals(other)
@@ -147,5 +157,14 @@ class DatapointsValue(val datapoints: List<DataPoint>, val dataType: DataType, v
 }
 
 
+fun valueClassToStringResId(valueClass: KClass<*>) : Int{
+    return when (valueClass) {
+        NumberValue::class -> R.string.trafoDebug_number
+        DatapointsValue::class -> R.string.trafoDebug_datapoints
+        TimeValue::class -> R.string.trafoDebug_time_duration
+        StringValue::class -> R.string.trafoDebug_string
+        else -> throw NotImplementedError("${valueClass.simpleName} not implemented!")
+    }
+}
 
 

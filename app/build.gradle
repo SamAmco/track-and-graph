@@ -83,6 +83,9 @@ dependencies {
     //Lifecycle extensions
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
+    //Advanced Testing
+    implementation 'androidx.test:monitor:1.4.0'
+
     //Database
     kapt "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-runtime:$room_version"

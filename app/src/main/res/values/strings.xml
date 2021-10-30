@@ -345,4 +345,20 @@
     <string name="hold_to_preview">Hold to preview</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+
+    <string name="trafoDebug_number">Number</string>
+    <string name="trafoDebug_string">String</string>
+    <string name="trafoDebug_time_duration">Time/Duration</string>
+    <string name="trafoDebug_datapoints">Datapoints</string>
+    <string name="errormsg_double_declaration">Variable \'%s\' was already declared!</string>
+    <string name="errormsg_not_declared">Variable \'%s\' was never declared!</string>
+    <string name="errormsg_unexisting_var">There is no variable named \'%s\'!</string>
+    <string name="errormsg_reference_before_declaration">You cannot refer to variable %s before its declaration</string>
+    <string name="errormsg_unknown_function">Unknown function \'%s\'</string>
+    <string name="errormsg_unsupported_argumenttype">Function \'%1$s\' expected argument(s) of type %2$s, got %3$s</string>
+    <string name="errormsg_antlr_synaxerror">Syntax Error at \'%s\'</string>
+    <string name="errormsg_arg_missing">Missing argument for function \'%1$s\'. Expected an argument of type %2$s at position %3$d</string>
+    <string name="errormsg_arg_wrong_type">Argument %1$d of function \'%2$s\' has to be of type %3$s, but was of type %4$s</string>
+    <string name="or">or</string>
+    <string name="errormsg_error_at_position">%1$s at %2$s: %3$s</string>
 </resources>

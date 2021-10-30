@@ -1,8 +1,6 @@
 package com.samco.trackandgraph.antlr.eval
 
-import com.samco.trackandgraph.antlr.ast.toAst
 import com.samco.trackandgraph.antlr.evaluation.*
-import com.samco.trackandgraph.antlr.parsing.DatatransformationFunctionAntlrParserFacade
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

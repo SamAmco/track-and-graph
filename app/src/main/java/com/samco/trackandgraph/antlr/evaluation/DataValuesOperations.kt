@@ -9,14 +9,14 @@ import kotlin.math.roundToLong
 fun NumberValue.plusValue(other: Value): Value {
     return when(other) {
         is NumberValue -> NumberValue(this.toDouble() + other.toDouble())
-        else -> throwUnsupportedArgumentTypeError("PLUS", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("PLUS", this, other, listOf(NumberValue::class))
     }
 }
 
 fun NumberValue.minusValue(other: Value): Value {
     return when(other) {
         is NumberValue -> NumberValue(this.toDouble() - other.toDouble())
-        else -> throwUnsupportedArgumentTypeError("MINUS", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("MINUS", this, other, listOf(NumberValue::class))
     }
 }
 
@@ -24,14 +24,14 @@ fun NumberValue.timesValue(other: Value): Value {
     return when(other) {
         is NumberValue -> NumberValue(this.toDouble() * other.toDouble())
         is TimeValue -> other._times(this) //we have to know that this is not recursive (it isn't)
-        else -> throwUnsupportedArgumentTypeError("TIMES", this, other, "Number, Timeinterval")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("TIMES", this, other, listOf(NumberValue::class, TimeValue::class))
     }
 }
 
 fun NumberValue.divValue(other: Value): Value {
     return when(other) {
         is NumberValue -> NumberValue(this.toDouble() / other.toDouble())
-        else -> throwUnsupportedArgumentTypeError("DIV", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("DIV", this, other, listOf(NumberValue::class))
     }
 }
 
@@ -43,28 +43,28 @@ fun NumberValue.divValue(other: Value): Value {
 fun TimeValue.plusValue(other: Value): Value {
     return when(other) {
         is TimeValue -> TimeValue(this.duration + other.duration)
-        else -> throwUnsupportedArgumentTypeError("PLUS", this, other, "Timeinterval")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("PLUS", this, other, listOf(TimeValue::class))
     }
 }
 
 fun TimeValue.minusValue(other: Value): Value {
     return when(other) {
         is TimeValue -> TimeValue(this.duration - other.duration)
-        else -> throwUnsupportedArgumentTypeError("MINUS", this, other, "Timeinterval")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("MINUS", this, other, listOf(TimeValue::class))
     }
 }
 
 fun TimeValue.timesValue(other: Value): Value {
     return when(other) {
         is NumberValue -> TimeValue(this.duration.multipliedBy(other.toDouble().roundToLong()))
-        else -> throwUnsupportedArgumentTypeError("TIMES", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("TIMES", this, other, listOf(NumberValue::class))
     }
 }
 
 fun TimeValue.divValue(other: Value): Value {
     return when(other) {
         is NumberValue -> TimeValue(this.duration.dividedBy(other.toDouble().roundToLong()))
-        else -> throwUnsupportedArgumentTypeError("DIV", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("DIV", this, other, listOf(NumberValue::class))
     }
 }
 
@@ -75,14 +75,14 @@ fun TimeValue.divValue(other: Value): Value {
 fun DatapointsValue.plusValue(other: Value): Value {
     return when(other) {
         is NumberValue -> applyToAllPoints( { it + other.toDouble() } )
-        else -> throwUnsupportedArgumentTypeError("PLUS", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("PLUS", this, other, listOf(NumberValue::class))
     }
 }
 
 fun DatapointsValue.minusValue(other: Value): Value {
     return when(other) {
         is NumberValue -> applyToAllPoints( { it - other.toDouble() } )
-        else -> throwUnsupportedArgumentTypeError("MINUS", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("MINUS", this, other, listOf(NumberValue::class))
     }
 }
 
@@ -90,15 +90,15 @@ fun DatapointsValue.timesValue(other: Value): Value {
     return when(other) {
         is NumberValue -> applyToAllPoints({ it * other.toDouble() } )
         is TimeValue -> {
-            if (this.dataType != DataType.NUMERICAL) throwUnsupportedArgumentTypeError(
+            if (this.dataType != DataType.NUMERICAL) throwUnsupportedArgumentTypeErrorBinaryOperation(
                 "TIMES",
                 this,
                 other,
-                "Number"
+                listOf(NumberValue::class)
             )
             else applyToAllPoints( {it * other.duration.seconds }, newDataType = DataType.TIME)
         }
-        else -> throwUnsupportedArgumentTypeError("TIMES", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("TIMES", this, other, listOf(NumberValue::class))
     }
 }
 
@@ -106,14 +106,14 @@ fun DatapointsValue.divValue(other: Value): Value {
     return when(other) {
         is NumberValue -> applyToAllPoints( { it / other.toDouble() } )
         is TimeValue -> {
-            if (this.dataType != DataType.TIME) throwUnsupportedArgumentTypeError(
+            if (this.dataType != DataType.TIME) throwUnsupportedArgumentTypeErrorBinaryOperation(
                 "DIV",
                 this,
                 other,
-                "Number"
+                listOf(NumberValue::class)
             )
             else applyToAllPoints( {it / other.duration.seconds }, newDataType = DataType.NUMERICAL)
         }
-        else -> throwUnsupportedArgumentTypeError("DIV", this, other, "Number")
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("DIV", this, other, listOf(NumberValue::class))
     }
 }

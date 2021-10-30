@@ -4,7 +4,7 @@ fun callFunction(functionName: String, args: List<Value>) : Value {
     return when(functionName) {
 //        "FromTime"  -> fromTime(args)
 //        "ToTime"    -> toTime(args)
-        else -> throw UnkownFunctionName(functionName)
+        else -> throw UnknownFunctionName(functionName)
     }
     return NumberValue(0)
 }
