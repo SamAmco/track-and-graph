@@ -15,28 +15,30 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.statistics
+package com.samco.trackandgraph.functionslib
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.*
 
-class Statistics_findBeginningOfTemporal_KtTest {
-    init {
-        GlobalAggregationPreferences.firstDayOfWeek = DayOfWeek.MONDAY
-    }
-
+class TimeHelperTests {
 
     @Test
     fun testDurationHour() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 6, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofHours(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -48,13 +50,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationOverHour() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 6, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofHours(2)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -66,13 +74,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationDay() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 6, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -84,13 +98,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationOverDay() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(1).plus(Duration.ofNanos(1))
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -102,13 +122,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationWeek() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(7)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -120,13 +146,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationOverWeek() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(7).plus(Duration.ofNanos(1))
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -138,13 +170,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationMonth() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(31)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -156,13 +194,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationOverMonth() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(31).plus(Duration.ofNanos(1))
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -174,13 +218,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationQuater() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 5, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(365/4)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -192,13 +242,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationOverQuater() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 5, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(365/4).plusDays(2)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -210,13 +266,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationBiYear() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 5, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(365/2)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -228,13 +290,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationOverBiYear() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(365/2).plusDays(2)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -246,13 +314,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationYear() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(365)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -264,13 +338,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testDurationOverYear() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Duration.ofDays(365*4)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -282,13 +362,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodWeek() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofWeeks(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -300,13 +386,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodOverWeek() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofWeeks(1).plusDays(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -318,13 +410,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodMonth() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofMonths(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -336,13 +434,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodOverMonth() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofMonths(1).plusDays(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -354,13 +458,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodQuater() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 5, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofMonths(3)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -372,13 +482,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodOverQuater() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 5, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofMonths(3).plusDays(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -390,13 +506,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodBiYear() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 5, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofMonths(6)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -408,13 +530,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodOverBiYear() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofMonths(6).plusDays(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -426,13 +554,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodYear() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofYears(1)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -444,13 +578,19 @@ class Statistics_findBeginningOfTemporal_KtTest {
     @Test
     fun testPeriodOverYear() {
         //GIVEN
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         val dateTime = OffsetDateTime.of(
             2020, 7, 8,
             15, 45, 32, 432, ZoneOffset.UTC)
         val temporal = Period.ofYears(4)
 
         //WHEN
-        val answer = findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
 
         //THEN
         val expected = OffsetDateTime.of(
@@ -461,19 +601,31 @@ class Statistics_findBeginningOfTemporal_KtTest {
 
     @Test
     fun testGetQuaterForMonthValue() {
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         assertEquals(
             listOf(1,1,1,4,4,4,7,7,7,10,10,10),
             IntProgression.fromClosedRange(1, 12, 1)
-                .map { getQuaterForMonthValue(it) }
+                .map { uut.getQuaterForMonthValue(it) }
         )
     }
 
     @Test
     fun testGetBiYearForMonthValue() {
+        val uut = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofSeconds(0)
+            }
+        )
         assertEquals(
             listOf(1,1,1,1,1,1,7,7,7,7,7,7),
             IntProgression.fromClosedRange(1, 12, 1)
-                .map { getBiYearForMonthValue(it) }
+                .map { uut.getBiYearForMonthValue(it) }
         )
     }
 }

@@ -26,8 +26,8 @@ import com.samco.trackandgraph.database.entity.PieChart
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.statistics.DataSample
-import com.samco.trackandgraph.statistics.sampleData
+import com.samco.trackandgraph.functionslib.DataSample
+import com.samco.trackandgraph.functionslib.DatabaseSampleHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -92,9 +92,8 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
         val feature = withContext(Dispatchers.IO) {
             dataSource.getFeatureById(pieChart.featureId)
         }
-        val dataSample = sampleData(
-            dataSource, feature.id, pieChart.duration,
-            pieChart.endDate, null, null
+        val dataSample = DatabaseSampleHelper(dataSource).sampleData(
+            feature.id, pieChart.duration, pieChart.endDate, null, null
         )
         return if (dataSample.dataPoints.isNotEmpty()) dataSample else null
     }

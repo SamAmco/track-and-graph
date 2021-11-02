@@ -15,10 +15,13 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.statistics
+package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.functionslib.AggregationPreferences
+import com.samco.trackandgraph.functionslib.DataSample
+import com.samco.trackandgraph.functionslib.TimeHelper
 import com.samco.trackandgraph.database.entity.*
-import org.junit.Assert.*
+import org.junit.Assert
 import org.junit.Test
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
@@ -26,11 +29,13 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import kotlin.random.Random
 
-class Statistics_getHistogramBinsForSample_KtTest {
-    init {
-        GlobalAggregationPreferences.firstDayOfWeek = DayOfWeek.MONDAY
-    }
-
+class TimeHistogramDataHelperTests {
+    private val timeHelper = TimeHelper(
+        object : AggregationPreferences {
+            override val firstDayOfWeek = DayOfWeek.MONDAY
+            override val startTimeOfDay = Duration.ofSeconds(0)
+        }
+    )
 
     @Test
     fun test_getHistogramBinsForSample_sumByVal_week_cont() {
@@ -45,15 +50,16 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val sumByCount = false
 
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
+        val answer = TimeHistogramDataHelper(timeHelper)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
-        assertEquals(1, answer.keys.size)
+        Assert.assertEquals(1, answer.keys.size)
         val vals = answer[0] ?: error("Key 0 not found")
-        assertEquals(7, vals.size)
+        Assert.assertEquals(7, vals.size)
         val total = 3 + 3 + 2 + 2 + 2 + 2 + 2.0
-        assertEquals(
+        Assert.assertEquals(
             listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total),
             vals
         )
@@ -72,19 +78,20 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val sumByCount = true
 
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
+        val answer = TimeHistogramDataHelper(timeHelper)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
-        assertEquals(1, answer.keys.size)
+        Assert.assertEquals(1, answer.keys.size)
         val vals = answer[0] ?: error("Key 0 not found")
-        assertEquals(30, vals.size)
+        Assert.assertEquals(30, vals.size)
         val total = 21.0
         val expected = listOf(
             1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0,
             1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
         )
-        assertEquals(
+        Assert.assertEquals(
             expected.map { it.toDouble() / total },
             vals
         )
@@ -103,35 +110,36 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val sumByCount = false
 
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
+        val answer = TimeHistogramDataHelper(timeHelper)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
-        assertEquals(3, answer.keys.size)
+        Assert.assertEquals(3, answer.keys.size)
 
         val vals0 = answer[0] ?: error("Key 0 not found")
-        assertEquals(60, vals0.size)
+        Assert.assertEquals(60, vals0.size)
         val expected0 = List(60) { 0.0 }
-        assertEquals(
+        Assert.assertEquals(
             expected0,
             vals0
         )
 
         val total = 240.0
         val vals1 = answer[1] ?: error("Key 1 not found")
-        assertEquals(60, vals1.size)
+        Assert.assertEquals(60, vals1.size)
         val expected1 =
             mutableListOf<Double>().apply { repeat(20) { addAll(listOf(0.0, 4.0, 0.0)) } }
-        assertEquals(
+        Assert.assertEquals(
             expected1.map { it / total },
             vals1
         )
 
         val vals2 = answer[2] ?: error("Key 2 not found")
-        assertEquals(60, vals2.size)
+        Assert.assertEquals(60, vals2.size)
         val expected2 =
             mutableListOf<Double>().apply { repeat(20) { addAll(listOf(0.0, 0.0, 8.0)) } }
-        assertEquals(
+        Assert.assertEquals(
             expected2.map { it / total },
             vals2
         )
@@ -150,18 +158,19 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val sumByCount = true
 
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
+        val answer = TimeHistogramDataHelper(timeHelper)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
-        assertEquals(2, answer.keys.size)
+        Assert.assertEquals(2, answer.keys.size)
         val av = 1.0 / 10.0
-        assertEquals(
+        Assert.assertEquals(
             listOf(av, 0.0, 0.0, 0.0, av, 0.0, av, 0.0, av, 0.0, av, 0.0),
             answer[0] ?: error("Key 0 not found")
         )
 
-        assertEquals(
+        Assert.assertEquals(
             listOf(0.0, av, 0.0, av, 0.0, av, 0.0, 0.0, 0.0, av, 0.0, av),
             answer[1] ?: error("Key 1 not found")
         )
@@ -176,10 +185,11 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val sumByCount = false
 
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
+        val answer = TimeHistogramDataHelper(timeHelper)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
-        assertNull(answer)
+        Assert.assertNull(answer)
     }
 
     @Test
@@ -196,25 +206,27 @@ class Statistics_getHistogramBinsForSample_KtTest {
         val feature = makeFeature(FeatureType.CONTINUOUS)
         val sumByCount = false
 
-        GlobalAggregationPreferences.startTimeOfDay = Duration.ofHours(4)
+        val timeHelper = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay = Duration.ofHours(4)
+            }
+        )
 
         //WHEN
-        val answer = getHistogramBinsForSample(sample, window, feature, sumByCount)
+        val answer = TimeHistogramDataHelper(timeHelper)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
-        assertEquals(1, answer.keys.size)
+        Assert.assertEquals(1, answer.keys.size)
         val vals = answer[0] ?: error("Key 0 not found")
-        assertEquals(7, vals.size)
+        Assert.assertEquals(7, vals.size)
         val total = 3 + 3 + 2 + 2 + 2 + 2 + 2.0
-        assertEquals(
+        Assert.assertEquals(
             listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total),
             vals
         )
-
-        // CLEAN UP
-        GlobalAggregationPreferences.startTimeOfDay = Duration.ZERO
-
     }
 
     private fun makeFeature(

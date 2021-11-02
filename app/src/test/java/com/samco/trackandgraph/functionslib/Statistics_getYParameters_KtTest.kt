@@ -15,9 +15,9 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.statistics
+package com.samco.trackandgraph.functionslib
 
-import junit.framework.Assert.assertEquals
+import com.samco.trackandgraph.graphstatview.factories.DataDisplayIntervalHelper
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -30,14 +30,21 @@ import kotlin.time.seconds
 
 class Statistics_getYParameters_KtTest {
 
-    private fun getYParametersInternalWithFallback(y_min: Double, y_max: Double, time_data: Boolean,
-                                           fixedBounds: Boolean, throw_exc_if_non_found: Boolean) : PossibleInterval {
-        val parameters = getYParametersInternal(y_min, y_max, time_data, fixedBounds, throw_exc_if_non_found)
+    private val uut = DataDisplayIntervalHelper()
+
+    private fun getYParametersInternalWithFallback(
+        y_min: Double, y_max: Double, time_data: Boolean,
+        fixedBounds: Boolean, throw_exc_if_non_found: Boolean
+    ): DataDisplayIntervalHelper.PossibleInterval {
+        val parameters =
+            uut.getYParametersInternal(y_min, y_max, time_data, fixedBounds, throw_exc_if_non_found)
         if (parameters != null) {
             return parameters
         }
-        return PossibleInterval((y_max - y_min) / 10.0, false, 11, 1.0,
-                y_min, y_max, 1.0)
+        return DataDisplayIntervalHelper.PossibleInterval(
+            (y_max - y_min) / 10.0, false, 11, 1.0,
+            y_min, y_max, 1.0
+        )
     }
 
 
@@ -57,8 +64,8 @@ class Statistics_getYParameters_KtTest {
     @ExperimentalTime
     fun manuallyTestValuesTime() {
         runBlocking {
-            val y_min = 1 *60*60 + 53 *60 // in seconds
-            val y_max = 8 *60*60 + 25 *60
+            val y_min = 1 * 60 * 60 + 53 * 60 // in seconds
+            val y_max = 8 * 60 * 60 + 25 * 60
 
             printExampleTime(y_min.toDouble(), y_max.toDouble())
         }
@@ -75,7 +82,13 @@ class Statistics_getYParameters_KtTest {
                 val length = Random.nextInt(1, 10 * 60 * 60).toDouble()
                 val end = start + length
 
-                val interval = getYParametersInternalWithFallback(start, end, time_data = true, fixedBounds = false, throw_exc_if_non_found = false)
+                val interval = getYParametersInternalWithFallback(
+                    start,
+                    end,
+                    time_data = true,
+                    fixedBounds = false,
+                    throw_exc_if_non_found = false
+                )
 
                 if (interval.percentage_range_used > RANGE_USED_BELOW) continue
 
@@ -96,10 +109,12 @@ class Statistics_getYParameters_KtTest {
                 val length = Random.nextInt(1, 500).toDouble() / 10
                 val end = start + length
 
-                val interval = getYParameters(start, end, time_data = false, fixedBounds = false,
-                    throw_exc_if_non_found = false)
+                val interval = uut.getYParameters(
+                    start, end, time_data = false, fixedBounds = false,
+                    throw_exc_if_non_found = false
+                )
 
-                val range_used = length / (interval.bounds_max-interval.bounds_min)
+                val range_used = length / (interval.bounds_max - interval.bounds_min)
                 if (range_used > RANGE_USED_BELOW) continue
 
                 printExampleNumerical(start, end)
@@ -113,37 +128,39 @@ class Statistics_getYParameters_KtTest {
         var errors = 0
         val allowed_error_percentage = when (time_data) {
             false -> 0.1 // it's ok if one   in 1000 doesn't have a good solution
-            true  -> 0.7 // it's ok if seven in 1000 don't   have a good solution
+            true -> 0.7 // it's ok if seven in 1000 don't   have a good solution
         }
         val no_solution_vals = mutableListOf<Pair<Double, Double>>()
-        val intervalList = mutableListOf<PossibleInterval>()
+        val intervalList = mutableListOf<DataDisplayIntervalHelper.PossibleInterval>()
 
-        val startValues  = when (time_data) {
-            false -> (0..10000).map { it.toDouble()/10 }
-            true  -> (0..36000).map { it.toDouble() } // zero seconds to 10 hours
+        val startValues = when (time_data) {
+            false -> (0..10000).map { it.toDouble() / 10 }
+            true -> (0..36000).map { it.toDouble() } // zero seconds to 10 hours
         }
         val lengthValues = when (time_data) {
-            false -> (1..7500).map { it.toDouble()/10 }
-            true  -> (1..72000).map { it.toDouble() } // one second to 20 hours
+            false -> (1..7500).map { it.toDouble() / 10 }
+            true -> (1..72000).map { it.toDouble() } // one second to 20 hours
         }
 
         val (numberOfStartValues, numberOfLengthValues) = when (long_test) {
-            true -> Pair(10000,500)
-            false -> Pair(1000,50)
+            true -> Pair(10000, 500)
+            false -> Pair(1000, 50)
         }
 
         for (start in startValues.shuffled().slice(0..numberOfStartValues)) {
             for (length in lengthValues.shuffled().slice(0..numberOfLengthValues)) {
-                val interval = getYParametersInternal(start, start+length,
-                        time_data = time_data,
-                        fixedBounds = false, throw_exc_if_non_found = false)
+                val interval = uut.getYParametersInternal(
+                    start, start + length,
+                    time_data = time_data,
+                    fixedBounds = false, throw_exc_if_non_found = false
+                )
 
                 if (interval != null) {
-                    val range_used = length / (interval.bounds_max-interval.bounds_min)
+                    val range_used = length / (interval.bounds_max - interval.bounds_min)
                     assert(range_used - interval.percentage_range_used < 0.001)
                     intervalList.add(interval)
                 } else {
-                    no_solution_vals.add(Pair(start, start+length))
+                    no_solution_vals.add(Pair(start, start + length))
                     //throw Exception("min: $start, max: ${start + length}")
                     errors += 1
                 }
@@ -158,34 +175,45 @@ class Statistics_getYParameters_KtTest {
         print("minimum range used: ${range_used_list.minOrNull()}\n\n")
 
         for (i in 0..9) {
-            val top = 1-i*0.03
-            val bot = 1-(i+1)*0.03
+            val top = 1 - i * 0.03
+            val bot = 1 - (i + 1) * 0.03
             val nInRange = range_used_list.filter { top >= it && it > bot }.count()
-            println("%.2f".format(top) + " -> " + "%.2f".format(bot)+
-                    ":" + "%.2f".format(100*nInRange.toDouble()/nRuns.toDouble()).padStart(6, ' ') + "%")
+            println(
+                "%.2f".format(top) + " -> " + "%.2f".format(bot) +
+                        ":" + "%.2f".format(100 * nInRange.toDouble() / nRuns.toDouble())
+                    .padStart(6, ' ') + "%"
+            )
 
         }
-        println("Didn't find a good solution for ${100*errors.toDouble()/nRuns.toDouble()}%")
+        println("Didn't find a good solution for ${100 * errors.toDouble() / nRuns.toDouble()}%")
         //println("$no_solution_vals")
 
         println("How many lines are drawn how often:")
         intervalList
-                .map { it.n_lines }.groupingBy { it }
-                .eachCount().mapValues { 100*it.value.toDouble()/nRuns }
-                .entries.sortedBy { it.key }
-                .forEach { println("${it.key}:".padStart(3,' ') + "%.2f".format(it.value).padStart(6,' ')+ "%") }
+            .map { it.n_lines }.groupingBy { it }
+            .eachCount().mapValues { 100 * it.value.toDouble() / nRuns }
+            .entries.sortedBy { it.key }
+            .forEach {
+                println(
+                    "${it.key}:".padStart(3, ' ') + "%.2f".format(it.value).padStart(6, ' ') + "%"
+                )
+            }
 
         println("Which divisors are chosen how often:")
         intervalList
-                .map { round(it.base/it.interval).toInt() }.groupingBy { it }
-                .eachCount().mapValues { 100*it.value.toDouble()/nRuns }
-                .entries.sortedBy { it.key }
-                .forEach { println("${it.key}:".padStart(3, ' ') + "%.2f".format(it.value).padStart(6,' ')+ "%") }
+            .map { round(it.base / it.interval).toInt() }.groupingBy { it }
+            .eachCount().mapValues { 100 * it.value.toDouble() / nRuns }
+            .entries.sortedBy { it.key }
+            .forEach {
+                println(
+                    "${it.key}:".padStart(3, ' ') + "%.2f".format(it.value).padStart(6, ' ') + "%"
+                )
+            }
         //assertEquals( 0, errors)
         println()
         print("Some of the combinations where the algorithm did not fine a good solution (start, end): ")
-        println( no_solution_vals.slice(0..15) )
-        assertTrue(100*errors.toDouble()/nRuns.toDouble() <= allowed_error_percentage)
+        println(no_solution_vals.slice(0..15))
+        assertTrue(100 * errors.toDouble() / nRuns.toDouble() <= allowed_error_percentage)
     }
 
     @Test
@@ -254,11 +282,11 @@ class Statistics_getYParameters_KtTest {
             11:  8.27%
             12:  8.43%
             Which divisors are chosen how often:
-             1: 31.23%
-             2:  8.99%
-             3:  4.70%
-             4:  2.76%
-             6:  2.43%
+            1: 31.23%
+            2:  8.99%
+            3:  4.70%
+            4:  2.76%
+            6:  2.43%
             12:  1.94%
             24: 31.63%
             30: 16.32%
@@ -266,48 +294,53 @@ class Statistics_getYParameters_KtTest {
         }
     }
 
-        /*
-    private fun printExampleNumerical(start:Double, end: Double) {
-        val interval = try {
-            getYParametersInternal(start, end, time_data = false, fixedBounds = false)
-        } catch (e: Exception) {
-            PossibleInterval((end - start) / 10.0, false, 11, 1.0,
-                    start, end, 1.0)
-        }
-        printExampleNumerical( start, end, interval)
+    /*
+private fun printExampleNumerical(start:Double, end: Double) {
+    val interval = try {
+        getYParametersInternal(start, end, time_data = false, fixedBounds = false)
+    } catch (e: Exception) {
+        PossibleInterval((end - start) / 10.0, false, 11, 1.0,
+                start, end, 1.0)
     }
+    printExampleNumerical( start, end, interval)
+}
 */
     private fun printExampleNumerical(start: Double, end: Double) {
-        val parameters = getYParameters(start, end, time_data = false, fixedBounds = false)
+        val parameters = uut.getYParameters(start, end, time_data = false, fixedBounds = false)
         val boundsRange = parameters.bounds_max - parameters.bounds_min
-        val interval = boundsRange / (parameters.n_intervals-1)
+        val interval = boundsRange / (parameters.n_intervals - 1)
         println("----------------------------")
         for (i in 0 until parameters.n_intervals.toInt()) {
-            val label = parameters.bounds_max - i*interval
+            val label = parameters.bounds_max - i * interval
             println("$label")
         }
         print("Data range: [$start -> $end] ")
-        print("interval: ${interval} x ${parameters.n_intervals.toInt()-1} | ")
-        println("range used = %.1f".format(100*(end-start)/boundsRange))
+        print("interval: ${interval} x ${parameters.n_intervals.toInt() - 1} | ")
+        println("range used = %.1f".format(100 * (end - start) / boundsRange))
         //return interval
     }
 
 
-
     @ExperimentalTime
-    private fun printExampleTime(start: Double, end: Double): YAxisParameters {
-        val parameters = getYParameters(start, end, time_data = true, fixedBounds = false, throw_exc_if_non_found = false)
+    private fun printExampleTime(start: Double, end: Double): DataDisplayIntervalHelper.YAxisParameters {
+        val parameters = uut.getYParameters(
+            start,
+            end,
+            time_data = true,
+            fixedBounds = false,
+            throw_exc_if_non_found = false
+        )
         val boundsRange = parameters.bounds_max - parameters.bounds_min
-        val interval = boundsRange / (parameters.n_intervals-1)
+        val interval = boundsRange / (parameters.n_intervals - 1)
         println("----------------------------")
         for (i in 0 until parameters.n_intervals.toInt()) {
-            val label_seconds = parameters.bounds_max - i*interval
+            val label_seconds = parameters.bounds_max - i * interval
             val label = duration2string(label_seconds.seconds)
             println(label)
         }
         print("Data range: [${duration2string(start.seconds)} -> ${duration2string(end.seconds)}] ")
-        print("interval: ${duration2string(interval.seconds)} x ${parameters.n_intervals.toInt()-1} | ")
-        println("range used = ${round(100*(end-start)/boundsRange)}%")
+        print("interval: ${duration2string(interval.seconds)} x ${parameters.n_intervals.toInt() - 1} | ")
+        println("range used = ${round(100 * (end - start) / boundsRange)}%")
         return parameters
     }
 

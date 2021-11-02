@@ -17,9 +17,6 @@
 
 package com.samco.trackandgraph.ui
 
-import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
-import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.Group

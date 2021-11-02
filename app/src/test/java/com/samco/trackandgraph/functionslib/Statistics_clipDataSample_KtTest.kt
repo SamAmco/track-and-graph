@@ -15,9 +15,10 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.statistics
+package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.entity.DataPoint
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.Duration
@@ -25,16 +26,16 @@ import org.threeten.bp.OffsetDateTime
 
 class Statistics_clipDataSample_KtTest {
     @Test
-    fun clipDataSample_empty_sample() {
+    fun clipDataSample_empty_sample() = runBlocking {
         //WHEN
-        val answer = clipDataSample(DataSample(listOf()), null, null)
+        val answer = DataClippingFunction(null, null).execute(DataSample(listOf()))
 
         //THEN
         assertEquals(0, answer.dataPoints.size)
     }
 
     @Test
-    fun clipDataSample_no_end_time_or_duration() {
+    fun clipDataSample_no_end_time_or_duration() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
@@ -54,19 +55,14 @@ class Statistics_clipDataSample_KtTest {
             )
 
         //WHEN
-        val answer =
-            clipDataSample(
-                dataSample,
-                null,
-                null
-            )
+        val answer = DataClippingFunction(null, null).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_no_end_time_with_duration_inclusive() {
+    fun clipDataSample_no_end_time_with_duration_inclusive() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
@@ -87,19 +83,14 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofHours(30)
 
         //WHEN
-        val answer =
-            clipDataSample(
-                dataSample,
-                null,
-                sampleDuration
-            )
+        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.takeLast(3), answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_no_end_time_with_duration_larger_than_data() {
+    fun clipDataSample_no_end_time_with_duration_larger_than_data() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
@@ -117,13 +108,13 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofHours(100)
 
         //WHEN
-        val answer = clipDataSample(dataSample, null, sampleDuration)
+        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_no_end_time_with_duration_excluding_all() {
+    fun clipDataSample_no_end_time_with_duration_excluding_all() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
@@ -141,14 +132,14 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofHours(1)
 
         //WHEN
-        val answer = clipDataSample(dataSample, null, sampleDuration)
+        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.takeLast(1), answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_no_end_time_all_data_in_future() {
+    fun clipDataSample_no_end_time_all_data_in_future() = runBlocking {
         //GIVEN
         val future = OffsetDateTime.now().plusMonths(1)
         val dataPoints = listOf(
@@ -166,14 +157,14 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofHours(35)
 
         //WHEN
-        val answer = clipDataSample(dataSample, null, sampleDuration)
+        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.takeLast(5), answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_with_end_time_no_duration_inclusive() {
+    fun clipDataSample_with_end_time_no_duration_inclusive() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
@@ -191,14 +182,14 @@ class Statistics_clipDataSample_KtTest {
         val endTime = now.minusDays(20)
 
         //WHEN
-        val answer = clipDataSample(dataSample, endTime, null)
+        val answer = DataClippingFunction(endTime, null).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.take(8), answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_with_end_time_all_data_after() {
+    fun clipDataSample_with_end_time_all_data_after() = runBlocking {
         //GIVEN
         val future = OffsetDateTime.now().plusYears(1)
         val dataPoints = listOf(
@@ -215,14 +206,14 @@ class Statistics_clipDataSample_KtTest {
         val dataSample = DataSample(dataPoints)
 
         //WHEN
-        val answer = clipDataSample(dataSample, OffsetDateTime.now(), null)
+        val answer = DataClippingFunction(OffsetDateTime.now(), null).execute(dataSample)
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_with_end_time_all_data_before() {
+    fun clipDataSample_with_end_time_all_data_before() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
@@ -239,14 +230,14 @@ class Statistics_clipDataSample_KtTest {
         val dataSample = DataSample(dataPoints)
 
         //WHEN
-        val answer = clipDataSample(dataSample, now, null)
+        val answer = DataClippingFunction(now, null).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints, answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_with_end_time_and_duration() {
+    fun clipDataSample_with_end_time_and_duration() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val future = now.plusMonths(1)
@@ -265,14 +256,14 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofDays(30)
 
         //WHEN
-        val answer = clipDataSample(dataSample, now, sampleDuration)
+        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(dataPoints.drop(1).take(6), answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_with_end_time_and_duration_all_data_before() {
+    fun clipDataSample_with_end_time_and_duration_all_data_before() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
@@ -290,14 +281,14 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofDays(3)
 
         //WHEN
-        val answer = clipDataSample(dataSample, now, sampleDuration)
+        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)
     }
 
     @Test
-    fun clipDataSample_with_end_time_and_duration_all_data_after() {
+    fun clipDataSample_with_end_time_and_duration_all_data_after() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
@@ -315,7 +306,7 @@ class Statistics_clipDataSample_KtTest {
         val sampleDuration = Duration.ofDays(20)
 
         //WHEN
-        val answer = clipDataSample(dataSample, now, sampleDuration)
+        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
 
         //THEN
         assertEquals(emptyList<DataPoint>(), answer.dataPoints)
