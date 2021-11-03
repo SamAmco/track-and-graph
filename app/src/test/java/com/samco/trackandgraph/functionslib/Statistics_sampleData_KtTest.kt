@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.statistics
+package com.samco.trackandgraph.functionslib
 
 import com.nhaarman.mockitokotlin2.argumentCaptor
 import com.nhaarman.mockitokotlin2.eq
@@ -45,8 +45,8 @@ class Statistics_sampleData_KtTest {
             val plotTotalTime: TemporalAmount? = null
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -67,8 +67,8 @@ class Statistics_sampleData_KtTest {
             val plotTotalTime: TemporalAmount? = null
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -96,8 +96,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -138,8 +138,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -185,8 +185,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -237,8 +237,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -276,8 +276,8 @@ class Statistics_sampleData_KtTest {
             val plotTotalTime: TemporalAmount? = Duration.ofDays(200)
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -301,8 +301,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -343,8 +343,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -385,8 +385,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -427,8 +427,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -469,8 +469,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
@@ -511,8 +511,8 @@ class Statistics_sampleData_KtTest {
             val endTimeCaptor = argumentCaptor<OffsetDateTime>()
 
             //WHEN
-            sampleData(
-                dataSource, featureId, sampleDuration, endDate,
+            DatabaseSampleHelper(dataSource).sampleData(
+                featureId, sampleDuration, endDate,
                 averagingDuration, plotTotalTime
             )
 
