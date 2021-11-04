@@ -2,6 +2,8 @@ package com.samco.trackandgraph.antlr.eval
 
 import com.samco.trackandgraph.antlr.evaluation.*
 import com.samco.trackandgraph.antlr.someData
+import com.samco.trackandgraph.antlr.someDataRandom
+import com.samco.trackandgraph.antlr.*
 import com.samco.trackandgraph.database.entity.DataPoint
 import org.junit.Assert
 import org.junit.Test
@@ -211,43 +213,27 @@ class FunctionsOnDataTest {
 
     }
 
-    private fun generateDataPoints2(
-        points: List<Triple<DayOfWeek, Int, Double>>
-    ): List<DataPoint> {
-        var currentDay = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
+    @Test
+    fun mergeFunctionTest() {
+        val d1 = someDataRandom()
+        val d2 = someDataRandom()
+        val d3 = someDataRandom()
 
-        val output = mutableListOf<DataPoint>()
+        val expected = (d1 + d2 + d3).sortedBy { it.timestamp }
 
-        for (pointData in points) {
-            val (dayOfWeek, timeInMinutes, value) = pointData
+        val evaluationModel = EvaluationModel()
 
-            currentDay = currentDay.with(TemporalAdjusters.nextOrSame(dayOfWeek))
-            val timestamp = currentDay + Duration.ofMinutes(timeInMinutes.toLong())
+        val code = "var output = Merge(d1, d2, d3)"
+        val context =
+            evaluationModel.run(code, mapOf("d1" to d1, "d2" to d2, "d3" to d3))
 
-            output.add(DataPoint(timestamp, 0L, value, "", ""))
-        }
+        val output = context["output"] as DatapointsValue
 
-        return output
-    }
+        Assert.assertEquals(
+            expected,
+            output.datapoints
+        )
 
-    private fun generateDataPoints2Categorical(
-        points: List<Triple<DayOfWeek, Int, Int>>,
-        val2str: Map<Int, String>
-    ): List<DataPoint> {
-        var currentDay = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
-
-        val output = mutableListOf<DataPoint>()
-
-        for (pointData in points) {
-            val (dayOfWeek, timeInMinutes, value) = pointData
-
-            currentDay = currentDay.with(TemporalAdjusters.nextOrSame(dayOfWeek))
-            val timestamp = currentDay + Duration.ofMinutes(timeInMinutes.toLong())
-
-            output.add(DataPoint(timestamp, 0L, value.toDouble(), val2str[value]!!, ""))
-        }
-
-        return output
     }
 
 }

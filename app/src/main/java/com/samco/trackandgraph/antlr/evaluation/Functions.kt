@@ -1,7 +1,9 @@
 package com.samco.trackandgraph.antlr.evaluation
 
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DataPointInterface
+import org.threeten.bp.OffsetDateTime
 
 fun callFunction(functionName: String, args: List<Value>) : Value {
 //    FunctionCallableFromCode::class.sealedSubclasses.map { it.objectInstance?.functionName  }
@@ -14,6 +16,8 @@ fun callFunction(functionName: String, args: List<Value>) : Value {
 
         "Filter" -> FilterFunction().main(args)
         "Exclude" -> ExcludeFunction().main(args)
+
+        "Merge" -> MergeFunction().main(args)
         else -> throw UnknownFunctionName(functionName)
     }
 }
@@ -154,6 +158,32 @@ class ExcludeFunction : FunctionCallableFromCode("Exclude", R.string.functionsig
                 else -> throw WrongArgDatatypeError("Filter", index+1, value::class, listOf(StringValue::class))
             } }
         return DatapointsValue(inputData.datapoints.filter { it.label !in allowedValues }, inputData.dataType, inputData.regularity)
+    }
+}
+
+class MergeFunction : FunctionCallableFromCode("Merge", R.string.functionsig_merge) {
+    override fun main(args: List<Value>): Value {
+        val reference = getArgument<DatapointsValue>(args, 0)
+        getArgument<DatapointsValue>(args, 1) // to make sure we have at least one more sample
+        val listsToMerge: List<MutableList<DataPointInterface>> = args.subList(0, args.size).mapIndexed { index, value ->
+            when (value) {
+                is DatapointsValue -> value.apply { this.confirmType(listOf(reference.dataType)) }.datapoints.toMutableList()
+                else -> throw WrongArgDatatypeError("Merge", index, value::class, listOf(StringValue::class))
+            } }
+
+        val mergedList = mutableListOf<DataPointInterface>()
+        while (listsToMerge.any { it.size > 0 }) {
+            val minIndex = listsToMerge
+                .withIndex()
+                .minByOrNull { it.value.firstOrNull()?.timestamp ?: OffsetDateTime.MAX }!!
+                .index
+
+            mergedList.add(listsToMerge[minIndex].removeFirst())
+        }
+
+        // regularity is NONE, bc even if all inputs were regular, now that there could be
+        // more than one point per regular interval
+        return DatapointsValue(mergedList, reference.dataType, Regularity.NONE)
     }
 }
 

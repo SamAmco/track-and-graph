@@ -374,4 +374,5 @@
     <string name="functionsig_timebetween2">TimeBetween2: Takes two series and calculates the smallest positive interval for each point in the first series</string>
     <string name="functionsig_filter">Filter: Takes a list of categorical data and removes entries not matching the args</string>
     <string name="functionsig_exclude">Exclude: Takes a list of categorical data and removes entries matching the args</string>
+    <string name="functionsig_merge">Merge: Takes two or more datasamples (of same type) and merges them into one</string>
 </resources>
