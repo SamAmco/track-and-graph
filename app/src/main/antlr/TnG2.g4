@@ -56,7 +56,7 @@ expression : left=expression operator=(DIVISION|ASTERISK) right=expression # bin
            | INTLIT                                                        # intLiteral
            | DECLIT                                                        # decimalLiteral
            | time_period                                                   # timePeriod
-           | aggregation_function                                          # aggregationFunction
+           | aggregation_function_enum                                     # aggregationFunction // move this to new constants category?
            | STRING                                                        # stringLiteral
 //           | functionName=FUNCTION_NAME LPAREN args=argumentList RPAREN    # functionCall
            | function_call                                                 # functionCall
@@ -77,13 +77,15 @@ time_period:
     | MONTHLY       # Monthly
     | YEARLY        # Yearly ;
 
-aggregation_function:
-      AVERAGE       # Average
-    | MEDIAN        # Median
-    | MIN           # Min
-    | MAX           # Max
-    | EARLIEST      # Earliest
-    | LATEST        # Latest ;
+aggregation_function_enum:
+      AVERAGE       # AF_Average
+    | MEDIAN        # AF_Median
+    | MIN           # AF_Min
+    | MAX           # AF_Max
+    | EARLIEST      # AF_Earliest
+    | LATEST        # AF_Latest
+    | SUM           # AF_Sum
+    | COUNT         # AF_Count ;
 
 
 
@@ -114,6 +116,8 @@ MIN                 : 'MIN' ;
 MAX                 : 'MAX' ;
 EARLIEST            : 'EARLIEST' ;
 LATEST              : 'LATEST' ;
+SUM                 : 'SUM' ;
+COUNT               : 'COUNT' ;
 
 // Literals
 INTLIT             : '0'|[1-9][0-9]* ;

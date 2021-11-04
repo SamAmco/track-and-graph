@@ -151,6 +151,8 @@ data class StringLit(val value: String, override val position: Position? = null)
 
 data class TimeperiodLit(val context: ParseTree, override val position: Position? = null) : Expression
 
+data class AggregationEnumLit(val context: ParseTree, override val position: Position? = null) : Expression
+
 data class FunctionCall(val functionName: String, val args: List<Expression>,  override val position: Position? = null) : Expression
 
 //

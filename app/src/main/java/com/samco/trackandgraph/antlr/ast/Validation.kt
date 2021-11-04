@@ -18,23 +18,20 @@
 package com.samco.trackandgraph.antlr.ast
 
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.antlr.evaluation.DoubleDeclarationError
-import com.samco.trackandgraph.antlr.evaluation.NotDeclaredError
-import com.samco.trackandgraph.antlr.evaluation.ReferencedBeforeDeclarationError
-import com.samco.trackandgraph.antlr.evaluation.UnexistingVariableError
+import com.samco.trackandgraph.antlr.evaluation.*
 import java.util.*
 import kotlin.reflect.KFunction2
 
 open class DatatransformationFunctionError(fallbackMessage: String, var position: Position,
-    val messageFunction: (KFunction2<Int, Array<out Any?>, String>) -> String) : Exception(fallbackMessage) {
+    val messageFunction: (KFunction2<Int, Array<out Any?>, String>) -> String) : Exception("[FALLBACK] $fallbackMessage") {
 
     constructor(
         fallbackMessage: String,
         position: Position,
         localizedMessageId: Int,
-        vararg localizedMessageArgs: String
+        vararg localizedMessageArgs: Any
     ) : this(fallbackMessage, position,
-        { getString -> getString(localizedMessageId, localizedMessageArgs) }
+        { getString -> BetterGetString(getString)(localizedMessageId, *localizedMessageArgs) }
     )
 
     fun getPos(): Position = position

@@ -106,23 +106,20 @@ class ArgMissingError(functionName: String, index: Int, type: KClass<*>) :
         }
     )
 
+// TODO: Maybe have function signatures ready to print out?
+class TooManyArgsError(functionName: String, expectedNumber: Number, actualNumber: Number) :
+    DatatransformationFunctionError("Function '$functionName' got $actualNumber argument, but expected only $expectedNumber.",
+        emptyPosition(),
+        R.string.errormsg_too_many_args,
+        functionName, actualNumber, expectedNumber)
 
-/**
- * Function to get an argument out of the list of arguments.
- * Throws errors if the argument has the wrong type or is missing.
- */
-inline fun <reified T : Value> getArgument(
-    functionName: String,
-    argumentList: List<Value>,
-    index: Int
-): T {
-    val arg =
-        argumentList.elementAtOrNull(index) ?: throw ArgMissingError(functionName, index, T::class)
-    when (arg) {
-        is T -> return arg
-        else -> throw WrongArgDatatypeError(functionName, index, arg::class, listOf(T::class))
-    }
-}
+
+class DatapointsWrongTypeError(expectedTypes: List<DataType>, actualType: DataType) :
+    DatatransformationFunctionError("Datapoints had the wrong type! Expected $expectedTypes, but got $actualType.",
+    emptyPosition(),
+    R.string.errormsg_datapoints_wrong_type,
+    expectedTypes, actualType)
+
 
 
 /**
@@ -132,7 +129,7 @@ inline fun <reified T : Value> getArgument(
  *  - Concatenates Lists with " or " (localized)
  *  - uses vararg instead of Array<Any>
  */
-private class BetterGetString(val getString: KFunction2<Int, Array<Any>, String>) {
+class BetterGetString(val getString: KFunction2<Int, Array<Any>, String>) {
     operator fun invoke(mainId: Int, vararg args: Any): String {
         val betterArgs = args.map {
             this.improveArg(it)
@@ -143,7 +140,8 @@ private class BetterGetString(val getString: KFunction2<Int, Array<Any>, String>
     private fun improveArg(arg: Any): Any {
         return when (arg) {
             is KClass<*> -> getString(valueClassToStringResId(arg), arrayOf())
-
+            is DataType -> arg.toLocalizedString(getString)
+            
             // This case recursively calls improveArg on all list components and then concatenates them with " or "
             is List<*> -> {
                 arg.filterNotNull().map {

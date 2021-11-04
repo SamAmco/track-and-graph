@@ -16,6 +16,8 @@
 
 package com.samco.trackandgraph.antlr.ast
 
+import com.samco.trackandgraph.antlr.evaluation.AggregationEnum
+import com.samco.trackandgraph.antlr.evaluation.AggregationEnumValue
 import org.antlr.v4.runtime.ParserRuleContext
 import org.antlr.v4.runtime.Token
 import org.antlr.v4.runtime.Token.EOF
@@ -48,6 +50,8 @@ fun ExpressionContext.toAst(considerPosition: Boolean = false) : Expression = wh
     is DecimalLiteralContext -> DecLit(text, toPosition(considerPosition))
     is StringLiteralContext -> StringLit(text.replace("\"", ""), toPosition(considerPosition))
     is TimePeriodContext -> TimeperiodLit(this.getChild(0)!!, toPosition(considerPosition))
+    is Aggregation_function_enumContext -> AggregationEnumLit(this.getChild(0)!!, toPosition(considerPosition))
+    is AggregationFunctionContext -> AggregationEnumLit(this.getChild(0)!!, toPosition(considerPosition))
     is ParenExpressionContext -> expression().toAst(considerPosition)
     is VarReferenceContext -> VarReference(text, toPosition(considerPosition))
 //    is TypeConversionContext -> TypeConversion(expression().toAst(considerPosition), targetType.toAst(considerPosition), toPosition(considerPosition))

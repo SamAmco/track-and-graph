@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
+import com.samco.trackandgraph.antlr.evaluation.AggregationEnum
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 
@@ -40,9 +41,63 @@ internal class RawAggregatedDatapoints(private val points: List<AggregatedDataPo
             .map { it.copy(value = it.parents.maxOf { par -> par.value }) }
     )
 
+    fun min() = DataSample(
+        this.points
+            .filter { it.parents.isNotEmpty() }
+            .map { it.copy(value = it.parents.minOf { par -> par.value }) }
+    )
+
     fun average() = DataSample(
         this.points
             .filter { it.parents.isNotEmpty() }
             .map { it.copy(value = it.parents.map { par -> par.value }.average()) }
     )
+
+    fun median() : DataSample{
+        fun median_internal(list: List<Double>): Double {
+            val sorted = list.sortedBy { it }
+            return when (sorted.size % 2) {
+                1 -> return sorted[sorted.size.div(2)]
+                0 -> return sorted.subList(sorted.size.div(2)-1, sorted.size.div(2)+1).average() // sublist 2nd arg is exclusive
+                else -> throw Exception("unreachable. positive int modulo 2 is always 1 or 0")
+            }
+        }
+        return DataSample(
+            this.points
+                .filter { it.parents.isNotEmpty() }
+                .map { it.copy(value =
+                median_internal(it.parents.map { par -> par.value })) }
+        )
+    }
+
+    fun earliest() = DataSample(
+        this.points
+            .filter { it.parents.isNotEmpty() }
+            .map { it.copy(value = it.parents.sortedBy { par -> par.timestamp }.first().value) }
+    )
+
+    fun latest() = DataSample(
+        this.points
+            .filter { it.parents.isNotEmpty() }
+            .map { it.copy(value = it.parents.sortedBy { par -> par.timestamp }.last().value) }
+    )
+
+    fun count() = DataSample(
+        this.points
+            .map { it.copy(value = it.parents.size.toDouble()) }
+    )
+
+    operator fun invoke(aggregationFunction: AggregationEnum) : DataSample {
+        return when (aggregationFunction) {
+            AggregationEnum.SUM -> this.sum()
+            AggregationEnum.AVERAGE -> this.average()
+            AggregationEnum.MAX -> this.max()
+            AggregationEnum.MIN -> this.min()
+            AggregationEnum.MEDIAN -> this.median()
+            AggregationEnum.EARLIEST -> this.earliest()
+            AggregationEnum.LATEST -> this.latest()
+            AggregationEnum.COUNT -> this.count()
+        }
+    }
+
 }

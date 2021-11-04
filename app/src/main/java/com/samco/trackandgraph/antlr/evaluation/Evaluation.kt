@@ -5,7 +5,9 @@ import com.samco.trackandgraph.antlr.ast.*
 import com.samco.trackandgraph.antlr.parsing.DatatransformationFunctionParserFacade
 import com.samco.trackandgraph.database.entity.DataPoint
 
+//TODO this function needs to be made obsolete by incorporating the information in DataSample!
 fun inferDatatype(data: List<DataPoint>) : DataType {
+    if (data.all { it.label != "" }) return DataType.CATEGORICAL
     return DataType.NUMERICAL
 }
 
@@ -48,6 +50,7 @@ fun Expression.evaluate(context: Map<String, Value>) : Value {
             is DecLit -> NumberValue(this.value.toDouble())
             is StringLit -> StringValue(this.value)
             is TimeperiodLit -> TimeValue(this.context)
+            is AggregationEnumLit -> AggregationEnumValue(this.context)
 
             is MultiplicationExpression -> this.left.evaluate(context) * this.right.evaluate(context)
             is DivisionExpression       -> this.left.evaluate(context) / this.right.evaluate(context)

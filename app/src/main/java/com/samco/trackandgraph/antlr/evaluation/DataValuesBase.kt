@@ -3,11 +3,14 @@ package com.samco.trackandgraph.antlr.evaluation
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.antlr.generated.TnG2Parser
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.functionslib.DataSample
 import org.antlr.v4.runtime.tree.ParseTree
 import org.threeten.bp.Duration
 import kotlin.reflect.KClass
+import kotlin.reflect.KFunction2
 
-abstract class Value () {
+sealed class Value {
     init {
         val debugNameRes = valueClassToStringResId(this::class)
     }
@@ -125,11 +128,21 @@ enum class DataType {
     NUMERICAL, TIME, CATEGORICAL,
 }
 
+fun DataType.toLocalizedString(getString: KFunction2<Int, Array<Any>, String>) : String{
+    return when(this) {
+        DataType.NUMERICAL -> getString(R.string.datatype_numerical, arrayOf())
+        DataType.TIME -> getString(R.string.datatype_time, arrayOf())
+        DataType.CATEGORICAL -> getString(R.string.datatype_categorical, arrayOf())
+    }
+}
+
 class DatapointsValue(
-    val datapoints: List<DataPoint>,
+    val datapoints: List<DataPointInterface>,
     val dataType: DataType,
     val regularity: Regularity = Regularity.NONE
 ) : Value() {
+    constructor(dataSample: DataSample, dataType: DataType, regularity: Regularity) : this(dataSample.dataPoints, dataType, regularity)
+
     override fun equals(other: Any?): Boolean {
         if (other is DatapointsValue) return this.datapoints == other.datapoints
         return super.equals(other)
@@ -154,6 +167,41 @@ class DatapointsValue(
     override fun _minus(other: Value): Value = this.minusValue(other)
     override fun _times (other: Value): Value = this.timesValue(other)
     override fun _div(other: Value): Value = this.divValue(other)
+
+    fun confirmType(allowedTypes: List<DataType>) {
+        if (dataType !in allowedTypes) {
+            throw DatapointsWrongTypeError(allowedTypes, dataType)
+        }
+    }
+}
+
+enum class AggregationEnum {
+    AVERAGE,
+    MEDIAN,
+    MIN,
+    MAX,
+    EARLIEST,
+    LATEST,
+    SUM,
+    COUNT,
+}
+
+class AggregationEnumValue(val aggregationFunction : AggregationEnum) : Value() {
+    constructor(context: ParseTree)  : this(when(context) {
+        is TnG2Parser.AF_MinContext -> AggregationEnum.MIN
+        is TnG2Parser.AF_MaxContext -> AggregationEnum.MAX
+        is TnG2Parser.AF_AverageContext -> AggregationEnum.AVERAGE
+        is TnG2Parser.AF_MedianContext -> AggregationEnum.MEDIAN
+        is TnG2Parser.AF_EarliestContext -> AggregationEnum.EARLIEST
+        is TnG2Parser.AF_LatestContext -> AggregationEnum.LATEST
+        is TnG2Parser.AF_SumContext ->  AggregationEnum.SUM
+        is TnG2Parser.AF_CountContext -> AggregationEnum.COUNT
+        else -> throw UnsupportedOperationException("Unexpected Context ${context::class.simpleName}!")})
+
+    override fun equals(other: Any?): Boolean {
+        if (other is AggregationEnumValue) return this.aggregationFunction == other.aggregationFunction
+        return super.equals(other)
+    }
 }
 
 
@@ -163,6 +211,7 @@ fun valueClassToStringResId(valueClass: KClass<*>) : Int{
         DatapointsValue::class -> R.string.trafoDebug_datapoints
         TimeValue::class -> R.string.trafoDebug_time_duration
         StringValue::class -> R.string.trafoDebug_string
+        AggregationEnumValue::class -> R.string.datatype_aggregation_enum
         else -> throw NotImplementedError("${valueClass.simpleName} not implemented!")
     }
 }

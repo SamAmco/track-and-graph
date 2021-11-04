@@ -26,12 +26,20 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
 
 
-interface DataPointInterface {
-    val timestamp: OffsetDateTime
-    val featureId: Long
-    val value: Double
-    val label: String
-    val note: String
+sealed class DataPointInterface {
+    abstract val timestamp: OffsetDateTime
+    abstract val featureId: Long
+    abstract val value: Double
+    abstract val label: String
+    abstract val note: String
+
+    abstract fun copy(
+        timestamp: OffsetDateTime? = null,
+        featureId: Long? = null,
+        value: Double? = null,
+        label: String? = null,
+        note: String? = null
+    ): DataPointInterface
 }
 
 @Entity(
@@ -62,7 +70,9 @@ data class DataPoint (
 
     @ColumnInfo(name = "note")
     override val note: String
-)  : DataPointInterface {
+
+
+) : DataPointInterface() {
     companion object {
         fun getDisplayValue(dataPoint: DataPointInterface, featureType: FeatureType): String {
             return when (featureType) {
@@ -72,13 +82,43 @@ data class DataPoint (
             }
         }
     }
+
+    override fun copy(
+        timestamp: OffsetDateTime?,
+        featureId: Long?,
+        value: Double?,
+        label: String?,
+        note: String?
+    ) = this.copy( // the this.copy function is the one automatically generated bc this is data-class
+        timestamp = timestamp ?: this.timestamp,
+        featureId = featureId ?: this.featureId,
+        value = value ?: this.value,
+        label = label ?: this.label,
+        note = note ?: this.note
+    )
+
 }
 
-data class AggregatedDataPoint (
+data class AggregatedDataPoint(
     override val timestamp: OffsetDateTime,
     override val featureId: Long,
     override val value: Double,
     val parents: List<DataPointInterface>,
     override val label: String = "",
     override val note: String = "",
-        ): DataPointInterface
+) : DataPointInterface() {
+
+    override fun copy(
+        timestamp: OffsetDateTime?,
+        featureId: Long?,
+        value: Double?,
+        label: String?,
+        note: String?
+    ) = this.copy( // the this.copy function is the one automatically generated bc this is data-class
+        timestamp = timestamp ?: this.timestamp,
+        featureId = featureId ?: this.featureId,
+        value = value ?: this.value,
+        label = label ?: this.label,
+        note = note ?: this.note
+    )
+}

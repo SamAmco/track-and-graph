@@ -34,4 +34,14 @@ public class ErrorLocalisationTest {
         )
     }
 
+    @Test
+    fun datapointsWrongTypeTest() {
+        val context: Context =  InstrumentationRegistry.getInstrumentation().targetContext
+
+        val error = DatapointsWrongTypeError(listOf(DataType.NUMERICAL, DataType.TIME), DataType.CATEGORICAL)
+        val msg = error.fullLocalizedMessage(context::getString)
+
+        assertEquals("DatapointsWrongTypeError at Line 0, Column 0: Datapoints had the wrong type! Expected Numerical or Time, but got Categorical.", msg)
+    }
+
 }

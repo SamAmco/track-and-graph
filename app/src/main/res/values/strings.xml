@@ -361,4 +361,17 @@
     <string name="errormsg_arg_wrong_type">Argument %1$d of function \'%2$s\' has to be of type %3$s, but was of type %4$s</string>
     <string name="or">or</string>
     <string name="errormsg_error_at_position">%1$s at %2$s: %3$s</string>
+    <string name="errormsg_too_many_args">Function \'%1$s\' got %2$d argument[s], but expected only %3$d.</string>
+    <string name="errormsg_datapoints_wrong_type">Datapoints had the wrong type! Expected %1$s, but got %2$s.</string>
+    <string name="datatype_numerical">Numerical</string>
+    <string name="datatype_time">Time</string>
+    <string name="datatype_categorical">Categorical</string>
+    <string name="functionsig_delta">Delta: Takes numerical or time datapoints</string>
+    <string name="functionsig_accumulate">Accumulate: Takes numerical or time datapoints and sums them up</string>
+    <string name="functionsig_derivative">Derivative: Takes numerical or time datapoints and a time value to calculate change per time</string>
+    <string name="datatype_aggregation_enum">Aggregation Function Identifier</string>
+    <string name="functionsig_timebetween">TimeBetween: Calculates the time between datapoints of a series</string>
+    <string name="functionsig_timebetween2">TimeBetween2: Takes two series and calculates the smallest positive interval for each point in the first series</string>
+    <string name="functionsig_filter">Filter: Takes a list of categorical data and removes entries not matching the args</string>
+    <string name="functionsig_exclude">Exclude: Takes a list of categorical data and removes entries matching the args</string>
 </resources>
