@@ -17,10 +17,12 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
+import com.samco.trackandgraph.antlr.evaluation.toDuration
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
+import org.threeten.bp.temporal.TemporalAmount
 
 /**
  * Calculate the moving aggregation-parents of all of the data points given over the moving duration given.
@@ -29,7 +31,7 @@ import org.threeten.bp.Duration
  * The data points in the input sample are expected to be in date order with the oldest data points
  * earliest in the list
  */
-internal class MovingAggregator(private val movingAggDuration: Duration) : DataAggregator {
+internal class MovingAggregator(private val movingAggDuration: TemporalAmount) : DataAggregator {
     override suspend fun aggregate(dataSample: DataSample): RawAggregatedDatapoints {
         val movingAggregationPointsRaw = mutableListOf<AggregatedDataPoint>()
         val dataPointsReversed = dataSample.dataPoints.reversed()
@@ -38,7 +40,7 @@ internal class MovingAggregator(private val movingAggDuration: Duration) : DataA
             yield()
             val parents = dataPointsReversed.drop(index)
                 .takeWhile { dp ->
-                    Duration.between(dp.timestamp, current.timestamp) < movingAggDuration
+                    Duration.between(dp.timestamp, current.timestamp) < movingAggDuration.toDuration()
                 }
 
             movingAggregationPointsRaw.add(

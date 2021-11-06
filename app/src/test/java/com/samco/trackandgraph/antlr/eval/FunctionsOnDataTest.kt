@@ -5,6 +5,10 @@ import com.samco.trackandgraph.antlr.someData
 import com.samco.trackandgraph.antlr.someDataRandom
 import com.samco.trackandgraph.antlr.*
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.functionslib.DataSample
+import com.samco.trackandgraph.functionslib.MovingAverageFunction
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
 import org.threeten.bp.DayOfWeek
@@ -30,7 +34,7 @@ class FunctionsOnDataTest {
         val output = context["a"] as DatapointsValue
 
         Assert.assertEquals(
-            DeltaFunction().main(listOf(DatapointsValue(datapoints))),
+            runBlocking { DeltaFunction().main(listOf(DatapointsValue(datapoints))) },
             output
         )
 
@@ -48,7 +52,7 @@ class FunctionsOnDataTest {
         val output = context["a"] as DatapointsValue
 
         Assert.assertEquals(
-            AccumulateFunction().main(listOf(DatapointsValue(datapoints))),
+            runBlocking { AccumulateFunction().main(listOf(DatapointsValue(datapoints))) },
             output
         )
 
@@ -73,12 +77,14 @@ class FunctionsOnDataTest {
         val output = context["a"] as DatapointsValue
 
         Assert.assertEquals(
-            DerivativeFunction().main(
-                listOf(
-                    DatapointsValue(datapoints),
-                    TimeValue(Duration.ofHours(1))
+            runBlocking {
+                DerivativeFunction().main(
+                    listOf(
+                        DatapointsValue(datapoints),
+                        TimeValue(Duration.ofHours(1))
+                    )
                 )
-            ),
+            },
             output
         )
 
@@ -104,11 +110,13 @@ class FunctionsOnDataTest {
         val output = context["output"] as DatapointsValue
 
         Assert.assertEquals(
-            TimeBetweenFunction().main(
-                listOf(
-                    DatapointsValue(datapoints),
-                )
-            ) / TimeValue(Duration.ofHours(1)),
+            runBlocking {
+                TimeBetweenFunction().main(
+                    listOf(
+                        DatapointsValue(datapoints),
+                    )
+                ) / TimeValue(Duration.ofHours(1))
+            },
             output
         )
 
@@ -144,12 +152,14 @@ class FunctionsOnDataTest {
         val output = context["output"] as DatapointsValue
 
         Assert.assertEquals(
-            TimeBetween2Function().main(
-                listOf(
-                    DatapointsValue(datapointsMain),
-                    DatapointsValue(datapointsRef),
-                )
-            ) / TimeValue(Duration.ofHours(1)),
+            runBlocking {
+                TimeBetween2Function().main(
+                    listOf(
+                        DatapointsValue(datapointsMain),
+                        DatapointsValue(datapointsRef),
+                    )
+                ) / TimeValue(Duration.ofHours(1))
+            },
             output
         )
 
@@ -234,6 +244,34 @@ class FunctionsOnDataTest {
             output.datapoints
         )
 
+    }
+
+    @Test
+    fun calculateMovingAverages() {
+        /* The test assumes that datapoints will only be averages when the time between is
+           smaller than the given window, NOT smaller or equal, e.g. the last two points will not be
+           averaged together since they are exactly 10 hours apart, not less.
+         */
+        // copied from Statistics_calculateMovingAverages_KtTest
+        runBlocking {
+            //GIVEN
+            val data = someData()
+            val averagingDuration = Duration.ofHours(10)
+
+            //WHEN
+            val evaluationModel = EvaluationModel()
+
+            val code = "var output = Moving(data, AVERAGE, HOUR * 10)"
+            val context =
+                evaluationModel.run(code, mapOf("data" to data))
+
+            val answer = context["output"] as DatapointsValue
+
+            //THEN
+            val expected = listOf(5.0, 0.0, 2.0, 2.0, 1.5, 2.0, 8.0, 7.0, 3.0) // correct for fixed values in someData()
+            val actual = answer.datapoints.map { dp -> dp.value }
+            junit.framework.Assert.assertEquals(expected, actual)
+        }
     }
 
 }

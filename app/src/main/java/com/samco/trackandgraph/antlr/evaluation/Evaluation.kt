@@ -6,6 +6,7 @@ import com.samco.trackandgraph.antlr.parsing.DatatransformationFunctionParserFac
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
+import kotlinx.coroutines.runBlocking
 
 
 class EvaluationModel {
@@ -18,10 +19,12 @@ class EvaluationModel {
             else -> throw ListOfErrors(parseResult.errors)
         }
 
-        return this.evaluate(parseResult.root!!, inputFeatures)
+        return runBlocking {
+            evaluate(parseResult.root!!, inputFeatures)
+        }
     }
 
-    private fun evaluate(
+    private suspend fun evaluate(
         parsedTree: DatatransformationFunction,
         inputFeatures: Map<String, DataSample> = emptyMap()
     ) : Map<String, Value> {
@@ -40,7 +43,7 @@ class EvaluationModel {
     }
 }
 
-fun Expression.evaluate(context: Map<String, Value>) : Value {
+suspend fun Expression.evaluate(context: Map<String, Value>) : Value {
     try {
         return when (this) {
             is IntLit -> NumberValue(this.value.toInt())
@@ -72,7 +75,7 @@ fun Expression.evaluate(context: Map<String, Value>) : Value {
 
 
 
-fun VarDeclaration.evaluate(context: Map<String, Value>) : HashMap<String, Value> {
+suspend fun VarDeclaration.evaluate(context: Map<String, Value>) : HashMap<String, Value> {
     val context = context.toMutableMap()
 
     if (context.containsKey(this.varName))
@@ -83,7 +86,7 @@ fun VarDeclaration.evaluate(context: Map<String, Value>) : HashMap<String, Value
     return context
 }
 
-fun Assignment.evaluate(context: Map<String, Value>) : HashMap<String, Value> {
+suspend fun Assignment.evaluate(context: Map<String, Value>) : HashMap<String, Value> {
     val context = context.toMutableMap()
 
     if (!context.containsKey(this.varName))

@@ -2,12 +2,13 @@ package com.samco.trackandgraph.antlr.evaluation
 
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.antlr.generated.TnG2Parser
-import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DataPointInterface
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
 import org.antlr.v4.runtime.tree.ParseTree
 import org.threeten.bp.Duration
+import org.threeten.bp.Period
+import org.threeten.bp.temporal.TemporalAmount
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction2
 
@@ -94,24 +95,24 @@ class StringValue(val string: String): Value() {
     }
 }
 
-class TimeValue(val duration: Duration) : Value() {
+class TimeValue(val temporalAmount: TemporalAmount) : Value() {
     constructor(context: ParseTree)  : this(when(context) {
         is TnG2Parser.SecondContext -> Duration.ofSeconds(1) // mostly for converting
         is TnG2Parser.MinuteContext -> Duration.ofMinutes(1) // mostly for converting
         is TnG2Parser.HourlyContext -> Duration.ofHours(1)    // mostly for converting, but mixed
-        is TnG2Parser.DailyContext -> Duration.ofDays(1)
-        is TnG2Parser.WeeklyContext -> Duration.ofDays(7)
-        is TnG2Parser.MonthlyContext -> Duration.ofDays(31)
-        is TnG2Parser.YearlyContext -> Duration.ofDays(365)
+        is TnG2Parser.DailyContext -> Period.ofDays(1)
+        is TnG2Parser.WeeklyContext -> Period.ofDays(7)
+        is TnG2Parser.MonthlyContext -> Period.ofMonths(1)
+        is TnG2Parser.YearlyContext -> Period.ofYears(1)
         else -> throw UnsupportedOperationException("Unexpected Context ${context::class.simpleName}!")})
 
 
     override fun hashCode(): Int {
-        return duration.hashCode()
+        return temporalAmount.hashCode()
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other is TimeValue) return this.duration == other.duration
+        if (other is TimeValue) return this.temporalAmount.toDuration() == other.temporalAmount.toDuration()
         return super.equals(other)
     }
 
@@ -188,6 +189,15 @@ class DatapointsValue(
             throw DatapointsWrongTypeError(allowedTypes, dataType)
         }
     }
+
+    fun toSample() = DataSample(
+        this.datapoints,
+        when(dataType) {
+            DataType.NUMERICAL -> FeatureType.CONTINUOUS
+            DataType.TIME -> FeatureType.DURATION
+            DataType.CATEGORICAL -> FeatureType.DISCRETE
+        }
+    )
 }
 
 enum class AggregationEnum {

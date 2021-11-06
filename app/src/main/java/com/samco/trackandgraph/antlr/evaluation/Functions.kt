@@ -1,11 +1,11 @@
 package com.samco.trackandgraph.antlr.evaluation
 
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.functionslib.aggregation.MovingAggregator
 import org.threeten.bp.OffsetDateTime
 
-fun callFunction(functionName: String, args: List<Value>) : Value {
+suspend fun callFunction(functionName: String, args: List<Value>) : Value {
 //    FunctionCallableFromCode::class.sealedSubclasses.map { it.objectInstance?.functionName  }
     return when(functionName) {
         "Delta" -> DeltaFunction().main(args)
@@ -18,6 +18,8 @@ fun callFunction(functionName: String, args: List<Value>) : Value {
         "Exclude" -> ExcludeFunction().main(args)
 
         "Merge" -> MergeFunction().main(args)
+
+        "Moving" -> MovingAggregationFunction().main(args)
         else -> throw UnknownFunctionName(functionName)
     }
 }
@@ -44,12 +46,12 @@ sealed class FunctionCallableFromCode(val functionName: String, val signature: I
         }
     }
 
-    abstract fun main(args: List<Value>) : Value
+    abstract suspend fun main(args: List<Value>) : Value
 
 }
 
 class DeltaFunction : FunctionCallableFromCode("Delta", R.string.functionsig_delta) {
-    override fun main(args: List<Value>) : Value {
+    override suspend fun main(args: List<Value>) : Value {
         val inputData = getArgument<DatapointsValue>(args, 0)
         inputData.confirmType(listOf(DataType.NUMERICAL, DataType.TIME))
         checkTooManyArgs(args, 1)
@@ -60,7 +62,7 @@ class DeltaFunction : FunctionCallableFromCode("Delta", R.string.functionsig_del
 }
 
 class AccumulateFunction : FunctionCallableFromCode("Accumulate", R.string.functionsig_accumulate) {
-    override fun main(args: List<Value>): Value {
+    override suspend fun main(args: List<Value>): Value {
         val inputData = getArgument<DatapointsValue>(args, 0)
         inputData.confirmType(listOf(DataType.NUMERICAL, DataType.TIME))
         checkTooManyArgs(args, 1)
@@ -78,7 +80,7 @@ class AccumulateFunction : FunctionCallableFromCode("Accumulate", R.string.funct
 }
 
 class DerivativeFunction : FunctionCallableFromCode("Derivative", R.string.functionsig_derivative) {
-    override fun main(args: List<Value>): Value {
+    override suspend fun main(args: List<Value>): Value {
         val inputData = getArgument<DatapointsValue>(args, 0)
         inputData.confirmType(listOf(DataType.NUMERICAL, DataType.TIME))
         val perTime = getArgument<TimeValue>(args, 1)
@@ -87,7 +89,7 @@ class DerivativeFunction : FunctionCallableFromCode("Derivative", R.string.funct
         fun calcDerivative(a: DataPointInterface, b: DataPointInterface) : DataPointInterface {
             val diff = b.value - a.value
             val derivative = diff / (b.timestamp.toEpochSecond() - a.timestamp.toEpochSecond())
-            val scaledDerivative = derivative * perTime.duration.seconds
+            val scaledDerivative = derivative * perTime.temporalAmount.toSeconds()
             return b.copy(value = scaledDerivative)
         }
 
@@ -97,7 +99,7 @@ class DerivativeFunction : FunctionCallableFromCode("Derivative", R.string.funct
 }
 
 class TimeBetweenFunction : FunctionCallableFromCode("TimeBetween", R.string.functionsig_timebetween) {
-    override fun main(args: List<Value>): Value {
+    override suspend fun main(args: List<Value>): Value {
         val inputData = getArgument<DatapointsValue>(args, 0)
         checkTooManyArgs(args, 1)
 
@@ -108,7 +110,7 @@ class TimeBetweenFunction : FunctionCallableFromCode("TimeBetween", R.string.fun
 }
 
 class TimeBetween2Function : FunctionCallableFromCode("TimeBetween2", R.string.functionsig_timebetween2) {
-    override fun main(args: List<Value>): Value {
+    override suspend fun main(args: List<Value>): Value {
         val mainData = getArgument<DatapointsValue>(args, 0)
         val referenceData = getArgument<DatapointsValue>(args, 1)
         checkTooManyArgs(args, 2)
@@ -134,7 +136,7 @@ class TimeBetween2Function : FunctionCallableFromCode("TimeBetween2", R.string.f
 }
 
 class FilterFunction : FunctionCallableFromCode("Filter", R.string.functionsig_filter) {
-    override fun main(args: List<Value>): Value {
+    override suspend fun main(args: List<Value>): Value {
         val inputData = getArgument<DatapointsValue>(args, 0)
         inputData.confirmType(listOf(DataType.CATEGORICAL))
         getArgument<StringValue>(args, 1) // to make sure we have at least one string
@@ -148,7 +150,7 @@ class FilterFunction : FunctionCallableFromCode("Filter", R.string.functionsig_f
 }
 
 class ExcludeFunction : FunctionCallableFromCode("Exclude", R.string.functionsig_exclude) {
-    override fun main(args: List<Value>): Value {
+    override suspend fun main(args: List<Value>): Value {
         val inputData = getArgument<DatapointsValue>(args, 0)
         inputData.confirmType(listOf(DataType.CATEGORICAL))
         getArgument<StringValue>(args, 1) // to make sure we have at least one string
@@ -162,7 +164,7 @@ class ExcludeFunction : FunctionCallableFromCode("Exclude", R.string.functionsig
 }
 
 class MergeFunction : FunctionCallableFromCode("Merge", R.string.functionsig_merge) {
-    override fun main(args: List<Value>): Value {
+    override suspend fun main(args: List<Value>): Value {
         val reference = getArgument<DatapointsValue>(args, 0)
         getArgument<DatapointsValue>(args, 1) // to make sure we have at least one more sample
         val listsToMerge: List<MutableList<DataPointInterface>> = args.subList(0, args.size).mapIndexed { index, value ->
@@ -188,15 +190,16 @@ class MergeFunction : FunctionCallableFromCode("Merge", R.string.functionsig_mer
 }
 
 // WORK IN PROGRESS
-//class MovingAggregationFunction : FunctionCallableFromCode("aggregateMoving", 0) {
-//    override fun main(args: List<Value>): Value {
-//        val inputData = getArgument<DatapointsValue>(args, 0)
-//        inputData.confirmType(listOf(DataType.NUMERICAL, DataType.TIME))
-//        val timeWindow = getArgument<TimeValue>(args, 1)
-//        val aggregationFunction = getArgument<AggregationEnumValue>(args, 2)
-//
-//        return DatapointsValue(
-//            MovingAggregator(timeWindow.duration).aggregate(inputData)(aggregationFunction.aggregationFunction) )
-//
-//    }
-//}
+class MovingAggregationFunction : FunctionCallableFromCode("Moving", 0) {
+    override suspend fun main(args: List<Value>): Value {
+        val inputData = getArgument<DatapointsValue>(args, 0)
+        inputData.confirmType(listOf(DataType.NUMERICAL, DataType.TIME))
+        val aggregationFunction = getArgument<AggregationEnumValue>(args, 1)
+        val timeWindow = getArgument<TimeValue>(args, 2)
+        checkTooManyArgs(args, 3)
+
+        return DatapointsValue(
+            MovingAggregator(timeWindow.temporalAmount).aggregate(inputData.toSample())(aggregationFunction.aggregationFunction) )
+
+    }
+}
