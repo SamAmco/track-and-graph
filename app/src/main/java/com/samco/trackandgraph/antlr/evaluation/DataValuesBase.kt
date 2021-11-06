@@ -152,12 +152,18 @@ fun DataType.toLocalizedString(getString: KFunction2<Int, Array<Any>, String>) :
 class DatapointsValue(
     val datapoints: List<DataPointInterface>,
     val dataType: DataType,
-    val regularity: Regularity = Regularity.NONE
+    val regularity: Regularity = Regularity.NONE,
+    val featureId: Long
 ) : Value() {
     constructor(
         dataSample: DataSample,
         regularity: Regularity = Regularity.NONE
-    ) : this(dataSample.dataPoints, inferDatatype(dataSample), regularity)
+    ) : this(
+        dataSample.dataPoints,
+        inferDatatype(dataSample),
+        regularity,
+        dataSample.featureId
+    )
 
     override fun equals(other: Any?): Boolean {
         if (other is DatapointsValue) return this.datapoints == other.datapoints
@@ -173,8 +179,8 @@ class DatapointsValue(
 
     fun applyToAllPoints(function: (Double) -> Double, newDataType: DataType = this.dataType) : DatapointsValue {
         return DatapointsValue(
-            this.datapoints.map { dp -> dp.copy(value = function(dp.value)) },
-            dataType = newDataType, regularity = this.regularity
+            this.datapoints.map { dp -> dp.copyPoint(value = function(dp.value)) },
+            dataType = newDataType, regularity = this.regularity, featureId = this.featureId
         )
     }
 
@@ -196,7 +202,8 @@ class DatapointsValue(
             DataType.NUMERICAL -> FeatureType.CONTINUOUS
             DataType.TIME -> FeatureType.DURATION
             DataType.CATEGORICAL -> FeatureType.DISCRETE
-        }
+        },
+        this.featureId
     )
 }
 

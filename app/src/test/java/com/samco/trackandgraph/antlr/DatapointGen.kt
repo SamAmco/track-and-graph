@@ -35,7 +35,7 @@ fun someData(): DataSample {
         3.0 to 10L
     ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
 
-    return DataSample(dataPoints, FeatureType.CONTINUOUS)
+    return DataSample(dataPoints, FeatureType.CONTINUOUS, 0L)
 }
 
 fun someDataAllTen(): DataSample {
@@ -52,7 +52,7 @@ fun someDataAllTen(): DataSample {
         10.0 to 10L
     ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
 
-    return DataSample(dataPoints, FeatureType.CONTINUOUS)
+    return DataSample(dataPoints, FeatureType.CONTINUOUS, 0L)
 }
 
 fun someDataRandom(): DataSample {
@@ -62,7 +62,7 @@ fun someDataRandom(): DataSample {
         dataPoints.add(makedp(Random.nextDouble()*100, now.minusHours(100*Random.nextLong(0,7*24))))
     }
 
-    return DataSample(dataPoints.sortedBy { it.timestamp }, FeatureType.CONTINUOUS)
+    return DataSample(dataPoints.sortedBy { it.timestamp }, FeatureType.CONTINUOUS, 0L)
 }
 
 fun generateDataPoints2(
@@ -81,7 +81,7 @@ fun generateDataPoints2(
         output.add(DataPoint(timestamp, 0L, value, "", ""))
     }
 
-    return DataSample(output, FeatureType.CONTINUOUS)
+    return DataSample(output, FeatureType.CONTINUOUS, 0L)
 }
 
 
@@ -102,5 +102,5 @@ fun generateDataPoints2Categorical(
         output.add(DataPoint(timestamp, 0L, value.toDouble(), val2str[value]!!, ""))
     }
 
-    return DataSample(output, FeatureType.DISCRETE)
+    return DataSample(output, FeatureType.DISCRETE, 0L)
 }

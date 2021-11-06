@@ -151,7 +151,6 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
             else -> DurationAggregationFunction(
                 timeHelper,
-                lineGraphFeature.featureId,
                 //We have to add movingAvDuration if it exists to make sure we're going back far enough
                 // to get correct averaging
                 lineGraph.duration?.plus(movingAvDuration ?: Duration.ZERO),

@@ -49,7 +49,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val answer =
                 DurationAggregationFunction(
                     timeHelper,
-                    0L,
+                    
                     null,
                     null,
                     plotTotalTime
@@ -74,7 +74,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 null,
                 plotTotalTime
@@ -100,7 +100,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 sampleDuration,
                 null,
                 plotTotalTime
@@ -123,13 +123,14 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData =
                 DataSample(
                     dataPoints,
-                    FeatureType.CONTINUOUS
+                    FeatureType.CONTINUOUS,
+                    0L
                 )
 
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 sampleDuration,
                 null,
                 plotTotalTime
@@ -155,7 +156,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 sampleDuration,
                 null,
                 plotTotalTime
@@ -175,12 +176,12 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofHours(1)
             val plotTotalTime: TemporalAmount = Period.ofDays(1)
             val dataPoints = emptyList<DataPoint>()
-            val rawData = DataSample(dataPoints, FeatureType.CONTINUOUS)
+            val rawData = DataSample(dataPoints, FeatureType.CONTINUOUS, 0L)
 
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 sampleDuration,
                 null,
                 plotTotalTime
@@ -210,7 +211,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 null,
                 plotTotalTime
@@ -231,13 +232,13 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val dataPoints = emptyList<DataPoint>()
             val rawData =
                 DataSample(
-                    dataPoints, FeatureType.CONTINUOUS
+                    dataPoints, FeatureType.CONTINUOUS, 0L
                 )
 
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 null,
                 plotTotalTime
@@ -265,7 +266,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 endTime,
                 plotTotalTime,
@@ -297,7 +298,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 OffsetDateTime.now(),
                 plotTotalTime
@@ -326,7 +327,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 null,
                 plotTotalTime
@@ -357,7 +358,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 sampleDuration,
                 OffsetDateTime.now(),
                 plotTotalTime
@@ -386,7 +387,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 OffsetDateTime.now(),
                 plotTotalTime
@@ -415,7 +416,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 sampleDuration,
                 OffsetDateTime.now(),
                 plotTotalTime
@@ -441,7 +442,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 null,
                 plotTotalTime
@@ -487,7 +488,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
+                
                 null,
                 null,
                 plotTotalTime,
@@ -524,7 +525,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             }
             currentTime = currentTime.minus(totalingPeriod)
         }
-        return DataSample(dataPoints, FeatureType.CONTINUOUS)
+        return DataSample(dataPoints, FeatureType.CONTINUOUS, 0L)
     }
 
     private fun generateDataPoints2(
@@ -543,7 +544,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             output.add(DataPoint(timestamp, 0L, value, "", ""))
         }
 
-        return DataSample(output, FeatureType.CONTINUOUS)
+        return DataSample(output, FeatureType.CONTINUOUS, 0L)
     }
 
 }

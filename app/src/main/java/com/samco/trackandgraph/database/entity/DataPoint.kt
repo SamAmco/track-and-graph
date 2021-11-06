@@ -21,9 +21,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.database.doubleFormatter
 import com.samco.trackandgraph.ui.formatTimeDuration
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
 
 
 sealed class DataPointInterface {
@@ -33,12 +31,12 @@ sealed class DataPointInterface {
     abstract val label: String
     abstract val note: String
 
-    abstract fun copy(
-        timestamp: OffsetDateTime? = null,
-        featureId: Long? = null,
-        value: Double? = null,
-        label: String? = null,
-        note: String? = null
+    abstract fun copyPoint(
+        timestamp: OffsetDateTime = this.timestamp,
+        featureId: Long = this.featureId,
+        value: Double = this.value,
+        label: String = this.label,
+        note: String = this.note
     ): DataPointInterface
 }
 
@@ -83,18 +81,18 @@ data class DataPoint (
         }
     }
 
-    override fun copy(
-        timestamp: OffsetDateTime?,
-        featureId: Long?,
-        value: Double?,
-        label: String?,
-        note: String?
+    override fun copyPoint(
+        timestamp: OffsetDateTime,
+        featureId: Long,
+        value: Double,
+        label: String,
+        note: String
     ) = this.copy( // the this.copy function is the one automatically generated bc this is data-class
-        timestamp = timestamp ?: this.timestamp,
-        featureId = featureId ?: this.featureId,
-        value = value ?: this.value,
-        label = label ?: this.label,
-        note = note ?: this.note
+        timestamp = timestamp,
+        featureId = featureId,
+        value = value,
+        label = label,
+        note = note
     )
 
 }
@@ -108,17 +106,17 @@ data class AggregatedDataPoint(
     override val note: String = "",
 ) : DataPointInterface() {
 
-    override fun copy(
-        timestamp: OffsetDateTime?,
-        featureId: Long?,
-        value: Double?,
-        label: String?,
-        note: String?
+    override fun copyPoint(
+        timestamp: OffsetDateTime,
+        featureId: Long,
+        value: Double,
+        label: String,
+        note: String
     ) = this.copy( // the this.copy function is the one automatically generated bc this is data-class
-        timestamp = timestamp ?: this.timestamp,
-        featureId = featureId ?: this.featureId,
-        value = value ?: this.value,
-        label = label ?: this.label,
-        note = note ?: this.note
+        timestamp = timestamp,
+        featureId = featureId,
+        value = value,
+        label = label,
+        note = note
     )
 }

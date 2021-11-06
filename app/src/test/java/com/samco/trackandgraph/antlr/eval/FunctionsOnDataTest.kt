@@ -188,7 +188,7 @@ class FunctionsOnDataTest {
         val output = context["output"] as DatapointsValue
 
         Assert.assertEquals(
-            DatapointsValue(datapointsFiltered, DataType.CATEGORICAL),
+            DatapointsValue(datapointsFiltered, DataType.CATEGORICAL, featureId = 0L),
             output
         )
 
@@ -217,7 +217,7 @@ class FunctionsOnDataTest {
         val output = context["output"] as DatapointsValue
 
         Assert.assertEquals(
-            DatapointsValue(datapointsFiltered, DataType.CATEGORICAL),
+            DatapointsValue(datapointsFiltered, DataType.CATEGORICAL, featureId = 0L),
             output
         )
 
@@ -272,6 +272,42 @@ class FunctionsOnDataTest {
             val actual = answer.datapoints.map { dp -> dp.value }
             junit.framework.Assert.assertEquals(expected, actual)
         }
+    }
+
+    @Test
+    fun fixedBinAggregationFunctionTest() {
+        val d1 = someDataRandom()
+        val d2SameYear = someDataRandom()
+        val d2 = DataSample(d2SameYear.dataPoints.map {
+            it.copyPoint(
+                timestamp = it.timestamp.minusYears(1)
+            )
+        }, d2SameYear.featureType, d2SameYear.featureId)
+
+
+        val evaluationModel = EvaluationModel()
+
+        val code = """var c1 = Bin(d1, COUNT, DAY)
+                     |var c2 = Bin(d2, COUNT, DAY)
+                     |var nf1 = Bin(d1, MIN, DAY)
+                     |var nf2 = Bin(d2, MIN, DAY)
+                     |var f1 = Bin(d1, MIN, DAY, 0)
+                     |var f2 = Bin(d2, MIN, DAY, 0)""".trimMargin("|")
+
+
+        val context = evaluationModel.run(code, mapOf("d1" to d1, "d2" to d2))
+
+        val c1 = context["c1"] as DatapointsValue // SUM automatically has a fallback, so none needed
+        val c2 = context["c2"] as DatapointsValue
+        val nf1 = context["nf1"] as DatapointsValue // no fallback
+        val nf2 = context["nf2"] as DatapointsValue
+        val f1 = context["f1"] as DatapointsValue // fallback
+        val f2 = context["f2"] as DatapointsValue
+
+        Assert.assertEquals(c1.datapoints.map { it.timestamp }, c2.datapoints.map { it.timestamp })
+        Assert.assertNotEquals(nf1.datapoints.map { it.timestamp }, nf2.datapoints.map { it.timestamp })
+        Assert.assertEquals(f1.datapoints.map { it.timestamp }, f2.datapoints.map { it.timestamp })
+
     }
 
 }

@@ -47,10 +47,10 @@ import org.threeten.bp.temporal.TemporalAmount
 
 internal class FixedBinAggregator(
     private val timeHelper: TimeHelper,
-    private val featureId: Long,
-    private val sampleDuration: Duration?,
+    private val samplePointsSince: Duration?,
     private val endTime: OffsetDateTime?,
     private val binSize: TemporalAmount,
+    private val hardStartTime: OffsetDateTime? = null
 ) : DataAggregator {
     override suspend fun aggregate(dataSample: DataSample): RawAggregatedDatapoints {
         val newData = mutableListOf<AggregatedDataPoint>()
@@ -60,7 +60,7 @@ internal class FixedBinAggregator(
         val lastDataPointTime = dataSample.dataPoints.lastOrNull()?.cutoffTimestampForAggregation()
 
         val latest = getEndTimeNowOrLatest(lastDataPointTime, endTime)
-        val earliest = getStartTimeOrFirst(firstDataPointTime, latest, endTime, sampleDuration)
+        val earliest = hardStartTime ?: getStartTimeOrFirst(firstDataPointTime, latest, endTime, samplePointsSince)
         var currentTimeStamp = timeHelper.findBeginningOfTemporal(earliest, binSize).minusNanos(1)
         var index = 0
         while (currentTimeStamp.isBefore(latest)) {
@@ -75,13 +75,13 @@ internal class FixedBinAggregator(
                 AggregatedDataPoint(
                     timestamp = currentTimeStamp,
                     value = Double.NaN, // this value gets overwritten when calling a function on RawAggregatedDatapoints
-                    featureId = featureId,
+                    featureId = dataSample.featureId,
                     parents = points
                 )
             )
             yield()
         }
-        return RawAggregatedDatapoints(newData, dataSample.featureType)
+        return RawAggregatedDatapoints(newData, dataSample.featureType, dataSample.featureId)
     }
 
     private fun getEndTimeNowOrLatest(

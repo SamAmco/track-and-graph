@@ -56,6 +56,6 @@ internal class MovingAggregator(private val movingAggDuration: TemporalAmount) :
             )
         }
 
-        return RawAggregatedDatapoints(movingAggregationPointsRaw, dataSample.featureType)
+        return RawAggregatedDatapoints(movingAggregationPointsRaw, dataSample.featureType, dataSample.featureId)
     }
 }

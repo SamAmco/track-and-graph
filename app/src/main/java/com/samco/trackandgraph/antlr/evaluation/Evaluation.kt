@@ -3,8 +3,6 @@ package com.samco.trackandgraph.antlr.evaluation
 
 import com.samco.trackandgraph.antlr.ast.*
 import com.samco.trackandgraph.antlr.parsing.DatatransformationFunctionParserFacade
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
 import kotlinx.coroutines.runBlocking
 
@@ -57,7 +55,7 @@ suspend fun Expression.evaluate(context: Map<String, Value>) : Value {
             is SumExpression            -> this.left.evaluate(context) + this.right.evaluate(context)
             is SubtractionExpression    -> this.left.evaluate(context) - this.right.evaluate(context)
 
-            is FunctionCall             -> callFunction(functionName, args.map { it.evaluate(context) })
+            is FunctionCall             -> callFunction(functionName, args.map { it.evaluate(context) }, context)
 
             is VarReference -> context.get(this.varName) ?: throw NotDeclaredError(this.varName, this.position!!)
             else -> throw UnsupportedOperationException(this.javaClass.canonicalName)

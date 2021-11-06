@@ -55,8 +55,8 @@ class DatabaseSampleHelper(
             val featureType: FeatureType? = dataSource.tryGetFeatureByIdSync(featureId)?.featureType
             if (sampleDuration == null && endDate == null) {
                 val points = dataSource.getDataPointsForFeatureAscSync(featureId)
-                if (points.isNotEmpty()) DataSample(points, featureType!!)
-                else DataSample.emptySample(featureType) // needed for test where featureType is null
+                if (points.isNotEmpty()) DataSample(points, featureType!!, featureId)
+                else DataSample.emptySample(featureType, featureId) // needed for test where featureType is null
             } else {
                 val latest = endDate ?: getLastTrackedTimeOrNow(
                     dataSource,
@@ -74,8 +74,8 @@ class DatabaseSampleHelper(
                 } ?: OffsetDateTime.MIN
                 val points =
                     dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
-                if (points.isNotEmpty()) DataSample(points, featureType!!)
-                else DataSample.emptySample(featureType) // needed for test where featureType is null
+                if (points.isNotEmpty()) DataSample(points, featureType!!, featureId)
+                else DataSample.emptySample(featureType, featureId) // needed for test where featureType is null
             }
         }
     }
