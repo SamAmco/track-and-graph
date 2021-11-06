@@ -22,7 +22,7 @@ class DataInputTest {
         val context = evaluationModel.run(code, mapOf("data" to datapoints))
 
         assertEquals(NumberValue(1), context["a"])
-        assertEquals(DatapointsValue(datapoints, DataType.NUMERICAL), context["data"])
+        assertEquals(DatapointsValue(datapoints), context["data"])
 
     }
 

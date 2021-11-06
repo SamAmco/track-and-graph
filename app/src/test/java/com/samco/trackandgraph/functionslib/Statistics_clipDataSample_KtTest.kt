@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -28,7 +29,8 @@ class Statistics_clipDataSample_KtTest {
     @Test
     fun clipDataSample_empty_sample() = runBlocking {
         //WHEN
-        val answer = DataClippingFunction(null, null).execute(DataSample(listOf()))
+        val answer =
+            DataClippingFunction(null, null).execute(DataSample(listOf(), FeatureType.CONTINUOUS))
 
         //THEN
         assertEquals(0, answer.dataPoints.size)
@@ -51,7 +53,7 @@ class Statistics_clipDataSample_KtTest {
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
         val dataSample =
             DataSample(
-                dataPoints
+                dataPoints, FeatureType.CONTINUOUS
             )
 
         //WHEN
@@ -78,7 +80,7 @@ class Statistics_clipDataSample_KtTest {
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
         val dataSample =
             DataSample(
-                dataPoints
+                dataPoints, FeatureType.CONTINUOUS
             )
         val sampleDuration = Duration.ofHours(30)
 
@@ -104,7 +106,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
         val sampleDuration = Duration.ofHours(100)
 
         //WHEN
@@ -128,7 +130,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
         val sampleDuration = Duration.ofHours(1)
 
         //WHEN
@@ -153,7 +155,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, future.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
         val sampleDuration = Duration.ofHours(35)
 
         //WHEN
@@ -178,7 +180,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
         val endTime = now.minusDays(20)
 
         //WHEN
@@ -203,7 +205,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, future.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
 
         //WHEN
         val answer = DataClippingFunction(OffsetDateTime.now(), null).execute(dataSample)
@@ -227,7 +229,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
 
         //WHEN
         val answer = DataClippingFunction(now, null).execute(dataSample)
@@ -252,7 +254,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, daysBefore) -> makedp(value, future.minusDays(daysBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
         val sampleDuration = Duration.ofDays(30)
 
         //WHEN
@@ -277,7 +279,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
         val sampleDuration = Duration.ofDays(3)
 
         //WHEN
@@ -302,7 +304,7 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.plusMonths(3).minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample(dataPoints, FeatureType.CONTINUOUS)
         val sampleDuration = Duration.ofDays(20)
 
         //WHEN

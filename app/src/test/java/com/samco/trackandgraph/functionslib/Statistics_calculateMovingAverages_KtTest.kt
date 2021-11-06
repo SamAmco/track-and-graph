@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -49,7 +50,7 @@ class Statistics_calculateMovingAverages_KtTest {
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
-            val answer = MovingAverageFunction(averagingDuration).execute(DataSample(dataPoints))
+            val answer = MovingAverageFunction(averagingDuration).execute(DataSample(dataPoints, FeatureType.CONTINUOUS))
 
             //THEN
             val expected = listOf(5.0, 0.0, 2.0, 2.0, 1.5, 2.0, 8.0, 7.0, 3.0)
@@ -67,7 +68,7 @@ class Statistics_calculateMovingAverages_KtTest {
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
-            val answer = MovingAverageFunction(averagingDuration).execute(DataSample(dataPoints))
+            val answer = MovingAverageFunction(averagingDuration).execute(DataSample(dataPoints, FeatureType.CONTINUOUS))
 
             //THEN
             assertEquals(0, answer.dataPoints.size)

@@ -30,7 +30,7 @@ class FunctionsOnDataTest {
         val output = context["a"] as DatapointsValue
 
         Assert.assertEquals(
-            DeltaFunction().main(listOf(DatapointsValue(datapoints, DataType.NUMERICAL))),
+            DeltaFunction().main(listOf(DatapointsValue(datapoints))),
             output
         )
 
@@ -48,7 +48,7 @@ class FunctionsOnDataTest {
         val output = context["a"] as DatapointsValue
 
         Assert.assertEquals(
-            AccumulateFunction().main(listOf(DatapointsValue(datapoints, DataType.NUMERICAL))),
+            AccumulateFunction().main(listOf(DatapointsValue(datapoints))),
             output
         )
 
@@ -75,7 +75,7 @@ class FunctionsOnDataTest {
         Assert.assertEquals(
             DerivativeFunction().main(
                 listOf(
-                    DatapointsValue(datapoints, DataType.NUMERICAL),
+                    DatapointsValue(datapoints),
                     TimeValue(Duration.ofHours(1))
                 )
             ),
@@ -106,7 +106,7 @@ class FunctionsOnDataTest {
         Assert.assertEquals(
             TimeBetweenFunction().main(
                 listOf(
-                    DatapointsValue(datapoints, DataType.NUMERICAL),
+                    DatapointsValue(datapoints),
                 )
             ) / TimeValue(Duration.ofHours(1)),
             output
@@ -146,8 +146,8 @@ class FunctionsOnDataTest {
         Assert.assertEquals(
             TimeBetween2Function().main(
                 listOf(
-                    DatapointsValue(datapointsMain, DataType.NUMERICAL),
-                    DatapointsValue(datapointsRef, DataType.NUMERICAL),
+                    DatapointsValue(datapointsMain),
+                    DatapointsValue(datapointsRef),
                 )
             ) / TimeValue(Duration.ofHours(1)),
             output
@@ -168,7 +168,7 @@ class FunctionsOnDataTest {
             mapOf(0 to "Lunch", 1 to "Dinner")
         )
 
-        val datapointsFiltered = datapoints.filter { it.label == "Dinner" }
+        val datapointsFiltered = datapoints.dataPoints.filter { it.label == "Dinner" }
 
         val evaluationModel = EvaluationModel()
 
@@ -197,7 +197,7 @@ class FunctionsOnDataTest {
             mapOf(0 to "Lunch", 1 to "Dinner")
         )
 
-        val datapointsFiltered = datapoints.filterNot { it.label == "Lunch" }
+        val datapointsFiltered = datapoints.dataPoints.filterNot { it.label == "Lunch" }
 
         val evaluationModel = EvaluationModel()
 
@@ -219,7 +219,7 @@ class FunctionsOnDataTest {
         val d2 = someDataRandom()
         val d3 = someDataRandom()
 
-        val expected = (d1 + d2 + d3).sortedBy { it.timestamp }
+        val expected = (d1.dataPoints + d2.dataPoints + d3.dataPoints).sortedBy { it.timestamp }
 
         val evaluationModel = EvaluationModel()
 

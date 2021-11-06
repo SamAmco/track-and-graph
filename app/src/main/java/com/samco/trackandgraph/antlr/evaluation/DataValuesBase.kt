@@ -4,6 +4,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.antlr.generated.TnG2Parser
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
 import org.antlr.v4.runtime.tree.ParseTree
 import org.threeten.bp.Duration
@@ -128,6 +129,15 @@ enum class DataType {
     NUMERICAL, TIME, CATEGORICAL,
 }
 
+private fun inferDatatype(data: DataSample) : DataType {
+    return when (data.featureType) {
+        FeatureType.DISCRETE -> DataType.CATEGORICAL
+        FeatureType.CONTINUOUS -> DataType.NUMERICAL
+        FeatureType.DURATION -> DataType.TIME
+    }
+}
+
+
 fun DataType.toLocalizedString(getString: KFunction2<Int, Array<Any>, String>) : String{
     return when(this) {
         DataType.NUMERICAL -> getString(R.string.datatype_numerical, arrayOf())
@@ -136,12 +146,17 @@ fun DataType.toLocalizedString(getString: KFunction2<Int, Array<Any>, String>) :
     }
 }
 
+
+
 class DatapointsValue(
     val datapoints: List<DataPointInterface>,
     val dataType: DataType,
     val regularity: Regularity = Regularity.NONE
 ) : Value() {
-    constructor(dataSample: DataSample, dataType: DataType, regularity: Regularity) : this(dataSample.dataPoints, dataType, regularity)
+    constructor(
+        dataSample: DataSample,
+        regularity: Regularity = Regularity.NONE
+    ) : this(dataSample.dataPoints, inferDatatype(dataSample), regularity)
 
     override fun equals(other: Any?): Boolean {
         if (other is DatapointsValue) return this.datapoints == other.datapoints

@@ -20,7 +20,7 @@ class DataArithmeticTest {
         val context = evaluationModel.run(code, mapOf("data" to datapoints))
 
         val processedData = context["b"] as DatapointsValue
-        Assert.assertEquals(datapoints.map { dp -> dp.copy(value=dp.value+5)}, processedData.datapoints)
+        Assert.assertEquals(datapoints.dataPoints.map { dp -> dp.copy(value=dp.value+5)}, processedData.datapoints)
 
     }
 }

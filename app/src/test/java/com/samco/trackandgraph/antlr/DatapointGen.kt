@@ -2,6 +2,8 @@ package com.samco.trackandgraph.antlr
 
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.functionslib.DataSample
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -19,7 +21,7 @@ private fun makedp(value: Double, timestamp: OffsetDateTime): DataPoint {
     )
 }
 
-fun someData(): List<DataPoint> {
+fun someData(): DataSample {
     val now = OffsetDateTime.now()
     val dataPoints = listOf(
         5.0 to 70L,
@@ -33,10 +35,10 @@ fun someData(): List<DataPoint> {
         3.0 to 10L
     ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
 
-    return dataPoints
+    return DataSample(dataPoints, FeatureType.CONTINUOUS)
 }
 
-fun someDataAllTen(): List<DataPoint> {
+fun someDataAllTen(): DataSample {
     val now = OffsetDateTime.now()
     val dataPoints = listOf(
         10.0 to 70L,
@@ -50,22 +52,22 @@ fun someDataAllTen(): List<DataPoint> {
         10.0 to 10L
     ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
 
-    return dataPoints
+    return DataSample(dataPoints, FeatureType.CONTINUOUS)
 }
 
-fun someDataRandom(): List<DataPoint> {
+fun someDataRandom(): DataSample {
     val now = OffsetDateTime.now()
     val dataPoints = mutableListOf<DataPoint>()
     for (i in 0..25) {
         dataPoints.add(makedp(Random.nextDouble()*100, now.minusHours(100*Random.nextLong(0,7*24))))
     }
 
-    return dataPoints.sortedBy { it.timestamp }
+    return DataSample(dataPoints.sortedBy { it.timestamp }, FeatureType.CONTINUOUS)
 }
 
 fun generateDataPoints2(
     points: List<Triple<DayOfWeek, Int, Double>>
-): List<DataPoint> {
+): DataSample {
     var currentDay = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
 
     val output = mutableListOf<DataPoint>()
@@ -79,14 +81,14 @@ fun generateDataPoints2(
         output.add(DataPoint(timestamp, 0L, value, "", ""))
     }
 
-    return output
+    return DataSample(output, FeatureType.CONTINUOUS)
 }
 
 
 fun generateDataPoints2Categorical(
     points: List<Triple<DayOfWeek, Int, Int>>,
     val2str: Map<Int, String>
-): List<DataPoint> {
+): DataSample {
     var currentDay = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0)
 
     val output = mutableListOf<DataPoint>()
@@ -100,5 +102,5 @@ fun generateDataPoints2Categorical(
         output.add(DataPoint(timestamp, 0L, value.toDouble(), val2str[value]!!, ""))
     }
 
-    return output
+    return DataSample(output, FeatureType.DISCRETE)
 }

@@ -81,7 +81,7 @@ internal class FixedBinAggregator(
             )
             yield()
         }
-        return RawAggregatedDatapoints(newData)
+        return RawAggregatedDatapoints(newData, dataSample.featureType)
     }
 
     private fun getEndTimeNowOrLatest(

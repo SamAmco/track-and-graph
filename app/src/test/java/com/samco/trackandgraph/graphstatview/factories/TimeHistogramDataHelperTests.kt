@@ -179,7 +179,7 @@ class TimeHistogramDataHelperTests {
     @Test
     fun test_getHistogramBinsForSample_no_data() {
         //GIVEN
-        val sample = DataSample(emptyList())
+        val sample = DataSample(emptyList(), FeatureType.CONTINUOUS)
         val window = TimeHistogramWindow.HOUR
         val feature = makeFeature(FeatureType.CONTINUOUS)
         val sumByCount = false
@@ -240,6 +240,7 @@ class TimeHistogramDataHelperTests {
 
     private fun makeDataSample(dataPoints: List<Pair<Double, OffsetDateTime>>) =
         DataSample(
-            dataPoints.map { DataPoint(it.second, 0L, it.first, "", "") }
+            dataPoints.map { DataPoint(it.second, 0L, it.first, "", "") },
+            FeatureType.CONTINUOUS
         )
 }

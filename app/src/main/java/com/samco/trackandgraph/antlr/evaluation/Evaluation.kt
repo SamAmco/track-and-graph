@@ -4,16 +4,13 @@ package com.samco.trackandgraph.antlr.evaluation
 import com.samco.trackandgraph.antlr.ast.*
 import com.samco.trackandgraph.antlr.parsing.DatatransformationFunctionParserFacade
 import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.functionslib.DataSample
 
-//TODO this function needs to be made obsolete by incorporating the information in DataSample!
-fun inferDatatype(data: List<DataPoint>) : DataType {
-    if (data.all { it.label != "" }) return DataType.CATEGORICAL
-    return DataType.NUMERICAL
-}
 
 class EvaluationModel {
 
-    fun run(code: String, inputFeatures: Map<String, List<DataPoint>> = emptyMap()) : Map<String, Value> {
+    fun run(code: String, inputFeatures: Map<String, DataSample> = emptyMap()) : Map<String, Value> {
         val parseResult = DatatransformationFunctionParserFacade.parse(code, inputFeatures.keys)
         when (parseResult.errors.size) {
             0 -> {}
@@ -26,9 +23,9 @@ class EvaluationModel {
 
     private fun evaluate(
         parsedTree: DatatransformationFunction,
-        inputFeatures: Map<String, List<DataPoint>> = emptyMap<String, List<DataPoint>>()
+        inputFeatures: Map<String, DataSample> = emptyMap()
     ) : Map<String, Value> {
-        var context : Map<String, Value> = inputFeatures.mapValues { list -> DatapointsValue(list.value, inferDatatype(list.value)) }
+        var context : Map<String, Value> = inputFeatures.mapValues { sample -> DatapointsValue(sample.value) }
         for (statement in parsedTree.statements) {
             context = when (statement) {
                 is VarDeclaration -> statement.evaluate(context)

@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.entity.FeatureType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
@@ -46,10 +47,17 @@ class DatabaseSampleHelper(
         averagingDuration: Duration?, plotTotalTime: TemporalAmount?
     ): DataSample {
         return withContext(Dispatchers.IO) {
-            if (sampleDuration == null && endDate == null) DataSample(
-                dataSource.getDataPointsForFeatureAscSync(featureId)
-            )
-            else {
+            // try to get the feature type from the db.
+            // some tests use a mock DAO which returns null when asking for the feature type
+            // this mock database also returns no points thus allowing to add an edge case
+            // thus when the list of points is empty we use the DataSample.emptySample factory which provides a fallback featureType
+            // if the list isn't empty we are in a "real" setting in which we should always be able to get the featureType
+            val featureType: FeatureType? = dataSource.tryGetFeatureByIdSync(featureId)?.featureType
+            if (sampleDuration == null && endDate == null) {
+                val points = dataSource.getDataPointsForFeatureAscSync(featureId)
+                if (points.isNotEmpty()) DataSample(points, featureType!!)
+                else DataSample.emptySample(featureType) // needed for test where featureType is null
+            } else {
                 val latest = endDate ?: getLastTrackedTimeOrNow(
                     dataSource,
                     featureId
@@ -64,11 +72,10 @@ class DatabaseSampleHelper(
                     )
                     latest.minus(possibleLongestDurations.maxBy { d -> d ?: Duration.ZERO })
                 } ?: OffsetDateTime.MIN
-                val dataPoints =
+                val points =
                     dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
-                DataSample(
-                    dataPoints
-                )
+                if (points.isNotEmpty()) DataSample(points, featureType!!)
+                else DataSample.emptySample(featureType) // needed for test where featureType is null
             }
         }
     }

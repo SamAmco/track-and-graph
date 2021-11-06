@@ -23,6 +23,8 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.database.entity.FeatureType
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test

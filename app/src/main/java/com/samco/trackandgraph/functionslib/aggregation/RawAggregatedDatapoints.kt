@@ -19,6 +19,8 @@ package com.samco.trackandgraph.functionslib.aggregation
 
 import com.samco.trackandgraph.antlr.evaluation.AggregationEnum
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
+import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
 
 /**
@@ -26,8 +28,10 @@ import com.samco.trackandgraph.functionslib.DataSample
  * To obtain usable values, one of the follow-up functions like sum, average, or max need to be called.
  * Note that some follow-up functions drop data-points without parents. This is supposed to be intuitive :)
  */
-internal class RawAggregatedDatapoints(private val points: List<AggregatedDataPoint>) {
-    fun sum() = DataSample(
+internal class RawAggregatedDatapoints(private val points: List<AggregatedDataPoint>, val featureType: FeatureType) {
+    private fun makeSample(datapoints: List<DataPointInterface>) = DataSample(datapoints, featureType)
+
+    fun sum() = makeSample(
         this.points.map { it.copy(value = it.parents.sumOf { par -> par.value }) }
     )
 
@@ -35,19 +39,19 @@ internal class RawAggregatedDatapoints(private val points: List<AggregatedDataPo
     // When using duration based aggregated values, some points can have no parents.
     // The most intuitive solution is probably to just remove these aggregated points
     // There might be cases where it can make sense to define a fallback value, e.g. 0
-    fun max() = DataSample(
+    fun max() = makeSample(
         this.points
             .filter { it.parents.isNotEmpty() }
             .map { it.copy(value = it.parents.maxOf { par -> par.value }) }
     )
 
-    fun min() = DataSample(
+    fun min() = makeSample(
         this.points
             .filter { it.parents.isNotEmpty() }
             .map { it.copy(value = it.parents.minOf { par -> par.value }) }
     )
 
-    fun average() = DataSample(
+    fun average() = makeSample(
         this.points
             .filter { it.parents.isNotEmpty() }
             .map { it.copy(value = it.parents.map { par -> par.value }.average()) }
@@ -62,7 +66,7 @@ internal class RawAggregatedDatapoints(private val points: List<AggregatedDataPo
                 else -> throw Exception("unreachable. positive int modulo 2 is always 1 or 0")
             }
         }
-        return DataSample(
+        return makeSample(
             this.points
                 .filter { it.parents.isNotEmpty() }
                 .map { it.copy(value =
@@ -70,19 +74,19 @@ internal class RawAggregatedDatapoints(private val points: List<AggregatedDataPo
         )
     }
 
-    fun earliest() = DataSample(
+    fun earliest() = makeSample(
         this.points
             .filter { it.parents.isNotEmpty() }
             .map { it.copy(value = it.parents.sortedBy { par -> par.timestamp }.first().value) }
     )
 
-    fun latest() = DataSample(
+    fun latest() = makeSample(
         this.points
             .filter { it.parents.isNotEmpty() }
             .map { it.copy(value = it.parents.sortedBy { par -> par.timestamp }.last().value) }
     )
 
-    fun count() = DataSample(
+    fun count() = makeSample(
         this.points
             .map { it.copy(value = it.parents.size.toDouble()) }
     )
