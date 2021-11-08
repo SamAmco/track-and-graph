@@ -4,17 +4,12 @@ import com.samco.trackandgraph.antlr.evaluation.*
 import com.samco.trackandgraph.antlr.someData
 import com.samco.trackandgraph.antlr.someDataRandom
 import com.samco.trackandgraph.antlr.*
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
-import com.samco.trackandgraph.functionslib.MovingAverageFunction
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert
 import org.junit.Test
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.TemporalAdjusters
 
 class FunctionsOnDataTest {
     // Most of these test are pretty cyclical. I guess one could copy the function implementation into this

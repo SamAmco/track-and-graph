@@ -122,10 +122,6 @@ class TimeValue(val temporalAmount: TemporalAmount) : Value() {
     override fun _div(other: Value): Value = this.divValue(other)
 }
 
-enum class Regularity {
-    NONE, DAILY, WEEKLY, MONTHLY, YEARLY
-}
-
 enum class DataType {
     NUMERICAL, TIME, CATEGORICAL,
 }
@@ -152,16 +148,13 @@ fun DataType.toLocalizedString(getString: KFunction2<Int, Array<Any>, String>) :
 class DatapointsValue(
     val datapoints: List<DataPointInterface>,
     val dataType: DataType,
-    val regularity: Regularity = Regularity.NONE,
     val featureId: Long
 ) : Value() {
     constructor(
         dataSample: DataSample,
-        regularity: Regularity = Regularity.NONE
     ) : this(
         dataSample.dataPoints,
         inferDatatype(dataSample),
-        regularity,
         dataSample.featureId
     )
 
@@ -173,14 +166,13 @@ class DatapointsValue(
     override fun hashCode(): Int {
         var result = datapoints.hashCode()
         result = 31 * result + dataType.hashCode()
-        result = 31 * result + regularity.hashCode()
         return result
     }
 
     fun applyToAllPoints(function: (Double) -> Double, newDataType: DataType = this.dataType) : DatapointsValue {
         return DatapointsValue(
             this.datapoints.map { dp -> dp.copyPoint(value = function(dp.value)) },
-            dataType = newDataType, regularity = this.regularity, featureId = this.featureId
+            dataType = newDataType, featureId = this.featureId
         )
     }
 

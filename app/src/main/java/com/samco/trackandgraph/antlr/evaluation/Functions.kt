@@ -61,7 +61,7 @@ class DeltaFunction : FunctionCallableFromCode("Delta", R.string.functionsig_del
         checkTooManyArgs(args, 1)
 
         val outputData = inputData.datapoints.zipWithNext { a, b -> b.copyPoint(value = b.value - a.value) }
-        return DatapointsValue(outputData, inputData.dataType, inputData.regularity, inputData.featureId)
+        return DatapointsValue(outputData, inputData.dataType, inputData.featureId)
     }
 }
 
@@ -79,7 +79,7 @@ class AccumulateFunction : FunctionCallableFromCode("Accumulate", R.string.funct
             outputData.add(point.copyPoint(value = sum))
         }
 
-        return DatapointsValue(outputData, inputData.dataType, inputData.regularity, inputData.featureId)
+        return DatapointsValue(outputData, inputData.dataType, inputData.featureId)
     }
 }
 
@@ -98,7 +98,7 @@ class DerivativeFunction : FunctionCallableFromCode("Derivative", R.string.funct
         }
 
         val outputData = inputData.datapoints.zipWithNext { a, b -> calcDerivative(a, b) }
-        return DatapointsValue(outputData, inputData.dataType, inputData.regularity, inputData.featureId)
+        return DatapointsValue(outputData, inputData.dataType, inputData.featureId)
     }
 }
 
@@ -109,7 +109,7 @@ class TimeBetweenFunction : FunctionCallableFromCode("TimeBetween", R.string.fun
 
         val outputData = inputData.datapoints.zipWithNext {
                 a, b -> b.copyPoint(value = b.timestamp.toEpochSecond().toDouble() - a.timestamp.toEpochSecond()) }
-        return DatapointsValue(outputData, DataType.TIME, inputData.regularity, inputData.featureId)
+        return DatapointsValue(outputData, DataType.TIME, inputData.featureId)
     }
 }
 
@@ -135,7 +135,7 @@ class TimeBetween2Function : FunctionCallableFromCode("TimeBetween2", R.string.f
                 }
             }
         }.filterNotNull().reversed()
-        return DatapointsValue(outputData, DataType.TIME, mainData.regularity, mainData.featureId)
+        return DatapointsValue(outputData, DataType.TIME, mainData.featureId)
     }
 }
 
@@ -149,7 +149,11 @@ class FilterFunction : FunctionCallableFromCode("Filter", R.string.functionsig_f
                 is StringValue -> value.string
                 else -> throw WrongArgDatatypeError("Filter", index+1, value::class, listOf(StringValue::class))
             } }
-        return DatapointsValue(inputData.datapoints.filter { it.label in allowedValues }, inputData.dataType, inputData.regularity, inputData.featureId)
+        return DatapointsValue(
+            inputData.datapoints.filter { it.label in allowedValues },
+            inputData.dataType,
+            inputData.featureId
+        )
     }
 }
 
@@ -163,7 +167,11 @@ class ExcludeFunction : FunctionCallableFromCode("Exclude", R.string.functionsig
                 is StringValue -> value.string
                 else -> throw WrongArgDatatypeError("Filter", index+1, value::class, listOf(StringValue::class))
             } }
-        return DatapointsValue(inputData.datapoints.filter { it.label !in allowedValues }, inputData.dataType, inputData.regularity, inputData.featureId)
+        return DatapointsValue(
+            inputData.datapoints.filter { it.label !in allowedValues },
+            inputData.dataType,
+            inputData.featureId
+        )
     }
 }
 
@@ -189,7 +197,7 @@ class MergeFunction : FunctionCallableFromCode("Merge", R.string.functionsig_mer
 
         // regularity is NONE, bc even if all inputs were regular, now that there could be
         // more than one point per regular interval
-        return DatapointsValue(mergedList, reference.dataType, Regularity.NONE, -1L) // when we merge, we don't have a singular featureId, so do -1L
+        return DatapointsValue(mergedList, reference.dataType, -1L) // when we merge, we don't have a singular featureId, so do -1L
     }
 }
 

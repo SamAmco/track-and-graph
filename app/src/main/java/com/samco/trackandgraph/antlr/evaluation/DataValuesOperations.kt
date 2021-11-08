@@ -167,6 +167,12 @@ fun TimeValue.divValue(other: Value): Value {
  *  DATAPOINTS VALUE
  */
 
+//private fun assertCompatibility(a: DatapointsValue, b: DatapointsValue) : Nothing {
+//    if (a.datapoints.map { it.timestamp } == b.datapoints.map { it.timestamp }) true
+//
+//
+//}
+
 fun DatapointsValue.plusValue(other: Value): Value {
     return when(other) {
         is NumberValue -> applyToAllPoints( { it + other.toDouble() } )
