@@ -1,7 +1,6 @@
 package com.samco.trackandgraph.antlr
 
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DataPointInterface
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
 import org.threeten.bp.DayOfWeek
@@ -35,7 +34,7 @@ fun someData(): DataSample {
         3.0 to 10L
     ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
 
-    return DataSample(dataPoints, FeatureType.CONTINUOUS, 0L)
+    return DataSample(dataPoints, FeatureType.CONTINUOUS)
 }
 
 fun someDataAllTen(): DataSample {
@@ -52,7 +51,7 @@ fun someDataAllTen(): DataSample {
         10.0 to 10L
     ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
 
-    return DataSample(dataPoints, FeatureType.CONTINUOUS, 0L)
+    return DataSample(dataPoints, FeatureType.CONTINUOUS)
 }
 
 fun someDataRandom(): DataSample {
@@ -62,7 +61,7 @@ fun someDataRandom(): DataSample {
         dataPoints.add(makedp(Random.nextDouble()*100, now.minusHours(100*Random.nextLong(0,7*24))))
     }
 
-    return DataSample(dataPoints.sortedBy { it.timestamp }, FeatureType.CONTINUOUS, 0L)
+    return DataSample(dataPoints.sortedBy { it.timestamp }, FeatureType.CONTINUOUS)
 }
 
 fun generateDataPoints2(
@@ -81,7 +80,7 @@ fun generateDataPoints2(
         output.add(DataPoint(timestamp, 0L, value, "", ""))
     }
 
-    return DataSample(output, FeatureType.CONTINUOUS, 0L)
+    return DataSample(output, FeatureType.CONTINUOUS)
 }
 
 
@@ -102,5 +101,5 @@ fun generateDataPoints2Categorical(
         output.add(DataPoint(timestamp, 0L, value.toDouble(), val2str[value]!!, ""))
     }
 
-    return DataSample(output, FeatureType.DISCRETE, 0L)
+    return DataSample(output, FeatureType.DISCRETE)
 }

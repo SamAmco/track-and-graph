@@ -47,15 +47,14 @@ internal class MovingAggregator(private val movingAggDuration: TemporalAmount) :
                 0,
                 AggregatedDataPoint(
                     current.timestamp,
-                    current.featureId,
                     value = Double.NaN,
+                    parents = parents,
                     label = current.label,
-                    note = current.note,
-                    parents = parents
+                    note = current.note
                 )
             )
         }
 
-        return RawAggregatedDatapoints(movingAggregationPointsRaw, dataSample.featureType, dataSample.featureId)
+        return RawAggregatedDatapoints(movingAggregationPointsRaw, dataSample.featureType)
     }
 }

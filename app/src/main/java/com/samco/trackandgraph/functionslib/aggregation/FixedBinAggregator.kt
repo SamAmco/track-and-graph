@@ -75,13 +75,12 @@ internal class FixedBinAggregator(
                 AggregatedDataPoint(
                     timestamp = currentTimeStamp,
                     value = Double.NaN, // this value gets overwritten when calling a function on RawAggregatedDatapoints
-                    featureId = dataSample.featureId,
                     parents = points
                 )
             )
             yield()
         }
-        return RawAggregatedDatapoints(newData, dataSample.featureType, dataSample.featureId)
+        return RawAggregatedDatapoints(newData, dataSample.featureType)
     }
 
     private fun getEndTimeNowOrLatest(

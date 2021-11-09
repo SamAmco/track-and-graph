@@ -104,10 +104,13 @@ class ViewGraphStatFragment : Fragment() {
             )
             NoteType.DATA_POINT -> {
                 val dataPoint = note.dataPoint!!
-                val featureDisplayName =
-                    viewModel.featurePathProvider.getPathForFeature(dataPoint.featureId)
+                val featureDisplayName =  dataPoint.featureId.let {
+                    if (it == null) ""
+                    else viewModel.featurePathProvider.getPathForFeature(it)
+                }
+
                 val featureType =
-                    viewModel.featureTypes?.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
+                    viewModel.featureTypes?.getOrElse(dataPoint.featureId ?: Long.MAX_VALUE) { FeatureType.CONTINUOUS }
                         ?: FeatureType.CONTINUOUS
                 showDataPointDescriptionDialog(
                     requireContext(),

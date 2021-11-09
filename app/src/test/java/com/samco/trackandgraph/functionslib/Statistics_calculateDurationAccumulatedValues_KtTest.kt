@@ -123,8 +123,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val rawData =
                 DataSample(
                     dataPoints,
-                    FeatureType.CONTINUOUS,
-                    0L
+                    FeatureType.CONTINUOUS
                 )
 
             //WHEN
@@ -176,7 +175,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val sampleDuration = Duration.ofHours(1)
             val plotTotalTime: TemporalAmount = Period.ofDays(1)
             val dataPoints = emptyList<DataPoint>()
-            val rawData = DataSample(dataPoints, FeatureType.CONTINUOUS, 0L)
+            val rawData = DataSample(dataPoints, FeatureType.CONTINUOUS)
 
             //WHEN
             val answer = DurationAggregationFunction(
@@ -232,7 +231,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val dataPoints = emptyList<DataPoint>()
             val rawData =
                 DataSample(
-                    dataPoints, FeatureType.CONTINUOUS, 0L
+                    dataPoints, FeatureType.CONTINUOUS
                 )
 
             //WHEN
@@ -525,7 +524,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             }
             currentTime = currentTime.minus(totalingPeriod)
         }
-        return DataSample(dataPoints, FeatureType.CONTINUOUS, 0L)
+        return DataSample(dataPoints, FeatureType.CONTINUOUS)
     }
 
     private fun generateDataPoints2(
@@ -544,7 +543,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             output.add(DataPoint(timestamp, 0L, value, "", ""))
         }
 
-        return DataSample(output, FeatureType.CONTINUOUS, 0L)
+        return DataSample(output, FeatureType.CONTINUOUS)
     }
 
 }

@@ -183,7 +183,7 @@ class FunctionsOnDataTest {
         val output = context["output"] as DatapointsValue
 
         Assert.assertEquals(
-            DatapointsValue(datapointsFiltered, DataType.CATEGORICAL, featureId = 0L),
+            DatapointsValue(datapointsFiltered, DataType.CATEGORICAL),
             output
         )
 
@@ -212,7 +212,7 @@ class FunctionsOnDataTest {
         val output = context["output"] as DatapointsValue
 
         Assert.assertEquals(
-            DatapointsValue(datapointsFiltered, DataType.CATEGORICAL, featureId = 0L),
+            DatapointsValue(datapointsFiltered, DataType.CATEGORICAL),
             output
         )
 
@@ -277,7 +277,7 @@ class FunctionsOnDataTest {
             it.copyPoint(
                 timestamp = it.timestamp.minusYears(1)
             )
-        }, d2SameYear.featureType, d2SameYear.featureId)
+        }, d2SameYear.featureType)
 
 
         val evaluationModel = EvaluationModel()

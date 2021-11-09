@@ -44,6 +44,6 @@ class DataClippingFunction(
             val firstIndex = newDataPoints.indexOfFirst { dp -> dp.timestamp >= startTime }
             newDataPoints = if (firstIndex < 0) emptyList() else newDataPoints.drop(firstIndex)
         }
-        return DataSample(newDataPoints, dataSample.featureType, dataSample.featureId)
+        return DataSample(newDataPoints, dataSample.featureType)
     }
 }

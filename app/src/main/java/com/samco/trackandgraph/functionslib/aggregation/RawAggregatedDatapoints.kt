@@ -22,15 +22,20 @@ import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import com.samco.trackandgraph.database.entity.DataPointInterface
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
-import kotlin.reflect.KFunction
 
 /**
  * This class represents the initial points clustered into the parent-attribute of the AggregatedDataPoints.
  * To obtain usable values, one of the follow-up functions like sum, average, or max need to be called.
  * Note that some follow-up functions drop data-points without parents. This is supposed to be intuitive :)
  */
-internal class RawAggregatedDatapoints(private val points: List<AggregatedDataPoint>, val featureType: FeatureType, val featureId: Long) {
-    private fun makeSample(datapoints: List<DataPointInterface>) = DataSample(datapoints, featureType, featureId)
+internal class RawAggregatedDatapoints(
+    private val points: List<AggregatedDataPoint>,
+    val featureType: FeatureType
+) {
+    private fun makeSample(datapoints: List<DataPointInterface>) = DataSample(
+        datapoints,
+        featureType
+    )
 
     private fun applyFun(
         aggFun: (List<DataPointInterface>) -> Double,

@@ -147,15 +147,13 @@ fun DataType.toLocalizedString(getString: KFunction2<Int, Array<Any>, String>) :
 
 class DatapointsValue(
     val datapoints: List<DataPointInterface>,
-    val dataType: DataType,
-    val featureId: Long
+    val dataType: DataType
 ) : Value() {
     constructor(
         dataSample: DataSample,
     ) : this(
         dataSample.dataPoints,
         inferDatatype(dataSample),
-        dataSample.featureId
     )
 
     override fun equals(other: Any?): Boolean {
@@ -172,7 +170,7 @@ class DatapointsValue(
     fun applyToAllPoints(function: (Double) -> Double, newDataType: DataType = this.dataType) : DatapointsValue {
         return DatapointsValue(
             this.datapoints.map { dp -> dp.copyPoint(value = function(dp.value)) },
-            dataType = newDataType, featureId = this.featureId
+            dataType = newDataType
         )
     }
 
@@ -194,8 +192,7 @@ class DatapointsValue(
             DataType.NUMERICAL -> FeatureType.CONTINUOUS
             DataType.TIME -> FeatureType.DURATION
             DataType.CATEGORICAL -> FeatureType.DISCRETE
-        },
-        this.featureId
+        }
     )
 }
 

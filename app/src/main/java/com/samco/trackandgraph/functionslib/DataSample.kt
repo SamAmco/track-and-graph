@@ -20,10 +20,11 @@ package com.samco.trackandgraph.functionslib
 import com.samco.trackandgraph.database.entity.DataPointInterface
 import com.samco.trackandgraph.database.entity.FeatureType
 
-class DataSample(val dataPoints: List<DataPointInterface>, val featureType: FeatureType, val featureId: Long) {
+class DataSample(val dataPoints: List<DataPointInterface>, val featureType: FeatureType) {
+
     companion object {
         // when there are no points, we are ok with receiving null as featureType, and provide a fallback for that case
-        fun emptySample(featureType: FeatureType?, featureId: Long) =
-            DataSample(listOf(), featureType ?: FeatureType.CONTINUOUS, featureId)
+        fun emptySample(featureType: FeatureType?) =
+            DataSample(listOf(), featureType ?: FeatureType.CONTINUOUS)
     }
 }

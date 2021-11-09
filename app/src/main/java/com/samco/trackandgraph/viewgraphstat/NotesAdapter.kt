@@ -89,10 +89,13 @@ class NotesAdapter(
         private fun initFromDataPointNote() {
             val dataPoint = note!!.dataPoint!!
             binding.valueText.visibility = View.VISIBLE
-            val featureType = featureTypes.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
+            val featureType = featureTypes.getOrElse(dataPoint.featureId ?: Long.MAX_VALUE) { FeatureType.CONTINUOUS }
             binding.valueText.text = DataPoint.getDisplayValue(note!!.dataPoint!!, featureType)
             binding.featureNameText.visibility = View.VISIBLE
-            binding.featureNameText.text = featurePathProvider.getPathForFeature(dataPoint.featureId)
+            binding.featureNameText.text = dataPoint.featureId.let {
+                if (it == null) ""
+                else featurePathProvider.getPathForFeature(it)
+            }
             binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
             binding.noteText.visibility = View.VISIBLE
             binding.noteText.text = dataPoint.note

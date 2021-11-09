@@ -26,14 +26,14 @@ import org.threeten.bp.OffsetDateTime
 
 sealed class DataPointInterface {
     abstract val timestamp: OffsetDateTime
-    abstract val featureId: Long
+    abstract val featureId: Long?
     abstract val value: Double
     abstract val label: String
     abstract val note: String
 
     abstract fun copyPoint(
         timestamp: OffsetDateTime = this.timestamp,
-        featureId: Long = this.featureId,
+        //featureId: Long = this.featureId,
         value: Double = this.value,
         label: String = this.label,
         note: String = this.note
@@ -83,7 +83,7 @@ data class DataPoint (
 
     override fun copyPoint(
         timestamp: OffsetDateTime,
-        featureId: Long,
+        //featureId: Long,
         value: Double,
         label: String,
         note: String
@@ -99,22 +99,23 @@ data class DataPoint (
 
 data class AggregatedDataPoint(
     override val timestamp: OffsetDateTime,
-    override val featureId: Long,
     override val value: Double,
     val parents: List<DataPointInterface>,
     override val label: String = "",
     override val note: String = "",
 ) : DataPointInterface() {
 
+    override val featureId: Long?
+        get() = parents.firstOrNull()?.featureId
+
     override fun copyPoint(
         timestamp: OffsetDateTime,
-        featureId: Long,
+        //featureId: Long,
         value: Double,
         label: String,
         note: String
     ) = this.copy( // the this.copy function is the one automatically generated bc this is data-class
         timestamp = timestamp,
-        featureId = featureId,
         value = value,
         label = label,
         note = note
