@@ -20,8 +20,8 @@ android {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 200004
-        versionName "2.0.4"
+        versionCode 200100
+        versionName "2.1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {
