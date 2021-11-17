@@ -272,12 +272,12 @@ class FunctionsOnDataTest {
     @Test
     fun fixedBinAggregationFunctionTest() {
         val d1 = someDataRandom()
-        val d2SameYear = someDataRandom()
-        val d2 = DataSample(d2SameYear.dataPoints.map {
+        val d2PrevYear = someDataRandom()
+        val d2 = DataSample(d2PrevYear.dataPoints.map {
             it.copyPoint(
                 timestamp = it.timestamp.minusYears(1)
             )
-        }, d2SameYear.featureType)
+        }, d2PrevYear.featureType)
 
 
         val evaluationModel = EvaluationModel()
@@ -302,6 +302,70 @@ class FunctionsOnDataTest {
         Assert.assertEquals(c1.datapoints.map { it.timestamp }, c2.datapoints.map { it.timestamp })
         Assert.assertNotEquals(nf1.datapoints.map { it.timestamp }, nf2.datapoints.map { it.timestamp })
         Assert.assertEquals(f1.datapoints.map { it.timestamp }, f2.datapoints.map { it.timestamp })
+
+    }
+
+    @Test
+    fun fixedBinAggregationPLUSFunctionTest() {
+        val d1 = someDataRandom()
+        val d2 = DataSample(d1.dataPoints.map {
+            it.copyPoint(
+                timestamp = it.timestamp.minusYears(1).minusDays(13)
+            )
+        }, d1.featureType)
+
+
+        val evaluationModel = EvaluationModel()
+
+        val code = """var f1 = Bin(d1, MIN, 3*DAY, 0)
+                     |var f2 = Bin(d2, MIN, 3*DAY, 0)
+                     |var m = f1 + f2""".trimMargin("|")
+
+
+        val context = evaluationModel.run(code, mapOf("d1" to d1, "d2" to d2))
+
+        val f1 = context["f1"] as DatapointsValue
+        val f2 = context["f2"] as DatapointsValue
+        val merged = context["m"] as DatapointsValue
+
+        Assert.assertEquals(f1.datapoints.map { it.timestamp }, f2.datapoints.map { it.timestamp })
+
+        Assert.assertEquals(
+            f1.datapoints.zip(f2.datapoints).map { (v1, v2) -> v1.value + v2.value },
+            merged.datapoints.map { it.value }
+        )
+
+    }
+
+    @Test
+    fun fixedBinAggregationDIVFunctionTest() {
+        val d1 = someDataRandom()
+        val d2 = DataSample(d1.dataPoints.map {
+            it.copyPoint(
+                timestamp = it.timestamp.minusYears(1).minusDays(13)
+            )
+        }, d1.featureType)
+
+
+        val evaluationModel = EvaluationModel()
+
+        val code = """var f1 = Bin(d1, MIN, 3*DAY, 0)
+                     |var f2 = Bin(d2, MIN, 3*DAY, 0)
+                     |var m = f1 / f2""".trimMargin("|")
+
+
+        val context = evaluationModel.run(code, mapOf("d1" to d1, "d2" to d2))
+
+        val f1 = context["f1"] as DatapointsValue
+        val f2 = context["f2"] as DatapointsValue
+        val merged = context["m"] as DatapointsValue
+
+        Assert.assertEquals(f1.datapoints.map { it.timestamp }, f2.datapoints.map { it.timestamp })
+
+        Assert.assertEquals(
+            f1.datapoints.zip(f2.datapoints).map { (v1, v2) -> v1.value / v2.value },
+            merged.datapoints.map { it.value }
+        )
 
     }
 

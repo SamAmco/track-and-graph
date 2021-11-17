@@ -121,6 +121,12 @@ class DatapointsWrongTypeError(expectedTypes: List<DataType>, actualType: DataTy
     expectedTypes, actualType)
 
 
+class DataRegularityNotMatchingError() : DatatransformationFunctionError(
+    "Couldn't compute the arithmetic between the two data-series, because their timestamps didn't exactly match. Try using the Bin()-aggregation function with a fallback beforehand.",
+    emptyPosition(),
+    R.string.errormsg_dataregularity
+)
+
 
 /**
  * This class wraps the getString function handed down from the app-context.

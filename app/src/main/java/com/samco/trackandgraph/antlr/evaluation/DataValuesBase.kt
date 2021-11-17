@@ -2,6 +2,7 @@ package com.samco.trackandgraph.antlr.evaluation
 
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.antlr.generated.TnG2Parser
+import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import com.samco.trackandgraph.database.entity.DataPointInterface
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.functionslib.DataSample
@@ -167,17 +168,37 @@ class DatapointsValue(
         return result
     }
 
-    fun applyToAllPoints(function: (Double) -> Double, newDataType: DataType = this.dataType) : DatapointsValue {
+    fun applyToAllPoints(
+        function: (Double) -> Double,
+        newDataType: DataType = this.dataType
+    ): DatapointsValue {
         return DatapointsValue(
             this.datapoints.map { dp -> dp.copyPoint(value = function(dp.value)) },
             dataType = newDataType
         )
     }
 
+    fun applyToAllPointsZip(
+        function: ArithmeticOperator,
+        otherData: DatapointsValue,
+    ): DatapointsValue {
+        val returnType = assertCompatibility(this, otherData, function)
+        return DatapointsValue(
+            this.datapoints.zip(otherData.datapoints).map { (dp1, dp2) ->
+                AggregatedDataPoint(
+                    timestamp = dp1.timestamp, // should be same as dp2
+                    value = function.computeDoubles(dp1.value, dp2.value),
+                    parents = listOf(dp1, dp2),
+                )
+            },
+            dataType = returnType
+        )
+    }
+
 
     override fun _plus(other: Value): Value = this.plusValue(other)
     override fun _minus(other: Value): Value = this.minusValue(other)
-    override fun _times (other: Value): Value = this.timesValue(other)
+    override fun _times(other: Value): Value = this.timesValue(other)
     override fun _div(other: Value): Value = this.divValue(other)
 
     fun confirmType(allowedTypes: List<DataType>) {
@@ -195,6 +216,40 @@ class DatapointsValue(
         }
     )
 }
+
+/**
+ * Checks if the datatypes are compatible and returns the resulting type
+ * probably should be refactored into a larger function which also takes care of the conversion between TimeValue/NumberValue etc.
+ */
+private fun assertCompatibility(a: DatapointsValue, b: DatapointsValue, function: ArithmeticOperator) : DataType {
+    if (a.dataType == DataType.CATEGORICAL) throw DatapointsWrongTypeError(listOf(DataType.NUMERICAL, DataType.TIME), DataType.CATEGORICAL)
+    if (b.dataType == DataType.CATEGORICAL) throw DatapointsWrongTypeError(listOf(DataType.NUMERICAL, DataType.TIME), DataType.CATEGORICAL)
+
+    val returnType = when (function) {
+        ArithmeticOperator.PLUS, ArithmeticOperator.MINUS ->
+            if (a.dataType != b.dataType)
+                throw DatapointsWrongTypeError(listOf(a.dataType), b.dataType)
+            else a.dataType
+        // Don't allow to multiply time with time
+        ArithmeticOperator.TIMES ->
+            if (a.dataType == DataType.TIME && b.dataType == DataType.TIME)
+                throw DatapointsWrongTypeError(listOf(DataType.NUMERICAL), b.dataType)
+            else if(DataType.TIME in listOf(a.dataType, b.dataType)) DataType.TIME else DataType.NUMERICAL
+
+        ArithmeticOperator.DIV ->
+            if (a.dataType == b.dataType) DataType.NUMERICAL
+            // one of them has to be TIME, the other NUMERICAL
+            else if (a.dataType == DataType.TIME) DataType.TIME
+                // a is number, b is time, we can't have this
+                else throw DatapointsWrongTypeError(listOf(DataType.NUMERICAL), b.dataType)
+    }
+
+    if (a.datapoints.map { it.timestamp } != b.datapoints.map { it.timestamp })
+        throw DataRegularityNotMatchingError()
+
+    return returnType
+}
+
 
 enum class AggregationEnum {
     AVERAGE,

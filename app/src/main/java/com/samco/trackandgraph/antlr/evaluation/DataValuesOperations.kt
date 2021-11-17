@@ -6,14 +6,32 @@ import org.threeten.bp.temporal.TemporalAmount
 import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
+enum class ArithmeticOperator {
+    PLUS, MINUS, TIMES, DIV;
+
+    fun computeDoubles(v1: Double, v2: Double): Double {
+        return when (this) {
+            PLUS -> v1 + v2
+            MINUS -> v1 - v2
+            TIMES -> v1 * v2
+            DIV -> v1 / v2
+        }
+    }
+}
+
 /**
  *  NUMBER VALUE
  */
 
 fun NumberValue.plusValue(other: Value): Value {
-    return when(other) {
+    return when (other) {
         is NumberValue -> NumberValue(this.toDouble() + other.toDouble())
-        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("PLUS", this, other, listOf(NumberValue::class))
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation(
+            "PLUS",
+            this,
+            other,
+            listOf(NumberValue::class)
+        )
     }
 }
 
@@ -154,6 +172,7 @@ fun TimeValue.timesValue(other: Value): Value {
 fun TimeValue.divValue(other: Value): Value {
     return when(other) {
         is NumberValue -> TimeValue(this.temporalAmount._dividedBy(other.toDouble().roundToLong()))
+        is TimeValue -> NumberValue(this.temporalAmount.toSeconds() / other.temporalAmount.toSeconds())
         else -> throwUnsupportedArgumentTypeErrorBinaryOperation(
             "DIV",
             this,
@@ -167,20 +186,15 @@ fun TimeValue.divValue(other: Value): Value {
  *  DATAPOINTS VALUE
  */
 
-//private fun assertCompatibility(a: DatapointsValue, b: DatapointsValue) : Nothing {
-//    if (a.datapoints.map { it.timestamp } == b.datapoints.map { it.timestamp }) true
-//
-//
-//}
-
 fun DatapointsValue.plusValue(other: Value): Value {
     return when(other) {
-        is NumberValue -> applyToAllPoints( { it + other.toDouble() } )
+        is NumberValue -> applyToAllPoints({ it + other.toDouble() })
+        is DatapointsValue -> applyToAllPointsZip(ArithmeticOperator.PLUS, other)
         else -> throwUnsupportedArgumentTypeErrorBinaryOperation(
             "PLUS",
             this,
             other,
-            listOf(NumberValue::class)
+            listOf(NumberValue::class, DatapointsValue::class)
         )
     }
 }
@@ -188,11 +202,12 @@ fun DatapointsValue.plusValue(other: Value): Value {
 fun DatapointsValue.minusValue(other: Value): Value {
     return when (other) {
         is NumberValue -> applyToAllPoints({ it - other.toDouble() })
+        is DatapointsValue -> applyToAllPointsZip(ArithmeticOperator.MINUS, other)
         else -> throwUnsupportedArgumentTypeErrorBinaryOperation(
             "MINUS",
             this,
             other,
-            listOf(NumberValue::class)
+            listOf(NumberValue::class, DatapointsValue::class)
         )
     }
 }
@@ -220,7 +235,13 @@ fun DatapointsValue.timesValue(other: Value): Value {
                 newDataType = DataType.TIME
             )
         }
-        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("TIMES", this, other, listOf(NumberValue::class))
+        is DatapointsValue -> applyToAllPointsZip(ArithmeticOperator.TIMES, other)
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation(
+            "TIMES",
+            this,
+            other,
+            listOf(NumberValue::class, TimeValue::class, DatapointsValue::class)
+        )
     }
 }
 
@@ -239,6 +260,12 @@ fun DatapointsValue.divValue(other: Value): Value {
                 newDataType = DataType.NUMERICAL
             )
         }
-        else -> throwUnsupportedArgumentTypeErrorBinaryOperation("DIV", this, other, listOf(NumberValue::class))
+        is DatapointsValue -> applyToAllPointsZip(ArithmeticOperator.DIV, other)
+        else -> throwUnsupportedArgumentTypeErrorBinaryOperation(
+            "DIV",
+            this,
+            other,
+            listOf(NumberValue::class, TimeValue::class, DatapointsValue::class)
+        )
     }
 }

@@ -377,4 +377,5 @@
     <string name="functionsig_merge">Merge: Takes two or more datasamples (of same type) and merges them into one</string>
     <string name="functionsig_moving">Moving: Calculates different aggregation functions over a moving timewindow</string>
     <string name="functionsig_bin">Bin: Splits the data into bins of a certain duration and computes aggregation function on them</string>
+    <string name="errormsg_dataregularity">Couldn\'t compute the arithmetic between the two data-series, because their timestamps didn\'t exactly match. Try using the Bin()-aggregation function with a fallback beforehand.</string>
 </resources>
