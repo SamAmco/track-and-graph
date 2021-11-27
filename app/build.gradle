@@ -3,6 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "androidx.navigation.safeargs.kotlin"
+//apply plugin: "antlr"
 
 android {
     compileSdkVersion 30
@@ -108,6 +109,8 @@ dependencies {
     implementation 'com.androidplot:androidplot-core:1.5.7'
     implementation 'com.google.android:flexbox:1.1.1'
 
+    //ANTLR
+    implementation "org.antlr:antlr4-runtime:4.9.2"
 
     testImplementation 'junit:junit:4.13.1'
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'

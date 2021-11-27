@@ -76,3 +76,4 @@ database-extract/ge_database.db-wal
 
 
 local-scripts/
+/app/src/main/java/com/samco/trackandgraph/antlr/generated/

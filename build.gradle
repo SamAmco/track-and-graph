@@ -1,5 +1,7 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
+apply plugin: 'antlr'
+
 buildscript {
     ext {
         kotlin_version = '1.4.10'
@@ -12,13 +14,27 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:7.0.2'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 
         //Safe Args
         classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$nav_version"
     }
 }
+
+sourceSets {
+    main {
+        antlr {
+            srcDirs = [ "app/src/main/antlr" ]
+        }
+    }
+}
+
+dependencies {
+    antlr "org.antlr:antlr4:4.9.1"
+    implementation "org.antlr:antlr4-runtime:4.9.1"
+}
+
 
 allprojects {
     repositories {
@@ -28,6 +44,16 @@ allprojects {
     }
 }
 
-task clean(type: Delete) {
-    delete rootProject.buildDir
+generateGrammarSource {
+    outputDirectory = file("app/src/main/java/com/samco/trackandgraph/antlr/generated")
 }
+
+gradle.projectsEvaluated {
+    subprojects{
+        preBuild.dependsOn generateGrammarSource
+    }
+}
+
+//task clean(type: Delete) {
+//    delete rootProject.buildDir
+//}
