@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.functionslib.aggregation
 
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
-import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.database.entity.IDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.TimeHelper
 import kotlinx.coroutines.yield
@@ -111,7 +111,7 @@ internal class FixedBinAggregator(
         ).minByOrNull { t -> t ?: OffsetDateTime.MAX } ?: latest
     }
 
-    private fun DataPointInterface.cutoffTimestampForAggregation(): OffsetDateTime {
+    private fun IDataPoint.cutoffTimestampForAggregation(): OffsetDateTime {
         return timestamp - timeHelper.aggregationPreferences.startTimeOfDay
     }
 }

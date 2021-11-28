@@ -28,7 +28,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<IDataPoint>) -> Unit
     ): ITimeSinceViewData {
         val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
             ?: return object : ITimeSinceViewData {
@@ -47,12 +47,12 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: TimeSinceLastStat,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<IDataPoint>) -> Unit
     ): ITimeSinceViewData {
         val dataPoint = getLastDataPoint(dataSource, config)
         onDataSampled.invoke(dataPoint?.let { listOf(dataPoint) } ?: emptyList())
         return object : ITimeSinceViewData {
-            override val lastDataPoint: DataPointInterface?
+            override val lastDataPoint: IDataPoint?
                 get() = dataPoint
             override val state: IGraphStatViewData.State
                 get() = IGraphStatViewData.State.READY
@@ -64,7 +64,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     private fun getLastDataPoint(
         dataSource: TrackAndGraphDatabaseDao,
         timeSinceLastStat: TimeSinceLastStat
-    ): DataPointInterface? {
+    ): IDataPoint? {
         val feature = dataSource.getFeatureById(timeSinceLastStat.featureId)
         return when (feature.featureType) {
             FeatureType.CONTINUOUS, FeatureType.DURATION -> {
