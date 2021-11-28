@@ -28,10 +28,11 @@ class Statistics_clipDataSample_KtTest {
     @Test
     fun clipDataSample_empty_sample() = runBlocking {
         //WHEN
-        val answer = DataClippingFunction(null, null).execute(DataSample(listOf()))
+        val answer = DataClippingFunction(null, null)
+            .mapSample(DataSample.fromSequence(emptySequence()))
 
         //THEN
-        assertEquals(0, answer.dataPoints.size)
+        assertEquals(0, answer.toList().size)
     }
 
     @Test
@@ -39,26 +40,23 @@ class Statistics_clipDataSample_KtTest {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
-            5.0 to 70L,
-            0.0 to 50L,
-            4.0 to 49L,
-            2.0 to 48L,
-            0.0 to 43L,
-            4.0 to 41L,
-            8.0 to 30L,
+            3.0 to 10L,
             7.0 to 20L,
-            3.0 to 10L
+            8.0 to 30L,
+            4.0 to 41L,
+            0.0 to 43L,
+            2.0 to 48L,
+            4.0 to 49L,
+            0.0 to 50L,
+            5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample =
-            DataSample(
-                dataPoints
-            )
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
 
         //WHEN
-        val answer = DataClippingFunction(null, null).execute(dataSample)
+        val answer = DataClippingFunction(null, null).mapSample(dataSample)
 
         //THEN
-        assertEquals(dataPoints, answer.dataPoints)
+        assertEquals(dataPoints, answer.toList())
     }
 
     @Test
@@ -66,27 +64,24 @@ class Statistics_clipDataSample_KtTest {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
-            5.0 to 70L,
-            0.0 to 50L,
-            4.0 to 49L,
-            2.0 to 48L,
-            0.0 to 43L,
-            4.0 to 41L,
-            8.0 to 30L,
+            3.0 to 10L,
             7.0 to 20L,
-            3.0 to 10L
+            8.0 to 30L,
+            4.0 to 41L,
+            0.0 to 43L,
+            2.0 to 48L,
+            4.0 to 49L,
+            0.0 to 50L,
+            5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample =
-            DataSample(
-                dataPoints
-            )
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofHours(30)
 
         //WHEN
-        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(null, sampleDuration).mapSample(dataSample)
 
         //THEN
-        assertEquals(dataPoints.takeLast(3), answer.dataPoints)
+        assertEquals(dataPoints.take(3), answer.toList())
     }
 
     @Test
@@ -104,13 +99,14 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofHours(100)
 
         //WHEN
-        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(null, sampleDuration).mapSample(dataSample)
+
         //THEN
-        assertEquals(dataPoints, answer.dataPoints)
+        assertEquals(dataPoints, answer.toList())
     }
 
     @Test
@@ -118,24 +114,24 @@ class Statistics_clipDataSample_KtTest {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
-            5.0 to 70L,
-            0.0 to 50L,
-            4.0 to 49L,
-            2.0 to 48L,
-            0.0 to 43L,
-            4.0 to 41L,
-            8.0 to 30L,
+            3.0 to 10L,
             7.0 to 20L,
-            3.0 to 10L
+            8.0 to 30L,
+            4.0 to 41L,
+            0.0 to 43L,
+            2.0 to 48L,
+            4.0 to 49L,
+            0.0 to 50L,
+            5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofHours(1)
 
         //WHEN
-        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(null, sampleDuration).mapSample(dataSample)
 
         //THEN
-        assertEquals(dataPoints.takeLast(1), answer.dataPoints)
+        assertEquals(dataPoints.take(1), answer.toList())
     }
 
     @Test
@@ -143,24 +139,24 @@ class Statistics_clipDataSample_KtTest {
         //GIVEN
         val future = OffsetDateTime.now().plusMonths(1)
         val dataPoints = listOf(
-            5.0 to 70L,
-            0.0 to 50L,
-            4.0 to 49L,
-            2.0 to 48L,
-            0.0 to 43L,
-            4.0 to 41L,
-            8.0 to 30L,
+            3.0 to 10L,
             7.0 to 20L,
-            3.0 to 10L
+            8.0 to 30L,
+            4.0 to 41L,
+            0.0 to 43L,
+            2.0 to 48L,
+            4.0 to 49L,
+            0.0 to 50L,
+            5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, future.minusHours(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofHours(35)
 
         //WHEN
-        val answer = DataClippingFunction(null, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(null, sampleDuration).mapSample(dataSample)
 
         //THEN
-        assertEquals(dataPoints.takeLast(5), answer.dataPoints)
+        assertEquals(dataPoints.take(5), answer.toList())
     }
 
     @Test
@@ -168,24 +164,24 @@ class Statistics_clipDataSample_KtTest {
         //GIVEN
         val now = OffsetDateTime.now()
         val dataPoints = listOf(
-            5.0 to 70L,
-            0.0 to 50L,
-            4.0 to 49L,
-            2.0 to 48L,
-            0.0 to 43L,
-            4.0 to 41L,
-            8.0 to 30L,
+            3.0 to 10L,
             7.0 to 20L,
-            3.0 to 10L
+            8.0 to 30L,
+            4.0 to 41L,
+            0.0 to 43L,
+            2.0 to 48L,
+            4.0 to 49L,
+            0.0 to 50L,
+            5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
         val endTime = now.minusDays(20)
 
         //WHEN
-        val answer = DataClippingFunction(endTime, null).execute(dataSample)
+        val answer = DataClippingFunction(endTime, null).mapSample(dataSample)
 
         //THEN
-        assertEquals(dataPoints.take(8), answer.dataPoints)
+        assertEquals(dataPoints.takeLast(8), answer.toList())
     }
 
     @Test
@@ -193,23 +189,23 @@ class Statistics_clipDataSample_KtTest {
         //GIVEN
         val future = OffsetDateTime.now().plusYears(1)
         val dataPoints = listOf(
-            5.0 to 70L,
-            0.0 to 50L,
-            4.0 to 49L,
-            2.0 to 48L,
-            0.0 to 43L,
-            4.0 to 41L,
-            8.0 to 30L,
+            3.0 to 10L,
             7.0 to 20L,
-            3.0 to 10L
+            8.0 to 30L,
+            4.0 to 41L,
+            0.0 to 43L,
+            2.0 to 48L,
+            4.0 to 49L,
+            0.0 to 50L,
+            5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, future.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
 
         //WHEN
-        val answer = DataClippingFunction(OffsetDateTime.now(), null).execute(dataSample)
+        val answer = DataClippingFunction(OffsetDateTime.now(), null).mapSample(dataSample)
 
         //THEN
-        assertEquals(emptyList<DataPoint>(), answer.dataPoints)
+        assertEquals(emptyList<DataPoint>(), answer.toList())
     }
 
     @Test
@@ -227,13 +223,13 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
 
         //WHEN
-        val answer = DataClippingFunction(now, null).execute(dataSample)
+        val answer = DataClippingFunction(now, null).mapSample(dataSample)
 
         //THEN
-        assertEquals(dataPoints, answer.dataPoints)
+        assertEquals(dataPoints, answer.toList())
     }
 
     @Test
@@ -242,24 +238,24 @@ class Statistics_clipDataSample_KtTest {
         val now = OffsetDateTime.now()
         val future = now.plusMonths(1)
         val dataPoints = listOf(
-            5.0 to 70L,
-            0.0 to 50L,
-            4.0 to 49L,
-            2.0 to 48L,
-            0.0 to 43L,
-            4.0 to 41L,
-            8.0 to 31L,
+            3.0 to 10L,
             7.0 to 20L,
-            3.0 to 10L
+            8.0 to 31L,
+            4.0 to 41L,
+            0.0 to 43L,
+            2.0 to 48L,
+            4.0 to 49L,
+            0.0 to 50L,
+            5.0 to 70L
         ).map { (value, daysBefore) -> makedp(value, future.minusDays(daysBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofDays(30)
 
         //WHEN
-        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(now, sampleDuration).mapSample(dataSample)
 
         //THEN
-        assertEquals(dataPoints.drop(1).take(6), answer.dataPoints)
+        assertEquals(dataPoints.drop(2).take(6), answer.toList())
     }
 
     @Test
@@ -277,14 +273,14 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofDays(3)
 
         //WHEN
-        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(now, sampleDuration).mapSample(dataSample)
 
         //THEN
-        assertEquals(emptyList<DataPoint>(), answer.dataPoints)
+        assertEquals(emptyList<DataPoint>(), answer.toList())
     }
 
     @Test
@@ -302,14 +298,14 @@ class Statistics_clipDataSample_KtTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.plusMonths(3).minusDays(hoursBefore)) }
-        val dataSample = DataSample(dataPoints)
+        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofDays(20)
 
         //WHEN
-        val answer = DataClippingFunction(now, sampleDuration).execute(dataSample)
+        val answer = DataClippingFunction(now, sampleDuration).mapSample(dataSample)
 
         //THEN
-        assertEquals(emptyList<DataPoint>(), answer.dataPoints)
+        assertEquals(emptyList<DataPoint>(), answer.toList())
     }
 
     private fun makedp(value: Double, timestamp: OffsetDateTime): DataPoint {

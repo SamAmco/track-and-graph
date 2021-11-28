@@ -51,7 +51,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample, window, feature, sumByCount)
+            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -79,7 +79,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample, window, feature, sumByCount)
+            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -111,7 +111,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample, window, feature, sumByCount)
+            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -159,7 +159,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample, window, feature, sumByCount)
+            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -179,14 +179,14 @@ class TimeHistogramDataHelperTests {
     @Test
     fun test_getHistogramBinsForSample_no_data() {
         //GIVEN
-        val sample = DataSample(emptyList())
+        val sample = DataSample.fromSequence(emptySequence())
         val window = TimeHistogramWindow.HOUR
         val feature = makeFeature(FeatureType.CONTINUOUS)
         val sumByCount = false
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample, window, feature, sumByCount)
+            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
 
         //THEN
         Assert.assertNull(answer)
@@ -215,7 +215,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample, window, feature, sumByCount)
+            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -239,7 +239,7 @@ class TimeHistogramDataHelperTests {
         )
 
     private fun makeDataSample(dataPoints: List<Pair<Double, OffsetDateTime>>) =
-        DataSample(
-            dataPoints.map { DataPoint(it.second, 0L, it.first, "", "") }
+        DataSample.fromSequence(
+            dataPoints.map { DataPoint(it.second, 0L, it.first, "", "") }.asSequence()
         )
 }

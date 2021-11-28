@@ -51,7 +51,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureAscSync(featureId)
+            verify(dataSource).getDataPointsForFeatureSync(featureId)
         }
     }
 
@@ -73,7 +73,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 eq(OffsetDateTime.MIN),
                 eq(endDate)
@@ -102,7 +102,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -144,7 +144,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -191,7 +191,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -243,7 +243,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -282,7 +282,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureAscSync(featureId)
+            verify(dataSource).getDataPointsForFeatureSync(featureId)
         }
     }
 
@@ -307,7 +307,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -349,7 +349,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -391,7 +391,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -433,7 +433,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -475,7 +475,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
@@ -517,7 +517,7 @@ class Statistics_sampleData_KtTest {
             )
 
             //THEN
-            verify(dataSource).getDataPointsForFeatureBetweenAscSync(
+            verify(dataSource).getDataPointsForFeatureBetweenDescSync(
                 eq(featureId),
                 startTimeCaptor.capture(),
                 endTimeCaptor.capture()
