@@ -52,26 +52,46 @@ internal class FixedBinAggregator(
     private val endTime: OffsetDateTime?,
     private val binSize: TemporalAmount,
 ) : DataAggregator {
-    override suspend fun aggregate(dataSample: DataSample): RawAggregatedDatapoints {
-        val newData = mutableListOf<AggregatedDataPoint>()
 
-        val firstDataPointTime =
-            dataSample.dataPoints.firstOrNull()?.cutoffTimestampForAggregation()
-        val lastDataPointTime = dataSample.dataPoints.lastOrNull()?.cutoffTimestampForAggregation()
+    override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
+        return AggregatedDataSample.fromSequence(
+            getSequence(dataSample),
+            dataSample.dataSampleProperties
+        )
+    }
+
+    override suspend fun aggregate(dataSample: AggregatedDataSample): AggregatedDataSample {
+        return AggregatedDataSample.fromSequence(
+            getSequence(dataSample),
+            dataSample.dataSampleProperties
+        )
+    }
+
+    private fun getSequence(dataSample: Sequence<IDataPoint>) = sequence {
+        //TODO would be really nice if there was an implementation that didn't require
+        // copying the whole sequence to memory
+
+        //Get the points in order from oldest to newest
+        val dataPoints = dataSample.toList().asReversed()
+
+        val firstDataPointTime = dataPoints.firstOrNull()?.cutoffTimestampForAggregation()
+        val lastDataPointTime = dataPoints.lastOrNull()?.cutoffTimestampForAggregation()
 
         val latest = getEndTimeNowOrLatest(lastDataPointTime, endTime)
         val earliest = getStartTimeOrFirst(firstDataPointTime, latest, endTime, sampleDuration)
-        var currentTimeStamp = timeHelper.findBeginningOfTemporal(earliest, binSize).minusNanos(1)
+        var currentTimeStamp = timeHelper
+            .findBeginningOfTemporal(earliest, binSize)
+            .minusNanos(1)
         var index = 0
         while (currentTimeStamp.isBefore(latest)) {
             currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(binSize) }
-            val points = dataSample.dataPoints.drop(index)
+            val points = dataPoints
+                .drop(index)
                 .takeWhile { dp ->
-                    dp.cutoffTimestampForAggregation()
-                        .isBefore(currentTimeStamp)
+                    dp.cutoffTimestampForAggregation().isBefore(currentTimeStamp)
                 }
             index += points.size
-            newData.add(
+            yield(
                 AggregatedDataPoint(
                     timestamp = currentTimeStamp,
                     value = Double.NaN, // this value gets overwritten when calling a function on RawAggregatedDatapoints
@@ -79,9 +99,7 @@ internal class FixedBinAggregator(
                     parents = points
                 )
             )
-            yield()
         }
-        return RawAggregatedDatapoints(newData)
     }
 
     private fun getEndTimeNowOrLatest(

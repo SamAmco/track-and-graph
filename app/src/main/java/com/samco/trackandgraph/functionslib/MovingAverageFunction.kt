@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.functionslib
 
+import com.samco.trackandgraph.database.entity.IDataPoint
 import com.samco.trackandgraph.functionslib.aggregation.MovingAggregator
 import org.threeten.bp.Duration
 
@@ -32,9 +33,11 @@ import org.threeten.bp.Duration
 class MovingAverageFunction(
     private val movingAvgDuration: Duration
 ) : DataSampleFunction {
-    override suspend fun execute(dataSample: DataSample): DataSample {
-        return MovingAggregator(movingAvgDuration)
+    override suspend fun mapSample(dataSample: DataSample): DataSample {
+        val sequence = MovingAggregator(movingAvgDuration)
             .aggregate(dataSample)
-            .average()
+            .filter { it.parents.isNotEmpty() }
+            .map { it.copy(value = it.parents.map { par -> par.value }.average()) }
+        return DataSample.fromSequence(sequence, dataSample.dataSampleProperties)
     }
 }

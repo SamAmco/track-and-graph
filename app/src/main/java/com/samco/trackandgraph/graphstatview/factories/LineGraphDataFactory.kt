@@ -120,7 +120,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             yield()
             val plottingData =
                 tryGetPlottingData(dataSource, lineGraph, allReferencedDataPoints, lgf)
-            lgf to plottingData?.let { getXYSeriesFromDataSample(it, endTime, lgf) }
+            lgf to plottingData?.let { getXYSeriesFromDataPoints(it, endTime, lgf) }
         }.toMap()
     }
 
@@ -129,7 +129,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         lineGraph: LineGraphWithFeatures,
         allReferencedDataPoints: MutableList<IDataPoint>,
         lineGraphFeature: LineGraphFeature
-    ): DataSample? {
+    ): List<IDataPoint>? {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
         val rawDataSample = withContext(Dispatchers.IO) {
@@ -143,8 +143,8 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             )
         }
         val clippingCalculator = DataClippingFunction(lineGraph.endDate, lineGraph.duration)
-        val visibleSection = clippingCalculator.execute(rawDataSample)
-        allReferencedDataPoints.addAll(visibleSection.dataPoints)
+        val visibleSection = clippingCalculator.mapSample(rawDataSample)
+        allReferencedDataPoints.addAll(visibleSection)
 
         val timeHelper = TimeHelper(GlobalAggregationPreferences)
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
@@ -169,14 +169,14 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
                 aggregationCalculator,
                 averageCalculator,
                 clippingCalculator
-            ).execute(rawDataSample)
-        }
+            ).mapSample(rawDataSample)
+        }.toList()
 
-        return if (plottingData.dataPoints.size >= 2) plottingData else null
+        return if (plottingData.size >= 2) plottingData else null
     }
 
-    private fun getXYSeriesFromDataSample(
-        dataSample: DataSample,
+    private fun getXYSeriesFromDataPoints(
+        dataSample: List<IDataPoint>,
         endTime: OffsetDateTime,
         lineGraphFeature: LineGraphFeature
     ): FastXYSeries {
@@ -187,11 +187,12 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             DurationPlottingMode.MINUTES -> 60.0
             else -> 1.0
         }
-        val yValues = dataSample.dataPoints.map { dp ->
+        val yValues = dataSample.map { dp ->
             (dp.value * scale / durationDivisor) + offset
         }
-        val xValues =
-            dataSample.dataPoints.map { dp -> Duration.between(endTime, dp.timestamp).toMillis() }
+        val xValues = dataSample.map { dp ->
+            Duration.between(endTime, dp.timestamp).toMillis()
+        }
 
         var yRegion = SeriesUtils.minMax(yValues)
         if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1)
@@ -204,7 +205,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             override fun getX(index: Int): Number = xValues[index]
             override fun getY(index: Int): Number = yValues[index]
             override fun getTitle() = lineGraphFeature.name
-            override fun size() = dataSample.dataPoints.size
+            override fun size() = xValues.size
         }
     }
 

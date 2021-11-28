@@ -18,5 +18,26 @@
 package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.entity.IDataPoint
+import org.threeten.bp.temporal.TemporalAmount
 
-class DataSample(val dataPoints: List<IDataPoint>)
+data class DataSampleProperties(
+    val regularity: TemporalAmount? = null
+)
+
+/**
+ * A sequence of data points in order from newest to oldest
+ */
+abstract class DataSample(
+    val dataSampleProperties: DataSampleProperties
+) : Sequence<IDataPoint> {
+    companion object {
+        fun fromSequence(
+            data: Sequence<IDataPoint>,
+            dataSampleProperties: DataSampleProperties = DataSampleProperties()
+        ): DataSample {
+            return object : DataSample(dataSampleProperties) {
+                override fun iterator(): Iterator<IDataPoint> = data.iterator()
+            }
+        }
+    }
+}

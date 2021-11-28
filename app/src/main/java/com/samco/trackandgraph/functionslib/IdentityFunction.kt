@@ -19,5 +19,5 @@ package com.samco.trackandgraph.functionslib
 
 /** A calculator that just returns the data passed to it **/
 class IdentityFunction : DataSampleFunction {
-    override suspend fun execute(dataSample: DataSample) = dataSample
+    override suspend fun mapSample(dataSample: DataSample): DataSample = dataSample
 }

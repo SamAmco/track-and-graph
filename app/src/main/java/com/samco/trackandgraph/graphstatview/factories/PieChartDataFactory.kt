@@ -73,7 +73,7 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
             )
         }
 
-        onDataSampled(plottingData.dataPoints)
+        onDataSampled(plottingData)
 
         return object : IPieChartViewData {
             override val segments: List<Segment>
@@ -88,18 +88,18 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
     private suspend fun tryGetPlottableDataForPieChart(
         dataSource: TrackAndGraphDatabaseDao,
         pieChart: PieChart
-    ): DataSample? {
+    ): List<IDataPoint>? {
         val feature = withContext(Dispatchers.IO) {
             dataSource.getFeatureById(pieChart.featureId)
         }
         val dataSample = DatabaseSampleHelper(dataSource).sampleData(
             feature.id, pieChart.duration, pieChart.endDate, null, null
-        )
-        return if (dataSample.dataPoints.isNotEmpty()) dataSample else null
+        ).toList()
+        return if (dataSample.isNotEmpty()) dataSample else null
     }
 
-    private fun getPieChartSegments(dataSample: DataSample) =
-        dataSample.dataPoints
+    private fun getPieChartSegments(dataSample: List<IDataPoint>) =
+        dataSample
             .groupingBy { dp -> dp.label }
             .eachCount()
             .map { b -> Segment(b.key, b.value) }

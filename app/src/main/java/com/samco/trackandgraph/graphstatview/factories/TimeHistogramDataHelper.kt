@@ -66,15 +66,15 @@ class TimeHistogramDataHelper(
      * the sum of their values
      */
     internal fun getHistogramBinsForSample(
-        sample: DataSample,
+        sample: List<IDataPoint>,
         window: TimeHistogramWindow,
         feature: Feature,
         sumByCount: Boolean,
     ): Map<Int, List<Double>>? {
-        if (sample.dataPoints.isEmpty()) return null
+        if (sample.isEmpty()) return null
         val endTime = getNextEndOfWindow(
             window,
-            sample.dataPoints.maxBy { it.timestamp }!!
+            sample.maxBy { it.timestamp }!!
                 .cutoffTimestampForAggregation(),
 
             )
@@ -86,22 +86,22 @@ class TimeHistogramDataHelper(
         return when {
             isDiscrete && sumByCount ->
                 getHistogramBinsForSample(
-                    sample.dataPoints, window, keys, endTime,
+                    sample, window, keys, endTime,
                     ::addOneDiscreteValueToBin
                 )
             isDiscrete ->
                 getHistogramBinsForSample(
-                    sample.dataPoints, window, keys, endTime,
+                    sample, window, keys, endTime,
                     ::addDiscreteValueToBin
                 )
             sumByCount ->
                 getHistogramBinsForSample(
-                    sample.dataPoints, window, keys, endTime,
+                    sample, window, keys, endTime,
                     ::addOneToBin
                 )
             else ->
                 getHistogramBinsForSample(
-                    sample.dataPoints, window, keys, endTime,
+                    sample, window, keys, endTime,
                     ::addValueToBin
                 )
         }

@@ -30,20 +30,27 @@ class DataClippingFunction(
      * If the endTime is null then all data points within the sampleDuration leading up to the last data point
      * will be returned. If both the sampleDuration and endTime are null then the whole list will be returned.
      */
-    override suspend fun execute(dataSample: DataSample): DataSample {
-        if (dataSample.dataPoints.isEmpty()) return dataSample
+    override suspend fun mapSample(dataSample: DataSample): DataSample = DataSample.fromSequence(
+        sequence {
+            val iterator = dataSample.iterator()
+            if (!iterator.hasNext()) return@sequence
 
-        var newDataPoints = dataSample.dataPoints
-        if (endTime != null) {
-            val lastIndex = newDataPoints.indexOfLast { dp -> dp.timestamp <= endTime }
-            newDataPoints = newDataPoints.take(lastIndex + 1)
-        }
-        if (sampleDuration != null) {
-            val endOfDuration = endTime ?: dataSample.dataPoints.last().timestamp
+            val first = iterator.next()
+
+            val endOfDuration = endTime ?: first.timestamp
             val startTime = endOfDuration.minus(sampleDuration)
-            val firstIndex = newDataPoints.indexOfFirst { dp -> dp.timestamp >= startTime }
-            newDataPoints = if (firstIndex < 0) emptyList() else newDataPoints.drop(firstIndex)
-        }
-        return DataSample(newDataPoints)
-    }
+
+            var next = first
+
+            while (
+                next.timestamp <= endOfDuration
+                && next.timestamp >= startTime
+                && iterator.hasNext()
+            ) {
+                yield(next)
+                next = iterator.next()
+            }
+            return@sequence
+        }, dataSample.dataSampleProperties
+    )
 }

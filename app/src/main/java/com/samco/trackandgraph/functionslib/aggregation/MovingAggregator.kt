@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.functionslib.aggregation
 
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
+import com.samco.trackandgraph.database.entity.IDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
@@ -30,30 +31,37 @@ import org.threeten.bp.Duration
  * earliest in the list
  */
 internal class MovingAggregator(private val movingAggDuration: Duration) : DataAggregator {
-    override suspend fun aggregate(dataSample: DataSample): RawAggregatedDatapoints {
-        val movingAggregationPointsRaw = mutableListOf<AggregatedDataPoint>()
-        val dataPointsReversed = dataSample.dataPoints.reversed()
+    override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
+        return AggregatedDataSample.fromSequence(
+            getSequence(dataSample),
+            dataSample.dataSampleProperties
+        )
+    }
 
-        for ((index, current) in dataPointsReversed.mapIndexed { idx, point -> Pair(idx, point) }) {
-            yield()
-            val parents = dataPointsReversed.drop(index)
+    override suspend fun aggregate(dataSample: AggregatedDataSample): AggregatedDataSample {
+        return AggregatedDataSample.fromSequence(
+            getSequence(dataSample),
+            dataSample.dataSampleProperties
+        )
+    }
+
+    private fun getSequence(dataSample: Sequence<IDataPoint>) = sequence {
+        for ((index, current) in dataSample.mapIndexed { idx, point -> Pair(idx, point) }) {
+            val parents = dataSample.drop(index)
                 .takeWhile { dp ->
                     Duration.between(dp.timestamp, current.timestamp) < movingAggDuration
                 }
 
-            movingAggregationPointsRaw.add(
-                0,
+            yield(
                 AggregatedDataPoint(
                     current.timestamp,
                     current.featureId,
                     value = Double.NaN,
                     label = current.label,
                     note = current.note,
-                    parents = parents
+                    parents = parents.toList()
                 )
             )
         }
-
-        return RawAggregatedDatapoints(movingAggregationPointsRaw)
     }
 }

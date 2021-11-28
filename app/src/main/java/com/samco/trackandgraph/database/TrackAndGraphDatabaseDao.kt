@@ -172,8 +172,8 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp > :cutOff AND timestamp < :now ORDER BY timestamp ASC")
-    fun getDataPointsForFeatureBetweenAscSync(
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp > :cutOff AND timestamp < :now ORDER BY timestamp DESC")
+    fun getDataPointsForFeatureBetweenDescSync(
         featureId: Long,
         cutOff: OffsetDateTime,
         now: OffsetDateTime
@@ -181,9 +181,6 @@ interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT 1")
     fun getLastDataPointForFeatureSync(featureId: Long): List<DataPoint>
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp ASC")
-    fun getDataPointsForFeatureAscSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
