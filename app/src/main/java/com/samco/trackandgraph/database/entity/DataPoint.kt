@@ -21,12 +21,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.database.doubleFormatter
 import com.samco.trackandgraph.ui.formatTimeDuration
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
 
 
-interface DataPointInterface {
+interface IDataPoint {
     val timestamp: OffsetDateTime
     val featureId: Long
     val value: Double
@@ -62,9 +60,9 @@ data class DataPoint (
 
     @ColumnInfo(name = "note")
     override val note: String
-)  : DataPointInterface {
+)  : IDataPoint {
     companion object {
-        fun getDisplayValue(dataPoint: DataPointInterface, featureType: FeatureType): String {
+        fun getDisplayValue(dataPoint: IDataPoint, featureType: FeatureType): String {
             return when (featureType) {
                 FeatureType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
                 FeatureType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
@@ -78,7 +76,7 @@ data class AggregatedDataPoint (
     override val timestamp: OffsetDateTime,
     override val featureId: Long,
     override val value: Double,
-    val parents: List<DataPointInterface>,
+    val parents: List<IDataPoint>,
     override val label: String = "",
     override val note: String = "",
-        ): DataPointInterface
+        ): IDataPoint

@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.functionslib.*
-import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.database.entity.IDataPoint
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.TimeHistogramWindow
@@ -127,11 +127,11 @@ class TimeHistogramDataHelper(
 
 
     private fun getHistogramBinsForSample(
-        sample: List<DataPointInterface>,
+        sample: List<IDataPoint>,
         window: TimeHistogramWindow,
         keys: Set<Int>,
         endTime: OffsetDateTime,
-        addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
+        addFunction: (IDataPoint, Map<Int, MutableList<Double>>, Int) -> Unit
     ): Map<Int, List<Double>> {
         val binTotalMaps =
             calculateBinTotals(sample, window, keys, endTime, addFunction)
@@ -143,11 +143,11 @@ class TimeHistogramDataHelper(
      * Create a map structure and place every data point in it using the provided addFunction
      */
     private fun calculateBinTotals(
-        sample: List<DataPointInterface>,
+        sample: List<IDataPoint>,
         window: TimeHistogramWindow,
         keys: Set<Int>,
         endTime: OffsetDateTime,
-        addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
+        addFunction: (IDataPoint, Map<Int, MutableList<Double>>, Int) -> Unit
     ): Map<Int, List<Double>> {
         val binTotalMap = keys.map { it to MutableList(window.numBins) { 0.0 } }.toMap()
         var currEnd = endTime
@@ -181,7 +181,7 @@ class TimeHistogramDataHelper(
      * Add the value of the given data point to the bin at the given binIndex
      */
     private fun addValueToBin(
-        dataPoint: DataPointInterface,
+        dataPoint: IDataPoint,
         bin: Map<Int, MutableList<Double>>,
         binIndex: Int
     ) {
@@ -192,7 +192,7 @@ class TimeHistogramDataHelper(
      * Add one to the bin at the given binIndex
      */
     private fun addOneToBin(
-        dataPoint: DataPointInterface,
+        dataPoint: IDataPoint,
         bin: Map<Int, MutableList<Double>>,
         binIndex: Int
     ) {
@@ -204,7 +204,7 @@ class TimeHistogramDataHelper(
      * specific to its discrete value.
      */
     private fun addDiscreteValueToBin(
-        dataPoint: DataPointInterface,
+        dataPoint: IDataPoint,
         bin: Map<Int, MutableList<Double>>,
         binIndex: Int
     ) {
@@ -216,7 +216,7 @@ class TimeHistogramDataHelper(
      * Add one to the bin at the given binIndex within the histogram specific to its discrete value.
      */
     private fun addOneDiscreteValueToBin(
-        dataPoint: DataPointInterface,
+        dataPoint: IDataPoint,
         bin: Map<Int, MutableList<Double>>,
         binIndex: Int
     ) {
@@ -224,7 +224,7 @@ class TimeHistogramDataHelper(
         bin[i]?.set(binIndex, (bin[i]?.get(binIndex) ?: 0.0) + 1.0)
     }
 
-    private fun DataPointInterface.cutoffTimestampForAggregation(): OffsetDateTime {
+    private fun IDataPoint.cutoffTimestampForAggregation(): OffsetDateTime {
         return timestamp - timeHelper.aggregationPreferences.startTimeOfDay
     }
 }

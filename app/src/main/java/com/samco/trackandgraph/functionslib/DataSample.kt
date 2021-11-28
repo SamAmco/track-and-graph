@@ -17,6 +17,6 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.database.entity.IDataPoint
 
-class DataSample(val dataPoints: List<DataPointInterface>)
+class DataSample(val dataPoints: List<IDataPoint>)

@@ -21,7 +21,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.database.*
-import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.lang.Exception
 
@@ -88,7 +87,7 @@ data class DiscreteValue(
             return DiscreteValue(index, label)
         }
 
-        fun fromDataPoint(dataPoint: DataPointInterface) =
+        fun fromDataPoint(dataPoint: IDataPoint) =
             DiscreteValue(
                 dataPoint.value.toInt(),
                 dataPoint.label

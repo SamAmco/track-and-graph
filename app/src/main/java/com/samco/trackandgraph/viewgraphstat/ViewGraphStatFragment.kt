@@ -307,7 +307,7 @@ class ViewGraphStatViewModel : ViewModel() {
         featureTypes = allFeatures.map { it.id to it.featureType }.toMap()
     }
 
-    private fun onSampledDataPoints(dataPoints: List<DataPointInterface>) {
+    private fun onSampledDataPoints(dataPoints: List<IDataPoint>) {
         ioScope.launch {
             val dataPointNotes = dataPoints
                 .filter { dp -> dp.note.isNotEmpty() }

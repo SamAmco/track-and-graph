@@ -33,7 +33,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<IDataPoint>) -> Unit
     ): ITimeHistogramViewData {
         val timeHistogram = dataSource.getTimeHistogramByGraphStatId(graphOrStat.id)
             ?: return object : ITimeHistogramViewData {
@@ -51,7 +51,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: TimeHistogram,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<IDataPoint>) -> Unit
     ): ITimeHistogramViewData {
         val discreteValue = getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
         val timeHistogramDataHelper =
@@ -97,7 +97,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         dataSource: TrackAndGraphDatabaseDao,
         config: TimeHistogram,
         endDate: OffsetDateTime?,
-        onDataSampled: (List<DataPointInterface>) -> Unit,
+        onDataSampled: (List<IDataPoint>) -> Unit,
         timeHistogramDataHelper: TimeHistogramDataHelper
     ): Map<Int, List<Double>>? {
         val feature = dataSource.getFeatureById(config.featureId)
