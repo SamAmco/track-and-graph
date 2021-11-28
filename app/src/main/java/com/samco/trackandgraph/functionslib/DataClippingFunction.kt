@@ -28,29 +28,24 @@ class DataClippingFunction(
      * Return all the data points in the sample that lie within the sampleDuration leading up to the endTime.
      * If the sampleDuration is null then all data points leading up to the end time will be returned.
      * If the endTime is null then all data points within the sampleDuration leading up to the last data point
-     * will be returned. If both the sampleDuration and endTime are null then the whole list will be returned.
+     * (in time, first in the list) will be returned. If both the sampleDuration and endTime are null then
+     * the whole list will be returned.
      */
-    override suspend fun mapSample(dataSample: DataSample): DataSample = DataSample.fromSequence(
-        sequence {
-            val iterator = dataSample.iterator()
-            if (!iterator.hasNext()) return@sequence
+    override suspend fun mapSample(dataSample: DataSample): DataSample {
+        if (!dataSample.iterator().hasNext()) return DataSample.fromSequence(
+            emptySequence(),
+            dataSample.dataSampleProperties
+        )
 
-            val first = iterator.next()
+        val endOfDuration = endTime ?: dataSample.first().timestamp
+        val startTime =
+            if (sampleDuration != null) endOfDuration.minus(sampleDuration)
+            else OffsetDateTime.MIN
 
-            val endOfDuration = endTime ?: first.timestamp
-            val startTime = endOfDuration.minus(sampleDuration)
-
-            var next = first
-
-            while (
-                next.timestamp <= endOfDuration
-                && next.timestamp >= startTime
-                && iterator.hasNext()
-            ) {
-                yield(next)
-                next = iterator.next()
-            }
-            return@sequence
-        }, dataSample.dataSampleProperties
-    )
+        return DataSample.fromSequence(
+            dataSample
+                .dropWhile { it.timestamp > endOfDuration }
+                .takeWhile { it.timestamp >= startTime }, dataSample.dataSampleProperties
+        )
+    }
 }

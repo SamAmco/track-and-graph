@@ -36,24 +36,25 @@ class Statistics_calculateMovingAverages_KtTest {
             //GIVEN
             val now = OffsetDateTime.now()
             val dataPoints = listOf(
-                5.0 to 70L,
-                0.0 to 50L,
-                4.0 to 49L,
-                2.0 to 48L,
-                0.0 to 43L,
-                4.0 to 41L,
-                8.0 to 30L,
+                3.0 to 10L,
                 7.0 to 20L,
-                3.0 to 10L
+                8.0 to 30L,
+                4.0 to 41L,
+                0.0 to 43L,
+                2.0 to 48L,
+                4.0 to 49L,
+                0.0 to 50L,
+                5.0 to 70L
             ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
-            val answer = MovingAverageFunction(averagingDuration).execute(DataSample(dataPoints))
+            val answer = MovingAverageFunction(averagingDuration)
+                .mapSample(DataSample.fromSequence(dataPoints.asSequence()))
 
             //THEN
-            val expected = listOf(5.0, 0.0, 2.0, 2.0, 1.5, 2.0, 8.0, 7.0, 3.0)
-            val actual = answer.dataPoints.map { dp -> dp.value }
+            val expected = listOf(3.0, 7.0, 8.0, 2.0, 1.5, 2.0, 2.0, 0.0, 5.0)
+            val actual = answer.map { dp -> dp.value }.toList()
             assertEquals(expected, actual)
         }
     }
@@ -67,10 +68,11 @@ class Statistics_calculateMovingAverages_KtTest {
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
-            val answer = MovingAverageFunction(averagingDuration).execute(DataSample(dataPoints))
+            val answer = MovingAverageFunction(averagingDuration)
+                .mapSample(DataSample.fromSequence(dataPoints.asSequence()))
 
             //THEN
-            assertEquals(0, answer.dataPoints.size)
+            assertEquals(0, answer.toList().size)
         }
     }
 
