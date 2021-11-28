@@ -104,14 +104,14 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         val sample = DatabaseSampleHelper(dataSource).sampleData(
             config.featureId, config.duration,
             endDate, null, null
-        )
+        ).toList()
         val barValues = timeHistogramDataHelper.getHistogramBinsForSample(
             sample,
             config.window,
             feature,
             config.sumByCount
         )
-        onDataSampled(sample.dataPoints)
+        onDataSampled(sample)
         return barValues
     }
 }

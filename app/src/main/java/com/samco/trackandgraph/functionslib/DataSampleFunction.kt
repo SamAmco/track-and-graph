@@ -18,5 +18,5 @@
 package com.samco.trackandgraph.functionslib
 
 interface DataSampleFunction {
-    suspend fun execute(dataSample: DataSample): DataSample
+    suspend fun mapSample(dataSample: DataSample): DataSample
 }

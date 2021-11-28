@@ -457,6 +457,8 @@ class GroupViewModel : ViewModel() {
         this.database = database
         this.dataSource = database.trackAndGraphDatabaseDao
 
+        //TODO this is really bad, we are storing potentially multiple instances of
+        // every data point in memory per group fragment :/ Definitely need to review this
         dataPoints = Transformations.map(dataSource.getAllDataPoints()) { Instant.now() }
         hasFeatures = Transformations.map(dataSource.getAllFeatures()) { it.isNotEmpty() }
 

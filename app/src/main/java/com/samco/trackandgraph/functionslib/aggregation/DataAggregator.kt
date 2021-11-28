@@ -18,8 +18,8 @@
 package com.samco.trackandgraph.functionslib.aggregation
 
 import com.samco.trackandgraph.functionslib.DataSample
-import com.samco.trackandgraph.functionslib.DataSampleFunction
 
 internal interface DataAggregator {
-    suspend fun aggregate(dataSample: DataSample): RawAggregatedDatapoints
+    suspend fun aggregate(dataSample: DataSample): AggregatedDataSample
+    suspend fun aggregate(dataSample: AggregatedDataSample): AggregatedDataSample
 }

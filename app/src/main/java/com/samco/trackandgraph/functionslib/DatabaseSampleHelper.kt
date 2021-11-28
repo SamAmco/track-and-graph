@@ -46,8 +46,8 @@ class DatabaseSampleHelper(
         averagingDuration: Duration?, plotTotalTime: TemporalAmount?
     ): DataSample {
         return withContext(Dispatchers.IO) {
-            if (sampleDuration == null && endDate == null) DataSample(
-                dataSource.getDataPointsForFeatureAscSync(featureId)
+            if (sampleDuration == null && endDate == null) DataSample.fromSequence(
+                dataSource.getDataPointsForFeatureSync(featureId).asSequence()
             )
             else {
                 val latest = endDate ?: getLastTrackedTimeOrNow(
@@ -64,11 +64,12 @@ class DatabaseSampleHelper(
                     )
                     latest.minus(possibleLongestDurations.maxBy { d -> d ?: Duration.ZERO })
                 } ?: OffsetDateTime.MIN
-                val dataPoints =
-                    dataSource.getDataPointsForFeatureBetweenAscSync(featureId, minSampleDate, latest)
-                DataSample(
-                    dataPoints
+                val dataPoints = dataSource.getDataPointsForFeatureBetweenDescSync(
+                    featureId,
+                    minSampleDate,
+                    latest
                 )
+                DataSample.fromSequence(dataPoints.asSequence())
             }
         }
     }

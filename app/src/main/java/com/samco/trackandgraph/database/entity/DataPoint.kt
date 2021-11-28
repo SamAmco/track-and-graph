@@ -45,7 +45,7 @@ interface IDataPoint {
     ]
 )
 
-data class DataPoint (
+data class DataPoint(
     @ColumnInfo(name = "timestamp")
     override val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
@@ -60,7 +60,7 @@ data class DataPoint (
 
     @ColumnInfo(name = "note")
     override val note: String
-)  : IDataPoint {
+) : IDataPoint {
     companion object {
         fun getDisplayValue(dataPoint: IDataPoint, featureType: FeatureType): String {
             return when (featureType) {
@@ -72,11 +72,11 @@ data class DataPoint (
     }
 }
 
-data class AggregatedDataPoint (
+data class AggregatedDataPoint(
     override val timestamp: OffsetDateTime,
     override val featureId: Long,
     override val value: Double,
     val parents: List<IDataPoint>,
     override val label: String = "",
     override val note: String = "",
-        ): IDataPoint
+) : IDataPoint
