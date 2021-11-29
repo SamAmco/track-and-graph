@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.functionslib.aggregation
 
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
+import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.DataSampleProperties
 
 /**
@@ -38,4 +39,16 @@ internal abstract class AggregatedDataSample(
             }
         }
     }
+
+    fun average() = DataSample.fromSequence(
+        this.filter { it.parents.isNotEmpty() }
+            .map { it.copy(value = it.parents.map { par -> par.value }.average()) },
+        dataSampleProperties
+    )
+
+    fun sum() = DataSample.fromSequence(
+        this.filter { it.parents.isNotEmpty() }
+            .map { it.copy(value = it.parents.sumOf { par -> par.value }) },
+        dataSampleProperties
+    )
 }

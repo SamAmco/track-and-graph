@@ -20,6 +20,7 @@ package com.samco.trackandgraph.functionslib.aggregation
 import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import com.samco.trackandgraph.database.entity.IDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
+import com.samco.trackandgraph.functionslib.cache
 import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
 
@@ -46,11 +47,15 @@ internal class MovingAggregator(private val movingAggDuration: Duration) : DataA
     }
 
     private fun getSequence(dataSample: Sequence<IDataPoint>) = sequence {
-        for ((index, current) in dataSample.mapIndexed { idx, point -> Pair(idx, point) }) {
-            val parents = dataSample.drop(index)
+        val cachedSample = dataSample.cache()
+        for ((index, current) in cachedSample.mapIndexed { idx, point -> Pair(idx, point) }) {
+            val parents = cachedSample
+                .drop(index)
                 .takeWhile { dp ->
+                    //We expect the durations to be negative but < just compares the absolute values
                     Duration.between(dp.timestamp, current.timestamp) < movingAggDuration
                 }
+                .toList()
 
             yield(
                 AggregatedDataPoint(
@@ -59,7 +64,7 @@ internal class MovingAggregator(private val movingAggDuration: Duration) : DataA
                     value = Double.NaN,
                     label = current.label,
                     note = current.note,
-                    parents = parents.toList()
+                    parents = parents
                 )
             )
         }

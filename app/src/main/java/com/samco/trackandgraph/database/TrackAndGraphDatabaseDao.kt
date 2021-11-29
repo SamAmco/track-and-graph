@@ -139,6 +139,7 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
+    //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :endDateTime AND timestamp > :startDateTime ORDER BY timestamp""")
     fun getDataPointsWithValueInTimeRange(
         featureId: Long,
@@ -147,6 +148,7 @@ interface TrackAndGraphDatabaseDao {
         endDateTime: OffsetDateTime
     ): List<DataPoint>
 
+    //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max  AND timestamp < :endDateTime AND timestamp > :startDateTime ORDER BY timestamp""")
     fun getDataPointsBetweenInTimeRange(
         featureId: Long,
