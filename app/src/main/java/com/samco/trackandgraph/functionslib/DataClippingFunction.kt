@@ -32,20 +32,17 @@ class DataClippingFunction(
      * the whole list will be returned.
      */
     override suspend fun mapSample(dataSample: DataSample): DataSample {
-        if (!dataSample.iterator().hasNext()) return DataSample.fromSequence(
-            emptySequence(),
-            dataSample.dataSampleProperties
-        )
+        return DataSample.fromSequence(sequence {
+            val endOfDuration = endTime ?: (dataSample.firstOrNull() ?: return@sequence).timestamp
+            val startTime =
+                if (sampleDuration != null) endOfDuration.minus(sampleDuration)
+                else OffsetDateTime.MIN
 
-        val endOfDuration = endTime ?: dataSample.first().timestamp
-        val startTime =
-            if (sampleDuration != null) endOfDuration.minus(sampleDuration)
-            else OffsetDateTime.MIN
-
-        return DataSample.fromSequence(
-            dataSample
+            //TODO can we write a test to make sure this doesn't drain the upstream if it doesn't
+            // need to
+            yieldAll(dataSample
                 .dropWhile { it.timestamp > endOfDuration }
-                .takeWhile { it.timestamp >= startTime }, dataSample.dataSampleProperties
-        )
+                .takeWhile { it.timestamp >= startTime })
+        }, dataSample.dataSampleProperties)
     }
 }

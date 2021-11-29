@@ -165,12 +165,11 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         }
 
         val plottingData = withContext(Dispatchers.Default) {
-            CompositeFunction(
-                aggregationCalculator,
-                averageCalculator,
-                clippingCalculator
-            ).mapSample(rawDataSample)
-        }.toList()
+            CompositeFunction(aggregationCalculator, averageCalculator, clippingCalculator)
+                .mapSample(rawDataSample)
+                .toList()
+                .asReversed()
+        }
 
         return if (plottingData.size >= 2) plottingData else null
     }

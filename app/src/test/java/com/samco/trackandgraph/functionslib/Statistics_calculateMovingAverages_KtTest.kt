@@ -27,9 +27,76 @@ import org.threeten.bp.OffsetDateTime
 class Statistics_calculateMovingAverages_KtTest {
 
     @Test
+    fun limitedUpstreamSamples() {
+        //Make sure that the moving average function only accesses it's upstream sequence once per item
+        // in the sequence that is accessed
+
+        runBlocking {
+            //GIVEN
+            val now = OffsetDateTime.now()
+            val averagingDuration = Duration.ofHours(2)
+            var count = 0
+            val sequence = sequence {
+                for (i in 1..10) {
+                    count++
+                    yield(i)
+                }
+            }.mapIndexed { hoursBefore, value ->
+                makedp(
+                    value.toDouble(),
+                    now.minusHours(hoursBefore.toLong())
+                )
+            }
+
+            //WHEN
+            MovingAverageFunction(averagingDuration)
+                .mapSample(DataSample.fromSequence(sequence))
+                .take(3)
+                .toList()
+
+            //THEN
+            //Each data point will be compared with the two following it, so the first 3 will
+            // require comparison with 5 data points
+            assertEquals(5, count)
+        }
+    }
+
+    @Test
+    fun maxUpstreamSamples() {
+        //Make sure that the moving average function only accesses it's upstream sequence once per item
+        // in the sequence
+
+        runBlocking {
+            //GIVEN
+            val now = OffsetDateTime.now()
+            val averagingDuration = Duration.ofHours(10)
+            var count = 0
+            val sequence = sequence {
+                for (i in 1..10) {
+                    count++
+                    yield(i)
+                }
+            }.mapIndexed { hoursBefore, value ->
+                makedp(
+                    value.toDouble(),
+                    now.minusHours(hoursBefore.toLong())
+                )
+            }
+
+            //WHEN
+            MovingAverageFunction(averagingDuration)
+                .mapSample(DataSample.fromSequence(sequence))
+                .toList()
+
+            //THEN
+            assertEquals(10, count)
+        }
+    }
+
+    @Test
     fun calculateMovingAverages() {
         /* The test assumes that datapoints will only be averages when the time between is
-           smaller than the given window, NOT smaller or equal, e.g. the last two points will not be
+           smaller than the given window, NOT smaller or equal, e.g. the first two points will not be
            averaged together since they are exactly 10 hours apart, not less.
          */
         runBlocking {
