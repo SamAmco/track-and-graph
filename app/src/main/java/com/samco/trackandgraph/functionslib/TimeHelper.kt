@@ -42,10 +42,6 @@ class TimeHelper(
      *  Duration.ofHours(1)
      *  Duration.ofHours(24)
      *  Duration.ofDays(7)
-     *  Duration.ofDays(30)
-     *  Duration.ofDays(365 / 4) or 3 months
-     *  Duration.ofDays(365 / 2) or 6 months
-     *  Duration.ofDays(365) or a year
      *
      */
     fun findBeginningOfTemporal(
@@ -67,8 +63,9 @@ class TimeHelper(
             .withMinute(0)
             .withSecond(0)
             .withNano(0)
+            .plus(aggregationPreferences.startTimeOfDay)
 
-        return when {
+        val startOfPeriod = when {
             isPeriodNegativeOrZero(period.minus(Period.ofDays(1))) -> dt
             isPeriodNegativeOrZero(period.minus(Period.ofWeeks(1))) -> {
                 dt.with(TemporalAdjusters.previousOrSame(aggregationPreferences.firstDayOfWeek))
@@ -86,6 +83,8 @@ class TimeHelper(
             }
             else -> dt.withDayOfYear(1)
         }
+
+        return if (startOfPeriod > dateTime) startOfPeriod.minus(period) else startOfPeriod
     }
 
     private fun isPeriodNegativeOrZero(period: Period) = period.years < 0
@@ -103,28 +102,18 @@ class TimeHelper(
 
         if (duration <= Duration.ofMinutes(60)) return dtHour
 
-        val dt = dtHour.withHour(0)
+        val dt = dtHour.withHour(0).plus(aggregationPreferences.startTimeOfDay)
 
-        return when {
+        val startOfDuration = when {
             duration <= Duration.ofDays(1) -> dt
-            duration <= Duration.ofDays(7) -> {
-                dt.with(
-                    TemporalAdjusters.previousOrSame(
-                        aggregationPreferences.firstDayOfWeek
-                    )
+            else -> dt.with(
+                TemporalAdjusters.previousOrSame(
+                    aggregationPreferences.firstDayOfWeek
                 )
-            }
-            duration <= Duration.ofDays(31) -> dt.withDayOfMonth(1)
-            duration <= Duration.ofDays(ceil(365.0 / 4).toLong()) -> {
-                val month = getQuaterForMonthValue(dt.monthValue)
-                dt.withMonth(month).withDayOfMonth(1)
-            }
-            duration <= Duration.ofDays(ceil(365.0 / 2).toLong()) -> {
-                val month = getBiYearForMonthValue(dt.monthValue)
-                dt.withMonth(month).withDayOfMonth(1).withHour(0)
-            }
-            else -> dt.withDayOfYear(1)
+            )
         }
+
+        return if (startOfDuration > dateTime) startOfDuration.minus(duration) else startOfDuration
     }
 
     /**
