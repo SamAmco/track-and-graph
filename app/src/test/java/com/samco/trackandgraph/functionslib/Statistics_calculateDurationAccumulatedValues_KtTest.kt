@@ -23,6 +23,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.*
+import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 
@@ -33,6 +34,53 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             override val startTimeOfDay = Duration.ofSeconds(0)
         }
     )
+
+    @Test
+    fun calculateDurationAccumulatedValues_DateTimeOffset_test() {
+        //A data point with the time stamp:2021-10-04T00:20:00.197+01:00 should appear in the week
+        // 10-04, (not the previous week). Assuming the user has a current time zone offset of +01:00
+
+        runBlocking {
+            //GIVEN
+            val plotTotalTime = Period.ofWeeks(1)
+            val toODT = { s: String ->
+                DateTimeFormatter.ISO_OFFSET_DATE_TIME.parse(s, OffsetDateTime::from)
+            }
+            val endTime = toODT("2021-11-01T00:13:13.949Z").plusHours(1)
+            val dataPoints = listOf(
+                "2021-10-04T00:20:00.197+01:00",
+                "2021-10-11T08:08:16.310+01:00",
+                "2021-10-18T00:16:16.137+01:00",
+                "2021-10-25T10:44:18.040+01:00",
+                "2021-11-01T00:13:13.949Z"
+            ).map { DataPoint(toODT(it), 0L, 1.0, "", "") }
+            val rawData = DataSample(dataPoints)
+
+            //WHEN
+            val answer = DurationAggregationFunction(
+                timeHelper,
+                0L,
+                null,
+                endTime,
+                plotTotalTime
+            ).execute(rawData)
+
+            //THEN
+            val expectedTimes = listOf(
+                "2021-10-10T23:59:59.999999999+01:00",
+                "2021-10-17T23:59:59.999999999+01:00",
+                "2021-10-24T23:59:59.999999999+01:00",
+                "2021-10-31T23:59:59.999999999+01:00",
+                "2021-11-07T23:59:59.999999999+01:00"
+            ).map { toODT(it) }
+
+            assertEquals(expectedTimes, answer.dataPoints.map { it.timestamp })
+
+            val expectedValues = listOf(1.0, 1.0, 1.0, 1.0, 1.0)
+
+            assertEquals(expectedValues, answer.dataPoints.map { it.value })
+        }
+    }
 
     @Test
     fun calculateDurationAccumulatedValues_hourly_plot_totals() {
