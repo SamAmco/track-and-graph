@@ -17,12 +17,9 @@
 
 package com.samco.trackandgraph.functionslib
 
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
+import org.threeten.bp.*
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
-import kotlin.math.ceil
 
 class TimeHelper(
     val aggregationPreferences: AggregationPreferences
@@ -47,18 +44,28 @@ class TimeHelper(
     fun findBeginningOfTemporal(
         dateTime: OffsetDateTime,
         temporalAmount: TemporalAmount,
-    ): OffsetDateTime {
+    ): ZonedDateTime {
+        return findBeginningOfTemporal(dateTime, temporalAmount, ZoneId.systemDefault())
+    }
+
+    fun findBeginningOfTemporal(
+        dateTime: OffsetDateTime,
+        temporalAmount: TemporalAmount,
+        zoneId: ZoneId
+    ): ZonedDateTime {
+        val zonedDateTime = dateTime.atZoneSameInstant(zoneId)
+        println(zonedDateTime)
         return when (temporalAmount) {
-            is Duration -> findBeginningOfDuration(dateTime, temporalAmount)
-            is Period -> findBeginningOfPeriod(dateTime, temporalAmount)
-            else -> dateTime
+            is Duration -> findBeginningOfDuration(zonedDateTime, temporalAmount)
+            is Period -> findBeginningOfPeriod(zonedDateTime, temporalAmount)
+            else -> zonedDateTime
         }
     }
 
     private fun findBeginningOfPeriod(
-        dateTime: OffsetDateTime,
+        dateTime: ZonedDateTime,
         period: Period,
-    ): OffsetDateTime {
+    ): ZonedDateTime {
         val dt = dateTime.withHour(0)
             .withMinute(0)
             .withSecond(0)
@@ -92,9 +99,9 @@ class TimeHelper(
             || (period.years == 0 && period.months == 0 && period.days <= 0)
 
     private fun findBeginningOfDuration(
-        dateTime: OffsetDateTime,
+        dateTime: ZonedDateTime,
         duration: Duration,
-    ): OffsetDateTime {
+    ): ZonedDateTime {
         val dtHour = dateTime
             .withMinute(0)
             .withSecond(0)

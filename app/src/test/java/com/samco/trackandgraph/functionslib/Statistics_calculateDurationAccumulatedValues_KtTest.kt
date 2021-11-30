@@ -67,12 +67,17 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
 
             //THEN
             val expectedTimes = listOf(
-                "2021-10-10T23:59:59.999999999+01:00",
-                "2021-10-17T23:59:59.999999999+01:00",
-                "2021-10-24T23:59:59.999999999+01:00",
-                "2021-10-31T23:59:59.999999999+01:00",
-                "2021-11-07T23:59:59.999999999+01:00"
-            ).map { toODT(it) }
+                Pair(10, 11), Pair(10, 18), Pair(10, 25), Pair(11, 1), Pair(11, 8)
+                //"2021-10-10T23:59:59.999999999+01:00",
+                //"2021-10-17T23:59:59.999999999+01:00",
+                //"2021-10-24T23:59:59.999999999+01:00",
+                //"2021-10-31T23:59:59.999999999+01:00",
+                //"2021-11-07T23:59:59.999999999+01:00"
+            ).map {
+                ZonedDateTime.of(2021, it.first, it.second, 0, 0, 0, 0, ZoneId.systemDefault())
+                    .minusNanos(1)
+                    .toOffsetDateTime()
+            }
 
             assertEquals(expectedTimes, answer.dataPoints.map { it.timestamp })
 

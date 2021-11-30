@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.functionslib
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.*
 
@@ -28,6 +27,31 @@ class TimeHelperTests {
     private val basicAggregationPreferences = object : AggregationPreferences {
         override val firstDayOfWeek = DayOfWeek.MONDAY
         override val startTimeOfDay = Duration.ZERO
+    }
+
+    private val zoneId = ZoneOffset.UTC
+
+    @Test
+    fun testDaylightSavingsAccountedFor() {
+        //GIVEN
+        val uut = TimeHelper(basicAggregationPreferences)
+        val dateTime = OffsetDateTime.of(
+            2021, 10, 31,
+            0, 30, 0, 0, ZoneOffset.UTC
+        )
+        val temporal = Duration.ofHours(1)
+        val zone = ZoneId.of("Europe/London")
+
+        //WHEN
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zone)
+        println(answer)
+
+        //THEN
+        val expected = ZonedDateTime.of(
+            2021, 10, 31,
+            1, 0, 0, 0, zone
+        )
+        assertEquals(expected, answer)
     }
 
     @Test
@@ -41,25 +65,14 @@ class TimeHelperTests {
         val temporal = Duration.ofHours(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2021, 11, 29,
             4, 0, 0, 0, ZoneOffset.ofHours(1)
         )
-        assertEquals(expected, answer)
-    }
-
-    @Test
-    fun test() {
-        assertTrue(OffsetDateTime.of(
-            2021, 11, 29,
-            0, 1, 0, 0, ZoneOffset.ofHours(0)
-        ) > OffsetDateTime.of(
-            2021, 11, 29,
-            0, 1, 0, 0, ZoneOffset.ofHours(1)
-        ))
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -67,20 +80,20 @@ class TimeHelperTests {
         //GIVEN
         val uut = TimeHelper(basicAggregationPreferences)
         val dateTime = OffsetDateTime.of(
-            2021, 11, 29,
+            2021, 10, 29,
             0, 1, 0, 0, ZoneOffset.ofHours(1)
         )
         val temporal = Period.ofWeeks(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
-            2021, 11, 29,
-            0, 0, 0, 0, ZoneOffset.ofHours(1)
+            2021, 10, 25,
+            0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -99,14 +112,14 @@ class TimeHelperTests {
         val temporal = Duration.ofDays(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2021, 11, 28,
             5, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -125,14 +138,14 @@ class TimeHelperTests {
         val temporal = Duration.ofDays(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2021, 11, 29,
             5, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -151,14 +164,14 @@ class TimeHelperTests {
         val temporal = Period.ofWeeks(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2021, 11, 24,
             4, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -177,14 +190,14 @@ class TimeHelperTests {
         val temporal = Period.ofWeeks(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2021, 12, 1,
             5, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -198,14 +211,14 @@ class TimeHelperTests {
         val temporal = Duration.ofHours(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 6, 8,
             15, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -219,14 +232,14 @@ class TimeHelperTests {
         val temporal = Duration.ofHours(2)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 6, 8,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -240,14 +253,14 @@ class TimeHelperTests {
         val temporal = Duration.ofDays(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 6, 8,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -261,14 +274,14 @@ class TimeHelperTests {
         val temporal = Duration.ofDays(1).plus(Duration.ofNanos(1))
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 7, 6,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -282,14 +295,14 @@ class TimeHelperTests {
         val temporal = Duration.ofDays(7)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 7, 6,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -303,7 +316,7 @@ class TimeHelperTests {
         val temporal = Duration.ofDays(7).plus(Duration.ofNanos(1))
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         //Should fallback to a week anyway
@@ -311,7 +324,7 @@ class TimeHelperTests {
             2020, 7, 6,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -325,14 +338,14 @@ class TimeHelperTests {
         val temporal = Period.ofWeeks(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 7, 6,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -346,14 +359,14 @@ class TimeHelperTests {
         val temporal = Period.ofWeeks(1).plusDays(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 7, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -367,14 +380,14 @@ class TimeHelperTests {
         val temporal = Period.ofMonths(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 7, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -388,14 +401,14 @@ class TimeHelperTests {
         val temporal = Period.ofMonths(1).plusDays(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 7, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -409,14 +422,14 @@ class TimeHelperTests {
         val temporal = Period.ofMonths(3)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 4, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -430,14 +443,14 @@ class TimeHelperTests {
         val temporal = Period.ofMonths(3).plusDays(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 1, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -451,14 +464,14 @@ class TimeHelperTests {
         val temporal = Period.ofMonths(6)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 1, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -472,14 +485,14 @@ class TimeHelperTests {
         val temporal = Period.ofMonths(6).plusDays(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 1, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -493,14 +506,14 @@ class TimeHelperTests {
         val temporal = Period.ofYears(1)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 1, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
@@ -514,14 +527,14 @@ class TimeHelperTests {
         val temporal = Period.ofYears(4)
 
         //WHEN
-        val answer = uut.findBeginningOfTemporal(dateTime, temporal)
+        val answer = uut.findBeginningOfTemporal(dateTime, temporal, zoneId)
 
         //THEN
         val expected = OffsetDateTime.of(
             2020, 1, 1,
             0, 0, 0, 0, ZoneOffset.UTC
         )
-        assertEquals(expected, answer)
+        assertEquals(expected.toInstant(), answer.toInstant())
     }
 
     @Test
