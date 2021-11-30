@@ -24,6 +24,8 @@ import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.TimeHistogramWindow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 
 class TimeHistogramDataHelper(
     private val timeHelper: TimeHelper
@@ -72,12 +74,8 @@ class TimeHistogramDataHelper(
         sumByCount: Boolean,
     ): Map<Int, List<Double>>? {
         if (sample.dataPoints.isEmpty()) return null
-        val endTime = getNextEndOfWindow(
-            window,
-            sample.dataPoints.maxBy { it.timestamp }!!
-                .cutoffTimestampForAggregation(),
-
-            )
+        val endTime = getNextEndOfWindow( window,
+            sample.dataPoints.maxBy { it.timestamp }!!.timestamp )
         val isDiscrete = feature.featureType == FeatureType.DISCRETE
         val keys =
             if (isDiscrete) feature.discreteValues.map { it.index }.toSet()
@@ -117,7 +115,7 @@ class TimeHistogramDataHelper(
     internal fun getNextEndOfWindow(
         window: TimeHistogramWindow,
         endDate: OffsetDateTime?,
-    ): OffsetDateTime {
+    ): ZonedDateTime {
         val end = endDate ?: OffsetDateTime.now()
         return timeHelper.findBeginningOfTemporal(
             end.plus(window.period),
@@ -130,11 +128,10 @@ class TimeHistogramDataHelper(
         sample: List<DataPointInterface>,
         window: TimeHistogramWindow,
         keys: Set<Int>,
-        endTime: OffsetDateTime,
+        endTime: ZonedDateTime,
         addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
     ): Map<Int, List<Double>> {
-        val binTotalMaps =
-            calculateBinTotals(sample, window, keys, endTime, addFunction)
+        val binTotalMaps = calculateBinTotals(sample, window, keys, endTime, addFunction)
         val total = binTotalMaps.map { it.value.sum() }.sum()
         return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { it / total } }.toMap()
     }
@@ -146,7 +143,7 @@ class TimeHistogramDataHelper(
         sample: List<DataPointInterface>,
         window: TimeHistogramWindow,
         keys: Set<Int>,
-        endTime: OffsetDateTime,
+        endTime: ZonedDateTime,
         addFunction: (DataPointInterface, Map<Int, MutableList<Double>>, Int) -> Unit
     ): Map<Int, List<Double>> {
         val binTotalMap = keys.map { it to MutableList(window.numBins) { 0.0 } }.toMap()
@@ -155,21 +152,26 @@ class TimeHistogramDataHelper(
         var binned = 0
         val reversed = sample.asReversed()
         var nextPoint = reversed[0]
+        val timeOf = { dp: DataPointInterface ->
+            dp.timestamp.atZoneSameInstant(ZoneId.systemDefault())
+        }
         while (binned < sample.size) {
             val periodDuration = Duration
                 .between(currStart, currEnd)
                 .seconds
                 .toDouble()
-            while (nextPoint.cutoffTimestampForAggregation() > currStart) {
+            var nextPointTime = timeOf(nextPoint)
+            while (nextPointTime > currStart) {
                 val distance = Duration.between(
                     currStart,
-                    nextPoint.cutoffTimestampForAggregation()
+                    nextPointTime
                 ).seconds.toDouble()
                 var binIndex = (window.numBins * (distance / periodDuration)).toInt()
                 if (binIndex == window.numBins) binIndex--
                 addFunction(nextPoint, binTotalMap, binIndex)
                 if (++binned == sample.size) break
                 nextPoint = reversed[binned]
+                nextPointTime = timeOf(nextPoint)
             }
             currEnd -= window.period
             currStart -= window.period
@@ -222,9 +224,5 @@ class TimeHistogramDataHelper(
     ) {
         val i = dataPoint.value.toInt()
         bin[i]?.set(binIndex, (bin[i]?.get(binIndex) ?: 0.0) + 1.0)
-    }
-
-    private fun DataPointInterface.cutoffTimestampForAggregation(): OffsetDateTime {
-        return timestamp - timeHelper.aggregationPreferences.startTimeOfDay
     }
 }

@@ -68,7 +68,6 @@ internal class FixedBinAggregator(
             sampleDuration
         )
         var currentTimeStamp = timeHelper.findBeginningOfTemporal(earliest, binSize).minusNanos(1)
-            .atZoneSameInstant(ZoneId.systemDefault())
         var index = 0
         while (currentTimeStamp.isBefore(latest)) {
             currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(binSize) }
