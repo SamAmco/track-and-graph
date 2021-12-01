@@ -17,12 +17,9 @@
 
 package com.samco.trackandgraph.functionslib
 
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
+import org.threeten.bp.*
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
-import kotlin.math.ceil
 
 class TimeHelper(
     val aggregationPreferences: AggregationPreferences
@@ -30,45 +27,68 @@ class TimeHelper(
 
     /**
      * Finds the first ending of temporalAmount before dateTime. For example if temporalAmount is a
-     * week then it will find the very end of the sunday before dateTime.
+     * week and the aggregationPreferences specify that the week should start on Monday at 00:00
+     * then it will find the very end of the sunday before dateTime.
      *
-     * temporalAmount supports the use of duration instead of Period.
-     * In this case the function will try to approximate the behaviour as closely as possible as though
-     * temporalAmount was a period. For example if you pass in a duration of 7 days it will try to find
-     * the last day of the week before the week containing dateTime. It is always the largest recognised
-     * duration that is used when deciding what the start of the period should be. The recognised durations
-     * are:
+     * temporalAmount supports the use of duration instead of Period for the following values:
      *
      *  Duration.ofHours(1)
      *  Duration.ofHours(24)
      *  Duration.ofDays(7)
-     *  Duration.ofDays(30)
-     *  Duration.ofDays(365 / 4) or 3 months
-     *  Duration.ofDays(365 / 2) or 6 months
-     *  Duration.ofDays(365) or a year
+     *
+     * For example if you pass in a duration of 7 days it will try to find
+     * the last day of the week before the week containing dateTime. It is always the largest recognised
+     * duration that is used when deciding what the start of the period should be.
+     *
+     * temporalAmount supports the following Period values:
+     * Period.ofDays(1)
+     * Period.ofWeeks(1)
+     * Period.ofMonths(1)
+     * Period.ofMonths(3)
+     * Period.ofMonths(6)
+     * Period.ofYears(1)
+     *
+     * A ZonedDateTime is returned so as to make sure that the time returned is the beginning of
+     * the period relative to the users time zone. For example the beginning of the day for a time
+     * 00:30 in a time zone that is one hour ahead of UTC should still return 00:00 for the same day
+     * in the given time zone.
      *
      */
     fun findBeginningOfTemporal(
         dateTime: OffsetDateTime,
         temporalAmount: TemporalAmount,
-    ): OffsetDateTime {
+        zoneId: ZoneId
+    ): ZonedDateTime {
+        val zonedDateTime = dateTime.atZoneSameInstant(zoneId)
+        println(zonedDateTime)
         return when (temporalAmount) {
-            is Duration -> findBeginningOfDuration(dateTime, temporalAmount)
-            is Period -> findBeginningOfPeriod(dateTime, temporalAmount)
-            else -> dateTime
+            is Duration -> findBeginningOfDuration(zonedDateTime, temporalAmount)
+            is Period -> findBeginningOfPeriod(zonedDateTime, temporalAmount)
+            else -> zonedDateTime
         }
     }
 
-    private fun findBeginningOfPeriod(
+    /**
+     * @see findBeginningOfTemporal
+     */
+    fun findBeginningOfTemporal(
         dateTime: OffsetDateTime,
+        temporalAmount: TemporalAmount,
+    ): ZonedDateTime {
+        return findBeginningOfTemporal(dateTime, temporalAmount, ZoneId.systemDefault())
+    }
+
+    private fun findBeginningOfPeriod(
+        dateTime: ZonedDateTime,
         period: Period,
-    ): OffsetDateTime {
+    ): ZonedDateTime {
         val dt = dateTime.withHour(0)
             .withMinute(0)
             .withSecond(0)
             .withNano(0)
+            .plus(aggregationPreferences.startTimeOfDay)
 
-        return when {
+        val startOfPeriod = when {
             isPeriodNegativeOrZero(period.minus(Period.ofDays(1))) -> dt
             isPeriodNegativeOrZero(period.minus(Period.ofWeeks(1))) -> {
                 dt.with(TemporalAdjusters.previousOrSame(aggregationPreferences.firstDayOfWeek))
@@ -86,6 +106,8 @@ class TimeHelper(
             }
             else -> dt.withDayOfYear(1)
         }
+
+        return if (startOfPeriod > dateTime) startOfPeriod.minus(period) else startOfPeriod
     }
 
     private fun isPeriodNegativeOrZero(period: Period) = period.years < 0
@@ -93,9 +115,9 @@ class TimeHelper(
             || (period.years == 0 && period.months == 0 && period.days <= 0)
 
     private fun findBeginningOfDuration(
-        dateTime: OffsetDateTime,
+        dateTime: ZonedDateTime,
         duration: Duration,
-    ): OffsetDateTime {
+    ): ZonedDateTime {
         val dtHour = dateTime
             .withMinute(0)
             .withSecond(0)
@@ -103,28 +125,18 @@ class TimeHelper(
 
         if (duration <= Duration.ofMinutes(60)) return dtHour
 
-        val dt = dtHour.withHour(0)
+        val dt = dtHour.withHour(0).plus(aggregationPreferences.startTimeOfDay)
 
-        return when {
+        val startOfDuration = when {
             duration <= Duration.ofDays(1) -> dt
-            duration <= Duration.ofDays(7) -> {
-                dt.with(
-                    TemporalAdjusters.previousOrSame(
-                        aggregationPreferences.firstDayOfWeek
-                    )
+            else -> dt.with(
+                TemporalAdjusters.previousOrSame(
+                    aggregationPreferences.firstDayOfWeek
                 )
-            }
-            duration <= Duration.ofDays(31) -> dt.withDayOfMonth(1)
-            duration <= Duration.ofDays(ceil(365.0 / 4).toLong()) -> {
-                val month = getQuaterForMonthValue(dt.monthValue)
-                dt.withMonth(month).withDayOfMonth(1)
-            }
-            duration <= Duration.ofDays(ceil(365.0 / 2).toLong()) -> {
-                val month = getBiYearForMonthValue(dt.monthValue)
-                dt.withMonth(month).withDayOfMonth(1).withHour(0)
-            }
-            else -> dt.withDayOfYear(1)
+            )
         }
+
+        return if (startOfDuration > dateTime) startOfDuration.minus(duration) else startOfDuration
     }
 
     /**

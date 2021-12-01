@@ -23,7 +23,6 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
-import kotlinx.coroutines.delay
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
