@@ -27,27 +27,33 @@ class TimeHelper(
 
     /**
      * Finds the first ending of temporalAmount before dateTime. For example if temporalAmount is a
-     * week then it will find the very end of the sunday before dateTime.
+     * week and the aggregationPreferences specify that the week should start on Monday at 00:00
+     * then it will find the very end of the sunday before dateTime.
      *
-     * temporalAmount supports the use of duration instead of Period.
-     * In this case the function will try to approximate the behaviour as closely as possible as though
-     * temporalAmount was a period. For example if you pass in a duration of 7 days it will try to find
-     * the last day of the week before the week containing dateTime. It is always the largest recognised
-     * duration that is used when deciding what the start of the period should be. The recognised durations
-     * are:
+     * temporalAmount supports the use of duration instead of Period for the following values:
      *
      *  Duration.ofHours(1)
      *  Duration.ofHours(24)
      *  Duration.ofDays(7)
      *
+     * For example if you pass in a duration of 7 days it will try to find
+     * the last day of the week before the week containing dateTime. It is always the largest recognised
+     * duration that is used when deciding what the start of the period should be.
+     *
+     * temporalAmount supports the following Period values:
+     * Period.ofDays(1)
+     * Period.ofWeeks(1)
+     * Period.ofMonths(1)
+     * Period.ofMonths(3)
+     * Period.ofMonths(6)
+     * Period.ofYears(1)
+     *
+     * A ZonedDateTime is returned so as to make sure that the time returned is the beginning of
+     * the period relative to the users time zone. For example the beginning of the day for a time
+     * 00:30 in a time zone that is one hour ahead of UTC should still return 00:00 for the same day
+     * in the given time zone.
+     *
      */
-    fun findBeginningOfTemporal(
-        dateTime: OffsetDateTime,
-        temporalAmount: TemporalAmount,
-    ): ZonedDateTime {
-        return findBeginningOfTemporal(dateTime, temporalAmount, ZoneId.systemDefault())
-    }
-
     fun findBeginningOfTemporal(
         dateTime: OffsetDateTime,
         temporalAmount: TemporalAmount,
@@ -60,6 +66,16 @@ class TimeHelper(
             is Period -> findBeginningOfPeriod(zonedDateTime, temporalAmount)
             else -> zonedDateTime
         }
+    }
+
+    /**
+     * @see findBeginningOfTemporal
+     */
+    fun findBeginningOfTemporal(
+        dateTime: OffsetDateTime,
+        temporalAmount: TemporalAmount,
+    ): ZonedDateTime {
+        return findBeginningOfTemporal(dateTime, temporalAmount, ZoneId.systemDefault())
     }
 
     private fun findBeginningOfPeriod(
