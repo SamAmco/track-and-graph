@@ -42,7 +42,7 @@ class TimeHistogramDataHelper(
             ?.size
             ?.downTo(1)
             ?.map { index -> bins.sumByDouble { it[index - 1] } }
-            ?.max()
+            ?.maxOrNull()
     }
 
     /**
@@ -74,8 +74,9 @@ class TimeHistogramDataHelper(
         sumByCount: Boolean,
     ): Map<Int, List<Double>>? {
         if (sample.dataPoints.isEmpty()) return null
-        val endTime = getNextEndOfWindow( window,
-            sample.dataPoints.maxBy { it.timestamp }!!.timestamp )
+        val endTime = getNextEndOfWindow(window,
+            sample.dataPoints.maxBy { it.timestamp }!!.timestamp
+        )
         val isDiscrete = feature.featureType == FeatureType.DISCRETE
         val keys =
             if (isDiscrete) feature.discreteValues.map { it.index }.toSet()
