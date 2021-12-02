@@ -27,13 +27,12 @@ import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
-import kotlin.random.Random
 
 class TimeHistogramDataHelperTests {
     private val timeHelper = TimeHelper(
         object : AggregationPreferences {
             override val firstDayOfWeek = DayOfWeek.MONDAY
-            override val startTimeOfDay = Duration.ofSeconds(0)
+            override val startTimeOfDay = Duration.ZERO
         }
     )
 
@@ -61,38 +60,6 @@ class TimeHistogramDataHelperTests {
         val total = 3 + 3 + 2 + 2 + 2 + 2 + 2.0
         Assert.assertEquals(
             listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total),
-            vals
-        )
-    }
-
-    @Test
-    fun test_getHistogramBinsForSample_sumByCount_month_cont() {
-        //GIVEN
-        val start = OffsetDateTime.of(2020, 7, 1, 9, 0, 0, 0, ZoneOffset.UTC)
-        val sample = makeDataSample(
-            IntProgression.fromClosedRange(0, 40, 2)
-                .map { Pair(Random.nextDouble(), start.plusDays(it.toLong())) }
-        )
-        val window = TimeHistogramWindow.MONTH
-        val feature = makeFeature(FeatureType.CONTINUOUS)
-        val sumByCount = true
-
-        //WHEN
-        val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
-
-        //THEN
-        answer!!
-        Assert.assertEquals(1, answer.keys.size)
-        val vals = answer[0] ?: error("Key 0 not found")
-        Assert.assertEquals(30, vals.size)
-        val total = 21.0
-        val expected = listOf(
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0,
-            1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
-        )
-        Assert.assertEquals(
-            expected.map { it.toDouble() / total },
             vals
         )
     }
@@ -194,8 +161,6 @@ class TimeHistogramDataHelperTests {
 
     @Test
     fun test_getHistogramBinsForSample_sumByVal_week_cont_StartTime() {
-        // Same test as above, but the points are all one day later but before 4 AM so the result is the same
-
         //GIVEN
         val month = OffsetDateTime.of(2020, 7, 1, 3, 30, 0, 0, ZoneOffset.UTC)
         val sample = makeDataSample(
@@ -222,11 +187,9 @@ class TimeHistogramDataHelperTests {
         Assert.assertEquals(1, answer.keys.size)
         val vals = answer[0] ?: error("Key 0 not found")
         Assert.assertEquals(7, vals.size)
-        val total = 3 + 3 + 2 + 2 + 2 + 2 + 2.0
-        Assert.assertEquals(
-            listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total),
-            vals
-        )
+        val expected = listOf(2, 3, 3, 2, 2, 2, 2)
+        val total = expected.sum().toDouble()
+        Assert.assertEquals(expected.map { it / total }, vals)
     }
 
     private fun makeFeature(
