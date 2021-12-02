@@ -46,7 +46,7 @@ class AverageTimeBetweenDataFactory :
             if (duration == null && dataPoints.size < 2) return null
             val last = dataPoints.lastOrNull()?.timestamp
             val first = dataPoints.firstOrNull()?.timestamp
-            val latest = endDate ?: last?.let { listOf(now, it).max() } ?: now
+            val latest = endDate ?: last?.let { listOf(now, it).maxOrNull() } ?: now
             val start = duration?.let { latest.minus(it) } ?: first
             //Although we will have only sampled points likely to be in the duration it is possible that
             // we could have been passed points that start before (latest - duration). So this is a good

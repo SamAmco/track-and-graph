@@ -24,6 +24,7 @@ import com.samco.trackandgraph.functionslib.TimeHelper
 import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.TemporalAmount
 
 /**
@@ -77,6 +78,14 @@ internal class FixedBinAggregator(
         val firstDataPointTime = dataPoints.firstOrNull()?.cutoffTimestampForAggregation()
         val lastDataPointTime = dataPoints.lastOrNull()?.cutoffTimestampForAggregation()
 
+        val latest = getEndTimeNowOrLatest(lastDataPointTime, endTime).toZonedDateTime()
+        val earliest = getStartTimeOrFirst(
+            firstDataPointTime,
+            latest.toOffsetDateTime(),
+            endTime,
+            sampleDuration
+        )
+        var currentTimeStamp = timeHelper.findBeginningOfTemporal(earliest, binSize).minusNanos(1)
         val latest = getEndTimeNowOrLatest(lastDataPointTime, endTime)
         val earliest = getStartTimeOrFirst(firstDataPointTime, latest, endTime, sampleDuration)
         var currentTimeStamp = timeHelper
@@ -85,6 +94,8 @@ internal class FixedBinAggregator(
         var index = 0
         while (currentTimeStamp.isBefore(latest)) {
             currentTimeStamp = currentTimeStamp.with { ld -> ld.plus(binSize) }
+            val points = dataSample.dataPoints.drop(index)
+                .takeWhile { dp -> dp.timestamp.toZonedDateTime().isBefore(currentTimeStamp) }
             val points = dataPoints
                 .drop(index)
                 .takeWhile { dp ->
@@ -93,7 +104,7 @@ internal class FixedBinAggregator(
             index += points.size
             yield(
                 AggregatedDataPoint(
-                    timestamp = currentTimeStamp,
+                    timestamp = currentTimeStamp.toOffsetDateTime(),
                     value = Double.NaN, // this value gets overwritten when calling a function on RawAggregatedDatapoints
                     featureId = featureId,
                     parents = points
