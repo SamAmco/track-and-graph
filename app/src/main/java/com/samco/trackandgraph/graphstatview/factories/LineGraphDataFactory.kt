@@ -152,13 +152,10 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             else -> DurationAggregationFunction(
                 timeHelper,
                 lineGraphFeature.featureId,
-                //We have to add movingAvDuration if it exists to make sure we're going back far enough
-                // to get correct averaging
-                lineGraph.duration?.plus(movingAvDuration ?: Duration.ZERO),
-                lineGraph.endDate,
                 plottingPeriod!!
             )
         }
+        //TODO we need to pad the result of duration aggregation
         val averageCalculator = when (lineGraphFeature.averagingMode) {
             LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
             else -> MovingAverageFunction(movingAvDuration!!)

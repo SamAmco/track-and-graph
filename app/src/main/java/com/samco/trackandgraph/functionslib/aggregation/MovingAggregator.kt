@@ -17,11 +17,9 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
-import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import com.samco.trackandgraph.database.entity.IDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.cache
-import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
 
 /**
@@ -33,13 +31,6 @@ import org.threeten.bp.Duration
  */
 internal class MovingAggregator(private val movingAggDuration: Duration) : DataAggregator {
     override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
-        return AggregatedDataSample.fromSequence(
-            getSequence(dataSample),
-            dataSample.dataSampleProperties
-        )
-    }
-
-    override suspend fun aggregate(dataSample: AggregatedDataSample): AggregatedDataSample {
         return AggregatedDataSample.fromSequence(
             getSequence(dataSample),
             dataSample.dataSampleProperties
@@ -59,9 +50,8 @@ internal class MovingAggregator(private val movingAggDuration: Duration) : DataA
 
             yield(
                 AggregatedDataPoint(
-                    current.timestamp,
-                    current.featureId,
-                    value = Double.NaN,
+                    timestamp = current.timestamp,
+                    featureId = current.featureId,
                     label = current.label,
                     note = current.note,
                     parents = parents

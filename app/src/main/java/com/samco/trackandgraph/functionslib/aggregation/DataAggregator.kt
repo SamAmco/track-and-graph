@@ -21,5 +21,4 @@ import com.samco.trackandgraph.functionslib.DataSample
 
 internal interface DataAggregator {
     suspend fun aggregate(dataSample: DataSample): AggregatedDataSample
-    suspend fun aggregate(dataSample: AggregatedDataSample): AggregatedDataSample
 }

@@ -22,7 +22,6 @@ import org.junit.Test
 import org.threeten.bp.*
 
 class TimeHelperTests {
-    //TODO account for offsets of daylight savings
 
     private val basicAggregationPreferences = object : AggregationPreferences {
         override val firstDayOfWeek = DayOfWeek.MONDAY

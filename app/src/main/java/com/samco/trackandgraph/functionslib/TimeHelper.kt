@@ -60,12 +60,19 @@ class TimeHelper(
         zoneId: ZoneId
     ): ZonedDateTime {
         val zonedDateTime = dateTime.atZoneSameInstant(zoneId)
-        println(zonedDateTime)
         return when (temporalAmount) {
             is Duration -> findBeginningOfDuration(zonedDateTime, temporalAmount)
             is Period -> findBeginningOfPeriod(zonedDateTime, temporalAmount)
             else -> zonedDateTime
         }
+    }
+
+    fun toZonedDateTime(dateTime: OffsetDateTime): ZonedDateTime {
+        return toZonedDateTime(dateTime, ZoneId.systemDefault())
+    }
+
+    fun toZonedDateTime(dateTime: OffsetDateTime, zoneId: ZoneId): ZonedDateTime {
+        return dateTime.atZoneSameInstant(zoneId)
     }
 
     /**
