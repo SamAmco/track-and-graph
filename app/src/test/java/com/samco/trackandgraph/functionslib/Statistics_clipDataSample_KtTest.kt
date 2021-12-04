@@ -36,6 +36,31 @@ class Statistics_clipDataSample_KtTest {
     }
 
     @Test
+    fun clipDataSample_does_not_drain_upstream() = runBlocking {
+        //GIVEN
+        val now = OffsetDateTime.now()
+        var consumed = 0
+        val sequence = sequence {
+            for (i in 0..100) {
+                yield((1.0 to i.toLong()))
+                consumed++
+            }
+        }.map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
+        val dataSample = DataSample.fromSequence(sequence)
+
+        //WHEN
+        DataClippingFunction(
+            now.minusHours(10),
+            Duration.ofHours(20)
+        ).mapSample(dataSample)
+            .toList()
+
+        //THEN
+        //We skip 10, consume 20 and the last one is read to check that the clipping can end
+        assertEquals(31, consumed)
+    }
+
+    @Test
     fun clipDataSample_no_end_time_or_duration() = runBlocking {
         //GIVEN
         val now = OffsetDateTime.now()
