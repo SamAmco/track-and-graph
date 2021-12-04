@@ -17,10 +17,17 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.database.DataSamplerImpl
+import com.samco.trackandgraph.database.DataSource
+import com.samco.trackandgraph.database.IDataSampler
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.functionslib.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.max
@@ -79,14 +86,18 @@ class AverageTimeBetweenDataFactory :
         onDataSampled: (List<IDataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
         val feature = dataSource.getFeatureById(config.featureId)
-        val dataPoints = getRelevantDataPoints(dataSource, config, feature)
-        val averageMillis =
+        val dataSampler = DataSamplerImpl(dataSource)
+        val dataPoints = withContext(Dispatchers.IO) {
+            getRelevantDataPoints(dataSampler, config, feature)
+        }
+        val averageMillis = withContext(Dispatchers.Default) {
             calculateAverageTimeBetweenOrNull(
                 OffsetDateTime.now(),
                 config.endDate,
                 config.duration,
                 dataPoints
-            ) ?: return notEnoughData(graphOrStat)
+            )
+        } ?: return notEnoughData(graphOrStat)
         onDataSampled(dataPoints)
         return object : IAverageTimeBetweenViewData {
             override val state: IGraphStatViewData.State
@@ -107,44 +118,39 @@ class AverageTimeBetweenDataFactory :
             get() = graphOrStat
     }
 
-    private fun getRelevantDataPoints(
-        dataSource: TrackAndGraphDatabaseDao,
+    private suspend fun getRelevantDataPoints(
+        dataSampler: IDataSampler,
         timeBetweenStat: AverageTimeBetweenStat,
         feature: Feature
     ): List<IDataPoint> {
+        val dataSource = DataSource.FeatureDataSource(feature.id)
         val endDate = timeBetweenStat.endDate ?: when (feature.featureType) {
-            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
-                dataSource.getLastDataPointBetween(
-                    feature.id,
+            DataType.CONTINUOUS, DataType.DURATION -> {
+                dataSampler.getLastDataPointBetween(
+                    dataSource,
                     timeBetweenStat.fromValue,
                     timeBetweenStat.toValue
                 )
             }
-            FeatureType.DISCRETE -> {
-                dataSource.getLastDataPointWithValue(feature.id, timeBetweenStat.discreteValues)
+            DataType.DISCRETE -> {
+                dataSampler.getLastDataPointWithValue(dataSource, timeBetweenStat.discreteValues)
             }
         }?.timestamp?.plusSeconds(1) ?: return emptyList()
 
-        val startDate =
-            timeBetweenStat.duration?.let { endDate.minus(it) } ?: OffsetDateTime.MIN
-        return when (feature.featureType) {
-            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
-                dataSource.getDataPointsBetweenInTimeRange(
-                    feature.id,
-                    timeBetweenStat.fromValue,
-                    timeBetweenStat.toValue,
-                    startDate,
-                    endDate
+        val dataSample = when (feature.featureType) {
+            DataType.CONTINUOUS, DataType.DURATION -> {
+                dataSampler.getDataPointsBetween(
+                    dataSource, timeBetweenStat.fromValue, timeBetweenStat.toValue
                 )
             }
-            FeatureType.DISCRETE -> {
-                dataSource.getDataPointsWithValueInTimeRange(
-                    feature.id,
-                    timeBetweenStat.discreteValues,
-                    startDate,
-                    endDate
+            DataType.DISCRETE -> {
+                dataSampler.getDataPointsWithValue(
+                    dataSource, timeBetweenStat.discreteValues
                 )
             }
         }
+        return DataClippingFunction(endDate, timeBetweenStat.duration)
+            .mapSample(dataSample)
+            .toList()
     }
 }

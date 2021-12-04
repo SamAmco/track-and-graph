@@ -140,22 +140,18 @@ interface TrackAndGraphDatabaseDao {
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
     //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :endDateTime AND timestamp > :startDateTime ORDER BY timestamp""")
-    fun getDataPointsWithValueInTimeRange(
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp""")
+    fun getDataPointsWithValue(
         featureId: Long,
-        values: List<Int>,
-        startDateTime: OffsetDateTime,
-        endDateTime: OffsetDateTime
+        values: List<Int>
     ): List<DataPoint>
 
     //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max  AND timestamp < :endDateTime AND timestamp > :startDateTime ORDER BY timestamp""")
-    fun getDataPointsBetweenInTimeRange(
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp""")
+    fun getDataPointsBetween(
         featureId: Long,
         min: String,
-        max: String,
-        startDateTime: OffsetDateTime,
-        endDateTime: OffsetDateTime
+        max: String
     ): List<DataPoint>
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp DESC LIMIT 1""")
@@ -173,13 +169,6 @@ interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp > :cutOff AND timestamp < :now ORDER BY timestamp DESC")
-    fun getDataPointsForFeatureBetweenDescSync(
-        featureId: Long,
-        cutOff: OffsetDateTime,
-        now: OffsetDateTime
-    ): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT 1")
     fun getLastDataPointForFeatureSync(featureId: Long): List<DataPoint>

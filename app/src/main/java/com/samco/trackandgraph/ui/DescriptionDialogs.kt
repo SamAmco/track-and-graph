@@ -28,8 +28,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayNote
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.IDataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.database.entity.GlobalNote
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
 import org.threeten.bp.OffsetDateTime
@@ -106,14 +105,14 @@ fun getNoteDialogHeader(
 }
 
 fun showDataPointDescriptionDialog(
-    context: Context, inflater: LayoutInflater, dataPoint: IDataPoint,
-    featureType: FeatureType, featureDispalayName: String? = null
+    context: Context, inflater: LayoutInflater, dataPoint: DataPoint,
+    dataType: DataType, featureDispalayName: String? = null
 ) {
     showDataPointDescriptionDialog(
         context,
         inflater,
         dataPoint.timestamp,
-        DataPoint.getDisplayValue(dataPoint, featureType),
+        DataPoint.getDisplayValue(dataPoint, dataType),
         dataPoint.note,
         featureDispalayName
     )

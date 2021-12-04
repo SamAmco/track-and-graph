@@ -15,21 +15,28 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview.factories.viewdto
+package com.samco.trackandgraph.database.dto
 
-import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.database.entity.GraphOrStat
+import androidx.room.ColumnInfo
+import com.samco.trackandgraph.database.entity.DataType
+import org.threeten.bp.OffsetDateTime
 
-interface ITimeSinceViewData : IGraphStatViewData {
-    val lastDataPoint: IDataPoint?
-        get() = null
+data class DataPointWithType (
+    @ColumnInfo(name = "timestamp")
+    override val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
-    companion object {
-        fun loading(graphOrStat: GraphOrStat) = object : ITimeSinceViewData {
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.LOADING
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-        }
-    }
-}
+    @ColumnInfo(name = "feature_id")
+    val featureId: Long,
+
+    @ColumnInfo(name = "data_type")
+    override val dataType: DataType,
+
+    @ColumnInfo(name = "value")
+    override val value: Double,
+
+    @ColumnInfo(name = "label")
+    override val label: String,
+
+    @ColumnInfo(name = "note")
+    override val note: String
+) : IDataPoint()

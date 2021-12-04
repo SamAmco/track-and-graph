@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
-import com.samco.trackandgraph.database.entity.IDataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.cache
 import org.threeten.bp.Duration
@@ -51,9 +51,6 @@ internal class MovingAggregator(private val movingAggDuration: Duration) : DataA
             yield(
                 AggregatedDataPoint(
                     timestamp = current.timestamp,
-                    featureId = current.featureId,
-                    label = current.label,
-                    note = current.note,
                     parents = parents
                 )
             )

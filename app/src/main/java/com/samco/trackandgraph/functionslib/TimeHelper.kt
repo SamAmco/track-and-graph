@@ -85,6 +85,31 @@ class TimeHelper(
         return findBeginningOfTemporal(dateTime, temporalAmount, ZoneId.systemDefault())
     }
 
+    /**
+     * @see findBeginningOfTemporal
+     */
+    fun findEndOfTemporal(
+        dateTime: OffsetDateTime,
+        temporalAmount: TemporalAmount,
+    ): ZonedDateTime {
+        return findBeginningOfTemporal(dateTime, temporalAmount)
+            .plus(temporalAmount)
+            .minusNanos(1)
+    }
+
+    /**
+     * @see findBeginningOfTemporal
+     */
+    fun findEndOfTemporal(
+        dateTime: OffsetDateTime,
+        temporalAmount: TemporalAmount,
+        zoneId: ZoneId
+    ): ZonedDateTime {
+        return findBeginningOfTemporal(dateTime, temporalAmount, zoneId)
+            .plus(temporalAmount)
+            .minusNanos(1)
+    }
+
     private fun findBeginningOfPeriod(
         dateTime: ZonedDateTime,
         period: Period,

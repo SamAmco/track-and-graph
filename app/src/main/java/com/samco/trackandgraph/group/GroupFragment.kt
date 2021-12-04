@@ -43,7 +43,7 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.DisplayFeature
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.entity.Group
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
@@ -466,7 +466,7 @@ class GroupViewModel : ViewModel() {
     }
 
     fun addDefaultFeatureValue(feature: DisplayFeature) = ioScope.launch {
-        val label = if (feature.featureType == FeatureType.DISCRETE) {
+        val label = if (feature.featureType == DataType.DISCRETE) {
             feature.discreteValues[feature.defaultValue.toInt()].label
         } else ""
         val newDataPoint = DataPoint(

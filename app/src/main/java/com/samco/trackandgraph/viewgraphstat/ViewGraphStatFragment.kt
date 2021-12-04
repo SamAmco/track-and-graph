@@ -107,8 +107,8 @@ class ViewGraphStatFragment : Fragment() {
                 val featureDisplayName =
                     viewModel.featurePathProvider.getPathForFeature(dataPoint.featureId)
                 val featureType =
-                    viewModel.featureTypes?.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
-                        ?: FeatureType.CONTINUOUS
+                    viewModel.featureTypes?.getOrElse(dataPoint.featureId) { DataType.CONTINUOUS }
+                        ?: DataType.CONTINUOUS
                 showDataPointDescriptionDialog(
                     requireContext(),
                     layoutInflater,
@@ -247,7 +247,7 @@ enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
 class ViewGraphStatViewModel : ViewModel() {
     var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyList(), emptyList())
         private set
-    var featureTypes: Map<Long, FeatureType>? = null
+    var featureTypes: Map<Long, DataType>? = null
         private set
 
     val state: LiveData<ViewGraphStatViewModelState>
@@ -307,7 +307,7 @@ class ViewGraphStatViewModel : ViewModel() {
         featureTypes = allFeatures.map { it.id to it.featureType }.toMap()
     }
 
-    private fun onSampledDataPoints(dataPoints: List<IDataPoint>) {
+    private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
         ioScope.launch {
             val dataPointNotes = dataPoints
                 .filter { dp -> dp.note.isNotEmpty() }

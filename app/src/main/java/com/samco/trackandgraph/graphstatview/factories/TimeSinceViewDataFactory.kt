@@ -18,7 +18,10 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.DataSamplerImpl
+import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -62,21 +65,25 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     }
 
     private fun getLastDataPoint(
-        dataSource: TrackAndGraphDatabaseDao,
+        dao: TrackAndGraphDatabaseDao,
         timeSinceLastStat: TimeSinceLastStat
     ): IDataPoint? {
-        val feature = dataSource.getFeatureById(timeSinceLastStat.featureId)
-        return when (feature.featureType) {
-            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
-                dataSource.getLastDataPointBetween(
-                    timeSinceLastStat.featureId,
+        //TODO need to revisit this
+        val dataSampler = DataSamplerImpl(dao)
+        val dataSource = DataSource.FeatureDataSource(timeSinceLastStat.featureId)
+        val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
+        val first = dataSample.firstOrNull() ?: return null
+        return when (first.dataType) {
+            DataType.CONTINUOUS, DataType.DURATION -> {
+                dataSampler.getLastDataPointBetween(
+                    dataSource,
                     timeSinceLastStat.fromValue,
                     timeSinceLastStat.toValue
                 )
             }
             else -> {
-                dataSource.getLastDataPointWithValue(
-                    timeSinceLastStat.featureId,
+                dataSampler.getLastDataPointWithValue(
+                    dataSource,
                     timeSinceLastStat.discreteValues
                 )
             }

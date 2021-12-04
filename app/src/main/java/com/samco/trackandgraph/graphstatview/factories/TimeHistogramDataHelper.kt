@@ -17,10 +17,10 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.functionslib.*
-import com.samco.trackandgraph.database.entity.IDataPoint
 import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.database.entity.TimeHistogramWindow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -78,7 +78,7 @@ class TimeHistogramDataHelper(
             window,
             sample.maxBy { it.timestamp }!!.timestamp
         )
-        val isDiscrete = feature.featureType == FeatureType.DISCRETE
+        val isDiscrete = feature.featureType == DataType.DISCRETE
         val keys =
             if (isDiscrete) feature.discreteValues.map { it.index }.toSet()
             else listOf(0).toSet()

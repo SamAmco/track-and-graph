@@ -29,7 +29,7 @@ import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.doubleFormatter
 import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -70,7 +70,7 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
     override fun validateConfig(): ValidationException? {
         val currFeature = getCurrentFeature()
             ?: return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        if (currFeature.featureType == FeatureType.DISCRETE && getDiscreteValues().isEmpty()) {
+        if (currFeature.featureType == DataType.DISCRETE && getDiscreteValues().isEmpty()) {
             return ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
         } else if (getCurrentFromValue() > getCurrentToValue()){
             return ValidationException(R.string.graph_stat_validation_invalid_value_stat_from_to)
@@ -94,20 +94,20 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
 
     private fun updateInputView(feature: Feature?) {
         when (feature?.featureType) {
-            FeatureType.DISCRETE -> {
+            DataType.DISCRETE -> {
                 sanitizeValueStatDiscreteValues()
                 setUpDiscreteValueInputView()
                 getDiscreteValueInputLayout().visibility = View.VISIBLE
                 getDurationRangeInput().visibility = View.GONE
                 getContinuousValueInputLayout().visibility = View.GONE
             }
-            FeatureType.CONTINUOUS -> {
+            DataType.CONTINUOUS -> {
                 setUpContinuousRangeInputView()
                 getDiscreteValueInputLayout().visibility = View.GONE
                 getDurationRangeInput().visibility = View.GONE
                 getContinuousValueInputLayout().visibility = View.VISIBLE
             }
-            FeatureType.DURATION -> {
+            DataType.DURATION -> {
                 setUpDurationRangeInputView()
                 getDiscreteValueInputLayout().visibility = View.GONE
                 getContinuousValueInputLayout().visibility = View.GONE

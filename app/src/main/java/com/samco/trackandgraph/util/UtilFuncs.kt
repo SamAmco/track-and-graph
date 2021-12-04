@@ -29,7 +29,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
-import com.samco.trackandgraph.database.entity.FeatureType
 import java.lang.NumberFormatException
 
 /**
