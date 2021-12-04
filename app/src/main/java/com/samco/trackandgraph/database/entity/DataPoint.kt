@@ -71,12 +71,3 @@ data class DataPoint(
         }
     }
 }
-
-data class AggregatedDataPoint(
-    override val timestamp: OffsetDateTime,
-    override val featureId: Long,
-    override val value: Double,
-    val parents: List<IDataPoint>,
-    override val label: String = "",
-    override val note: String = "",
-) : IDataPoint

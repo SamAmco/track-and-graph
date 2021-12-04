@@ -43,13 +43,11 @@ import org.threeten.bp.temporal.TemporalAmount
 class DurationAggregationFunction(
     private val timeHelper: TimeHelper,
     private val featureId: Long,
-    private val sampleDuration: Duration?,
-    private val endTime: OffsetDateTime?,
     private val binSize: TemporalAmount,
 ) : DataSampleFunction {
     override suspend fun mapSample(dataSample: DataSample): DataSample {
         return DataSample.fromSequence(
-            FixedBinAggregator(timeHelper, featureId, sampleDuration, endTime, binSize)
+            FixedBinAggregator(timeHelper, featureId, binSize)
                 .aggregate(dataSample)
                 .sum(),
             dataSample.dataSampleProperties

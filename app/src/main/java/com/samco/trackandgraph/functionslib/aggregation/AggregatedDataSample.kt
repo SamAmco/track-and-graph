@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
-import com.samco.trackandgraph.database.entity.AggregatedDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.DataSampleProperties
 
@@ -27,7 +26,7 @@ import com.samco.trackandgraph.functionslib.DataSampleProperties
  * Note that some follow-up functions drop data-points without parents. This is supposed to be intuitive :)
  */
 internal abstract class AggregatedDataSample(
-    val dataSampleProperties: DataSampleProperties
+    private val dataSampleProperties: DataSampleProperties
 ) : Sequence<AggregatedDataPoint> {
     companion object {
         fun fromSequence(
@@ -41,14 +40,16 @@ internal abstract class AggregatedDataSample(
     }
 
     fun average() = DataSample.fromSequence(
-        this.filter { it.parents.isNotEmpty() }
-            .map { it.copy(value = it.parents.map { par -> par.value }.average()) },
+        this
+            .filter { it.parents.isNotEmpty() }
+            .map { it.toDataPoint(it.parents.map { par -> par.value }
+            .average()) },
         dataSampleProperties
     )
 
     fun sum() = DataSample.fromSequence(
-        this.filter { it.parents.isNotEmpty() }
-            .map { it.copy(value = it.parents.sumOf { par -> par.value }) },
+        this.map { it.toDataPoint(it.parents.sumOf { par -> par.value }) },
         dataSampleProperties
     )
+
 }
