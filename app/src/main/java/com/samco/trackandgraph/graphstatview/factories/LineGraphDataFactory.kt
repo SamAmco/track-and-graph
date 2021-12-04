@@ -23,7 +23,10 @@ import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.DataSamplerImpl
+import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.database.dto.YRangeType
 import com.samco.trackandgraph.database.entity.*
@@ -125,7 +128,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
     }
 
     private suspend fun tryGetPlottingData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dao: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
         allReferencedDataPoints: MutableList<IDataPoint>,
         lineGraphFeature: LineGraphFeature
@@ -133,14 +136,9 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
         val rawDataSample = withContext(Dispatchers.IO) {
-            val dataSampler = DatabaseSampleHelper(dataSource)
-            dataSampler.sampleData(
-                lineGraphFeature.featureId,
-                lineGraph.duration,
-                lineGraph.endDate,
-                movingAvDuration,
-                plottingPeriod
-            )
+            val dataSampler = DataSamplerImpl(dao)
+            val dataSource = DataSource.FeatureDataSource(lineGraphFeature.featureId)
+            dataSampler.getDataPointsForDataSource(dataSource)
         }
         val clippingCalculator = DataClippingFunction(lineGraph.endDate, lineGraph.duration)
         val visibleSection = clippingCalculator.mapSample(rawDataSample)
@@ -149,11 +147,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         val timeHelper = TimeHelper(GlobalAggregationPreferences)
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
-            else -> DurationAggregationFunction(
-                timeHelper,
-                lineGraphFeature.featureId,
-                plottingPeriod!!
-            )
+            else -> DurationAggregationFunction(timeHelper, plottingPeriod!!)
         }
         //TODO we need to pad the result of duration aggregation
         val averageCalculator = when (lineGraphFeature.averagingMode) {

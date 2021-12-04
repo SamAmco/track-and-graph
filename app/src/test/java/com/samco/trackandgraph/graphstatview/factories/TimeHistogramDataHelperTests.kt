@@ -45,7 +45,7 @@ class TimeHistogramDataHelperTests {
                 .map { Pair(1.0, month.withDayOfMonth(it)) }
         )
         val window = TimeHistogramWindow.WEEK
-        val feature = makeFeature(FeatureType.CONTINUOUS)
+        val feature = makeFeature(DataType.CONTINUOUS)
         val sumByCount = false
 
         //WHEN
@@ -73,7 +73,7 @@ class TimeHistogramDataHelperTests {
                 .map { Pair((it % 3).toDouble(), start.plusMinutes(it.toLong())) }
         )
         val window = TimeHistogramWindow.HOUR
-        val feature = makeFeature(FeatureType.DISCRETE, listOf(0, 1, 2))
+        val feature = makeFeature(DataType.DISCRETE, listOf(0, 1, 2))
         val sumByCount = false
 
         //WHEN
@@ -121,7 +121,7 @@ class TimeHistogramDataHelperTests {
                 .map { Pair((it % 2).toDouble(), start.plusMonths((it.toLong() * 5) % 12)) }
         )
         val window = TimeHistogramWindow.YEAR
-        val feature = makeFeature(FeatureType.DISCRETE, listOf(0, 1))
+        val feature = makeFeature(DataType.DISCRETE, listOf(0, 1))
         val sumByCount = true
 
         //WHEN
@@ -148,7 +148,7 @@ class TimeHistogramDataHelperTests {
         //GIVEN
         val sample = DataSample.fromSequence(emptySequence())
         val window = TimeHistogramWindow.HOUR
-        val feature = makeFeature(FeatureType.CONTINUOUS)
+        val feature = makeFeature(DataType.CONTINUOUS)
         val sumByCount = false
 
         //WHEN
@@ -168,7 +168,7 @@ class TimeHistogramDataHelperTests {
                 .map { Pair(1.0, month.withDayOfMonth(it)) }
         )
         val window = TimeHistogramWindow.WEEK
-        val feature = makeFeature(FeatureType.CONTINUOUS)
+        val feature = makeFeature(DataType.CONTINUOUS)
         val sumByCount = false
 
         val timeHelper = TimeHelper(
@@ -193,7 +193,7 @@ class TimeHistogramDataHelperTests {
     }
 
     private fun makeFeature(
-        featureType: FeatureType,
+        featureType: DataType,
         discreteValues: List<Int> = listOf()
     ) =
         Feature(

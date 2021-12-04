@@ -23,15 +23,6 @@ import com.samco.trackandgraph.database.doubleFormatter
 import com.samco.trackandgraph.ui.formatTimeDuration
 import org.threeten.bp.OffsetDateTime
 
-
-interface IDataPoint {
-    val timestamp: OffsetDateTime
-    val featureId: Long
-    val value: Double
-    val label: String
-    val note: String
-}
-
 @Entity(
     tableName = "data_points_table",
     primaryKeys = ["timestamp", "feature_id"],
@@ -44,29 +35,28 @@ interface IDataPoint {
         )
     ]
 )
-
 data class DataPoint(
     @ColumnInfo(name = "timestamp")
-    override val timestamp: OffsetDateTime = OffsetDateTime.now(),
+    val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
     @ColumnInfo(name = "feature_id", index = true)
-    override val featureId: Long,
+    val featureId: Long,
 
     @ColumnInfo(name = "value")
-    override val value: Double,
+    val value: Double,
 
     @ColumnInfo(name = "label")
-    override val label: String,
+    val label: String,
 
     @ColumnInfo(name = "note")
-    override val note: String
-) : IDataPoint {
+    val note: String
+) {
     companion object {
-        fun getDisplayValue(dataPoint: IDataPoint, featureType: FeatureType): String {
-            return when (featureType) {
-                FeatureType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
-                FeatureType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
-                FeatureType.DURATION -> formatTimeDuration(dataPoint.value.toLong())
+        fun getDisplayValue(dataPoint: DataPoint, dataType: DataType): String {
+            return when (dataType) {
+                DataType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
+                DataType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
+                DataType.DURATION -> formatTimeDuration(dataPoint.value.toLong())
             }
         }
     }

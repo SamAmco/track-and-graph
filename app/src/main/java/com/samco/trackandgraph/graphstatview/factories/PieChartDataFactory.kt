@@ -19,15 +19,16 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.androidplot.pie.Segment
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.database.DataSamplerImpl
+import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.IDataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.entity.PieChart
+import com.samco.trackandgraph.functionslib.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.functionslib.DataSample
-import com.samco.trackandgraph.functionslib.DatabaseSampleHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -86,16 +87,19 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
     }
 
     private suspend fun tryGetPlottableDataForPieChart(
-        dataSource: TrackAndGraphDatabaseDao,
+        dao: TrackAndGraphDatabaseDao,
         pieChart: PieChart
     ): List<IDataPoint>? {
         val feature = withContext(Dispatchers.IO) {
-            dataSource.getFeatureById(pieChart.featureId)
+            dao.getFeatureById(pieChart.featureId)
         }
-        val dataSample = DatabaseSampleHelper(dataSource).sampleData(
-            feature.id, pieChart.duration, pieChart.endDate, null, null
-        ).toList()
-        return if (dataSample.isNotEmpty()) dataSample else null
+        val dataSampler = DataSamplerImpl(dao)
+        val dataSource = DataSource.FeatureDataSource(feature.id)
+        val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
+        val dataPoints = DataClippingFunction(pieChart.endDate, pieChart.duration)
+            .mapSample(dataSample)
+            .toList()
+        return if (dataPoints.isNotEmpty()) dataPoints else null
     }
 
     private fun getPieChartSegments(dataSample: List<IDataPoint>) =

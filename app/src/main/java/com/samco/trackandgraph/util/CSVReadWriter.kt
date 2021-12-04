@@ -21,7 +21,7 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import kotlinx.coroutines.yield
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
@@ -58,11 +58,11 @@ object CSVReadWriter {
                 val dataPoints = dataSource.getDataPointsForFeatureSync(feature.id)
 
                 val dataPointToString = when (feature.featureType) {
-                    FeatureType.DISCRETE -> { dp: DataPoint ->
+                    DataType.DISCRETE -> { dp: DataPoint ->
                         DiscreteValue.fromDataPoint(dp).toString()
                     }
-                    FeatureType.CONTINUOUS -> { dp: DataPoint -> dp.value.toString() }
-                    FeatureType.DURATION -> { dp: DataPoint -> DataPoint.getDisplayValue(dp, FeatureType.DURATION) }
+                    DataType.CONTINUOUS -> { dp: DataPoint -> dp.value.toString() }
+                    DataType.DURATION -> { dp: DataPoint -> DataPoint.getDisplayValue(dp, DataType.DURATION) }
                 }
 
                 dataPoints.forEach { dp ->
@@ -153,7 +153,7 @@ object CSVReadWriter {
         val newFeature = createNewFeature(dataSource, rec, trackGroupId, lineNumber)
         insertFeature(existingFeatures, existingFeaturesByName, newFeature)
         when (newFeature.featureType) {
-            FeatureType.DISCRETE -> addDiscreteDataPoint(
+            DataType.DISCRETE -> addDiscreteDataPoint(
                 points,
                 rec.value,
                 rec.timestamp,
@@ -161,14 +161,14 @@ object CSVReadWriter {
                 rec.note,
                 lineNumber
             )
-            FeatureType.CONTINUOUS -> addContinuousDataPoint(
+            DataType.CONTINUOUS -> addContinuousDataPoint(
                 points,
                 rec.value.toDoubleOrNull(),
                 rec.timestamp,
                 newFeature.id,
                 rec.note
             )
-            FeatureType.DURATION -> addDurationDataPoint(
+            DataType.DURATION -> addDurationDataPoint(
                 points,
                 rec.value,
                 rec.timestamp,
@@ -188,8 +188,8 @@ object CSVReadWriter {
     ) {
         val feature = existingFeaturesByName[rec.featureName]!!
         when (getFeatureTypeForValue(rec.value)) {
-            FeatureType.DISCRETE -> {
-                validateFeatureType(feature, FeatureType.DISCRETE, lineNumber)
+            DataType.DISCRETE -> {
+                validateFeatureType(feature, DataType.DISCRETE, lineNumber)
                 val discreteValue =
                     addDiscreteDataPoint(
                         points,
@@ -210,8 +210,8 @@ object CSVReadWriter {
                     )
                 }
             }
-            FeatureType.CONTINUOUS -> {
-                validateFeatureType(feature, FeatureType.CONTINUOUS, lineNumber)
+            DataType.CONTINUOUS -> {
+                validateFeatureType(feature, DataType.CONTINUOUS, lineNumber)
                 addContinuousDataPoint(
                     points,
                     rec.value.toDoubleOrNull(),
@@ -220,8 +220,8 @@ object CSVReadWriter {
                     rec.note
                 )
             }
-            FeatureType.DURATION -> {
-                validateFeatureType(feature, FeatureType.DURATION, lineNumber)
+            DataType.DURATION -> {
+                validateFeatureType(feature, DataType.DURATION, lineNumber)
                 addDurationDataPoint(
                     points,
                     rec.value,
@@ -348,7 +348,7 @@ object CSVReadWriter {
     ): Feature {
         val featureType = getFeatureTypeForValue(rec.value)
         val discreteValues =
-            if (featureType == FeatureType.DISCRETE) listOf(
+            if (featureType == DataType.DISCRETE) listOf(
                 tryGetDiscreteValueFromString(
                     rec.value,
                     lineNumber
@@ -401,7 +401,7 @@ object CSVReadWriter {
         return feature.copy(discreteValues = newDiscreteValues)
     }
 
-    private fun validateFeatureType(feature: Feature, expectedType: FeatureType, lineNumber: Int) {
+    private fun validateFeatureType(feature: Feature, expectedType: DataType, lineNumber: Int) {
         if (feature.featureType != expectedType)
             throw ImportFeaturesException(
                 R.string.import_exception_inconsistent_data_type,
@@ -409,12 +409,12 @@ object CSVReadWriter {
             )
     }
 
-    private fun getFeatureTypeForValue(value: String): FeatureType {
+    private fun getFeatureTypeForValue(value: String): DataType {
         val durationRegex = Regex("\\d*:\\d{2}:\\d{2}")
         return when {
-            value.matches(durationRegex) -> FeatureType.DURATION
-            value.contains(":") -> FeatureType.DISCRETE
-            else -> FeatureType.CONTINUOUS
+            value.matches(durationRegex) -> DataType.DURATION
+            value.contains(":") -> DataType.DISCRETE
+            else -> DataType.CONTINUOUS
         }
     }
 

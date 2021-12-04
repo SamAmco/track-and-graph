@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.entity.IDataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
 import org.threeten.bp.temporal.TemporalAmount
 
 data class DataSampleProperties(

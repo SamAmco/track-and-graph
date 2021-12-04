@@ -15,21 +15,6 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview.factories.viewdto
+package com.samco.trackandgraph.functionslib.exceptions
 
-import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.database.entity.GraphOrStat
-
-interface ITimeSinceViewData : IGraphStatViewData {
-    val lastDataPoint: IDataPoint?
-        get() = null
-
-    companion object {
-        fun loading(graphOrStat: GraphOrStat) = object : ITimeSinceViewData {
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.LOADING
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-        }
-    }
-}
+class InvalidRegularityException : Exception() { }

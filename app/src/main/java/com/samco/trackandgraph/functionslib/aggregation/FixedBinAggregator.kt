@@ -17,11 +17,9 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
-import com.samco.trackandgraph.database.entity.IDataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.TimeHelper
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
 /**
@@ -34,44 +32,43 @@ import org.threeten.bp.temporal.TemporalAmount
 
 internal class FixedBinAggregator(
     private val timeHelper: TimeHelper,
-    private val featureId: Long,
     private val binSize: TemporalAmount,
 ) : DataAggregator {
 
     override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
         return AggregatedDataSample.fromSequence(
             getSequence(dataSample),
-            dataSample.dataSampleProperties
+            dataSample.dataSampleProperties.copy(
+                regularity = binSize
+            )
         )
     }
 
     private fun getSequence(dataSample: Sequence<IDataPoint>) = sequence {
         val latest = dataSample.firstOrNull()?.timestamp ?: return@sequence
-        var nextBinTimeStamp = timeHelper
-            .findBeginningOfTemporal(latest, binSize)
-            .minusNanos(1)
+        var nextBinTimeStamp = timeHelper.findEndOfTemporal(latest, binSize)
+        var nextCutOff = timeHelper.findBeginningOfTemporal(latest, binSize)
 
         val iterator = dataSample.iterator()
         var nextPoints = mutableListOf<IDataPoint>()
         while (iterator.hasNext()) {
             val next = iterator.next()
-            while (timeHelper.toZonedDateTime(next.timestamp) < nextBinTimeStamp) {
+            while (timeHelper.toZonedDateTime(next.timestamp) < nextCutOff) {
                 yield(
                     AggregatedDataPoint(
-                        timestamp = nextBinTimeStamp.plus(binSize).toOffsetDateTime(),
-                        featureId = featureId,
+                        timestamp = nextBinTimeStamp.toOffsetDateTime(),
                         parents = nextPoints
                     )
                 )
                 nextBinTimeStamp = nextBinTimeStamp.minus(binSize)
+                nextCutOff = nextCutOff.minus(binSize)
                 nextPoints = mutableListOf()
             }
             nextPoints.add(next)
         }
         yield(
             AggregatedDataPoint(
-                timestamp = nextBinTimeStamp.plus(binSize).toOffsetDateTime(),
-                featureId = featureId,
+                timestamp = nextBinTimeStamp.toOffsetDateTime(),
                 parents = nextPoints
             )
         )

@@ -36,7 +36,7 @@ import androidx.viewpager.widget.ViewPager
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
@@ -187,12 +187,12 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun setupViewFeature(feature: Feature, index: Int) {
-        if (feature.featureType != FeatureType.DISCRETE) binding.addButton.visibility = View.VISIBLE
+        if (feature.featureType != DataType.DISCRETE) binding.addButton.visibility = View.VISIBLE
         else binding.addButton.visibility = View.INVISIBLE
         indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
-        if (feature.featureType != FeatureType.DISCRETE) context?.showKeyboard()
+        if (feature.featureType != DataType.DISCRETE) context?.showKeyboard()
         else activity?.window?.hideKeyboard(view?.windowToken, 0)
         requireActivity().currentFocus?.clearFocus()
     }
@@ -305,7 +305,7 @@ class InputDataPointDialogViewModel : ViewModel() {
             val dataPointValue = when {
                 dataPointData?.value != null -> dataPointData.value
                 f.hasDefaultValue -> f.defaultValue
-                f.featureType == FeatureType.CONTINUOUS -> 1.0
+                f.featureType == DataType.CONTINUOUS -> 1.0
                 else -> 0.0
             }
             val dataPointLabel = dataPointData?.label

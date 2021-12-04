@@ -17,24 +17,30 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
-import com.samco.trackandgraph.database.entity.IDataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.database.entity.DataType
 import org.threeten.bp.OffsetDateTime
 
 data class AggregatedDataPoint(
     val timestamp: OffsetDateTime,
-    val featureId: Long,
     val parents: List<IDataPoint>,
-    val label: String = "",
-    val note: String = "",
 ) {
     fun toDataPoint(value: Double): IDataPoint {
-        return object : IDataPoint {
+        return object : IDataPoint() {
             override val timestamp = this@AggregatedDataPoint.timestamp
-            override val featureId = this@AggregatedDataPoint.featureId
+            override val dataType: DataType
+                get() {
+                    return when {
+                        parents.isEmpty() -> DataType.CONTINUOUS
+                        parents.all { it.dataType == parents[0].dataType } -> parents[0].dataType
+                        else -> DataType.CONTINUOUS
+                    }
+                }
             override val value = value
-            override val label = this@AggregatedDataPoint.label
+            override val label = ""
+
             //TODO we should probably combine notes in some way and pass them in here
-            override val note = this@AggregatedDataPoint.note
+            override val note = ""
         }
     }
 }
