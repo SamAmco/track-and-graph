@@ -38,8 +38,6 @@ class DataClippingFunction(
                 if (sampleDuration != null) endOfDuration.minus(sampleDuration)
                 else OffsetDateTime.MIN
 
-            //TODO can we write a test to make sure this doesn't drain the upstream if it doesn't
-            // need to
             yieldAll(dataSample
                 .dropWhile { it.timestamp > endOfDuration }
                 .takeWhile { it.timestamp >= startTime })
