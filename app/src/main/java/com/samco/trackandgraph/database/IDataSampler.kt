@@ -17,34 +17,8 @@
 
 package com.samco.trackandgraph.database
 
-import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 
 interface IDataSampler {
-    //TODO we should be able to get rid of these two functions and just have one that is backed by
-    // a cursor. Any other filtering on the returned data could be done with a function wrapper
-    // the same way it is done for clipping
-    fun getLastDataPointBetween(
-        dataSource: DataSource,
-        min: String,
-        max: String
-    ): IDataPoint?
-
-    fun getLastDataPointWithValue(
-        dataSource: DataSource,
-        values: List<Int>
-    ): IDataPoint?
-
-    fun getDataPointsBetween(
-        dataSource: DataSource,
-        min: String,
-        max: String
-    ): DataSample
-
-    fun getDataPointsWithValue(
-        dataSource: DataSource,
-        values: List<Int>
-    ): DataSample
-
     fun getDataPointsForDataSource(dataSource: DataSource): DataSample
 }

@@ -23,6 +23,9 @@ import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.functionslib.CompositeFunction
+import com.samco.trackandgraph.functionslib.DataClippingFunction
+import com.samco.trackandgraph.functionslib.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
@@ -31,7 +34,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<IDataPoint>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
         val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
             ?: return object : ITimeSinceViewData {
@@ -50,10 +53,9 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: TimeSinceLastStat,
-        onDataSampled: (List<IDataPoint>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
-        val dataPoint = getLastDataPoint(dataSource, config)
-        onDataSampled.invoke(dataPoint?.let { listOf(dataPoint) } ?: emptyList())
+        val dataPoint = getLastDataPoint(dataSource, config, onDataSampled)
         return object : ITimeSinceViewData {
             override val lastDataPoint: IDataPoint?
                 get() = dataPoint
@@ -64,29 +66,21 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         }
     }
 
-    private fun getLastDataPoint(
+    private suspend fun getLastDataPoint(
         dao: TrackAndGraphDatabaseDao,
-        timeSinceLastStat: TimeSinceLastStat
+        config: TimeSinceLastStat,
+        onDataSampled: (List<DataPoint>) -> Unit
     ): IDataPoint? {
-        //TODO need to revisit this
         val dataSampler = DataSamplerImpl(dao)
-        val dataSource = DataSource.FeatureDataSource(timeSinceLastStat.featureId)
+        val dataSource = DataSource.FeatureDataSource(config.featureId)
         val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
-        val first = dataSample.firstOrNull() ?: return null
-        return when (first.dataType) {
-            DataType.CONTINUOUS, DataType.DURATION -> {
-                dataSampler.getLastDataPointBetween(
-                    dataSource,
-                    timeSinceLastStat.fromValue,
-                    timeSinceLastStat.toValue
-                )
-            }
-            else -> {
-                dataSampler.getLastDataPointWithValue(
-                    dataSource,
-                    timeSinceLastStat.discreteValues
-                )
-            }
-        }
+        val sample = FilterValueFunction(
+            config.fromValue.toDouble(),
+            config.toValue.toDouble(),
+            config.discreteValues
+        ).mapSample(dataSample)
+        val first = sample.firstOrNull()
+        onDataSampled(sample.getRawDataPoints())
+        return first
     }
 }

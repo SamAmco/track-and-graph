@@ -17,11 +17,9 @@
 
 package com.samco.trackandgraph.database
 
-import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.functionslib.DataSample
-import org.threeten.bp.OffsetDateTime
 
 class DataSamplerImpl(private val dao: TrackAndGraphDatabaseDao) : IDataSampler {
     private fun getDataType(featureId: Long) = dao.getFeatureById(featureId).featureType
@@ -29,90 +27,7 @@ class DataSamplerImpl(private val dao: TrackAndGraphDatabaseDao) : IDataSampler 
     private fun emptyDataSample() = DataSample.fromSequence(emptySequence())
 
     private fun dataSampleFromDb(dataPoints: List<DataPoint>, dataType: DataType): DataSample {
-        return DataSample.fromSequence(dataPoints.asSequence().map { toIDataPoint(it, dataType) })
-    }
-
-    private fun toIDataPoint(dataPoint: DataPoint, dataType: DataType): IDataPoint {
-        return object : IDataPoint() {
-            override val timestamp = dataPoint.timestamp
-            override val dataType = dataType
-            override val value = dataPoint.value
-            override val label = dataPoint.label
-            override val note = dataPoint.note
-        }
-    }
-
-    override fun getLastDataPointBetween(
-        dataSource: DataSource,
-        min: String,
-        max: String
-    ): IDataPoint? {
-        return when (dataSource) {
-            is DataSource.FeatureDataSource -> {
-                val dataPoint = dao.getLastDataPointBetween(
-                    dataSource.featureId,
-                    min,
-                    max
-                )
-                if (dataPoint == null) {
-                    null
-                } else {
-                    val dataType = getDataType(dataSource.featureId)
-                    toIDataPoint(dataPoint, dataType)
-                }
-            }
-            //TODO implement function data source
-            is DataSource.FunctionDataSource -> null
-        }
-    }
-
-    override fun getLastDataPointWithValue(dataSource: DataSource, values: List<Int>): IDataPoint? {
-        return when (dataSource) {
-            is DataSource.FeatureDataSource -> {
-                val dataPoint = dao.getLastDataPointWithValue(
-                    dataSource.featureId,
-                    values
-                )
-                if (dataPoint == null) {
-                    null
-                } else {
-                    val dataType = getDataType(dataSource.featureId)
-                    toIDataPoint(dataPoint, dataType)
-                }
-            }
-            //TODO implement function data source
-            is DataSource.FunctionDataSource -> null
-        }
-    }
-
-    override fun getDataPointsBetween(
-        dataSource: DataSource,
-        min: String,
-        max: String
-    ): DataSample {
-        return when (dataSource) {
-            is DataSource.FeatureDataSource -> {
-                dataSampleFromDb(
-                    dao.getDataPointsBetween(dataSource.featureId, min, max),
-                    getDataType(dataSource.featureId)
-                )
-            }
-            //TODO implement function data source
-            is DataSource.FunctionDataSource -> emptyDataSample()
-        }
-    }
-
-    override fun getDataPointsWithValue(dataSource: DataSource, values: List<Int>): DataSample {
-        return when (dataSource) {
-            is DataSource.FeatureDataSource -> {
-                dataSampleFromDb(
-                    dao.getDataPointsWithValue(dataSource.featureId, values),
-                    getDataType(dataSource.featureId)
-                )
-            }
-            //TODO implement function data source
-            is DataSource.FunctionDataSource -> emptyDataSample()
-        }
+        return DataSample.fromList(dataPoints, dataType)
     }
 
     override fun getDataPointsForDataSource(dataSource: DataSource): DataSample {

@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.Dispatchers
@@ -35,14 +35,14 @@ abstract class ViewDataFactory<in I, out T : IGraphStatViewData> {
     protected abstract suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<IDataPoint>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): T
 
     protected abstract suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: I,
-        onDataSampled: (List<IDataPoint>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): T
 
     @Suppress("UNCHECKED_CAST")
@@ -50,7 +50,7 @@ abstract class ViewDataFactory<in I, out T : IGraphStatViewData> {
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: Any,
-        onDataSampled: (List<IDataPoint>) -> Unit = {}
+        onDataSampled: (List<DataPoint>) -> Unit = {}
     ): T =
         withContext(Dispatchers.IO) {
             return@withContext createViewData(dataSource, graphOrStat, config as I, onDataSampled)
@@ -59,7 +59,7 @@ abstract class ViewDataFactory<in I, out T : IGraphStatViewData> {
     suspend fun getViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<IDataPoint>) -> Unit = {}
+        onDataSampled: (List<DataPoint>) -> Unit = {}
     ): T =
         withContext(Dispatchers.IO) {
             return@withContext createViewData(dataSource, graphOrStat, onDataSampled)
