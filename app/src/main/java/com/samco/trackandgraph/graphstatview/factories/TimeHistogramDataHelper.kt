@@ -68,16 +68,14 @@ class TimeHistogramDataHelper(
      * the sum of their values
      */
     internal fun getHistogramBinsForSample(
-        sample: List<IDataPoint>,
+        sample: DataSample,
         window: TimeHistogramWindow,
         feature: Feature,
         sumByCount: Boolean,
     ): Map<Int, List<Double>>? {
-        if (sample.isEmpty()) return null
-        val endTime = getNextEndOfWindow(
-            window,
-            sample.maxBy { it.timestamp }!!.timestamp
-        )
+        val sampleList = sample.toList()
+        if (sampleList.isEmpty()) return null
+        val endTime = getNextEndOfWindow(window, sample.first().timestamp)
         val isDiscrete = feature.featureType == DataType.DISCRETE
         val keys =
             if (isDiscrete) feature.discreteValues.map { it.index }.toSet()
@@ -86,43 +84,33 @@ class TimeHistogramDataHelper(
         return when {
             isDiscrete && sumByCount ->
                 getHistogramBinsForSample(
-                    sample, window, keys, endTime,
+                    sampleList, window, keys, endTime,
                     ::addOneDiscreteValueToBin
                 )
             isDiscrete ->
                 getHistogramBinsForSample(
-                    sample, window, keys, endTime,
+                    sampleList, window, keys, endTime,
                     ::addDiscreteValueToBin
                 )
             sumByCount ->
                 getHistogramBinsForSample(
-                    sample, window, keys, endTime,
+                    sampleList, window, keys, endTime,
                     ::addOneToBin
                 )
             else ->
                 getHistogramBinsForSample(
-                    sample, window, keys, endTime,
+                    sampleList, window, keys, endTime,
                     ::addValueToBin
                 )
         }
     }
 
-    /**
-     * Get the end of the window with respect to the given endDate. For example if the window
-     * size is a week and the endDate is on a Wednesday then the returned date/time will be
-     * 00:00 on the following monday.
-     *
-     * If the endDate is null then the current date/time is used in its place
-     */
-    internal fun getNextEndOfWindow(
+    private fun getNextEndOfWindow(
         window: TimeHistogramWindow,
         endDate: OffsetDateTime?,
     ): ZonedDateTime {
         val end = endDate ?: OffsetDateTime.now()
-        return timeHelper.findBeginningOfTemporal(
-            end.plus(window.period),
-            window.period,
-        )
+        return timeHelper.findEndOfTemporal(end, window.period)
     }
 
 
@@ -152,8 +140,7 @@ class TimeHistogramDataHelper(
         var currEnd = endTime
         var currStart = currEnd - window.period
         var binned = 0
-        val reversed = sample.asReversed()
-        var nextPoint = reversed[0]
+        var nextPoint = sample[0]
         val timeOf = { dp: IDataPoint ->
             dp.timestamp.atZoneSameInstant(ZoneId.systemDefault())
         }
@@ -172,7 +159,7 @@ class TimeHistogramDataHelper(
                 if (binIndex == window.numBins) binIndex--
                 addFunction(nextPoint, binTotalMap, binIndex)
                 if (++binned == sample.size) break
-                nextPoint = reversed[binned]
+                nextPoint = sample[binned]
                 nextPointTime = timeOf(nextPoint)
             }
             currEnd -= window.period

@@ -36,7 +36,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewDat
 import com.samco.trackandgraph.functionslib.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.abs
@@ -50,65 +49,49 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: LineGraphWithFeatures,
-        onDataSampled: (List<IDataPoint>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData {
         val endTime = config.endDate ?: OffsetDateTime.now()
-        val allReferencedDataPoints = mutableListOf<IDataPoint>()
         val plottableData = generatePlottingData(
             dataSource,
             config,
-            allReferencedDataPoints,
-            endTime
+            endTime,
+            onDataSampled
         )
-        val hasPlottableData = plottableData.any { kvp -> kvp.value != null }
+        val hasPlottableData = plottableData
+            .any { kvp -> kvp.value != null }
 
-        val durationBasedRange =
-            config.features.any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
+        val durationBasedRange = config.features
+            .any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
         val (bounds, yAxisParameters) = getYAxisParameters(
             config,
             plottableData.values,
             durationBasedRange
         )
-        //val bounds = getBounds(config, plottableData.values)
-        //val yAxisParameters = getYAxisParameters(bounds, durationBasedRange)
-
-        onDataSampled(allReferencedDataPoints)
 
         return object : ILineGraphViewData {
-            override val durationBasedRange: Boolean
-                get() = durationBasedRange
-            override val yRangeType: YRangeType
-                get() = config.yRangeType
-            override val bounds: RectRegion
-                get() = bounds
-            override val hasPlottableData: Boolean
-                get() = hasPlottableData
-            override val endTime: OffsetDateTime
-                get() = endTime
-            override val plottableData: Map<LineGraphFeature, FastXYSeries?>
-                get() = plottableData
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.READY
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-            override val yAxisRangeParameters: Pair<StepMode, Double>
-                get() = yAxisParameters
+            override val durationBasedRange = durationBasedRange
+            override val yRangeType = config.yRangeType
+            override val bounds = bounds
+            override val hasPlottableData = hasPlottableData
+            override val endTime = endTime
+            override val plottableData = plottableData
+            override val state = IGraphStatViewData.State.READY
+            override val graphOrStat = graphOrStat
+            override val yAxisRangeParameters = yAxisParameters
         }
     }
 
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<IDataPoint>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData {
         val lineGraph = dataSource.getLineGraphByGraphStatId(graphOrStat.id)
             ?: return object : ILineGraphViewData {
-                override val state: IGraphStatViewData.State
-                    get() = IGraphStatViewData.State.ERROR
-                override val graphOrStat: GraphOrStat
-                    get() = graphOrStat
-                override val error: GraphStatInitException?
-                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
             }
         return createViewData(dataSource, graphOrStat, lineGraph, onDataSampled)
     }
@@ -116,23 +99,30 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
     private suspend fun generatePlottingData(
         dataSource: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
-        allReferencedDataPoints: MutableList<IDataPoint>,
-        endTime: OffsetDateTime
+        endTime: OffsetDateTime,
+        onDataSampled: (List<DataPoint>) -> Unit
     ): Map<LineGraphFeature, FastXYSeries?> {
-        return lineGraph.features.map { lgf ->
-            yield()
-            val plottingData =
-                tryGetPlottingData(dataSource, lineGraph, allReferencedDataPoints, lgf)
-            lgf to plottingData?.let { getXYSeriesFromDataPoints(it, endTime, lgf) }
-        }.toMap()
+        val dataSamples = mutableListOf<DataSample>()
+        val features = withContext(Dispatchers.IO) {
+            lineGraph.features.map { lgf ->
+                val dataSample = tryGetPlottingData(dataSource, lineGraph, lgf)
+                val dataPoints = dataSample.toList().asReversed()
+                val series = if (dataPoints.size >= 2) {
+                    dataSamples.add(dataSample)
+                    getXYSeriesFromDataPoints(dataPoints, endTime, lgf)
+                } else null
+                lgf to series
+            }.toMap()
+        }
+        onDataSampled(dataSamples.map { it.getRawDataPoints() }.flatten())
+        return features
     }
 
     private suspend fun tryGetPlottingData(
         dao: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
-        allReferencedDataPoints: MutableList<IDataPoint>,
         lineGraphFeature: LineGraphFeature
-    ): List<IDataPoint>? {
+    ): DataSample {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
         val rawDataSample = withContext(Dispatchers.IO) {
@@ -141,8 +131,6 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             dataSampler.getDataPointsForDataSource(dataSource)
         }
         val clippingCalculator = DataClippingFunction(lineGraph.endDate, lineGraph.duration)
-        val visibleSection = clippingCalculator.mapSample(rawDataSample)
-        allReferencedDataPoints.addAll(visibleSection)
 
         val timeHelper = TimeHelper(GlobalAggregationPreferences)
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
@@ -154,15 +142,8 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
             else -> MovingAverageFunction(movingAvDuration!!)
         }
-
-        val plottingData = withContext(Dispatchers.Default) {
-            CompositeFunction(aggregationCalculator, averageCalculator, clippingCalculator)
-                .mapSample(rawDataSample)
-                .toList()
-                .asReversed()
-        }
-
-        return if (plottingData.size >= 2) plottingData else null
+        return CompositeFunction(aggregationCalculator, averageCalculator, clippingCalculator)
+            .mapSample(rawDataSample)
     }
 
     private fun getXYSeriesFromDataPoints(

@@ -28,6 +28,7 @@ import org.threeten.bp.temporal.TemporalAmount
  * the end time and down to the start time. No clipping is performed here, so if the input sample is
  * larger than the given time range then the input sample will not be modified.
  */
+// TODO write tests around this
 class DataPaddingFunction : DataSampleFunction {
     private val timeHelper: TimeHelper
     private val endTime: OffsetDateTime
@@ -72,7 +73,8 @@ class DataPaddingFunction : DataSampleFunction {
         if (dataSample.dataSampleProperties.regularity == null) throw InvalidRegularityException()
         return DataSample.fromSequence(
             getSequence(dataSample, dataSample.dataSampleProperties.regularity),
-            dataSample.dataSampleProperties
+            dataSample.dataSampleProperties,
+            dataSample::getRawDataPoints
         )
     }
 

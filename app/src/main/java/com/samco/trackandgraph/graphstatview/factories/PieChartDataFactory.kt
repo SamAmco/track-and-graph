@@ -23,6 +23,7 @@ import com.samco.trackandgraph.database.DataSamplerImpl
 import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.GraphOrStat
 import com.samco.trackandgraph.database.entity.PieChart
 import com.samco.trackandgraph.functionslib.DataClippingFunction
@@ -36,16 +37,13 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<IDataPoint>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): IPieChartViewData {
         val pieChart = dataSource.getPieChartByGraphStatId(graphOrStat.id)
             ?: return object : IPieChartViewData {
-                override val state: IGraphStatViewData.State
-                    get() = IGraphStatViewData.State.ERROR
-                override val graphOrStat: GraphOrStat
-                    get() = graphOrStat
-                override val error: GraphStatInitException?
-                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
             }
         return createViewData(dataSource, graphOrStat, pieChart, onDataSampled)
     }
@@ -54,51 +52,40 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: PieChart,
-        onDataSampled: (List<IDataPoint>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): IPieChartViewData {
-        val plottingData = tryGetPlottableDataForPieChart(dataSource, config)
+        val plottingData = tryGetPlottableDataForPieChart(dataSource, config, onDataSampled)
             ?: return object : IPieChartViewData {
-                override val state: IGraphStatViewData.State
-                    get() = IGraphStatViewData.State.READY
-                override val graphOrStat: GraphOrStat
-                    get() = graphOrStat
-                override val segments: List<Segment>?
-                    get() = null
+                override val state = IGraphStatViewData.State.READY
+                override val graphOrStat = graphOrStat
             }
         val segments = getPieChartSegments(plottingData)
         val total = segments.sumByDouble { s -> s.value.toDouble() }
         val percentages = segments.map {
-            Segment(
-                it.title,
-                (it.value.toDouble() / total) * 100f
-            )
+            Segment(it.title, (it.value.toDouble() / total) * 100f)
         }
 
-        onDataSampled(plottingData)
-
         return object : IPieChartViewData {
-            override val segments: List<Segment>
-                get() = percentages
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.READY
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
+            override val segments = percentages
+            override val state = IGraphStatViewData.State.READY
+            override val graphOrStat = graphOrStat
         }
     }
 
     private suspend fun tryGetPlottableDataForPieChart(
         dao: TrackAndGraphDatabaseDao,
-        pieChart: PieChart
+        pieChart: PieChart,
+        onDataSampled: (List<DataPoint>) -> Unit
     ): List<IDataPoint>? {
         val feature = withContext(Dispatchers.IO) {
             dao.getFeatureById(pieChart.featureId)
         }
         val dataSampler = DataSamplerImpl(dao)
         val dataSource = DataSource.FeatureDataSource(feature.id)
-        val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
-        val dataPoints = DataClippingFunction(pieChart.endDate, pieChart.duration)
-            .mapSample(dataSample)
-            .toList()
+        val dataSample = DataClippingFunction(pieChart.endDate, pieChart.duration)
+            .mapSample(dataSampler.getDataPointsForDataSource(dataSource))
+        val dataPoints = dataSample.toList()
+        onDataSampled(dataSample.getRawDataPoints())
         return if (dataPoints.isNotEmpty()) dataPoints else null
     }
 
