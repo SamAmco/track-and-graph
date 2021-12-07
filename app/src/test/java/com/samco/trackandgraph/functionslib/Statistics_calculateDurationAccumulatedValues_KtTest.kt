@@ -17,14 +17,14 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.database.entity.DataType
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.threeten.bp.*
 import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.temporal.TemporalAdjuster
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 
@@ -53,13 +53,12 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 "2021-10-18T00:16:16.137+01:00",
                 "2021-10-11T08:08:16.310+01:00",
                 "2021-10-04T00:20:00.197+01:00"
-            ).map { DataPoint(toODT(it), 0L, 1.0, "", "") }
+            ).map { iDataPoint(toODT(it), 1.0, "", DataType.CONTINUOUS) }
             val rawData = DataSample.fromSequence(dataPoints.asSequence())
 
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
                 plotTotalTime
             ).mapSample(rawData)
                 .toList()
@@ -86,6 +85,14 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
         }
     }
 
+    private fun iDataPoint(time: OffsetDateTime, value: Double, label: String, dataType: DataType) =
+        object : IDataPoint() {
+            override val timestamp = time
+            override val value = value
+            override val label = label
+            override val dataType = dataType
+        }
+
     @Test
     fun calculateDurationAccumulatedValues_hourly_plot_totals() {
         runBlocking {
@@ -100,7 +107,6 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             val answer =
                 DurationAggregationFunction(
                     timeHelper,
-                    0L,
                     plotTotalTime
                 ).mapSample(rawData)
 
@@ -124,7 +130,6 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
                 plotTotalTime
             ).mapSample(rawData)
 
@@ -148,7 +153,6 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
                 plotTotalTime
             ).mapSample(rawData)
 
@@ -164,13 +168,12 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
         runBlocking {
             //GIVEN
             val plotTotalTime: TemporalAmount = Period.ofMonths(1)
-            val dataPoints = emptyList<DataPoint>()
+            val dataPoints = emptyList<IDataPoint>()
             val rawData = DataSample.fromSequence(dataPoints.asSequence())
 
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
                 plotTotalTime
             ).mapSample(rawData)
 
@@ -195,7 +198,6 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
                 plotTotalTime
             ).mapSample(rawData).toList()
 
@@ -220,7 +222,6 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
                 plotTotalTime
             ).mapSample(rawData)
 
@@ -261,7 +262,6 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             //WHEN
             val answer = DurationAggregationFunction(
                 timeHelper,
-                0L,
                 plotTotalTime,
             ).mapSample(rawData)
                 .toList()
@@ -290,19 +290,18 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
         endTime: OffsetDateTime,
         totalingPeriod: TemporalAmount,
         clusters: List<Int>
-    ): Sequence<DataPoint> {
-        val dataPoints = mutableListOf<DataPoint>()
+    ): Sequence<IDataPoint> {
+        val dataPoints = mutableListOf<IDataPoint>()
         var currentTime = endTime
         for (element in clusters) {
             for (y in 0 until element) {
                 val dataPointTime = currentTime.minusSeconds(y + 1L)
                 dataPoints.add(
-                    DataPoint(
+                    iDataPoint(
                         dataPointTime,
-                        0L,
                         1.0,
                         "",
-                        ""
+                        DataType.CONTINUOUS
                     )
                 )
             }
@@ -314,10 +313,10 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
     private fun generateDataPoints2(
         endTime: OffsetDateTime,
         points: List<Triple<DayOfWeek, Int, Double>>
-    ): Sequence<DataPoint> {
+    ): Sequence<IDataPoint> {
         var currentDay = endTime.withHour(0).withMinute(0).withSecond(0).withNano(0)
 
-        val output = mutableListOf<DataPoint>()
+        val output = mutableListOf<IDataPoint>()
 
         for (pointData in points) {
             val (dayOfWeek, timeInMinutes, value) = pointData
@@ -325,7 +324,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             currentDay = currentDay.with(TemporalAdjusters.previousOrSame(dayOfWeek))
             val timestamp = currentDay + Duration.ofMinutes(timeInMinutes.toLong())
 
-            output.add(DataPoint(timestamp, 0L, value, "", ""))
+            output.add(iDataPoint(timestamp, value, "Hi", DataType.DISCRETE))
         }
 
         return output.asSequence()

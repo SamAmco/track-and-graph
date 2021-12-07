@@ -17,7 +17,8 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.database.entity.DataType
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -230,7 +231,7 @@ class Statistics_clipDataSample_KtTest {
         val answer = DataClippingFunction(OffsetDateTime.now(), null).mapSample(dataSample)
 
         //THEN
-        assertEquals(emptyList<DataPoint>(), answer.toList())
+        assertEquals(emptyList<IDataPoint>(), answer.toList())
     }
 
     @Test
@@ -305,7 +306,7 @@ class Statistics_clipDataSample_KtTest {
         val answer = DataClippingFunction(now, sampleDuration).mapSample(dataSample)
 
         //THEN
-        assertEquals(emptyList<DataPoint>(), answer.toList())
+        assertEquals(emptyList<IDataPoint>(), answer.toList())
     }
 
     @Test
@@ -330,10 +331,13 @@ class Statistics_clipDataSample_KtTest {
         val answer = DataClippingFunction(now, sampleDuration).mapSample(dataSample)
 
         //THEN
-        assertEquals(emptyList<DataPoint>(), answer.toList())
+        assertEquals(emptyList<IDataPoint>(), answer.toList())
     }
 
-    private fun makedp(value: Double, timestamp: OffsetDateTime): DataPoint {
-        return DataPoint(timestamp, 0L, value, "", "")
+    private fun makedp(value: Double, timestamp: OffsetDateTime) = object: IDataPoint() {
+        override val timestamp = timestamp
+        override val dataType = DataType.CONTINUOUS
+        override val value = value
+        override val label = ""
     }
 }
