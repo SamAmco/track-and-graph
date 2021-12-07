@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
+import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.DataSampleProperties
 
@@ -31,25 +32,31 @@ internal abstract class AggregatedDataSample(
     companion object {
         fun fromSequence(
             data: Sequence<AggregatedDataPoint>,
-            dataSampleProperties: DataSampleProperties = DataSampleProperties()
+            dataSampleProperties: DataSampleProperties,
+            getRawDataPoints: () -> List<DataPoint>
         ): AggregatedDataSample {
             return object : AggregatedDataSample(dataSampleProperties) {
+                override fun getRawDataPoints() = getRawDataPoints.invoke()
                 override fun iterator(): Iterator<AggregatedDataPoint> = data.iterator()
             }
         }
     }
+
+    abstract fun getRawDataPoints(): List<DataPoint>
 
     fun average() = DataSample.fromSequence(
         this
             .filter { it.parents.isNotEmpty() }
             .map { it.toDataPoint(it.parents.map { par -> par.value }
             .average()) },
-        dataSampleProperties
+        dataSampleProperties,
+        this::getRawDataPoints
     )
 
     fun sum() = DataSample.fromSequence(
         this.map { it.toDataPoint(it.parents.sumOf { par -> par.value }) },
-        dataSampleProperties
+        dataSampleProperties,
+        this::getRawDataPoints
     )
 
 }

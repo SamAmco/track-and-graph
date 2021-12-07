@@ -33,11 +33,8 @@ class MovingAverageFunction(
     private val movingAvgDuration: Duration
 ) : DataSampleFunction {
     override suspend fun mapSample(dataSample: DataSample): DataSample {
-        return DataSample.fromSequence(
-            MovingAggregator(movingAvgDuration)
-                .aggregate(dataSample)
-                .average(),
-            dataSample.dataSampleProperties
-        )
+        return MovingAggregator(movingAvgDuration)
+            .aggregate(dataSample)
+            .average()
     }
 }

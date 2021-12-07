@@ -120,7 +120,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
 
     private suspend fun tryGetPlottingData(
         dao: TrackAndGraphDatabaseDao,
-        lineGraph: LineGraphWithFeatures,
+        config: LineGraphWithFeatures,
         lineGraphFeature: LineGraphFeature
     ): DataSample {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
@@ -130,14 +130,16 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
             val dataSource = DataSource.FeatureDataSource(lineGraphFeature.featureId)
             dataSampler.getDataPointsForDataSource(dataSource)
         }
-        val clippingCalculator = DataClippingFunction(lineGraph.endDate, lineGraph.duration)
+        val clippingCalculator = DataClippingFunction(config.endDate, config.duration)
 
         val timeHelper = TimeHelper(GlobalAggregationPreferences)
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
-            else -> DurationAggregationFunction(timeHelper, plottingPeriod!!)
+            else -> CompositeFunction(
+                DurationAggregationFunction(timeHelper, plottingPeriod!!),
+                DataPaddingFunction(timeHelper, config.endDate, config.duration)
+            )
         }
-        //TODO we need to pad the result of duration aggregation
         val averageCalculator = when (lineGraphFeature.averagingMode) {
             LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
             else -> MovingAverageFunction(movingAvDuration!!)

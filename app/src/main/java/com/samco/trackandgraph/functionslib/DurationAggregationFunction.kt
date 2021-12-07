@@ -45,11 +45,8 @@ class DurationAggregationFunction(
     private val binSize: TemporalAmount,
 ) : DataSampleFunction {
     override suspend fun mapSample(dataSample: DataSample): DataSample {
-        return DataSample.fromSequence(
-            FixedBinAggregator(timeHelper, binSize)
-                .aggregate(dataSample)
-                .sum(),
-            dataSample.dataSampleProperties
-        )
+        return FixedBinAggregator(timeHelper, binSize)
+            .aggregate(dataSample)
+            .sum()
     }
 }

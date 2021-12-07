@@ -33,7 +33,8 @@ internal class MovingAggregator(private val movingAggDuration: Duration) : DataA
     override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
         return AggregatedDataSample.fromSequence(
             getSequence(dataSample),
-            dataSample.dataSampleProperties
+            dataSample.dataSampleProperties,
+            dataSample::getRawDataPoints
         )
     }
 
