@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.functionslib.AggregationPreferences
 import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.TimeHelper
@@ -41,7 +42,7 @@ class TimeHistogramDataHelperTests {
         //GIVEN
         val month = OffsetDateTime.of(2020, 7, 1, 9, 0, 0, 0, ZoneOffset.UTC)
         val sample = makeDataSample(
-            IntProgression.fromClosedRange(6, 21, 1)
+            IntProgression.fromClosedRange(21, 6, -1)
                 .map { Pair(1.0, month.withDayOfMonth(it)) }
         )
         val window = TimeHistogramWindow.WEEK
@@ -50,7 +51,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -69,7 +70,7 @@ class TimeHistogramDataHelperTests {
         //GIVEN
         val start = OffsetDateTime.of(2020, 7, 1, 9, 0, 1, 0, ZoneOffset.UTC)
         val sample = makeDataSample(
-            IntProgression.fromClosedRange(0, 240 - 1, 1)
+            IntProgression.fromClosedRange(240-1, 0, -1)
                 .map { Pair((it % 3).toDouble(), start.plusMinutes(it.toLong())) }
         )
         val window = TimeHistogramWindow.HOUR
@@ -78,7 +79,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -126,7 +127,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -153,7 +154,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         Assert.assertNull(answer)
@@ -164,7 +165,7 @@ class TimeHistogramDataHelperTests {
         //GIVEN
         val month = OffsetDateTime.of(2020, 7, 1, 3, 30, 0, 0, ZoneOffset.UTC)
         val sample = makeDataSample(
-            IntProgression.fromClosedRange(7, 22, 1)
+            IntProgression.fromClosedRange(22, 7, -1)
                 .map { Pair(1.0, month.withDayOfMonth(it)) }
         )
         val window = TimeHistogramWindow.WEEK
@@ -180,7 +181,7 @@ class TimeHistogramDataHelperTests {
 
         //WHEN
         val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample.toList(), window, feature, sumByCount)
+            .getHistogramBinsForSample(sample, window, feature, sumByCount)
 
         //THEN
         answer!!
@@ -203,6 +204,13 @@ class TimeHistogramDataHelperTests {
 
     private fun makeDataSample(dataPoints: List<Pair<Double, OffsetDateTime>>) =
         DataSample.fromSequence(
-            dataPoints.map { DataPoint(it.second, 0L, it.first, "", "") }.asSequence()
+            dataPoints.map { makeDp(it.second, it.first) }.asSequence()
         )
+
+    private fun makeDp(timestamp: OffsetDateTime, value: Double) = object : IDataPoint() {
+        override val timestamp = timestamp
+        override val dataType = DataType.CONTINUOUS
+        override val value = value
+        override val label = ""
+    }
 }

@@ -89,7 +89,6 @@ abstract class DataSample(
                 override val dataType = dataType
                 override val value = dataPoint.value
                 override val label = dataPoint.label
-                override val note = dataPoint.note
             }
         }
     }

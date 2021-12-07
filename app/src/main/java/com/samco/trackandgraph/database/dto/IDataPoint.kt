@@ -27,7 +27,6 @@ abstract class IDataPoint {
     abstract val dataType: DataType
     abstract val value: Double
     abstract val label: String
-    abstract val note: String
 
     fun getDisplayValue(): String {
         return when (dataType) {
@@ -44,6 +43,5 @@ abstract class IDataPoint {
                 && this.dataType == other.dataType
                 && this.value == other.value
                 && this.label == other.label
-                && this.note == other.note
     }
 }
