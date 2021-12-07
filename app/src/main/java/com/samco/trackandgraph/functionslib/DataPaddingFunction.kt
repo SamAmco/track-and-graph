@@ -39,15 +39,15 @@ class DataPaddingFunction : DataSampleFunction {
 
     constructor(
         timeHelper: TimeHelper,
-        endTime: OffsetDateTime,
-        duration: TemporalAmount,
+        endTime: OffsetDateTime?,
+        duration: TemporalAmount?,
         defaultValue: Double = 0.0,
         defaultLabel: String = "",
         defaultDataType: DataType = DataType.CONTINUOUS
     ) {
         this.timeHelper = timeHelper
-        this.endTime = endTime
-        this.startTime = this.endTime.minus(duration)
+        this.endTime = endTime ?: OffsetDateTime.now()
+        this.startTime = duration?.let { this.endTime.minus(it) } ?: this.endTime
         this.defaultValue = defaultValue
         this.defaultLabel = defaultLabel
         this.defaultDataType = defaultDataType
@@ -55,15 +55,15 @@ class DataPaddingFunction : DataSampleFunction {
 
     constructor(
         timeHelper: TimeHelper,
-        endTime: OffsetDateTime,
-        startTime: OffsetDateTime,
+        endTime: OffsetDateTime?,
+        startTime: OffsetDateTime?,
         defaultValue: Double = 0.0,
         defaultLabel: String = "",
         defaultDataType: DataType = DataType.CONTINUOUS
     ) {
         this.timeHelper = timeHelper
-        this.endTime = endTime
-        this.startTime = startTime
+        this.endTime = endTime ?: OffsetDateTime.now()
+        this.startTime = startTime ?: OffsetDateTime.now()
         this.defaultValue = defaultValue
         this.defaultLabel = defaultLabel
         this.defaultDataType = defaultDataType
@@ -106,10 +106,18 @@ class DataPaddingFunction : DataSampleFunction {
         }
     }
 
+    //TODO test full generate empty data
+    //TODO test no end time
+    //TODO test no duration time
+    //TODO test end time and duration
+    //TODO test no end time or duration
+    //TODO test points fall on boundaries
+    //TODO test no duplicate points when padding data start or end
+
     private fun fullRange(period: TemporalAmount) = sequence {
-        val end = timeHelper.findEndOfTemporal(startTime, period)
-        var current = timeHelper.findEndOfTemporal(endTime, period).minus(period)
-        while (current >= end) {
+        var current = timeHelper.findBeginningOfTemporal(endTime, period)
+        val start = timeHelper.findEndOfTemporal(startTime, period)
+        while (current >= start) {
             yield(createDataPoint(current.toOffsetDateTime()))
             current = current.minus(period)
         }
