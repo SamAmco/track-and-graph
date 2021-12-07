@@ -128,7 +128,6 @@ class Statistics_calculateMovingAverages_KtTest {
     }
 
     @Test
-
     fun calculateMovingAverages_empty_data() {
         runBlocking {
             //GIVEN

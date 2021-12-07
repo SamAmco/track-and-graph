@@ -28,7 +28,6 @@ import org.threeten.bp.temporal.TemporalAmount
  * the end time and down to the start time. No clipping is performed here, so if the input sample is
  * larger than the given time range then the input sample will not be modified.
  */
-// TODO write tests around this
 class DataPaddingFunction : DataSampleFunction {
     private val timeHelper: TimeHelper
     private val endTime: OffsetDateTime
@@ -106,14 +105,6 @@ class DataPaddingFunction : DataSampleFunction {
         }
     }
 
-    //TODO test full generate empty data
-    //TODO test no end time
-    //TODO test no duration time
-    //TODO test end time and duration
-    //TODO test no end time or duration
-    //TODO test points fall on boundaries
-    //TODO test no duplicate points when padding data start or end
-
     private fun fullRange(period: TemporalAmount) = sequence {
         var current = timeHelper.findBeginningOfTemporal(endTime, period)
         val start = timeHelper.findEndOfTemporal(startTime, period)
@@ -128,6 +119,5 @@ class DataPaddingFunction : DataSampleFunction {
         override val dataType: DataType = defaultDataType
         override val value: Double = defaultValue
         override val label: String = defaultLabel
-        override val note: String = ""
     }
 }
