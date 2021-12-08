@@ -25,7 +25,6 @@ import com.samco.trackandgraph.database.entity.DataType
  * given discreteValues. Otherwise the data point will be checked to see if it is greater than
  * or equal to the fromValue and smaller than or equal to the toValue.
  */
-//TODO test this
 class FilterValueFunction(
     val fromValue: Double,
     val toValue: Double,

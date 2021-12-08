@@ -44,4 +44,12 @@ abstract class IDataPoint {
                 && this.value == other.value
                 && this.label == other.label
     }
+
+    override fun hashCode(): Int {
+        var result = timestamp.hashCode()
+        result = 31 * result + dataType.hashCode()
+        result = 31 * result + value.hashCode()
+        result = 31 * result + label.hashCode()
+        return result
+    }
 }
