@@ -38,9 +38,6 @@ data class AggregatedDataPoint(
                 }
             override val value = value
             override val label = ""
-
-            //TODO we should probably combine notes in some way and pass them in here
-            override val note = ""
         }
     }
 }

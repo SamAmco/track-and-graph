@@ -34,8 +34,7 @@ import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.functionslib.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.abs
@@ -101,21 +100,30 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         lineGraph: LineGraphWithFeatures,
         endTime: OffsetDateTime,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): Map<LineGraphFeature, FastXYSeries?> {
-        val dataSamples = mutableListOf<DataSample>()
-        val features = withContext(Dispatchers.IO) {
-            lineGraph.features.map { lgf ->
-                val dataSample = tryGetPlottingData(dataSource, lineGraph, lgf)
-                val dataPoints = dataSample.toList().asReversed()
-                val series = if (dataPoints.size >= 2) {
-                    dataSamples.add(dataSample)
-                    getXYSeriesFromDataPoints(dataPoints, endTime, lgf)
-                } else null
-                lgf to series
-            }.toMap()
+    ): Map<LineGraphFeature, FastXYSeries?> = coroutineScope {
+        withContext(Dispatchers.Default) {
+            //Create all the data samples in parallel (this shouldn't actually take long but why not)
+            val dataSamples = lineGraph.features.map { lgf ->
+                async { Pair(lgf, tryGetPlottingData(dataSource, lineGraph, lgf)) }
+            }.awaitAll()
+
+            //Generate the actual plotting data for each sample. This is the part that will take longer
+            // hence the parallelization
+            val features = dataSamples.map { pair ->
+                async {
+                    //Calling toList on the data sample evaluates it and causes the whole pipeline
+                    // to be processed
+                    val dataPoints = pair.second.toList().asReversed()
+                    val series = if (dataPoints.size >= 2) {
+                        getXYSeriesFromDataPoints(dataPoints, endTime, pair.first)
+                    } else null
+                    pair.first to series
+                }
+            }.awaitAll().toMap()
+            val rawDataPoints = dataSamples.map { it.second.getRawDataPoints() }.flatten()
+            withContext(Dispatchers.Main) { onDataSampled(rawDataPoints) }
+            return@withContext features
         }
-        onDataSampled(dataSamples.map { it.getRawDataPoints() }.flatten())
-        return features
     }
 
     private suspend fun tryGetPlottingData(

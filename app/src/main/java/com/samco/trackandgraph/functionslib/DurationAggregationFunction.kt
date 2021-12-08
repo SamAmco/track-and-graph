@@ -18,8 +18,6 @@
 package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.functionslib.aggregation.FixedBinAggregator
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
 /**
