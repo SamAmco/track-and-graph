@@ -47,7 +47,7 @@ class DataPaddingFunction_KtTest {
             val sample = DataSample.fromSequence(emptySequence())
 
             //WHEN
-            val dataPoints = DataPaddingFunction(defaultTimeHelper, null, null as TemporalAmount?)
+            DataPaddingFunction(defaultTimeHelper, null, null as TemporalAmount?)
                 .mapSample(sample)
                 .toList()
         }

@@ -26,7 +26,9 @@ import org.threeten.bp.temporal.TemporalAmount
 /**
  * Requires regular input. Makes sure that the output sample at least contains data up to
  * the end time and down to the start time. No clipping is performed here, so if the input sample is
- * larger than the given time range then the input sample will not be modified.
+ * larger than the given time range then the input sample will not be modified. If there is no data
+ * in the input sample then empty points will be created for the entire range. Default values for
+ * those data points can be optionally provided.
  */
 class DataPaddingFunction : DataSampleFunction {
     private val timeHelper: TimeHelper
