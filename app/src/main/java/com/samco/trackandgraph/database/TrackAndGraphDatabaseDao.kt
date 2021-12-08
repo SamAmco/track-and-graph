@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.database
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -169,6 +170,9 @@ interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
+
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
+    fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT 1")
     fun getLastDataPointForFeatureSync(featureId: Long): List<DataPoint>
