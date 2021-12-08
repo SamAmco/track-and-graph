@@ -17,24 +17,32 @@
 
 package com.samco.trackandgraph.database
 
+import android.database.Cursor
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.functionslib.DataSample
+import com.samco.trackandgraph.functionslib.DataSampleProperties
+import com.samco.trackandgraph.functionslib.cache
 
 class DataSamplerImpl(private val dao: TrackAndGraphDatabaseDao) : IDataSampler {
     private fun getDataType(featureId: Long) = dao.getFeatureById(featureId).featureType
 
     private fun emptyDataSample() = DataSample.fromSequence(emptySequence())
 
-    private fun dataSampleFromDb(dataPoints: List<DataPoint>, dataType: DataType): DataSample {
-        return DataSample.fromList(dataPoints, dataType)
+    private fun dataSampleFromDb(cursor: Cursor, dataType: DataType): DataSample {
+        val cursorSequence = DataPointCursorSequence(cursor, dataType)
+        return DataSample.fromSequence(
+            cursorSequence.cache(),
+            DataSampleProperties(),
+            cursorSequence::getRawDataPoints
+        )
     }
 
     override fun getDataPointsForDataSource(dataSource: DataSource): DataSample {
         return when (dataSource) {
             is DataSource.FeatureDataSource -> {
                 dataSampleFromDb(
-                    dao.getDataPointsForFeatureSync(dataSource.featureId),
+                    dao.getDataPointsCursorForFeatureSync(dataSource.featureId),
                     getDataType(dataSource.featureId)
                 )
             }
