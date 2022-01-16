@@ -23,8 +23,6 @@ import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
-import com.samco.trackandgraph.functionslib.CompositeFunction
-import com.samco.trackandgraph.functionslib.DataClippingFunction
 import com.samco.trackandgraph.functionslib.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -38,12 +36,9 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     ): ITimeSinceViewData {
         val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
             ?: return object : ITimeSinceViewData {
-                override val state: IGraphStatViewData.State
-                    get() = IGraphStatViewData.State.ERROR
-                override val graphOrStat: GraphOrStat
-                    get() = graphOrStat
-                override val error: GraphStatInitException?
-                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
 
             }
         return createViewData(dataSource, graphOrStat, timeSinceStat, onDataSampled)
@@ -55,14 +50,19 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         config: TimeSinceLastStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
-        val dataPoint = getLastDataPoint(dataSource, config, onDataSampled)
-        return object : ITimeSinceViewData {
-            override val lastDataPoint: IDataPoint?
-                get() = dataPoint
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.READY
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
+        return try {
+            val dataPoint = getLastDataPoint(dataSource, config, onDataSampled)
+            object : ITimeSinceViewData {
+                override val lastDataPoint = dataPoint
+                override val state = IGraphStatViewData.State.READY
+                override val graphOrStat = graphOrStat
+            }
+        } catch (throwable: Throwable) {
+            object : ITimeSinceViewData {
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = throwable
+            }
         }
     }
 

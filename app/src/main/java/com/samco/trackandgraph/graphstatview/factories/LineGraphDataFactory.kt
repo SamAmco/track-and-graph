@@ -50,34 +50,42 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         config: LineGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData {
-        val endTime = config.endDate ?: OffsetDateTime.now()
-        val plottableData = generatePlottingData(
-            dataSource,
-            config,
-            endTime,
-            onDataSampled
-        )
-        val hasPlottableData = plottableData
-            .any { kvp -> kvp.value != null }
+        try {
+            val endTime = config.endDate ?: OffsetDateTime.now()
+            val plottableData = generatePlottingData(
+                dataSource,
+                config,
+                endTime,
+                onDataSampled
+            )
+            val hasPlottableData = plottableData
+                .any { kvp -> kvp.value != null }
 
-        val durationBasedRange = config.features
-            .any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
-        val (bounds, yAxisParameters) = getYAxisParameters(
-            config,
-            plottableData.values,
-            durationBasedRange
-        )
+            val durationBasedRange = config.features
+                .any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
+            val (bounds, yAxisParameters) = getYAxisParameters(
+                config,
+                plottableData.values,
+                durationBasedRange
+            )
 
-        return object : ILineGraphViewData {
-            override val durationBasedRange = durationBasedRange
-            override val yRangeType = config.yRangeType
-            override val bounds = bounds
-            override val hasPlottableData = hasPlottableData
-            override val endTime = endTime
-            override val plottableData = plottableData
-            override val state = IGraphStatViewData.State.READY
-            override val graphOrStat = graphOrStat
-            override val yAxisRangeParameters = yAxisParameters
+            return object : ILineGraphViewData {
+                override val durationBasedRange = durationBasedRange
+                override val yRangeType = config.yRangeType
+                override val bounds = bounds
+                override val hasPlottableData = hasPlottableData
+                override val endTime = endTime
+                override val plottableData = plottableData
+                override val state = IGraphStatViewData.State.READY
+                override val graphOrStat = graphOrStat
+                override val yAxisRangeParameters = yAxisParameters
+            }
+        } catch (throwable: Throwable) {
+            return object : ILineGraphViewData {
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = throwable
+            }
         }
     }
 

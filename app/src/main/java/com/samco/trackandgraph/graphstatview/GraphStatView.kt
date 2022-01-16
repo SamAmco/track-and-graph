@@ -167,19 +167,18 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
                     decorator.update()
                 }
             } catch (throwable: Throwable) {
-                if (throwable !is GraphStatInitException) return@launch
                 onDecorateThrew(graphOrStat, throwable)
             }
         }
     }
 
-    private fun onDecorateThrew(graphOrStat: GraphOrStat?, exception: GraphStatInitException) {
+    private fun onDecorateThrew(graphOrStat: GraphOrStat?, throwable: Throwable) {
         cleanAllViews()
         currentDecorator = null
         val headerText = graphOrStat?.name ?: ""
         binding.headerText.text = headerText
         binding.errorMessage.visibility = View.VISIBLE
-        binding.errorMessage.text = context.getString(exception.errorTextId)
+        binding.errorMessage.text = ErrorMessageResolver(context).getErrorMessage(throwable)
         setDynamicViewHeight()
     }
 

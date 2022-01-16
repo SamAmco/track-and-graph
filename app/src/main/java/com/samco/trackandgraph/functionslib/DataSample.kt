@@ -19,7 +19,6 @@ package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DataType
 import org.threeten.bp.temporal.TemporalAmount
 
 data class DataSampleProperties(
@@ -60,15 +59,6 @@ abstract class DataSample(
             return object : DataSample(dataSampleProperties) {
                 override fun getRawDataPoints() = getRawDataPoints()
                 override fun iterator(): Iterator<IDataPoint> = data.iterator()
-            }
-        }
-
-        private fun toIDataPoint(dataPoint: DataPoint, dataType: DataType): IDataPoint {
-            return object : IDataPoint() {
-                override val timestamp = dataPoint.timestamp
-                override val dataType = dataType
-                override val value = dataPoint.value
-                override val label = dataPoint.label
             }
         }
     }
