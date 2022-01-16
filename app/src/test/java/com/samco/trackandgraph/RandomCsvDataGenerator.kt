@@ -11,11 +11,6 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
 class RandomCsvDataGenerator {
 
     data class LineData(val featureName: String, val featureValue: String)

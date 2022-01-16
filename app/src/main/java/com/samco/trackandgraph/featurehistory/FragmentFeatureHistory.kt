@@ -52,7 +52,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_feature_history, container, false
         )

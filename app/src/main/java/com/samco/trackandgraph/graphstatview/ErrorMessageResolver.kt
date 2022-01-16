@@ -15,28 +15,17 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview.factories.viewdto
+package com.samco.trackandgraph.graphstatview
 
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import android.content.Context
+import com.samco.trackandgraph.R
 
-interface IGraphStatViewData {
-    enum class State {
-        LOADING,
-        READY,
-        ERROR
-    }
-    val state: State
-    val graphOrStat: GraphOrStat
-    val error: Throwable?
-        get() = null
-
-    companion object {
-        fun loading(graphOrStat: GraphOrStat) = object: IGraphStatViewData {
-            override val state: State
-                get() = State.LOADING
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
+class ErrorMessageResolver(private val context: Context) {
+    fun getErrorMessage(throwable: Throwable): String {
+        when (throwable) {
+            is GraphStatInitException -> context.getString(throwable.errorTextId)
+            //TODO flesh this out with support for common functions exceptions
         }
+        return context.getString(R.string.graph_stat_validation_unknown)
     }
 }

@@ -23,7 +23,7 @@ import android.view.LayoutInflater
 import android.view.View
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.database.entity.PieChart
 import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.databinding.PieChartInputViewBinding
@@ -49,7 +49,7 @@ internal class PieChartConfigView @JvmOverloads constructor(
     }
 
     private fun discreteFeatures(): List<Feature> {
-        return allFeatures.filter { ftg -> ftg.featureType == FeatureType.DISCRETE }
+        return allFeatures.filter { ftg -> ftg.featureType == DataType.DISCRETE }
     }
 
     private fun getCurrentFeature(): Feature? {
@@ -68,7 +68,7 @@ internal class PieChartConfigView @JvmOverloads constructor(
         }
 
         listenToFeatureSpinner(this, binding.pieChartFeatureSpinner, configData.featureId, {
-            ftg -> ftg.featureType == FeatureType.DISCRETE
+            ftg -> ftg.featureType == DataType.DISCRETE
         }, {
             configData = configData.copy(featureId = it.id)
         })
@@ -92,7 +92,7 @@ internal class PieChartConfigView @JvmOverloads constructor(
             binding.pieChartFeatureSpinner.visibility = View.VISIBLE
         }
         val currFeature = getCurrentFeature()
-        if (currFeature == null || currFeature.featureType != FeatureType.DISCRETE) {
+        if (currFeature == null || currFeature.featureType != DataType.DISCRETE) {
             return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         }
         return null

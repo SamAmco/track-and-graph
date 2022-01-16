@@ -1,0 +1,1 @@
+Bug fix for plot totals wrong in some time zones

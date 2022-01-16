@@ -17,6 +17,55 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.entity.DataPointInterface
+import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
+import org.threeten.bp.temporal.TemporalAmount
 
-class DataSample(val dataPoints: List<DataPointInterface>)
+data class DataSampleProperties(
+    val regularity: TemporalAmount? = null
+)
+
+/**
+ * A sequence of data points in order from newest to oldest
+ */
+abstract class DataSample(
+    val dataSampleProperties: DataSampleProperties = DataSampleProperties()
+) : Sequence<IDataPoint> {
+    companion object {
+        /**
+         * Useful for testing purposes, but this form of data sample will not return any raw data
+         * when queried. You should use a sequence that supports [DataSample.getRawDataPoints]
+         * in production.
+         */
+        fun fromSequence(
+            data: Sequence<IDataPoint>,
+            dataSampleProperties: DataSampleProperties = DataSampleProperties()
+        ): DataSample {
+            return object : DataSample(dataSampleProperties) {
+                override fun getRawDataPoints() = emptyList<DataPoint>()
+                override fun iterator(): Iterator<IDataPoint> = data.iterator()
+            }
+        }
+
+        /**
+         * Return a DataSample from a sequence with the given properties and the given function
+         * for returning the raw data used.
+         */
+        fun fromSequence(
+            data: Sequence<IDataPoint>,
+            dataSampleProperties: DataSampleProperties = DataSampleProperties(),
+            getRawDataPoints: () -> List<DataPoint>
+        ): DataSample {
+            return object : DataSample(dataSampleProperties) {
+                override fun getRawDataPoints() = getRawDataPoints()
+                override fun iterator(): Iterator<IDataPoint> = data.iterator()
+            }
+        }
+    }
+
+    /**
+     * Get a list of all the raw data points that have been used so far to generate this
+     * data sample.
+     */
+    abstract fun getRawDataPoints(): List<DataPoint>
+}

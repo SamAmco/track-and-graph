@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.database.dto.NoteType
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
@@ -32,7 +32,7 @@ import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
 
 class NotesAdapter(
     private val featurePathProvider: FeaturePathProvider,
-    private val featureTypes: Map<Long, FeatureType>,
+    private val featureTypes: Map<Long, DataType>,
     private val weekDayNames: List<String>,
     private val clickListener: NoteClickListener
 ) : ListAdapter<GraphNote, NotesAdapter.ViewHolder>(
@@ -57,7 +57,7 @@ class NotesAdapter(
         private val binding: ListItemNoteBinding,
         private val featurePathProvider: FeaturePathProvider,
         private val weekDayNames: List<String>,
-        private val featureTypes: Map<Long, FeatureType>,
+        private val featureTypes: Map<Long, DataType>,
         private val clickListener: NoteClickListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -89,7 +89,7 @@ class NotesAdapter(
         private fun initFromDataPointNote() {
             val dataPoint = note!!.dataPoint!!
             binding.valueText.visibility = View.VISIBLE
-            val featureType = featureTypes.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
+            val featureType = featureTypes.getOrElse(dataPoint.featureId) { DataType.CONTINUOUS }
             binding.valueText.text = DataPoint.getDisplayValue(note!!.dataPoint!!, featureType)
             binding.featureNameText.visibility = View.VISIBLE
             binding.featureNameText.text = featurePathProvider.getPathForFeature(dataPoint.featureId)
@@ -103,7 +103,7 @@ class NotesAdapter(
                 parent: ViewGroup,
                 featurePathProvider: FeaturePathProvider,
                 weekDayNames: List<String>,
-                featureTypes: Map<Long, FeatureType>,
+                featureTypes: Map<Long, DataType>,
                 clickListener: NoteClickListener
             ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)

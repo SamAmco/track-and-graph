@@ -17,7 +17,8 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.database.entity.DataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.database.entity.DataType
 import org.junit.Assert
 import org.junit.Test
 import org.threeten.bp.Duration
@@ -29,16 +30,10 @@ class AverageTimeBetweenDataFactoryTest {
     fun test_returns_null_for_less_than_two_data_points_and_no_duration() {
         //PREPARE
         val dataPoints1 = listOf(
-            DataPoint(
-                OffsetDateTime.now(),
-                0L,
-                1.0,
-                "",
-                ""
-            )
+            unitDataPoint(OffsetDateTime.now())
         )
 
-        val dataPoints2 = emptyList<DataPoint>()
+        val dataPoints2 = emptyList<IDataPoint>()
 
         //EXECUTE
         val ans1 = AverageTimeBetweenDataFactory.calculateAverageTimeBetweenOrNull(
@@ -623,7 +618,10 @@ class AverageTimeBetweenDataFactoryTest {
         )
     }
 
-    private fun unitDataPoint(dt: OffsetDateTime) = DataPoint(
-        dt, 0L, 1.0, "", ""
-    )
+    private fun unitDataPoint(timestamp: OffsetDateTime) = object : IDataPoint() {
+        override val timestamp = timestamp
+        override val dataType = DataType.CONTINUOUS
+        override val value = 1.0
+        override val label = ""
+    }
 }

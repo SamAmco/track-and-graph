@@ -23,18 +23,18 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinuteWeekDayTwoLines
 
 class DataPointAdapter(
     private val clickListener: DataPointClickListener,
     private val weekDayNames: List<String>,
-    private val featureType: FeatureType
+    private val dataType: DataType
 ) : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(DataPointDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, clickListener, weekDayNames, featureType)
+        return ViewHolder.from(parent, clickListener, weekDayNames, dataType)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -46,11 +46,11 @@ class DataPointAdapter(
         private val binding: ListItemDataPointBinding,
         private val clickListener: DataPointClickListener,
         private val weekDayNames: List<String>,
-        private val featureType: FeatureType
+        private val dataType: DataType
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(dataPoint: DataPoint) {
-            binding.valueText.text = DataPoint.getDisplayValue(dataPoint, featureType)
+            binding.valueText.text = DataPoint.getDisplayValue(dataPoint, dataType)
             binding.timestampText.text = formatDayMonthYearHourMinuteWeekDayTwoLines(
                 binding.timestampText.context,
                 weekDayNames,
@@ -75,11 +75,11 @@ class DataPointAdapter(
                 parent: ViewGroup,
                 clickListener: DataPointClickListener,
                 weekDayNames: List<String>,
-                featureType: FeatureType
+                dataType: DataType
             ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemDataPointBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding, clickListener, weekDayNames, featureType)
+                return ViewHolder(binding, clickListener, weekDayNames, dataType)
             }
         }
     }
@@ -87,7 +87,7 @@ class DataPointAdapter(
 
 class DataPointDiffCallback : DiffUtil.ItemCallback<DataPoint>() {
     override fun areItemsTheSame(oldItem: DataPoint, newItem: DataPoint) =
-        oldItem.timestamp == newItem.timestamp && oldItem.featureId == newItem.featureId
+        oldItem.timestamp == newItem.timestamp
 
     override fun areContentsTheSame(oldItem: DataPoint, newItem: DataPoint) = oldItem == newItem
 }

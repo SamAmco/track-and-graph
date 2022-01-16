@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.database.entity.TimeHistogram
 import com.samco.trackandgraph.database.entity.TimeHistogramWindow
 import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
