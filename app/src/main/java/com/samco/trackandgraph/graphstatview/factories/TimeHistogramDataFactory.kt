@@ -51,26 +51,35 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         config: TimeHistogram,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
-        val discreteValue = getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
-        val timeHistogramDataHelper =
-            TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
-        val barValues =
-            getBarValues(dataSource, config, onDataSampled, timeHistogramDataHelper)
-        val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.values?.toList())
-        val maxDisplayHeight = largestBin?.let {
-            min(
-                it.times(10.0).toInt().plus(1).div(10.0),
-                1.0
-            )
-        }
+        return try {
+            val discreteValue =
+                getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
+            val timeHistogramDataHelper =
+                TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
+            val barValues =
+                getBarValues(dataSource, config, onDataSampled, timeHistogramDataHelper)
+            val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.values?.toList())
+            val maxDisplayHeight = largestBin?.let {
+                min(
+                    it.times(10.0).toInt().plus(1).div(10.0),
+                    1.0
+                )
+            }
 
-        return object : ITimeHistogramViewData {
-            override val state = IGraphStatViewData.State.READY
-            override val graphOrStat = graphOrStat
-            override val window = config.window
-            override val discreteValues = discreteValue
-            override val barValues = barValues
-            override val maxDisplayHeight = maxDisplayHeight
+            object : ITimeHistogramViewData {
+                override val state = IGraphStatViewData.State.READY
+                override val graphOrStat = graphOrStat
+                override val window = config.window
+                override val discreteValues = discreteValue
+                override val barValues = barValues
+                override val maxDisplayHeight = maxDisplayHeight
+            }
+        } catch (throwable: Throwable) {
+            object : ITimeHistogramViewData {
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = throwable
+            }
         }
     }
 

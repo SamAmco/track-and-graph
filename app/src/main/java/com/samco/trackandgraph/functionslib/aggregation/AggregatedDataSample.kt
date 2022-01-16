@@ -47,8 +47,7 @@ internal abstract class AggregatedDataSample(
     fun average() = DataSample.fromSequence(
         this
             .filter { it.parents.isNotEmpty() }
-            .map { it.toDataPoint(it.parents.map { par -> par.value }
-            .average()) },
+            .map { it.toDataPoint(it.parents.map { par -> par.value }.average()) },
         dataSampleProperties,
         this::getRawDataPoints
     )

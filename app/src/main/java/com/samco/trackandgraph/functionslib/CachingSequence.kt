@@ -41,7 +41,6 @@ class CachingSequence<T>(sequence: Sequence<T>) : Sequence<T> {
                     next
                 }
             }
-
         }
     }
 }

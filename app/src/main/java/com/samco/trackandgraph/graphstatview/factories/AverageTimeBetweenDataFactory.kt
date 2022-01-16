@@ -88,26 +88,34 @@ class AverageTimeBetweenDataFactory :
         config: AverageTimeBetweenStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
-        val feature = dataSource.getFeatureById(config.featureId)
-        val dataSampler = DataSamplerImpl(dataSource)
-        val dataSample = withContext(Dispatchers.IO) {
-            getRelevantDataPoints(dataSampler, config, feature)
-        }
-        val dataPoints = dataSample.toList()
-        val averageMillis = withContext(Dispatchers.Default) {
-            calculateAverageTimeBetweenOrNull(
-                OffsetDateTime.now(),
-                config.endDate,
-                config.duration,
-                dataPoints
-            )
-        } ?: return notEnoughData(graphOrStat)
-        onDataSampled(dataSample.getRawDataPoints())
-        return object : IAverageTimeBetweenViewData {
-            override val state = IGraphStatViewData.State.READY
-            override val graphOrStat = graphOrStat
-            override val averageMillis = averageMillis
-            override val hasEnoughData = true
+        return try {
+            val feature = dataSource.getFeatureById(config.featureId)
+            val dataSampler = DataSamplerImpl(dataSource)
+            val dataSample = withContext(Dispatchers.IO) {
+                getRelevantDataPoints(dataSampler, config, feature)
+            }
+            val dataPoints = dataSample.toList()
+            val averageMillis = withContext(Dispatchers.Default) {
+                calculateAverageTimeBetweenOrNull(
+                    OffsetDateTime.now(),
+                    config.endDate,
+                    config.duration,
+                    dataPoints
+                )
+            } ?: return notEnoughData(graphOrStat)
+            onDataSampled(dataSample.getRawDataPoints())
+            object : IAverageTimeBetweenViewData {
+                override val state = IGraphStatViewData.State.READY
+                override val graphOrStat = graphOrStat
+                override val averageMillis = averageMillis
+                override val hasEnoughData = true
+            }
+        } catch (throwable: Throwable) {
+            object : IAverageTimeBetweenViewData {
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = throwable
+            }
         }
     }
 

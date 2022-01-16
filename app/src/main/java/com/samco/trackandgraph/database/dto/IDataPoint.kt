@@ -24,6 +24,8 @@ import org.threeten.bp.OffsetDateTime
 
 abstract class IDataPoint {
     abstract val timestamp: OffsetDateTime
+    //TODO I kind of think this is wrong. Ideally a data point can have any value and any label
+    // and we don't distinguish between what kind of data point it is.
     abstract val dataType: DataType
     abstract val value: Double
     abstract val label: String

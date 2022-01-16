@@ -54,21 +54,29 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
         config: PieChart,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IPieChartViewData {
-        val plottingData = tryGetPlottableDataForPieChart(dataSource, config, onDataSampled)
-            ?: return object : IPieChartViewData {
+        return try {
+            val plottingData = tryGetPlottableDataForPieChart(dataSource, config, onDataSampled)
+                ?: return object : IPieChartViewData {
+                    override val state = IGraphStatViewData.State.READY
+                    override val graphOrStat = graphOrStat
+                }
+            val segments = getPieChartSegments(plottingData)
+            val total = segments.sumByDouble { s -> s.value.toDouble() }
+            val percentages = segments.map {
+                Segment(it.title, (it.value.toDouble() / total) * 100f)
+            }
+
+            object : IPieChartViewData {
+                override val segments = percentages
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
             }
-        val segments = getPieChartSegments(plottingData)
-        val total = segments.sumByDouble { s -> s.value.toDouble() }
-        val percentages = segments.map {
-            Segment(it.title, (it.value.toDouble() / total) * 100f)
-        }
-
-        return object : IPieChartViewData {
-            override val segments = percentages
-            override val state = IGraphStatViewData.State.READY
-            override val graphOrStat = graphOrStat
+        } catch (throwable: Throwable) {
+            object : IPieChartViewData {
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = throwable
+            }
         }
     }
 
