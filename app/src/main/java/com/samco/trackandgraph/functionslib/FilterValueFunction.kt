@@ -17,24 +17,27 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.functionslib.aggregation.MovingAggregator
-import org.threeten.bp.Duration
+import com.samco.trackandgraph.database.entity.DataType
 
 /**
- * Calculate the moving averages of all of the data points given over the moving average duration given.
- * A new DataSample will be returned with one data point for every data point in the input set whose
- * timestamp shall be the same but value will be equal to the average of it and all previous data points
- * within the movingAvDuration.
- *
- * The data points in the input sample are expected to be in date order with the oldest data points
- * earliest in the list
+ * A function that will filter all data points in the given input sample and return only those that
+ * match the given constraints. Any data point that is marked as discrete will be checked against the
+ * given discreteValues. Otherwise the data point will be checked to see if it is greater than
+ * or equal to the fromValue and smaller than or equal to the toValue.
  */
-class MovingAverageFunction(
-    private val movingAvgDuration: Duration
+class FilterValueFunction(
+    val fromValue: Double,
+    val toValue: Double,
+    val discreteValues: List<Int>
 ) : DataSampleFunction {
     override suspend fun mapSample(dataSample: DataSample): DataSample {
-        return MovingAggregator(movingAvgDuration)
-            .aggregate(dataSample)
-            .average()
+        return DataSample.fromSequence(
+            dataSample.filter {
+                if (it.dataType == DataType.DISCRETE) it.value.toInt() in discreteValues
+                else it.value in fromValue..toValue
+            },
+            dataSample.dataSampleProperties,
+            dataSample::getRawDataPoints
+        )
     }
 }

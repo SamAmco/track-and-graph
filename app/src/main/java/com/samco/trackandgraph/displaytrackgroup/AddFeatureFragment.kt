@@ -48,7 +48,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -64,9 +64,9 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     private val viewModel by viewModels<AddFeatureViewModel>()
     private var navController: NavController? = null
     private val featureTypeList = listOf(
-        FeatureType.DISCRETE,
-        FeatureType.CONTINUOUS,
-        FeatureType.DURATION
+        DataType.DISCRETE,
+        DataType.CONTINUOUS,
+        DataType.DURATION
     )
 
     override fun onCreateView(
@@ -236,7 +236,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     private fun updateDefaultValuesViewFromViewModel(checked: Boolean) {
         if (checked) {
             when (viewModel.featureType.value) {
-                FeatureType.DISCRETE -> {
+                DataType.DISCRETE -> {
                     if (currentDefaultValueIsInvalidDiscreteValue()) {
                         viewModel.featureDefaultValue.value = 0.0
                     }
@@ -245,13 +245,13 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
                     binding.defaultNumericalInput.visibility = View.GONE
                     binding.defaultDurationInput.visibility = View.GONE
                 }
-                FeatureType.CONTINUOUS -> {
+                DataType.CONTINUOUS -> {
                     binding.defaultNumericalInput.setText(viewModel.featureDefaultValue.value!!.toString())
                     binding.defaultDiscreteScrollView.visibility = View.GONE
                     binding.defaultNumericalInput.visibility = View.VISIBLE
                     binding.defaultDurationInput.visibility = View.GONE
                 }
-                FeatureType.DURATION -> {
+                DataType.DURATION -> {
                     binding.defaultDurationInput.setTimeInSeconds(viewModel.featureDefaultValue.value!!.toLong())
                     binding.defaultDiscreteScrollView.visibility = View.GONE
                     binding.defaultNumericalInput.visibility = View.GONE
@@ -389,7 +389,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     private fun validateForm() {
         var errorSet = false
         val discreteValueStrings = viewModel.discreteValues
-        if (viewModel.featureType.value!! == FeatureType.DISCRETE) {
+        if (viewModel.featureType.value!! == DataType.DISCRETE) {
             if (discreteValueStrings.isNullOrEmpty() || discreteValueStrings.size < 2) {
                 setErrorText(getString(R.string.discrete_feature_needs_at_least_two_values))
                 errorSet = true
@@ -477,11 +477,11 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
     private fun updateDurationNumericConversionUI() {
         val durationToNumeric = viewModel.updateMode
-                && viewModel.existingFeature?.featureType == FeatureType.DURATION
-                && viewModel.featureType.value == FeatureType.CONTINUOUS
+                && viewModel.existingFeature?.featureType == DataType.DURATION
+                && viewModel.featureType.value == DataType.CONTINUOUS
         val numericToDuration = viewModel.updateMode
-                && viewModel.existingFeature?.featureType == FeatureType.CONTINUOUS
-                && viewModel.featureType.value == FeatureType.DURATION
+                && viewModel.existingFeature?.featureType == DataType.CONTINUOUS
+                && viewModel.featureType.value == DataType.DURATION
         binding.durationToNumericModeHeader.visibility =
             if (durationToNumeric) View.VISIBLE else View.GONE
         binding.numericToDurationModeHeader.visibility =
@@ -490,18 +490,18 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
             if (durationToNumeric || numericToDuration) View.VISIBLE else View.GONE
     }
 
-    private fun onFeatureTypeChanged(featureType: FeatureType) {
+    private fun onFeatureTypeChanged(featureType: DataType) {
         showOnFeatureTypeUpdatedMessage(featureType)
         updateDurationNumericConversionUI()
         updateDefaultValuesViewFromViewModel(viewModel.featureHasDefaultValue.value!!)
-        val vis = if (featureType == FeatureType.DISCRETE) View.VISIBLE else View.GONE
+        val vis = if (featureType == DataType.DISCRETE) View.VISIBLE else View.GONE
         binding.discreteValuesTextView.visibility = vis
         binding.discreteValues.visibility = vis
         binding.addDiscreteValueButton.visibility = vis
         validateForm()
     }
 
-    private fun showOnFeatureTypeUpdatedMessage(newType: FeatureType) {
+    private fun showOnFeatureTypeUpdatedMessage(newType: DataType) {
         val oldType = viewModel.existingFeature?.featureType
         if (viewModel.updateMode && oldType != null && oldType != newType) {
             val message = getOnDataTypeChangedMessage(oldType, newType)
@@ -516,11 +516,11 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         }
     }
 
-    private fun getOnDataTypeChangedMessage(oldType: FeatureType, newType: FeatureType): String? {
+    private fun getOnDataTypeChangedMessage(oldType: DataType, newType: DataType): String? {
         return when (oldType) {
-            FeatureType.DISCRETE -> when (newType) {
-                FeatureType.DISCRETE -> null
-                FeatureType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
+            DataType.DISCRETE -> when (newType) {
+                DataType.DISCRETE -> null
+                DataType.CONTINUOUS -> getString(R.string.on_feature_type_change_numerical_warning)
                 else -> null
             }
             else -> null
@@ -546,7 +546,7 @@ class AddFeatureViewModel : ViewModel() {
 
     var featureName = ""
     var featureDescription = ""
-    val featureType = MutableLiveData(FeatureType.DISCRETE)
+    val featureType = MutableLiveData(DataType.DISCRETE)
     val durationNumericConversionMode = MutableLiveData(DurationNumericConversionMode.HOURS)
     val featureHasDefaultValue = MutableLiveData(false)
     val featureDefaultValue = MutableLiveData(1.0)
@@ -599,7 +599,7 @@ class AddFeatureViewModel : ViewModel() {
         }
     }
 
-    fun isFeatureTypeEnabled(type: FeatureType): Boolean {
+    fun isFeatureTypeEnabled(type: DataType): Boolean {
         if (!updateMode) return true
         // disc -> cont Y
         // disc -> dur N
@@ -608,12 +608,12 @@ class AddFeatureViewModel : ViewModel() {
         // dur -> disc N
         // dur -> cont Y
         return when (type) {
-            FeatureType.DISCRETE -> existingFeature!!.featureType == FeatureType.DISCRETE
-            FeatureType.CONTINUOUS -> existingFeature!!.featureType == FeatureType.DURATION
-                    || existingFeature!!.featureType == FeatureType.DISCRETE
-                    || existingFeature!!.featureType == FeatureType.CONTINUOUS
-            FeatureType.DURATION -> existingFeature!!.featureType == FeatureType.CONTINUOUS
-                    || existingFeature!!.featureType == FeatureType.DURATION
+            DataType.DISCRETE -> existingFeature!!.featureType == DataType.DISCRETE
+            DataType.CONTINUOUS -> existingFeature!!.featureType == DataType.DURATION
+                    || existingFeature!!.featureType == DataType.DISCRETE
+                    || existingFeature!!.featureType == DataType.CONTINUOUS
+            DataType.DURATION -> existingFeature!!.featureType == DataType.CONTINUOUS
+                    || existingFeature!!.featureType == DataType.DURATION
         }
     }
 
@@ -659,17 +659,17 @@ class AddFeatureViewModel : ViewModel() {
 
     private fun updateAllExistingDataPointsForTransformation(valOfDiscVal: (MutableLabel) -> Int) {
         when (existingFeature!!.featureType) {
-            FeatureType.DISCRETE -> when (featureType.value) {
-                FeatureType.CONTINUOUS -> stripDataPointsToValue()
-                FeatureType.DISCRETE -> updateDiscreteValueDataPoints(valOfDiscVal)
+            DataType.DISCRETE -> when (featureType.value) {
+                DataType.CONTINUOUS -> stripDataPointsToValue()
+                DataType.DISCRETE -> updateDiscreteValueDataPoints(valOfDiscVal)
                 else -> run {}
             }
-            FeatureType.CONTINUOUS -> when (featureType.value) {
-                FeatureType.DURATION -> updateContinuousDataPointsToDurations()
+            DataType.CONTINUOUS -> when (featureType.value) {
+                DataType.DURATION -> updateContinuousDataPointsToDurations()
                 else -> run {}
             }
-            FeatureType.DURATION -> when (featureType.value) {
-                FeatureType.CONTINUOUS -> updateDurationDataPointsToContinuous()
+            DataType.DURATION -> when (featureType.value) {
+                DataType.CONTINUOUS -> updateDurationDataPointsToContinuous()
                 else -> run {}
             }
         }

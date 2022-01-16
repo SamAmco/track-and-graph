@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.functionslib.AggregationPreferences
 import com.samco.trackandgraph.functionslib.DataSample
 import com.samco.trackandgraph.functionslib.TimeHelper
@@ -27,13 +28,12 @@ import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
-import kotlin.random.Random
 
 class TimeHistogramDataHelperTests {
     private val timeHelper = TimeHelper(
         object : AggregationPreferences {
             override val firstDayOfWeek = DayOfWeek.MONDAY
-            override val startTimeOfDay = Duration.ofSeconds(0)
+            override val startTimeOfDay = Duration.ZERO
         }
     )
 
@@ -42,11 +42,11 @@ class TimeHistogramDataHelperTests {
         //GIVEN
         val month = OffsetDateTime.of(2020, 7, 1, 9, 0, 0, 0, ZoneOffset.UTC)
         val sample = makeDataSample(
-            IntProgression.fromClosedRange(6, 21, 1)
+            IntProgression.fromClosedRange(21, 6, -1)
                 .map { Pair(1.0, month.withDayOfMonth(it)) }
         )
         val window = TimeHistogramWindow.WEEK
-        val feature = makeFeature(FeatureType.CONTINUOUS)
+        val feature = makeFeature(DataType.CONTINUOUS)
         val sumByCount = false
 
         //WHEN
@@ -66,47 +66,15 @@ class TimeHistogramDataHelperTests {
     }
 
     @Test
-    fun test_getHistogramBinsForSample_sumByCount_month_cont() {
-        //GIVEN
-        val start = OffsetDateTime.of(2020, 7, 1, 9, 0, 0, 0, ZoneOffset.UTC)
-        val sample = makeDataSample(
-            IntProgression.fromClosedRange(0, 40, 2)
-                .map { Pair(Random.nextDouble(), start.plusDays(it.toLong())) }
-        )
-        val window = TimeHistogramWindow.MONTH
-        val feature = makeFeature(FeatureType.CONTINUOUS)
-        val sumByCount = true
-
-        //WHEN
-        val answer = TimeHistogramDataHelper(timeHelper)
-            .getHistogramBinsForSample(sample, window, feature, sumByCount)
-
-        //THEN
-        answer!!
-        Assert.assertEquals(1, answer.keys.size)
-        val vals = answer[0] ?: error("Key 0 not found")
-        Assert.assertEquals(30, vals.size)
-        val total = 21.0
-        val expected = listOf(
-            1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0,
-            1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1
-        )
-        Assert.assertEquals(
-            expected.map { it.toDouble() / total },
-            vals
-        )
-    }
-
-    @Test
     fun test_getHistogramBinsForSample_sumByVal_hour_disc() {
         //GIVEN
         val start = OffsetDateTime.of(2020, 7, 1, 9, 0, 1, 0, ZoneOffset.UTC)
         val sample = makeDataSample(
-            IntProgression.fromClosedRange(0, 240 - 1, 1)
+            IntProgression.fromClosedRange(240-1, 0, -1)
                 .map { Pair((it % 3).toDouble(), start.plusMinutes(it.toLong())) }
         )
         val window = TimeHistogramWindow.HOUR
-        val feature = makeFeature(FeatureType.DISCRETE, listOf(0, 1, 2))
+        val feature = makeFeature(DataType.DISCRETE, listOf(0, 1, 2))
         val sumByCount = false
 
         //WHEN
@@ -154,7 +122,7 @@ class TimeHistogramDataHelperTests {
                 .map { Pair((it % 2).toDouble(), start.plusMonths((it.toLong() * 5) % 12)) }
         )
         val window = TimeHistogramWindow.YEAR
-        val feature = makeFeature(FeatureType.DISCRETE, listOf(0, 1))
+        val feature = makeFeature(DataType.DISCRETE, listOf(0, 1))
         val sumByCount = true
 
         //WHEN
@@ -179,9 +147,9 @@ class TimeHistogramDataHelperTests {
     @Test
     fun test_getHistogramBinsForSample_no_data() {
         //GIVEN
-        val sample = DataSample(emptyList())
+        val sample = DataSample.fromSequence(emptySequence())
         val window = TimeHistogramWindow.HOUR
-        val feature = makeFeature(FeatureType.CONTINUOUS)
+        val feature = makeFeature(DataType.CONTINUOUS)
         val sumByCount = false
 
         //WHEN
@@ -194,16 +162,14 @@ class TimeHistogramDataHelperTests {
 
     @Test
     fun test_getHistogramBinsForSample_sumByVal_week_cont_StartTime() {
-        // Same test as above, but the points are all one day later but before 4 AM so the result is the same
-
         //GIVEN
         val month = OffsetDateTime.of(2020, 7, 1, 3, 30, 0, 0, ZoneOffset.UTC)
         val sample = makeDataSample(
-            IntProgression.fromClosedRange(7, 22, 1)
+            IntProgression.fromClosedRange(22, 7, -1)
                 .map { Pair(1.0, month.withDayOfMonth(it)) }
         )
         val window = TimeHistogramWindow.WEEK
-        val feature = makeFeature(FeatureType.CONTINUOUS)
+        val feature = makeFeature(DataType.CONTINUOUS)
         val sumByCount = false
 
         val timeHelper = TimeHelper(
@@ -222,15 +188,13 @@ class TimeHistogramDataHelperTests {
         Assert.assertEquals(1, answer.keys.size)
         val vals = answer[0] ?: error("Key 0 not found")
         Assert.assertEquals(7, vals.size)
-        val total = 3 + 3 + 2 + 2 + 2 + 2 + 2.0
-        Assert.assertEquals(
-            listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total),
-            vals
-        )
+        val expected = listOf(2, 3, 3, 2, 2, 2, 2)
+        val total = expected.sum().toDouble()
+        Assert.assertEquals(expected.map { it / total }, vals)
     }
 
     private fun makeFeature(
-        featureType: FeatureType,
+        featureType: DataType,
         discreteValues: List<Int> = listOf()
     ) =
         Feature(
@@ -239,7 +203,14 @@ class TimeHistogramDataHelperTests {
         )
 
     private fun makeDataSample(dataPoints: List<Pair<Double, OffsetDateTime>>) =
-        DataSample(
-            dataPoints.map { DataPoint(it.second, 0L, it.first, "", "") }
+        DataSample.fromSequence(
+            dataPoints.map { makeDp(it.second, it.first) }.asSequence()
         )
+
+    private fun makeDp(timestamp: OffsetDateTime, value: Double) = object : IDataPoint() {
+        override val timestamp = timestamp
+        override val dataType = DataType.CONTINUOUS
+        override val value = value
+        override val label = ""
+    }
 }

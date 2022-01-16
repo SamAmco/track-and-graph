@@ -17,6 +17,15 @@
 
 package com.samco.trackandgraph.functionslib
 
+/**
+ * Represents a function that can modify a given [DataSample]
+ */
 interface DataSampleFunction {
-    suspend fun execute(dataSample: DataSample): DataSample
+    /**
+     * Should check the validity of the input properties immediately and throw an exception
+     * if they are invalid. However the sequence should be generated lazily where ever possible
+     * without draining the upstream (for example by converting it to a list) or pre-calculating
+     * any values which may not be needed if the downstream ceases to consume the sequence.
+     */
+    suspend fun mapSample(dataSample: DataSample): DataSample
 }

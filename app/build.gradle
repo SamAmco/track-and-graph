@@ -20,8 +20,8 @@ android {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 21
         targetSdkVersion 30
-        versionCode 200100
-        versionName "2.1.0"
+        versionCode 200101
+        versionName "2.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         kapt {
@@ -91,8 +91,8 @@ dependencies {
     androidTestImplementation "androidx.room:room-testing:$room_version"
 
     // Coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutine_version"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutine_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.0"
 
     //Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'

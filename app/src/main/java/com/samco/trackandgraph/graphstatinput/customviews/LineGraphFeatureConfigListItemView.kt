@@ -212,7 +212,7 @@ class LineGraphFeatureConfigListItemView(
     private fun getSpinnerItemsForFeature(feature: Feature)
             : List<Triple<Feature, DurationPlottingMode, String>> {
         val name = featurePathProvider.getPathForFeature(feature.id)
-        return if (feature.featureType == FeatureType.DURATION) {
+        return if (feature.featureType == DataType.DURATION) {
             val time = context.getString(R.string.time_duration)
             val hours = context.getString(R.string.hours)
             val minutes = context.getString(R.string.minutes)

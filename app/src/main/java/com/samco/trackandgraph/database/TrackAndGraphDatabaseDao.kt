@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.database
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -139,21 +140,19 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) AND timestamp < :endDateTime AND timestamp > :startDateTime ORDER BY timestamp""")
-    fun getDataPointsWithValueInTimeRange(
+    //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp""")
+    fun getDataPointsWithValue(
         featureId: Long,
-        values: List<Int>,
-        startDateTime: OffsetDateTime,
-        endDateTime: OffsetDateTime
+        values: List<Int>
     ): List<DataPoint>
 
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max  AND timestamp < :endDateTime AND timestamp > :startDateTime ORDER BY timestamp""")
-    fun getDataPointsBetweenInTimeRange(
+    //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
+    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp""")
+    fun getDataPointsBetween(
         featureId: Long,
         min: String,
-        max: String,
-        startDateTime: OffsetDateTime,
-        endDateTime: OffsetDateTime
+        max: String
     ): List<DataPoint>
 
     @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp DESC LIMIT 1""")
@@ -172,18 +171,11 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp > :cutOff AND timestamp < :now ORDER BY timestamp ASC")
-    fun getDataPointsForFeatureBetweenAscSync(
-        featureId: Long,
-        cutOff: OffsetDateTime,
-        now: OffsetDateTime
-    ): List<DataPoint>
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
+    fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT 1")
     fun getLastDataPointForFeatureSync(featureId: Long): List<DataPoint>
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp ASC")
-    fun getDataPointsForFeatureAscSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>

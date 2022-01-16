@@ -18,31 +18,29 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.functionslib.DatabaseSampleHelper
+import com.samco.trackandgraph.database.DataSamplerImpl
+import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.functionslib.GlobalAggregationPreferences
 import com.samco.trackandgraph.functionslib.TimeHelper
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.functionslib.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
-import org.threeten.bp.OffsetDateTime
 import kotlin.math.min
 
 class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramViewData>() {
     override suspend fun createViewData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
         val timeHistogram = dataSource.getTimeHistogramByGraphStatId(graphOrStat.id)
             ?: return object : ITimeHistogramViewData {
-                override val state: IGraphStatViewData.State
-                    get() = IGraphStatViewData.State.ERROR
-                override val graphOrStat: GraphOrStat
-                    get() = graphOrStat
-                override val error: GraphStatInitException?
-                    get() = GraphStatInitException(R.string.graph_stat_view_not_found)
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
             }
         return createViewData(dataSource, graphOrStat, timeHistogram, onDataSampled)
     }
@@ -51,34 +49,37 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: TimeHistogram,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
-        val discreteValue = getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
-        val timeHistogramDataHelper =
-            TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
-        val barValues =
-            getBarValues(dataSource, config, config.endDate, onDataSampled, timeHistogramDataHelper)
-        val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.values?.toList())
-        val maxDisplayHeight = largestBin?.let {
-            min(
-                it.times(10.0).toInt().plus(1).div(10.0),
-                1.0
-            )
-        }
+        return try {
+            val discreteValue =
+                getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
+            val timeHistogramDataHelper =
+                TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
+            val barValues =
+                getBarValues(dataSource, config, onDataSampled, timeHistogramDataHelper)
+            val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.values?.toList())
+            val maxDisplayHeight = largestBin?.let {
+                min(
+                    it.times(10.0).toInt().plus(1).div(10.0),
+                    1.0
+                )
+            }
 
-        return object : ITimeHistogramViewData {
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.READY
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-            override val window: TimeHistogramWindow?
-                get() = config.window
-            override val discreteValues: List<DiscreteValue>?
-                get() = discreteValue
-            override val barValues: Map<Int, List<Double>>?
-                get() = barValues
-            override val maxDisplayHeight: Double?
-                get() = maxDisplayHeight
+            object : ITimeHistogramViewData {
+                override val state = IGraphStatViewData.State.READY
+                override val graphOrStat = graphOrStat
+                override val window = config.window
+                override val discreteValues = discreteValue
+                override val barValues = barValues
+                override val maxDisplayHeight = maxDisplayHeight
+            }
+        } catch (throwable: Throwable) {
+            object : ITimeHistogramViewData {
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = throwable
+            }
         }
     }
 
@@ -88,30 +89,30 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
     ): List<DiscreteValue>? {
         val feature = dataSource.tryGetFeatureByIdSync(config.featureId)
         return feature?.let {
-            if (it.featureType == FeatureType.DISCRETE) it.discreteValues
+            if (it.featureType == DataType.DISCRETE) it.discreteValues
             else null
         }
     }
 
     private suspend fun getBarValues(
-        dataSource: TrackAndGraphDatabaseDao,
+        dao: TrackAndGraphDatabaseDao,
         config: TimeHistogram,
-        endDate: OffsetDateTime?,
-        onDataSampled: (List<DataPointInterface>) -> Unit,
+        onDataSampled: (List<DataPoint>) -> Unit,
         timeHistogramDataHelper: TimeHistogramDataHelper
     ): Map<Int, List<Double>>? {
-        val feature = dataSource.getFeatureById(config.featureId)
-        val sample = DatabaseSampleHelper(dataSource).sampleData(
-            config.featureId, config.duration,
-            endDate, null, null
-        )
+        val feature = dao.getFeatureById(config.featureId)
+        val dataSampler = DataSamplerImpl(dao)
+        val dataSource = DataSource.FeatureDataSource(config.featureId)
+        val sample = dataSampler.getDataPointsForDataSource(dataSource)
+        val dataSample = DataClippingFunction(config.endDate, config.duration)
+            .mapSample(sample)
         val barValues = timeHistogramDataHelper.getHistogramBinsForSample(
-            sample,
+            dataSample,
             config.window,
             feature,
             config.sumByCount
         )
-        onDataSampled(sample.dataPoints)
+        onDataSampled(dataSample.getRawDataPoints())
         return barValues
     }
 }

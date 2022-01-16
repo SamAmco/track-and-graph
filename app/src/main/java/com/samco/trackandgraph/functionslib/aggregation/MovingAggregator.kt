@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
-import com.samco.trackandgraph.database.entity.AggregatedDataPoint
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.functionslib.DataSample
-import kotlinx.coroutines.yield
+import com.samco.trackandgraph.functionslib.cache
 import org.threeten.bp.Duration
 
 /**
@@ -30,30 +30,31 @@ import org.threeten.bp.Duration
  * earliest in the list
  */
 internal class MovingAggregator(private val movingAggDuration: Duration) : DataAggregator {
-    override suspend fun aggregate(dataSample: DataSample): RawAggregatedDatapoints {
-        val movingAggregationPointsRaw = mutableListOf<AggregatedDataPoint>()
-        val dataPointsReversed = dataSample.dataPoints.reversed()
+    override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
+        return AggregatedDataSample.fromSequence(
+            getSequence(dataSample),
+            dataSample.dataSampleProperties,
+            dataSample::getRawDataPoints
+        )
+    }
 
-        for ((index, current) in dataPointsReversed.mapIndexed { idx, point -> Pair(idx, point) }) {
-            yield()
-            val parents = dataPointsReversed.drop(index)
+    private fun getSequence(dataSample: Sequence<IDataPoint>) = sequence {
+        val cachedSample = dataSample.cache()
+        for ((index, current) in cachedSample.mapIndexed { idx, point -> Pair(idx, point) }) {
+            val parents = cachedSample
+                .drop(index)
                 .takeWhile { dp ->
+                    //We expect the durations to be negative but < just compares the absolute values
                     Duration.between(dp.timestamp, current.timestamp) < movingAggDuration
                 }
+                .toList()
 
-            movingAggregationPointsRaw.add(
-                0,
+            yield(
                 AggregatedDataPoint(
-                    current.timestamp,
-                    current.featureId,
-                    value = Double.NaN,
-                    label = current.label,
-                    note = current.note,
+                    timestamp = current.timestamp,
                     parents = parents
                 )
             )
         }
-
-        return RawAggregatedDatapoints(movingAggregationPointsRaw)
     }
 }

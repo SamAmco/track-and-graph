@@ -15,28 +15,10 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview.factories.viewdto
+package com.samco.trackandgraph.database
 
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.functionslib.DataSample
 
-interface IGraphStatViewData {
-    enum class State {
-        LOADING,
-        READY,
-        ERROR
-    }
-    val state: State
-    val graphOrStat: GraphOrStat
-    val error: Throwable?
-        get() = null
-
-    companion object {
-        fun loading(graphOrStat: GraphOrStat) = object: IGraphStatViewData {
-            override val state: State
-                get() = State.LOADING
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-        }
-    }
+interface IDataSampler {
+    fun getDataPointsForDataSource(dataSource: DataSource): DataSample
 }

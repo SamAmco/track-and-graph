@@ -17,32 +17,45 @@
 
 package com.samco.trackandgraph.functionslib.aggregation
 
-import com.samco.trackandgraph.database.entity.AggregatedDataPoint
+import com.samco.trackandgraph.database.entity.DataPoint
 import com.samco.trackandgraph.functionslib.DataSample
+import com.samco.trackandgraph.functionslib.DataSampleProperties
 
 /**
  * This class represents the initial points clustered into the parent-attribute of the AggregatedDataPoints.
  * To obtain usable values, one of the follow-up functions like sum, average, or max need to be called.
  * Note that some follow-up functions drop data-points without parents. This is supposed to be intuitive :)
  */
-internal class RawAggregatedDatapoints(private val points: List<AggregatedDataPoint>) {
-    fun sum() = DataSample(
-        this.points.map { it.copy(value = it.parents.sumOf { par -> par.value }) }
-    )
+internal abstract class AggregatedDataSample(
+    private val dataSampleProperties: DataSampleProperties
+) : Sequence<AggregatedDataPoint> {
+    companion object {
+        fun fromSequence(
+            data: Sequence<AggregatedDataPoint>,
+            dataSampleProperties: DataSampleProperties,
+            getRawDataPoints: () -> List<DataPoint>
+        ): AggregatedDataSample {
+            return object : AggregatedDataSample(dataSampleProperties) {
+                override fun getRawDataPoints() = getRawDataPoints.invoke()
+                override fun iterator(): Iterator<AggregatedDataPoint> = data.iterator()
+            }
+        }
+    }
 
+    abstract fun getRawDataPoints(): List<DataPoint>
 
-    // When using duration based aggregated values, some points can have no parents.
-    // The most intuitive solution is probably to just remove these aggregated points
-    // There might be cases where it can make sense to define a fallback value, e.g. 0
-    fun max() = DataSample(
-        this.points
+    fun average() = DataSample.fromSequence(
+        this
             .filter { it.parents.isNotEmpty() }
-            .map { it.copy(value = it.parents.maxOf { par -> par.value }) }
+            .map { it.toDataPoint(it.parents.map { par -> par.value }.average()) },
+        dataSampleProperties,
+        this::getRawDataPoints
     )
 
-    fun average() = DataSample(
-        this.points
-            .filter { it.parents.isNotEmpty() }
-            .map { it.copy(value = it.parents.map { par -> par.value }.average()) }
+    fun sum() = DataSample.fromSequence(
+        this.map { it.toDataPoint(it.parents.sumOf { par -> par.value }) },
+        dataSampleProperties,
+        this::getRawDataPoints
     )
+
 }

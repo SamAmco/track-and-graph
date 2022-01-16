@@ -21,7 +21,6 @@ import android.content.Context
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.util.DATE_FORMAT_SETTING_PREF_KEY
 import com.samco.trackandgraph.util.getPrefs
-import org.threeten.bp.DayOfWeek
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
@@ -49,6 +48,9 @@ fun getWeekDayNames(context: Context) = listOf(
     context.getString(R.string.sun)
 )
 
+/**
+ * Should return the day of the week locally at the time the data point was tracked
+ */
 private fun weekDayPart(dateTime: OffsetDateTime, weekDayNames: List<String>) =
     " (${weekDayNames[dateTime.dayOfWeek.value - 1]}) "
 

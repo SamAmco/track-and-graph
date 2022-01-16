@@ -19,7 +19,7 @@ package com.samco.trackandgraph.database.dto
 import androidx.room.ColumnInfo
 import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.database.entity.DataType
 import org.threeten.bp.OffsetDateTime
 
 data class DisplayFeature(
@@ -33,7 +33,7 @@ data class DisplayFeature(
     val groupId: Long,
 
     @ColumnInfo(name = "type")
-    val featureType: FeatureType = FeatureType.CONTINUOUS,
+    val featureType: DataType = DataType.CONTINUOUS,
 
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,

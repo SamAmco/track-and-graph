@@ -138,10 +138,10 @@ class Converters {
     }
 
     @TypeConverter
-    fun intToFeatureType(i: Int): FeatureType = FeatureType.values()[i]
+    fun intToFeatureType(i: Int): DataType = DataType.values()[i]
 
     @TypeConverter
-    fun featureTypeToInt(featureType: FeatureType): Int = featureType.ordinal
+    fun featureTypeToInt(featureType: DataType): Int = featureType.ordinal
 
     @TypeConverter
     fun intToGraphStatType(i: Int): GraphStatType = GraphStatType.values()[i]

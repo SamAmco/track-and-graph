@@ -174,10 +174,7 @@ class DataDisplayIntervalHelper {
             }
             .map { proto -> finishProto(proto, y_min, y_max, fixedBounds = fixedBounds) }
             .filterNotNull()
-            .filter { interval ->
-                interval.n_lines >= MIN_INTERVALS &&
-                        interval.n_lines <= MAX_INTERVALS
-            }
+            .filter { interval -> interval.n_lines in MIN_INTERVALS..MAX_INTERVALS }
 
         if (reasonable_intervals.isEmpty()) {
             if (throw_exc_if_non_found) throw Exception("No solution found! No intervals passed the initial filtering. ymin: $y_min, ymax: $y_max")

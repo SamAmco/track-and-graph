@@ -20,8 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.samco.trackandgraph.database.*
-import com.squareup.moshi.Json
+import com.samco.trackandgraph.database.dto.IDataPoint
 import com.squareup.moshi.JsonClass
 import java.lang.Exception
 
@@ -46,7 +45,7 @@ data class Feature(
     val groupId: Long,
 
     @ColumnInfo(name = "type")
-    val featureType: FeatureType,
+    val featureType: DataType,
 
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
@@ -64,12 +63,12 @@ data class Feature(
     val description: String,
 ) {
     fun getDefaultLabel(): String =
-        if (featureType == FeatureType.DISCRETE)
+        if (featureType == DataType.DISCRETE)
             discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
         else ""
 }
 
-enum class FeatureType { DISCRETE, CONTINUOUS, DURATION }
+enum class DataType { DISCRETE, CONTINUOUS, DURATION }
 
 @JsonClass(generateAdapter = true)
 data class DiscreteValue(
@@ -88,7 +87,13 @@ data class DiscreteValue(
             return DiscreteValue(index, label)
         }
 
-        fun fromDataPoint(dataPoint: DataPointInterface) =
+        fun fromDataPoint(dataPoint: DataPoint) =
+            DiscreteValue(
+                dataPoint.value.toInt(),
+                dataPoint.label
+            )
+
+        fun fromIDataPoint(dataPoint: IDataPoint) =
             DiscreteValue(
                 dataPoint.value.toInt(),
                 dataPoint.label

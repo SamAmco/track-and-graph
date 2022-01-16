@@ -21,18 +21,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.database.doubleFormatter
 import com.samco.trackandgraph.ui.formatTimeDuration
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
-
-
-interface DataPointInterface {
-    val timestamp: OffsetDateTime
-    val featureId: Long
-    val value: Double
-    val label: String
-    val note: String
-}
 
 @Entity(
     tableName = "data_points_table",
@@ -46,39 +35,29 @@ interface DataPointInterface {
         )
     ]
 )
-
-data class DataPoint (
+data class DataPoint(
     @ColumnInfo(name = "timestamp")
-    override val timestamp: OffsetDateTime = OffsetDateTime.now(),
+    val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
     @ColumnInfo(name = "feature_id", index = true)
-    override val featureId: Long,
+    val featureId: Long,
 
     @ColumnInfo(name = "value")
-    override val value: Double,
+    val value: Double,
 
     @ColumnInfo(name = "label")
-    override val label: String,
+    val label: String,
 
     @ColumnInfo(name = "note")
-    override val note: String
-)  : DataPointInterface {
+    val note: String
+) {
     companion object {
-        fun getDisplayValue(dataPoint: DataPointInterface, featureType: FeatureType): String {
-            return when (featureType) {
-                FeatureType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
-                FeatureType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
-                FeatureType.DURATION -> formatTimeDuration(dataPoint.value.toLong())
+        fun getDisplayValue(dataPoint: DataPoint, dataType: DataType): String {
+            return when (dataType) {
+                DataType.DISCRETE -> doubleFormatter.format(dataPoint.value) + " : ${dataPoint.label}"
+                DataType.CONTINUOUS -> doubleFormatter.format(dataPoint.value)
+                DataType.DURATION -> formatTimeDuration(dataPoint.value.toLong())
             }
         }
     }
 }
-
-data class AggregatedDataPoint (
-    override val timestamp: OffsetDateTime,
-    override val featureId: Long,
-    override val value: Double,
-    val parents: List<DataPointInterface>,
-    override val label: String = "",
-    override val note: String = "",
-        ): DataPointInterface

@@ -20,10 +20,10 @@ package com.samco.trackandgraph.functionslib
 /**
  * A calculator that simply applies the operations of all provided calculators in order
  */
-class CompositeFunction(vararg val calculators: DataSampleFunction) : DataSampleFunction {
-    override suspend fun execute(dataSample: DataSample): DataSample {
+class CompositeFunction(private vararg val calculators: DataSampleFunction) : DataSampleFunction {
+    override suspend fun mapSample(dataSample: DataSample): DataSample {
         var runningSample = dataSample
-        for (calculator in calculators) runningSample = calculator.execute(runningSample)
+        for (calculator in calculators) runningSample = calculator.mapSample(runningSample)
         return runningSample
     }
 }
