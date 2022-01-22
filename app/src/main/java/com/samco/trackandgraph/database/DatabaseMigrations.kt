@@ -4,9 +4,86 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.database.entity.CheckedDays
 import com.samco.trackandgraph.database.entity.DiscreteValue
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import java.lang.Exception
+
+private data class NTuple2<T1, T2>(val t1: T1, val t2: T2) {
+    fun toList() = listOf(t1, t2)
+}
+
+private data class NTuple3<T1, T2, T3>(val t1: T1, val t2: T2, val t3: T3) {
+    fun toList() = listOf(t1, t2, t3)
+}
+
+private data class NTuple4<T1, T2, T3, T4>(val t1: T1, val t2: T2, val t3: T3, val t4: T4) {
+    fun toList() = listOf(t1, t2, t3, t4)
+}
+
+private data class NTuple5<T1, T2, T3, T4, T5>(
+    val t1: T1,
+    val t2: T2,
+    val t3: T3,
+    val t4: T4,
+    val t5: T5
+) {
+    fun toList() = listOf(t1, t2, t3, t4, t5)
+}
+
+private data class NTuple6<T1, T2, T3, T4, T5, T6>(
+    val t1: T1,
+    val t2: T2,
+    val t3: T3,
+    val t4: T4,
+    val t5: T5,
+    val t6: T6
+) {
+    fun toList() = listOf(t1, t2, t3, t4, t5, t6)
+}
+
+private data class NTuple7<T1, T2, T3, T4, T5, T6, T7>(
+    val t1: T1,
+    val t2: T2,
+    val t3: T3,
+    val t4: T4,
+    val t5: T5,
+    val t6: T6,
+    val t7: T7
+) {
+    fun toList() = listOf(t1, t2, t3, t4, t5, t6, t7)
+}
+
+private data class NTuple8<T1, T2, T3, T4, T5, T6, T7, T8>(
+    val t1: T1,
+    val t2: T2,
+    val t3: T3,
+    val t4: T4,
+    val t5: T5,
+    val t6: T6,
+    val t7: T7,
+    val t8: T8
+) {
+    fun toList() = listOf(t1, t2, t3, t4, t5, t6, t7, t8)
+}
+
+private val moshi = Moshi.Builder().build()
+
+private fun <T> toJson(adapter: JsonAdapter<T>, value: T): String {
+    return try {
+        adapter.toJson(value) ?: ""
+    } catch (e: Exception) {
+        ""
+    }
+}
+
+private fun <T> fromJson(adapter: JsonAdapter<T>, value: String, onError: () -> T): T {
+    return try {
+        adapter.fromJson(value) ?: onError()
+    } catch (e: Exception) {
+        onError()
+    }
+}
 
 val MIGRATION_29_30 = object : Migration(29, 30) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -672,6 +749,164 @@ val MIGRATION_43_44 = object : Migration(43, 44) {
     }
 }
 
+val MIGRATION_44_45 = object : Migration(44, 45) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        createTimeSinceLastTable(database)
+        createAverageTimeBetweenTable(database)
+
+        copyTimeSinceLastData(database)
+        copyAverageTimeBetweenData(database)
+        database.execSQL("DROP TABLE IF EXISTS `time_since_last_stat_table2`")
+        database.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table2`")
+    }
+
+    private fun getDiscreteValues(value: String): List<DiscreteValue> {
+        if (value.isBlank()) return emptyList()
+        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
+        return fromJson(moshi.adapter(listType), value) { emptyList() }
+    }
+
+    private fun encodeListOfLabels(labels: List<String>): String {
+        val listType = Types.newParameterizedType(List::class.java, String::class.java)
+        return toJson(moshi.adapter(listType), labels)
+    }
+
+    private fun copyTimeSinceLastData(database: SupportSQLiteDatabase) {
+        val inserts = mutableListOf<NTuple6<Long, Long, Long, Double, Double, String>>()
+        val graphsCursor = database.query("SELECT * FROM time_since_last_stat_table2")
+        while (graphsCursor.moveToNext()) {
+            try {
+                val id = graphsCursor.getLong(0)
+                val graphStatId = graphsCursor.getLong(1)
+                val featureId = graphsCursor.getLong(2)
+                val fromValue = graphsCursor.getString(3).toDouble()
+                val toValue = graphsCursor.getString(4).toDouble()
+                val discreteIds = graphsCursor.getString(5)
+
+                val discreteIdInts = discreteIds.split("||").mapNotNull { it.toIntOrNull() }
+                val featureCursor =
+                    database.query("SELECT discrete_values FROM features_table WHERE id = $featureId")
+                val discreteValuesString = try {
+                    if (featureCursor.moveToNext()) featureCursor.getString(0) else ""
+                } catch (t: Throwable) {
+                    ""
+                }
+                val discreteValues = getDiscreteValues(discreteValuesString)
+
+                val labels = discreteValues.filter { it.index in discreteIdInts }.map { it.label }
+                val labelsString = encodeListOfLabels(labels)
+                inserts.add(NTuple6(id, graphStatId, featureId, fromValue, toValue, labelsString))
+            } catch (throwable: Throwable) {
+                continue
+            }
+        }
+        val query =
+            """
+                INSERT INTO time_since_last_stat_table3(
+                    id, graph_stat_id, feature_id, from_value, to_value, labels
+                ) VALUES (?,?,?,?,?,?)
+            """.trimIndent()
+        if (inserts.size > 0) inserts.forEach { args ->
+            database.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
+        }
+    }
+
+    private fun copyAverageTimeBetweenData(database: SupportSQLiteDatabase) {
+        val inserts =
+            mutableListOf<NTuple8<Long, Long, Long, Double, Double, String, String, String>>()
+        val graphsCursor = database.query("SELECT * FROM average_time_between_stat_table2")
+        while (graphsCursor.moveToNext()) {
+            try {
+                val id = graphsCursor.getLong(0)
+                val graphStatId = graphsCursor.getLong(1)
+                val featureId = graphsCursor.getLong(2)
+                val fromValue = graphsCursor.getString(3).toDouble()
+                val toValue = graphsCursor.getString(4).toDouble()
+                val duration = graphsCursor.getString(5)
+                val discreteIds = graphsCursor.getString(6)
+                val endDate = graphsCursor.getString(7)
+
+                val discreteIdInts = discreteIds.split("||").mapNotNull { it.toIntOrNull() }
+
+                val featureCursor =
+                    database.query("SELECT discrete_values FROM features_table WHERE id = $featureId")
+                val discreteValuesString = try {
+                    if (featureCursor.moveToNext()) featureCursor.getString(0) else ""
+                } catch (t: Throwable) {
+                    ""
+                }
+                val discreteValues = getDiscreteValues(discreteValuesString)
+                val labels = discreteValues.filter { it.index in discreteIdInts }.map { it.label }
+                val labelsString = encodeListOfLabels(labels)
+
+                inserts.add(
+                    NTuple8(
+                        id,
+                        graphStatId,
+                        featureId,
+                        fromValue,
+                        toValue,
+                        duration,
+                        labelsString,
+                        endDate
+                    )
+                )
+            } catch (throwable: Throwable) {
+                continue
+            }
+        }
+        val query =
+            """
+                INSERT INTO average_time_between_stat_table3(
+                    id, graph_stat_id, feature_id, from_value, to_value, duration, labels, end_date
+                ) VALUES (?,?,?,?,?,?,?,?)
+            """.trimIndent()
+        if (inserts.size > 0) inserts.forEach { args ->
+            database.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
+        }
+    }
+
+    private fun createTimeSinceLastTable(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                CREATE TABLE IF NOT EXISTS `time_since_last_stat_table3` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `graph_stat_id` INTEGER NOT NULL, 
+                    `feature_id` INTEGER NOT NULL, 
+                    `from_value` REAL NOT NULL, 
+                    `to_value` REAL NOT NULL, 
+                    `labels` TEXT NOT NULL, 
+                    FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE, 
+                    FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_id` ON `time_since_last_stat_table3` (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_graph_stat_id` ON `time_since_last_stat_table3` (`graph_stat_id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table3_feature_id` ON `time_since_last_stat_table3` (`feature_id`)")
+    }
+
+    private fun createAverageTimeBetweenTable(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                CREATE TABLE IF NOT EXISTS average_time_between_stat_table3 (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `graph_stat_id` INTEGER NOT NULL, 
+                    `feature_id` INTEGER NOT NULL, 
+                    `from_value` REAL NOT NULL, 
+                    `to_value` REAL NOT NULL, 
+                    `duration` TEXT, 
+                    `labels` TEXT NOT NULL, 
+                    `end_date` TEXT, 
+                    FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , 
+                    FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_id` ON average_time_between_stat_table3 (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_graph_stat_id` ON average_time_between_stat_table3 (`graph_stat_id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table3_feature_id` ON average_time_between_stat_table3 (`feature_id`)")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -687,5 +922,6 @@ val allMigrations = arrayOf(
     MIGRATION_40_41,
     MIGRATION_41_42,
     MIGRATION_42_43,
-    MIGRATION_43_44
+    MIGRATION_43_44,
+    MIGRATION_44_45
 )
