@@ -23,10 +23,7 @@ import com.samco.trackandgraph.database.IDataSampler
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
-import com.samco.trackandgraph.functionslib.CompositeFunction
-import com.samco.trackandgraph.functionslib.DataClippingFunction
-import com.samco.trackandgraph.functionslib.DataSample
-import com.samco.trackandgraph.functionslib.FilterValueFunction
+import com.samco.trackandgraph.functionslib.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.Dispatchers
@@ -131,12 +128,11 @@ class AverageTimeBetweenDataFactory :
     ): DataSample {
         val dataSource = DataSource.FeatureDataSource(feature.id)
         val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
+        val filterFunction =
+            if (config.labels.isNullOrEmpty()) FilterValueFunction(config.fromValue, config.toValue)
+            else FilterLabelFunction(config.labels.toSet())
         return CompositeFunction(
-            FilterValueFunction(
-                config.fromValue.toDouble(),
-                config.toValue.toDouble(),
-                config.discreteValues
-            ),
+            filterFunction,
             DataClippingFunction(config.endDate, config.duration),
         ).mapSample(dataSample)
     }

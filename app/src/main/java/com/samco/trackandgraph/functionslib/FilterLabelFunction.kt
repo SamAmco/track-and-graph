@@ -15,27 +15,20 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.database.dto
+package com.samco.trackandgraph.functionslib
 
-import org.threeten.bp.OffsetDateTime
-
-abstract class IDataPoint {
-    abstract val timestamp: OffsetDateTime
-    abstract val value: Double
-    abstract val label: String
-
-    override fun equals(other: Any?): Boolean {
-        return other != null
-                && other is IDataPoint
-                && this.timestamp == other.timestamp
-                && this.value == other.value
-                && this.label == other.label
-    }
-
-    override fun hashCode(): Int {
-        var result = timestamp.hashCode()
-        result = 31 * result + value.hashCode()
-        result = 31 * result + label.hashCode()
-        return result
+/**
+ * A function that will filter all data points in the given input sample and return only those that
+ * have a label in the set of given input labels.
+ */
+class FilterLabelFunction(
+    private val labels: Set<String>
+) : DataSampleFunction {
+    override suspend fun mapSample(dataSample: DataSample): DataSample {
+        return DataSample.fromSequence(
+            dataSample.filter { it.label in labels },
+            dataSample.dataSampleProperties,
+            dataSample::getRawDataPoints
+        )
     }
 }

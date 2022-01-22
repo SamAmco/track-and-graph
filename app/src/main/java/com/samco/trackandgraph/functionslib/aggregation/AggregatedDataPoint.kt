@@ -28,11 +28,6 @@ data class AggregatedDataPoint(
     fun toDataPoint(value: Double): IDataPoint {
         return object : IDataPoint() {
             override val timestamp = this@AggregatedDataPoint.timestamp
-            override val dataType = when {
-                parents.isEmpty() -> DataType.CONTINUOUS
-                parents.all { it.dataType == parents[0].dataType } -> parents[0].dataType
-                else -> DataType.CONTINUOUS
-            }
             override val value = value
             override val label = when {
                 parents.isEmpty() -> ""

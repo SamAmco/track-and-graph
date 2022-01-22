@@ -57,7 +57,7 @@ val dataVisColorList = listOf(
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class, GlobalNote::class, LineGraphFeature::class,
         TimeHistogram::class],
-    version = 44
+    version = 45
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -122,6 +122,19 @@ class Converters {
         } catch (e: Exception) {
             onError()
         }
+    }
+
+    @TypeConverter
+    fun stringToListOfStrings(value: String): List<String> {
+        if (value.isBlank()) return emptyList()
+        val listType = Types.newParameterizedType(List::class.java, String::class.java)
+        return fromJson(moshi.adapter(listType), value) { emptyList() }
+    }
+
+    @TypeConverter
+    fun listOfStringsToString(values: List<String>): String {
+        val listType = Types.newParameterizedType(List::class.java, String::class.java)
+        return toJson(moshi.adapter(listType), values)
     }
 
     @TypeConverter

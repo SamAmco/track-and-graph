@@ -23,6 +23,7 @@ import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.functionslib.FilterLabelFunction
 import com.samco.trackandgraph.functionslib.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -74,11 +75,10 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         val dataSampler = DataSamplerImpl(dao)
         val dataSource = DataSource.FeatureDataSource(config.featureId)
         val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
-        val sample = FilterValueFunction(
-            config.fromValue.toDouble(),
-            config.toValue.toDouble(),
-            config.discreteValues
-        ).mapSample(dataSample)
+        val filterFunction =
+            if (config.labels.isNullOrEmpty()) FilterValueFunction(config.fromValue, config.toValue)
+            else FilterLabelFunction(config.labels.toSet())
+        val sample = filterFunction.mapSample(dataSample)
         val first = sample.firstOrNull()
         onDataSampled(sample.getRawDataPoints())
         return first

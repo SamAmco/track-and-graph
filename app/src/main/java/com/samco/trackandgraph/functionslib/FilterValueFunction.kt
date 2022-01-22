@@ -17,25 +17,17 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.entity.DataType
-
 /**
  * A function that will filter all data points in the given input sample and return only those that
- * match the given constraints. Any data point that is marked as discrete will be checked against the
- * given discreteValues. Otherwise the data point will be checked to see if it is greater than
- * or equal to the fromValue and smaller than or equal to the toValue.
+ * are greater than or equal to the fromValue and smaller than or equal to the toValue.
  */
 class FilterValueFunction(
     val fromValue: Double,
-    val toValue: Double,
-    val discreteValues: List<Int>
+    val toValue: Double
 ) : DataSampleFunction {
     override suspend fun mapSample(dataSample: DataSample): DataSample {
         return DataSample.fromSequence(
-            dataSample.filter {
-                if (it.dataType == DataType.DISCRETE) it.value.toInt() in discreteValues
-                else it.value in fromValue..toValue
-            },
+            dataSample.filter { it.value in fromValue..toValue },
             dataSample.dataSampleProperties,
             dataSample::getRawDataPoints
         )

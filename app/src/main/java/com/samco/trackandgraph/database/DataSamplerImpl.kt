@@ -25,12 +25,10 @@ import com.samco.trackandgraph.functionslib.DataSampleProperties
 import com.samco.trackandgraph.functionslib.cache
 
 class DataSamplerImpl(private val dao: TrackAndGraphDatabaseDao) : IDataSampler {
-    private fun getDataType(featureId: Long) = dao.getFeatureById(featureId).featureType
-
     private fun emptyDataSample() = DataSample.fromSequence(emptySequence())
 
-    private fun dataSampleFromDb(cursor: Cursor, dataType: DataType): DataSample {
-        val cursorSequence = DataPointCursorSequence(cursor, dataType)
+    private fun dataSampleFromDb(cursor: Cursor): DataSample {
+        val cursorSequence = DataPointCursorSequence(cursor)
         return DataSample.fromSequence(
             cursorSequence.cache(),
             DataSampleProperties(),
@@ -42,11 +40,11 @@ class DataSamplerImpl(private val dao: TrackAndGraphDatabaseDao) : IDataSampler 
         return when (dataSource) {
             is DataSource.FeatureDataSource -> {
                 dataSampleFromDb(
-                    dao.getDataPointsCursorForFeatureSync(dataSource.featureId),
-                    getDataType(dataSource.featureId)
+                    dao.getDataPointsCursorForFeatureSync(dataSource.featureId)
                 )
             }
-            //TODO implement function data source
+            //TODO actually probably don't want two different types of data source. Just use feature
+            // and a feature may point to a function and have data type FUNCTION .. ?
             is DataSource.FunctionDataSource -> emptyDataSample()
         }
     }

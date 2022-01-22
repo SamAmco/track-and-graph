@@ -67,17 +67,17 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
         0,
         0,
         allFeatures.getOrElse(0) { null }?.id ?: 0,
-        "0.0",
-        "1.0",
+        0.0,
+        1.0,
         null,
         emptyList(),
         null
     )
 
     override fun getCurrentFeatureId(): Long = configData.featureId
-    override fun getCurrentFromValue(): Double = configData.fromValue.toDouble()
-    override fun getCurrentToValue(): Double = configData.toValue.toDouble()
-    override fun getDiscreteValues(): List<Int> = configData.discreteValues
+    override fun getCurrentFromValue(): Double = configData.fromValue
+    override fun getCurrentToValue(): Double = configData.toValue
+    override fun getDiscreteValues(): List<Int> = emptyList() //TODO figure out ui stuff
 
 
     override fun getFeatureSpinner(): AppCompatSpinner = binding.valueStatFeatureSpinner
@@ -97,14 +97,15 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
     }
 
     override fun onNewDiscreteValues(discreteValues: List<Int>) {
-        configData = configData.copy(discreteValues = discreteValues)
+        //TODO figure this out
+        //configData = configData.copy(discreteValues = discreteValues)
     }
 
     override fun onNewToValue(value: Double) {
-        configData = configData.copy(toValue = value.toString())
+        configData = configData.copy(toValue = value)
     }
 
     override fun onNewFromValue(value: Double) {
-        configData = configData.copy(fromValue = value.toString())
+        configData = configData.copy(fromValue = value)
     }
 }

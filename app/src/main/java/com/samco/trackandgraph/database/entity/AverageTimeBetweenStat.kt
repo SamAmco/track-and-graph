@@ -23,7 +23,7 @@ import androidx.room.PrimaryKey
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-@Entity(tableName = "average_time_between_stat_table2",
+@Entity(tableName = "average_time_between_stat_table3",
     foreignKeys = [
         ForeignKey(
             entity = GraphOrStat::class,
@@ -50,16 +50,16 @@ data class AverageTimeBetweenStat(
     val featureId: Long,
 
     @ColumnInfo(name = "from_value")
-    val fromValue: String,//TODO these really shouldn't be strings. What was I thinking!?
+    val fromValue: Double,
 
     @ColumnInfo(name = "to_value")
-    val toValue: String,
+    val toValue: Double,
 
     @ColumnInfo(name = "duration")
     val duration: Duration?,
 
-    @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<Int>,
+    @ColumnInfo(name = "labels")
+    val labels: List<String>,
 
     @ColumnInfo(name = "end_date")
     val endDate: OffsetDateTime?
