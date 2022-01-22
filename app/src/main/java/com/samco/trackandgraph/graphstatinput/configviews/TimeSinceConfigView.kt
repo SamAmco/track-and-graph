@@ -25,7 +25,6 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatSpinner
 import com.samco.trackandgraph.database.entity.TimeSinceLastStat
-import com.samco.trackandgraph.databinding.AverageTimeBetweenInputLayoutBinding
 import com.samco.trackandgraph.databinding.TimeSinceInputLayoutBinding
 import com.samco.trackandgraph.ui.DurationInputView
 
@@ -52,16 +51,16 @@ internal class TimeSinceConfigView @JvmOverloads constructor(
         0,
         0,
         allFeatures.getOrElse(0) { null }?.id ?: 0,
-        "0.0",
-        "1.0",
+        0.0,
+        1.0,
         emptyList()
     )
 
     override fun getConfigData(): Any = configData
     override fun getCurrentFeatureId(): Long = configData.featureId
-    override fun getCurrentFromValue(): Double = configData.fromValue.toDouble()
-    override fun getCurrentToValue(): Double = configData.toValue.toDouble()
-    override fun getDiscreteValues(): List<Int> = configData.discreteValues
+    override fun getCurrentFromValue(): Double = configData.fromValue
+    override fun getCurrentToValue(): Double = configData.toValue
+    override fun getDiscreteValues(): List<Int> = emptyList() //TODO figure out ui stuff configData.discreteValues
 
     override fun getFeatureSpinner(): AppCompatSpinner = binding.valueStatFeatureSpinner
     override fun getDiscreteValueButtonsLayout(): LinearLayout =
@@ -80,14 +79,15 @@ internal class TimeSinceConfigView @JvmOverloads constructor(
     }
 
     override fun onNewDiscreteValues(discreteValues: List<Int>) {
-        configData = configData.copy(discreteValues = discreteValues)
+        //TODO figure this out
+        //configData = configData.copy(discreteValues = discreteValues)
     }
 
     override fun onNewToValue(value: Double) {
-        configData = configData.copy(toValue = value.toString())
+        configData = configData.copy(toValue = value)
     }
 
     override fun onNewFromValue(value: Double) {
-        configData = configData.copy(fromValue = value.toString())
+        configData = configData.copy(fromValue = value)
     }
 }

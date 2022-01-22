@@ -20,12 +20,10 @@ package com.samco.trackandgraph.database
 import android.database.Cursor
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DataType
 import java.lang.Exception
 
 class DataPointCursorSequence(
-    private val cursor: Cursor,
-    private val dataType: DataType
+    private val cursor: Cursor
 ) : Sequence<IDataPoint> {
     private val visited = mutableListOf<DataPoint>()
     fun getRawDataPoints(): List<DataPoint> = visited
@@ -40,7 +38,6 @@ class DataPointCursorSequence(
             visited.add(dataPoint)
             return object : IDataPoint() {
                 override val timestamp = dataPoint.timestamp
-                override val dataType = this@DataPointCursorSequence.dataType
                 override val value = dataPoint.value
                 override val label = dataPoint.label
             }

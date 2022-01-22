@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.functionslib.exceptions.InvalidRegularityException
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
@@ -35,7 +34,6 @@ class DataPaddingFunction : DataSampleFunction {
     private val endTime: OffsetDateTime
     private val startTime: OffsetDateTime
     private val defaultValue: Double
-    private val defaultDataType: DataType
     private val defaultLabel: String
 
     constructor(
@@ -43,15 +41,13 @@ class DataPaddingFunction : DataSampleFunction {
         endTime: OffsetDateTime?,
         duration: TemporalAmount?,
         defaultValue: Double = 0.0,
-        defaultLabel: String = "",
-        defaultDataType: DataType = DataType.CONTINUOUS
+        defaultLabel: String = ""
     ) {
         this.timeHelper = timeHelper
         this.endTime = endTime ?: OffsetDateTime.now()
         this.startTime = duration?.let { this.endTime.minus(it) } ?: this.endTime
         this.defaultValue = defaultValue
         this.defaultLabel = defaultLabel
-        this.defaultDataType = defaultDataType
     }
 
     constructor(
@@ -59,15 +55,13 @@ class DataPaddingFunction : DataSampleFunction {
         endTime: OffsetDateTime?,
         startTime: OffsetDateTime?,
         defaultValue: Double = 0.0,
-        defaultLabel: String = "",
-        defaultDataType: DataType = DataType.CONTINUOUS
+        defaultLabel: String = ""
     ) {
         this.timeHelper = timeHelper
         this.endTime = endTime ?: OffsetDateTime.now()
         this.startTime = startTime ?: OffsetDateTime.now()
         this.defaultValue = defaultValue
         this.defaultLabel = defaultLabel
-        this.defaultDataType = defaultDataType
     }
 
     override suspend fun mapSample(dataSample: DataSample): DataSample {
@@ -118,7 +112,6 @@ class DataPaddingFunction : DataSampleFunction {
 
     private fun createDataPoint(timestamp: OffsetDateTime): IDataPoint = object : IDataPoint() {
         override val timestamp = timestamp
-        override val dataType: DataType = defaultDataType
         override val value: Double = defaultValue
         override val label: String = defaultLabel
     }
