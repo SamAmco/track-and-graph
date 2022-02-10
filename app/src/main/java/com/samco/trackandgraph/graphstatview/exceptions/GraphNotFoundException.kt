@@ -15,21 +15,6 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview.factories.viewdto
+package com.samco.trackandgraph.graphstatview.exceptions
 
-import com.samco.trackandgraph.database.entity.GraphOrStat
-
-interface IAverageTimeBetweenViewData : IGraphStatViewData{
-    //The total millis between the first and last data point
-    val averageMillis: Double
-        get() = 0.0
-
-    companion object {
-        fun loading(graphOrStat: GraphOrStat) = object : IAverageTimeBetweenViewData {
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.LOADING
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-        }
-    }
-}
+class GraphNotFoundException : Exception()

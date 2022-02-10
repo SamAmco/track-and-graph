@@ -19,13 +19,17 @@ package com.samco.trackandgraph.graphstatview
 
 import android.content.Context
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
+import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 
 class ErrorMessageResolver(private val context: Context) {
     fun getErrorMessage(throwable: Throwable): String {
-        when (throwable) {
+        return when (throwable) {
             is GraphStatInitException -> context.getString(throwable.errorTextId)
+            is NotEnoughDataException -> context.getString(R.string.graph_stat_view_not_enough_data_graph)
+            is GraphNotFoundException -> context.getString(R.string.graph_stat_view_not_found)
+            else -> context.getString(R.string.graph_stat_validation_unknown)
             //TODO flesh this out with support for common functions exceptions
         }
-        return context.getString(R.string.graph_stat_validation_unknown)
     }
 }

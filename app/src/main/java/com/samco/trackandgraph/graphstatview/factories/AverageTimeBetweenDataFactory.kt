@@ -24,13 +24,13 @@ import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.functionslib.*
+import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
+import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import kotlin.math.max
 
 class AverageTimeBetweenDataFactory :
     ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
@@ -38,34 +38,17 @@ class AverageTimeBetweenDataFactory :
     companion object {
         /**
          * Calculates the average duration between the timestamps of a set of data points. This is
-         * simply the duration divided by the number of points plus 1. The duration is calculated
-         * as start -> end. Start is end minus [duration] if it exists and first [dataPoints]
-         * timestamp otherwise. End is [endDate] if given and last [dataPoints] timestamp or [now]
-         * (whichever is later) otherwise. If there are not 2 or more elements in [dataPoints] with
-         * timestamps falling in this range then null is returned.
+         * simply the duration between first and last divided by the number of points minus 1.
          */
         internal fun calculateAverageTimeBetweenOrNull(
-            now: OffsetDateTime,
-            endDate: OffsetDateTime?,
-            duration: Duration?,
             dataPoints: List<IDataPoint>
-        ): Double? {
-            if (duration == null && dataPoints.size < 2) return null
-            val last = dataPoints.lastOrNull()?.timestamp
-            val first = dataPoints.firstOrNull()?.timestamp
-            val latest = endDate ?: last?.let { listOf(now, it).maxOrNull() } ?: now
-            val start = duration?.let { latest.minus(it) } ?: first
-            //Although we will have only sampled points likely to be in the duration it is possible that
-            // we could have been passed points that start before (latest - duration). So this is a good
-            // final check.
-            val clippedPoints = dataPoints
-                .dropWhile { it.timestamp.isBefore(start) }
-                .dropLastWhile { it.timestamp.isAfter(latest) }
-            val totalMillis = Duration.between(start, latest).toMillis().toDouble()
-            var divisor = clippedPoints.size + 1
-            if (latest == last) divisor -= 1
-            if (start == first) divisor -= 1
-            return totalMillis / max(1.0, divisor.toDouble())
+        ): Double {
+            if (dataPoints.size < 2) throw Exception("Don't call this method with less than 2 data points.")
+            //The data points will be in order newest to oldest
+            val last = dataPoints.first().timestamp
+            val first = dataPoints.last().timestamp
+            return Duration.between(first, last).toMillis()
+                .toDouble() / (dataPoints.size - 1).toDouble()
         }
     }
 
@@ -75,7 +58,7 @@ class AverageTimeBetweenDataFactory :
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
         val timeBetweenStat = dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
-            ?: return notEnoughData(graphOrStat)
+            ?: return graphNotFound(graphOrStat)
         return createViewData(dataSource, graphOrStat, timeBetweenStat, onDataSampled)
     }
 
@@ -91,21 +74,18 @@ class AverageTimeBetweenDataFactory :
             val dataSample = withContext(Dispatchers.IO) {
                 getRelevantDataPoints(dataSampler, config, feature)
             }
-            val dataPoints = dataSample.toList()
+            val dataPoints = withContext(Dispatchers.IO) {
+                dataSample.toList()
+            }
+            if (dataPoints.size < 2) return notEnoughData(graphOrStat, dataPoints.size)
             val averageMillis = withContext(Dispatchers.Default) {
-                calculateAverageTimeBetweenOrNull(
-                    OffsetDateTime.now(),
-                    config.endDate,
-                    config.duration,
-                    dataPoints
-                )
-            } ?: return notEnoughData(graphOrStat)
+                calculateAverageTimeBetweenOrNull(dataPoints)
+            }
             onDataSampled(dataSample.getRawDataPoints())
             object : IAverageTimeBetweenViewData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
                 override val averageMillis = averageMillis
-                override val hasEnoughData = true
             }
         } catch (throwable: Throwable) {
             object : IAverageTimeBetweenViewData {
@@ -116,10 +96,19 @@ class AverageTimeBetweenDataFactory :
         }
     }
 
-    private fun notEnoughData(graphOrStat: GraphOrStat) = object : IAverageTimeBetweenViewData {
-        override val state = IGraphStatViewData.State.READY
-        override val graphOrStat = graphOrStat
-    }
+    private fun graphNotFound(graphOrStat: GraphOrStat) =
+        object : IAverageTimeBetweenViewData {
+            override val error = GraphNotFoundException()
+            override val state = IGraphStatViewData.State.ERROR
+            override val graphOrStat = graphOrStat
+        }
+
+    private fun notEnoughData(graphOrStat: GraphOrStat, numDataPoints: Int) =
+        object : IAverageTimeBetweenViewData {
+            override val error = NotEnoughDataException(numDataPoints)
+            override val state = IGraphStatViewData.State.ERROR
+            override val graphOrStat = graphOrStat
+        }
 
     private suspend fun getRelevantDataPoints(
         dataSampler: IDataSampler,
