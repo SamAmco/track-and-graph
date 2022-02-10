@@ -26,6 +26,8 @@ class FeaturePathProvider(
 ) : GroupPathProvider(groups) {
     private val featuresById = features.map { it.id to it }.toMap()
 
+    fun featuresSortedAlphabetically() = features.sortedBy { getPathForFeature(it.id) }
+
     fun getPathForFeature(id: Long): String {
         val feature = featuresById[id] ?: return ""
         val groupPath = getPathForGroup(feature.groupId)

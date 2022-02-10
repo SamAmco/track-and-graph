@@ -167,7 +167,7 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupFeatureSpinner() {
-        val items = featurePathProvider.features.flatMap { getSpinnerItemsForFeature(it) }
+        val items = featurePathProvider.featuresSortedAlphabetically().flatMap { getSpinnerItemsForFeature(it) }
         val itemNames = items.map { it.third }
         val adapter =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
