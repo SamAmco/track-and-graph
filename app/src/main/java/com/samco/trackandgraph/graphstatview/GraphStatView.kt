@@ -178,7 +178,8 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         val headerText = graphOrStat?.name ?: ""
         binding.headerText.text = headerText
         binding.errorMessage.visibility = View.VISIBLE
-        binding.errorMessage.text = ErrorMessageResolver(context).getErrorMessage(throwable)
+        val t = ErrorMessageResolver(context).getErrorMessage(throwable)
+        binding.errorMessage.text = t
         setDynamicViewHeight()
     }
 

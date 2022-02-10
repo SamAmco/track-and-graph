@@ -20,9 +20,7 @@ package com.samco.trackandgraph.graphstatview.decorators
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.View
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
-import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import org.threeten.bp.OffsetDateTime
 
@@ -48,12 +46,8 @@ class GraphStatAverageTimeBetweenDecorator(listMode: Boolean) :
 
     @SuppressLint("SetTextI18n")
     private fun initAverageTimeBetweenStatBody() {
-        if (!data!!.hasEnoughData) {
-            throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
-        } else {
-            binding!!.statMessage.text =
-                formatTimeToDaysHoursMinutesSeconds(context!!, data!!.averageMillis.toLong())
-        }
+        binding!!.statMessage.text =
+            formatTimeToDaysHoursMinutesSeconds(context!!, data!!.averageMillis.toLong())
         binding!!.statMessage.visibility = View.VISIBLE
     }
 }

@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.R
+import android.util.Log
 import com.samco.trackandgraph.database.DataSamplerImpl
 import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
@@ -25,7 +25,8 @@ import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.functionslib.FilterLabelFunction
 import com.samco.trackandgraph.functionslib.FilterValueFunction
-import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
+import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
 
@@ -36,12 +37,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
         val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
-            ?: return object : ITimeSinceViewData {
-                override val state = IGraphStatViewData.State.ERROR
-                override val graphOrStat = graphOrStat
-                override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
-
-            }
+            ?: return graphNotFound(graphOrStat)
         return createViewData(dataSource, graphOrStat, timeSinceStat, onDataSampled)
     }
 
@@ -53,6 +49,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     ): ITimeSinceViewData {
         return try {
             val dataPoint = getLastDataPoint(dataSource, config, onDataSampled)
+                ?: return notEnoughData(graphOrStat, 0)
             object : ITimeSinceViewData {
                 override val lastDataPoint = dataPoint
                 override val state = IGraphStatViewData.State.READY
@@ -66,6 +63,20 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
             }
         }
     }
+
+    private fun graphNotFound(graphOrStat: GraphOrStat) =
+        object : ITimeSinceViewData {
+            override val state = IGraphStatViewData.State.ERROR
+            override val graphOrStat = graphOrStat
+            override val error = GraphNotFoundException()
+        }
+
+    private fun notEnoughData(graphOrStat: GraphOrStat, numDataPoints: Int) =
+        object : ITimeSinceViewData {
+            override val error = NotEnoughDataException(numDataPoints)
+            override val state = IGraphStatViewData.State.ERROR
+            override val graphOrStat = graphOrStat
+        }
 
     private suspend fun getLastDataPoint(
         dao: TrackAndGraphDatabaseDao,
