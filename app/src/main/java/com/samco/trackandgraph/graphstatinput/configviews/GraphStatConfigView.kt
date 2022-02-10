@@ -90,7 +90,7 @@ abstract class GraphStatConfigView constructor(
             featureFilter: (Feature) -> Boolean,
             onItemSelected: (Feature) -> Unit
         ) {
-            val allFeatures = view.featurePathProvider.features.filter(featureFilter)
+            val allFeatures = view.featurePathProvider.featuresSortedAlphabetically().filter(featureFilter)
             val context = view.context
             val itemNames = allFeatures.map { ft -> view.featurePathProvider.getPathForFeature(ft.id) }
             val adapter =

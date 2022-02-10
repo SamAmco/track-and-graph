@@ -23,6 +23,7 @@ import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.functionslib.CompositeFunction
 import com.samco.trackandgraph.functionslib.FilterLabelFunction
 import com.samco.trackandgraph.functionslib.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
@@ -88,7 +89,10 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
         val filterFunction =
             if (config.labels.isNullOrEmpty()) FilterValueFunction(config.fromValue, config.toValue)
-            else FilterLabelFunction(config.labels.toSet())
+            else CompositeFunction(
+                FilterLabelFunction(config.labels.toSet()),
+                FilterValueFunction(config.fromValue, config.toValue)
+            )
         val sample = filterFunction.mapSample(dataSample)
         val first = sample.firstOrNull()
         onDataSampled(sample.getRawDataPoints())
