@@ -66,7 +66,8 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
     private fun createEmptyConfig() = AverageTimeBetweenStat(
         0,
         0,
-        allFeatures.getOrElse(0) { null }?.id ?: 0,
+        //Shouldn't actually be possible to get here without at least one feature
+        allFeatureData.getOrElse(0) { null }?.feature?.id ?: 0,
         0.0,
         1.0,
         null,
@@ -77,7 +78,7 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
     override fun getCurrentFeatureId(): Long = configData.featureId
     override fun getCurrentFromValue(): Double = configData.fromValue
     override fun getCurrentToValue(): Double = configData.toValue
-    override fun getDiscreteValues(): List<Int> = emptyList() //TODO figure out ui stuff
+    override fun getLabels(): Set<String> = configData.labels.toSet()
 
 
     override fun getFeatureSpinner(): AppCompatSpinner = binding.valueStatFeatureSpinner
@@ -96,9 +97,8 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
         configData = configData.copy(featureId = featureId)
     }
 
-    override fun onNewDiscreteValues(discreteValues: List<Int>) {
-        //TODO figure this out
-        //configData = configData.copy(discreteValues = discreteValues)
+    override fun onNewLabels(labels: Set<String>) {
+        configData = configData.copy(labels = labels.toList())
     }
 
     override fun onNewToValue(value: Double) {

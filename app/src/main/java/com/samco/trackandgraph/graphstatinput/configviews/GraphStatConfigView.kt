@@ -30,7 +30,6 @@ import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.ExtendedSpinner
-import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.formatDayMonthYear
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -46,9 +45,9 @@ abstract class GraphStatConfigView constructor(
     attrs,
     defStyleAttr
 ) {
-    protected lateinit var featurePathProvider: FeaturePathProvider
+    protected lateinit var featureDataProvider: FeatureDataProvider
 
-    protected val allFeatures: List<Feature> get() = featurePathProvider.features
+    protected val allFeatureData: List<FeatureDataProvider.FeatureData> get() = featureDataProvider.featureData
 
     private var configChangedListener: ((Any?, ValidationException?) -> Unit)? = null
     protected var onScrollListener: ((Int) -> Unit)? = null
@@ -56,8 +55,8 @@ abstract class GraphStatConfigView constructor(
 
     abstract fun initFromConfigData(configData: Any?)
 
-    internal fun initFromConfigData(configData: Any?, featurePathProvider: FeaturePathProvider) {
-        this.featurePathProvider = featurePathProvider
+    internal fun initFromConfigData(configData: Any?, featurePathProvider: FeatureDataProvider) {
+        this.featureDataProvider = featurePathProvider
         initFromConfigData(configData)
     }
 
@@ -90,9 +89,9 @@ abstract class GraphStatConfigView constructor(
             featureFilter: (Feature) -> Boolean,
             onItemSelected: (Feature) -> Unit
         ) {
-            val allFeatures = view.featurePathProvider.featuresSortedAlphabetically().filter(featureFilter)
+            val allFeatures = view.featureDataProvider.featuresSortedAlphabetically().filter(featureFilter)
             val context = view.context
-            val itemNames = allFeatures.map { ft -> view.featurePathProvider.getPathForFeature(ft.id) }
+            val itemNames = allFeatures.map { ft -> view.featureDataProvider.getPathForFeature(ft.id) }
             val adapter =
                 ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
             spinner.adapter = adapter

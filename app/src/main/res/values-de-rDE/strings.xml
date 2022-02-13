@@ -151,7 +151,6 @@
     <string name="graph_stat_validation_unknown">Ein unbekannter Fehler ist aufgetreten</string>
     <string name="graph_stat_validation_no_name">Geben Sie bitte einen Namen an</string>
     <string name="graph_stat_validation_no_line_graph_features">Bitte fügen Sie dem Diagramm etwas hinzu</string>
-    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Bitte wählen Sie mindestens eine Multiple-Choice-Antwort aus</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Bitte stellen Sie sicher, dass "Von" kleiner oder gleich "Bis" ist.</string>
     <string name="graph_stat_validation_unrecognised_color">Bitte stellen Sie sicher, dass alle Datensätze eine Farbe haben</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Ungültiger Liniendiagramm-Datensatz entdeckt</string>

@@ -151,7 +151,7 @@
     <string name="graph_stat_validation_unknown">Une erreur inconnue s\'est produite</string>
     <string name="graph_stat_validation_no_name">Veuillez fournir un nom</string>
     <string name="graph_stat_validation_no_line_graph_features">Veuillez ajouter quelque chose au graphique</string>
-    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Veuillez sélectionner au moins une réponse à choix multiple</string>.
+    .
     <string name="graph_stat_validation_invalid_value_stat_from_to">Veuillez vous assurer que "Depuis" est antérieur ou égal à "Jusqu\'à"</string>.
     <string name="graph_stat_validation_unrecognised_color">Veuillez vous assurer que tous les ensembles de données ont une couleur</string>.
     <string name="graph_stat_validation_invalid_line_graph_feature">Ensemble de données de graphique linéaire non valide détecté</string>.

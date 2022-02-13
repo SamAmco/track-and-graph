@@ -51,7 +51,7 @@ class TimeHistogramConfigView @JvmOverloads constructor(
     private fun createEmptyConfig() = TimeHistogram(
         0L,
         0L,
-        allFeatures.getOrElse(0) { null }?.id ?: -1,
+        allFeatureData.getOrElse(0) { null }?.feature?.id ?: -1,
         null,
         TimeHistogramWindow.DAY,
         false,
@@ -97,8 +97,8 @@ class TimeHistogramConfigView @JvmOverloads constructor(
     }
 
     override fun validateConfig(): ValidationException? {
-        return if (allFeatures.isNullOrEmpty()
-            || !allFeatures.map { it.id }.contains(configData.featureId)
+        return if (allFeatureData.isNullOrEmpty()
+            || !allFeatureData.map { it.feature.id }.contains(configData.featureId)
         ) {
             ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         } else null

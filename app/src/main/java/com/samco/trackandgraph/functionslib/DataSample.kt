@@ -22,7 +22,8 @@ import com.samco.trackandgraph.database.entity.DataPoint
 import org.threeten.bp.temporal.TemporalAmount
 
 data class DataSampleProperties(
-    val regularity: TemporalAmount? = null
+    val regularity: TemporalAmount? = null,
+    val isDuration: Boolean = false
 )
 
 /**

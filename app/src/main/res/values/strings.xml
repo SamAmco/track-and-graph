@@ -164,7 +164,6 @@
     <string name="graph_stat_validation_unknown">An unknown error occurred</string>
     <string name="graph_stat_validation_no_name">Please provide a name</string>
     <string name="graph_stat_validation_no_line_graph_features">Please add something to the graph</string>
-    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Please select at least one multiple choice answer</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Please make sure that "From" is smaller than or equal to "To"</string>
     <string name="graph_stat_validation_unrecognised_color">Please make sure all data sets have a color</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Invalid line graph data set detected</string>
