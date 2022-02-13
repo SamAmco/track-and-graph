@@ -49,11 +49,15 @@ internal class PieChartConfigView @JvmOverloads constructor(
     }
 
     private fun discreteFeatures(): List<Feature> {
-        return allFeatures.filter { ftg -> ftg.featureType == DataType.DISCRETE }
+        return allFeatureData
+            .filter { data -> data.labels.isNotEmpty() }
+            .map { it.feature }
     }
 
     private fun getCurrentFeature(): Feature? {
-        return allFeatures.firstOrNull { it.id == configData.featureId }
+        return allFeatureData
+            .firstOrNull { it.feature.id == configData.featureId }
+            ?.feature
     }
 
     private fun initFromPieChart() {
@@ -67,8 +71,8 @@ internal class PieChartConfigView @JvmOverloads constructor(
             updateEndDateText(this, binding.customEndDateText, it)
         }
 
-        listenToFeatureSpinner(this, binding.pieChartFeatureSpinner, configData.featureId, {
-            ftg -> ftg.featureType == DataType.DISCRETE
+        listenToFeatureSpinner(this, binding.pieChartFeatureSpinner, configData.featureId, { ftg ->
+            ftg.featureType == DataType.DISCRETE
         }, {
             configData = configData.copy(featureId = it.id)
         })

@@ -28,7 +28,6 @@ import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.doubleFormatter
-import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.DurationInputView
@@ -46,7 +45,7 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
     protected abstract fun getCurrentFeatureId(): Long
     protected abstract fun getCurrentFromValue(): Double
     protected abstract fun getCurrentToValue(): Double
-    protected abstract fun getDiscreteValues(): List<Int>
+    protected abstract fun getLabels(): Set<String>
     protected abstract fun getFeatureSpinner(): AppCompatSpinner
     protected abstract fun getDiscreteValueButtonsLayout(): LinearLayout
     protected abstract fun getDiscreteValueInputLayout(): View
@@ -58,23 +57,20 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
     protected abstract fun getToDurationInput(): DurationInputView
 
     protected abstract fun onNewFeatureId(featureId: Long)
-    protected abstract fun onNewDiscreteValues(discreteValues: List<Int>)
+    protected abstract fun onNewLabels(labels: Set<String>)
     protected abstract fun onNewToValue(value: Double)
     protected abstract fun onNewFromValue(value: Double)
 
-    private fun getCurrentFeature(): Feature? {
+    private fun getCurrentFeatureData(): FeatureDataProvider.FeatureData? {
         val featId = getCurrentFeatureId()
-        return allFeatures.firstOrNull { it.id == featId }
+        return allFeatureData.firstOrNull { it.feature.id == featId }
     }
 
     override fun validateConfig(): ValidationException? {
-        val currFeature = getCurrentFeature()
-            ?: return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        if (currFeature.featureType == DataType.DISCRETE && getDiscreteValues().isEmpty()) {
-            return ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
-        } else if (getCurrentFromValue() > getCurrentToValue()){
+        if (getCurrentFeatureData() == null)
+            return ValidationException(R.string.graph_stat_validation_no_line_graph_features) //Shouldn't happen
+        if (getCurrentFromValue() > getCurrentToValue())
             return ValidationException(R.string.graph_stat_validation_invalid_value_stat_from_to)
-        }
         return null
     }
 
@@ -82,68 +78,52 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
         listenToValueStat()
         listenToContinuousRangeInputView()
         listenToDurationRangeInputView()
-        updateInputView(getCurrentFeature())
+        updateInputView()
     }
 
     private fun listenToValueStat() {
         listenToFeatureSpinner(this, getFeatureSpinner(), getCurrentFeatureId()) {
             onNewFeatureId(it.id)
-            updateInputView(it)
         }
     }
 
-    private fun updateInputView(feature: Feature?) {
-        when (feature?.featureType) {
-            DataType.DISCRETE -> {
-                sanitizeValueStatDiscreteValues()
-                setUpDiscreteValueInputView()
-                getDiscreteValueInputLayout().visibility = View.VISIBLE
-                getDurationRangeInput().visibility = View.GONE
-                getContinuousValueInputLayout().visibility = View.GONE
-            }
-            DataType.CONTINUOUS -> {
-                setUpContinuousRangeInputView()
-                getDiscreteValueInputLayout().visibility = View.GONE
-                getDurationRangeInput().visibility = View.GONE
-                getContinuousValueInputLayout().visibility = View.VISIBLE
-            }
-            DataType.DURATION -> {
-                setUpDurationRangeInputView()
-                getDiscreteValueInputLayout().visibility = View.GONE
-                getContinuousValueInputLayout().visibility = View.GONE
-                getDurationRangeInput().visibility = View.VISIBLE
-            }
-        }
-    }
+    private fun updateInputView() {
+        val featureData = getCurrentFeatureData() ?: return
+        val labels = featureData.labels
+        onNewLabels(labels)
+        getDiscreteValueInputLayout().visibility = if (labels.isNotEmpty()) View.VISIBLE else View.GONE
+        if (labels.isNotEmpty()) setUpDiscreteValueInputView(labels)
 
-    private fun sanitizeValueStatDiscreteValues() {
-        val allowedDiscreteValues = getCurrentFeature()?.discreteValues?.map { it.index }
-        val newValues = if (allowedDiscreteValues != null) {
-            getDiscreteValues()
-                .filter { allowedDiscreteValues.contains(it) }
-                .distinct()
-        } else emptyList()
-        onNewDiscreteValues(newValues)
+        val duration = featureData.dataProperties.isDuration
+        getDurationRangeInput().visibility = if (duration) View.VISIBLE else View.GONE
+        if (duration) {
+            getDurationRangeInput().visibility = View.VISIBLE
+            getContinuousValueInputLayout().visibility = View.GONE
+            setUpDurationRangeInputView()
+        } else {
+            getDurationRangeInput().visibility = View.GONE
+            getContinuousValueInputLayout().visibility = View.VISIBLE
+            setUpContinuousRangeInputView()
+        }
         emitConfigChange()
     }
 
-    private fun setUpDiscreteValueInputView() {
-        val discreteValues = getCurrentFeature()?.discreteValues ?: emptyList()
+    private fun setUpDiscreteValueInputView(labels: Set<String>) {
         val buttonsLayout = getDiscreteValueButtonsLayout()
         buttonsLayout.removeAllViews()
         val inflater = LayoutInflater.from(context)
-        for (discreteValue in discreteValues.sortedBy { it.index }) {
+        for (label in labels) {
             val item = inflater.inflate(
                 R.layout.discrete_value_input_button,
                 buttonsLayout, false
             ) as CheckBox
-            item.text = discreteValue.label
-            item.isChecked = getDiscreteValues().contains(discreteValue.index)
+            item.text = label
+            item.isChecked = getLabels().contains(label)
             item.setOnCheckedChangeListener { _, checked ->
-                val newDiscreteValues = getDiscreteValues().toMutableList()
-                if (checked) newDiscreteValues.add(discreteValue.index)
-                else newDiscreteValues.remove(discreteValue.index)
-                onNewDiscreteValues(newDiscreteValues)
+                val newLabels = getLabels().toMutableSet()
+                if (checked) newLabels.add(label)
+                else newLabels.remove(label)
+                onNewLabels(newLabels)
                 emitConfigChange()
             }
             buttonsLayout.addView(item)

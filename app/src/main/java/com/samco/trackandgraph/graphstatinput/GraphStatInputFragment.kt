@@ -24,8 +24,8 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
 import androidx.core.widget.addTextChangedListener
+import android.widget.*
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.NavController
@@ -39,10 +39,10 @@ import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.dto.*
 import com.samco.trackandgraph.database.entity.*
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
+import com.samco.trackandgraph.functionslib.DataSampleProperties
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.util.hideKeyboard
 import kotlinx.coroutines.*
 import java.lang.Exception
@@ -188,7 +188,10 @@ class GraphStatInputFragment : Fragment() {
     private fun updateViewForSelectedGraphStatType(graphStatType: GraphStatType) {
         binding.configLayout.removeAllViews()
         inflateConfigView(graphStatType)
-        currentConfigView.initFromConfigData(viewModel.configData.value, viewModel.featurePathProvider)
+        currentConfigView.initFromConfigData(
+            viewModel.configData.value,
+            viewModel.featureDataProvider
+        )
         listenToConfigView()
     }
 
@@ -277,7 +280,7 @@ class GraphStatInputViewModel : ViewModel() {
     val demoViewData: LiveData<IGraphStatViewData?> get() = _demoViewData
     private val _demoViewData = MutableLiveData<IGraphStatViewData?>(null)
 
-    lateinit var featurePathProvider: FeaturePathProvider private set
+    lateinit var featureDataProvider: FeatureDataProvider private set
 
     fun initViewModel(database: TrackAndGraphDatabase, graphStatGroupId: Long, graphStatId: Long) {
         if (this.database != null) return
@@ -288,7 +291,15 @@ class GraphStatInputViewModel : ViewModel() {
         ioScope.launch {
             val allFeatures = dataSource!!.getAllFeaturesSync()
             val allGroups = dataSource!!.getAllGroupsSync()
-            featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
+            //TODO Need to get an actual data sample and iterate to get actual labels and properties
+            val featureData = allFeatures.map { feat ->
+                FeatureDataProvider.FeatureData(
+                    feat,
+                    feat.discreteValues.map { it.label }.toSet(),
+                    DataSampleProperties(null, feat.featureType == DataType.DURATION)
+                )
+            }
+            featureDataProvider = FeatureDataProvider(featureData, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
             else withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
         }

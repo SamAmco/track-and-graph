@@ -22,8 +22,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.core.widget.addTextChangedListener
+import android.widget.AdapterView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dataVisColorGenerator
 import com.samco.trackandgraph.database.dataVisColorList
@@ -159,7 +159,7 @@ internal class LineGraphConfigView @JvmOverloads constructor(
 
     private fun inflateLineGraphFeatureView(index: Int, lineGraphFeature: LineGraphFeature) {
         val featureConfig = LineGraphFeatureConfig.fromLineGraphFeature(lineGraphFeature)
-        val view = LineGraphFeatureConfigListItemView(context, featurePathProvider, featureConfig)
+        val view = LineGraphFeatureConfigListItemView(context, featureDataProvider, featureConfig)
         lgfConfigIndices.add(index, view)
         view.setOnRemoveListener {
             binding.lineGraphFeaturesLayout.removeView(view)
@@ -220,7 +220,7 @@ internal class LineGraphConfigView @JvmOverloads constructor(
     override fun validateConfig(): ValidationException? {
         if (configData.features.isEmpty())
             return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        val featureIds = allFeatures.map { feat -> feat.id }.toSet()
+        val featureIds = allFeatureData.map { data -> data.feature.id }.toSet()
         configData.features.forEach { f ->
             if (f.colorIndex !in dataVisColorList.indices)
                 return ValidationException(R.string.graph_stat_validation_unrecognised_color)

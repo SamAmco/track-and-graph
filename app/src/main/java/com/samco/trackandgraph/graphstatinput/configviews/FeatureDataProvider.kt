@@ -15,24 +15,20 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.ui
+package com.samco.trackandgraph.graphstatinput.configviews
 
 import com.samco.trackandgraph.database.entity.Feature
 import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.functionslib.DataSampleProperties
+import com.samco.trackandgraph.ui.FeaturePathProvider
 
-open class FeaturePathProvider(
-    val features: List<Feature>,
+class FeatureDataProvider(
+    val featureData: List<FeatureData>,
     groups: List<Group>
-) : GroupPathProvider(groups) {
-    private val featuresById = features.map { it.id to it }.toMap()
-
-    fun featuresSortedAlphabetically() = features.sortedBy { getPathForFeature(it.id) }
-
-    fun getPathForFeature(id: Long): String {
-        val feature = featuresById[id] ?: return ""
-        val groupPath = getPathForGroup(feature.groupId)
-        var path = groupPath
-        if (groupPath.lastOrNull() != '/') path += '/'
-        return path + feature.name
-    }
+) : FeaturePathProvider(featureData.map { it.feature }, groups) {
+    data class FeatureData(
+        val feature: Feature,
+        val labels: Set<String>,
+        val dataProperties: DataSampleProperties
+    )
 }
