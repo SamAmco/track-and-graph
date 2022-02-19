@@ -23,7 +23,7 @@ import androidx.room.PrimaryKey
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-@Entity(tableName = "average_time_between_stat_table3",
+@Entity(tableName = "average_time_between_stat_table4",
     foreignKeys = [
         ForeignKey(
             entity = GraphOrStat::class,
@@ -62,5 +62,11 @@ data class AverageTimeBetweenStat(
     val labels: List<String>,
 
     @ColumnInfo(name = "end_date")
-    val endDate: OffsetDateTime?
+    val endDate: OffsetDateTime?,
+
+    @ColumnInfo(name = "filter_by_range")
+    val filterByRange: Boolean,
+
+    @ColumnInfo(name = "filter_by_labels")
+    val filterByLabels: Boolean
 )

@@ -64,15 +64,17 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
     override fun getConfigData(): Any = configData
 
     private fun createEmptyConfig() = AverageTimeBetweenStat(
-        0,
-        0,
+        id = 0,
+        graphStatId = 0,
         //Shouldn't actually be possible to get here without at least one feature
-        allFeatureData.getOrElse(0) { null }?.feature?.id ?: 0,
-        0.0,
-        1.0,
-        null,
-        emptyList(),
-        null
+        featureId = allFeatureData.getOrElse(0) { null }?.feature?.id ?: 0,
+        fromValue = 0.0,
+        toValue = 1.0,
+        duration = null,
+        labels = emptyList(),
+        endDate = null,
+        filterByRange = true,
+        filterByLabels = true
     )
 
     override fun getCurrentFeatureId(): Long = configData.featureId

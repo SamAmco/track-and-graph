@@ -21,7 +21,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "time_since_last_stat_table3",
+@Entity(tableName = "time_since_last_stat_table4",
     foreignKeys = [
         ForeignKey(
             entity = GraphOrStat::class,
@@ -54,5 +54,11 @@ data class TimeSinceLastStat(
     val toValue: Double,
 
     @ColumnInfo(name = "labels")
-    val labels: List<String>
+    val labels: List<String>,
+
+    @ColumnInfo(name = "filter_by_range")
+    val filterByRange: Boolean,
+
+    @ColumnInfo(name = "filter_by_labels")
+    val filterByLabels: Boolean
 )
