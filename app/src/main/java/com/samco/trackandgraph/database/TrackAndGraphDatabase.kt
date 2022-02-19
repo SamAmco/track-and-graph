@@ -57,7 +57,7 @@ val dataVisColorList = listOf(
         GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
         TimeSinceLastStat::class, Reminder::class, GlobalNote::class, LineGraphFeature::class,
         TimeHistogram::class],
-    version = 45
+    version = 46
 )
 @TypeConverters(Converters::class)
 abstract class TrackAndGraphDatabase : RoomDatabase() {

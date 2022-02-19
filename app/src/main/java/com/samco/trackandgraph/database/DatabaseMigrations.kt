@@ -907,6 +907,131 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
     }
 }
 
+val MIGRATION_45_46 = object : Migration(45, 46) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        updateAverageTimeBetween(database)
+        updateTimeSinceLast(database)
+    }
+
+    private fun updateAverageTimeBetween(database: SupportSQLiteDatabase) {
+        createAverageTimeBetweenTable(database)
+        insertAverageTimeBetweenData(database)
+        database.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table3`")
+    }
+
+    private fun insertAverageTimeBetweenData(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                INSERT INTO average_time_between_stat_table4 
+                    SELECT id, graph_stat_id, feature_id, from_value, to_value, duration, labels, end_date, 0, 0
+                    FROM average_time_between_stat_table3
+            """.trimIndent()
+        )
+        val updates = mutableListOf<NTuple3<Int, Int, Long>>()
+        val graphsCursor = database.query("SELECT * FROM average_time_between_stat_table4")
+        while (graphsCursor.moveToNext()) {
+            try {
+                val id = graphsCursor.getLong(0)
+                val labels = graphsCursor.getString(6)
+                val filterByRange = labels.equals("[]")
+                val filterByLabels = !filterByRange
+                updates.add(NTuple3(if (filterByRange) 1 else 0, if (filterByLabels) 1 else 0, id))
+            } catch (throwable: Throwable) {
+                continue
+            }
+        }
+        val query =
+            """
+                UPDATE average_time_between_stat_table4 SET filter_by_range=?, filter_by_labels=? WHERE id=?
+            """.trimIndent()
+        if (updates.size > 0) updates.forEach { args ->
+            database.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
+        }
+    }
+
+    private fun createAverageTimeBetweenTable(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                CREATE TABLE IF NOT EXISTS `average_time_between_stat_table4` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `graph_stat_id` INTEGER NOT NULL, 
+                    `feature_id` INTEGER NOT NULL, 
+                    `from_value` REAL NOT NULL, 
+                    `to_value` REAL NOT NULL, 
+                    `duration` TEXT, 
+                    `labels` TEXT NOT NULL, 
+                    `end_date` TEXT, 
+                    `filter_by_range` INTEGER NOT NULL, 
+                    `filter_by_labels` INTEGER NOT NULL, 
+                    FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , 
+                    FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
+                )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_id` ON `average_time_between_stat_table4` (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_graph_stat_id` ON `average_time_between_stat_table4` (`graph_stat_id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_feature_id` ON `average_time_between_stat_table4` (`feature_id`)")
+    }
+
+    private fun updateTimeSinceLast(database: SupportSQLiteDatabase) {
+        createTimeSinceLastTable(database)
+        insertTimeSinceLastData(database)
+        database.execSQL("DROP TABLE IF EXISTS `time_since_last_stat_table3`")
+    }
+
+    private fun insertTimeSinceLastData(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                INSERT INTO time_since_last_stat_table4 
+                SELECT id, graph_stat_id, feature_id, from_value, to_value, labels, 0, 0
+                FROM time_since_last_stat_table3
+            """.trimIndent()
+        )
+        val updates = mutableListOf<NTuple3<Int, Int, Long>>()
+        val graphsCursor = database.query("SELECT * FROM time_since_last_stat_table4")
+        while (graphsCursor.moveToNext()) {
+            try {
+                val id = graphsCursor.getLong(0)
+                val labels = graphsCursor.getString(5)
+                val filterByRange = labels.equals("[]")
+                val filterByLabels = !filterByRange
+                updates.add(NTuple3(if (filterByRange) 1 else 0, if (filterByLabels) 1 else 0, id))
+            } catch (throwable: Throwable) {
+                continue
+            }
+        }
+        val query =
+            """
+                UPDATE time_since_last_stat_table4 SET filter_by_range=?, filter_by_labels=? WHERE id=?
+            """.trimIndent()
+        if (updates.size > 0) updates.forEach { args ->
+            database.execSQL(query, args.toList().map { it.toString() }.toTypedArray())
+        }
+    }
+
+    private fun createTimeSinceLastTable(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                CREATE TABLE IF NOT EXISTS `time_since_last_stat_table4` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `graph_stat_id` INTEGER NOT NULL, 
+                    `feature_id` INTEGER NOT NULL, 
+                    `from_value` REAL NOT NULL, 
+                    `to_value` REAL NOT NULL, 
+                    `labels` TEXT NOT NULL, 
+                    `filter_by_range` INTEGER NOT NULL, 
+                    `filter_by_labels` INTEGER NOT NULL, 
+                    FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , 
+                    FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
+                )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_id` ON `time_since_last_stat_table4` (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_graph_stat_id` ON `time_since_last_stat_table4` (`graph_stat_id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_feature_id` ON `time_since_last_stat_table4` (`feature_id`)")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -923,5 +1048,6 @@ val allMigrations = arrayOf(
     MIGRATION_41_42,
     MIGRATION_42_43,
     MIGRATION_43_44,
-    MIGRATION_44_45
+    MIGRATION_44_45,
+    MIGRATION_45_46
 )

@@ -195,10 +195,10 @@ interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM pie_charts_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getPieChartByGraphStatId(graphStatId: Long): PieChart?
 
-    @Query("SELECT * FROM average_time_between_stat_table3 WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Query("SELECT * FROM average_time_between_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
 
-    @Query("SELECT * FROM time_since_last_stat_table3 WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Query("SELECT * FROM time_since_last_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")

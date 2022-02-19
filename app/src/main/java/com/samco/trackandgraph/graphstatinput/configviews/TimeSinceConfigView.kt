@@ -48,12 +48,14 @@ internal class TimeSinceConfigView @JvmOverloads constructor(
     }
 
     private fun createEmptyConfig() = TimeSinceLastStat(
-        0,
-        0,
-        allFeatureData.getOrElse(0) { null }?.feature?.id ?: 0,
-        0.0,
-        1.0,
-        emptyList()
+        id = 0,
+        graphStatId = 0,
+        featureId = allFeatureData.getOrElse(0) { null }?.feature?.id ?: 0,
+        fromValue = 0.0,
+        toValue = 1.0,
+        labels = emptyList(),
+        filterByRange = true,
+        filterByLabels = true
     )
 
     override fun getConfigData(): Any = configData
