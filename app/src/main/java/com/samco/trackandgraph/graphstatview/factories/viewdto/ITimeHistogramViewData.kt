@@ -17,15 +17,12 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.database.entity.DiscreteValue
 import com.samco.trackandgraph.database.entity.TimeHistogramWindow
 
 interface ITimeHistogramViewData : IGraphStatViewData {
     val window: TimeHistogramWindow?
         get() = null
-    val discreteValues: List<DiscreteValue>?
-        get() = null
-    val barValues: Map<Int, List<Double>>?
+    val barValues: Map<String, List<Double>>?
         get() = null
     val maxDisplayHeight: Double?
         get() = 0.0

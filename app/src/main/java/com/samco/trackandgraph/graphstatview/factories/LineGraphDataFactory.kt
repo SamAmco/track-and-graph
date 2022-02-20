@@ -144,7 +144,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         val rawDataSample = withContext(Dispatchers.IO) {
             val dataSampler = DataSamplerImpl(dao)
             val dataSource = DataSource.FeatureDataSource(lineGraphFeature.featureId)
-            dataSampler.getDataPointsForDataSource(dataSource)
+            dataSampler.getDataSampleForSource(dataSource)
         }
         val clippingCalculator = DataClippingFunction(config.endDate, config.duration)
 

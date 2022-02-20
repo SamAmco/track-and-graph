@@ -52,8 +52,6 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
         return try {
-            val discreteValue =
-                getDiscreteValues(dataSource, config) ?: listOf(DiscreteValue(0, ""))
             val timeHistogramDataHelper =
                 TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
             val barValues =
@@ -70,7 +68,6 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
                 override val window = config.window
-                override val discreteValues = discreteValue
                 override val barValues = barValues
                 override val maxDisplayHeight = maxDisplayHeight
             }
@@ -83,33 +80,20 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         }
     }
 
-    private fun getDiscreteValues(
-        dataSource: TrackAndGraphDatabaseDao,
-        config: TimeHistogram
-    ): List<DiscreteValue>? {
-        val feature = dataSource.tryGetFeatureByIdSync(config.featureId)
-        return feature?.let {
-            if (it.featureType == DataType.DISCRETE) it.discreteValues
-            else null
-        }
-    }
-
     private suspend fun getBarValues(
         dao: TrackAndGraphDatabaseDao,
         config: TimeHistogram,
         onDataSampled: (List<DataPoint>) -> Unit,
         timeHistogramDataHelper: TimeHistogramDataHelper
-    ): Map<Int, List<Double>>? {
-        val feature = dao.getFeatureById(config.featureId)
+    ): Map<String, List<Double>>? {
         val dataSampler = DataSamplerImpl(dao)
         val dataSource = DataSource.FeatureDataSource(config.featureId)
-        val sample = dataSampler.getDataPointsForDataSource(dataSource)
+        val sample = dataSampler.getDataSampleForSource(dataSource)
         val dataSample = DataClippingFunction(config.endDate, config.duration)
             .mapSample(sample)
         val barValues = timeHistogramDataHelper.getHistogramBinsForSample(
             dataSample,
             config.window,
-            feature,
             config.sumByCount
         )
         onDataSampled(dataSample.getRawDataPoints())

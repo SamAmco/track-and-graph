@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import android.util.Log
 import com.samco.trackandgraph.database.DataSamplerImpl
 import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
@@ -84,7 +83,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
     ): IDataPoint? {
         val dataSampler = DataSamplerImpl(dao)
         val dataSource = DataSource.FeatureDataSource(config.featureId)
-        val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
+        val dataSample = dataSampler.getDataSampleForSource(dataSource)
 
         val filters = mutableListOf<DataSampleFunction>()
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))

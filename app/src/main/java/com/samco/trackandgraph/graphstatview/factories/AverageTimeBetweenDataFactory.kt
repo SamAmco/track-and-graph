@@ -116,7 +116,7 @@ class AverageTimeBetweenDataFactory :
         feature: Feature
     ): DataSample {
         val dataSource = DataSource.FeatureDataSource(feature.id)
-        val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
+        val dataSample = dataSampler.getDataSampleForSource(dataSource)
         val filters = mutableListOf<DataSampleFunction>()
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
         if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))

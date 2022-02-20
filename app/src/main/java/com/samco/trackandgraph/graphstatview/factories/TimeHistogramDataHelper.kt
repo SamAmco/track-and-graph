@@ -70,38 +70,17 @@ class TimeHistogramDataHelper(
     internal fun getHistogramBinsForSample(
         sample: DataSample,
         window: TimeHistogramWindow,
-        feature: Feature,
         sumByCount: Boolean,
-    ): Map<Int, List<Double>>? {
+    ): Map<String, List<Double>>? {
         val sampleList = sample.toList()
         if (sampleList.isEmpty()) return null
         val endTime = getNextEndOfWindow(window, sample.first().timestamp)
-        val isDiscrete = feature.featureType == DataType.DISCRETE
-        val keys =
-            if (isDiscrete) feature.discreteValues.map { it.index }.toSet()
-            else listOf(0).toSet()
 
         return when {
-            isDiscrete && sumByCount ->
-                getHistogramBinsForSample(
-                    sampleList, window, keys, endTime,
-                    ::addOneDiscreteValueToBin
-                )
-            isDiscrete ->
-                getHistogramBinsForSample(
-                    sampleList, window, keys, endTime,
-                    ::addDiscreteValueToBin
-                )
             sumByCount ->
-                getHistogramBinsForSample(
-                    sampleList, window, keys, endTime,
-                    ::addOneToBin
-                )
+                getHistogramBinsForSample(sampleList, window, endTime, ::addOneToBin)
             else ->
-                getHistogramBinsForSample(
-                    sampleList, window, keys, endTime,
-                    ::addValueToBin
-                )
+                getHistogramBinsForSample(sampleList, window, endTime, ::addValueToBin)
         }
     }
 
@@ -117,11 +96,10 @@ class TimeHistogramDataHelper(
     private fun getHistogramBinsForSample(
         sample: List<IDataPoint>,
         window: TimeHistogramWindow,
-        keys: Set<Int>,
         endTime: ZonedDateTime,
-        addFunction: (IDataPoint, Map<Int, MutableList<Double>>, Int) -> Unit
-    ): Map<Int, List<Double>> {
-        val binTotalMaps = calculateBinTotals(sample, window, keys, endTime, addFunction)
+        addFunction: (IDataPoint, MutableMap<String, MutableList<Double>>, Int) -> Unit
+    ): Map<String, List<Double>> {
+        val binTotalMaps = calculateBinTotals(sample, window, endTime, addFunction)
         val total = binTotalMaps.map { it.value.sum() }.sum()
         return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { it / total } }.toMap()
     }
@@ -132,11 +110,10 @@ class TimeHistogramDataHelper(
     private fun calculateBinTotals(
         sample: List<IDataPoint>,
         window: TimeHistogramWindow,
-        keys: Set<Int>,
         endTime: ZonedDateTime,
-        addFunction: (IDataPoint, Map<Int, MutableList<Double>>, Int) -> Unit
-    ): Map<Int, List<Double>> {
-        val binTotalMap = keys.map { it to MutableList(window.numBins) { 0.0 } }.toMap()
+        addFunction: (IDataPoint, MutableMap<String, MutableList<Double>>, Int) -> Unit
+    ): Map<String, List<Double>> {
+        val binTotalMap = mutableMapOf<String, MutableList<Double>>()
         var currEnd = endTime
         var currStart = currEnd - window.period
         var binned = 0
@@ -157,6 +134,9 @@ class TimeHistogramDataHelper(
                 ).seconds.toDouble()
                 var binIndex = (window.numBins * (distance / periodDuration)).toInt()
                 if (binIndex == window.numBins) binIndex--
+                if (!binTotalMap.containsKey(nextPoint.label)) {
+                    binTotalMap[nextPoint.label] = MutableList(window.numBins) { 0.0 }
+                }
                 addFunction(nextPoint, binTotalMap, binIndex)
                 if (++binned == sample.size) break
                 nextPoint = sample[binned]
@@ -173,10 +153,11 @@ class TimeHistogramDataHelper(
      */
     private fun addValueToBin(
         dataPoint: IDataPoint,
-        bin: Map<Int, MutableList<Double>>,
+        bin: MutableMap<String, MutableList<Double>>,
         binIndex: Int
     ) {
-        bin[0]?.set(binIndex, (bin[0]?.get(binIndex) ?: 0.0) + dataPoint.value)
+        val list = bin[dataPoint.label]
+        list?.set(binIndex, list[binIndex] + dataPoint.value)
     }
 
     /**
@@ -184,34 +165,10 @@ class TimeHistogramDataHelper(
      */
     private fun addOneToBin(
         dataPoint: IDataPoint,
-        bin: Map<Int, MutableList<Double>>,
+        bin: MutableMap<String, MutableList<Double>>,
         binIndex: Int
     ) {
-        bin[0]?.set(binIndex, (bin[0]?.get(binIndex) ?: 0.0) + 1.0)
-    }
-
-    /**
-     * Add the value of the given data point to the bin at the given binIndex within the histogram
-     * specific to its discrete value.
-     */
-    private fun addDiscreteValueToBin(
-        dataPoint: IDataPoint,
-        bin: Map<Int, MutableList<Double>>,
-        binIndex: Int
-    ) {
-        val i = dataPoint.value.toInt()
-        bin[i]?.set(binIndex, (bin[i]?.get(binIndex) ?: 0.0) + dataPoint.value)
-    }
-
-    /**
-     * Add one to the bin at the given binIndex within the histogram specific to its discrete value.
-     */
-    private fun addOneDiscreteValueToBin(
-        dataPoint: IDataPoint,
-        bin: Map<Int, MutableList<Double>>,
-        binIndex: Int
-    ) {
-        val i = dataPoint.value.toInt()
-        bin[i]?.set(binIndex, (bin[i]?.get(binIndex) ?: 0.0) + 1.0)
+        val list = bin[dataPoint.label]
+        list?.set(binIndex, list[binIndex] + 1.0)
     }
 }
