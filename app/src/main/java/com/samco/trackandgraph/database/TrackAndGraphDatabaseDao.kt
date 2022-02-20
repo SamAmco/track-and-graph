@@ -30,7 +30,7 @@ private const val getFeatureByIdQuery =
 @Dao
 interface TrackAndGraphDatabaseDao {
     @RawQuery
-    fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery?): Int
+    fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 
     @Insert
     fun insertGroup(group: Group): Long

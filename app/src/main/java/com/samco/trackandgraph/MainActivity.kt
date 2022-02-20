@@ -54,6 +54,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var currentNavBarConfig: NavBarConfig
 
+    val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         readThemeValue()
@@ -77,7 +79,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeAppBar() {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.let {
             //The ActionBarDrawerToggle draws the navigation button/back button in the top left of

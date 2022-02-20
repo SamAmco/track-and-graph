@@ -86,19 +86,19 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
     override fun getFilterByRange(): Boolean = configData.filterByRange
 
     override fun getFeatureSpinner(): AppCompatSpinner = binding.valueStatFeatureSpinner
-    override fun getLabelButtonsLayout(): LinearLayout = binding.valueStatLabelsInputLayout
+    override fun getLabelButtonsLayout(): LinearLayout = binding.incLabelCard.valueStatLabelsInputLayout
 
-    override fun getLabelCardLayout(): View = binding.cardLabelInput
-    override fun getLabelCardContentLayout(): View = binding.labelButtonScrollView
+    override fun getLabelCardLayout(): View = binding.incLabelCard.cardLabelInput
+    override fun getLabelCardContentLayout(): View = binding.incLabelCard.labelButtonScrollView
 
-    override fun getDurationRangeInput(): View = binding.valueStatDurationRangeInput
-    override fun getContinuousValueInputLayout(): View = binding.valueStatContinuousValueInputLayout
-    override fun getToInput(): EditText = binding.valueStatToInput
-    override fun getFromInput(): EditText = binding.valueStatFromInput
-    override fun getFromDurationInput(): DurationInputView = binding.valueStatDurationFromInput
-    override fun getToDurationInput(): DurationInputView = binding.valueStatDurationToInput
-    override fun getFilterByLabelCheckbox(): CheckBox = binding.checkFilterByLabel
-    override fun getFilterByValueCheckbox(): CheckBox = binding.checkFilterByValue
+    override fun getDurationRangeInput(): View = binding.incRangeCard.valueStatDurationRangeInput
+    override fun getContinuousValueInputLayout(): View = binding.incRangeCard.valueStatContinuousValueInputLayout
+    override fun getToInput(): EditText = binding.incRangeCard.valueStatToInput
+    override fun getFromInput(): EditText = binding.incRangeCard.valueStatFromInput
+    override fun getFromDurationInput(): DurationInputView = binding.incRangeCard.valueStatDurationFromInput
+    override fun getToDurationInput(): DurationInputView = binding.incRangeCard.valueStatDurationToInput
+    override fun getFilterByLabelCheckbox(): CheckBox = binding.incLabelCard.checkFilterByLabel
+    override fun getFilterByValueCheckbox(): CheckBox = binding.incRangeCard.checkFilterByValue
 
     override fun onNewFeatureId(featureId: Long) {
         configData = configData.copy(featureId = featureId)

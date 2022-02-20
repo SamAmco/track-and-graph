@@ -40,7 +40,6 @@ import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
-import kotlinx.android.synthetic.main.data_point_input_dialog.*
 import kotlinx.coroutines.*
 
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
@@ -116,7 +115,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
                 viewModel.uiStates,
                 inputViews
             )
-            if (features.size == 1) indexText.visibility = View.INVISIBLE
+            if (features.size == 1) binding.indexText.visibility = View.INVISIBLE
         })
     }
 
@@ -189,7 +188,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun setupViewFeature(feature: Feature, index: Int) {
         if (feature.featureType != DataType.DISCRETE) binding.addButton.visibility = View.VISIBLE
         else binding.addButton.visibility = View.INVISIBLE
-        indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
+        binding.indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
         if (feature.featureType != DataType.DISCRETE) context?.showKeyboard()
