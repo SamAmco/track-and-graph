@@ -28,7 +28,6 @@ import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.doubleFormatter
-import com.samco.trackandgraph.database.entity.DataType
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -46,20 +45,28 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
     protected abstract fun getCurrentFromValue(): Double
     protected abstract fun getCurrentToValue(): Double
     protected abstract fun getLabels(): Set<String>
+    protected abstract fun getFilterByLabel(): Boolean
+    protected abstract fun getFilterByRange(): Boolean
+
     protected abstract fun getFeatureSpinner(): AppCompatSpinner
-    protected abstract fun getDiscreteValueButtonsLayout(): LinearLayout
-    protected abstract fun getDiscreteValueInputLayout(): View
+    protected abstract fun getLabelButtonsLayout(): LinearLayout
+    protected abstract fun getLabelCardLayout(): View
+    protected abstract fun getLabelCardContentLayout(): View
     protected abstract fun getDurationRangeInput(): View
     protected abstract fun getContinuousValueInputLayout(): View
     protected abstract fun getToInput(): EditText
     protected abstract fun getFromInput(): EditText
     protected abstract fun getFromDurationInput(): DurationInputView
     protected abstract fun getToDurationInput(): DurationInputView
+    protected abstract fun getFilterByLabelCheckbox(): CheckBox
+    protected abstract fun getFilterByValueCheckbox(): CheckBox
 
     protected abstract fun onNewFeatureId(featureId: Long)
     protected abstract fun onNewLabels(labels: Set<String>)
     protected abstract fun onNewToValue(value: Double)
     protected abstract fun onNewFromValue(value: Double)
+    protected abstract fun onFilterByLabelChanged(value: Boolean)
+    protected abstract fun onFilterByValueChanged(value: Boolean)
 
     private fun getCurrentFeatureData(): FeatureDataProvider.FeatureData? {
         val featId = getCurrentFeatureId()
@@ -78,38 +85,70 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
         listenToValueStat()
         listenToContinuousRangeInputView()
         listenToDurationRangeInputView()
+        listenToFilterCheckboxes()
         updateInputView()
+    }
+
+    private fun listenToFilterCheckboxes() {
+        getFilterByLabelCheckbox().setOnCheckedChangeListener { _, isChecked ->
+            onFilterByLabelChanged(isChecked)
+            setupLabelCardLayout(isChecked)
+            emitConfigChange()
+        }
+        getFilterByValueCheckbox().setOnCheckedChangeListener { _, isChecked ->
+            onFilterByValueChanged(isChecked)
+            setupRangeCardLayout(isChecked)
+            emitConfigChange()
+        }
+    }
+
+    private fun setupLabelCardLayout(isEnabled: Boolean) {
+        getLabelCardContentLayout().visibility = if (isEnabled) View.VISIBLE else View.GONE
+    }
+
+    private fun setupRangeCardLayout(isEnabled: Boolean) {
+        val featureData = getCurrentFeatureData() ?: return
+        val duration = featureData.dataProperties.isDuration
+        if (duration) {
+            getDurationRangeInput().visibility = if (isEnabled) View.VISIBLE else View.GONE
+            getContinuousValueInputLayout().visibility = View.GONE
+        } else {
+            getDurationRangeInput().visibility = View.GONE
+            getContinuousValueInputLayout().visibility = if (isEnabled) View.VISIBLE else View.GONE
+        }
     }
 
     private fun listenToValueStat() {
         listenToFeatureSpinner(this, getFeatureSpinner(), getCurrentFeatureId()) {
-            onNewFeatureId(it.id)
+            if (getCurrentFeatureId() != it.id) {
+                onFilterByValueChanged(false)
+                onFilterByLabelChanged(false)
+                onNewFeatureId(it.id)
+                updateInputView()
+            }
         }
     }
 
     private fun updateInputView() {
         val featureData = getCurrentFeatureData() ?: return
         val labels = featureData.labels
-        onNewLabels(labels)
-        getDiscreteValueInputLayout().visibility = if (labels.isNotEmpty()) View.VISIBLE else View.GONE
-        if (labels.isNotEmpty()) setUpDiscreteValueInputView(labels)
+        getLabelCardLayout().visibility = if (labels.isNotEmpty()) View.VISIBLE else View.GONE
+        if (labels.isNotEmpty()) setUpLabelButtonsView(labels)
+
+        getFilterByLabelCheckbox().isChecked = getFilterByLabel()
+        getFilterByValueCheckbox().isChecked = getFilterByRange()
 
         val duration = featureData.dataProperties.isDuration
         getDurationRangeInput().visibility = if (duration) View.VISIBLE else View.GONE
-        if (duration) {
-            getDurationRangeInput().visibility = View.VISIBLE
-            getContinuousValueInputLayout().visibility = View.GONE
-            setUpDurationRangeInputView()
-        } else {
-            getDurationRangeInput().visibility = View.GONE
-            getContinuousValueInputLayout().visibility = View.VISIBLE
-            setUpContinuousRangeInputView()
-        }
+        setUpDurationRangeInputView()
+        setUpContinuousRangeInputView()
+        setupLabelCardLayout(getFilterByLabel())
+        setupRangeCardLayout(getFilterByRange())
         emitConfigChange()
     }
 
-    private fun setUpDiscreteValueInputView(labels: Set<String>) {
-        val buttonsLayout = getDiscreteValueButtonsLayout()
+    private fun setUpLabelButtonsView(labels: Set<String>) {
+        val buttonsLayout = getLabelButtonsLayout()
         buttonsLayout.removeAllViews()
         val inflater = LayoutInflater.from(context)
         for (label in labels) {

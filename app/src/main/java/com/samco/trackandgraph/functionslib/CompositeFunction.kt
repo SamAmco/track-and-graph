@@ -21,6 +21,9 @@ package com.samco.trackandgraph.functionslib
  * A calculator that simply applies the operations of all provided calculators in order
  */
 class CompositeFunction(private vararg val calculators: DataSampleFunction) : DataSampleFunction {
+
+    constructor(calculators: List<DataSampleFunction>) : this(*calculators.toTypedArray())
+
     override suspend fun mapSample(dataSample: DataSample): DataSample {
         var runningSample = dataSample
         for (calculator in calculators) runningSample = calculator.mapSample(runningSample)

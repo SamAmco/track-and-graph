@@ -21,6 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatSpinner
@@ -54,8 +55,8 @@ internal class TimeSinceConfigView @JvmOverloads constructor(
         fromValue = 0.0,
         toValue = 1.0,
         labels = emptyList(),
-        filterByRange = true,
-        filterByLabels = true
+        filterByRange = false,
+        filterByLabels = false
     )
 
     override fun getConfigData(): Any = configData
@@ -63,18 +64,22 @@ internal class TimeSinceConfigView @JvmOverloads constructor(
     override fun getCurrentFromValue(): Double = configData.fromValue
     override fun getCurrentToValue(): Double = configData.toValue
     override fun getLabels(): Set<String> = configData.labels.toSet()
+    override fun getFilterByLabel(): Boolean = configData.filterByLabels
+    override fun getFilterByRange(): Boolean = configData.filterByRange
 
     override fun getFeatureSpinner(): AppCompatSpinner = binding.valueStatFeatureSpinner
-    override fun getDiscreteValueButtonsLayout(): LinearLayout =
-        binding.valueStatDiscreteValueButtonsLayout
+    override fun getLabelButtonsLayout(): LinearLayout = binding.valueStatLabelsInputLayout
+    override fun getLabelCardContentLayout(): View = binding.labelButtonScrollView
 
-    override fun getDiscreteValueInputLayout(): View = binding.valueStatDiscreteValueInputLayout
+    override fun getLabelCardLayout(): View = binding.cardLabelInput
     override fun getDurationRangeInput(): View = binding.valueStatDurationRangeInput
     override fun getContinuousValueInputLayout(): View = binding.valueStatContinuousValueInputLayout
     override fun getToInput(): EditText = binding.valueStatToInput
     override fun getFromInput(): EditText = binding.valueStatFromInput
     override fun getFromDurationInput(): DurationInputView = binding.valueStatDurationFromInput
     override fun getToDurationInput(): DurationInputView = binding.valueStatDurationToInput
+    override fun getFilterByLabelCheckbox(): CheckBox = binding.checkFilterByLabel
+    override fun getFilterByValueCheckbox(): CheckBox = binding.checkFilterByValue
 
     override fun onNewFeatureId(featureId: Long) {
         configData = configData.copy(featureId = featureId)
@@ -90,5 +95,13 @@ internal class TimeSinceConfigView @JvmOverloads constructor(
 
     override fun onNewFromValue(value: Double) {
         configData = configData.copy(fromValue = value)
+    }
+
+    override fun onFilterByLabelChanged(value: Boolean) {
+        configData = configData.copy(filterByLabels = value)
+    }
+
+    override fun onFilterByValueChanged(value: Boolean) {
+        configData = configData.copy(filterByRange = value)
     }
 }

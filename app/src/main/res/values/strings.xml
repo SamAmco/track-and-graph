@@ -270,7 +270,6 @@
     <string name="create">Create</string>
     <string name="use_default_value">Set a default value</string>
     <string name="default_value_description_hint">(Your default will be used automatically when you add a data point but you can always go back and change it.)</string>
-    <string name="check_all_relevant_values">Check all relevant values: </string>
     <string name="backup_and_restore">Backup and Restore</string>
     <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken.</string>
     <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app. Track &amp; Graph will restart after the restore is complete.</string>
@@ -344,4 +343,6 @@
     <string name="hold_to_preview">Hold to preview</string>
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="filter_by_label">Filter by label</string>
+    <string name="filter_by_value">Filter by value range</string>
 </resources>
