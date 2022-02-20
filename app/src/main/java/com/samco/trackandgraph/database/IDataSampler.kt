@@ -20,5 +20,5 @@ package com.samco.trackandgraph.database
 import com.samco.trackandgraph.functionslib.DataSample
 
 interface IDataSampler {
-    fun getDataPointsForDataSource(dataSource: DataSource): DataSample
+    fun getDataSampleForSource(dataSource: DataSource): DataSample
 }

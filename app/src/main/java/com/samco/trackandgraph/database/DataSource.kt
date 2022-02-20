@@ -17,6 +17,9 @@
 
 package com.samco.trackandgraph.database
 
+//TODO I think we remove this distinction from the front end and figure out how to get the
+// data in the sampler by adding an optional reference to a function table in the feature
+// database definition.
 sealed class DataSource {
     class FeatureDataSource(val featureId: Long) : DataSource()
     class FunctionDataSource(val functionId: Long) : DataSource()

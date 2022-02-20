@@ -48,9 +48,6 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     private var context: Context? = null
     private var data: ITimeHistogramViewData? = null
 
-    private lateinit var legendKeys: List<Int>
-    private lateinit var nameMap: Map<Int, String>
-
     private fun getLabelInterval(window: TimeHistogramWindow) = when (window) {
         TimeHistogramWindow.HOUR -> 5
         TimeHistogramWindow.DAY -> 2
@@ -178,14 +175,11 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     private fun drawLegend() {
-        legendKeys = data!!.barValues!!.keys.toList().sorted()
-        nameMap = data!!.discreteValues!!.map { it.index to it.label }.toMap()
-        if (legendKeys.size > 1) {
-            for (l in legendKeys) {
-                val colorIndex = (l * dataVisColorGenerator) % dataVisColorList.size
-                nameMap.getOrElse(l) { null }?.let { name ->
-                    inflateGraphLegendItem(binding!!, context!!, colorIndex, name)
-                }
+        val labels = data!!.barValues!!.keys.toList()
+        if (labels.size > 1) {
+            labels.forEachIndexed { i, l ->
+                val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
+                inflateGraphLegendItem(binding!!, context!!, colorIndex, l)
             }
         } else {
             binding?.legendFlexboxLayout?.removeAllViews()
@@ -195,11 +189,10 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     private fun drawBars() {
         val outlineColor = context!!.getColorFromAttr(R.attr.colorOnSurface)
 
-        for (key in legendKeys) {
+        data!!.barValues!!.keys.forEachIndexed { i, key ->
             val series = (data!!.barValues!![key] ?: error("")).toTypedArray()
-            val name = nameMap[key] ?: error("")
-            val xySeries = SimpleXYSeries(SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, name, *series)
-            val colorIndex = (key * dataVisColorGenerator) % dataVisColorList.size
+            val xySeries = SimpleXYSeries(SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, key, *series)
+            val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
             val color = ContextCompat.getColor(context!!, dataVisColorList[colorIndex])
             val seriesFormatter = BarFormatter(color, outlineColor)
             seriesFormatter.borderPaint.strokeWidth = PixelUtils.dpToPix(1f)

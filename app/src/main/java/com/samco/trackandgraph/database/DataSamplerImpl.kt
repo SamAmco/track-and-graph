@@ -36,7 +36,7 @@ class DataSamplerImpl(private val dao: TrackAndGraphDatabaseDao) : IDataSampler 
         )
     }
 
-    override fun getDataPointsForDataSource(dataSource: DataSource): DataSample {
+    override fun getDataSampleForSource(dataSource: DataSource): DataSample {
         return when (dataSource) {
             is DataSource.FeatureDataSource -> {
                 dataSampleFromDb(
