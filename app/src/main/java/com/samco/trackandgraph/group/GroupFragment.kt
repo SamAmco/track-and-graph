@@ -52,7 +52,6 @@ import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -343,14 +342,14 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
     override fun onStart() {
         super.onStart()
-        requireActivity().toolbar.overflowIcon =
+        (requireActivity() as MainActivity).toolbar.overflowIcon =
             ContextCompat.getDrawable(requireContext(), R.drawable.add_icon)
     }
 
     override fun onStop() {
         super.onStop()
         if (navController?.currentDestination?.id != R.id.groupFragment) {
-            requireActivity().toolbar.overflowIcon =
+            (requireActivity() as MainActivity).toolbar.overflowIcon =
                 ContextCompat.getDrawable(requireContext(), R.drawable.list_menu_icon)
         }
     }
