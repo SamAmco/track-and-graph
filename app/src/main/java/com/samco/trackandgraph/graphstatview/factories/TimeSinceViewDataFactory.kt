@@ -23,9 +23,7 @@ import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.database.entity.*
-import com.samco.trackandgraph.functionslib.CompositeFunction
-import com.samco.trackandgraph.functionslib.FilterLabelFunction
-import com.samco.trackandgraph.functionslib.FilterValueFunction
+import com.samco.trackandgraph.functionslib.*
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -87,14 +85,14 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         val dataSampler = DataSamplerImpl(dao)
         val dataSource = DataSource.FeatureDataSource(config.featureId)
         val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
-        val filterFunction =
-            if (config.labels.isNullOrEmpty()) FilterValueFunction(config.fromValue, config.toValue)
-            else CompositeFunction(
-                FilterLabelFunction(config.labels.toSet()),
-                FilterValueFunction(config.fromValue, config.toValue)
-            )
-        val sample = filterFunction.mapSample(dataSample)
+
+        val filters = mutableListOf<DataSampleFunction>()
+        if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
+        if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
+
+        val sample = CompositeFunction(filters).mapSample(dataSample)
         val first = sample.firstOrNull()
+
         onDataSampled(sample.getRawDataPoints())
         return first
     }

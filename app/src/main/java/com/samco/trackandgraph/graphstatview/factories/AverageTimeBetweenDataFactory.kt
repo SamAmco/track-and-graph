@@ -117,15 +117,10 @@ class AverageTimeBetweenDataFactory :
     ): DataSample {
         val dataSource = DataSource.FeatureDataSource(feature.id)
         val dataSample = dataSampler.getDataPointsForDataSource(dataSource)
-        val filterFunction =
-            if (config.labels.isNullOrEmpty()) FilterValueFunction(config.fromValue, config.toValue)
-            else CompositeFunction(
-                FilterLabelFunction(config.labels.toSet()),
-                FilterValueFunction(config.fromValue, config.toValue)
-            )
-        return CompositeFunction(
-            filterFunction,
-            DataClippingFunction(config.endDate, config.duration),
-        ).mapSample(dataSample)
+        val filters = mutableListOf<DataSampleFunction>()
+        if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
+        if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
+        filters.add(DataClippingFunction(config.endDate, config.duration))
+        return CompositeFunction(filters).mapSample(dataSample)
     }
 }
