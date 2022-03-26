@@ -217,8 +217,8 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     private fun onEditGraphStat(graphOrStat: IGraphStatViewData) {
         navController?.navigate(
             GroupFragmentDirections.actionGraphStatInput(
-                graphOrStat.graphOrStat.id,
-                args.groupId
+                graphStatId = graphOrStat.graphOrStat.id,
+                groupId = args.groupId
             )
         )
     }
