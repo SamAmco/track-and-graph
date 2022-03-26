@@ -92,7 +92,9 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
         val dataSource = DataSource.FeatureDataSource(feature.id)
         val dataSample = DataClippingFunction(pieChart.endDate, pieChart.duration)
             .mapSample(dataSampler.getDataSampleForSource(dataSource))
-        val dataPoints = dataSample.toList()
+        val dataPoints = dataSample
+            .filter { it.label.isNotEmpty() }
+            .toList()
         onDataSampled(dataSample.getRawDataPoints())
         return dataPoints.ifEmpty { null }
     }

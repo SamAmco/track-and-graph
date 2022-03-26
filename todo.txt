@@ -1,0 +1,8 @@
+- remove data type from IDataPoint
+	- Add pie chart exception for data source with no labels or too many labels (or generate random colours?)
+	- Line graph data factory should check dataSampleProperties isDuration bool rather than feature type
+	- Double check all tests are passing before you merge
+
+
+- When you add functions you need to go back and change graph/stat config logic to account for them.
+	- You need to gather the labels per feature in the graphstatinput view model 
