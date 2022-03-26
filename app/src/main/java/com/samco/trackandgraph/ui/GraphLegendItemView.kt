@@ -17,16 +17,28 @@
 package com.samco.trackandgraph.ui
 
 import android.content.Context
+import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat.getColor
 import com.samco.trackandgraph.databinding.ListItemGraphLegendBinding
 
-//TODO this is incorrectly written
-class GraphLegendItemView(context: Context, colorId: Int, text: String): FrameLayout(context) {
-    private var binding = ListItemGraphLegendBinding.inflate(LayoutInflater.from(context), this, true)
-    init {
-        binding.circleImage.setColorFilter(getColor(context, colorId))
-        binding.labelText.text = text
-    }
+class GraphLegendItemView @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : FrameLayout(context) {
+    private val binding = ListItemGraphLegendBinding
+        .inflate(LayoutInflater.from(context), this, true)
+
+    var color: Int = 0
+        set(value) {
+            binding.circleImage.setColorFilter(value)
+            field = value
+        }
+
+    var text: String = ""
+        set(value) {
+            binding.labelText.text = value
+            field = value
+        }
 }

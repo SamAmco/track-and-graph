@@ -20,6 +20,7 @@ package com.samco.trackandgraph.graphstatview.decorators
 import android.content.Context
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
@@ -179,7 +180,8 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
         if (labels.size > 1) {
             labels.forEachIndexed { i, l ->
                 val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
-                inflateGraphLegendItem(binding!!, context!!, colorIndex, l)
+                val color = getColor(context!!, dataVisColorList[colorIndex])
+                inflateGraphLegendItem(binding!!, context!!, color, l)
             }
         } else {
             binding?.legendFlexboxLayout?.removeAllViews()

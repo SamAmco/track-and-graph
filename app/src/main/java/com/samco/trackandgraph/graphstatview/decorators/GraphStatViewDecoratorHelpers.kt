@@ -19,21 +19,18 @@ package com.samco.trackandgraph.graphstatview.decorators
 
 import android.content.Context
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.ui.GraphLegendItemView
 
 internal fun inflateGraphLegendItem(
     binding: GraphStatViewBinding, context: Context,
-    colorIndex: Int, label: String
+    color: Int, label: String
 ) {
-    val colorId = dataVisColorList[colorIndex]
     binding.legendFlexboxLayout.addView(
-        GraphLegendItemView(
-            context,
-            colorId,
-            label
-        )
+        GraphLegendItemView(context).apply {
+            this.color = color
+            this.text = label
+        }
     )
 }
 
@@ -50,8 +47,8 @@ internal fun formatTimeToDaysHoursMinutesSeconds(context: Context, millis: Long)
     val hasHms = (hours + minutes + seconds) > 0
     val hms = "$hoursStr:$minutesStr:$secondsStr"
     return when {
-        daysNum == 1 -> "$days ${context.getString(R.string.day)}${if (hasHms) "\n"+hms else ""}"
-        daysNum > 0 -> "$days ${context.getString(R.string.days)}${if (hasHms) "\n"+hms else ""}"
+        daysNum == 1 -> "$days ${context.getString(R.string.day)}${if (hasHms) "\n" + hms else ""}"
+        daysNum > 0 -> "$days ${context.getString(R.string.days)}${if (hasHms) "\n" + hms else ""}"
         else -> hms
     }
 }

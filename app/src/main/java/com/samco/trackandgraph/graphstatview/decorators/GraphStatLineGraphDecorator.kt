@@ -21,6 +21,7 @@ import android.content.Context
 import android.graphics.Paint
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.*
@@ -210,7 +211,8 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     private suspend fun drawLineGraphFeatures() {
         for (kvp in data!!.plottableData) {
             withContext(Dispatchers.Main) {
-                inflateGraphLegendItem(binding!!, context!!, kvp.key.colorIndex, kvp.key.name)
+                val color = getColor(context!!, dataVisColorList[kvp.key.colorIndex])
+                inflateGraphLegendItem(binding!!, context!!, color, kvp.key.name)
             }
             kvp.value?.let { addSeries(it, kvp.key) }
         }
