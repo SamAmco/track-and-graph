@@ -61,7 +61,7 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
                     override val graphOrStat = graphOrStat
                 }
             val segments = getPieChartSegments(plottingData)
-            val total = segments.sumByDouble { s -> s.value.toDouble() }
+            val total = segments.sumOf { s -> s.value.toDouble() }
             val percentages = segments.map {
                 Segment(it.title, (it.value.toDouble() / total) * 100f)
             }
@@ -94,7 +94,7 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
             .mapSample(dataSampler.getDataSampleForSource(dataSource))
         val dataPoints = dataSample.toList()
         onDataSampled(dataSample.getRawDataPoints())
-        return if (dataPoints.isNotEmpty()) dataPoints else null
+        return dataPoints.ifEmpty { null }
     }
 
     private fun getPieChartSegments(dataSample: List<IDataPoint>) =
