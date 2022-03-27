@@ -26,6 +26,9 @@ class FeatureDataProvider(
     val featureData: List<FeatureData>,
     groups: List<Group>
 ) : FeaturePathProvider(featureData.map { it.feature }, groups) {
+
+    fun featureDataAlphabetical() = featureData.sortedBy { getPathForFeature(it.feature.id) }
+
     data class FeatureData(
         val feature: Feature,
         val labels: Set<String>,
