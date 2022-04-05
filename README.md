@@ -7,8 +7,10 @@ An android app for tracking personal data and creating custom graphs
 <p align="center">
 	<a href='https://play.google.com/store/apps/details?id=com.samco.trackandgraph'>
 		<img alt='Get it on Google Play' src='https://play.google.com/intl/en_gb/badges/static/images/badges/en_badge_web_generic.png' height="100px" />
+	</a>
 	<a href='https://f-droid.org/packages/com.samco.trackandgraph/'>
 		<img alt='Get it on F-Droid' src='https://fdroid.gitlab.io/artwork/badge/get-it-on.png' height="100px" />
+	</a>
 </p>
 
 # Screenshots
@@ -75,3 +77,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+
+# Donate crypto to the creator
+
+<center>
+
+| <img src="./docs/readme/bitcoin.jpeg" width="180px" /> | <img src="./docs/readme/ethereum.jpeg" width="180px" /> |
+|:--:|:--:|
+| bc1q3a74v98lklzqsgrennlveujfwgluusld7hqsvu | 0xf2bae4971f67dfb49a2a4a08449980657abfb965 |
+| <img src="./docs/readme/bitcoin-cash.jpeg" width="180px" /> | <img src="./docs/readme/litecoin.jpeg" width="180px" /> |
+| qr266rwh2t4jajlvekudn89vlh6nd6u4wsj3ngv45m | ltc1q0ayy9ctvnnk7wyqgmh80ujq6wry3saz9a00d28 |
+
+</center>
