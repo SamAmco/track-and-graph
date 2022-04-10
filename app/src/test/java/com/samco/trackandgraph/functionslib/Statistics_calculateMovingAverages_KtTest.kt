@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.database.entity.DataType
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -145,7 +144,6 @@ class Statistics_calculateMovingAverages_KtTest {
 
     private fun makedp(value: Double, timestamp: OffsetDateTime) = object: IDataPoint() {
         override val timestamp = timestamp
-        override val dataType = DataType.CONTINUOUS
         override val value = value
         override val label = ""
     }

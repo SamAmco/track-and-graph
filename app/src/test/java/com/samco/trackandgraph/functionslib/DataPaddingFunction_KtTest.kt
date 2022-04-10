@@ -280,9 +280,9 @@ class DataPaddingFunction_KtTest {
                 .withNano(0)
             val duration = Period.ofWeeks(3)
             val dataSampleProperties = DataSampleProperties(regularity = Period.ofWeeks(1))
-            val sequence =
-                listOf(1, 2).map { makedp(endDate.minusSeconds(1).minusWeeks(it.toLong())) }
-                    .asSequence()
+            val sequence = listOf(1, 2)
+                .map { makedp(endDate.minusSeconds(1).minusWeeks(it.toLong())) }
+                .asSequence()
             val sample = DataSample.fromSequence(sequence, dataSampleProperties)
 
             //WHEN
@@ -308,7 +308,6 @@ class DataPaddingFunction_KtTest {
 
     private fun makedp(timestamp: OffsetDateTime) = object : IDataPoint() {
         override val timestamp = timestamp
-        override val dataType = DataType.CONTINUOUS
         override val value = 1.0
         override val label = ""
     }

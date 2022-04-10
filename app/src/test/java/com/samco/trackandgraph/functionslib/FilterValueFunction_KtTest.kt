@@ -28,7 +28,6 @@ class FilterValueFunction_KtTest {
 
     data class DpInput(
         val offset: Int,
-        val dataType: DataType,
         val label: String,
         val value: Double = 1.0
     )
@@ -39,23 +38,23 @@ class FilterValueFunction_KtTest {
             //GIVEN
             val now = OffsetDateTime.now()
             val inputPoints = listOf(
-                DpInput(1, DataType.CONTINUOUS, "", 500.0),
-                DpInput(4, DataType.CONTINUOUS, "", 200.0),
-                DpInput(5, DataType.CONTINUOUS, "", 100.0),
-                DpInput(10, DataType.CONTINUOUS, "", 300.0)
+                DpInput(1, "", 500.0),
+                DpInput(4, "", 200.0),
+                DpInput(5, "", 100.0),
+                DpInput(10, "", 300.0)
             ).map { makedp(now, it) }
             val dataSample = DataSample.fromSequence(inputPoints.asSequence())
 
             //WHEN
-            val answer = FilterValueFunction(150.0, 350.0, emptyList())
+            val answer = FilterValueFunction(150.0, 350.0)
                 .mapSample(dataSample)
                 .toList()
 
             //THEN
             assertEquals(
                 listOf(
-                    DpInput(4, DataType.CONTINUOUS, "", 200.0),
-                    DpInput(10, DataType.CONTINUOUS, "", 300.0)
+                    DpInput(4, "", 200.0),
+                    DpInput(10, "", 300.0)
                 ).map { makedp(now, it) },
                 answer
             )
@@ -68,51 +67,55 @@ class FilterValueFunction_KtTest {
             //GIVEN
             val now = OffsetDateTime.now()
             val inputPoints = listOf(
-                DpInput(1, DataType.DISCRETE, "A", 1.0),
-                DpInput(4, DataType.DISCRETE, "B", 2.0),
-                DpInput(5, DataType.DISCRETE, "A", 1.0),
-                DpInput(10, DataType.DISCRETE, "B", 2.0)
+                DpInput(1, "A", 1.0),
+                DpInput(4, "B", 2.0),
+                DpInput(5, "A", 1.0),
+                DpInput(10, "B", 2.0)
             ).map { makedp(now, it) }
             val dataSample = DataSample.fromSequence(inputPoints.asSequence())
 
             //WHEN
-            val answer = FilterValueFunction(150.0, 350.0, listOf(1))
+            val answer = FilterLabelFunction(setOf("A"))
                 .mapSample(dataSample)
                 .toList()
 
             //THEN
             assertEquals(
                 listOf(
-                    DpInput(1, DataType.DISCRETE, "A", 1.0),
-                    DpInput(5, DataType.DISCRETE, "A", 1.0)
+                    DpInput(1, "A", 1.0),
+                    DpInput(5, "A", 1.0)
                 ).map { makedp(now, it) },
                 answer
             )
         }
     }
+
     @Test
     fun filter_mixed() {
         runBlocking {
             //GIVEN
             val now = OffsetDateTime.now()
             val inputPoints = listOf(
-                DpInput(1, DataType.DISCRETE, "A", 1.0),
-                DpInput(4, DataType.DISCRETE, "B", 2.0),
-                DpInput(5, DataType.CONTINUOUS, "", 100.0),
-                DpInput(10, DataType.DISCRETE, "B", 2.0)
+                DpInput(1, "A", 1.0),
+                DpInput(4, "B", 2.0),
+                DpInput(5, "A", 100.0),
+                DpInput(10, "B", 2.0)
             ).map { makedp(now, it) }
             val dataSample = DataSample.fromSequence(inputPoints.asSequence())
 
             //WHEN
-            val answer = FilterValueFunction(-50.0, 350.0, listOf(1))
+            val answer = CompositeFunction(
+                FilterValueFunction(-50.0, 350.0),
+                FilterLabelFunction(setOf("A"))
+            )
                 .mapSample(dataSample)
                 .toList()
 
             //THEN
             assertEquals(
                 listOf(
-                    DpInput(1, DataType.DISCRETE, "A", 1.0),
-                    DpInput(5, DataType.CONTINUOUS, "", 100.0),
+                    DpInput(1, "A", 1.0),
+                    DpInput(5, "A", 100.0),
                 ).map { makedp(now, it) },
                 answer
             )
@@ -121,7 +124,6 @@ class FilterValueFunction_KtTest {
 
     private fun makedp(now: OffsetDateTime, dpInput: DpInput) = object : IDataPoint() {
         override val timestamp = now.minusHours(dpInput.offset.toLong())
-        override val dataType = dpInput.dataType
         override val value = dpInput.value
         override val label = dpInput.label
     }

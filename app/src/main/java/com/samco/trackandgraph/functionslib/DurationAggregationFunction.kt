@@ -25,16 +25,13 @@ import org.threeten.bp.temporal.TemporalAmount
  * sample data contains 3 data points {1, 3, 7} all tracked on the same day then the function will
  * return a data sample containing 1 point with the value 11.
  *
- * The currently supported plotTotalTime values are: Duration.ofHours(1), Period.ofDays(1),
+ * The timestamp of each generated data point will be one nanosecond before the end of that [binSize]
+ * period. For example if the [binSize] is one week and the [timeHelper] specifies [TimeHelper.findEndOfTemporal]
+ * for one week to be at 00:00 on a Monday then each generated data point will have a timestamp
+ * of the last nanosecond of the preceding Sunday.
+ *
+ * The currently supported [binSize] values are: Duration.ofHours(1), Period.ofDays(1),
  * Period.ofWeeks(1), Period.ofMonths(1), Period.ofYears(1)
- *
- * If sampleDuration is provided then totals will be generated at least as far back as now minus the
- * sampleDuration. However if there is more data before this period then it that data will also be
- * totalled. For clipping see clipDataSample.
- *
- * If end time is provided then totals will be generated at least up to this time. However if there
- * is more data after the end time in the input sample then that data will also be totalled. For
- * clipping see clipDataSample.
  *
  * sampleData.dataPoints should be sorted from oldest timestamp to newest timestamp
  */
