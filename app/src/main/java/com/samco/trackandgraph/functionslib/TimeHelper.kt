@@ -55,16 +55,25 @@ class TimeHelper(
      *
      */
     fun findBeginningOfTemporal(
-        dateTime: OffsetDateTime,
+        zonedDateTime: ZonedDateTime,
         temporalAmount: TemporalAmount,
-        zoneId: ZoneId
     ): ZonedDateTime {
-        val zonedDateTime = dateTime.atZoneSameInstant(zoneId)
         return when (temporalAmount) {
             is Duration -> findBeginningOfDuration(zonedDateTime, temporalAmount)
             is Period -> findBeginningOfPeriod(zonedDateTime, temporalAmount)
             else -> zonedDateTime
         }
+    }
+
+    /**
+     * @see findBeginningOfTemporal
+     */
+    fun findBeginningOfTemporal(
+        dateTime: OffsetDateTime,
+        temporalAmount: TemporalAmount,
+        zoneId: ZoneId
+    ): ZonedDateTime {
+        return findBeginningOfTemporal(dateTime.atZoneSameInstant(zoneId), temporalAmount)
     }
 
     fun toZonedDateTime(dateTime: OffsetDateTime): ZonedDateTime {
@@ -106,6 +115,18 @@ class TimeHelper(
         zoneId: ZoneId
     ): ZonedDateTime {
         return findBeginningOfTemporal(dateTime, temporalAmount, zoneId)
+            .plus(temporalAmount)
+            .minusNanos(1)
+    }
+
+    /**
+     * @see findBeginningOfTemporal
+     */
+    fun findEndOfTemporal(
+        zonedDateTime: ZonedDateTime,
+        temporalAmount: TemporalAmount,
+    ): ZonedDateTime {
+        return findBeginningOfTemporal(zonedDateTime, temporalAmount)
             .plus(temporalAmount)
             .minusNanos(1)
     }

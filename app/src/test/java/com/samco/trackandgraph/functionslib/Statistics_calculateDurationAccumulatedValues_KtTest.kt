@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.functionslib
 
 import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.database.entity.DataType
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -53,7 +52,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
                 "2021-10-18T00:16:16.137+01:00",
                 "2021-10-11T08:08:16.310+01:00",
                 "2021-10-04T00:20:00.197+01:00"
-            ).map { iDataPoint(toODT(it), 1.0, "", DataType.CONTINUOUS) }
+            ).map { iDataPoint(toODT(it), 1.0, "") }
             val rawData = DataSample.fromSequence(dataPoints.asSequence())
 
             //WHEN
@@ -85,12 +84,11 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
         }
     }
 
-    private fun iDataPoint(time: OffsetDateTime, value: Double, label: String, dataType: DataType) =
+    private fun iDataPoint(time: OffsetDateTime, value: Double, label: String) =
         object : IDataPoint() {
             override val timestamp = time
             override val value = value
             override val label = label
-            override val dataType = dataType
         }
 
     @Test
@@ -297,12 +295,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             for (y in 0 until element) {
                 val dataPointTime = currentTime.minusSeconds(y + 1L)
                 dataPoints.add(
-                    iDataPoint(
-                        dataPointTime,
-                        1.0,
-                        "",
-                        DataType.CONTINUOUS
-                    )
+                    iDataPoint(dataPointTime, 1.0, "")
                 )
             }
             currentTime = currentTime.minus(totalingPeriod)
@@ -324,7 +317,7 @@ class Statistics_calculateDurationAccumulatedValues_KtTest {
             currentDay = currentDay.with(TemporalAdjusters.previousOrSame(dayOfWeek))
             val timestamp = currentDay + Duration.ofMinutes(timeInMinutes.toLong())
 
-            output.add(iDataPoint(timestamp, value, "Hi", DataType.DISCRETE))
+            output.add(iDataPoint(timestamp, value, "Hi"))
         }
 
         return output.asSequence()

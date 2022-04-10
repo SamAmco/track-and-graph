@@ -39,8 +39,9 @@ class AverageTimeBetweenDataFactory :
         /**
          * Calculates the average duration between the timestamps of a set of data points. This is
          * simply the duration between first and last divided by the number of points minus 1.
+         * Points must be passed in in order from newest to oldest
          */
-        internal fun calculateAverageTimeBetweenOrNull(
+        internal fun calculateAverageTimeBetween(
             dataPoints: List<IDataPoint>
         ): Double {
             if (dataPoints.size < 2) throw Exception("Don't call this method with less than 2 data points.")
@@ -79,7 +80,7 @@ class AverageTimeBetweenDataFactory :
             }
             if (dataPoints.size < 2) return notEnoughData(graphOrStat, dataPoints.size)
             val averageMillis = withContext(Dispatchers.Default) {
-                calculateAverageTimeBetweenOrNull(dataPoints)
+                calculateAverageTimeBetween(dataPoints)
             }
             onDataSampled(dataSample.getRawDataPoints())
             object : IAverageTimeBetweenViewData {

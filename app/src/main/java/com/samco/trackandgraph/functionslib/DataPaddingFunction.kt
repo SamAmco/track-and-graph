@@ -20,19 +20,25 @@ package com.samco.trackandgraph.functionslib
 import com.samco.trackandgraph.database.dto.IDataPoint
 import com.samco.trackandgraph.functionslib.exceptions.InvalidRegularityException
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
 /**
- * Requires regular input. Makes sure that the output sample at least contains data up to
+ * Makes sure that the output sample at least contains data up to
  * the end time and down to the start time. No clipping is performed here, so if the input sample is
  * larger than the given time range then the input sample will not be modified. If there is no data
  * in the input sample then empty points will be created for the entire range. Default values for
  * those data points can be optionally provided.
+ *
+ * The timestamp of each generated data point is provided by [TimeHelper.findEndOfTemporal] with
+ * the temporal amount value given as the [DataSampleProperties.regularity]
+ *
+ * Requires regular input.
  */
 class DataPaddingFunction : DataSampleFunction {
     private val timeHelper: TimeHelper
-    private val endTime: OffsetDateTime
-    private val startTime: OffsetDateTime
+    private val endTime: ZonedDateTime
+    private val startTime: ZonedDateTime
     private val defaultValue: Double
     private val defaultLabel: String
 
@@ -44,7 +50,7 @@ class DataPaddingFunction : DataSampleFunction {
         defaultLabel: String = ""
     ) {
         this.timeHelper = timeHelper
-        this.endTime = endTime ?: OffsetDateTime.now()
+        this.endTime = endTime?.let { timeHelper.toZonedDateTime(it) } ?: ZonedDateTime.now()
         this.startTime = duration?.let { this.endTime.minus(it) } ?: this.endTime
         this.defaultValue = defaultValue
         this.defaultLabel = defaultLabel
@@ -52,18 +58,21 @@ class DataPaddingFunction : DataSampleFunction {
 
     constructor(
         timeHelper: TimeHelper,
-        endTime: OffsetDateTime?,
-        startTime: OffsetDateTime?,
+        endTime: ZonedDateTime?,
+        startTime: ZonedDateTime?,
         defaultValue: Double = 0.0,
         defaultLabel: String = ""
     ) {
         this.timeHelper = timeHelper
-        this.endTime = endTime ?: OffsetDateTime.now()
-        this.startTime = startTime ?: OffsetDateTime.now()
+        this.endTime = endTime ?: ZonedDateTime.now()
+        this.startTime = startTime ?: ZonedDateTime.now()
         this.defaultValue = defaultValue
         this.defaultLabel = defaultLabel
     }
 
+    /**
+     * @throws InvalidRegularityException if the data sample provided has a null regularity
+     */
     override suspend fun mapSample(dataSample: DataSample): DataSample {
         if (dataSample.dataSampleProperties.regularity == null) throw InvalidRegularityException()
         return DataSample.fromSequence(
@@ -94,8 +103,7 @@ class DataPaddingFunction : DataSampleFunction {
                     .minus(period)
             }
         }
-        val beginning = timeHelper.toZonedDateTime(startTime)
-        while (current > beginning) {
+        while (current > startTime) {
             yield(createDataPoint(current.toOffsetDateTime()))
             current = current.minus(period)
         }
