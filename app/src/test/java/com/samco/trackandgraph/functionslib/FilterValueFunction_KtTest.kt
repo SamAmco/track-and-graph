@@ -17,8 +17,11 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.database.entity.DataType
+import com.samco.trackandgraph.base.data.IDataPoint
+import com.samco.trackandgraph.functions.functions.CompositeFunction
+import com.samco.trackandgraph.functions.sampling.DataSample
+import com.samco.trackandgraph.functions.functions.FilterLabelFunction
+import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test

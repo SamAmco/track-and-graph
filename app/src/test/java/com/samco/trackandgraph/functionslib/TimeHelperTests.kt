@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.functionslib
 
+import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
+import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.*

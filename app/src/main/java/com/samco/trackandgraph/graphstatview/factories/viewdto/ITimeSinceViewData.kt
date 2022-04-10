@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.base.data.IDataPoint
 import com.samco.trackandgraph.database.entity.GraphOrStat
 
 interface ITimeSinceViewData : IGraphStatViewData {

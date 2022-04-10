@@ -17,12 +17,15 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.database.DataSamplerImpl
 import com.samco.trackandgraph.database.DataSource
 import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.base.data.IDataPoint
 import com.samco.trackandgraph.database.entity.*
-import com.samco.trackandgraph.functionslib.*
+import com.samco.trackandgraph.functions.functions.CompositeFunction
+import com.samco.trackandgraph.functions.sampling.DataSampleFunction
+import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.functions.functions.FilterLabelFunction
+import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData

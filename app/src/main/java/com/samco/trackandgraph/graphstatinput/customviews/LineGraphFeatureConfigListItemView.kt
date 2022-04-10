@@ -27,12 +27,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.dataVisColorList
+import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
 import com.samco.trackandgraph.graphstatinput.configviews.FeatureDataProvider
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
-import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
 
@@ -41,6 +40,13 @@ class LineGraphFeatureConfigListItemView(
     private val featureDataProvider: FeatureDataProvider,
     private val lineGraphFeature: LineGraphFeatureConfig
 ) : LinearLayout(context) {
+
+    private val pointStyleDrawableResources = listOf(
+        R.drawable.point_style_none_icon,
+        R.drawable.point_style_circles_icon,
+        R.drawable.point_style_circles_and_numbers_icon
+    )
+
     private val binding =
         ListItemLineGraphFeatureBinding.inflate(LayoutInflater.from(context), this, true)
     private var onRemoveListener: ((LineGraphFeature) -> Unit)? = null
