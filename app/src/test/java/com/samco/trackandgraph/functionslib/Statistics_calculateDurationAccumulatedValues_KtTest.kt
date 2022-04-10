@@ -17,7 +17,11 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.dto.IDataPoint
+import com.samco.trackandgraph.base.data.IDataPoint
+import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
+import com.samco.trackandgraph.functions.sampling.DataSample
+import com.samco.trackandgraph.functions.functions.DurationAggregationFunction
+import com.samco.trackandgraph.functions.helpers.TimeHelper
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue

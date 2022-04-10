@@ -17,9 +17,16 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.database.entity.DataType
-import com.samco.trackandgraph.functionslib.exceptions.InvalidRegularityException
+import com.samco.trackandgraph.base.data.IDataPoint
+import com.samco.trackandgraph.functions.sampling.DataSample
+import com.samco.trackandgraph.functions.sampling.DataSampleProperties
+import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
+import com.samco.trackandgraph.functions.functionslib.*
+import com.samco.trackandgraph.functions.exceptions.InvalidRegularityException
+import com.samco.trackandgraph.functions.functions.CompositeFunction
+import com.samco.trackandgraph.functions.functions.DataPaddingFunction
+import com.samco.trackandgraph.functions.functions.DurationAggregationFunction
+import com.samco.trackandgraph.functions.helpers.TimeHelper
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking

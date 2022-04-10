@@ -17,10 +17,10 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.functionslib.AggregationPreferences
-import com.samco.trackandgraph.functionslib.DataSample
-import com.samco.trackandgraph.functionslib.TimeHelper
+import com.samco.trackandgraph.base.data.IDataPoint
+import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
+import com.samco.trackandgraph.functions.sampling.DataSample
+import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.database.entity.*
 import org.junit.Assert
 import org.junit.Test
