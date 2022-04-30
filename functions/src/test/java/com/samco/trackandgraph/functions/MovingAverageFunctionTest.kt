@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functionslib
+package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.sampling.DataSample
@@ -26,7 +26,7 @@ import org.junit.Test
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-class Statistics_calculateMovingAverages_KtTest {
+class MovingAverageFunctionTest {
 
     @Test
     fun limitedUpstreamSamples() {

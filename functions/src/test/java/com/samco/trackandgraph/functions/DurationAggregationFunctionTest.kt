@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functionslib
+package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
@@ -31,7 +31,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 
-class Statistics_calculateDurationAccumulatedValues_KtTest {
+class DurationAggregationFunctionTest {
     private val timeHelper = TimeHelper(
         object : AggregationPreferences {
             override val firstDayOfWeek = DayOfWeek.MONDAY

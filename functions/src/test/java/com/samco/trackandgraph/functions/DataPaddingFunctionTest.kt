@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functionslib
+package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.sampling.DataSample
@@ -37,7 +37,7 @@ import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 
-class DataPaddingFunction_KtTest {
+class DataPaddingFunctionTest {
 
     private val defaultTimeHelper = TimeHelper(
         object : AggregationPreferences {
