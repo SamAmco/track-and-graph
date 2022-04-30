@@ -35,6 +35,7 @@ import org.threeten.bp.Instant
  * that scheduled post executes, it is cancelled and scheduled again to try and minimise the number
  * of down stream update events.
  */
+//TODO I think this could probably be done much more nicely using a Flow that combines the LiveData's?
 class GroupChildrenLiveData(
     updateJob: Job,
     groupId: Long,
