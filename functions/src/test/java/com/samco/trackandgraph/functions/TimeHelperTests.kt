@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functionslib
+package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper

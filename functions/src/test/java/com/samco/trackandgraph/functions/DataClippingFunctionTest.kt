@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functionslib
+package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
@@ -26,7 +26,7 @@ import org.junit.Test
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-class Statistics_clipDataSample_KtTest {
+class DataClippingFunctionTest {
     @Test
     fun clipDataSample_empty_sample() = runBlocking {
         //WHEN
