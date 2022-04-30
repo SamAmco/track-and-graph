@@ -16,20 +16,25 @@ import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.util.getColorFromAttr
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import javax.inject.Inject
 import kotlin.system.exitProcess
 
 const val EXPORT_DATABASE_REQUEST_CODE = 235
 const val RESTORE_DATABASE_REQUEST_CODE = 578
 const val SQLITE_MIME_TYPE = "application/vnd.sqlite3"
 
+@AndroidEntryPoint
 class BackupAndRestoreFragment : Fragment() {
     private lateinit var binding: BackupAndRestoreFragmentBinding
     private val viewModel by viewModels<BackupAndRestoreViewModel>()
@@ -41,7 +46,6 @@ class BackupAndRestoreFragment : Fragment() {
     ): View {
         binding = BackupAndRestoreFragmentBinding.inflate(inflater)
 
-        viewModel.init(TrackAndGraphDatabase.getInstance(requireContext()))
         listenToViewModel()
 
         binding.backupButton.setOnClickListener { onBackupClicked() }
@@ -75,7 +79,8 @@ class BackupAndRestoreFragment : Fragment() {
                 true -> restartApp()
                 false -> {
                     RemindersHelper.syncAlarms(requireContext())
-                    val color = binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
+                    val color =
+                        binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.restoreFeedbackText.setTextColor(color)
                     val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
                     binding.restoreFeedbackText.text = getString(R.string.restore_failed, errorText)
@@ -88,12 +93,14 @@ class BackupAndRestoreFragment : Fragment() {
         viewModel.backupResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 true -> {
-                    val color = binding.backupFeedbackText.context.getColorFromAttr(R.attr.colorOnError)
+                    val color =
+                        binding.backupFeedbackText.context.getColorFromAttr(R.attr.colorOnError)
                     binding.backupFeedbackText.setTextColor(color)
                     binding.backupFeedbackText.text = getString(R.string.backup_successful)
                 }
                 false -> {
-                    val color = binding.backupFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
+                    val color =
+                        binding.backupFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.backupFeedbackText.setTextColor(color)
                     val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
                     binding.backupFeedbackText.text = getString(R.string.backup_failed, errorText)
@@ -154,7 +161,11 @@ class BackupAndRestoreFragment : Fragment() {
     }
 }
 
-class BackupAndRestoreViewModel : ViewModel() {
+@HiltViewModel
+class BackupAndRestoreViewModel @Inject constructor(
+    private val database: TrackAndGraphDatabase,
+    private val dao: TrackAndGraphDatabaseDao
+) : ViewModel() {
     class BackupRestoreException(val stringResource: Int?)
 
     private val _restoreResult: MutableLiveData<Boolean?> = MutableLiveData(null)
@@ -169,17 +180,11 @@ class BackupAndRestoreViewModel : ViewModel() {
     private val _inProgress = MutableLiveData(false)
     val inProgress: LiveData<Boolean> = _inProgress
 
-    private var database: TrackAndGraphDatabase? = null
     private var workerJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + workerJob)
 
-    fun init(database: TrackAndGraphDatabase) {
-        if (this.database != null) return
-        this.database = database
-    }
-
     fun exportDatabase(outputStream: OutputStream?) {
-        val databaseFilePath = database?.openHelper?.readableDatabase?.path
+        val databaseFilePath = database.openHelper.readableDatabase.path
 
         if (outputStream == null) {
             error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
@@ -200,7 +205,7 @@ class BackupAndRestoreViewModel : ViewModel() {
         _inProgress.value = true
         ioScope.launch {
             try {
-                database!!.trackAndGraphDatabaseDao.doRawQuery(
+                dao.doRawQuery(
                     SimpleSQLiteQuery("PRAGMA wal_checkpoint(full)")
                 )
 
@@ -222,7 +227,7 @@ class BackupAndRestoreViewModel : ViewModel() {
     }
 
     fun restoreDatabase(inputStream: InputStream?) {
-        val databaseFilePath = database?.openHelper?.writableDatabase?.path
+        val databaseFilePath = database.openHelper.writableDatabase.path
 
         if (inputStream == null) {
             error = BackupRestoreException(R.string.restore_error_could_not_read_from_database_file)
@@ -238,7 +243,7 @@ class BackupAndRestoreViewModel : ViewModel() {
         _inProgress.value = true
         ioScope.launch {
             try {
-                database?.openHelper?.close()
+                database.openHelper.close()
 
                 inputStream.use { inStream ->
                     File(databaseFilePath).outputStream().use { inStream.copyTo(it) }

@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.di
 
+import android.content.ContentResolver
 import android.content.Context
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
@@ -36,4 +37,8 @@ class AppModule {
     @Provides
     fun getDatabaseDao(database: TrackAndGraphDatabase): TrackAndGraphDatabaseDao =
         database.trackAndGraphDatabaseDao
+
+    @Provides
+    fun getContentResolver(@ApplicationContext context: Context): ContentResolver =
+        context.contentResolver
 }

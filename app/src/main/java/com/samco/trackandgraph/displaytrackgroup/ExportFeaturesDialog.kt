@@ -16,8 +16,8 @@
 */
 package com.samco.trackandgraph.displaytrackgroup
 
-import android.app.Activity
 import android.app.Dialog
+import android.content.ContentResolver
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -29,22 +29,26 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.util.CSVReadWriter
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
 import com.samco.trackandgraph.util.getColorFromAttr
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
+import javax.inject.Inject
 
 const val GROUP_ID_KEY = "GROUP_ID_KEY"
 const val GROUP_NAME_KEY = "GROUP_NAME_KEY"
 const val CREATE_FILE_REQUEST_CODE = 123
 
 enum class ExportState { LOADING, WAITING, EXPORTING, DONE }
+
+@AndroidEntryPoint
 class ExportFeaturesDialog : DialogFragment() {
 
     private var groupName: String? = null
@@ -89,21 +93,23 @@ class ExportFeaturesDialog : DialogFragment() {
         alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
             .setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
         positiveButton.isEnabled = false
-        viewModel.loadFeatures(requireActivity(), groupId!!)
+        viewModel.loadFeatures(groupId!!)
         listenToState()
         setUriListeners()
         listenToFeatures()
-        positiveButton.setOnClickListener { viewModel.beginExport(requireActivity()) }
+        positiveButton.setOnClickListener { viewModel.beginExport() }
     }
 
     private fun listenToState() {
-        viewModel.exportState.observe(this, Observer { state ->
+        viewModel.exportState.observe(this) { state ->
             when (state) {
                 ExportState.LOADING -> {
                     progressBar.visibility = View.VISIBLE
                     positiveButton.isEnabled = false
                 }
-                ExportState.WAITING -> { progressBar.visibility = View.INVISIBLE }
+                ExportState.WAITING -> {
+                    progressBar.visibility = View.INVISIBLE
+                }
                 ExportState.EXPORTING -> {
                     progressBar.visibility = View.VISIBLE
                     positiveButton.isEnabled = false
@@ -113,30 +119,39 @@ class ExportFeaturesDialog : DialogFragment() {
                 }
                 else -> {}
             }
-        })
+        }
     }
 
     private fun setUriListeners() {
-        viewModel.selectedFileUri.observe(this, Observer { uri ->
+        viewModel.selectedFileUri.observe(this) { uri ->
             if (uri != null) {
-                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, uri, fileButton, alertDialog)
+                ImportExportFeatureUtils.setFileButtonTextFromUri(
+                    activity,
+                    uri,
+                    fileButton,
+                    alertDialog
+                )
             }
-        })
+        }
     }
 
     private fun listenToFeatures() {
-        viewModel.featuresLoaded.observe(this, Observer { loaded ->
-            if (loaded) { createFeatureCheckboxes() }
-        })
+        viewModel.featuresLoaded.observe(this) { loaded ->
+            if (loaded) {
+                createFeatureCheckboxes()
+            }
+        }
     }
 
     private fun onFileButtonClicked() {
         val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
             addCategory(Intent.CATEGORY_OPENABLE)
             val now = OffsetDateTime.now()
-            val generatedName = getString( R.string.export_file_name_suffix,
+            val generatedName = getString(
+                R.string.export_file_name_suffix,
                 "TrackAndGraph", groupName, now.year, now.monthValue,
-                now.dayOfMonth, now.hour, now.minute, now.second)
+                now.dayOfMonth, now.hour, now.minute, now.second
+            )
             putExtra(Intent.EXTRA_TITLE, generatedName)
             type = "text/csv"
         }
@@ -156,13 +171,18 @@ class ExportFeaturesDialog : DialogFragment() {
 
     private fun createFeatureCheckboxes() {
         for (feature in viewModel.features) {
-            val item = layoutInflater.inflate(R.layout.list_item_feature_checkbox, checkboxLayout, false)
+            val item =
+                layoutInflater.inflate(R.layout.list_item_feature_checkbox, checkboxLayout, false)
             val checkBox = item.findViewById<CheckBox>(R.id.checkbox)
             checkBox.text = feature.name
             checkBox.isChecked = viewModel.selectedFeatures.contains(feature)
             checkBox.setOnCheckedChangeListener { _, b ->
-                if (b && !viewModel.selectedFeatures.contains(feature)) viewModel.selectedFeatures.add(feature)
-                else if (!b && viewModel.selectedFeatures.contains(feature)) viewModel.selectedFeatures.remove(feature)
+                if (b && !viewModel.selectedFeatures.contains(feature)) viewModel.selectedFeatures.add(
+                    feature
+                )
+                else if (!b && viewModel.selectedFeatures.contains(feature)) viewModel.selectedFeatures.remove(
+                    feature
+                )
             }
             checkboxLayout.addView(item)
         }
@@ -175,13 +195,20 @@ class ExportFeaturesDialog : DialogFragment() {
 }
 
 
-class ExportFeaturesViewModel : ViewModel() {
+@HiltViewModel
+class ExportFeaturesViewModel @Inject constructor(
+    private val dao: TrackAndGraphDatabaseDao,
+    private val contentResolver: ContentResolver
+) : ViewModel() {
     private var updateJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
     lateinit var features: List<Feature>
 
-    val exportState: LiveData<ExportState> get() { return _exportState }
+    val exportState: LiveData<ExportState>
+        get() {
+            return _exportState
+        }
     private val _exportState by lazy {
         val state = MutableLiveData<ExportState>()
         state.value = ExportState.WAITING
@@ -195,19 +222,20 @@ class ExportFeaturesViewModel : ViewModel() {
         return@lazy uri
     }
 
-    val featuresLoaded: LiveData<Boolean> get() { return _featuresLoaded }
+    val featuresLoaded: LiveData<Boolean>
+        get() {
+            return _featuresLoaded
+        }
     private val _featuresLoaded by lazy {
         val loaded = MutableLiveData<Boolean>()
         loaded.value = false
         return@lazy loaded
     }
 
-    fun loadFeatures(activity: Activity, groupId: Long) {
+    fun loadFeatures(groupId: Long) {
         if (_featuresLoaded.value == false) {
             uiScope.launch {
                 _exportState.value = ExportState.LOADING
-                val application = activity.application
-                val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
                 withContext(Dispatchers.IO) {
                     features = dao.getFeaturesForGroupSync(groupId).toMutableList()
                 }
@@ -218,15 +246,14 @@ class ExportFeaturesViewModel : ViewModel() {
         }
     }
 
-    fun beginExport(activity: Activity) {
+    //TODO this should probably be scheduled to run in a service
+    fun beginExport() {
         selectedFileUri.value?.let {
             uiScope.launch {
                 _exportState.value = ExportState.EXPORTING
                 withContext(Dispatchers.IO) {
-                    val outStream = activity.contentResolver.openOutputStream(it)
+                    val outStream = contentResolver.openOutputStream(it)
                     if (outStream != null) {
-                        val application = activity.application
-                        val dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
                         CSVReadWriter.writeFeaturesToCSV(selectedFeatures, dao, outStream)
                     }
                 }

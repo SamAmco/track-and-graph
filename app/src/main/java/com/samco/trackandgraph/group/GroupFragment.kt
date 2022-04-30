@@ -27,7 +27,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -52,12 +51,15 @@ import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import javax.inject.Inject
 
 /**
  * The group fragment is used on the home page and in any nested group to display the contents of
@@ -65,6 +67,7 @@ import org.threeten.bp.OffsetDateTime
  * The default value for args.groupId is 0L representing the root group or home page. The
  * args.groupName may be null or empty.
  */
+@AndroidEntryPoint
 class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
@@ -83,9 +86,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             .inflate(inflater, R.layout.fragment_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        val database = TrackAndGraphDatabase
-            .getInstance(requireActivity().application)
-        viewModel.initViewModel(database, args.groupId)
+        viewModel.setGroup(args.groupId)
 
         binding.emptyGroupText.visibility = View.INVISIBLE
 
@@ -434,11 +435,13 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 }
 
-class GroupViewModel : ViewModel() {
+@HiltViewModel
+class GroupViewModel @Inject constructor(
+    private var database: TrackAndGraphDatabase,
+    private var dao: TrackAndGraphDatabaseDao
+) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
-    private var database: TrackAndGraphDatabase? = null
-    private lateinit var dataSource: TrackAndGraphDatabaseDao
 
     lateinit var dataPoints: LiveData<Instant>
     lateinit var hasFeatures: LiveData<Boolean>
@@ -451,17 +454,17 @@ class GroupViewModel : ViewModel() {
             ?.map { it.obj as DisplayFeature }
             ?: emptyList()
 
-    fun initViewModel(database: TrackAndGraphDatabase, groupId: Long) {
-        if (this.database != null) return
-        this.database = database
-        this.dataSource = database.trackAndGraphDatabaseDao
+    private var initialized = false
 
+    fun setGroup(groupId: Long) {
+        if (initialized) return
+        initialized = true
         //TODO this is really bad, we are storing potentially multiple instances of
         // every data point in memory per group fragment :/ Definitely need to review this
-        dataPoints = Transformations.map(dataSource.getAllDataPoints()) { Instant.now() }
-        hasFeatures = Transformations.map(dataSource.getAllFeatures()) { it.isNotEmpty() }
+        dataPoints = Transformations.map(dao.getAllDataPoints()) { Instant.now() }
+        hasFeatures = Transformations.map(dao.getAllFeatures()) { it.isNotEmpty() }
 
-        groupChildren = GroupChildrenLiveData(updateJob, groupId, dataSource)
+        groupChildren = GroupChildrenLiveData(updateJob, groupId, dao)
     }
 
     fun addDefaultFeatureValue(feature: DisplayFeature) = ioScope.launch {
@@ -475,11 +478,11 @@ class GroupViewModel : ViewModel() {
             label,
             ""
         )
-        dataSource.insertDataPoint(newDataPoint)
+        dao.insertDataPoint(newDataPoint)
     }
 
     fun onDeleteFeature(id: Long) = ioScope.launch {
-        dataSource.deleteFeature(id)
+        dao.deleteFeature(id)
         groupChildren.graphStatLiveData.preenGraphStats()
     }
 
@@ -504,10 +507,10 @@ class GroupViewModel : ViewModel() {
                 )
             }
         }
-        database?.withTransaction {
-            dataSource.updateFeatures(displayFeatures.map { it.asFeature() })
-            dataSource.updateGraphStats(graphs)
-            dataSource.updateGroups(groups)
+        database.withTransaction {
+            dao.updateFeatures(displayFeatures.map { it.asFeature() })
+            dao.updateGraphStats(graphs)
+            dao.updateGroups(groups)
         }
     }
 
@@ -524,18 +527,18 @@ class GroupViewModel : ViewModel() {
 
     fun updateAllGraphs() = groupChildren.graphStatLiveData.updateAllGraphStats()
 
-    fun onDeleteGraphStat(id: Long) = ioScope.launch { dataSource.deleteGraphOrStat(id) }
+    fun onDeleteGraphStat(id: Long) = ioScope.launch { dao.deleteGraphOrStat(id) }
 
     fun onDeleteGroup(id: Long) = ioScope.launch {
-        dataSource.deleteGroup(id)
+        dao.deleteGroup(id)
         groupChildren.graphStatLiveData.preenGraphStats()
     }
 
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         ioScope.launch {
-            database?.withTransaction {
+            database.withTransaction {
                 val gs = graphOrStatViewData.graphOrStat
-                graphStatTypes[gs.type]?.dataSourceAdapter?.duplicateGraphOrStat(dataSource, gs)
+                graphStatTypes[gs.type]?.dataSourceAdapter?.duplicateGraphOrStat(dao, gs)
             }
         }
     }

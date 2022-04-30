@@ -27,7 +27,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.database.dto.NoteType
@@ -40,11 +39,15 @@ import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showNoteDialog
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NotesFragment : Fragment() {
     lateinit var binding: FragmentNotesBinding
     private val viewModel by viewModels<NotesViewModel>()
@@ -57,9 +60,6 @@ class NotesFragment : Fragment() {
     ): View {
         binding = FragmentNotesBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        val dataSource =
-            TrackAndGraphDatabase.getInstance(requireActivity().applicationContext).trackAndGraphDatabaseDao
-        viewModel.init(dataSource)
 
         listenToFeatureNameProvdier()
 
@@ -154,13 +154,14 @@ class NotesFragment : Fragment() {
     }
 }
 
-class NotesViewModel : ViewModel() {
-    private var dataSource: TrackAndGraphDatabaseDao? = null
+@HiltViewModel
+class NotesViewModel @Inject constructor(
+    private val dao: TrackAndGraphDatabaseDao
+) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    lateinit var notes: LiveData<List<DisplayNote>>
-        private set
+    val notes: LiveData<List<DisplayNote>> = dao.getAllDisplayNotes()
 
     lateinit var featureNameProvider: LiveData<FeaturePathProvider> private set
 
@@ -169,17 +170,14 @@ class NotesViewModel : ViewModel() {
     private val _onNoteInsertedTop = MutableLiveData(false)
     val onNoteInsertedTop: LiveData<Boolean> = _onNoteInsertedTop
 
-    fun init(dataSource: TrackAndGraphDatabaseDao) {
-        if (this.dataSource != null) return
-        this.dataSource = dataSource
-        notes = dataSource.getAllDisplayNotes()
+    init {
         initOnNoteInsertedTop()
         initFeatureNameProvider()
     }
 
     private fun initFeatureNameProvider() {
         val mediator = MediatorLiveData<FeaturePathProvider>()
-        dataSource?.let {
+        dao.let {
             val groups = it.getAllGroups()
             val features = it.getAllFeatures()
             val onEmitted = {
@@ -211,7 +209,7 @@ class NotesViewModel : ViewModel() {
     fun deleteNote(note: DisplayNote) = ioScope.launch {
         when (note.noteType) {
             NoteType.DATA_POINT -> note.featureId?.let {
-                dataSource!!.removeNote(note.timestamp, it)
+                dao.removeNote(note.timestamp, it)
             }
             NoteType.GLOBAL_NOTE -> {
                 val globalNote =
@@ -219,7 +217,7 @@ class NotesViewModel : ViewModel() {
                         note.timestamp,
                         note.note
                     )
-                dataSource!!.deleteGlobalNote(globalNote)
+                dao.deleteGlobalNote(globalNote)
             }
         }
     }

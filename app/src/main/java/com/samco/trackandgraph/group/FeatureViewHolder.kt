@@ -76,12 +76,10 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
     }
 
     private fun onQuickAddClicked() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            val ripple = binding.cardView.foreground as RippleDrawable
-            ripple.setHotspot(ripple.bounds.right.toFloat(), ripple.bounds.bottom.toFloat())
-            ripple.state = intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
-            ripple.state = intArrayOf()
-        }
+        val ripple = binding.cardView.foreground as RippleDrawable
+        ripple.setHotspot(ripple.bounds.right.toFloat(), ripple.bounds.bottom.toFloat())
+        ripple.state = intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
+        ripple.state = intArrayOf()
         feature?.let { clickListener?.onAdd(it) }
     }
 
