@@ -38,9 +38,11 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.NoteType
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatview.GraphStatView

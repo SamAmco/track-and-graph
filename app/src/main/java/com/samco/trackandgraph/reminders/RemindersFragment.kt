@@ -35,9 +35,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.CheckedDays
-import com.samco.trackandgraph.database.entity.Reminder
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.entity.CheckedDays
+import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import org.threeten.bp.LocalTime

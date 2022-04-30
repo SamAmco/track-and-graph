@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.base.data.IDataPoint
+import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.functions.sampling.DataSample
 import kotlinx.coroutines.runBlocking

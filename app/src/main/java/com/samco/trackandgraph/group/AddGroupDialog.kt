@@ -33,11 +33,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.dataVisColorList
-import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.entity.Group
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
+import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.showKeyboard
 import kotlinx.coroutines.*

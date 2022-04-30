@@ -27,7 +27,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.doubleFormatter
+import com.samco.trackandgraph.base.database.doubleFormatter
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.util.getDoubleFromText

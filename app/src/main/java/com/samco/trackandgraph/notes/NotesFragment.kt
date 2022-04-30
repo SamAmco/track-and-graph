@@ -27,10 +27,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.DisplayNote
-import com.samco.trackandgraph.database.dto.NoteType
-import com.samco.trackandgraph.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.dto.DisplayNote
+import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
@@ -52,7 +54,7 @@ class NotesFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentNotesBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         val dataSource =
@@ -209,7 +211,7 @@ class NotesViewModel : ViewModel() {
     fun deleteNote(note: DisplayNote) = ioScope.launch {
         when (note.noteType) {
             NoteType.DATA_POINT -> note.featureId?.let {
-                dataSource!!.removeNote(note.timestamp, note.featureId)
+                dataSource!!.removeNote(note.timestamp, it)
             }
             NoteType.GLOBAL_NOTE -> {
                 val globalNote =

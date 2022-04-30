@@ -30,8 +30,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
 
@@ -68,8 +68,8 @@ class TrackWidgetConfigureDialog : DialogFragment() {
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
-    private fun observeAllFeatures() = viewModel.featurePathProvider.observe(this,
-        { featurePathProvider ->
+    private fun observeAllFeatures() = viewModel.featurePathProvider
+        .observe(this) { featurePathProvider ->
             val features = featurePathProvider.features
             if (features.isEmpty()) {
                 listener.onNoFeatures()
@@ -95,7 +95,7 @@ class TrackWidgetConfigureDialog : DialogFragment() {
                         viewModel.featureId = features[position].id
                     }
                 }
-        })
+        }
 
     override fun onDismiss(dialog: DialogInterface) {
         listener.onDismiss()

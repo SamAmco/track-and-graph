@@ -23,12 +23,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DataType
-import com.samco.trackandgraph.database.dto.NoteType
+import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
+import com.samco.trackandgraph.ui.getDisplayValue
 
 class NotesAdapter(
     private val featurePathProvider: FeaturePathProvider,
@@ -90,7 +91,7 @@ class NotesAdapter(
             val dataPoint = note!!.dataPoint!!
             binding.valueText.visibility = View.VISIBLE
             val featureType = featureTypes.getOrElse(dataPoint.featureId) { DataType.CONTINUOUS }
-            binding.valueText.text = DataPoint.getDisplayValue(note!!.dataPoint!!, featureType)
+            binding.valueText.text = note!!.dataPoint!!.getDisplayValue(featureType)
             binding.featureNameText.visibility = View.VISIBLE
             binding.featureNameText.text = featurePathProvider.getPathForFeature(dataPoint.featureId)
             binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }

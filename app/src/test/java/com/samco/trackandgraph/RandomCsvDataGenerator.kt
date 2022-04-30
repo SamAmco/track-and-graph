@@ -1,8 +1,7 @@
 package com.samco.trackandgraph
 
-import com.samco.trackandgraph.database.databaseFormatter
+import com.samco.trackandgraph.base.database.databaseFormatter
 import com.samco.trackandgraph.util.CSVReadWriter
-import org.junit.Test
 
 import org.threeten.bp.OffsetDateTime
 import java.io.File
@@ -119,21 +118,3 @@ class RandomCsvDataGenerator {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

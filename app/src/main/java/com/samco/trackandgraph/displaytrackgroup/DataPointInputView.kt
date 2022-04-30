@@ -28,11 +28,11 @@ import android.widget.*
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DiscreteValue
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.DataType
+import com.samco.trackandgraph.base.database.doubleFormatter
+import com.samco.trackandgraph.base.database.dto.DiscreteValue
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.DataType
+import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.ui.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText

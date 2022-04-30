@@ -24,7 +24,6 @@ import android.widget.Button
 import androidx.viewpager.widget.PagerAdapter
 import com.samco.trackandgraph.R
 
-
 class TutorialPagerAdapter(
     private val context: Context,
     private val closeTutorialCallback: () -> Unit)

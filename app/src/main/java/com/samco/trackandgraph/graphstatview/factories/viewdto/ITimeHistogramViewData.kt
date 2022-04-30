@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.database.entity.TimeHistogramWindow
+import com.samco.trackandgraph.base.database.entity.TimeHistogramWindow
 
 interface ITimeHistogramViewData : IGraphStatViewData {
     val window: TimeHistogramWindow?

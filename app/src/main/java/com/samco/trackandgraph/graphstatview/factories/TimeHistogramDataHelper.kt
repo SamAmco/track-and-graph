@@ -17,9 +17,8 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.data.IDataPoint
-import com.samco.trackandgraph.functionslib.*
-import com.samco.trackandgraph.database.entity.TimeHistogramWindow
+import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.entity.TimeHistogramWindow
 import com.samco.trackandgraph.functions.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.threeten.bp.Duration

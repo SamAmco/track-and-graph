@@ -26,8 +26,8 @@ import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatSpinner
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
+import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.ExtendedSpinner
 import com.samco.trackandgraph.ui.formatDayMonthYear

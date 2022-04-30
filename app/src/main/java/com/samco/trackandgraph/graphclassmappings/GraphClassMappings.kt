@@ -17,8 +17,8 @@
 
 package com.samco.trackandgraph.graphclassmappings
 
-import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatinput.configviews.AverageTimeBetweenConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigView
