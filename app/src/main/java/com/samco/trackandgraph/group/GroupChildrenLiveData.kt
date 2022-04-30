@@ -20,9 +20,9 @@ package com.samco.trackandgraph.group
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.dto.DisplayFeature
-import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.entity.Group
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.*
 import org.threeten.bp.Instant

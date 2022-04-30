@@ -24,12 +24,12 @@ import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dataVisColorGenerator
-import com.samco.trackandgraph.database.dataVisColorList
-import com.samco.trackandgraph.database.entity.TimeHistogramWindow
+import com.samco.trackandgraph.base.database.entity.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
+import com.samco.trackandgraph.ui.dataVisColorGenerator
+import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -48,6 +48,18 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
     private var data: ITimeHistogramViewData? = null
+
+    private fun getNameForWindow(window: TimeHistogramWindow): String {
+        return when (window) {
+            TimeHistogramWindow.HOUR -> context!!.getString(R.string.minutes)
+            TimeHistogramWindow.DAY -> context!!.getString(R.string.hours)
+            TimeHistogramWindow.WEEK -> context!!.getString(R.string.days)
+            TimeHistogramWindow.MONTH -> context!!.getString(R.string.days)
+            TimeHistogramWindow.THREE_MONTHS -> context!!.getString(R.string.weeks)
+            TimeHistogramWindow.SIX_MONTHS -> context!!.getString(R.string.weeks)
+            TimeHistogramWindow.YEAR -> context!!.getString(R.string.months)
+        }
+    }
 
     private fun getLabelInterval(window: TimeHistogramWindow) = when (window) {
         TimeHistogramWindow.HOUR -> 5
@@ -92,7 +104,7 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     private fun setUpXAxisTitle() {
-        var title = context!!.getString(data!!.window!!.subTitleId)
+        var title = getNameForWindow(data!!.window!!)
         if (data!!.window!! == TimeHistogramWindow.WEEK) {
             val weekDayNameIds = mapOf(
                 DayOfWeek.MONDAY to R.string.mon,

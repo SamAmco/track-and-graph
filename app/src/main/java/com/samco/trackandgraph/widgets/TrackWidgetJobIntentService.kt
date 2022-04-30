@@ -20,7 +20,7 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.JobIntentService
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 
 class TrackWidgetJobIntentService : JobIntentService() {
     companion object {

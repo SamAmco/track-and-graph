@@ -15,7 +15,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -38,7 +38,7 @@ class BackupAndRestoreFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = BackupAndRestoreFragmentBinding.inflate(inflater)
 
         viewModel.init(TrackAndGraphDatabase.getInstance(requireContext()))

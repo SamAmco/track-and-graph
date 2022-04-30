@@ -19,6 +19,10 @@ package com.samco.trackandgraph.ui
 
 import android.content.Context
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.database.doubleFormatter
+import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.util.DATE_FORMAT_SETTING_PREF_KEY
 import com.samco.trackandgraph.util.getPrefs
 import org.threeten.bp.OffsetDateTime
@@ -61,6 +65,25 @@ fun formatDayWeekDayMonthYearHourMinuteOneLine(
 ) = formatDayMonthYear(context, dateTime) +
         weekDayPart(dateTime, weekDayNames) +
         formatHourMinute(dateTime)
+
+fun DataPoint.getDisplayValue(dataType: DataType): String {
+    val time = this.timestamp
+    val value = this.value
+    val label = this.label
+    return object : IDataPoint() {
+        override val timestamp = time
+        override val value = value
+        override val label = label
+    }.getDisplayValue(dataType)
+}
+
+fun IDataPoint.getDisplayValue(dataType: DataType): String {
+    return when (dataType) {
+        DataType.DISCRETE -> doubleFormatter.format(this.value) + " : ${this.label}"
+        DataType.CONTINUOUS -> doubleFormatter.format(this.value)
+        DataType.DURATION -> formatTimeDuration(this.value.toLong())
+    }
+}
 
 fun formatDayMonthYearHourMinuteWeekDayTwoLines(
     context: Context,

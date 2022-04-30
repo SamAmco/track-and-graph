@@ -22,10 +22,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DataType
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinuteWeekDayTwoLines
+import com.samco.trackandgraph.ui.getDisplayValue
 
 class DataPointAdapter(
     private val clickListener: DataPointClickListener,
@@ -50,7 +51,7 @@ class DataPointAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(dataPoint: DataPoint) {
-            binding.valueText.text = DataPoint.getDisplayValue(dataPoint, dataType)
+            binding.valueText.text = dataPoint.getDisplayValue(dataType)
             binding.timestampText.text = formatDayMonthYearHourMinuteWeekDayTwoLines(
                 binding.timestampText.context,
                 weekDayNames,
