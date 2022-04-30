@@ -17,8 +17,8 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.base.data.IDataPoint
-import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
 
 interface ITimeSinceViewData : IGraphStatViewData {
     val lastDataPoint: IDataPoint?

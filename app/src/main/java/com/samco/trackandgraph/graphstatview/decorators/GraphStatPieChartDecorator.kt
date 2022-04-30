@@ -25,11 +25,11 @@ import com.androidplot.pie.PieRenderer
 import com.androidplot.pie.Segment
 import com.androidplot.pie.SegmentFormatter
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dataVisColorGenerator
-import com.samco.trackandgraph.database.dataVisColorList
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
+import com.samco.trackandgraph.ui.dataVisColorGenerator
+import com.samco.trackandgraph.ui.dataVisColorList
 import org.threeten.bp.OffsetDateTime
 
 class GraphStatPieChartDecorator(listMode: Boolean) :

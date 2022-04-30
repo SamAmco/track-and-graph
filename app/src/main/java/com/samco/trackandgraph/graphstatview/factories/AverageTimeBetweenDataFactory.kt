@@ -17,20 +17,21 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.database.DataSource
-import com.samco.trackandgraph.database.IDataSampler
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.data.IDataPoint
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.DataSource
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.functions.sampling.DataSample
 import com.samco.trackandgraph.functions.sampling.DataSampleFunction
 import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
-import com.samco.trackandgraph.functions.functionslib.*
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
-import com.samco.trackandgraph.functionslib.*
+import com.samco.trackandgraph.functions.sampling.IDataSampler
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData

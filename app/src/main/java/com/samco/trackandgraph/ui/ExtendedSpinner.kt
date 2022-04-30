@@ -21,7 +21,6 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatSpinner
 
-
 class ExtendedSpinner(context: Context, attrs: AttributeSet?) : AppCompatSpinner(context, attrs) {
     interface OnItemClickedListener {
         fun onItemClicked(index: Int)

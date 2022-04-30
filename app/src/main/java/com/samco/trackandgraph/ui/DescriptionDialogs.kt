@@ -25,11 +25,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dto.DisplayNote
-import com.samco.trackandgraph.database.dto.NoteType
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DataType
-import com.samco.trackandgraph.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.dto.DisplayNote
+import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.DataType
+import com.samco.trackandgraph.base.database.entity.GlobalNote
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
 import org.threeten.bp.OffsetDateTime
 
@@ -112,7 +112,7 @@ fun showDataPointDescriptionDialog(
         context,
         inflater,
         dataPoint.timestamp,
-        DataPoint.getDisplayValue(dataPoint, dataType),
+        dataPoint.getDisplayValue(dataType),
         dataPoint.note,
         featureDispalayName
     )

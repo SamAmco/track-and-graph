@@ -17,11 +17,10 @@
 
 package com.samco.trackandgraph.functionslib
 
-import com.samco.trackandgraph.base.data.IDataPoint
+import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.sampling.DataSample
 import com.samco.trackandgraph.functions.sampling.DataSampleProperties
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
-import com.samco.trackandgraph.functions.functionslib.*
 import com.samco.trackandgraph.functions.exceptions.InvalidRegularityException
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataPaddingFunction

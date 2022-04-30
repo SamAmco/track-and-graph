@@ -25,8 +25,8 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatSpinner
-import com.samco.trackandgraph.database.entity.AverageTimeBetweenStat
-import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
+import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
+import com.samco.trackandgraph.base.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.databinding.AverageTimeBetweenInputLayoutBinding
 import com.samco.trackandgraph.ui.DurationInputView
 

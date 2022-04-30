@@ -22,10 +22,10 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.DataType
-import com.samco.trackandgraph.database.entity.PieChart
-import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
+import com.samco.trackandgraph.base.database.entity.DataType
+import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.entity.PieChart
+import com.samco.trackandgraph.base.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.databinding.PieChartInputViewBinding
 import com.samco.trackandgraph.graphstatinput.ValidationException
 

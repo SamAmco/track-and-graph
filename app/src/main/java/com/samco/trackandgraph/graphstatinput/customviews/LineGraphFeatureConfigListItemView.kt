@@ -27,11 +27,16 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dataVisColorList
+import com.samco.trackandgraph.base.database.constants.DurationPlottingMode
+import com.samco.trackandgraph.base.database.constants.LineGraphAveraginModes
+import com.samco.trackandgraph.base.database.constants.LineGraphPlottingModes
+import com.samco.trackandgraph.base.database.constants.LineGraphPointStyle
+import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
 import com.samco.trackandgraph.graphstatinput.configviews.FeatureDataProvider
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
+import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
 
@@ -174,7 +179,8 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupFeatureSpinner() {
-        val items = featureDataProvider.featureDataAlphabetical().flatMap { getSpinnerItemsForFeature(it) }
+        val items =
+            featureDataProvider.featureDataAlphabetical().flatMap { getSpinnerItemsForFeature(it) }
         val itemNames = items.map { it.third }
         val adapter =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
