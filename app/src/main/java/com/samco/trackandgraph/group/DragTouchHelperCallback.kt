@@ -39,7 +39,7 @@ class DragTouchHelperCallback(
         viewHolder: RecyclerView.ViewHolder,
         target: RecyclerView.ViewHolder
     ): Boolean {
-        onMove(viewHolder.adapterPosition, target.adapterPosition)
+        onMove(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
         return true
     }
 

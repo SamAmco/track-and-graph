@@ -46,11 +46,14 @@ import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.util.hideKeyboard
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.lang.Exception
+import javax.inject.Inject
 import kotlin.reflect.full.primaryConstructor
 
-
+@AndroidEntryPoint
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
     private val args: GraphStatInputFragmentArgs by navArgs()
@@ -71,11 +74,7 @@ class GraphStatInputFragment : Fragment() {
         this.navController = container?.findNavController()
         binding = FragmentGraphStatInputBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        viewModel.initViewModel(
-            TrackAndGraphDatabase.getInstance(requireContext()),
-            args.groupId,
-            args.graphStatId
-        )
+        viewModel.initViewModel(args.groupId, args.graphStatId)
         listenToViewModelState()
         return binding.root
     }
@@ -244,11 +243,12 @@ class GraphStatInputFragment : Fragment() {
 
 enum class GraphStatInputState { INITIALIZING, WAITING, ADDING, FINISHED }
 class ValidationException(val errorMessageId: Int) : Exception()
-class GraphStatInputViewModel : ViewModel() {
 
-    private var database: TrackAndGraphDatabase? = null
-    private var dataSource: TrackAndGraphDatabaseDao? = null
-
+@HiltViewModel
+class GraphStatInputViewModel @Inject constructor(
+    private val database: TrackAndGraphDatabase,
+    private val dao: TrackAndGraphDatabaseDao
+) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
     private val workScope = CoroutineScope(Dispatchers.Default + updateJob)
@@ -284,15 +284,13 @@ class GraphStatInputViewModel : ViewModel() {
 
     lateinit var featureDataProvider: FeatureDataProvider private set
 
-    fun initViewModel(database: TrackAndGraphDatabase, graphStatGroupId: Long, graphStatId: Long) {
-        if (this.database != null) return
-        this.database = database
-        this.dataSource = database.trackAndGraphDatabaseDao
+    fun initViewModel(graphStatGroupId: Long, graphStatId: Long) {
+        if (this.graphStatGroupId != -1L) return
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
         ioScope.launch {
-            val allFeatures = dataSource!!.getAllFeaturesSync()
-            val allGroups = dataSource!!.getAllGroupsSync()
+            val allFeatures = dao.getAllFeaturesSync()
+            val allGroups = dao.getAllGroupsSync()
             //TODO Need to get an actual data sample and iterate to get actual labels and properties
             val featureData = allFeatures.map { feat ->
                 FeatureDataProvider.FeatureData(
@@ -308,7 +306,7 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     private suspend fun initFromExistingGraphStat(graphStatId: Long) {
-        val graphStat = dataSource!!.tryGetGraphStatById(graphStatId)
+        val graphStat = dao.tryGetGraphStatById(graphStatId)
 
         if (graphStat == null) {
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
@@ -316,7 +314,7 @@ class GraphStatInputViewModel : ViewModel() {
         }
 
         val configData = graphStatTypes[graphStat.type]
-            ?.dataSourceAdapter!!.getConfigData(dataSource!!, graphStatId)
+            ?.dataSourceAdapter!!.getConfigData(dao, graphStatId)
 
         configData?.first?.let {
             withContext(Dispatchers.Main) {
@@ -366,7 +364,7 @@ class GraphStatInputViewModel : ViewModel() {
         }
         val graphStatType = graphStatTypes[graphOrStat.type]
         val demoData = graphStatType?.dataFactory
-            ?.getViewData(dataSource!!, graphOrStat, _configData.value!!) {}
+            ?.getViewData(dao, graphOrStat, _configData.value!!) {}
         withContext(Dispatchers.Main) { demoData?.let { _demoViewData.value = it } }
     }
 
@@ -384,17 +382,17 @@ class GraphStatInputViewModel : ViewModel() {
         if (_configData.value == null) return
         _state.value = GraphStatInputState.ADDING
         ioScope.launch {
-            database!!.withTransaction {
+            database.withTransaction {
                 val graphStatId = if (_updateMode.value!!) {
-                    dataSource!!.updateGraphOrStat(constructGraphOrStat())
+                    dao.updateGraphOrStat(constructGraphOrStat())
                     graphStatId!!
                 } else {
                     shiftUpGraphStatViewIndexes()
-                    dataSource!!.insertGraphOrStat(constructGraphOrStat())
+                    dao.insertGraphOrStat(constructGraphOrStat())
                 }
 
                 graphStatTypes[_graphStatType.value]?.dataSourceAdapter?.writeConfig(
-                    dataSource!!, graphStatId, _configData.value!!, _updateMode.value!!
+                    dao, graphStatId, _configData.value!!, _updateMode.value!!
                 )
             }
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
@@ -402,10 +400,10 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     private fun shiftUpGraphStatViewIndexes() {
-        val newList = dataSource!!.getAllGraphStatsSync().map {
+        val newList = dao.getAllGraphStatsSync().map {
             it.copy(displayIndex = it.displayIndex + 1)
         }
-        dataSource!!.updateGraphStats(newList)
+        dao.updateGraphStats(newList)
     }
 
     private fun constructGraphOrStat() = GraphOrStat(

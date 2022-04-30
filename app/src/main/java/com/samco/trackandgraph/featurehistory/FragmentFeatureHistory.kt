@@ -41,8 +41,12 @@ import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
 
     private lateinit var binding: FragmentFeatureHistoryBinding
@@ -60,8 +64,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         )
         initPreLoadViewState()
 
-        val dao = TrackAndGraphDatabase.getInstance(requireContext()).trackAndGraphDatabaseDao
-        viewModel.initViewModel(args.feature, dao)
+        viewModel.setFeatureId(args.feature)
 
         observeFeature()
 
@@ -162,7 +165,10 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
     }
 }
 
-class FeatureHistoryViewModel : ViewModel() {
+@HiltViewModel
+class FeatureHistoryViewModel @Inject constructor(
+    private val dao: TrackAndGraphDatabaseDao
+): ViewModel() {
     private val _feature = MutableLiveData<Feature?>(null)
     val feature: LiveData<Feature?> = _feature
 
@@ -170,22 +176,23 @@ class FeatureHistoryViewModel : ViewModel() {
         private set
     var currentActionDataPoint: DataPoint? = null
 
-    var dataSource: TrackAndGraphDatabaseDao? = null
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    fun initViewModel(featureId: Long, dataSource: TrackAndGraphDatabaseDao) {
-        if (this.dataSource != null) return
-        this.dataSource = dataSource
-        this.dataPoints = dataSource.getDataPointsForFeature(featureId)
+    private var featureId: Long? = null
+
+    fun setFeatureId(featureId: Long) {
+        if (this.featureId != null) return
+        this.featureId = featureId
+        this.dataPoints = dao.getDataPointsForFeature(featureId)
         ioScope.launch {
-            val feature = dataSource.getFeatureById(featureId)
+            val feature = dao.getFeatureById(featureId)
             withContext(Dispatchers.Main) { _feature.value = feature }
         }
     }
 
     fun deleteDataPoint() = currentActionDataPoint?.let {
-        ioScope.launch { dataSource!!.deleteDataPoint(it) }
+        ioScope.launch { dao.deleteDataPoint(it) }
     }
 
     override fun onCleared() {

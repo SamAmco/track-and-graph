@@ -20,7 +20,6 @@ package com.samco.trackandgraph.graphstatview.decorators
 import android.content.Context
 import android.graphics.Paint
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning

@@ -16,28 +16,29 @@
 */
 package com.samco.trackandgraph.widgets
 
-import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.performTrackVibrate
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TrackWidgetInputDataPointActivity : AppCompatActivity() {
     private val viewModel by viewModels<TrackWidgetInputDataPointViewModel>()
 
@@ -54,12 +55,12 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
                 return
             }
 
-            viewModel.init(this.application, featureId)
+            viewModel.setFeatureId(featureId)
             observeFeature()
         } ?: finish()
     }
 
-    private fun observeFeature() = viewModel.feature.observe(this, Observer { feature ->
+    private fun observeFeature() = viewModel.feature.observe(this) { feature ->
         if (feature == null) finish()
         else when (feature.hasDefaultValue) {
             true -> {
@@ -69,7 +70,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
             }
             else -> showDialog(feature.id)
         }
-    })
+    }
 
     private fun showDialog(featureId: Long) {
         val dialog = TrackWidgetInputDataPointDialog()
@@ -87,17 +88,21 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
     }
 }
 
-class TrackWidgetInputDataPointViewModel : ViewModel() {
-    private var dataSource: TrackAndGraphDatabaseDao? = null
+@HiltViewModel
+class TrackWidgetInputDataPointViewModel @Inject constructor(
+    private var dao: TrackAndGraphDatabaseDao
+) : ViewModel() {
     lateinit var feature: LiveData<Feature?> private set
 
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    fun init(application: Application, featureId: Long) {
-        if (dataSource != null) return
-        dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        feature = dataSource!!.tryGetFeatureById(featureId)
+    private var initialized = false
+
+    fun setFeatureId(featureId: Long) {
+        if (initialized) return
+        initialized = true
+        feature = dao.tryGetFeatureById(featureId)
     }
 
     fun addDefaultDataPoint() = feature.value?.let {
@@ -109,7 +114,7 @@ class TrackWidgetInputDataPointViewModel : ViewModel() {
                 it.getDefaultLabel(),
                 ""
             )
-            dataSource!!.insertDataPoint(newDataPoint)
+            dao.insertDataPoint(newDataPoint)
         }
     }
 }

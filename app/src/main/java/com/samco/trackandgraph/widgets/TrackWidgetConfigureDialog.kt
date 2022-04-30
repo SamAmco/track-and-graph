@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.widgets
 
-import android.app.Application
 import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -30,11 +29,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TrackWidgetConfigureDialog : DialogFragment() {
     private val viewModel by viewModels<TrackWidgetConfigureDialogViewModel>()
     private lateinit var binding: TrackWidgetConfigureDialogBinding
@@ -50,9 +52,8 @@ class TrackWidgetConfigureDialog : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         return activity?.let {
-            viewModel.init(requireActivity().application)
             binding = TrackWidgetConfigureDialogBinding.inflate(inflater, container, false)
             listener = activity as TrackWidgetConfigureDialogListener
 
@@ -102,20 +103,16 @@ class TrackWidgetConfigureDialog : DialogFragment() {
     }
 }
 
-class TrackWidgetConfigureDialogViewModel : ViewModel() {
-    private var dataSource: TrackAndGraphDatabaseDao? = null
-    lateinit var featurePathProvider: LiveData<FeaturePathProvider> private set
+@HiltViewModel
+class TrackWidgetConfigureDialogViewModel @Inject constructor(
+    dataSource: TrackAndGraphDatabaseDao
+) : ViewModel() {
+    val featurePathProvider: LiveData<FeaturePathProvider>
     var featureId: Long? = null
 
-    fun init(application: Application) {
-        if (dataSource != null) return
-        dataSource = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
-        initFeatureNameProvider()
-    }
-
-    private fun initFeatureNameProvider() {
+    init {
         val mediator = MediatorLiveData<FeaturePathProvider>()
-        dataSource?.let {
+        dataSource.let {
             val groups = it.getAllGroups()
             val features = it.getAllFeatures()
             val onEmitted = {

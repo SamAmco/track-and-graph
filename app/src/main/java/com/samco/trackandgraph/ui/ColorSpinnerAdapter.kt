@@ -26,7 +26,7 @@ import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.R
 
-class ColorSpinnerAdapter(context: Context, val colorIds: List<Int>) :
+class ColorSpinnerAdapter(context: Context, private val colorIds: List<Int>) :
     ArrayAdapter<Int>(context, R.layout.circular_spinner_item) {
 
     override fun getCount() = colorIds.size
