@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.displaytrackgroup
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -33,7 +32,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.entity.DataType
@@ -42,11 +40,15 @@ import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 
+@AndroidEntryPoint
 open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
@@ -125,7 +127,6 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         val timestampStr = requireArguments().getString(DATA_POINT_TIMESTAMP_KEY)
         val timestamp = if (timestampStr != null) odtFromString(timestampStr) else null
         viewModel.init(
-            requireActivity(),
             requireArguments().getLongArray(FEATURE_LIST_KEY)!!.toList(),
             timestamp
         )
@@ -240,8 +241,11 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 }
 
 enum class InputDataPointDialogState { LOADING, WAITING, ADDING, ADDED }
-class InputDataPointDialogViewModel : ViewModel() {
-    private lateinit var dao: TrackAndGraphDatabaseDao
+
+@HiltViewModel
+class InputDataPointDialogViewModel @Inject constructor(
+    private val dao: TrackAndGraphDatabaseDao
+) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
@@ -276,10 +280,12 @@ class InputDataPointDialogViewModel : ViewModel() {
         return@lazy index
     }
 
-    fun init(activity: Activity, featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?) {
-        if (features.value!!.isNotEmpty()) return
-        val application = activity.application
-        dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
+    private var initialized = false
+
+    fun init(featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?) {
+        if (initialized) return
+        initialized = true
+
         _state.value = InputDataPointDialogState.LOADING
         ioScope.launch {
             val featureData = dao.getFeaturesByIdsSync(featureIds)

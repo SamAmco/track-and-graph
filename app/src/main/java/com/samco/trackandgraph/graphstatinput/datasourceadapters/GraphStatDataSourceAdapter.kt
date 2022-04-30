@@ -38,12 +38,13 @@ abstract class GraphStatDataSourceAdapter<I> {
         graphOrStatId: Long
     ): Pair<Long, I>?
 
-    @Suppress("UNCHECKED_CAST")
     suspend fun getConfigData(
         dataSource: TrackAndGraphDatabaseDao,
         graphOrStatId: Long
     ): Pair<Long, Any>? {
-        return getConfigDataFromDatabase(dataSource, graphOrStatId) as Pair<Long, Any>
+        return (getConfigDataFromDatabase(dataSource, graphOrStatId) ?: return null).let {
+            Pair(it.first, it.second as Any)
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

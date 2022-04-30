@@ -19,7 +19,6 @@ package com.samco.trackandgraph.viewgraphstat
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.res.Configuration
 import android.graphics.Point
 import android.os.Bundle
@@ -32,13 +31,14 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.database.entity.DataPoint
@@ -51,8 +51,12 @@ import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
     private val viewModel by viewModels<ViewGraphStatViewModel>()
@@ -72,11 +76,13 @@ class ViewGraphStatFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         this.navController = container?.findNavController()
-        viewModel.init(requireActivity(), args.graphStatId)
         binding = FragmentViewGraphStatBinding.inflate(inflater, container, false)
         graphStatView = binding.graphStatView
+
+        viewModel.setGraphStatId(args.graphStatId)
+
         setViewInitialState()
         listenToState()
         listenToBinding()
@@ -134,19 +140,15 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun listenToState() {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            Observer { state -> onViewModelStateChanged(state) })
-        viewModel.showingNotes.observe(
-            viewLifecycleOwner,
-            Observer { b -> onShowingNotesChanged(b) })
+        viewModel.state.observe(viewLifecycleOwner) { state -> onViewModelStateChanged(state) }
+        viewModel.showingNotes.observe(viewLifecycleOwner) { b -> onShowingNotesChanged(b) }
     }
 
     private fun observeNoteMarker() {
-        viewModel.markedNote.observe(viewLifecycleOwner, Observer { note ->
-            if (note == null) return@Observer
+        viewModel.markedNote.observe(viewLifecycleOwner) { note ->
+            if (note == null) return@observe
             binding.graphStatView.placeMarker(note.timestamp)
-        })
+        }
     }
 
     private fun onNewNotesList(notes: List<GraphNote>) {
@@ -179,7 +181,7 @@ class ViewGraphStatFragment : Fragment() {
         binding.notesRecyclerView.layoutManager = LinearLayoutManager(
             context, RecyclerView.VERTICAL, false
         )
-        viewModel.notes.observe(viewLifecycleOwner, Observer { onNewNotesList(it) })
+        viewModel.notes.observe(viewLifecycleOwner) { onNewNotesList(it) }
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
@@ -239,14 +241,18 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun observeGraphStatViewData() {
-        viewModel.graphStatViewData.observe(viewLifecycleOwner, Observer {
+        viewModel.graphStatViewData.observe(viewLifecycleOwner) {
             graphStatView.initFromGraphStat(it, false)
-        })
+        }
     }
 }
 
 enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
-class ViewGraphStatViewModel : ViewModel() {
+
+@HiltViewModel
+class ViewGraphStatViewModel @Inject constructor(
+    private val dao: TrackAndGraphDatabaseDao
+) : ViewModel() {
     var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyList(), emptyList())
         private set
     var featureTypes: Map<Long, DataType>? = null
@@ -274,14 +280,12 @@ class ViewGraphStatViewModel : ViewModel() {
     private val currJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + currJob)
 
-    private var dataSource: TrackAndGraphDatabaseDao? = null
+    private var initialized = false
 
-    fun init(activity: Activity, graphStatId: Long) {
-        if (dataSource != null) return
-        dataSource =
-            TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
-        _state.value =
-            ViewGraphStatViewModelState.INITIALIZING
+    fun setGraphStatId(graphStatId: Long) {
+        if (initialized) return
+        initialized = true
+
         ioScope.launch {
             initFromGraphStatId(graphStatId)
             getAllFeatureAttributes()
@@ -294,7 +298,7 @@ class ViewGraphStatViewModel : ViewModel() {
 
     //TODO we need to filter these by date/time and only show global notes relevant to the current graph/stat
     private suspend fun getAllGlobalNotes() = withContext(Dispatchers.IO) {
-        val globalNotes = dataSource!!.getAllGlobalNotesSync()
+        val globalNotes = dao.getAllGlobalNotesSync()
             .map { GraphNote(it) }
         val mergedList = _notes.value
             ?.union(globalNotes)
@@ -303,10 +307,10 @@ class ViewGraphStatViewModel : ViewModel() {
     }
 
     private fun getAllFeatureAttributes() {
-        val allFeatures = dataSource!!.getAllFeaturesSync()
-        val allGroups = dataSource!!.getAllGroupsSync()
+        val allFeatures = dao.getAllFeaturesSync()
+        val allGroups = dao.getAllGroupsSync()
         featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
-        featureTypes = allFeatures.map { it.id to it.featureType }.toMap()
+        featureTypes = allFeatures.associate { it.id to it.featureType }
     }
 
     private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
@@ -323,9 +327,9 @@ class ViewGraphStatViewModel : ViewModel() {
     }
 
     private suspend fun initFromGraphStatId(graphStatId: Long) {
-        val graphStat = dataSource!!.getGraphStatById(graphStatId)
+        val graphStat = dao.getGraphStatById(graphStatId)
         val viewData = graphStatTypes[graphStat.type]
-            ?.dataFactory!!.getViewData(dataSource!!, graphStat, this::onSampledDataPoints)
+            ?.dataFactory!!.getViewData(dao, graphStat, this::onSampledDataPoints)
         withContext(Dispatchers.Main) { _graphStatViewData.value = viewData }
     }
 
