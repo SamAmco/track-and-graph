@@ -17,8 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
 
 interface IGraphStatViewData {
     enum class State {

@@ -17,9 +17,10 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.database.entity.TimeHistogram
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.entity.TimeHistogram
+
 
 class TimeHistogramDataSourceAdapter : GraphStatDataSourceAdapter<TimeHistogram>(){
     override suspend fun writeConfigToDatabase(

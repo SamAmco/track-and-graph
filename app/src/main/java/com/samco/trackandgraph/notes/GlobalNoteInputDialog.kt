@@ -30,10 +30,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.database.entity.GlobalNote
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.odtFromString
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.databinding.GlobalNoteInputDialogBinding
 import com.samco.trackandgraph.ui.formatDayMonthYear
 import kotlinx.coroutines.*

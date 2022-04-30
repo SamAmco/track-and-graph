@@ -17,11 +17,14 @@
 package com.samco.trackandgraph.util
 
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DiscreteValue
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.DataType
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.dto.DiscreteValue
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.DataType
+import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.odtFromString
+import com.samco.trackandgraph.ui.dataVisColorList
+import com.samco.trackandgraph.ui.getDisplayValue
 import kotlinx.coroutines.yield
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
@@ -62,7 +65,7 @@ object CSVReadWriter {
                         DiscreteValue.fromDataPoint(dp).toString()
                     }
                     DataType.CONTINUOUS -> { dp: DataPoint -> dp.value.toString() }
-                    DataType.DURATION -> { dp: DataPoint -> DataPoint.getDisplayValue(dp, DataType.DURATION) }
+                    DataType.DURATION -> { dp: DataPoint -> dp.getDisplayValue(DataType.DURATION) }
                 }
 
                 dataPoints.forEach { dp ->

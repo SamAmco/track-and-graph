@@ -17,8 +17,8 @@
 
 package com.samco.trackandgraph.ui
 
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.entity.Group
 
 open class FeaturePathProvider(
     val features: List<Feature>,

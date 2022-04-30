@@ -18,13 +18,15 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.DataSamplerImpl
-import com.samco.trackandgraph.database.DataSource
-import com.samco.trackandgraph.functionslib.GlobalAggregationPreferences
-import com.samco.trackandgraph.functionslib.TimeHelper
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.*
-import com.samco.trackandgraph.functionslib.DataClippingFunction
+import com.samco.trackandgraph.base.database.DataSource
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.entity.TimeHistogram
+import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
+import com.samco.trackandgraph.functions.helpers.TimeHelper
+import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData

@@ -35,11 +35,13 @@ import androidx.room.withTransaction
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.*
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.entity.DataType
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.entity.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
-import com.samco.trackandgraph.functionslib.DataSampleProperties
+import com.samco.trackandgraph.functions.sampling.DataSampleProperties
 import com.samco.trackandgraph.graphclassmappings.graphStatTypes
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData

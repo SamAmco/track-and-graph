@@ -19,14 +19,14 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.androidplot.pie.Segment
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.DataSamplerImpl
-import com.samco.trackandgraph.database.DataSource
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.dto.IDataPoint
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.database.entity.PieChart
-import com.samco.trackandgraph.functionslib.DataClippingFunction
+import com.samco.trackandgraph.base.database.DataSource
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.entity.PieChart
+import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData

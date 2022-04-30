@@ -23,9 +23,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.entity.TimeHistogram
-import com.samco.trackandgraph.database.entity.TimeHistogramWindow
-import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
+import com.samco.trackandgraph.base.database.entity.TimeHistogram
+import com.samco.trackandgraph.base.database.entity.TimeHistogramWindow
+import com.samco.trackandgraph.base.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.databinding.TimeHistogramInputViewBinding
 import com.samco.trackandgraph.graphstatinput.ValidationException
 

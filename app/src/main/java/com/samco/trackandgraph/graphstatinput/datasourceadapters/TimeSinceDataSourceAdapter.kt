@@ -17,9 +17,10 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.database.entity.TimeSinceLastStat
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
+
 
 class TimeSinceDataSourceAdapter : GraphStatDataSourceAdapter<TimeSinceLastStat>() {
     override suspend fun writeConfigToDatabase(
