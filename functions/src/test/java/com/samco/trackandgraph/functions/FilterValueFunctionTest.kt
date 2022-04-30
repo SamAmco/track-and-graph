@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functionslib
+package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.functions.CompositeFunction
@@ -27,7 +27,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.threeten.bp.OffsetDateTime
 
-class FilterValueFunction_KtTest {
+class FilterValueFunctionTest {
 
     data class DpInput(
         val offset: Int,
