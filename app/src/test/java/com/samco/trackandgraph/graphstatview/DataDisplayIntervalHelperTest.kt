@@ -28,7 +28,7 @@ import kotlin.time.Duration
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
-class Statistics_getYParameters_KtTest {
+class DataDisplayIntervalHelperTest {
 
     private val uut = DataDisplayIntervalHelper()
 
