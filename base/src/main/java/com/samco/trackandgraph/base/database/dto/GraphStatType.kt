@@ -15,13 +15,12 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.constants
+package com.samco.trackandgraph.base.database.dto
 
-enum class LineGraphPlottingModes {
-    WHEN_TRACKED,
-    GENERATE_HOURLY_TOTALS,
-    GENERATE_DAILY_TOTALS,
-    GENERATE_WEEKLY_TOTALS,
-    GENERATE_MONTHLY_TOTALS,
-    GENERATE_YEARLY_TOTALS
+enum class GraphStatType {
+    LINE_GRAPH,
+    PIE_CHART,
+    AVERAGE_TIME_BETWEEN,
+    TIME_SINCE,
+    TIME_HISTOGRAM
 }

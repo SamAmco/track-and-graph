@@ -21,7 +21,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.base.database.entity.queryresponse.YRangeType
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -34,7 +34,7 @@ import org.threeten.bp.OffsetDateTime
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class LineGraph(
+internal data class LineGraph(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,

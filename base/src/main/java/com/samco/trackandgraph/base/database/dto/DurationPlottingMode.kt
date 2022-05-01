@@ -15,10 +15,12 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.constants
+package com.samco.trackandgraph.base.database.dto
 
-enum class LineGraphPointStyle {
+enum class DurationPlottingMode {
     NONE,
-    CIRCLES,
-    CIRCLES_AND_NUMBERS
+    DURATION_IF_POSSIBLE,
+    HOURS,
+    MINUTES,
+    SECONDS
 }

@@ -19,7 +19,6 @@ package com.samco.trackandgraph.ui
 
 import android.content.Context
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.doubleFormatter
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.entity.DataType
@@ -28,6 +27,9 @@ import com.samco.trackandgraph.util.getPrefs
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
+import java.text.DecimalFormat
+
+val doubleFormatter = DecimalFormat("#.##################")
 
 enum class DateFormatSetting { DMY, MDY, YMD }
 

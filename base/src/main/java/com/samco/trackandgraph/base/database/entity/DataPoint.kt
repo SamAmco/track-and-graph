@@ -33,7 +33,7 @@ import org.threeten.bp.OffsetDateTime
         )
     ]
 )
-data class DataPoint(
+internal data class DataPoint(
     @ColumnInfo(name = "timestamp")
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
 

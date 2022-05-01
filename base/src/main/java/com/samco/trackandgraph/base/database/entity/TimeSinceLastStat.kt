@@ -36,7 +36,7 @@ import androidx.room.PrimaryKey
         )
     ]
 )
-data class TimeSinceLastStat(
+internal data class TimeSinceLastStat(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,

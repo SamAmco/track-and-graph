@@ -38,7 +38,7 @@ import org.threeten.bp.OffsetDateTime
         )
     ]
 )
-data class AverageTimeBetweenStat(
+internal data class AverageTimeBetweenStat(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,

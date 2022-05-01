@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
 
 @Entity(
@@ -31,7 +32,7 @@ import com.samco.trackandgraph.base.database.dto.DiscreteValue
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class Feature(
+internal data class Feature(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
@@ -66,5 +67,4 @@ data class Feature(
         else ""
 }
 
-enum class DataType { DISCRETE, CONTINUOUS, DURATION }
 

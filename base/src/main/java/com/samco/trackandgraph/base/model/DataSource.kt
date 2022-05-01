@@ -15,17 +15,12 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.constants
+package com.samco.trackandgraph.base.model
 
-import org.threeten.bp.Duration
-import org.threeten.bp.Period
-import org.threeten.bp.temporal.TemporalAmount
-
-val plottingModePeriods: Map<LineGraphPlottingModes, TemporalAmount?> = mapOf(
-    LineGraphPlottingModes.WHEN_TRACKED to null,
-    LineGraphPlottingModes.GENERATE_HOURLY_TOTALS to Duration.ofHours(1),
-    LineGraphPlottingModes.GENERATE_DAILY_TOTALS to Period.ofDays(1),
-    LineGraphPlottingModes.GENERATE_WEEKLY_TOTALS to Period.ofWeeks(1),
-    LineGraphPlottingModes.GENERATE_MONTHLY_TOTALS to Period.ofMonths(1),
-    LineGraphPlottingModes.GENERATE_YEARLY_TOTALS to Period.ofYears(1)
-)
+//TODO I think we remove this distinction from the front end and figure out how to get the
+// data in the sampler by adding an optional reference to a function table in the feature
+// database definition.
+sealed class DataSource {
+    class FeatureDataSource(val featureId: Long) : DataSource()
+    class FunctionDataSource(val functionId: Long) : DataSource()
+}

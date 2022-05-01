@@ -18,14 +18,13 @@
 package com.samco.trackandgraph.group
 
 import android.graphics.drawable.RippleDrawable
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 

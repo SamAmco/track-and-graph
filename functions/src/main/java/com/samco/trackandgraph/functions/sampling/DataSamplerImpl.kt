@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.functions.sampling
 
 import android.database.Cursor
-import com.samco.trackandgraph.base.database.DataSource
+import com.samco.trackandgraph.base.model.DataSource
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.functions.helpers.cache
 

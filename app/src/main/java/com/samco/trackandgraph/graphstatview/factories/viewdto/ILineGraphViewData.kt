@@ -20,7 +20,7 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.StepMode
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.base.database.entity.queryresponse.YRangeType
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import org.threeten.bp.OffsetDateTime
