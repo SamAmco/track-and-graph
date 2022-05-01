@@ -15,9 +15,9 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphclassmappings
+package com.samco.trackandgraph.graphstatconstants
 
-import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
 import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatinput.configviews.AverageTimeBetweenConfigView

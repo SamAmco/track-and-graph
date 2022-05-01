@@ -15,12 +15,14 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.constants
+package com.samco.trackandgraph.base.database.dto
 
-enum class DurationPlottingMode {
-    NONE,
-    DURATION_IF_POSSIBLE,
-    HOURS,
-    MINUTES,
-    SECONDS
+enum class TimeHistogramWindow {
+    HOUR,
+    DAY,
+    WEEK,
+    MONTH,
+    THREE_MONTHS,
+    SIX_MONTHS,
+    YEAR
 }

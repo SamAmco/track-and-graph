@@ -26,20 +26,6 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAmount
 
-enum class TimeHistogramWindow(
-    val duration: Duration,
-    val period: TemporalAmount,
-    val numBins: Int
-) {
-    HOUR(Duration.ofHours(1), Duration.ofHours(1), 60),
-    DAY(Duration.ofDays(1), Duration.ofDays(1), 24),
-    WEEK(Duration.ofDays(7), Period.ofWeeks(1), 7),
-    MONTH(Duration.ofDays(30), Period.ofMonths(1), 30),
-    THREE_MONTHS(Duration.ofDays(365 / 4), Period.ofMonths(3), 13),
-    SIX_MONTHS(Duration.ofDays(365 / 2), Period.ofMonths(6), 26),
-    YEAR(Duration.ofDays(365), Period.ofYears(1), 12)
-}
-
 @Entity(
     tableName = "time_histograms_table",
     foreignKeys = [
@@ -57,7 +43,7 @@ enum class TimeHistogramWindow(
         )
     ]
 )
-data class TimeHistogram(
+internal data class TimeHistogram(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,

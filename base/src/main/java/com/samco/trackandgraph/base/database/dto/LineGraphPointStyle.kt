@@ -15,17 +15,10 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.constants
+package com.samco.trackandgraph.base.database.dto
 
-import org.threeten.bp.Duration
-
-val movingAverageDurations = mapOf(
-    LineGraphAveraginModes.NO_AVERAGING to null,
-    LineGraphAveraginModes.DAILY_MOVING_AVERAGE to Duration.ofDays(1),
-    LineGraphAveraginModes.THREE_DAY_MOVING_AVERAGE to Duration.ofDays(3),
-    LineGraphAveraginModes.WEEKLY_MOVING_AVERAGE to Duration.ofDays(7),
-    LineGraphAveraginModes.MONTHLY_MOVING_AVERAGE to Duration.ofDays(31),
-    LineGraphAveraginModes.THREE_MONTH_MOVING_AVERAGE to Duration.ofDays(93),
-    LineGraphAveraginModes.SIX_MONTH_MOVING_AVERAGE to Duration.ofDays(183),
-    LineGraphAveraginModes.YEARLY_MOVING_AVERAGE to Duration.ofDays(365)
-)
+enum class LineGraphPointStyle {
+    NONE,
+    CIRCLES,
+    CIRCLES_AND_NUMBERS
+}

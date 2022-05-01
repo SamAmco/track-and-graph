@@ -20,11 +20,12 @@ package com.samco.trackandgraph.base.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.CheckedDays
 import com.squareup.moshi.JsonClass
 import org.threeten.bp.LocalTime
 
 @Entity(tableName = "reminders_table")
-data class Reminder(
+internal data class Reminder(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
@@ -41,36 +42,3 @@ data class Reminder(
     @ColumnInfo(name = "checked_days")
     val checkedDays: CheckedDays
 )
-
-@JsonClass(generateAdapter = true)
-data class CheckedDays (
-    val monday: Boolean,
-    val tuesday: Boolean,
-    val wednesday: Boolean,
-    val thursday: Boolean,
-    val friday: Boolean,
-    val saturday: Boolean,
-    val sunday: Boolean
-) {
-    fun toList() = listOf(monday, tuesday, wednesday, thursday, friday, saturday, sunday)
-
-    companion object {
-        fun fromList(bools: List<Boolean>): CheckedDays {
-            if (bools.size != 7) return none()
-            return CheckedDays(
-                bools[0],
-                bools[1],
-                bools[2],
-                bools[3],
-                bools[4],
-                bools[5],
-                bools[6]
-            )
-        }
-
-        fun none() = CheckedDays(
-            monday = false, tuesday = false, wednesday = false,
-            thursday = false, friday = false, saturday = false, sunday = false
-        )
-    }
-}

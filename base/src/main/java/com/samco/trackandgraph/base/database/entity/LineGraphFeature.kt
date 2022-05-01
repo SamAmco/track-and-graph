@@ -21,10 +21,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.samco.trackandgraph.base.database.constants.DurationPlottingMode
-import com.samco.trackandgraph.base.database.constants.LineGraphAveraginModes
-import com.samco.trackandgraph.base.database.constants.LineGraphPlottingModes
-import com.samco.trackandgraph.base.database.constants.LineGraphPointStyle
+import com.samco.trackandgraph.base.database.dto.DurationPlottingMode
+import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 
 @Entity(
     tableName = "line_graph_features_table2",
@@ -42,7 +42,7 @@ import com.samco.trackandgraph.base.database.constants.LineGraphPointStyle
             onDelete = ForeignKey.CASCADE
         )]
 )
-data class LineGraphFeature(
+internal data class LineGraphFeature(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,

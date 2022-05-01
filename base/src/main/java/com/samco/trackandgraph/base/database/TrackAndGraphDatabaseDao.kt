@@ -20,15 +20,17 @@ import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.entity.*
+import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayFeature
+import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
+import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
 import org.threeten.bp.OffsetDateTime
 
 private const val getFeatureByIdQuery =
     """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
 
 @Dao
-interface TrackAndGraphDatabaseDao {
+internal interface TrackAndGraphDatabaseDao {
     @RawQuery
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 

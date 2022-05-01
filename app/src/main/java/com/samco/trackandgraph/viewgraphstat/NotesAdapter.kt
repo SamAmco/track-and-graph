@@ -23,8 +23,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.dto.NoteType
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.queryresponse.NoteType
 import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider

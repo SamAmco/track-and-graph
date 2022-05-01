@@ -25,7 +25,7 @@ import org.threeten.bp.OffsetDateTime
     tableName = "notes_table",
     primaryKeys = ["timestamp"]
 )
-data class GlobalNote(
+internal data class GlobalNote(
     @ColumnInfo(name = "timestamp")
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
 

@@ -19,13 +19,8 @@ package com.samco.trackandgraph.base.database
 import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.samco.trackandgraph.base.database.constants.DurationPlottingMode
-import com.samco.trackandgraph.base.database.constants.LineGraphAveraginModes
-import com.samco.trackandgraph.base.database.constants.LineGraphPlottingModes
-import com.samco.trackandgraph.base.database.constants.LineGraphPointStyle
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.dto.NoteType
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.entity.queryresponse.YRangeType
 import com.samco.trackandgraph.base.database.entity.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -35,11 +30,8 @@ import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.lang.Exception
-import java.text.DecimalFormat
 
-val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
-val doubleFormatter = DecimalFormat("#.##################")
-
+private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 @Database(
     entities = [Feature::class, DataPoint::class, Group::class,
@@ -49,7 +41,7 @@ val doubleFormatter = DecimalFormat("#.##################")
     version = 46
 )
 @TypeConverters(Converters::class)
-abstract class TrackAndGraphDatabase : RoomDatabase() {
+internal abstract class TrackAndGraphDatabase : RoomDatabase() {
     abstract val trackAndGraphDatabaseDao: TrackAndGraphDatabaseDao
 
     companion object {
@@ -93,7 +85,7 @@ abstract class TrackAndGraphDatabase : RoomDatabase() {
     }
 }
 
-class Converters {
+internal class Converters {
 
     private val moshi = Moshi.Builder().build()
 

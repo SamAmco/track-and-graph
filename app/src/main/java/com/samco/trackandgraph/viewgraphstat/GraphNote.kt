@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.viewgraphstat
 
-import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.database.entity.queryresponse.NoteType
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.entity.GlobalNote
 import org.threeten.bp.OffsetDateTime

@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.base.database.dto
+package com.samco.trackandgraph.base.database.entity.queryresponse
 
 import androidx.room.ColumnInfo
 import androidx.room.Relation
@@ -23,12 +23,12 @@ import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-enum class YRangeType {
+internal enum class YRangeType {
     DYNAMIC,
     FIXED
 }
 
-data class LineGraphWithFeatures(
+internal data class LineGraphWithFeatures(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 

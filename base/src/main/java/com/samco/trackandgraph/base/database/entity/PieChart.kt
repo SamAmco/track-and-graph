@@ -38,7 +38,7 @@ import org.threeten.bp.OffsetDateTime
         )
     ]
 )
-data class PieChart(
+internal data class PieChart(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,

@@ -22,24 +22,6 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import org.threeten.bp.Duration
 
-enum class GraphStatType {
-    LINE_GRAPH,
-    PIE_CHART,
-    AVERAGE_TIME_BETWEEN,
-    TIME_SINCE,
-    TIME_HISTOGRAM
-}
-
-val maxGraphPeriodDurations = listOf(
-    null,
-    Duration.ofDays(1),
-    Duration.ofDays(7),
-    Duration.ofDays(31),
-    Duration.ofDays(93),
-    Duration.ofDays(183),
-    Duration.ofDays(365)
-)
-
 @Entity(
     tableName = "graphs_and_stats_table2",
     foreignKeys = [ForeignKey(
@@ -49,7 +31,7 @@ val maxGraphPeriodDurations = listOf(
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class GraphOrStat(
+internal data class GraphOrStat(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
