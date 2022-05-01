@@ -29,6 +29,8 @@ import org.threeten.bp.OffsetDateTime
 private const val getFeatureByIdQuery =
     """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
 
+//TODO it would probably be better if we migrated from LiveData to flow here to remove lifecycle
+// awareness from the model layer
 @Dao
 internal interface TrackAndGraphDatabaseDao {
     @RawQuery
@@ -55,15 +57,16 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroups(): LiveData<List<Group>>
 
+    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
+    fun getAllGroupsSync(): List<Group>
+
     @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeatures(): LiveData<List<Feature>>
 
     @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeaturesSync(): List<Feature>
 
-    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
-    fun getAllGroupsSync(): List<Group>
-
+    //TODO remove this once we have a model layer that can track updates and emit events for us
     @Query("""SELECT * FROM data_points_table""")
     fun getAllDataPoints(): LiveData<List<DataPoint>>
 
@@ -142,42 +145,11 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
-    //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp""")
-    fun getDataPointsWithValue(
-        featureId: Long,
-        values: List<Int>
-    ): List<DataPoint>
-
-    //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp""")
-    fun getDataPointsBetween(
-        featureId: Long,
-        min: String,
-        max: String
-    ): List<DataPoint>
-
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointBetween(
-        featureId: Long,
-        min: String,
-        max: String
-    ): DataPoint?
-
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointWithValue(
-        featureId: Long,
-        values: List<Int>
-    ): DataPoint?
-
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT 1")
-    fun getLastDataPointForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
@@ -270,6 +242,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat)
 
+    //TODO consider managing GraphOrStat automatically in the model
     @Insert
     fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
 
