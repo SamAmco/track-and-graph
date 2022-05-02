@@ -24,14 +24,14 @@ import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.sampling.DataSampleFunction
-import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.functions.functions.DataSampleFunction
+import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
-import com.samco.trackandgraph.functions.sampling.IDataSampler
+import com.samco.trackandgraph.base.database.sampling.IDataSampler
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
@@ -79,7 +79,7 @@ class AverageTimeBetweenDataFactory :
     ): IAverageTimeBetweenViewData {
         return try {
             val feature = dataSource.getFeatureById(config.featureId)
-            val dataSampler = DataSamplerImpl(dataSource)
+            val dataSampler = DataSampler(dataSource)
             val dataSample = withContext(Dispatchers.IO) {
                 getRelevantDataPoints(dataSampler, config, feature)
             }

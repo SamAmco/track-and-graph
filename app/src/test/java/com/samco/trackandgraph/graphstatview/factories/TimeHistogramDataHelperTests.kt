@@ -20,7 +20,7 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.entity.TimeHistogramWindow
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
-import com.samco.trackandgraph.functions.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.junit.Assert
 import org.junit.Test

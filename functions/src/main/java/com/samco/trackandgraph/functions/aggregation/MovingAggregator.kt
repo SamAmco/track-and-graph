@@ -18,8 +18,8 @@
 package com.samco.trackandgraph.functions.aggregation
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.helpers.cache
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.sequencehelpers.cache
 import org.threeten.bp.Duration
 
 /**

@@ -41,7 +41,7 @@ import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
-import com.samco.trackandgraph.functions.sampling.DataSampleProperties
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.graphstatconstants.graphStatTypes
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData

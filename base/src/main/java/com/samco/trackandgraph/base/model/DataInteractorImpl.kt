@@ -24,6 +24,8 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSampler
 import org.threeten.bp.OffsetDateTime
 
 internal class DataInteractorImpl(
@@ -171,6 +173,13 @@ internal class DataInteractorImpl(
 
     override fun updateDataPoints(dataPoint: List<DataPoint>) {
         return dao.updateDataPoints(dataPoint.map { it.toEntity() })
+    }
+
+    //TODO probably can do better than this
+    override fun getDataSampleForFeatureId(featureId: Long): DataSample {
+        val dataSampler = DataSampler(dao)
+        val dataSource = DataSource.FeatureDataSource(featureId)
+        return dataSampler.getDataSampleForSource(dataSource)
     }
 
     override fun getAllDataPoints(): LiveData<List<DataPoint>> {
