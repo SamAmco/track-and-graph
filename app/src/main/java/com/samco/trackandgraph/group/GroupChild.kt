@@ -21,7 +21,7 @@ enum class GroupChildType { GROUP, FEATURE, GRAPH }
 
 /**
  * Represents all relevant view data that the GroupFragment might present. The obj will be one of:
- * DisplayFeature, Group or Pair<Instant, IGraphStatViewData>. The id and displayIndex functions
+ * com.samco.trackandgraph.base.database.dto.DisplayFeature, Group or Pair<Instant, IGraphStatViewData>. The id and displayIndex functions
  * are just there for convenience but will simply return properties of the obj.
  */
 data class GroupChild(

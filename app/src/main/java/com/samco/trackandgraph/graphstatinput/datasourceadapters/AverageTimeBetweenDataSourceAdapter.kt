@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
+import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 
 

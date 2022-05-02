@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.displaytrackgroup
 
 import android.app.AlertDialog
-import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
@@ -47,7 +46,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.ui.YesCancelDialogFragment

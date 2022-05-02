@@ -30,7 +30,7 @@ import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.doubleFormatter
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.ui.DurationInputView

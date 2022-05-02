@@ -30,9 +30,9 @@ import com.samco.trackandgraph.base.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
 import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
-import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
-import com.samco.trackandgraph.base.database.entity.queryresponse.YRangeType
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import com.samco.trackandgraph.functions.sampling.DataSample

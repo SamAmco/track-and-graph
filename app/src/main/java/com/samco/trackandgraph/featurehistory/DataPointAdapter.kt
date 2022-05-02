@@ -22,7 +22,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinuteWeekDayTwoLines

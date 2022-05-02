@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 
 

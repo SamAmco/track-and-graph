@@ -15,45 +15,17 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.entity
+package com.samco.trackandgraph.base.database.dto
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
-import com.samco.trackandgraph.base.database.dto.YRangeType
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-@Entity(
-    tableName = "line_graphs_table3",
-    foreignKeys = [ForeignKey(
-        entity = GraphOrStat::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("graph_stat_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
-)
-internal data class LineGraph(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id", index = true)
+data class LineGraph(
     val id: Long,
-
-    @ColumnInfo(name = "graph_stat_id", index = true)
     val graphStatId: Long,
-
-    @ColumnInfo(name = "duration")
     val duration: Duration?,
-
-    @ColumnInfo(name = "y_range_type")
     val yRangeType: YRangeType,
-
-    @ColumnInfo(name = "y_from")
     val yFrom: Double,
-
-    @ColumnInfo(name = "y_to")
     val yTo: Double,
-
-    @ColumnInfo(name = "end_date")
     val endDate: OffsetDateTime?
 )

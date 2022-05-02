@@ -21,10 +21,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.Period
-import org.threeten.bp.temporal.TemporalAmount
 
 @Entity(
     tableName = "time_histograms_table",

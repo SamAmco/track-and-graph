@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.squareup.moshi.JsonClass
 import java.lang.Exception
 
