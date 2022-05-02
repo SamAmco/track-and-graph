@@ -21,6 +21,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.TimeHistogram
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -64,4 +65,14 @@ internal data class TimeHistogram(
 
     @ColumnInfo(name = "end_date")
     val endDate: OffsetDateTime?
-)
+) {
+    fun toDto() = TimeHistogram(
+        id,
+        graphStatId,
+        featureId,
+        duration,
+        window,
+        sumByCount,
+        endDate
+    )
+}

@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.DataPoint
 import org.threeten.bp.OffsetDateTime
 
 data class DataPoint(
@@ -24,4 +25,12 @@ data class DataPoint(
     val value: Double,
     val label: String,
     val note: String
-)
+) {
+    internal fun toEntity() = DataPoint(
+        timestamp,
+        featureId,
+        value,
+        label,
+        note
+    )
+}

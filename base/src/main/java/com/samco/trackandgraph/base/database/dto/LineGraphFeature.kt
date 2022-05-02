@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.LineGraphFeature
+
 data class LineGraphFeature(
     val id: Long,
     val lineGraphId: Long,
@@ -29,4 +31,18 @@ data class LineGraphFeature(
     val offset: Double,
     val scale: Double,
     val durationPlottingMode: DurationPlottingMode
-)
+) {
+    internal fun toEntity() = LineGraphFeature(
+        id,
+        lineGraphId,
+        featureId,
+        name,
+        colorIndex,
+        averagingMode,
+        plottingMode,
+        pointStyle,
+        offset,
+        scale,
+        durationPlottingMode
+    )
+}

@@ -16,10 +16,20 @@
 */
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
+
 data class GraphOrStat(
     val id: Long,
     val groupId: Long,
     val name: String,
     val type: GraphStatType,
     val displayIndex: Int
-)
+) {
+    internal fun toEntity() = GraphOrStat(
+        id,
+        groupId,
+        name,
+        type,
+        displayIndex
+    )
+}

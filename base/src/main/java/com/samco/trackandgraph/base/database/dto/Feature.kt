@@ -16,6 +16,8 @@
 */
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.Feature
+
 data class Feature(
     val id: Long,
     val name: String,
@@ -31,6 +33,16 @@ data class Feature(
         if (featureType == DataType.DISCRETE)
             discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
         else ""
+
+    internal fun toEntity() = Feature(
+        id,
+        name,
+        groupId,
+        featureType,
+        discreteValues,
+        displayIndex,
+        hasDefaultValue,
+        defaultValue,
+        description
+    )
 }
-
-

@@ -20,6 +20,7 @@ package com.samco.trackandgraph.base.database.entity.queryresponse
 import androidx.room.ColumnInfo
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
+import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import org.threeten.bp.OffsetDateTime
 
 internal data class DisplayFeature(
@@ -55,4 +56,18 @@ internal data class DisplayFeature(
 
     @ColumnInfo(name = "feature_description")
     val description: String
-)
+) {
+    fun toDto() = DisplayFeature(
+        id,
+        name,
+        groupId,
+        featureType,
+        discreteValues,
+        hasDefaultValue,
+        defaultValue,
+        timestamp,
+        numDataPoints,
+        displayIndex,
+        description
+    )
+}

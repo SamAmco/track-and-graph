@@ -17,9 +17,15 @@
 
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.GlobalNote
 import org.threeten.bp.OffsetDateTime
 
 data class GlobalNote(
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
     val note: String
-)
+) {
+    internal fun toEntity() = GlobalNote(
+        timestamp,
+        note
+    )
+}

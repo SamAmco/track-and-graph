@@ -19,6 +19,7 @@ package com.samco.trackandgraph.base.database.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import com.samco.trackandgraph.base.database.dto.GlobalNote
 import org.threeten.bp.OffsetDateTime
 
 @Entity(
@@ -31,4 +32,9 @@ internal data class GlobalNote(
 
     @ColumnInfo(name = "note")
     val note: String
-)
+) {
+    fun toDto() = GlobalNote(
+        timestamp,
+        note
+    )
+}

@@ -20,12 +20,10 @@ import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
-import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayFeature
-import com.samco.trackandgraph.base.database.dto.DisplayNote
-import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
+import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
 import org.threeten.bp.OffsetDateTime
 
 private const val getFeatureByIdQuery =

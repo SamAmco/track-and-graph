@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.GraphStatType
 
 @Entity(
@@ -47,4 +48,12 @@ internal data class GraphOrStat(
 
     @ColumnInfo(name = "display_index")
     val displayIndex: Int
-)
+) {
+    fun toDto() = GraphOrStat(
+        id,
+        groupId,
+        name,
+        type,
+        displayIndex
+    )
+}

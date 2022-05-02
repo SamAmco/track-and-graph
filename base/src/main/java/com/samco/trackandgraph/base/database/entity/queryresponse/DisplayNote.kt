@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.base.database.entity.queryresponse
 
 import androidx.room.ColumnInfo
+import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.database.dto.NoteType
 import org.threeten.bp.OffsetDateTime
 
@@ -39,4 +40,13 @@ internal data class DisplayNote(
 
     @ColumnInfo(name = "note")
     val note: String
-)
+) {
+    fun toDto() = DisplayNote(
+        timestamp,
+        noteType,
+        featureId,
+        featureName,
+        groupId,
+        note
+    )
+}

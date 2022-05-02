@@ -47,4 +47,15 @@ internal data class LineGraphWithFeatures(
 
     @ColumnInfo(name = "end_date")
     val endDate: OffsetDateTime?
-)
+) {
+    fun toDto() = com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures(
+        id,
+        graphStatId,
+        features.map { it.toDto() },
+        duration,
+        yRangeType,
+        yFrom,
+        yTo,
+        endDate
+    )
+}

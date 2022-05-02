@@ -16,6 +16,8 @@
 */
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
+
 data class TimeSinceLastStat(
     val id: Long,
     val graphStatId: Long,
@@ -25,4 +27,15 @@ data class TimeSinceLastStat(
     val labels: List<String>,
     val filterByRange: Boolean,
     val filterByLabels: Boolean
-)
+) {
+    internal fun toEntity() = TimeSinceLastStat(
+        id,
+        graphStatId,
+        featureId,
+        fromValue,
+        toValue,
+        labels,
+        filterByRange,
+        filterByLabels
+    )
+}

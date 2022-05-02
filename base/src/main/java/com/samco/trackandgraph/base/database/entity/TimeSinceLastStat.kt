@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
 
 @Entity(tableName = "time_since_last_stat_table4",
     foreignKeys = [
@@ -61,4 +62,15 @@ internal data class TimeSinceLastStat(
 
     @ColumnInfo(name = "filter_by_labels")
     val filterByLabels: Boolean
-)
+) {
+    fun toDto() = TimeSinceLastStat(
+        id,
+        graphStatId,
+        featureId,
+        fromValue,
+        toValue,
+        labels,
+        filterByRange,
+        filterByLabels
+    )
+}

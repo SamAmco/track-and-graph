@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.PieChart
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -54,4 +55,12 @@ internal data class PieChart(
 
     @ColumnInfo(name = "end_date")
     val endDate: OffsetDateTime?
-)
+) {
+    fun toDto() = PieChart(
+        id,
+        graphStatId,
+        featureId,
+        duration,
+        endDate
+    )
+}
