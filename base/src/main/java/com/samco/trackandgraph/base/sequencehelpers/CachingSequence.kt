@@ -15,12 +15,17 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functions.helpers
+package com.samco.trackandgraph.base.sequencehelpers
 
 import java.util.*
 
 fun <T> Sequence<T>.cache() = CachingSequence(this)
 
+/**
+ * A sequence that caches items that have already been visited so that they may be iterated again.
+ * Supports multiple calls to [iterator]. Each call will return an iterator that iterates the whole
+ * sequence from start to finish. The base sequence will only be iterated once for each item.
+ */
 class CachingSequence<T>(sequence: Sequence<T>) : Sequence<T> {
     private val upstream = sequence.iterator()
     private val cache: MutableList<T> = Collections.synchronizedList(mutableListOf<T>())

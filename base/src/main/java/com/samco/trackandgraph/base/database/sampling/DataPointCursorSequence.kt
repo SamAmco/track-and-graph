@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functions.sampling
+package com.samco.trackandgraph.base.database.sampling
 
 import android.database.Cursor
 import com.samco.trackandgraph.base.database.Converters
@@ -23,7 +23,7 @@ import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import java.lang.Exception
 
-class DataPointCursorSequence(
+internal class DataPointCursorSequence(
     private val cursor: Cursor
 ) : Sequence<IDataPoint> {
     private val visited = mutableListOf<DataPoint>()

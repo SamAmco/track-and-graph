@@ -24,8 +24,8 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
 import com.samco.trackandgraph.functions.functions.CompositeFunction
-import com.samco.trackandgraph.functions.sampling.DataSampleFunction
-import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.functions.functions.DataSampleFunction
+import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
@@ -86,7 +86,7 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         config: TimeSinceLastStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IDataPoint? {
-        val dataSampler = DataSamplerImpl(dao)
+        val dataSampler = DataSampler(dao)
         val dataSource = DataSource.FeatureDataSource(config.featureId)
         val dataSample = dataSampler.getDataSampleForSource(dataSource)
 

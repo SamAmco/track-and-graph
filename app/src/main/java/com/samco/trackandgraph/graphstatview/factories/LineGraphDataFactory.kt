@@ -35,8 +35,8 @@ import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.LineGraphFeature
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.functions.*
 import com.samco.trackandgraph.functions.helpers.TimeHelper
@@ -151,7 +151,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
         val rawDataSample = withContext(Dispatchers.IO) {
-            val dataSampler = DataSamplerImpl(dao)
+            val dataSampler = DataSampler(dao)
             val dataSource = DataSource.FeatureDataSource(lineGraphFeature.featureId)
             dataSampler.getDataSampleForSource(dataSource)
         }

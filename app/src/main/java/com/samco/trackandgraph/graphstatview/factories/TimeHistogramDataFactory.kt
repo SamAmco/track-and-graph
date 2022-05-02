@@ -25,7 +25,7 @@ import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.TimeHistogram
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
-import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -88,7 +88,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
         onDataSampled: (List<DataPoint>) -> Unit,
         timeHistogramDataHelper: TimeHistogramDataHelper
     ): Map<String, List<Double>>? {
-        val dataSampler = DataSamplerImpl(dao)
+        val dataSampler = DataSampler(dao)
         val dataSource = DataSource.FeatureDataSource(config.featureId)
         val sample = dataSampler.getDataSampleForSource(dataSource)
         val dataSample = DataClippingFunction(config.endDate, config.duration)

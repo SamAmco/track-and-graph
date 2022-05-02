@@ -25,7 +25,7 @@ import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.PieChart
-import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
@@ -88,7 +88,7 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
         val feature = withContext(Dispatchers.IO) {
             dao.getFeatureById(pieChart.featureId)
         }
-        val dataSampler = DataSamplerImpl(dao)
+        val dataSampler = DataSampler(dao)
         val dataSource = DataSource.FeatureDataSource(feature.id)
         val dataSample = DataClippingFunction(pieChart.endDate, pieChart.duration)
             .mapSample(dataSampler.getDataSampleForSource(dataSource))

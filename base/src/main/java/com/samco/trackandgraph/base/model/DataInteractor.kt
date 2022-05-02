@@ -23,6 +23,7 @@ import androidx.lifecycle.LiveData
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.sampling.DataSample
 import org.threeten.bp.OffsetDateTime
 
 interface DataInteractor {
@@ -98,6 +99,8 @@ interface DataInteractor {
     fun insertDataPoints(dataPoint: List<DataPoint>)
 
     fun updateDataPoints(dataPoint: List<DataPoint>)
+
+    fun getDataSampleForFeatureId(featureId: Long): DataSample
 
     //TODO remove this once we have a model layer that can track updates and emit events for us
     fun getAllDataPoints(): LiveData<List<DataPoint>>

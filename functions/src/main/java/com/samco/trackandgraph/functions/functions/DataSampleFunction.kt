@@ -15,7 +15,9 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functions.sampling
+package com.samco.trackandgraph.functions.functions
+
+import com.samco.trackandgraph.base.database.sampling.DataSample
 
 /**
  * Represents a function that can modify a given [DataSample]

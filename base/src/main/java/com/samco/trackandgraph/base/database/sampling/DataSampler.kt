@@ -15,20 +15,18 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functions.sampling
+package com.samco.trackandgraph.base.database.sampling
 
 import android.database.Cursor
 import com.samco.trackandgraph.base.model.DataSource
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.functions.helpers.cache
+import com.samco.trackandgraph.base.sequencehelpers.cache
 
-class DataSamplerImpl(private val dao: TrackAndGraphDatabaseDao) :
-    IDataSampler {
+internal class DataSampler(private val dao: TrackAndGraphDatabaseDao) {
     private fun emptyDataSample() = DataSample.fromSequence(emptySequence())
 
     private fun dataSampleFromDb(cursor: Cursor): DataSample {
-        val cursorSequence =
-            DataPointCursorSequence(cursor)
+        val cursorSequence = DataPointCursorSequence(cursor)
         return DataSample.fromSequence(
             cursorSequence.cache(),
             DataSampleProperties(),
@@ -36,7 +34,7 @@ class DataSamplerImpl(private val dao: TrackAndGraphDatabaseDao) :
         )
     }
 
-    override fun getDataSampleForSource(dataSource: DataSource): DataSample {
+    fun getDataSampleForSource(dataSource: DataSource): DataSample {
         return when (dataSource) {
             is DataSource.FeatureDataSource -> {
                 dataSampleFromDb(
