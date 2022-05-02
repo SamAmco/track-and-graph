@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -30,4 +31,17 @@ data class AverageTimeBetweenStat(
     val endDate: OffsetDateTime?,
     val filterByRange: Boolean,
     val filterByLabels: Boolean
-)
+) {
+    internal fun toEntity() = AverageTimeBetweenStat(
+        id,
+        graphStatId,
+        featureId,
+        fromValue,
+        toValue,
+        duration,
+        labels,
+        endDate,
+        filterByRange,
+        filterByLabels
+    )
+}

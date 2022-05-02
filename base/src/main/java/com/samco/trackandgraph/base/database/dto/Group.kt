@@ -23,4 +23,12 @@ data class Group (
     val displayIndex: Int,
     val parentGroupId: Long?,
     val colorIndex: Int,
-)
+) {
+    internal fun toEntity()  = com.samco.trackandgraph.base.database.entity.Group(
+        id,
+        name,
+        displayIndex,
+        parentGroupId,
+        colorIndex,
+    )
+}

@@ -21,6 +21,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.CheckedDays
+import com.samco.trackandgraph.base.database.dto.Reminder
 import org.threeten.bp.LocalTime
 
 @Entity(tableName = "reminders_table")
@@ -40,4 +41,12 @@ internal data class Reminder(
 
     @ColumnInfo(name = "checked_days")
     val checkedDays: CheckedDays
-)
+) {
+    fun toDto() = Reminder(
+        id,
+        displayIndex,
+        alarmName,
+        time,
+        checkedDays
+    )
+}

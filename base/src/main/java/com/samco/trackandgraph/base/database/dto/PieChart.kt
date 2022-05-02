@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.PieChart
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -25,4 +26,12 @@ data class PieChart(
     val featureId: Long,
     val duration: Duration?,
     val endDate: OffsetDateTime?
-)
+) {
+    internal fun toEntity() = PieChart(
+        id,
+        graphStatId,
+        featureId,
+        duration,
+        endDate
+    )
+}

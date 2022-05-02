@@ -22,6 +22,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
+import com.samco.trackandgraph.base.database.dto.Feature
 
 @Entity(
     tableName = "features_table",
@@ -59,12 +60,19 @@ internal data class Feature(
     val defaultValue: Double,
 
     @ColumnInfo(name = "feature_description")
-    val description: String,
+    val description: String
 ) {
-    fun getDefaultLabel(): String =
-        if (featureType == DataType.DISCRETE)
-            discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
-        else ""
+    fun toDto() = Feature(
+        id,
+        name,
+        groupId,
+        featureType,
+        discreteValues,
+        displayIndex,
+        hasDefaultValue,
+        defaultValue,
+        description
+    )
 }
 
 

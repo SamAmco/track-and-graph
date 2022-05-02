@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.Reminder
 import org.threeten.bp.LocalTime
 
 data class Reminder(
@@ -25,4 +26,12 @@ data class Reminder(
     val alarmName: String,
     val time: LocalTime,
     val checkedDays: CheckedDays
-)
+) {
+    internal fun toEntity() = Reminder(
+        id,
+        displayIndex,
+        alarmName,
+        time,
+        checkedDays
+    )
+}

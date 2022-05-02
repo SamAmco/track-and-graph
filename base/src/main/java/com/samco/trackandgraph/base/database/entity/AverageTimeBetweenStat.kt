@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -69,4 +70,17 @@ internal data class AverageTimeBetweenStat(
 
     @ColumnInfo(name = "filter_by_labels")
     val filterByLabels: Boolean
-)
+) {
+    fun toDto() = AverageTimeBetweenStat(
+        id,
+        graphStatId,
+        featureId,
+        fromValue,
+        toValue,
+        duration,
+        labels,
+        endDate,
+        filterByRange,
+        filterByLabels
+    )
+}

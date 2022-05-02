@@ -23,6 +23,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.base.database.dto.LineGraphFeature
 import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 
@@ -76,4 +77,18 @@ internal data class LineGraphFeature(
 
     @ColumnInfo(name = "duration_plotting_mode")
     val durationPlottingMode: DurationPlottingMode
-)
+) {
+    fun toDto() = LineGraphFeature(
+        id,
+        lineGraphId,
+        featureId,
+        name,
+        colorIndex,
+        averagingMode,
+        plottingMode,
+        pointStyle,
+        offset,
+        scale,
+        durationPlottingMode
+    )
+}

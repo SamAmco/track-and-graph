@@ -20,10 +20,18 @@ import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.YRangeType
-import com.samco.trackandgraph.base.database.entity.*
+import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
+import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.entity.Group
+import com.samco.trackandgraph.base.database.entity.LineGraph
+import com.samco.trackandgraph.base.database.entity.LineGraphFeature
+import com.samco.trackandgraph.base.database.entity.PieChart
+import com.samco.trackandgraph.base.database.entity.Reminder
+import com.samco.trackandgraph.base.database.entity.TimeHistogram
+import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -36,10 +44,20 @@ import java.lang.Exception
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
 @Database(
-    entities = [Feature::class, DataPoint::class, Group::class,
-        GraphOrStat::class, LineGraph::class, AverageTimeBetweenStat::class, PieChart::class,
-        TimeSinceLastStat::class, Reminder::class, GlobalNote::class, LineGraphFeature::class,
-        TimeHistogram::class],
+    entities = [
+        Feature::class,
+        DataPoint::class,
+        Group::class,
+        GraphOrStat::class,
+        LineGraph::class,
+        AverageTimeBetweenStat::class,
+        PieChart::class,
+        TimeSinceLastStat::class,
+        Reminder::class,
+        GlobalNote::class,
+        LineGraphFeature::class,
+        TimeHistogram::class
+    ],
     version = 46
 )
 @TypeConverters(Converters::class)

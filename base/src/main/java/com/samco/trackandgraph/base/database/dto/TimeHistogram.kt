@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.TimeHistogram
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -28,4 +29,14 @@ data class TimeHistogram(
     val window: TimeHistogramWindow,
     val sumByCount: Boolean,
     val endDate: OffsetDateTime?
-)
+) {
+    internal fun toEntity() = TimeHistogram(
+        id,
+        graphStatId,
+        featureId,
+        duration,
+        window,
+        sumByCount,
+        endDate
+    )
+}

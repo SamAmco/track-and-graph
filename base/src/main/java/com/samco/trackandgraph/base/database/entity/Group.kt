@@ -22,7 +22,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "groups_table",
+@Entity(
+    tableName = "groups_table",
     foreignKeys = [ForeignKey(
         entity = Group::class,
         parentColumns = arrayOf("id"),
@@ -30,7 +31,7 @@ import androidx.room.PrimaryKey
         onDelete = ForeignKey.CASCADE
     )]
 )
-internal data class Group (
+internal data class Group(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
@@ -46,4 +47,12 @@ internal data class Group (
 
     @ColumnInfo(name = "color_index")
     val colorIndex: Int,
-)
+) {
+    fun toDto() = com.samco.trackandgraph.base.database.dto.Group(
+        id,
+        name,
+        displayIndex,
+        parentGroupId,
+        colorIndex,
+    )
+}
