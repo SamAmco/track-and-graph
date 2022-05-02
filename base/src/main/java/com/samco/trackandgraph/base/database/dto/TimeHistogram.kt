@@ -15,28 +15,17 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.entity.queryresponse
+package com.samco.trackandgraph.base.database.dto
 
-import androidx.room.ColumnInfo
-import com.samco.trackandgraph.base.database.dto.NoteType
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
-internal data class DisplayNote(
-    @ColumnInfo(name = "timestamp")
-    val timestamp: OffsetDateTime = OffsetDateTime.now(),
-
-    @ColumnInfo(name = "note_type")
-    val noteType: NoteType,
-
-    @ColumnInfo(name = "feature_id")
-    val featureId: Long?,
-
-    @ColumnInfo(name = "feature_name")
-    val featureName: String?,
-
-    @ColumnInfo(name = "group_id")
-    val groupId: Long?,
-
-    @ColumnInfo(name = "note")
-    val note: String
+data class TimeHistogram(
+    val id: Long,
+    val graphStatId: Long,
+    val featureId: Long,
+    val duration: Duration?,
+    val window: TimeHistogramWindow,
+    val sumByCount: Boolean,
+    val endDate: OffsetDateTime?
 )

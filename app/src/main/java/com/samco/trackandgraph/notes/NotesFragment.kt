@@ -28,7 +28,7 @@ import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
+import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.database.entity.queryresponse.NoteType
 import com.samco.trackandgraph.base.database.entity.GlobalNote
 import com.samco.trackandgraph.base.database.stringFromOdt

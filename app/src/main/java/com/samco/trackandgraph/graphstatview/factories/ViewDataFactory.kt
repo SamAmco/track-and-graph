@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.Dispatchers

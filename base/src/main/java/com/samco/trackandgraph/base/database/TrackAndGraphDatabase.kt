@@ -20,7 +20,9 @@ import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.database.entity.queryresponse.YRangeType
+import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.database.entity.*
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi

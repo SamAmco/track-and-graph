@@ -20,7 +20,7 @@ package com.samco.trackandgraph.functions.sampling
 import android.database.Cursor
 import com.samco.trackandgraph.base.database.Converters
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import java.lang.Exception
 
 class DataPointCursorSequence(

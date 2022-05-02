@@ -19,7 +19,7 @@ package com.samco.trackandgraph.util
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.DataType
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.base.database.odtFromString

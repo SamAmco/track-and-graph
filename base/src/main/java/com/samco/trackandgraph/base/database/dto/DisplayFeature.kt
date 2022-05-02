@@ -15,44 +15,20 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.entity.queryresponse
+package com.samco.trackandgraph.base.database.dto
 
-import androidx.room.ColumnInfo
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import org.threeten.bp.OffsetDateTime
 
-internal data class DisplayFeature(
-    @ColumnInfo(name = "id")
+data class DisplayFeature(
     var id: Long,
-
-    @ColumnInfo(name = "name")
     val name: String,
-
-    @ColumnInfo(name = "group_id")
     val groupId: Long,
-
-    @ColumnInfo(name = "type")
     val featureType: DataType = DataType.CONTINUOUS,
-
-    @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
-
-    @ColumnInfo(name = "has_default_value")
     val hasDefaultValue: Boolean,
-
-    @ColumnInfo(name = "default_value")
     val defaultValue: Double,
-
-    @ColumnInfo(name = "last_timestamp")
     val timestamp: OffsetDateTime?,
-
-    @ColumnInfo(name = "num_data_points")
     val numDataPoints: Long?,
-
-    @ColumnInfo(name = "display_index")
     val displayIndex: Int,
-
-    @ColumnInfo(name = "feature_description")
     val description: String
 )

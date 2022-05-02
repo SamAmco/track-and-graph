@@ -22,7 +22,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.model.DataSource
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.PieChart
 import com.samco.trackandgraph.functions.sampling.DataSamplerImpl

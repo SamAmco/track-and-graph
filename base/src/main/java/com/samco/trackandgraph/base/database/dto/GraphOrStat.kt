@@ -14,37 +14,12 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.base.database.entity
+package com.samco.trackandgraph.base.database.dto
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
-import com.samco.trackandgraph.base.database.dto.GraphStatType
-
-@Entity(
-    tableName = "graphs_and_stats_table2",
-    foreignKeys = [ForeignKey(
-        entity = Group::class,
-        parentColumns = arrayOf("id"),
-        childColumns = arrayOf("group_id"),
-        onDelete = ForeignKey.CASCADE
-    )]
-)
-internal data class GraphOrStat(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id", index = true)
+data class GraphOrStat(
     val id: Long,
-
-    @ColumnInfo(name = "group_id", index = true)
     val groupId: Long,
-
-    @ColumnInfo(name = "name")
     val name: String,
-
-    @ColumnInfo(name = "graph_stat_type")
     val type: GraphStatType,
-
-    @ColumnInfo(name = "display_index")
     val displayIndex: Int
 )
