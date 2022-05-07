@@ -17,15 +17,13 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.model.DataSource
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataSampleFunction
-import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
@@ -35,23 +33,23 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewDat
 
 class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceViewData>() {
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
-        val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
+        val timeSinceStat = dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
-        return createViewData(dataSource, graphOrStat, timeSinceStat, onDataSampled)
+        return createViewData(dataInteractor, graphOrStat, timeSinceStat, onDataSampled)
     }
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         config: TimeSinceLastStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
         return try {
-            val dataPoint = getLastDataPoint(dataSource, config, onDataSampled)
+            val dataPoint = getLastDataPoint(dataInteractor, config, onDataSampled)
                 ?: return notEnoughData(graphOrStat, 0)
             object : ITimeSinceViewData {
                 override val lastDataPoint = dataPoint
@@ -82,13 +80,11 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         }
 
     private suspend fun getLastDataPoint(
-        dao: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         config: TimeSinceLastStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IDataPoint? {
-        val dataSampler = DataSampler(dao)
-        val dataSource = DataSource.FeatureDataSource(config.featureId)
-        val dataSample = dataSampler.getDataSampleForSource(dataSource)
+        val dataSample = dataInteractor.getDataSampleForFeatureId(config.featureId)
 
         val filters = mutableListOf<DataSampleFunction>()
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))

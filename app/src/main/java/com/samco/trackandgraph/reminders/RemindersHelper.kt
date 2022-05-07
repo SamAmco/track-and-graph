@@ -21,8 +21,8 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.entity.Reminder
+import com.samco.trackandgraph.base.database.dto.Reminder
+import com.samco.trackandgraph.base.model.DataInteractor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -32,22 +32,20 @@ import java.util.*
 
 class RemindersHelper {
     companion object {
-        fun syncAlarms(context: Context) = CoroutineScope(Dispatchers.IO + Job()).launch {
-            val dataSource = TrackAndGraphDatabase
-                .getInstance(context).trackAndGraphDatabaseDao
-            for (reminder in dataSource.getAllRemindersSync()) {
-                deleteAlarms(reminder, context)
-                createAlarms(reminder, context)
+        fun syncAlarms(context: Context, dataInteractor: DataInteractor) =
+            CoroutineScope(Dispatchers.IO + Job()).launch {
+                for (reminder in dataInteractor.getAllRemindersSync()) {
+                    deleteAlarms(reminder, context)
+                    createAlarms(reminder, context)
+                }
             }
-        }
 
-        fun clearAlarms(context: Context) = CoroutineScope(Dispatchers.IO + Job()).launch {
-            TrackAndGraphDatabase
-                .getInstance(context)
-                .trackAndGraphDatabaseDao
-                .getAllRemindersSync()
-                .forEach { deleteAlarms(it, context) }
-        }
+        fun clearAlarms(context: Context, dataInteractor: DataInteractor) =
+            CoroutineScope(Dispatchers.IO + Job()).launch {
+                dataInteractor
+                    .getAllRemindersSync()
+                    .forEach { deleteAlarms(it, context) }
+            }
 
         fun createAlarms(reminder: Reminder, context: Context) {
             val allIntents = getAllAlarmIntents(reminder, context, true)
@@ -69,41 +67,53 @@ class RemindersHelper {
             allIntents.forEach { kvp -> alarmMgr.cancel(kvp.value) }
         }
 
-        private fun getAllAlarmIntents(reminder: Reminder, context: Context, filterUnchecked: Boolean): Map<Int, PendingIntent> {
+        private fun getAllAlarmIntents(
+            reminder: Reminder,
+            context: Context,
+            filterUnchecked: Boolean
+        ): Map<Int, PendingIntent> {
             val days = reminder.checkedDays.toList()
-                .mapIndexed { i, checked -> i + 1 to checked}.toMap()
+                .mapIndexed { i, checked -> i + 1 to checked }.toMap()
             return days
                 .filter { kvp -> !filterUnchecked || kvp.value }
-                .map { day -> day.key to
-                        Intent(context, AlarmReceiver::class.java)
-                            .putExtra("Message", reminder.alarmName)
-                            .let { intent ->
-                                val id = ((reminder.id * 10) + day.key).toInt()
-                                PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-                            }
+                .map { day ->
+                    day.key to
+                            Intent(context, AlarmReceiver::class.java)
+                                .putExtra("Message", reminder.alarmName)
+                                .let { intent ->
+                                    val id = ((reminder.id * 10) + day.key).toInt()
+                                    PendingIntent.getBroadcast(
+                                        context,
+                                        id,
+                                        intent,
+                                        PendingIntent.FLAG_UPDATE_CURRENT
+                                    )
+                                }
                 }.toMap()
         }
 
-        private fun getNextReminderTime(time: LocalTime, dayOfWeek: Int) = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            val orderedDays = listOf(
-                Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY,
-                Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY, Calendar.SUNDAY)
-            val currentDay = (orderedDays.indexOf(get(Calendar.DAY_OF_WEEK)) + 1)
-            var dayDiff = dayOfWeek - currentDay
-            if (dayDiff < 0) dayDiff += 7
-            else if (dayDiff == 0) {
-                val currentHour = get(Calendar.HOUR_OF_DAY)
-                val reminderHour = time.hour
-                val currentMin = get(Calendar.MINUTE)
-                val reminderMin = time.minute
+        private fun getNextReminderTime(time: LocalTime, dayOfWeek: Int) =
+            Calendar.getInstance().apply {
+                timeInMillis = System.currentTimeMillis()
+                val orderedDays = listOf(
+                    Calendar.MONDAY, Calendar.TUESDAY, Calendar.WEDNESDAY,
+                    Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY, Calendar.SUNDAY
+                )
+                val currentDay = (orderedDays.indexOf(get(Calendar.DAY_OF_WEEK)) + 1)
+                var dayDiff = dayOfWeek - currentDay
+                if (dayDiff < 0) dayDiff += 7
+                else if (dayDiff == 0) {
+                    val currentHour = get(Calendar.HOUR_OF_DAY)
+                    val reminderHour = time.hour
+                    val currentMin = get(Calendar.MINUTE)
+                    val reminderMin = time.minute
 
-                if (currentHour > reminderHour) dayDiff += 7
-                else if (currentHour == reminderHour && currentMin >= reminderMin) dayDiff += 7
+                    if (currentHour > reminderHour) dayDiff += 7
+                    else if (currentHour == reminderHour && currentMin >= reminderMin) dayDiff += 7
+                }
+                add(Calendar.DAY_OF_MONTH, dayDiff)
+                set(Calendar.HOUR_OF_DAY, time.hour)
+                set(Calendar.MINUTE, time.minute)
             }
-            add(Calendar.DAY_OF_MONTH, dayDiff)
-            set(Calendar.HOUR_OF_DAY, time.hour)
-            set(Calendar.MINUTE, time.minute)
-        }
     }
 }

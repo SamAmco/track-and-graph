@@ -25,28 +25,18 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DisplayNote
-import com.samco.trackandgraph.base.database.entity.queryresponse.NoteType
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.entity.DataType
-import com.samco.trackandgraph.base.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
 import org.threeten.bp.OffsetDateTime
 
 fun showFeatureDescriptionDialog(context: Context, name: String, description: String) {
-    val descriptionOrNone = if (description.isEmpty())
-        context.getString(R.string.no_description)
-    else description
+    val descriptionOrNone = description.ifEmpty { context.getString(R.string.no_description) }
 
     val descriptionView = LayoutInflater.from(context)
         .inflate(R.layout.feature_description_layout, null, false)
 
-    descriptionView.findViewById<TextView>(R.id.tv_title).let {
-        it.text = name
-    }
-    descriptionView.findViewById<TextView>(R.id.tv_description).let {
-        it.text = descriptionOrNone
-    }
+    descriptionView.findViewById<TextView>(R.id.tv_title).text = name
+    descriptionView.findViewById<TextView>(R.id.tv_description).text = descriptionOrNone
 
     AlertDialog.Builder(context)
         .setView(descriptionView)

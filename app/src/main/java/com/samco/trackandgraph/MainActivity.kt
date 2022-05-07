@@ -38,11 +38,13 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 import com.samco.trackandgraph.ui.DateFormatSetting
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 enum class NavButtonStyle { UP, MENU }
 
@@ -56,6 +58,9 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var currentNavBarConfig: NavBarConfig
 
+    @Inject
+    lateinit var dataInteractor: DataInteractor
+
     val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         initializeAppBar()
         onDrawerHideKeyboard()
         initDrawerSpinners()
-        RemindersHelper.syncAlarms(this)
+        RemindersHelper.syncAlarms(this, dataInteractor)
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
     }

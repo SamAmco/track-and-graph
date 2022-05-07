@@ -17,10 +17,10 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.base.database.entity.TimeHistogramWindow
+import com.samco.trackandgraph.graphstatconstants.TimeHistogramWindowData
 
 interface ITimeHistogramViewData : IGraphStatViewData {
-    val window: TimeHistogramWindow?
+    val window: TimeHistogramWindowData?
         get() = null
     val barValues: Map<String, List<Double>>?
         get() = null

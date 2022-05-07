@@ -20,6 +20,7 @@ package com.samco.trackandgraph.base.model
 import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.room.withTransaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
@@ -35,6 +36,18 @@ internal class DataInteractorImpl(
     @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
     override fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int {
         return dao.doRawQuery(supportSQLiteQuery)
+    }
+
+    override fun getDatabaseFilePath(): String {
+        return database.openHelper.readableDatabase.path
+    }
+
+    override fun closeOpenHelper() {
+        database.openHelper.close()
+    }
+
+    override suspend fun <T> withTransaction(function: suspend () -> T): T {
+        return database.withTransaction { function() }
     }
 
     override fun insertGroup(group: Group): Long {

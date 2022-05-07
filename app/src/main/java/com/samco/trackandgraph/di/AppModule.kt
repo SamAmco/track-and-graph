@@ -19,8 +19,7 @@ package com.samco.trackandgraph.di
 
 import android.content.ContentResolver
 import android.content.Context
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.model.DataInteractor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,12 +30,8 @@ import dagger.hilt.components.SingletonComponent
 @InstallIn(SingletonComponent::class)
 class AppModule {
     @Provides
-    fun getDatabase(@ApplicationContext context: Context): TrackAndGraphDatabase =
-        TrackAndGraphDatabase.getInstance(context)
-
-    @Provides
-    fun getDatabaseDao(database: TrackAndGraphDatabase): TrackAndGraphDatabaseDao =
-        database.trackAndGraphDatabaseDao
+    fun getDataInteractor(@ApplicationContext context: Context): DataInteractor =
+        DataInteractor.getInstance(context)
 
     @Provides
     fun getContentResolver(@ApplicationContext context: Context): ContentResolver =

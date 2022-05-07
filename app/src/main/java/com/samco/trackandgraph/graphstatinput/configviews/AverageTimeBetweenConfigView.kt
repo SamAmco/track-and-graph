@@ -26,8 +26,8 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatSpinner
 import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
-import com.samco.trackandgraph.base.database.entity.maxGraphPeriodDurations
 import com.samco.trackandgraph.databinding.AverageTimeBetweenInputLayoutBinding
+import com.samco.trackandgraph.graphstatconstants.maxGraphPeriodDurations
 import com.samco.trackandgraph.ui.DurationInputView
 
 internal class AverageTimeBetweenConfigView @JvmOverloads constructor(

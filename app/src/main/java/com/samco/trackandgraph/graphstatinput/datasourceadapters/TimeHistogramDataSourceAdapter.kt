@@ -17,44 +17,43 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.base.database.entity.TimeHistogram
-
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.TimeHistogram
+import com.samco.trackandgraph.base.model.DataInteractor
 
 class TimeHistogramDataSourceAdapter : GraphStatDataSourceAdapter<TimeHistogram>(){
     override suspend fun writeConfigToDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStatId: Long,
         config: TimeHistogram,
         updateMode: Boolean
     ) {
-        if (updateMode) dataSource.updateTimeHistogram(config.copy(graphStatId = graphOrStatId))
-        else dataSource.insertTimeHistogram(config.copy(graphStatId = graphOrStatId))
+        if (updateMode) dataInteractor.updateTimeHistogram(config.copy(graphStatId = graphOrStatId))
+        else dataInteractor.insertTimeHistogram(config.copy(graphStatId = graphOrStatId))
     }
 
     override suspend fun getConfigDataFromDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStatId: Long
     ): Pair<Long, TimeHistogram>? {
-        val th = dataSource.getTimeHistogramByGraphStatId(graphOrStatId) ?: return null
+        val th = dataInteractor.getTimeHistogramByGraphStatId(graphOrStatId) ?: return null
         return Pair(th.id, th)
     }
 
     override suspend fun shouldPreen(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat
     ): Boolean {
-        return dataSource.getTimeHistogramByGraphStatId(graphOrStat.id) == null
+        return dataInteractor.getTimeHistogramByGraphStatId(graphOrStat.id) == null
     }
 
     override suspend fun duplicate(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         oldGraphId: Long,
         newGraphId: Long
     ) {
-        val timeHistogram = dataSource.getTimeHistogramByGraphStatId(oldGraphId)
+        val timeHistogram = dataInteractor.getTimeHistogramByGraphStatId(oldGraphId)
         val copy = timeHistogram?.copy(id = 0, graphStatId = newGraphId)
-        copy?.let { dataSource.insertTimeHistogram(it) }
+        copy?.let { dataInteractor.insertTimeHistogram(it) }
     }
 }

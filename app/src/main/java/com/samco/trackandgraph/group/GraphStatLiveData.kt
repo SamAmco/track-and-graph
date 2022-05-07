@@ -19,8 +19,8 @@ package com.samco.trackandgraph.group
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatconstants.graphStatTypes
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.*
@@ -38,7 +38,7 @@ import org.threeten.bp.Instant
 class GraphStatLiveData(
     updateJob: Job,
     groupId: Long,
-    private val dataSource: TrackAndGraphDatabaseDao
+    private val dataSource: DataInteractor
 ) :
     LiveData<List<Pair<Instant, IGraphStatViewData>>>(),
     Observer<List<GraphOrStat>> {

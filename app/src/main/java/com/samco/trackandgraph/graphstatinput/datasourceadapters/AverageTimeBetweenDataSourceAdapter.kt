@@ -17,44 +17,43 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.model.DataInteractor
 
 class AverageTimeBetweenDataSourceAdapter : GraphStatDataSourceAdapter<AverageTimeBetweenStat>() {
     override suspend fun writeConfigToDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStatId: Long,
         config: AverageTimeBetweenStat,
         updateMode: Boolean
     ) {
-        if (updateMode) dataSource.updateAverageTimeBetweenStat(config.copy(graphStatId = graphOrStatId))
-        else dataSource.insertAverageTimeBetweenStat(config.copy(graphStatId = graphOrStatId))
+        if (updateMode) dataInteractor.updateAverageTimeBetweenStat(config.copy(graphStatId = graphOrStatId))
+        else dataInteractor.insertAverageTimeBetweenStat(config.copy(graphStatId = graphOrStatId))
     }
 
     override suspend fun getConfigDataFromDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStatId: Long
     ): Pair<Long, AverageTimeBetweenStat>? {
-        val ats = dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStatId) ?: return null
+        val ats = dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStatId) ?: return null
         return Pair(ats.id, ats)
     }
 
     override suspend fun shouldPreen(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat
     ): Boolean {
-        return dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id) == null
+        return dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id) == null
     }
 
     override suspend fun duplicate(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         oldGraphId: Long,
         newGraphId: Long
     ) {
-        val avTimeStat = dataSource.getAverageTimeBetweenStatByGraphStatId(oldGraphId)
+        val avTimeStat = dataInteractor.getAverageTimeBetweenStatByGraphStatId(oldGraphId)
         val copy = avTimeStat?.copy(id = 0, graphStatId = newGraphId)
-        copy?.let { dataSource.insertAverageTimeBetweenStat(it) }
+        copy?.let { dataInteractor.insertAverageTimeBetweenStat(it) }
     }
 }

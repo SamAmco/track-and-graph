@@ -17,21 +17,17 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.model.DataSource
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.entity.Feature
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.functions.functions.DataSampleFunction
-import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
-import com.samco.trackandgraph.base.database.sampling.IDataSampler
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
@@ -62,26 +58,24 @@ class AverageTimeBetweenDataFactory :
     }
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
-        val timeBetweenStat = dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
+        val timeBetweenStat = dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
-        return createViewData(dataSource, graphOrStat, timeBetweenStat, onDataSampled)
+        return createViewData(dataInteractor, graphOrStat, timeBetweenStat, onDataSampled)
     }
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         config: AverageTimeBetweenStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
         return try {
-            val feature = dataSource.getFeatureById(config.featureId)
-            val dataSampler = DataSampler(dataSource)
             val dataSample = withContext(Dispatchers.IO) {
-                getRelevantDataPoints(dataSampler, config, feature)
+                getRelevantDataPoints(dataInteractor, config, config.featureId)
             }
             val dataPoints = withContext(Dispatchers.IO) {
                 dataSample.toList()
@@ -120,12 +114,11 @@ class AverageTimeBetweenDataFactory :
         }
 
     private suspend fun getRelevantDataPoints(
-        dataSampler: IDataSampler,
+        dataInteractor: DataInteractor,
         config: AverageTimeBetweenStat,
-        feature: Feature
+        featureId: Long
     ): DataSample {
-        val dataSource = DataSource.FeatureDataSource(feature.id)
-        val dataSample = dataSampler.getDataSampleForSource(dataSource)
+        val dataSample = dataInteractor.getDataSampleForFeatureId(featureId)
         val filters = mutableListOf<DataSampleFunction>()
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
         if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
