@@ -31,8 +31,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.util.CSVReadWriter
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -197,7 +197,7 @@ class ExportFeaturesDialog : DialogFragment() {
 
 @HiltViewModel
 class ExportFeaturesViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao,
+    private val dataInteractor: DataInteractor,
     private val contentResolver: ContentResolver
 ) : ViewModel() {
     private var updateJob = Job()
@@ -237,7 +237,7 @@ class ExportFeaturesViewModel @Inject constructor(
             uiScope.launch {
                 _exportState.value = ExportState.LOADING
                 withContext(Dispatchers.IO) {
-                    features = dao.getFeaturesForGroupSync(groupId).toMutableList()
+                    features = dataInteractor.getFeaturesForGroupSync(groupId).toMutableList()
                 }
                 selectedFeatures = features.toMutableList()
                 _featuresLoaded.value = true
@@ -254,7 +254,7 @@ class ExportFeaturesViewModel @Inject constructor(
                 withContext(Dispatchers.IO) {
                     val outStream = contentResolver.openOutputStream(it)
                     if (outStream != null) {
-                        CSVReadWriter.writeFeaturesToCSV(selectedFeatures, dao, outStream)
+                        CSVReadWriter.writeFeaturesToCSV(selectedFeatures, dataInteractor, outStream)
                     }
                 }
                 _exportState.value = ExportState.DONE

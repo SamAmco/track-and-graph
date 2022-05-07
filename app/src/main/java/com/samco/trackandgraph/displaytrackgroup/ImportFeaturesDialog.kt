@@ -30,10 +30,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
-import androidx.room.withTransaction
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.util.CSVReadWriter
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -169,8 +167,7 @@ class ImportFeaturesDialog : DialogFragment() {
 
 @HiltViewModel
 class ImportFeaturesViewModel @Inject constructor(
-    private val database: TrackAndGraphDatabase,
-    private val dao: TrackAndGraphDatabaseDao,
+    private val dataInteractor: DataInteractor,
     private val contentResolver: ContentResolver
 ) : ViewModel() {
     private var updateJob = Job()
@@ -206,8 +203,8 @@ class ImportFeaturesViewModel @Inject constructor(
                     withContext(Dispatchers.IO) {
                         val inputStream = contentResolver.openInputStream(it)
                         if (inputStream != null) {
-                            database.withTransaction {
-                                CSVReadWriter.readFeaturesFromCSV(dao, inputStream, trackGroupId)
+                            dataInteractor.withTransaction {
+                                CSVReadWriter.readFeaturesFromCSV(dataInteractor, inputStream, trackGroupId)
                             }
                         }
                     }

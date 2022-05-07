@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -33,13 +33,13 @@ import kotlinx.coroutines.withContext
  */
 abstract class ViewDataFactory<in I, out T : IGraphStatViewData> {
     protected abstract suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): T
 
     protected abstract suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         config: I,
         onDataSampled: (List<DataPoint>) -> Unit
@@ -47,21 +47,21 @@ abstract class ViewDataFactory<in I, out T : IGraphStatViewData> {
 
     @Suppress("UNCHECKED_CAST")
     suspend fun getViewData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         config: Any,
         onDataSampled: (List<DataPoint>) -> Unit = {}
     ): T =
         withContext(Dispatchers.IO) {
-            return@withContext createViewData(dataSource, graphOrStat, config as I, onDataSampled)
+            return@withContext createViewData(dataInteractor, graphOrStat, config as I, onDataSampled)
         }
 
     suspend fun getViewData(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit = {}
     ): T =
         withContext(Dispatchers.IO) {
-            return@withContext createViewData(dataSource, graphOrStat, onDataSampled)
+            return@withContext createViewData(dataInteractor, graphOrStat, onDataSampled)
         }
 }

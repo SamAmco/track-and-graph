@@ -31,17 +31,15 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.room.withTransaction
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.DataType
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.base.database.entity.GraphStatType
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatconstants.graphStatTypes
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -246,8 +244,7 @@ class ValidationException(val errorMessageId: Int) : Exception()
 
 @HiltViewModel
 class GraphStatInputViewModel @Inject constructor(
-    private val database: TrackAndGraphDatabase,
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -289,8 +286,8 @@ class GraphStatInputViewModel @Inject constructor(
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
         ioScope.launch {
-            val allFeatures = dao.getAllFeaturesSync()
-            val allGroups = dao.getAllGroupsSync()
+            val allFeatures = dataInteractor.getAllFeaturesSync()
+            val allGroups = dataInteractor.getAllGroupsSync()
             //TODO Need to get an actual data sample and iterate to get actual labels and properties
             val featureData = allFeatures.map { feat ->
                 FeatureDataProvider.FeatureData(
@@ -306,7 +303,7 @@ class GraphStatInputViewModel @Inject constructor(
     }
 
     private suspend fun initFromExistingGraphStat(graphStatId: Long) {
-        val graphStat = dao.tryGetGraphStatById(graphStatId)
+        val graphStat = dataInteractor.tryGetGraphStatById(graphStatId)
 
         if (graphStat == null) {
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
@@ -314,7 +311,7 @@ class GraphStatInputViewModel @Inject constructor(
         }
 
         val configData = graphStatTypes[graphStat.type]
-            ?.dataSourceAdapter!!.getConfigData(dao, graphStatId)
+            ?.dataSourceAdapter!!.getConfigData(dataInteractor, graphStatId)
 
         configData?.first?.let {
             withContext(Dispatchers.Main) {
@@ -364,7 +361,7 @@ class GraphStatInputViewModel @Inject constructor(
         }
         val graphStatType = graphStatTypes[graphOrStat.type]
         val demoData = graphStatType?.dataFactory
-            ?.getViewData(dao, graphOrStat, _configData.value!!) {}
+            ?.getViewData(dataInteractor, graphOrStat, _configData.value!!) {}
         withContext(Dispatchers.Main) { demoData?.let { _demoViewData.value = it } }
     }
 
@@ -382,17 +379,17 @@ class GraphStatInputViewModel @Inject constructor(
         if (_configData.value == null) return
         _state.value = GraphStatInputState.ADDING
         ioScope.launch {
-            database.withTransaction {
+            dataInteractor.withTransaction {
                 val graphStatId = if (_updateMode.value!!) {
-                    dao.updateGraphOrStat(constructGraphOrStat())
+                    dataInteractor.updateGraphOrStat(constructGraphOrStat())
                     graphStatId!!
                 } else {
                     shiftUpGraphStatViewIndexes()
-                    dao.insertGraphOrStat(constructGraphOrStat())
+                    dataInteractor.insertGraphOrStat(constructGraphOrStat())
                 }
 
                 graphStatTypes[_graphStatType.value]?.dataSourceAdapter?.writeConfig(
-                    dao, graphStatId, _configData.value!!, _updateMode.value!!
+                    dataInteractor, graphStatId, _configData.value!!, _updateMode.value!!
                 )
             }
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
@@ -400,10 +397,10 @@ class GraphStatInputViewModel @Inject constructor(
     }
 
     private fun shiftUpGraphStatViewIndexes() {
-        val newList = dao.getAllGraphStatsSync().map {
+        val newList = dataInteractor.getAllGraphStatsSync().map {
             it.copy(displayIndex = it.displayIndex + 1)
         }
-        dao.updateGraphStats(newList)
+        dataInteractor.updateGraphStats(newList)
     }
 
     private fun constructGraphOrStat() = GraphOrStat(

@@ -39,10 +39,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.queryresponse.NoteType
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.entity.DataType
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatconstants.graphStatTypes
 import com.samco.trackandgraph.graphstatview.GraphStatView
@@ -251,7 +251,7 @@ enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
 
 @HiltViewModel
 class ViewGraphStatViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyList(), emptyList())
         private set
@@ -298,7 +298,7 @@ class ViewGraphStatViewModel @Inject constructor(
 
     //TODO we need to filter these by date/time and only show global notes relevant to the current graph/stat
     private suspend fun getAllGlobalNotes() = withContext(Dispatchers.IO) {
-        val globalNotes = dao.getAllGlobalNotesSync()
+        val globalNotes = dataInteractor.getAllGlobalNotesSync()
             .map { GraphNote(it) }
         val mergedList = _notes.value
             ?.union(globalNotes)
@@ -307,8 +307,8 @@ class ViewGraphStatViewModel @Inject constructor(
     }
 
     private fun getAllFeatureAttributes() {
-        val allFeatures = dao.getAllFeaturesSync()
-        val allGroups = dao.getAllGroupsSync()
+        val allFeatures = dataInteractor.getAllFeaturesSync()
+        val allGroups = dataInteractor.getAllGroupsSync()
         featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
         featureTypes = allFeatures.associate { it.id to it.featureType }
     }
@@ -327,9 +327,9 @@ class ViewGraphStatViewModel @Inject constructor(
     }
 
     private suspend fun initFromGraphStatId(graphStatId: Long) {
-        val graphStat = dao.getGraphStatById(graphStatId)
+        val graphStat = dataInteractor.getGraphStatById(graphStatId)
         val viewData = graphStatTypes[graphStat.type]
-            ?.dataFactory!!.getViewData(dao, graphStat, this::onSampledDataPoints)
+            ?.dataFactory!!.getViewData(dataInteractor, graphStat, this::onSampledDataPoints)
         withContext(Dispatchers.Main) { _graphStatViewData.value = viewData }
     }
 

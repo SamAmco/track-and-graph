@@ -27,11 +27,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DisplayNote
-import com.samco.trackandgraph.base.database.entity.queryresponse.NoteType
-import com.samco.trackandgraph.base.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.dto.GlobalNote
+import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.database.stringFromOdt
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
@@ -156,12 +156,12 @@ class NotesFragment : Fragment() {
 
 @HiltViewModel
 class NotesViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    val notes: LiveData<List<DisplayNote>> = dao.getAllDisplayNotes()
+    val notes: LiveData<List<DisplayNote>> = dataInteractor.getAllDisplayNotes()
 
     lateinit var featureNameProvider: LiveData<FeaturePathProvider> private set
 
@@ -177,7 +177,7 @@ class NotesViewModel @Inject constructor(
 
     private fun initFeatureNameProvider() {
         val mediator = MediatorLiveData<FeaturePathProvider>()
-        dao.let {
+        dataInteractor.let {
             val groups = it.getAllGroups()
             val features = it.getAllFeatures()
             val onEmitted = {
@@ -209,15 +209,11 @@ class NotesViewModel @Inject constructor(
     fun deleteNote(note: DisplayNote) = ioScope.launch {
         when (note.noteType) {
             NoteType.DATA_POINT -> note.featureId?.let {
-                dao.removeNote(note.timestamp, it)
+                dataInteractor.removeNote(note.timestamp, it)
             }
             NoteType.GLOBAL_NOTE -> {
-                val globalNote =
-                    GlobalNote(
-                        note.timestamp,
-                        note.note
-                    )
-                dao.deleteGlobalNote(globalNote)
+                val globalNote = GlobalNote(note.timestamp, note.note)
+                dataInteractor.deleteGlobalNote(globalNote)
             }
         }
     }

@@ -34,17 +34,11 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.withTransaction
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayFeature
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.entity.DataType
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.base.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphstatconstants.graphStatTypes
@@ -437,8 +431,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
 @HiltViewModel
 class GroupViewModel @Inject constructor(
-    private var database: TrackAndGraphDatabase,
-    private var dao: TrackAndGraphDatabaseDao
+    private var dataInteractor: DataInteractor
 ) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -461,10 +454,10 @@ class GroupViewModel @Inject constructor(
         initialized = true
         //TODO this is really bad, we are storing potentially multiple instances of
         // every data point in memory per group fragment :/ Definitely need to review this
-        dataPoints = Transformations.map(dao.getAllDataPoints()) { Instant.now() }
-        hasFeatures = Transformations.map(dao.getAllFeatures()) { it.isNotEmpty() }
+        dataPoints = Transformations.map(dataInteractor.getAllDataPoints()) { Instant.now() }
+        hasFeatures = Transformations.map(dataInteractor.getAllFeatures()) { it.isNotEmpty() }
 
-        groupChildren = GroupChildrenLiveData(updateJob, groupId, dao)
+        groupChildren = GroupChildrenLiveData(updateJob, groupId, dataInteractor)
     }
 
     fun addDefaultFeatureValue(feature: DisplayFeature) = ioScope.launch {
@@ -478,11 +471,11 @@ class GroupViewModel @Inject constructor(
             label,
             ""
         )
-        dao.insertDataPoint(newDataPoint)
+        dataInteractor.insertDataPoint(newDataPoint)
     }
 
     fun onDeleteFeature(id: Long) = ioScope.launch {
-        dao.deleteFeature(id)
+        dataInteractor.deleteFeature(id)
         groupChildren.graphStatLiveData.preenGraphStats()
     }
 
@@ -507,10 +500,10 @@ class GroupViewModel @Inject constructor(
                 )
             }
         }
-        database.withTransaction {
-            dao.updateFeatures(displayFeatures.map { it.asFeature() })
-            dao.updateGraphStats(graphs)
-            dao.updateGroups(groups)
+        dataInteractor.withTransaction {
+            dataInteractor.updateFeatures(displayFeatures.map { it.asFeature() })
+            dataInteractor.updateGraphStats(graphs)
+            dataInteractor.updateGroups(groups)
         }
     }
 
@@ -527,18 +520,18 @@ class GroupViewModel @Inject constructor(
 
     fun updateAllGraphs() = groupChildren.graphStatLiveData.updateAllGraphStats()
 
-    fun onDeleteGraphStat(id: Long) = ioScope.launch { dao.deleteGraphOrStat(id) }
+    fun onDeleteGraphStat(id: Long) = ioScope.launch { dataInteractor.deleteGraphOrStat(id) }
 
     fun onDeleteGroup(id: Long) = ioScope.launch {
-        dao.deleteGroup(id)
+        dataInteractor.deleteGroup(id)
         groupChildren.graphStatLiveData.preenGraphStats()
     }
 
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         ioScope.launch {
-            database.withTransaction {
+            dataInteractor.withTransaction {
                 val gs = graphOrStatViewData.graphOrStat
-                graphStatTypes[gs.type]?.dataSourceAdapter?.duplicateGraphOrStat(dao, gs)
+                graphStatTypes[gs.type]?.dataSourceAdapter?.duplicateGraphOrStat(dataInteractor, gs)
             }
         }
     }

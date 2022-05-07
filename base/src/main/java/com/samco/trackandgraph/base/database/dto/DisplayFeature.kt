@@ -31,4 +31,16 @@ data class DisplayFeature(
     val numDataPoints: Long?,
     val displayIndex: Int,
     val description: String
-)
+) {
+    fun asFeature() = Feature(
+        id,
+        name,
+        groupId,
+        featureType,
+        discreteValues,
+        displayIndex,
+        hasDefaultValue,
+        defaultValue,
+        description
+    )
+}

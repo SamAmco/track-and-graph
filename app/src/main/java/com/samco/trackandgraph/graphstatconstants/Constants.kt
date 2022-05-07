@@ -19,22 +19,63 @@ package com.samco.trackandgraph.graphstatconstants
 
 import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
 import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import org.threeten.bp.Duration
 import org.threeten.bp.Period
 import org.threeten.bp.temporal.TemporalAmount
 
-enum class TimeHistogramWindow(
+data class TimeHistogramWindowData(
+    val window: TimeHistogramWindow,
     val duration: Duration,
     val period: TemporalAmount,
     val numBins: Int
 ) {
-    HOUR(Duration.ofHours(1), Duration.ofHours(1), 60),
-    DAY(Duration.ofDays(1), Duration.ofDays(1), 24),
-    WEEK(Duration.ofDays(7), Period.ofWeeks(1), 7),
-    MONTH(Duration.ofDays(30), Period.ofMonths(1), 30),
-    THREE_MONTHS(Duration.ofDays(365 / 4), Period.ofMonths(3), 13),
-    SIX_MONTHS(Duration.ofDays(365 / 2), Period.ofMonths(6), 26),
-    YEAR(Duration.ofDays(365), Period.ofYears(1), 12)
+    companion object {
+        fun getWindowData(window: TimeHistogramWindow): TimeHistogramWindowData = when (window) {
+            TimeHistogramWindow.HOUR -> TimeHistogramWindowData(
+                TimeHistogramWindow.HOUR,
+                Duration.ofHours(1),
+                Duration.ofHours(1),
+                60
+            )
+            TimeHistogramWindow.DAY -> TimeHistogramWindowData(
+                TimeHistogramWindow.DAY,
+                Duration.ofDays(1),
+                Duration.ofDays(1),
+                24
+            )
+            TimeHistogramWindow.WEEK -> TimeHistogramWindowData(
+                TimeHistogramWindow.WEEK,
+                Duration.ofDays(7),
+                Period.ofWeeks(1),
+                7
+            )
+            TimeHistogramWindow.MONTH -> TimeHistogramWindowData(
+                TimeHistogramWindow.MONTH,
+                Duration.ofDays(30),
+                Period.ofMonths(1),
+                30
+            )
+            TimeHistogramWindow.THREE_MONTHS -> TimeHistogramWindowData(
+                TimeHistogramWindow.THREE_MONTHS,
+                Duration.ofDays(365 / 4),
+                Period.ofMonths(3),
+                13
+            )
+            TimeHistogramWindow.SIX_MONTHS -> TimeHistogramWindowData(
+                TimeHistogramWindow.SIX_MONTHS,
+                Duration.ofDays(365 / 2),
+                Period.ofMonths(6),
+                26
+            )
+            TimeHistogramWindow.YEAR -> TimeHistogramWindowData(
+                TimeHistogramWindow.YEAR,
+                Duration.ofDays(365),
+                Period.ofYears(1),
+                12
+            )
+        }
+    }
 }
 
 val maxGraphPeriodDurations = listOf(

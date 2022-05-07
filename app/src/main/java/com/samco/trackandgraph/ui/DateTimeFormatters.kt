@@ -21,7 +21,7 @@ import android.content.Context
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.entity.DataType
+import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.util.DATE_FORMAT_SETTING_PREF_KEY
 import com.samco.trackandgraph.util.getPrefs
 import org.threeten.bp.OffsetDateTime

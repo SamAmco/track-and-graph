@@ -32,11 +32,11 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.entity.DataType
-import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.odtFromString
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
@@ -244,7 +244,7 @@ enum class InputDataPointDialogState { LOADING, WAITING, ADDING, ADDED }
 
 @HiltViewModel
 class InputDataPointDialogViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -288,9 +288,9 @@ class InputDataPointDialogViewModel @Inject constructor(
 
         _state.value = InputDataPointDialogState.LOADING
         ioScope.launch {
-            val featureData = dao.getFeaturesByIdsSync(featureIds)
+            val featureData = dataInteractor.getFeaturesByIdsSync(featureIds)
             val dataPointData = dataPointTimestamp?.let {
-                dao.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
+                dataInteractor.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
             }
             uiStates = getUIStatesForFeatures(featureData, dataPointData)
 
@@ -343,8 +343,8 @@ class InputDataPointDialogViewModel @Inject constructor(
         if (state.value != InputDataPointDialogState.WAITING) return
         _state.value = InputDataPointDialogState.ADDING
         ioScope.launch {
-            if (oldDataPoint != null) dao.deleteDataPoint(oldDataPoint)
-            dao.insertDataPoint(newDataPoint)
+            if (oldDataPoint != null) dataInteractor.deleteDataPoint(oldDataPoint)
+            dataInteractor.insertDataPoint(newDataPoint)
             withContext(Dispatchers.Main) { _state.value = InputDataPointDialogState.ADDED }
         }
     }

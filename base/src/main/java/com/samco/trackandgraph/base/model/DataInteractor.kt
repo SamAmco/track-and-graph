@@ -26,15 +26,25 @@ import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import org.threeten.bp.OffsetDateTime
 
+//TODO for legacy reasons this class still contains some direct proxies to the database. This code should
+// be abstracted away over time
 interface DataInteractor {
-    fun getInstance(context: Context): DataInteractor {
-        val database = TrackAndGraphDatabase.getInstance(context)
-        return DataInteractorImpl(database, database.trackAndGraphDatabaseDao)
+    companion object {
+        fun getInstance(context: Context): DataInteractor {
+            val database = TrackAndGraphDatabase.getInstance(context)
+            return DataInteractorImpl(database, database.trackAndGraphDatabaseDao)
+        }
     }
 
     //TODO get rid of this
     @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
+
+    fun getDatabaseFilePath(): String?
+
+    fun closeOpenHelper()
+
+    suspend fun <T> withTransaction(function: suspend () -> T): T
 
     fun insertGroup(group: Group): Long
 

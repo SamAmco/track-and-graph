@@ -33,8 +33,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -151,7 +151,7 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
 
 @HiltViewModel
 class AddGroupDialogViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     enum class AddGroupDialogViewModelState { INIT, READY, DONE }
 
@@ -180,7 +180,7 @@ class AddGroupDialogViewModel @Inject constructor(
 
         ioScope.launch {
             if (groupId != null) {
-                val group = dao.getGroupById(groupId)
+                val group = dataInteractor.getGroupById(groupId)
                 withContext(Dispatchers.Main) {
                     _colorIndex.value = group.colorIndex
                     _groupName.value = group.name
@@ -200,10 +200,10 @@ class AddGroupDialogViewModel @Inject constructor(
         if (newName == null || newColor == null) return@launch
         val newId = groupId
         if (newId != null) {
-            val group = dao.getGroupById(newId)
-            dao.updateGroup(group.copy(name = newName, colorIndex = newColor))
+            val group = dataInteractor.getGroupById(newId)
+            dataInteractor.updateGroup(group.copy(name = newName, colorIndex = newColor))
         } else {
-            dao.insertGroup(Group(0, newName, 0, parentGroupId, newColor))
+            dataInteractor.insertGroup(Group(0, newName, 0, parentGroupId, newColor))
         }
         withContext(Dispatchers.Main) { _state.value = AddGroupDialogViewModelState.DONE }
     }

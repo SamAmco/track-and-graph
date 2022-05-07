@@ -20,9 +20,16 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.JobIntentService
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.model.DataInteractor
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TrackWidgetJobIntentService : JobIntentService() {
+
+    @Inject
+    lateinit var dataInteractor: DataInteractor
+
     companion object {
         fun enqueueWork(context: Context, work: Intent) {
             enqueueWork(context, TrackWidgetJobIntentService::class.java, 0, work)
@@ -39,9 +46,7 @@ class TrackWidgetJobIntentService : JobIntentService() {
             TrackWidgetProvider.getFeatureIdPref(appWidgetId), -1
         )
 
-        val dao = TrackAndGraphDatabase.getInstance(this).trackAndGraphDatabaseDao
-
-        val feature = dao.tryGetFeatureByIdSync(featureId)
+        val feature = dataInteractor.tryGetFeatureByIdSync(featureId)
         val title = feature?.name
         val requireInput = !(feature?.hasDefaultValue ?: false)
         val remoteViews = TrackWidgetProvider.createRemoteViews(

@@ -17,44 +17,44 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
+import com.samco.trackandgraph.base.model.DataInteractor
 
 
 class TimeSinceDataSourceAdapter : GraphStatDataSourceAdapter<TimeSinceLastStat>() {
     override suspend fun writeConfigToDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStatId: Long,
         config: TimeSinceLastStat,
         updateMode: Boolean
     ) {
-        if (updateMode) dataSource.updateTimeSinceLastStat(config.copy(graphStatId = graphOrStatId))
-        else dataSource.insertTimeSinceLastStat(config.copy(graphStatId = graphOrStatId))
+        if (updateMode) dataInteractor.updateTimeSinceLastStat(config.copy(graphStatId = graphOrStatId))
+        else dataInteractor.insertTimeSinceLastStat(config.copy(graphStatId = graphOrStatId))
     }
 
     override suspend fun getConfigDataFromDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStatId: Long
     ): Pair<Long, TimeSinceLastStat>? {
-        val tss = dataSource.getTimeSinceLastStatByGraphStatId(graphOrStatId) ?: return null
+        val tss = dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStatId) ?: return null
         return Pair(tss.id, tss)
     }
 
     override suspend fun shouldPreen(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat
     ): Boolean {
-        return dataSource.getTimeSinceLastStatByGraphStatId(graphOrStat.id) == null
+        return dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStat.id) == null
     }
 
     override suspend fun duplicate(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         oldGraphId: Long,
         newGraphId: Long
     ) {
-        val timeSinceStat = dataSource.getTimeSinceLastStatByGraphStatId(oldGraphId)
+        val timeSinceStat = dataInteractor.getTimeSinceLastStatByGraphStatId(oldGraphId)
         val copy = timeSinceStat?.copy(id = 0, graphStatId = newGraphId)
-        copy?.let { dataSource.insertTimeSinceLastStat(it) }
+        copy?.let { dataInteractor.insertTimeSinceLastStat(it) }
     }
 }

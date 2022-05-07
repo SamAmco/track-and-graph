@@ -24,7 +24,7 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.databinding.ListItemGroupBinding
 import com.samco.trackandgraph.ui.dataVisColorList
 
