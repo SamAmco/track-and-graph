@@ -41,12 +41,6 @@ android {
         versionName "2.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas".toString())
-            }
-        }
-
         sourceSets {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
         }
@@ -104,11 +98,6 @@ dependencies {
 
     //Lifecycle extensions
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-
-    //Database
-    kapt "androidx.room:room-compiler:2.4.2"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.13.0"
-    androidTestImplementation "androidx.room:room-testing:2.4.1"
 
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2"
