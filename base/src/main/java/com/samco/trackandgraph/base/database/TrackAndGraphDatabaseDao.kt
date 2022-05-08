@@ -66,10 +66,6 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeaturesSync(): List<Feature>
 
-    //TODO remove this once we have a model layer that can track updates and emit events for us
-    @Query("""SELECT * FROM data_points_table""")
-    fun getAllDataPoints(): LiveData<List<DataPoint>>
-
     @Insert
     fun insertReminder(reminder: Reminder)
 

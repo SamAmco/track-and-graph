@@ -27,6 +27,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -40,6 +41,8 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
+import com.samco.trackandgraph.di.DefaultDispatcher
+import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphstatconstants.graphStatTypes
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -47,10 +50,8 @@ import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
@@ -300,12 +301,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun listenToViewModel() {
-        var skippedFirstDataPointsUpdate = false
         viewModel.hasFeatures.observe(viewLifecycleOwner) {}
-        viewModel.dataPoints.observe(viewLifecycleOwner) {
-            if (skippedFirstDataPointsUpdate) viewModel.updateAllGraphs()
-            else skippedFirstDataPointsUpdate = true
-        }
         viewModel.groupChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             updateShowQueueTrackButton()
@@ -431,18 +427,18 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
 @HiltViewModel
 class GroupViewModel @Inject constructor(
-    private var dataInteractor: DataInteractor
+    private var dataInteractor: DataInteractor,
+    @IODispatcher private val io: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewModel() {
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    lateinit var dataPoints: LiveData<Instant>
     lateinit var hasFeatures: LiveData<Boolean>
 
-    lateinit var groupChildren: GroupChildrenLiveData
+    private lateinit var _groupChildren: GroupChildrenLiveData
+    val groupChildren: LiveData<List<GroupChild>> get() = _groupChildren
 
     val features
-        get() = groupChildren.value
+        get() = _groupChildren.value
             ?.filter { it.type == GroupChildType.FEATURE }
             ?.map { it.obj as DisplayFeature }
             ?: emptyList()
@@ -452,15 +448,16 @@ class GroupViewModel @Inject constructor(
     fun setGroup(groupId: Long) {
         if (initialized) return
         initialized = true
-        //TODO this is really bad, we are storing potentially multiple instances of
-        // every data point in memory per group fragment :/ Definitely need to review this
-        dataPoints = Transformations.map(dataInteractor.getAllDataPoints()) { Instant.now() }
+        dataInteractor.getDataUpdateEvents()
+            .map { Instant.now() }
+            .onEach { updateAllGraphs() }
+            .launchIn(viewModelScope)
         hasFeatures = Transformations.map(dataInteractor.getAllFeatures()) { it.isNotEmpty() }
 
-        groupChildren = GroupChildrenLiveData(updateJob, groupId, dataInteractor)
+        _groupChildren = GroupChildrenLiveData(viewModelScope, groupId, dataInteractor, defaultDispatcher)
     }
 
-    fun addDefaultFeatureValue(feature: DisplayFeature) = ioScope.launch {
+    fun addDefaultFeatureValue(feature: DisplayFeature) = viewModelScope.launch(io) {
         val label = if (feature.featureType == DataType.DISCRETE) {
             feature.discreteValues[feature.defaultValue.toInt()].label
         } else ""
@@ -474,12 +471,12 @@ class GroupViewModel @Inject constructor(
         dataInteractor.insertDataPoint(newDataPoint)
     }
 
-    fun onDeleteFeature(id: Long) = ioScope.launch {
+    fun onDeleteFeature(id: Long) = viewModelScope.launch(io) {
         dataInteractor.deleteFeature(id)
-        groupChildren.graphStatLiveData.preenGraphStats()
+        _groupChildren.graphStatLiveData.preenGraphStats()
     }
 
-    fun adjustDisplayIndexes(items: List<GroupChild>) = ioScope.launch {
+    fun adjustDisplayIndexes(items: List<GroupChild>) = viewModelScope.launch(io) {
         val displayFeatures = mutableListOf<DisplayFeature>()
         val groups = mutableListOf<Group>()
         val graphs = mutableListOf<GraphOrStat>()
@@ -518,17 +515,18 @@ class GroupViewModel @Inject constructor(
 
     private fun toGroupWithIndex(obj: Any, index: Int) = (obj as Group).copy(displayIndex = index)
 
-    fun updateAllGraphs() = groupChildren.graphStatLiveData.updateAllGraphStats()
+    private fun updateAllGraphs() = _groupChildren.graphStatLiveData.updateAllGraphStats()
 
-    fun onDeleteGraphStat(id: Long) = ioScope.launch { dataInteractor.deleteGraphOrStat(id) }
+    fun onDeleteGraphStat(id: Long) =
+        viewModelScope.launch(io) { dataInteractor.deleteGraphOrStat(id) }
 
-    fun onDeleteGroup(id: Long) = ioScope.launch {
+    fun onDeleteGroup(id: Long) = viewModelScope.launch(io) {
         dataInteractor.deleteGroup(id)
-        groupChildren.graphStatLiveData.preenGraphStats()
+        _groupChildren.graphStatLiveData.preenGraphStats()
     }
 
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
-        ioScope.launch {
+        viewModelScope.launch(io) {
             dataInteractor.withTransaction {
                 val gs = graphOrStatViewData.graphOrStat
                 graphStatTypes[gs.type]?.dataSourceAdapter?.duplicateGraphOrStat(dataInteractor, gs)
