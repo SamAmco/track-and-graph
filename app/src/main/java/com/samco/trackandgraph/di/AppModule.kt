@@ -25,15 +25,52 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.*
+import javax.inject.Qualifier
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IODispatcher
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DefaultDispatcher
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class UnconfinedDispatcher
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class MainDispatcher
 
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
     @Provides
-    fun getDataInteractor(@ApplicationContext context: Context): DataInteractor =
-        DataInteractor.getInstance(context)
+    fun getDataInteractor(
+        @ApplicationContext context: Context,
+        @IODispatcher io: CoroutineDispatcher
+    ): DataInteractor =
+        DataInteractor.getInstance(context, io)
 
     @Provides
     fun getContentResolver(@ApplicationContext context: Context): ContentResolver =
         context.contentResolver
+
+    @Provides
+    @IODispatcher
+    fun getIODispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @Provides
+    @MainDispatcher
+    fun getMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+
+    @Provides
+    @DefaultDispatcher
+    fun getDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
+    @Provides
+    @UnconfinedDispatcher
+    fun getUnconfinedDispatcher(): CoroutineDispatcher = Dispatchers.Unconfined
 }

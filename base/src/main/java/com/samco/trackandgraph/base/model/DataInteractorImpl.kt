@@ -27,12 +27,25 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.sampling.DataSampler
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
 internal class DataInteractorImpl(
     private val database: TrackAndGraphDatabase,
-    private val dao: TrackAndGraphDatabaseDao
+    private val dao: TrackAndGraphDatabaseDao,
+    private val io: CoroutineDispatcher
 ) : DataInteractor {
+
+    private val ioJob = Job()
+    private val ioScope = CoroutineScope(ioJob + io)
+
+    private val dataUpdateEvents = MutableSharedFlow<Unit>()
+
     @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
     override fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int {
         return dao.doRawQuery(supportSQLiteQuery)
@@ -55,7 +68,10 @@ internal class DataInteractorImpl(
     }
 
     override fun deleteGroup(id: Long) {
-        return dao.deleteGroup(id)
+        ioScope.launch {
+            dao.deleteGroup(id)
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun updateGroup(group: Group) {
@@ -99,7 +115,10 @@ internal class DataInteractorImpl(
     }
 
     override fun updateFeatures(features: List<Feature>) {
-        return dao.updateFeatures(features.map { it.toEntity() })
+        ioScope.launch {
+            dao.updateFeatures(features.map { it.toEntity() })
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun getDisplayFeaturesForGroup(groupId: Long): LiveData<List<DisplayFeature>> {
@@ -129,15 +148,23 @@ internal class DataInteractorImpl(
     }
 
     override fun insertFeature(feature: Feature): Long {
-        return dao.insertFeature(feature.toEntity())
+        return dao.insertFeature(feature.toEntity()).also {
+            ioScope.launch { dataUpdateEvents.emit(Unit) }
+        }
     }
 
     override fun updateFeature(feature: Feature) {
-        return dao.updateFeature(feature.toEntity())
+        ioScope.launch {
+            dao.updateFeature(feature.toEntity())
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun deleteFeature(id: Long) {
-        return dao.deleteFeature(id)
+        ioScope.launch {
+            dao.deleteFeature(id)
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun deleteFeaturesForLineGraph(lineGraphId: Long) {
@@ -161,11 +188,17 @@ internal class DataInteractorImpl(
     }
 
     override fun deleteDataPoint(dataPoint: DataPoint) {
-        return dao.deleteDataPoint(dataPoint.toEntity())
+        ioScope.launch {
+            dao.deleteDataPoint(dataPoint.toEntity())
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double) {
-        return dao.deleteAllDataPointsForDiscreteValue(featureId, index)
+        ioScope.launch {
+            dao.deleteAllDataPointsForDiscreteValue(featureId, index)
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun deleteGraphOrStat(id: Long) {
@@ -177,15 +210,23 @@ internal class DataInteractorImpl(
     }
 
     override fun insertDataPoint(dataPoint: DataPoint): Long {
-        return dao.insertDataPoint(dataPoint.toEntity())
+        return dao.insertDataPoint(dataPoint.toEntity()).also {
+            ioScope.launch { dataUpdateEvents.emit(Unit) }
+        }
     }
 
     override fun insertDataPoints(dataPoint: List<DataPoint>) {
-        return dao.insertDataPoints(dataPoint.map { it.toEntity() })
+        ioScope.launch {
+            dao.insertDataPoints(dataPoint.map { it.toEntity() })
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun updateDataPoints(dataPoint: List<DataPoint>) {
-        return dao.updateDataPoints(dataPoint.map { it.toEntity() })
+        ioScope.launch {
+            dao.updateDataPoints(dataPoint.map { it.toEntity() })
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     //TODO probably can do better than this
@@ -195,9 +236,7 @@ internal class DataInteractorImpl(
         return dataSampler.getDataSampleForSource(dataSource)
     }
 
-    override fun getAllDataPoints(): LiveData<List<DataPoint>> {
-        return Transformations.map(dao.getAllDataPoints()) { dataPoints -> dataPoints.map { it.toDto() } }
-    }
+    override fun getDataUpdateEvents(): SharedFlow<Unit> = dataUpdateEvents
 
     override fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint> {
         return dao.getDataPointsForFeatureSync(featureId).map { it.toDto() }
@@ -255,15 +294,21 @@ internal class DataInteractorImpl(
     }
 
     override fun removeNote(timestamp: OffsetDateTime, featureId: Long) {
-        return dao.removeNote(timestamp, featureId)
+        return dao.removeNote(timestamp, featureId).also {
+            ioScope.launch { dataUpdateEvents.emit(Unit) }
+        }
     }
 
     override fun deleteGlobalNote(note: GlobalNote) {
-        return dao.deleteGlobalNote(note.toEntity())
+        return dao.deleteGlobalNote(note.toEntity()).also {
+            ioScope.launch { dataUpdateEvents.emit(Unit) }
+        }
     }
 
     override fun insertGlobalNote(note: GlobalNote): Long {
-        return dao.insertGlobalNote(note.toEntity())
+        return dao.insertGlobalNote(note.toEntity()).also {
+            ioScope.launch { dataUpdateEvents.emit(Unit) }
+        }
     }
 
     override fun getGlobalNoteByTimeSync(timestamp: OffsetDateTime?): GlobalNote? {

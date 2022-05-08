@@ -37,14 +37,14 @@ import org.threeten.bp.Instant
  */
 //TODO I think this could probably be done much more nicely using a Flow that combines the LiveData's?
 class GroupChildrenLiveData(
-    updateJob: Job,
+    private val coroutineScope: CoroutineScope,
     groupId: Long,
-    dataSource: DataInteractor
+    dataSource: DataInteractor,
+    private val dispatcher: CoroutineDispatcher
 ) : LiveData<List<GroupChild>>() {
-    private val workScope = CoroutineScope(Dispatchers.Default + updateJob)
     private var job: Job? = null
 
-    val graphStatLiveData = GraphStatLiveData(updateJob, groupId, dataSource)
+    val graphStatLiveData = GraphStatLiveData(coroutineScope, groupId, dataSource, dispatcher)
 
     private val graphStatData = Transformations.map(
         graphStatLiveData,
@@ -82,7 +82,7 @@ class GroupChildrenLiveData(
     @Synchronized
     private fun schedulePost() {
         job?.cancel()
-        job = workScope.launch {
+        job = coroutineScope.launch(dispatcher) {
             delay(200)
             if (isActive) postLatest()
         }

@@ -32,15 +32,15 @@ import org.threeten.bp.Instant
  * objects with the [Instant] that data was calculated so that the observer can determine if a
  * graph has changed since the last emission. It operates only on the given groupId.
  *
- * A list of graph/stats will be emitted as soon as they are observed from the database with
+ * A list of graph/stats will be emitted as soon as they are observed from the data interactor with
  * loading state view data, then again later when the data has been calculated.
  */
 class GraphStatLiveData(
-    updateJob: Job,
-    groupId: Long,
-    private val dataSource: DataInteractor
-) :
-    LiveData<List<Pair<Instant, IGraphStatViewData>>>(),
+    private val coroutineScope: CoroutineScope,
+    private val groupId: Long,
+    private val dataSource: DataInteractor,
+    private val dispatcher: CoroutineDispatcher
+) : LiveData<List<Pair<Instant, IGraphStatViewData>>>(),
     Observer<List<GraphOrStat>> {
 
     private var hasPostedFirstValue = false
@@ -53,18 +53,24 @@ class GraphStatLiveData(
         hasPostedFirstValue = false
     }
 
-    private val workScope = CoroutineScope(Dispatchers.Default + updateJob)
-
     override fun onChanged(graphsAndStats: List<GraphOrStat>?) {
         if (graphsAndStats == null) return
         //When first receiving the graphs, preen them to remove invalid graphs in case
         // their dependencies have been removed
-        if (!hasPostedFirstValue) workScope.launch { preenGraphStats(graphsAndStats) }
+        if (!hasPostedFirstValue) this.coroutineScope.launch(dispatcher) {
+            preenGraphStats(
+                graphsAndStats
+            )
+        }
         hasPostedFirstValue = true
         val loadingStates = graphsAndStats
             .map { Pair(Instant.now(), IGraphStatViewData.loading(it)) }
         updateGraphStats(loadingStates)
-        workScope.launch { iterateGraphStatDataFactories(graphsAndStats) }
+        this.coroutineScope.launch(dispatcher) {
+            iterateGraphStatDataFactories(
+                graphsAndStats
+            )
+        }
     }
 
     private fun updateGraphStats(graphStats: List<Pair<Instant, IGraphStatViewData>>) {
@@ -72,7 +78,7 @@ class GraphStatLiveData(
     }
 
     fun updateAllGraphStats() {
-        workScope.launch {
+        this.coroutineScope.launch(dispatcher) {
             iterateGraphStatDataFactories(
                 value?.map { it.second.graphOrStat } ?: emptyList()
             )
@@ -100,7 +106,7 @@ class GraphStatLiveData(
             val graphOrStat = graphsAndStats[index]
             //I think calling run here may be more optimal because presumably the work will be split
             //across the thread pool
-            val viewData = workScope.run {
+            val viewData = this.coroutineScope.run {
                 graphStatTypes[graphOrStat.type]?.dataFactory!!.getViewData(dataSource, graphOrStat)
             }
             batch.add(index, viewData)

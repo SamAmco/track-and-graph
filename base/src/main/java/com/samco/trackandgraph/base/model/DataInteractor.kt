@@ -24,15 +24,18 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
 
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
 interface DataInteractor {
     companion object {
-        fun getInstance(context: Context): DataInteractor {
+        fun getInstance(context: Context, ioDispatcher: CoroutineDispatcher): DataInteractor {
             val database = TrackAndGraphDatabase.getInstance(context)
-            return DataInteractorImpl(database, database.trackAndGraphDatabaseDao)
+            return DataInteractorImpl(database, database.trackAndGraphDatabaseDao, ioDispatcher)
         }
     }
 
@@ -112,8 +115,11 @@ interface DataInteractor {
 
     fun getDataSampleForFeatureId(featureId: Long): DataSample
 
-    //TODO remove this once we have a model layer that can track updates and emit events for us
-    fun getAllDataPoints(): LiveData<List<DataPoint>>
+    /**
+     * Emits a unit every time currently displayed data may have changed.
+     * For example if you create/update/remove a data point.
+     */
+    fun getDataUpdateEvents(): SharedFlow<Unit>
 
     //TODO get rid of this and only return DataSample for a feature
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
