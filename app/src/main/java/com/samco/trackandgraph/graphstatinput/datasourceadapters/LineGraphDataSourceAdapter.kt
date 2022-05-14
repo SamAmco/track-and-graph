@@ -17,63 +17,54 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.model.DataInteractor
+import javax.inject.Inject
 
-
-class LineGraphDataSourceAdapter : GraphStatDataSourceAdapter<LineGraphWithFeatures>() {
+class LineGraphDataSourceAdapter @Inject constructor(
+    dataInteractor: DataInteractor
+) : GraphStatDataSourceAdapter<LineGraphWithFeatures>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStatId: Long,
         config: LineGraphWithFeatures,
         updateMode: Boolean
     ) {
         val newLineGraphId = if (updateMode) {
-            dataSource.deleteFeaturesForLineGraph(config.id)
-            dataSource.updateLineGraph(config.toLineGraph().copy(graphStatId = graphOrStatId))
+            dataInteractor.deleteFeaturesForLineGraph(config.id)
+            dataInteractor.updateLineGraph(config.toLineGraph().copy(graphStatId = graphOrStatId))
             config.id
         } else {
-            dataSource.insertLineGraph(config.toLineGraph().copy(graphStatId = graphOrStatId))
+            dataInteractor.insertLineGraph(config.toLineGraph().copy(graphStatId = graphOrStatId))
         }
         val lineGraphFeatures = config.features
             .map { it.copy(lineGraphId = newLineGraphId) }
-        dataSource.insertLineGraphFeatures(lineGraphFeatures)
+        dataInteractor.insertLineGraphFeatures(lineGraphFeatures)
     }
 
-    override suspend fun getConfigDataFromDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
-        graphOrStatId: Long
-    ): Pair<Long, LineGraphWithFeatures>? {
-        val lineGraph = dataSource.getLineGraphByGraphStatId(graphOrStatId) ?: return null
+    override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LineGraphWithFeatures>? {
+        val lineGraph = dataInteractor.getLineGraphByGraphStatId(graphOrStatId) ?: return null
         return Pair(lineGraph.id, lineGraph)
     }
 
-    override suspend fun shouldPreen(
-        dataSource: TrackAndGraphDatabaseDao,
-        graphOrStat: GraphOrStat
-    ): Boolean {
-        val lineGraph = dataSource.getLineGraphByGraphStatId(graphOrStat.id) ?: return true
+    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
+        val lineGraph = dataInteractor.getLineGraphByGraphStatId(graphOrStat.id) ?: return true
         //If the feature was deleted then it should have been deleted via a cascade rule in the db
         // so the any statement should not strictly be necessary.
         return lineGraph.features.isEmpty() || lineGraph.features.any {
-            dataSource.tryGetFeatureByIdSync(it.featureId) == null
+            dataInteractor.tryGetFeatureByIdSync(it.featureId) == null
         }
     }
 
-    override suspend fun duplicate(
-        dataSource: TrackAndGraphDatabaseDao,
-        oldGraphId: Long,
-        newGraphId: Long
-    ) {
-        val lineGraph = dataSource.getLineGraphByGraphStatId(oldGraphId)
+    override suspend fun duplicate(oldGraphId: Long, newGraphId: Long) {
+        val lineGraph = dataInteractor.getLineGraphByGraphStatId(oldGraphId)
         lineGraph?.let {
             val copy = it.toLineGraph().copy(id = 0, graphStatId = newGraphId)
-            val newLineGraphId = dataSource.insertLineGraph(copy)
+            val newLineGraphId = dataInteractor.insertLineGraph(copy)
             val newFeatures = lineGraph.features.map { f ->
                 f.copy(id = 0, lineGraphId = newLineGraphId)
             }
-            dataSource.insertLineGraphFeatures(newFeatures)
+            dataInteractor.insertLineGraphFeatures(newFeatures)
         }
     }
 }

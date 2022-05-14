@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph.functions.aggregation
 
-import com.samco.trackandgraph.functions.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSample
 
 internal interface DataAggregator {
     suspend fun aggregate(dataSample: DataSample): AggregatedDataSample

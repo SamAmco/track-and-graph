@@ -28,15 +28,14 @@ import com.androidplot.xy.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.graphclassmappings.graphStatTypes
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.graphstatview.decorators.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
 import java.text.DecimalFormat
-import kotlin.reflect.full.primaryConstructor
 
+//TODO there shouldn't be a job in here. It's probably fine to have suspending functions though
 class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
     constructor(context: Context, attrSet: AttributeSet) : super(context, attrSet)
@@ -215,16 +214,16 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         }
     }
 
-    fun initFromGraphStat(data: IGraphStatViewData, listMode: Boolean) {
+    fun <T : IGraphStatViewData> initFromGraphStat(
+        data: IGraphStatViewData,
+        decorator: GraphStatViewDecorator<T>
+    ) {
         if (data.state == IGraphStatViewData.State.LOADING) {
             currentDecorator = null
             val headerText = data.graphOrStat.name
             binding.headerText.text = headerText
             binding.progressBar.visibility = View.VISIBLE
         } else {
-            val decorator = graphStatTypes[data.graphOrStat.type]
-                ?.decoratorClass
-                ?.primaryConstructor!!.call(listMode)
             trySetDecorator(decorator, data)
         }
     }

@@ -27,10 +27,10 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.Feature
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.base.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.ListItemMoveToGroupBinding
 import com.samco.trackandgraph.databinding.MoveToGroupDialogBinding
 import dagger.hilt.android.AndroidEntryPoint
@@ -127,7 +127,7 @@ enum class MoveToDialogState { INITIALIZING, WAITING, MOVING, MOVED }
 
 @HiltViewModel
 class MoveToDialogViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     private lateinit var mode: MoveDialogType
     private var updateJob = Job()
@@ -157,13 +157,13 @@ class MoveToDialogViewModel @Inject constructor(
 
         this.mode = mode
         ioScope.launch {
-            val groups = dao.getAllGroupsSync().toMutableList()
+            val groups = dataInteractor.getAllGroupsSync().toMutableList()
             if (mode == MoveDialogType.GROUP) groups.removeAll { it.id == id }
             val groupPathProvider = GroupPathProvider(groups)
             when (mode) {
-                MoveDialogType.TRACKER -> feature = dao.getFeatureById(id)
-                MoveDialogType.GRAPH -> graphStat = dao.getGraphStatById(id)
-                MoveDialogType.GROUP -> group = dao.getGroupById(id)
+                MoveDialogType.TRACKER -> feature = dataInteractor.getFeatureById(id)
+                MoveDialogType.GRAPH -> graphStat = dataInteractor.getGraphStatById(id)
+                MoveDialogType.GROUP -> group = dataInteractor.getGroupById(id)
             }
             withContext(Dispatchers.Main) {
                 _availableGroups.value = groupPathProvider
@@ -178,15 +178,15 @@ class MoveToDialogViewModel @Inject constructor(
         when (mode) {
             MoveDialogType.TRACKER -> {
                 val newFeature = feature.copy(groupId = newGroupId)
-                dao.updateFeature(newFeature)
+                dataInteractor.updateFeature(newFeature)
             }
             MoveDialogType.GRAPH -> {
                 val newGraphStat = graphStat.copy(groupId = newGroupId)
-                dao.updateGraphOrStat(newGraphStat)
+                dataInteractor.updateGraphOrStat(newGraphStat)
             }
             MoveDialogType.GROUP -> {
                 val newGroup = group.copy(parentGroupId = newGroupId)
-                dao.updateGroup(newGroup)
+                dataInteractor.updateGroup(newGroup)
             }
         }
         withContext(Dispatchers.Main) { _state.value = MoveToDialogState.MOVED }

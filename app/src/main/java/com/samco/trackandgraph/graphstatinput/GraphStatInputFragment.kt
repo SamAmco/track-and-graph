@@ -31,19 +31,17 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.room.withTransaction
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.DataType
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.base.database.entity.GraphStatType
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
-import com.samco.trackandgraph.functions.sampling.DataSampleProperties
-import com.samco.trackandgraph.graphclassmappings.graphStatTypes
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatinput.configviews.*
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,7 +49,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.lang.Exception
 import javax.inject.Inject
-import kotlin.reflect.full.primaryConstructor
 
 @AndroidEntryPoint
 class GraphStatInputFragment : Fragment() {
@@ -65,6 +62,9 @@ class GraphStatInputFragment : Fragment() {
     private lateinit var currentConfigView: GraphStatConfigView
 
     private var lastPreviewButtonDownPosY = 0f
+
+    @Inject
+    lateinit var gsiProvider: GraphStatInteractorProvider
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -197,12 +197,10 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun inflateConfigView(graphStatType: GraphStatType) {
-        graphStatTypes[graphStatType]?.configViewClass
-            ?.primaryConstructor?.call(requireContext(), null, 0)
-            ?.let {
-                currentConfigView = it
-                binding.configLayout.addView(it)
-            }
+        gsiProvider.getConfigView(graphStatType, requireContext()).let {
+            currentConfigView = it
+            binding.configLayout.addView(it)
+        }
     }
 
     private fun listenToFormValid() {
@@ -224,7 +222,8 @@ class GraphStatInputFragment : Fragment() {
                 binding.previewOverlay.visibility = View.GONE
             } else {
                 binding.btnPreivew.visibility = View.VISIBLE
-                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, true)
+                val decorator = gsiProvider.getDecorator(data.graphOrStat.type, true)
+                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, decorator)
             }
             if (viewModel.formValid.value != null) {
                 binding.demoGraphStatCardView.graphStatView.initError(
@@ -246,8 +245,8 @@ class ValidationException(val errorMessageId: Int) : Exception()
 
 @HiltViewModel
 class GraphStatInputViewModel @Inject constructor(
-    private val database: TrackAndGraphDatabase,
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor,
+    private val gsiProvider: GraphStatInteractorProvider
 ) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -289,8 +288,8 @@ class GraphStatInputViewModel @Inject constructor(
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
         ioScope.launch {
-            val allFeatures = dao.getAllFeaturesSync()
-            val allGroups = dao.getAllGroupsSync()
+            val allFeatures = dataInteractor.getAllFeaturesSync()
+            val allGroups = dataInteractor.getAllGroupsSync()
             //TODO Need to get an actual data sample and iterate to get actual labels and properties
             val featureData = allFeatures.map { feat ->
                 FeatureDataProvider.FeatureData(
@@ -306,15 +305,14 @@ class GraphStatInputViewModel @Inject constructor(
     }
 
     private suspend fun initFromExistingGraphStat(graphStatId: Long) {
-        val graphStat = dao.tryGetGraphStatById(graphStatId)
+        val graphStat = dataInteractor.tryGetGraphStatById(graphStatId)
 
         if (graphStat == null) {
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
             return
         }
 
-        val configData = graphStatTypes[graphStat.type]
-            ?.dataSourceAdapter!!.getConfigData(dao, graphStatId)
+        val configData = gsiProvider.getDataSourceAdapter(graphStat.type).getConfigData(graphStatId)
 
         configData?.first?.let {
             withContext(Dispatchers.Main) {
@@ -362,10 +360,9 @@ class GraphStatInputViewModel @Inject constructor(
         withContext(Dispatchers.Main) {
             _demoViewData.value = IGraphStatViewData.loading(graphOrStat)
         }
-        val graphStatType = graphStatTypes[graphOrStat.type]
-        val demoData = graphStatType?.dataFactory
-            ?.getViewData(dao, graphOrStat, _configData.value!!) {}
-        withContext(Dispatchers.Main) { demoData?.let { _demoViewData.value = it } }
+        val demoData = gsiProvider.getDataFactory(graphOrStat.type)
+            .getViewData(graphOrStat, _configData.value!!) {}
+        withContext(Dispatchers.Main) { _demoViewData.value = demoData }
     }
 
     private fun validateConfiguration() {
@@ -382,17 +379,17 @@ class GraphStatInputViewModel @Inject constructor(
         if (_configData.value == null) return
         _state.value = GraphStatInputState.ADDING
         ioScope.launch {
-            database.withTransaction {
+            dataInteractor.withTransaction {
                 val graphStatId = if (_updateMode.value!!) {
-                    dao.updateGraphOrStat(constructGraphOrStat())
+                    dataInteractor.updateGraphOrStat(constructGraphOrStat())
                     graphStatId!!
                 } else {
                     shiftUpGraphStatViewIndexes()
-                    dao.insertGraphOrStat(constructGraphOrStat())
+                    dataInteractor.insertGraphOrStat(constructGraphOrStat())
                 }
 
-                graphStatTypes[_graphStatType.value]?.dataSourceAdapter?.writeConfig(
-                    dao, graphStatId, _configData.value!!, _updateMode.value!!
+                gsiProvider.getDataSourceAdapter(_graphStatType.value!!).writeConfig(
+                    graphStatId, _configData.value!!, _updateMode.value!!
                 )
             }
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
@@ -400,10 +397,10 @@ class GraphStatInputViewModel @Inject constructor(
     }
 
     private fun shiftUpGraphStatViewIndexes() {
-        val newList = dao.getAllGraphStatsSync().map {
+        val newList = dataInteractor.getAllGraphStatsSync().map {
             it.copy(displayIndex = it.displayIndex + 1)
         }
-        dao.updateGraphStats(newList)
+        dataInteractor.updateGraphStats(newList)
     }
 
     private fun constructGraphOrStat() = GraphOrStat(

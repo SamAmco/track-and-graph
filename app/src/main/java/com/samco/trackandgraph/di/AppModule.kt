@@ -19,26 +19,59 @@ package com.samco.trackandgraph.di
 
 import android.content.ContentResolver
 import android.content.Context
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.model.DataInteractor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.*
+import javax.inject.Qualifier
+import javax.inject.Singleton
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class IODispatcher
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DefaultDispatcher
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class UnconfinedDispatcher
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class MainDispatcher
 
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
     @Provides
-    fun getDatabase(@ApplicationContext context: Context): TrackAndGraphDatabase =
-        TrackAndGraphDatabase.getInstance(context)
-
-    @Provides
-    fun getDatabaseDao(database: TrackAndGraphDatabase): TrackAndGraphDatabaseDao =
-        database.trackAndGraphDatabaseDao
+    @Singleton
+    fun getDataInteractor(
+        @ApplicationContext context: Context,
+        @IODispatcher io: CoroutineDispatcher
+    ): DataInteractor = DataInteractor.getInstance(context, io)
 
     @Provides
     fun getContentResolver(@ApplicationContext context: Context): ContentResolver =
         context.contentResolver
+
+    @Provides
+    @IODispatcher
+    fun getIODispatcher(): CoroutineDispatcher = Dispatchers.IO
+
+    @Provides
+    @MainDispatcher
+    fun getMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
+
+    @Provides
+    @DefaultDispatcher
+    fun getDefaultDispatcher(): CoroutineDispatcher = Dispatchers.Default
+
+    @Provides
+    @UnconfinedDispatcher
+    fun getUnconfinedDispatcher(): CoroutineDispatcher = Dispatchers.Unconfined
 }

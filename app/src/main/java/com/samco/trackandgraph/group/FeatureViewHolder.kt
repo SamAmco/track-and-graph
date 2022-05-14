@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.group
 
 import android.graphics.drawable.RippleDrawable
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View

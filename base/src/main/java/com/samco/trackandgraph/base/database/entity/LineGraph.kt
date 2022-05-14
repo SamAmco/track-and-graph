@@ -34,7 +34,7 @@ import org.threeten.bp.OffsetDateTime
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class LineGraph(
+internal data class LineGraph(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
@@ -56,21 +56,4 @@ data class LineGraph(
 
     @ColumnInfo(name = "end_date")
     val endDate: OffsetDateTime?
-) {
-    companion object {
-        fun create(
-            id: Long, graphStatId: Long, duration: Duration?,
-            yRangeType: YRangeType, yFrom: Double, yTo: Double, endDate: OffsetDateTime?
-        ): LineGraph {
-            return LineGraph(
-                id,
-                graphStatId,
-                duration,
-                yRangeType,
-                yFrom,
-                yTo,
-                endDate
-            )
-        }
-    }
-}
+)

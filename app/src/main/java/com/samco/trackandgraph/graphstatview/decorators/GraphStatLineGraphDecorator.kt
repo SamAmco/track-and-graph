@@ -25,9 +25,9 @@ import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.constants.LineGraphPointStyle
+import com.samco.trackandgraph.base.database.dto.LineGraphFeature
+import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.base.database.dto.YRangeType
-import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData

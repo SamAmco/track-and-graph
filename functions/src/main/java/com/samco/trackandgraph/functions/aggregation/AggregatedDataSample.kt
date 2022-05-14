@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.functions.aggregation
 
-import com.samco.trackandgraph.base.database.entity.DataPoint
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.sampling.DataSampleProperties
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 
 /**
  * This class represents the initial points clustered into the parent-attribute of the AggregatedDataPoints.

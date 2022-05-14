@@ -33,9 +33,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.CheckedDays
-import com.samco.trackandgraph.base.database.entity.Reminder
+import com.samco.trackandgraph.base.database.dto.CheckedDays
+import com.samco.trackandgraph.base.database.dto.Reminder
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
@@ -214,13 +214,13 @@ class RemindersFragment : Fragment() {
 
 @HiltViewModel
 class RemindersViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     //I use an executor here rather than kotlin co-routines because I want everything executed in the
     // order that it is called
     private val executor = Executors.newSingleThreadExecutor()
 
-    val allReminders: LiveData<List<Reminder>> = dao.getAllReminders()
+    val allReminders: LiveData<List<Reminder>> = dataInteractor.getAllReminders()
 
     override fun onCleared() {
         super.onCleared()
@@ -229,7 +229,7 @@ class RemindersViewModel @Inject constructor(
 
     fun addReminder(defaultName: String) {
         executor.submit {
-            dao.insertReminder(
+            dataInteractor.insertReminder(
                 Reminder(
                     0,
                     0,
@@ -242,7 +242,7 @@ class RemindersViewModel @Inject constructor(
     }
 
     fun deleteReminder(reminder: Reminder) {
-        executor.submit { dao.deleteReminder(reminder) }
+        executor.submit { dataInteractor.deleteReminder(reminder) }
     }
 
     fun adjustDisplayIndexes(reminders: List<Reminder>) {
@@ -253,7 +253,7 @@ class RemindersViewModel @Inject constructor(
                 }.filterNotNull()
             }
             newList?.let {
-                dao.updateReminders(it)
+                dataInteractor.updateReminders(it)
             }
         }
     }
@@ -271,7 +271,7 @@ class RemindersViewModel @Inject constructor(
         executor.submit {
             allReminders.value?.firstOrNull { it.id == reminder.id }?.let {
                 val newReminder = onFound(it)
-                dao.updateReminder(newReminder)
+                dataInteractor.updateReminder(newReminder)
             }
         }
     }

@@ -17,69 +17,50 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.model.DataInteractor
+import javax.inject.Inject
 
 /**
  * An abstract adapter for retrieving and writing graph or stat configs to a database
  *
  * I is the type of object to be stored and retrieved by this adapter
  */
-abstract class GraphStatDataSourceAdapter<I> {
+abstract class GraphStatDataSourceAdapter<I>(
+    protected val dataInteractor: DataInteractor
+) {
     protected abstract suspend fun writeConfigToDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStatId: Long,
         config: I,
         updateMode: Boolean
     )
 
-    protected abstract suspend fun getConfigDataFromDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
-        graphOrStatId: Long
-    ): Pair<Long, I>?
+    protected abstract suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, I>?
 
-    suspend fun getConfigData(
-        dataSource: TrackAndGraphDatabaseDao,
-        graphOrStatId: Long
-    ): Pair<Long, Any>? {
-        return (getConfigDataFromDatabase(dataSource, graphOrStatId) ?: return null).let {
+    suspend fun getConfigData(graphOrStatId: Long): Pair<Long, Any>? {
+        return (getConfigDataFromDatabase(graphOrStatId) ?: return null).let {
             Pair(it.first, it.second as Any)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    suspend fun writeConfig(
-        dataSource: TrackAndGraphDatabaseDao,
-        graphOrStatId: Long,
-        config: Any,
-        updateMode: Boolean
-    ) {
-        writeConfigToDatabase(dataSource, graphOrStatId, config as I, updateMode)
+    suspend fun writeConfig(graphOrStatId: Long, config: Any, updateMode: Boolean) {
+        writeConfigToDatabase(graphOrStatId, config as I, updateMode)
     }
 
-    protected abstract suspend fun shouldPreen(
-        dataSource: TrackAndGraphDatabaseDao,
-        graphOrStat: GraphOrStat
-    ): Boolean
+    protected abstract suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean
 
-    suspend fun preen(dataSource: TrackAndGraphDatabaseDao, graphOrStat: GraphOrStat) {
-        if (shouldPreen(dataSource, graphOrStat)) {
-            dataSource.deleteGraphOrStat(graphOrStat)
+    suspend fun preen(graphOrStat: GraphOrStat) {
+        if (shouldPreen(graphOrStat)) {
+            dataInteractor.deleteGraphOrStat(graphOrStat)
         }
     }
 
-    protected abstract suspend fun duplicate(
-        dataSource: TrackAndGraphDatabaseDao,
-        oldGraphId: Long,
-        newGraphId: Long
-    )
+    protected abstract suspend fun duplicate(oldGraphId: Long, newGraphId: Long)
 
-    suspend fun duplicateGraphOrStat(
-        dataSource: TrackAndGraphDatabaseDao,
-        graphOrStat: GraphOrStat
-    ) {
+    suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
         val originalId = graphOrStat.id
-        val newId = dataSource.insertGraphOrStat(graphOrStat.copy(id = 0))
-        duplicate(dataSource, originalId, newId)
+        val newId = dataInteractor.insertGraphOrStat(graphOrStat.copy(id = 0))
+        duplicate(originalId, newId)
     }
 }

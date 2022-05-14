@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.functions.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.functions.MovingAverageFunction
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking

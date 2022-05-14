@@ -23,35 +23,30 @@ import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.DataSource
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.constants.*
-import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.base.database.dto.YRangeType
-import com.samco.trackandgraph.base.database.entity.DataPoint
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.base.database.entity.LineGraphFeature
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.functions.*
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
+import com.samco.trackandgraph.movingAverageDurations
+import com.samco.trackandgraph.plottingModePeriods
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import javax.inject.Inject
 import kotlin.math.abs
 
-class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>() {
-    companion object {
-        val instance = LineGraphDataFactory()
-    }
+class LineGraphDataFactory @Inject constructor(
+    dataInteractor: DataInteractor,
+    @IODispatcher ioDispatcher: CoroutineDispatcher
+) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(dataInteractor, ioDispatcher) {
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: LineGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
@@ -59,7 +54,6 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         try {
             val endTime = config.endDate ?: OffsetDateTime.now()
             val plottableData = generatePlottingData(
-                dataSource,
                 config,
                 endTime,
                 onDataSampled
@@ -96,21 +90,19 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
     }
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData {
-        val lineGraph = dataSource.getLineGraphByGraphStatId(graphOrStat.id)
+        val lineGraph = dataInteractor.getLineGraphByGraphStatId(graphOrStat.id)
             ?: return object : ILineGraphViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
                 override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
             }
-        return createViewData(dataSource, graphOrStat, lineGraph, onDataSampled)
+        return createViewData(graphOrStat, lineGraph, onDataSampled)
     }
 
     private suspend fun generatePlottingData(
-        dataSource: TrackAndGraphDatabaseDao,
         lineGraph: LineGraphWithFeatures,
         endTime: OffsetDateTime,
         onDataSampled: (List<DataPoint>) -> Unit
@@ -118,7 +110,7 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
         withContext(Dispatchers.Default) {
             //Create all the data samples in parallel (this shouldn't actually take long but why not)
             val dataSamples = lineGraph.features.map { lgf ->
-                async { Pair(lgf, tryGetPlottingData(dataSource, lineGraph, lgf)) }
+                async { Pair(lgf, tryGetPlottingData(lineGraph, lgf)) }
             }.awaitAll()
 
             //Generate the actual plotting data for each sample. This is the part that will take longer
@@ -141,16 +133,13 @@ class LineGraphDataFactory : ViewDataFactory<LineGraphWithFeatures, ILineGraphVi
     }
 
     private suspend fun tryGetPlottingData(
-        dao: TrackAndGraphDatabaseDao,
         config: LineGraphWithFeatures,
         lineGraphFeature: LineGraphFeature
     ): DataSample {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
         val rawDataSample = withContext(Dispatchers.IO) {
-            val dataSampler = DataSamplerImpl(dao)
-            val dataSource = DataSource.FeatureDataSource(lineGraphFeature.featureId)
-            dataSampler.getDataSampleForSource(dataSource)
+            dataInteractor.getDataSampleForFeatureId(lineGraphFeature.featureId)
         }
         val clippingCalculator = DataClippingFunction(config.endDate, config.duration)
 

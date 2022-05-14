@@ -25,21 +25,15 @@ import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
 import android.widget.AdapterView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.constants.DurationPlottingMode
-import com.samco.trackandgraph.base.database.constants.LineGraphAveraginModes
-import com.samco.trackandgraph.base.database.constants.LineGraphPlottingModes
-import com.samco.trackandgraph.base.database.constants.LineGraphPointStyle
-import com.samco.trackandgraph.base.database.doubleFormatter
-import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.base.database.dto.YRangeType
-import com.samco.trackandgraph.base.database.entity.LineGraphFeature
-import com.samco.trackandgraph.base.database.entity.maxGraphPeriodDurations
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.LineGraphInputViewBinding
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfig
 import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfigListItemView
+import com.samco.trackandgraph.maxGraphPeriodDurations
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
+import com.samco.trackandgraph.ui.doubleFormatter
 import com.samco.trackandgraph.util.getDoubleFromText
 
 internal class LineGraphConfigView @JvmOverloads constructor(

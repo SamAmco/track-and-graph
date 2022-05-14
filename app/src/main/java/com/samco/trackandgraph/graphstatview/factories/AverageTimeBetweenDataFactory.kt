@@ -17,31 +17,35 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.database.DataSource
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
-import com.samco.trackandgraph.base.database.entity.DataPoint
-import com.samco.trackandgraph.base.database.entity.Feature
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.sampling.DataSampleFunction
-import com.samco.trackandgraph.functions.sampling.DataSamplerImpl
+import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
+import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
-import com.samco.trackandgraph.functions.sampling.IDataSampler
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
+import javax.inject.Inject
 
-class AverageTimeBetweenDataFactory :
-    ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
+class AverageTimeBetweenDataFactory @Inject constructor(
+    dataInteractor: DataInteractor,
+    @IODispatcher ioDispatcher: CoroutineDispatcher
+) : ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>(
+    dataInteractor,
+    ioDispatcher
+) {
 
     companion object {
         /**
@@ -62,26 +66,22 @@ class AverageTimeBetweenDataFactory :
     }
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
-        val timeBetweenStat = dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
+        val timeBetweenStat = dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
-        return createViewData(dataSource, graphOrStat, timeBetweenStat, onDataSampled)
+        return createViewData(graphOrStat, timeBetweenStat, onDataSampled)
     }
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: AverageTimeBetweenStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
         return try {
-            val feature = dataSource.getFeatureById(config.featureId)
-            val dataSampler = DataSamplerImpl(dataSource)
             val dataSample = withContext(Dispatchers.IO) {
-                getRelevantDataPoints(dataSampler, config, feature)
+                getRelevantDataPoints(config, config.featureId)
             }
             val dataPoints = withContext(Dispatchers.IO) {
                 dataSample.toList()
@@ -120,12 +120,10 @@ class AverageTimeBetweenDataFactory :
         }
 
     private suspend fun getRelevantDataPoints(
-        dataSampler: IDataSampler,
         config: AverageTimeBetweenStat,
-        feature: Feature
+        featureId: Long
     ): DataSample {
-        val dataSource = DataSource.FeatureDataSource(feature.id)
-        val dataSample = dataSampler.getDataSampleForSource(dataSource)
+        val dataSample = dataInteractor.getDataSampleForFeatureId(featureId)
         val filters = mutableListOf<DataSampleFunction>()
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
         if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))

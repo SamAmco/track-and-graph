@@ -18,8 +18,7 @@
 package com.samco.trackandgraph.functions.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.sampling.DataSampleFunction
+import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.functions.exceptions.InvalidRegularityException
 import org.threeten.bp.OffsetDateTime
@@ -77,12 +76,13 @@ class DataPaddingFunction : DataSampleFunction {
      * @throws InvalidRegularityException if the data sample provided has a null regularity
      */
     override suspend fun mapSample(dataSample: DataSample): DataSample {
-        if (dataSample.dataSampleProperties.regularity == null) throw InvalidRegularityException()
-        return DataSample.fromSequence(
-            getSequence(dataSample, dataSample.dataSampleProperties.regularity),
-            dataSample.dataSampleProperties,
-            dataSample::getRawDataPoints
-        )
+        return dataSample.dataSampleProperties.regularity?.let { regularity ->
+            DataSample.fromSequence(
+                getSequence(dataSample, regularity),
+                dataSample.dataSampleProperties,
+                dataSample::getRawDataPoints
+            )
+        } ?: throw InvalidRegularityException()
     }
 
     private fun getSequence(dataSample: DataSample, period: TemporalAmount) = sequence {

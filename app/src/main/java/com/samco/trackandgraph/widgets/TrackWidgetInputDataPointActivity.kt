@@ -23,9 +23,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.DataPoint
-import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.performTrackVibrate
@@ -90,7 +90,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
 
 @HiltViewModel
 class TrackWidgetInputDataPointViewModel @Inject constructor(
-    private var dao: TrackAndGraphDatabaseDao
+    private var dataInteractor: DataInteractor
 ) : ViewModel() {
     lateinit var feature: LiveData<Feature?> private set
 
@@ -102,7 +102,7 @@ class TrackWidgetInputDataPointViewModel @Inject constructor(
     fun setFeatureId(featureId: Long) {
         if (initialized) return
         initialized = true
-        feature = dao.tryGetFeatureById(featureId)
+        feature = dataInteractor.tryGetFeatureById(featureId)
     }
 
     fun addDefaultDataPoint() = feature.value?.let {
@@ -114,7 +114,7 @@ class TrackWidgetInputDataPointViewModel @Inject constructor(
                 it.getDefaultLabel(),
                 ""
             )
-            dao.insertDataPoint(newDataPoint)
+            dataInteractor.insertDataPoint(newDataPoint)
         }
     }
 }

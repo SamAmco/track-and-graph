@@ -17,9 +17,10 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.entity.TimeHistogramWindow
-import com.samco.trackandgraph.functions.sampling.DataSample
+import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -44,6 +45,12 @@ class TimeHistogramDataHelper(
             ?.maxOrNull()
     }
 
+    internal fun getHistogramBinsForSample(
+        sample: DataSample,
+        window: TimeHistogramWindow,
+        sumByCount: Boolean,
+    ) = getHistogramBinsForSample(sample, TimeHistogramWindowData.getWindowData(window), sumByCount)
+
     /**
      * This function essentially loops over the data sample and puts every input data point into a bin
      * depending on where its timestamp falls within the given input window. For example if the window
@@ -61,14 +68,14 @@ class TimeHistogramDataHelper(
      * histogram bin before normalisation is the number of data points that fall in that bin.
      *
      * {@param sample} - The data points to generate a histogram for
-     * {@param window} - The TimeHistogramWindow specifying the domain and number of bins of the histogram
+     * {@param window} - The TimeHistogramWindowData specifying the domain and number of bins of the histogram
      * {@param feature} - The Feature for which the histogram is being generated
      * {@param sumByCount} - Whether this histogram represents the number of data points tracked or
      * the sum of their values
      */
     internal fun getHistogramBinsForSample(
         sample: DataSample,
-        window: TimeHistogramWindow,
+        window: TimeHistogramWindowData,
         sumByCount: Boolean,
     ): Map<String, List<Double>>? {
         val sampleList = sample.toList()
@@ -84,7 +91,7 @@ class TimeHistogramDataHelper(
     }
 
     private fun getNextEndOfWindow(
-        window: TimeHistogramWindow,
+        window: TimeHistogramWindowData,
         endDate: OffsetDateTime?,
     ): ZonedDateTime {
         val end = endDate ?: OffsetDateTime.now()
@@ -94,7 +101,7 @@ class TimeHistogramDataHelper(
 
     private fun getHistogramBinsForSample(
         sample: List<IDataPoint>,
-        window: TimeHistogramWindow,
+        window: TimeHistogramWindowData,
         endTime: ZonedDateTime,
         addFunction: (IDataPoint, MutableMap<String, MutableList<Double>>, Int) -> Unit
     ): Map<String, List<Double>> {
@@ -108,7 +115,7 @@ class TimeHistogramDataHelper(
      */
     private fun calculateBinTotals(
         sample: List<IDataPoint>,
-        window: TimeHistogramWindow,
+        window: TimeHistogramWindowData,
         endTime: ZonedDateTime,
         addFunction: (IDataPoint, MutableMap<String, MutableList<Double>>, Int) -> Unit
     ): Map<String, List<Double>> {

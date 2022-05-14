@@ -29,9 +29,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.database.odtFromString
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.GlobalNoteInputDialogBinding
 import com.samco.trackandgraph.ui.formatDayMonthYear
 import dagger.hilt.android.AndroidEntryPoint
@@ -161,7 +161,7 @@ enum class GlobalNoteInputState { INITIALIZING, WAITING, DONE }
 
 @HiltViewModel
 class GlobalNoteInputViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -182,7 +182,7 @@ class GlobalNoteInputViewModel @Inject constructor(
         ioScope.launch {
             if (timestampStr != null) {
                 val noteTimestamp = odtFromString(timestampStr)
-                val note = dao.getGlobalNoteByTimeSync(noteTimestamp)
+                val note = dataInteractor.getGlobalNoteByTimeSync(noteTimestamp)
                 if (note != null) {
                     timestamp = note.timestamp
                     noteText = note.note
@@ -196,8 +196,8 @@ class GlobalNoteInputViewModel @Inject constructor(
     }
 
     fun onAddClicked() = ioScope.launch {
-        oldNote?.let { dao.deleteGlobalNote(it) }
-        if (noteText.isNotEmpty()) dao.insertGlobalNote(
+        oldNote?.let { dataInteractor.deleteGlobalNote(it) }
+        if (noteText.isNotEmpty()) dataInteractor.insertGlobalNote(
             GlobalNote(
                 timestamp,
                 noteText

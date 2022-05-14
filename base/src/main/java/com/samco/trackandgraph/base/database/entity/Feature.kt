@@ -20,7 +20,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
+import com.samco.trackandgraph.base.database.dto.Feature
 
 @Entity(
     tableName = "features_table",
@@ -31,7 +33,7 @@ import com.samco.trackandgraph.base.database.dto.DiscreteValue
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class Feature(
+internal data class Feature(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
@@ -58,13 +60,19 @@ data class Feature(
     val defaultValue: Double,
 
     @ColumnInfo(name = "feature_description")
-    val description: String,
+    val description: String
 ) {
-    fun getDefaultLabel(): String =
-        if (featureType == DataType.DISCRETE)
-            discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
-        else ""
+    fun toDto() = Feature(
+        id,
+        name,
+        groupId,
+        featureType,
+        discreteValues,
+        displayIndex,
+        hasDefaultValue,
+        defaultValue,
+        description
+    )
 }
 
-enum class DataType { DISCRETE, CONTINUOUS, DURATION }
 

@@ -20,15 +20,19 @@ import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.entity.*
+import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayFeature
+import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
+import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
 import org.threeten.bp.OffsetDateTime
 
 private const val getFeatureByIdQuery =
     """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
 
+//TODO it would probably be better if we migrated from LiveData to flow here to remove lifecycle
+// awareness from the model layer
 @Dao
-interface TrackAndGraphDatabaseDao {
+internal interface TrackAndGraphDatabaseDao {
     @RawQuery
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 
@@ -53,17 +57,14 @@ interface TrackAndGraphDatabaseDao {
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroups(): LiveData<List<Group>>
 
+    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
+    fun getAllGroupsSync(): List<Group>
+
     @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeatures(): LiveData<List<Feature>>
 
     @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeaturesSync(): List<Feature>
-
-    @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
-    fun getAllGroupsSync(): List<Group>
-
-    @Query("""SELECT * FROM data_points_table""")
-    fun getAllDataPoints(): LiveData<List<DataPoint>>
 
     @Insert
     fun insertReminder(reminder: Reminder)
@@ -93,7 +94,7 @@ interface TrackAndGraphDatabaseDao {
 		WHERE group_id = :groupId
         ORDER BY features_table.display_index ASC, id DESC"""
     )
-    fun getDisplayFeaturesForGroup(groupId: Long): LiveData<List<DisplayFeature>>
+    fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature>
 
     @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
@@ -140,42 +141,11 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
-    //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp""")
-    fun getDataPointsWithValue(
-        featureId: Long,
-        values: List<Int>
-    ): List<DataPoint>
-
-    //TODO make these descending. Eventually all access to data points will be mediated so all need to be in the same order
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp""")
-    fun getDataPointsBetween(
-        featureId: Long,
-        min: String,
-        max: String
-    ): List<DataPoint>
-
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value >= :min AND value <= :max ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointBetween(
-        featureId: Long,
-        min: String,
-        max: String
-    ): DataPoint?
-
-    @Query("""SELECT * FROM data_points_table WHERE feature_id = :featureId AND value IN (:values) ORDER BY timestamp DESC LIMIT 1""")
-    fun getLastDataPointWithValue(
-        featureId: Long,
-        values: List<Int>
-    ): DataPoint?
-
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT 1")
-    fun getLastDataPointForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
@@ -202,7 +172,7 @@ interface TrackAndGraphDatabaseDao {
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
-    fun getGraphsAndStatsByGroupId(groupId: Long): LiveData<List<GraphOrStat>>
+    fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
     @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC, id DESC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
@@ -268,6 +238,7 @@ interface TrackAndGraphDatabaseDao {
     @Update
     fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat)
 
+    //TODO consider managing GraphOrStat automatically in the model
     @Insert
     fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
 
@@ -287,5 +258,5 @@ interface TrackAndGraphDatabaseDao {
     fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 
     @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
-    fun getGroupsForGroup(id: Long): LiveData<List<Group>>
+    fun getGroupsForGroupSync(id: Long): List<Group>
 }
