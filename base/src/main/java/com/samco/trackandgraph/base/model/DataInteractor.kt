@@ -81,7 +81,7 @@ interface DataInteractor {
 
     fun updateFeatures(features: List<Feature>)
 
-    fun getDisplayFeaturesForGroup(groupId: Long): LiveData<List<DisplayFeature>>
+    fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature>
 
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
@@ -144,7 +144,7 @@ interface DataInteractor {
 
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
-    fun getGraphsAndStatsByGroupId(groupId: Long): LiveData<List<GraphOrStat>>
+    fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
     fun getAllGraphStatsSync(): List<GraphOrStat>
 
@@ -193,5 +193,5 @@ interface DataInteractor {
 
     fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 
-    fun getGroupsForGroup(id: Long): LiveData<List<Group>>
+    fun getGroupsForGroupSync(id: Long): List<Group>
 }

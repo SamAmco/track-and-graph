@@ -64,7 +64,9 @@ internal class DataInteractorImpl(
     }
 
     override fun insertGroup(group: Group): Long {
-        return dao.insertGroup(group.toEntity())
+        return dao.insertGroup(group.toEntity()).also {
+            ioScope.launch { dataUpdateEvents.emit(Unit) }
+        }
     }
 
     override fun deleteGroup(id: Long) {
@@ -75,15 +77,17 @@ internal class DataInteractorImpl(
     }
 
     override fun updateGroup(group: Group) {
-        return dao.updateGroup(group.toEntity())
+        ioScope.launch {
+            dao.updateGroup(group.toEntity())
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun updateGroups(groups: List<Group>) {
-        return dao.updateGroups(groups.map { it.toEntity() })
-    }
-
-    override fun getGroupsForGroup(id: Long): LiveData<List<Group>> {
-        return Transformations.map(dao.getGroupsForGroup(id)) { it.map { it.toDto() } }
+        ioScope.launch {
+            dao.updateGroups(groups.map { it.toEntity() })
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override fun getAllGroups(): LiveData<List<Group>> {
@@ -121,10 +125,8 @@ internal class DataInteractorImpl(
         }
     }
 
-    override fun getDisplayFeaturesForGroup(groupId: Long): LiveData<List<DisplayFeature>> {
-        return Transformations.map(dao.getDisplayFeaturesForGroup(groupId)) { displayFeatures ->
-            displayFeatures.map { it.toDto() }
-        }
+    override fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature> {
+        return dao.getDisplayFeaturesForGroupSync(groupId).map { it.toDto() }
     }
 
     override fun getFeaturesForGroupSync(groupId: Long): List<Feature> {
@@ -281,8 +283,8 @@ internal class DataInteractorImpl(
         return dao.getTimeSinceLastStatByGraphStatId(graphStatId)?.toDto()
     }
 
-    override fun getGraphsAndStatsByGroupId(groupId: Long): LiveData<List<GraphOrStat>> {
-        return Transformations.map(dao.getGraphsAndStatsByGroupId(groupId)) { graphStats -> graphStats.map { it.toDto() } }
+    override fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat> {
+        return dao.getGraphsAndStatsByGroupIdSync(groupId).map { it.toDto() }
     }
 
     override fun getAllGraphStatsSync(): List<GraphOrStat> {
@@ -377,5 +379,9 @@ internal class DataInteractorImpl(
 
     override fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram? {
         return dao.getTimeHistogramByGraphStatId(graphStatId)?.toDto()
+    }
+
+    override fun getGroupsForGroupSync(id: Long): List<Group> {
+        return dao.getGroupsForGroupSync(id).map { it.toDto() }
     }
 }

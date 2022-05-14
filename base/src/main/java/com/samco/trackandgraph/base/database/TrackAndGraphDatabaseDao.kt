@@ -94,7 +94,7 @@ internal interface TrackAndGraphDatabaseDao {
 		WHERE group_id = :groupId
         ORDER BY features_table.display_index ASC, id DESC"""
     )
-    fun getDisplayFeaturesForGroup(groupId: Long): LiveData<List<DisplayFeature>>
+    fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature>
 
     @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
@@ -172,7 +172,7 @@ internal interface TrackAndGraphDatabaseDao {
     fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
-    fun getGraphsAndStatsByGroupId(groupId: Long): LiveData<List<GraphOrStat>>
+    fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
     @Query("SELECT * FROM graphs_and_stats_table2 ORDER BY display_index ASC, id DESC")
     fun getAllGraphStatsSync(): List<GraphOrStat>
@@ -258,5 +258,5 @@ internal interface TrackAndGraphDatabaseDao {
     fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 
     @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
-    fun getGroupsForGroup(id: Long): LiveData<List<Group>>
+    fun getGroupsForGroupSync(id: Long): List<Group>
 }
