@@ -23,6 +23,7 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
@@ -32,12 +33,19 @@ import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
+import javax.inject.Inject
 
-class AverageTimeBetweenDataFactory :
-    ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
+class AverageTimeBetweenDataFactory @Inject constructor(
+    dataInteractor: DataInteractor,
+    @IODispatcher ioDispatcher: CoroutineDispatcher
+) : ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>(
+    dataInteractor,
+    ioDispatcher
+) {
 
     companion object {
         /**
@@ -58,24 +66,22 @@ class AverageTimeBetweenDataFactory :
     }
 
     override suspend fun createViewData(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
         val timeBetweenStat = dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
-        return createViewData(dataInteractor, graphOrStat, timeBetweenStat, onDataSampled)
+        return createViewData(graphOrStat, timeBetweenStat, onDataSampled)
     }
 
     override suspend fun createViewData(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         config: AverageTimeBetweenStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
         return try {
             val dataSample = withContext(Dispatchers.IO) {
-                getRelevantDataPoints(dataInteractor, config, config.featureId)
+                getRelevantDataPoints(config, config.featureId)
             }
             val dataPoints = withContext(Dispatchers.IO) {
                 dataSample.toList()
@@ -114,7 +120,6 @@ class AverageTimeBetweenDataFactory :
         }
 
     private suspend fun getRelevantDataPoints(
-        dataInteractor: DataInteractor,
         config: AverageTimeBetweenStat,
         featureId: Long
     ): DataSample {

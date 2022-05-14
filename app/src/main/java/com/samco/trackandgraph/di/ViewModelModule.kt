@@ -15,15 +15,21 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatview.factories.viewdto
+package com.samco.trackandgraph.di
 
-import com.samco.trackandgraph.TimeHistogramWindowData
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProviderImpl
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 
-interface ITimeHistogramViewData : IGraphStatViewData {
-    val window: TimeHistogramWindowData?
-        get() = null
-    val barValues: Map<String, List<Double>>?
-        get() = null
-    val maxDisplayHeight: Double?
-        get() = 0.0
+@Module
+@InstallIn(ActivityRetainedComponent::class)
+class ViewModelModule {
+    @Provides
+    @ActivityRetainedScoped
+    fun getGraphStatInteractorProvider(impl: GraphStatInteractorProviderImpl)
+            : GraphStatInteractorProvider = impl
 }

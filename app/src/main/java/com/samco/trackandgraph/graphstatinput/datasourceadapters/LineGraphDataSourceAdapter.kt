@@ -20,10 +20,12 @@ package com.samco.trackandgraph.graphstatinput.datasourceadapters
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.base.model.DataInteractor
+import javax.inject.Inject
 
-class LineGraphDataSourceAdapter : GraphStatDataSourceAdapter<LineGraphWithFeatures>() {
+class LineGraphDataSourceAdapter @Inject constructor(
+    dataInteractor: DataInteractor
+) : GraphStatDataSourceAdapter<LineGraphWithFeatures>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        dataInteractor: DataInteractor,
         graphOrStatId: Long,
         config: LineGraphWithFeatures,
         updateMode: Boolean
@@ -40,18 +42,12 @@ class LineGraphDataSourceAdapter : GraphStatDataSourceAdapter<LineGraphWithFeatu
         dataInteractor.insertLineGraphFeatures(lineGraphFeatures)
     }
 
-    override suspend fun getConfigDataFromDatabase(
-        dataInteractor: DataInteractor,
-        graphOrStatId: Long
-    ): Pair<Long, LineGraphWithFeatures>? {
+    override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LineGraphWithFeatures>? {
         val lineGraph = dataInteractor.getLineGraphByGraphStatId(graphOrStatId) ?: return null
         return Pair(lineGraph.id, lineGraph)
     }
 
-    override suspend fun shouldPreen(
-        dataInteractor: DataInteractor,
-        graphOrStat: GraphOrStat
-    ): Boolean {
+    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
         val lineGraph = dataInteractor.getLineGraphByGraphStatId(graphOrStat.id) ?: return true
         //If the feature was deleted then it should have been deleted via a cascade rule in the db
         // so the any statement should not strictly be necessary.
@@ -60,11 +56,7 @@ class LineGraphDataSourceAdapter : GraphStatDataSourceAdapter<LineGraphWithFeatu
         }
     }
 
-    override suspend fun duplicate(
-        dataInteractor: DataInteractor,
-        oldGraphId: Long,
-        newGraphId: Long
-    ) {
+    override suspend fun duplicate(oldGraphId: Long, newGraphId: Long) {
         val lineGraph = dataInteractor.getLineGraphByGraphStatId(oldGraphId)
         lineGraph?.let {
             val copy = it.toLineGraph().copy(id = 0, graphStatId = newGraphId)

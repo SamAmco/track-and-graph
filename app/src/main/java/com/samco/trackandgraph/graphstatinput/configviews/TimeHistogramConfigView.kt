@@ -26,8 +26,8 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.TimeHistogram
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.TimeHistogramInputViewBinding
-import com.samco.trackandgraph.graphstatconstants.maxGraphPeriodDurations
 import com.samco.trackandgraph.graphstatinput.ValidationException
+import com.samco.trackandgraph.maxGraphPeriodDurations
 
 class TimeHistogramConfigView @JvmOverloads constructor(
     context: Context,

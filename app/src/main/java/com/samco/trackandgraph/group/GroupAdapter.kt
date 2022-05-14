@@ -23,19 +23,21 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import org.threeten.bp.Instant
 
 class GroupAdapter(
     private val featureClickListener: FeatureClickListener,
     private val graphStatClickListener: GraphStatClickListener,
-    private val groupClickListener: GroupClickListener
+    private val groupClickListener: GroupClickListener,
+    private val gsiProvider: GraphStatInteractorProvider
 ) : RecyclerView.Adapter<GroupChildViewHolder>() {
     private val groupChildren = mutableListOf<GroupChild>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupChildViewHolder {
         return when (viewType) {
-            GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent)
+            GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
             GroupChildType.FEATURE.ordinal -> FeatureViewHolder.from(parent)
             else -> GroupViewHolder.from(parent)
         }

@@ -17,11 +17,11 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
-import com.samco.trackandgraph.graphstatconstants.TimeHistogramWindowData
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId

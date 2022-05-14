@@ -20,10 +20,12 @@ package com.samco.trackandgraph.graphstatinput.datasourceadapters
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.TimeHistogram
 import com.samco.trackandgraph.base.model.DataInteractor
+import javax.inject.Inject
 
-class TimeHistogramDataSourceAdapter : GraphStatDataSourceAdapter<TimeHistogram>(){
+class TimeHistogramDataSourceAdapter @Inject constructor(
+    dataInteractor: DataInteractor
+) : GraphStatDataSourceAdapter<TimeHistogram>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        dataInteractor: DataInteractor,
         graphOrStatId: Long,
         config: TimeHistogram,
         updateMode: Boolean
@@ -32,26 +34,16 @@ class TimeHistogramDataSourceAdapter : GraphStatDataSourceAdapter<TimeHistogram>
         else dataInteractor.insertTimeHistogram(config.copy(graphStatId = graphOrStatId))
     }
 
-    override suspend fun getConfigDataFromDatabase(
-        dataInteractor: DataInteractor,
-        graphOrStatId: Long
-    ): Pair<Long, TimeHistogram>? {
+    override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, TimeHistogram>? {
         val th = dataInteractor.getTimeHistogramByGraphStatId(graphOrStatId) ?: return null
         return Pair(th.id, th)
     }
 
-    override suspend fun shouldPreen(
-        dataInteractor: DataInteractor,
-        graphOrStat: GraphOrStat
-    ): Boolean {
+    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
         return dataInteractor.getTimeHistogramByGraphStatId(graphOrStat.id) == null
     }
 
-    override suspend fun duplicate(
-        dataInteractor: DataInteractor,
-        oldGraphId: Long,
-        newGraphId: Long
-    ) {
+    override suspend fun duplicate(oldGraphId: Long, newGraphId: Long) {
         val timeHistogram = dataInteractor.getTimeHistogramByGraphStatId(oldGraphId)
         val copy = timeHistogram?.copy(id = 0, graphStatId = newGraphId)
         copy?.let { dataInteractor.insertTimeHistogram(it) }

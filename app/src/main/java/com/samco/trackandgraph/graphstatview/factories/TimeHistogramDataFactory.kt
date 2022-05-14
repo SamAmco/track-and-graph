@@ -18,22 +18,27 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.TimeHistogram
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
-import com.samco.trackandgraph.graphstatconstants.TimeHistogramWindowData
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
+import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 import kotlin.math.min
 
-class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramViewData>() {
+class TimeHistogramDataFactory @Inject constructor(
+    dataInteractor: DataInteractor,
+    @IODispatcher ioDispatcher: CoroutineDispatcher
+) : ViewDataFactory<TimeHistogram, ITimeHistogramViewData>(dataInteractor, ioDispatcher) {
     override suspend fun createViewData(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
@@ -43,11 +48,10 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
                 override val graphOrStat = graphOrStat
                 override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
             }
-        return createViewData(dataInteractor, graphOrStat, timeHistogram, onDataSampled)
+        return createViewData(graphOrStat, timeHistogram, onDataSampled)
     }
 
     override suspend fun createViewData(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         config: TimeHistogram,
         onDataSampled: (List<DataPoint>) -> Unit
@@ -56,7 +60,7 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
             val timeHistogramDataHelper =
                 TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
             val barValues =
-                getBarValues(dataInteractor, config, onDataSampled, timeHistogramDataHelper)
+                getBarValues(config, onDataSampled, timeHistogramDataHelper)
             val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.values?.toList())
             val maxDisplayHeight = largestBin?.let {
                 min(
@@ -82,7 +86,6 @@ class TimeHistogramDataFactory : ViewDataFactory<TimeHistogram, ITimeHistogramVi
     }
 
     private suspend fun getBarValues(
-        dataInteractor: DataInteractor,
         config: TimeHistogram,
         onDataSampled: (List<DataPoint>) -> Unit,
         timeHistogramDataHelper: TimeHistogramDataHelper

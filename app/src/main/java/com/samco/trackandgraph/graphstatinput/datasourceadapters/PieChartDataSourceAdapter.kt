@@ -20,10 +20,12 @@ package com.samco.trackandgraph.graphstatinput.datasourceadapters
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.base.model.DataInteractor
+import javax.inject.Inject
 
-class PieChartDataSourceAdapter : GraphStatDataSourceAdapter<PieChart>() {
+class PieChartDataSourceAdapter @Inject constructor(
+    dataInteractor: DataInteractor
+) : GraphStatDataSourceAdapter<PieChart>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        dataInteractor: DataInteractor,
         graphOrStatId: Long,
         config: PieChart,
         updateMode: Boolean
@@ -33,7 +35,6 @@ class PieChartDataSourceAdapter : GraphStatDataSourceAdapter<PieChart>() {
     }
 
     override suspend fun getConfigDataFromDatabase(
-        dataInteractor: DataInteractor,
         graphOrStatId: Long
     ): Pair<Long, PieChart>? {
         val pieChart = dataInteractor.getPieChartByGraphStatId(graphOrStatId) ?: return null
@@ -41,14 +42,12 @@ class PieChartDataSourceAdapter : GraphStatDataSourceAdapter<PieChart>() {
     }
 
     override suspend fun shouldPreen(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat
     ): Boolean {
         return dataInteractor.getPieChartByGraphStatId(graphOrStat.id) == null
     }
 
     override suspend fun duplicate(
-        dataInteractor: DataInteractor,
         oldGraphId: Long,
         newGraphId: Long
     ) {
