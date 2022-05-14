@@ -34,6 +34,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+//TODO I would like to have a working test for this but right now the view model is tightly
+// coupled with too many dependencies and the test would be too complicated. I need to inject
+// the graph stat data factories
+/*
 @OptIn(ExperimentalCoroutinesApi::class)
 class GroupViewModelTest {
 
@@ -59,10 +63,6 @@ class GroupViewModelTest {
 
     @Test
     fun `When data update events are emitted the viewmodel updates the graphs`() = runTest {
-        //TODO I would like to have a working test for this but right now the view model is tightly
-        // coupled with too many dependencies and the test would be too complicated. I need to inject
-        // the graph stat data factories
-/*
         //PREPARE
         val groupId = 1L
         val graphStatId = 2L
@@ -104,6 +104,6 @@ class GroupViewModelTest {
 
         //VERIFY
         verify(dataInteractor, times(2)).getPieChartByGraphStatId(eq(graphStatId))
-*/
+
     }
-}
+}*/
