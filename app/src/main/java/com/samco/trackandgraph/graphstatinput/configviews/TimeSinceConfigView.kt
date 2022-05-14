@@ -25,7 +25,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatSpinner
-import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
+import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
 import com.samco.trackandgraph.databinding.TimeSinceInputLayoutBinding
 import com.samco.trackandgraph.ui.DurationInputView
 

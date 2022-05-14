@@ -15,8 +15,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -36,8 +35,13 @@ const val SQLITE_MIME_TYPE = "application/vnd.sqlite3"
 
 @AndroidEntryPoint
 class BackupAndRestoreFragment : Fragment() {
+
     private lateinit var binding: BackupAndRestoreFragmentBinding
     private val viewModel by viewModels<BackupAndRestoreViewModel>()
+
+    //TODO need to re-write the alarm manager stuff, shouldn't need this in a fragment
+    @Inject
+    lateinit var dataInteractor: DataInteractor
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,7 +82,7 @@ class BackupAndRestoreFragment : Fragment() {
             when (it) {
                 true -> restartApp()
                 false -> {
-                    RemindersHelper.syncAlarms(requireContext())
+                    RemindersHelper.syncAlarms(requireContext(), dataInteractor)
                     val color =
                         binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.restoreFeedbackText.setTextColor(color)
@@ -152,7 +156,7 @@ class BackupAndRestoreFragment : Fragment() {
                 )
             }
             RESTORE_DATABASE_REQUEST_CODE -> {
-                RemindersHelper.clearAlarms(requireContext())
+                RemindersHelper.clearAlarms(requireContext(), dataInteractor)
                 viewModel.restoreDatabase(
                     resultData?.data?.let { activity?.contentResolver?.openInputStream(it) }
                 )
@@ -163,8 +167,7 @@ class BackupAndRestoreFragment : Fragment() {
 
 @HiltViewModel
 class BackupAndRestoreViewModel @Inject constructor(
-    private val database: TrackAndGraphDatabase,
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     class BackupRestoreException(val stringResource: Int?)
 
@@ -184,7 +187,7 @@ class BackupAndRestoreViewModel @Inject constructor(
     private val ioScope = CoroutineScope(Dispatchers.IO + workerJob)
 
     fun exportDatabase(outputStream: OutputStream?) {
-        val databaseFilePath = database.openHelper.readableDatabase.path
+        val databaseFilePath = dataInteractor.getDatabaseFilePath()
 
         if (outputStream == null) {
             error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
@@ -205,7 +208,7 @@ class BackupAndRestoreViewModel @Inject constructor(
         _inProgress.value = true
         ioScope.launch {
             try {
-                dao.doRawQuery(
+                dataInteractor.doRawQuery(
                     SimpleSQLiteQuery("PRAGMA wal_checkpoint(full)")
                 )
 
@@ -227,7 +230,7 @@ class BackupAndRestoreViewModel @Inject constructor(
     }
 
     fun restoreDatabase(inputStream: InputStream?) {
-        val databaseFilePath = database.openHelper.writableDatabase.path
+        val databaseFilePath = dataInteractor.getDatabaseFilePath()
 
         if (inputStream == null) {
             error = BackupRestoreException(R.string.restore_error_could_not_read_from_database_file)
@@ -243,7 +246,7 @@ class BackupAndRestoreViewModel @Inject constructor(
         _inProgress.value = true
         ioScope.launch {
             try {
-                database.openHelper.close()
+                dataInteractor.closeOpenHelper()
 
                 inputStream.use { inStream ->
                     File(databaseFilePath).outputStream().use { inStream.copyTo(it) }

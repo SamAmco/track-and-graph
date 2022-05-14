@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.functionslib
+package com.samco.trackandgraph.graphstatview
 
 import com.samco.trackandgraph.graphstatview.factories.DataDisplayIntervalHelper
 import junit.framework.Assert.assertTrue

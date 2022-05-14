@@ -17,8 +17,7 @@
 
 package com.samco.trackandgraph.functions.functions
 
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.sampling.DataSampleFunction
+import com.samco.trackandgraph.base.database.sampling.DataSample
 
 /**
  * A calculator that simply applies the operations of all provided calculators in order

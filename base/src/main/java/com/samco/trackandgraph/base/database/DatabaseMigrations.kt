@@ -2,8 +2,8 @@ package com.samco.trackandgraph.base.database
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.samco.trackandgraph.base.database.dto.CheckedDays
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.entity.CheckedDays
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types

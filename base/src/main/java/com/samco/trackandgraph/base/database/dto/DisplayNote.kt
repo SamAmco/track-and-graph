@@ -17,30 +17,13 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-import androidx.room.ColumnInfo
 import org.threeten.bp.OffsetDateTime
 
-enum class NoteType {
-    DATA_POINT,
-    GLOBAL_NOTE
-}
-
 data class DisplayNote(
-    @ColumnInfo(name = "timestamp")
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
-
-    @ColumnInfo(name = "note_type")
     val noteType: NoteType,
-
-    @ColumnInfo(name = "feature_id")
     val featureId: Long?,
-
-    @ColumnInfo(name = "feature_name")
     val featureName: String?,
-
-    @ColumnInfo(name = "group_id")
     val groupId: Long?,
-
-    @ColumnInfo(name = "note")
     val note: String
 )

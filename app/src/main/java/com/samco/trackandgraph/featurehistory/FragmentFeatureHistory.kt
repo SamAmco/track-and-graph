@@ -28,11 +28,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.DataPoint
-import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.stringFromOdt
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentFeatureHistoryBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
@@ -167,7 +166,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
 @HiltViewModel
 class FeatureHistoryViewModel @Inject constructor(
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ): ViewModel() {
     private val _feature = MutableLiveData<Feature?>(null)
     val feature: LiveData<Feature?> = _feature
@@ -184,15 +183,15 @@ class FeatureHistoryViewModel @Inject constructor(
     fun setFeatureId(featureId: Long) {
         if (this.featureId != null) return
         this.featureId = featureId
-        this.dataPoints = dao.getDataPointsForFeature(featureId)
+        this.dataPoints = dataInteractor.getDataPointsForFeature(featureId)
         ioScope.launch {
-            val feature = dao.getFeatureById(featureId)
+            val feature = dataInteractor.getFeatureById(featureId)
             withContext(Dispatchers.Main) { _feature.value = feature }
         }
     }
 
     fun deleteDataPoint() = currentActionDataPoint?.let {
-        ioScope.launch { dao.deleteDataPoint(it) }
+        ioScope.launch { dataInteractor.deleteDataPoint(it) }
     }
 
     override fun onCleared() {

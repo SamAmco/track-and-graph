@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
 import com.androidplot.pie.Segment
-import com.samco.trackandgraph.base.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
 
 interface IPieChartViewData : IGraphStatViewData {
     val segments: List<Segment>?

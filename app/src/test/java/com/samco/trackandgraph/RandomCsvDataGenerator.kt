@@ -1,16 +1,19 @@
 package com.samco.trackandgraph
 
-import com.samco.trackandgraph.base.database.databaseFormatter
 import com.samco.trackandgraph.util.CSVReadWriter
 
 import org.threeten.bp.OffsetDateTime
 import java.io.File
 import java.io.PrintWriter
+import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.random.Random
 
+/*
 class RandomCsvDataGenerator {
+
+    private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
     data class LineData(val featureName: String, val featureValue: String)
 
@@ -118,3 +121,5 @@ class RandomCsvDataGenerator {
         }
     }
 }
+
+ */

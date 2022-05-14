@@ -23,11 +23,14 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 
-class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView) :
-    GroupChildViewHolder(graphStatCardView), PopupMenu.OnMenuItemClickListener {
+class GraphStatViewHolder(
+    private val graphStatCardView: GraphStatCardView,
+    private val gsiProvider: GraphStatInteractorProvider
+) : GroupChildViewHolder(graphStatCardView), PopupMenu.OnMenuItemClickListener {
     private var clickListener: GraphStatClickListener? = null
     private var graphStat: IGraphStatViewData? = null
     private var dropElevation = 0f
@@ -41,7 +44,8 @@ class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView) :
         this.clickListener = clickListener
         graphStatCardView.menuButtonClickListener = { v -> createContextMenu(v) }
         graphStatCardView.cardView.setOnClickListener { clickListener.onClick(graphStat) }
-        graphStatCardView.graphStatView.initFromGraphStat(graphStat, true)
+        val decorator = gsiProvider.getDecorator(graphStat.graphOrStat.type, true)
+        graphStatCardView.graphStatView.initFromGraphStat(graphStat, decorator)
     }
 
     override fun elevateCard() {
@@ -76,13 +80,13 @@ class GraphStatViewHolder(private val graphStatCardView: GraphStatCardView) :
     }
 
     companion object {
-        fun from(parent: ViewGroup): GraphStatViewHolder {
+        fun from(parent: ViewGroup, gsiProvider: GraphStatInteractorProvider): GraphStatViewHolder {
             val graphStat = GraphStatCardView(parent.context)
             graphStat.layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.WRAP_CONTENT
             )
-            return GraphStatViewHolder(graphStat)
+            return GraphStatViewHolder(graphStat, gsiProvider)
         }
     }
 }

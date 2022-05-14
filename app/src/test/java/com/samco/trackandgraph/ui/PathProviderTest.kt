@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.ui
 
-import com.samco.trackandgraph.base.database.entity.DataType
-import com.samco.trackandgraph.base.database.entity.Feature
-import com.samco.trackandgraph.base.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.Group
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 

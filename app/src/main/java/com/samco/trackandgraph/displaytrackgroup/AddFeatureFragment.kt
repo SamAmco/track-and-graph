@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.displaytrackgroup
 
 import android.app.AlertDialog
-import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
@@ -33,7 +32,6 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.room.withTransaction
 import com.samco.trackandgraph.databinding.AddFeatureFragmentBinding
 import com.samco.trackandgraph.databinding.FeatureDiscreteValueListItemBinding
 import kotlinx.coroutines.*
@@ -44,12 +42,11 @@ import androidx.fragment.app.viewModels
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.entity.DataPoint
-import com.samco.trackandgraph.base.database.entity.DataType
-import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -224,15 +221,15 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     }
 
     private fun observeFeatureType() {
-        viewModel.featureType.observe(viewLifecycleOwner, Observer {
+        viewModel.featureType.observe(viewLifecycleOwner) {
             onFeatureTypeChanged(it)
-        })
+        }
     }
 
     private fun observeHasDefaultValue() {
-        viewModel.featureHasDefaultValue.observe(viewLifecycleOwner, Observer {
+        viewModel.featureHasDefaultValue.observe(viewLifecycleOwner) {
             updateDefaultValuesViewFromViewModel(it)
-        })
+        }
     }
 
     private fun updateDefaultValuesViewFromViewModel(checked: Boolean) {
@@ -539,8 +536,7 @@ enum class DurationNumericConversionMode { HOURS, MINUTES, SECONDS }
 
 @HiltViewModel
 class AddFeatureViewModel @Inject constructor(
-    private val database: TrackAndGraphDatabase,
-    private val dao: TrackAndGraphDatabaseDao
+    private val dataInteractor: DataInteractor
 ) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -580,7 +576,7 @@ class AddFeatureViewModel @Inject constructor(
         ioScope.launch {
             if (existingFeatureId > -1) {
                 updateMode = true
-                existingFeature = dao.getFeatureById(existingFeatureId)
+                existingFeature = dataInteractor.getFeatureById(existingFeatureId)
                 val existingDiscreteValues = existingFeature!!.discreteValues
                     .sortedBy { f -> f.index }
                     .map { f -> MutableLabel(f.label, f.index) }
@@ -621,7 +617,7 @@ class AddFeatureViewModel @Inject constructor(
         _state.value = AddFeatureState.ADDING
         ioScope.launch {
             try {
-                database!!.withTransaction {
+                dataInteractor.withTransaction {
                     if (updateMode) updateFeature()
                     else addFeature()
                 }
@@ -654,7 +650,7 @@ class AddFeatureViewModel @Inject constructor(
             featureHasDefaultValue.value!!, featureDefaultValue.value!!,
             featureDescription
         )
-        dao.updateFeature(feature)
+        dataInteractor.updateFeature(feature)
     }
 
     private fun updateAllExistingDataPointsForTransformation(valOfDiscVal: (MutableLabel) -> Int) {
@@ -676,7 +672,7 @@ class AddFeatureViewModel @Inject constructor(
     }
 
     private fun updateDurationDataPointsToContinuous() {
-        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature!!.id)
+        val oldDataPoints = dataInteractor.getDataPointsForFeatureSync(existingFeature!!.id)
         val divisor = when (durationNumericConversionMode.value) {
             DurationNumericConversionMode.HOURS -> 3600.0
             DurationNumericConversionMode.MINUTES -> 60.0
@@ -693,11 +689,11 @@ class AddFeatureViewModel @Inject constructor(
                 it.note
             )
         }
-        dao.updateDataPoints(newDataPoints)
+        dataInteractor.updateDataPoints(newDataPoints)
     }
 
     private fun updateContinuousDataPointsToDurations() {
-        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature!!.id)
+        val oldDataPoints = dataInteractor.getDataPointsForFeatureSync(existingFeature!!.id)
         val multiplier = when (durationNumericConversionMode.value) {
             DurationNumericConversionMode.HOURS -> 3600.0
             DurationNumericConversionMode.MINUTES -> 60.0
@@ -714,7 +710,7 @@ class AddFeatureViewModel @Inject constructor(
                 it.note
             )
         }
-        dao.updateDataPoints(newDataPoints)
+        dataInteractor.updateDataPoints(newDataPoints)
     }
 
     private fun updateDiscreteValueDataPoints(valOfDiscVal: (MutableLabel) -> Int) {
@@ -732,7 +728,7 @@ class AddFeatureViewModel @Inject constructor(
     }
 
     private fun stripDataPointsToValue() {
-        val oldDataPoints = dao.getDataPointsForFeatureSync(existingFeature!!.id)
+        val oldDataPoints = dataInteractor.getDataPointsForFeatureSync(existingFeature!!.id)
         val newDataPoints = oldDataPoints.map {
             DataPoint(
                 it.timestamp,
@@ -742,15 +738,15 @@ class AddFeatureViewModel @Inject constructor(
                 it.note
             )
         }
-        dao.updateDataPoints(newDataPoints)
+        dataInteractor.updateDataPoints(newDataPoints)
     }
 
     private fun removeExistingDataPointsForDiscreteValue(index: Int) {
-        dao.deleteAllDataPointsForDiscreteValue(existingFeature!!.id, index.toDouble())
+        dataInteractor.deleteAllDataPointsForDiscreteValue(existingFeature!!.id, index.toDouble())
     }
 
     private fun updateExistingDataPointsForDiscreteValue(valMap: Map<Int, Pair<Int, String>>) {
-        val oldValues = dao.getDataPointsForFeatureSync(existingFeature!!.id)
+        val oldValues = dataInteractor.getDataPointsForFeatureSync(existingFeature!!.id)
         val newValues = oldValues.map { v ->
             DataPoint(
                 v.timestamp, v.featureId,
@@ -758,7 +754,7 @@ class AddFeatureViewModel @Inject constructor(
                 valMap[v.value.toInt()]!!.second, v.note
             )
         }
-        dao.updateDataPoints(newValues)
+        dataInteractor.updateDataPoints(newValues)
     }
 
     private fun addFeature() {
@@ -773,7 +769,7 @@ class AddFeatureViewModel @Inject constructor(
             featureHasDefaultValue.value!!, featureDefaultValue.value!!,
             featureDescription
         )
-        dao.insertFeature(feature)
+        dataInteractor.insertFeature(feature)
     }
 
     override fun onCleared() {

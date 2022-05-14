@@ -18,8 +18,8 @@
 package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.functions.sampling.DataSample
-import com.samco.trackandgraph.functions.sampling.DataSampleProperties
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.functions.exceptions.InvalidRegularityException
 import com.samco.trackandgraph.functions.functions.CompositeFunction
