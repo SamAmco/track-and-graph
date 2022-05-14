@@ -1,0 +1,9 @@
+Handle larger number of labels in pie charts
+Remove max multiple choice answers
+Add checkboxes for filter by label/value to:
+	- Time since last stat
+	- Average time between stat
+Filter Time since and av time between on both label and value
+sort feature name lists alphabetically
+Better error resolution for graphs
+Average time between stat no longer contains the time since the last data point
