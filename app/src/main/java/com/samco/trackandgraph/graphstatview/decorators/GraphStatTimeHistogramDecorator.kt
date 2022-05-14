@@ -23,9 +23,9 @@ import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
-import com.samco.trackandgraph.graphstatconstants.TimeHistogramWindowData
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.ui.dataVisColorGenerator

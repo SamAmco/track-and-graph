@@ -36,22 +36,13 @@ import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
-import com.samco.trackandgraph.di.DefaultDispatcher
-import com.samco.trackandgraph.di.IODispatcher
-import com.samco.trackandgraph.di.MainDispatcher
 import com.samco.trackandgraph.displaytrackgroup.*
-import com.samco.trackandgraph.graphstatconstants.graphStatTypes
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import org.threeten.bp.Instant
-import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 /**
@@ -64,6 +55,9 @@ import javax.inject.Inject
 class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
+
+    @Inject
+    lateinit var gsiProvider: GraphStatInteractorProvider
 
     private lateinit var binding: FragmentGroupBinding
     private lateinit var adapter: GroupAdapter
@@ -86,7 +80,8 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         adapter = GroupAdapter(
             createFeatureClickListener(),
             createGraphStatClickListener(),
-            createGroupClickListener()
+            createGroupClickListener(),
+            gsiProvider
         )
         binding.itemList.adapter = adapter
         disableChangeAnimations()
@@ -419,199 +414,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             getString(R.string.ru_sure_del_feature) -> id?.let { viewModel.onDeleteFeature(it.toLong()) }
             getString(R.string.ru_sure_del_group) -> id?.let { viewModel.onDeleteGroup(it.toLong()) }
             getString(R.string.ru_sure_del_graph) -> id?.let { viewModel.onDeleteGraphStat(it.toLong()) }
-        }
-    }
-}
-
-@HiltViewModel
-class GroupViewModel @Inject constructor(
-    private var dataInteractor: DataInteractor,
-    @IODispatcher private val ioDispatcher: CoroutineDispatcher,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
-    @MainDispatcher private val mainDispatcher: CoroutineDispatcher
-) : ViewModel() {
-
-    lateinit var hasFeatures: LiveData<Boolean>
-
-    lateinit var groupChildren: LiveData<List<GroupChild>>
-        private set
-
-    val features
-        get() = groupChildren.value
-            ?.filter { it.type == GroupChildType.FEATURE }
-            ?.map { it.obj as DisplayFeature }
-            ?: emptyList()
-
-    private var initialized = false
-
-    fun setGroup(groupId: Long) {
-        if (initialized) return
-        initialized = true
-        hasFeatures = Transformations.map(dataInteractor.getAllFeatures()) { it.isNotEmpty() }
-        initGroupChildren(groupId)
-    }
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun initGroupChildren(groupId: Long) {
-        groupChildren = dataInteractor.getDataUpdateEvents()
-            .onStart { emit(Unit) }
-            .debounce(100)
-            .flatMapLatest {
-                flow {
-                    val featureDataDeferred = getFeatureChildrenAsync(groupId)
-                    val groupDataDeferred = getGroupChildrenAsync(groupId)
-                    getGraphViewData(groupId).collect { graphDataPairs ->
-                        val featureData = featureDataDeferred.await()
-                        val groupData = groupDataDeferred.await()
-                        val graphData = graphsToGroupChildren(graphDataPairs)
-                        val children = mutableListOf<GroupChild>().apply {
-                            addAll(featureData)
-                            addAll(groupData)
-                            addAll(graphData)
-                        }
-                        sortChildren(children)
-                        val next = children.toList()
-                        emit(next)
-                    }
-                }
-            }
-            .flowOn(mainDispatcher)
-            .asLiveData()
-    }
-
-    private fun sortChildren(children: MutableList<GroupChild>) = children.sortWith { a, b ->
-        val aInd = a.displayIndex()
-        val bInd = b.displayIndex()
-        when {
-            aInd < bInd -> -1
-            bInd < aInd -> 1
-            else -> {
-                val aId = a.id()
-                val bId = b.id()
-                when {
-                    aId > bId -> -1
-                    bId > aId -> 1
-                    else -> 0
-                }
-            }
-        }
-    }
-
-    private fun getFeatureChildrenAsync(groupId: Long) = viewModelScope.async(ioDispatcher) {
-        return@async dataInteractor.getDisplayFeaturesForGroupSync(groupId).map {
-            GroupChild(GroupChildType.FEATURE, it, it::id, it::displayIndex)
-        }
-    }
-
-    private fun getGroupChildrenAsync(groupId: Long) = viewModelScope.async(ioDispatcher) {
-        return@async dataInteractor.getGroupsForGroupSync(groupId).map {
-            GroupChild(GroupChildType.GROUP, it, it::id, it::displayIndex)
-        }
-    }
-
-    private suspend fun getGraphViewData(groupId: Long) =
-        flow<List<Pair<Instant, IGraphStatViewData>>> {
-            val graphStats = dataInteractor.getGraphsAndStatsByGroupIdSync(groupId)
-            graphStats.forEach {
-                graphStatTypes[it.type]?.dataSourceAdapter?.preen(dataInteractor, it)
-            }
-            val loadingStates =
-                graphStats.map { Pair(Instant.now(), IGraphStatViewData.loading(it)) }
-            emit(loadingStates)
-
-            val batch = mutableListOf<Deferred<IGraphStatViewData>>()
-            for (index in graphStats.indices) {
-                val graphOrStat = graphStats[index]
-                val viewData = viewModelScope.async(defaultDispatcher) {
-                    //TODO would be really nice if we could inject these
-                    graphStatTypes[graphOrStat.type]?.dataFactory!!
-                        .getViewData(dataInteractor, graphOrStat)
-                }
-                batch.add(index, viewData)
-            }
-            emit(batch.map { Pair(Instant.now(), it.await()) })
-        }.flowOn(ioDispatcher)
-
-    private fun graphsToGroupChildren(graphs: List<Pair<Instant, IGraphStatViewData>>): List<GroupChild> {
-        return graphs.map {
-            GroupChild(
-                GroupChildType.GRAPH,
-                it,
-                { it.second.graphOrStat.id },
-                { it.second.graphOrStat.displayIndex }
-            )
-        }
-    }
-
-    fun addDefaultFeatureValue(feature: DisplayFeature) = viewModelScope.launch(ioDispatcher) {
-        val label = if (feature.featureType == DataType.DISCRETE) {
-            feature.discreteValues[feature.defaultValue.toInt()].label
-        } else ""
-        val newDataPoint = DataPoint(
-            OffsetDateTime.now(),
-            feature.id,
-            feature.defaultValue,
-            label,
-            ""
-        )
-        dataInteractor.insertDataPoint(newDataPoint)
-    }
-
-    fun onDeleteFeature(id: Long) = viewModelScope.launch(ioDispatcher) {
-        dataInteractor.deleteFeature(id)
-    }
-
-    fun adjustDisplayIndexes(items: List<GroupChild>) = viewModelScope.launch(ioDispatcher) {
-        val displayFeatures = mutableListOf<DisplayFeature>()
-        val groups = mutableListOf<Group>()
-        val graphs = mutableListOf<GraphOrStat>()
-        items.forEachIndexed { index, groupChild ->
-            when (groupChild.type) {
-                GroupChildType.GROUP -> groups.add(toGroupWithIndex(groupChild.obj, index))
-                GroupChildType.FEATURE -> displayFeatures.add(
-                    toDisplayFeatureWithIndex(
-                        groupChild.obj,
-                        index
-                    )
-                )
-                GroupChildType.GRAPH -> graphs.add(
-                    toGraphStatViewDataWithIndex(
-                        groupChild.obj,
-                        index
-                    )
-                )
-            }
-        }
-        dataInteractor.withTransaction {
-            dataInteractor.updateFeatures(displayFeatures.map { it.asFeature() })
-            dataInteractor.updateGraphStats(graphs)
-            dataInteractor.updateGroups(groups)
-        }
-    }
-
-    private fun toGraphStatViewDataWithIndex(obj: Any, index: Int): GraphOrStat {
-        val pair = obj as Pair<*, *>
-        val viewData = pair.second as IGraphStatViewData
-        return viewData.graphOrStat.copy(displayIndex = index)
-    }
-
-    private fun toDisplayFeatureWithIndex(obj: Any, index: Int) =
-        (obj as DisplayFeature).copy(displayIndex = index)
-
-    private fun toGroupWithIndex(obj: Any, index: Int) = (obj as Group).copy(displayIndex = index)
-
-    fun onDeleteGraphStat(id: Long) =
-        viewModelScope.launch(ioDispatcher) { dataInteractor.deleteGraphOrStat(id) }
-
-    fun onDeleteGroup(id: Long) =
-        viewModelScope.launch(ioDispatcher) { dataInteractor.deleteGroup(id) }
-
-    fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
-        viewModelScope.launch(ioDispatcher) {
-            dataInteractor.withTransaction {
-                val gs = graphOrStatViewData.graphOrStat
-                graphStatTypes[gs.type]?.dataSourceAdapter?.duplicateGraphOrStat(dataInteractor, gs)
-            }
         }
     }
 }

@@ -26,8 +26,8 @@ import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.databinding.PieChartInputViewBinding
-import com.samco.trackandgraph.graphstatconstants.maxGraphPeriodDurations
 import com.samco.trackandgraph.graphstatinput.ValidationException
+import com.samco.trackandgraph.maxGraphPeriodDurations
 
 internal class PieChartConfigView @JvmOverloads constructor(
     context: Context,

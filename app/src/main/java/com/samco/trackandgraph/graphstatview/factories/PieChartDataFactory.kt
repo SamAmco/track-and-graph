@@ -24,16 +24,22 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
+class PieChartDataFactory @Inject constructor(
+    dataInteractor: DataInteractor,
+    @IODispatcher ioDispatcher: CoroutineDispatcher
+) : ViewDataFactory<PieChart, IPieChartViewData>(dataInteractor, ioDispatcher) {
+
     override suspend fun createViewData(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IPieChartViewData {
@@ -43,17 +49,16 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
                 override val graphOrStat = graphOrStat
                 override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
             }
-        return createViewData(dataInteractor, graphOrStat, pieChart, onDataSampled)
+        return createViewData(graphOrStat, pieChart, onDataSampled)
     }
 
     override suspend fun createViewData(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         config: PieChart,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IPieChartViewData {
         return try {
-            val plottingData = tryGetPlottableDataForPieChart(dataInteractor, config, onDataSampled)
+            val plottingData = tryGetPlottableDataForPieChart(config, onDataSampled)
                 ?: return object : IPieChartViewData {
                     override val state = IGraphStatViewData.State.READY
                     override val graphOrStat = graphOrStat
@@ -79,7 +84,6 @@ class PieChartDataFactory : ViewDataFactory<PieChart, IPieChartViewData>() {
     }
 
     private suspend fun tryGetPlottableDataForPieChart(
-        dataInteractor: DataInteractor,
         pieChart: PieChart,
         onDataSampled: (List<DataPoint>) -> Unit
     ): List<IDataPoint>? {

@@ -20,10 +20,12 @@ package com.samco.trackandgraph.graphstatinput.datasourceadapters
 import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.model.DataInteractor
+import javax.inject.Inject
 
-class AverageTimeBetweenDataSourceAdapter : GraphStatDataSourceAdapter<AverageTimeBetweenStat>() {
+class AverageTimeBetweenDataSourceAdapter @Inject constructor(
+    dataInteractor: DataInteractor
+) : GraphStatDataSourceAdapter<AverageTimeBetweenStat>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        dataInteractor: DataInteractor,
         graphOrStatId: Long,
         config: AverageTimeBetweenStat,
         updateMode: Boolean
@@ -32,26 +34,17 @@ class AverageTimeBetweenDataSourceAdapter : GraphStatDataSourceAdapter<AverageTi
         else dataInteractor.insertAverageTimeBetweenStat(config.copy(graphStatId = graphOrStatId))
     }
 
-    override suspend fun getConfigDataFromDatabase(
-        dataInteractor: DataInteractor,
-        graphOrStatId: Long
-    ): Pair<Long, AverageTimeBetweenStat>? {
-        val ats = dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStatId) ?: return null
+    override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, AverageTimeBetweenStat>? {
+        val ats =
+            dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStatId) ?: return null
         return Pair(ats.id, ats)
     }
 
-    override suspend fun shouldPreen(
-        dataInteractor: DataInteractor,
-        graphOrStat: GraphOrStat
-    ): Boolean {
+    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
         return dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id) == null
     }
 
-    override suspend fun duplicate(
-        dataInteractor: DataInteractor,
-        oldGraphId: Long,
-        newGraphId: Long
-    ) {
+    override suspend fun duplicate(oldGraphId: Long, newGraphId: Long) {
         val avTimeStat = dataInteractor.getAverageTimeBetweenStatByGraphStatId(oldGraphId)
         val copy = avTimeStat?.copy(id = 0, graphStatId = newGraphId)
         copy?.let { dataInteractor.insertAverageTimeBetweenStat(it) }

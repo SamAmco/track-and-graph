@@ -22,6 +22,7 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
@@ -30,26 +31,29 @@ import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
+import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Inject
 
-class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceViewData>() {
+class TimeSinceDataFactory @Inject constructor(
+    dataInteractor: DataInteractor,
+    @IODispatcher ioDispatcher: CoroutineDispatcher
+) : ViewDataFactory<TimeSinceLastStat, ITimeSinceViewData>(dataInteractor, ioDispatcher) {
     override suspend fun createViewData(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
         val timeSinceStat = dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
-        return createViewData(dataInteractor, graphOrStat, timeSinceStat, onDataSampled)
+        return createViewData(graphOrStat, timeSinceStat, onDataSampled)
     }
 
     override suspend fun createViewData(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat,
         config: TimeSinceLastStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeSinceViewData {
         return try {
-            val dataPoint = getLastDataPoint(dataInteractor, config, onDataSampled)
+            val dataPoint = getLastDataPoint(config, onDataSampled)
                 ?: return notEnoughData(graphOrStat, 0)
             object : ITimeSinceViewData {
                 override val lastDataPoint = dataPoint
@@ -80,7 +84,6 @@ class TimeSinceViewDataFactory : ViewDataFactory<TimeSinceLastStat, ITimeSinceVi
         }
 
     private suspend fun getLastDataPoint(
-        dataInteractor: DataInteractor,
         config: TimeSinceLastStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): IDataPoint? {

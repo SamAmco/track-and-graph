@@ -20,11 +20,13 @@ package com.samco.trackandgraph.graphstatinput.datasourceadapters
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
 import com.samco.trackandgraph.base.model.DataInteractor
+import javax.inject.Inject
 
 
-class TimeSinceDataSourceAdapter : GraphStatDataSourceAdapter<TimeSinceLastStat>() {
+class TimeSinceDataSourceAdapter @Inject constructor(
+    dataInteractor: DataInteractor
+) : GraphStatDataSourceAdapter<TimeSinceLastStat>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        dataInteractor: DataInteractor,
         graphOrStatId: Long,
         config: TimeSinceLastStat,
         updateMode: Boolean
@@ -34,7 +36,6 @@ class TimeSinceDataSourceAdapter : GraphStatDataSourceAdapter<TimeSinceLastStat>
     }
 
     override suspend fun getConfigDataFromDatabase(
-        dataInteractor: DataInteractor,
         graphOrStatId: Long
     ): Pair<Long, TimeSinceLastStat>? {
         val tss = dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStatId) ?: return null
@@ -42,14 +43,12 @@ class TimeSinceDataSourceAdapter : GraphStatDataSourceAdapter<TimeSinceLastStat>
     }
 
     override suspend fun shouldPreen(
-        dataInteractor: DataInteractor,
         graphOrStat: GraphOrStat
     ): Boolean {
         return dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStat.id) == null
     }
 
     override suspend fun duplicate(
-        dataInteractor: DataInteractor,
         oldGraphId: Long,
         newGraphId: Long
     ) {

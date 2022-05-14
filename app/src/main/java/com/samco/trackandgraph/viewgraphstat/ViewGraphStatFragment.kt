@@ -44,7 +44,7 @@ import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
-import com.samco.trackandgraph.graphstatconstants.graphStatTypes
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.FeaturePathProvider
@@ -71,6 +71,9 @@ class ViewGraphStatFragment : Fragment() {
     private val minGraphHeightRatioLandscape = 0f
 
     private var showHideNotesAnimator: ValueAnimator? = null
+
+    @Inject
+    lateinit var gsiProvider: GraphStatInteractorProvider
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -242,7 +245,8 @@ class ViewGraphStatFragment : Fragment() {
 
     private fun observeGraphStatViewData() {
         viewModel.graphStatViewData.observe(viewLifecycleOwner) {
-            graphStatView.initFromGraphStat(it, false)
+            val decorator = gsiProvider.getDecorator(it.graphOrStat.type, false)
+            graphStatView.initFromGraphStat(it, decorator)
         }
     }
 }
@@ -251,7 +255,8 @@ enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
 
 @HiltViewModel
 class ViewGraphStatViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    private val gsiProvider: GraphStatInteractorProvider
 ) : ViewModel() {
     var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyList(), emptyList())
         private set
@@ -328,8 +333,8 @@ class ViewGraphStatViewModel @Inject constructor(
 
     private suspend fun initFromGraphStatId(graphStatId: Long) {
         val graphStat = dataInteractor.getGraphStatById(graphStatId)
-        val viewData = graphStatTypes[graphStat.type]
-            ?.dataFactory!!.getViewData(dataInteractor, graphStat, this::onSampledDataPoints)
+        val viewData = gsiProvider.getDataFactory(graphStat.type)
+            .getViewData(graphStat, this::onSampledDataPoints)
         withContext(Dispatchers.Main) { _graphStatViewData.value = viewData }
     }
 

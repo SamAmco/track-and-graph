@@ -40,8 +40,8 @@ import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.graphstatconstants.graphStatTypes
 import com.samco.trackandgraph.graphstatinput.configviews.*
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,7 +49,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.lang.Exception
 import javax.inject.Inject
-import kotlin.reflect.full.primaryConstructor
 
 @AndroidEntryPoint
 class GraphStatInputFragment : Fragment() {
@@ -63,6 +62,9 @@ class GraphStatInputFragment : Fragment() {
     private lateinit var currentConfigView: GraphStatConfigView
 
     private var lastPreviewButtonDownPosY = 0f
+
+    @Inject
+    lateinit var gsiProvider: GraphStatInteractorProvider
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -195,12 +197,10 @@ class GraphStatInputFragment : Fragment() {
     }
 
     private fun inflateConfigView(graphStatType: GraphStatType) {
-        graphStatTypes[graphStatType]?.configViewClass
-            ?.primaryConstructor?.call(requireContext(), null, 0)
-            ?.let {
-                currentConfigView = it
-                binding.configLayout.addView(it)
-            }
+        gsiProvider.getConfigView(graphStatType, requireContext()).let {
+            currentConfigView = it
+            binding.configLayout.addView(it)
+        }
     }
 
     private fun listenToFormValid() {
@@ -222,7 +222,8 @@ class GraphStatInputFragment : Fragment() {
                 binding.previewOverlay.visibility = View.GONE
             } else {
                 binding.btnPreivew.visibility = View.VISIBLE
-                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, true)
+                val decorator = gsiProvider.getDecorator(data.graphOrStat.type, true)
+                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, decorator)
             }
             if (viewModel.formValid.value != null) {
                 binding.demoGraphStatCardView.graphStatView.initError(
@@ -244,7 +245,8 @@ class ValidationException(val errorMessageId: Int) : Exception()
 
 @HiltViewModel
 class GraphStatInputViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    private val gsiProvider: GraphStatInteractorProvider
 ) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
@@ -310,8 +312,7 @@ class GraphStatInputViewModel @Inject constructor(
             return
         }
 
-        val configData = graphStatTypes[graphStat.type]
-            ?.dataSourceAdapter!!.getConfigData(dataInteractor, graphStatId)
+        val configData = gsiProvider.getDataSourceAdapter(graphStat.type).getConfigData(graphStatId)
 
         configData?.first?.let {
             withContext(Dispatchers.Main) {
@@ -359,10 +360,9 @@ class GraphStatInputViewModel @Inject constructor(
         withContext(Dispatchers.Main) {
             _demoViewData.value = IGraphStatViewData.loading(graphOrStat)
         }
-        val graphStatType = graphStatTypes[graphOrStat.type]
-        val demoData = graphStatType?.dataFactory
-            ?.getViewData(dataInteractor, graphOrStat, _configData.value!!) {}
-        withContext(Dispatchers.Main) { demoData?.let { _demoViewData.value = it } }
+        val demoData = gsiProvider.getDataFactory(graphOrStat.type)
+            .getViewData(graphOrStat, _configData.value!!) {}
+        withContext(Dispatchers.Main) { _demoViewData.value = demoData }
     }
 
     private fun validateConfiguration() {
@@ -388,8 +388,8 @@ class GraphStatInputViewModel @Inject constructor(
                     dataInteractor.insertGraphOrStat(constructGraphOrStat())
                 }
 
-                graphStatTypes[_graphStatType.value]?.dataSourceAdapter?.writeConfig(
-                    dataInteractor, graphStatId, _configData.value!!, _updateMode.value!!
+                gsiProvider.getDataSourceAdapter(_graphStatType.value!!).writeConfig(
+                    graphStatId, _configData.value!!, _updateMode.value!!
                 )
             }
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
