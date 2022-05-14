@@ -27,6 +27,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.*
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -48,11 +49,11 @@ annotation class MainDispatcher
 @InstallIn(SingletonComponent::class)
 class AppModule {
     @Provides
+    @Singleton
     fun getDataInteractor(
         @ApplicationContext context: Context,
         @IODispatcher io: CoroutineDispatcher
-    ): DataInteractor =
-        DataInteractor.getInstance(context, io)
+    ): DataInteractor = DataInteractor.getInstance(context, io)
 
     @Provides
     fun getContentResolver(@ApplicationContext context: Context): ContentResolver =
