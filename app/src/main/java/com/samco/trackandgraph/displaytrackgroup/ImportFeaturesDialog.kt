@@ -203,9 +203,7 @@ class ImportFeaturesViewModel @Inject constructor(
                     withContext(Dispatchers.IO) {
                         val inputStream = contentResolver.openInputStream(it)
                         if (inputStream != null) {
-                            dataInteractor.withTransaction {
-                                CSVReadWriter.readFeaturesFromCSV(dataInteractor, inputStream, trackGroupId)
-                            }
+                            CSVReadWriter.readFeaturesFromCSV(dataInteractor, inputStream, trackGroupId)
                         }
                     }
                 } catch (e: CSVReadWriter.ImportFeaturesException) { _importException.value = e }

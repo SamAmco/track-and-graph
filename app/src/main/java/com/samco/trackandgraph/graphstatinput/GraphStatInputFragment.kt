@@ -40,6 +40,9 @@ import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.DefaultDispatcher
+import com.samco.trackandgraph.di.IODispatcher
+import com.samco.trackandgraph.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -246,11 +249,11 @@ class ValidationException(val errorMessageId: Int) : Exception()
 @HiltViewModel
 class GraphStatInputViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
-    private val gsiProvider: GraphStatInteractorProvider
+    private val gsiProvider: GraphStatInteractorProvider,
+    @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher,
+    @DefaultDispatcher private val worker: CoroutineDispatcher
 ) : ViewModel() {
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
-    private val workScope = CoroutineScope(Dispatchers.Default + updateJob)
 
     private var graphStatGroupId: Long = -1L
     private var graphStatId: Long? = null
@@ -287,7 +290,7 @@ class GraphStatInputViewModel @Inject constructor(
         if (this.graphStatGroupId != -1L) return
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
-        ioScope.launch {
+        viewModelScope.launch(io) {
             val allFeatures = dataInteractor.getAllFeaturesSync()
             val allGroups = dataInteractor.getAllGroupsSync()
             //TODO Need to get an actual data sample and iterate to get actual labels and properties
@@ -300,7 +303,7 @@ class GraphStatInputViewModel @Inject constructor(
             }
             featureDataProvider = FeatureDataProvider(featureData, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
-            else withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
+            else withContext(ui) { _state.value = GraphStatInputState.WAITING }
         }
     }
 
@@ -308,14 +311,14 @@ class GraphStatInputViewModel @Inject constructor(
         val graphStat = dataInteractor.tryGetGraphStatById(graphStatId)
 
         if (graphStat == null) {
-            withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
+            withContext(ui) { _state.value = GraphStatInputState.WAITING }
             return
         }
 
         val configData = gsiProvider.getDataSourceAdapter(graphStat.type).getConfigData(graphStatId)
 
         configData?.first?.let {
-            withContext(Dispatchers.Main) {
+            withContext(ui) {
                 this@GraphStatInputViewModel._graphName.value = graphStat.name
                 this@GraphStatInputViewModel._graphStatType.value = graphStat.type
                 this@GraphStatInputViewModel.graphStatId = graphStat.id
@@ -324,7 +327,7 @@ class GraphStatInputViewModel @Inject constructor(
                 this@GraphStatInputViewModel._configData.value = configData.second
             }
         }
-        withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
+        withContext(ui) { _state.value = GraphStatInputState.WAITING }
     }
 
     fun setGraphName(name: String) {
@@ -341,7 +344,7 @@ class GraphStatInputViewModel @Inject constructor(
     }
 
     internal fun onNewConfigData(config: Any?, exception: ValidationException?) {
-        workScope.coroutineContext.cancelChildren()
+        worker.cancelChildren()
         _configData.value = config
         configCache[_graphStatType.value!!] = config
         subConfigException = exception
@@ -354,15 +357,15 @@ class GraphStatInputViewModel @Inject constructor(
         else _demoViewData.value = null
     }
 
-    private fun updateDemoViewData() = workScope.launch {
+    private fun updateDemoViewData() = viewModelScope.launch(worker) {
         if (_configData.value == null) return@launch
         val graphOrStat = constructGraphOrStat()
-        withContext(Dispatchers.Main) {
+        withContext(ui) {
             _demoViewData.value = IGraphStatViewData.loading(graphOrStat)
         }
         val demoData = gsiProvider.getDataFactory(graphOrStat.type)
             .getViewData(graphOrStat, _configData.value!!) {}
-        withContext(Dispatchers.Main) { _demoViewData.value = demoData }
+        withContext(ui) { _demoViewData.value = demoData }
     }
 
     private fun validateConfiguration() {
@@ -378,25 +381,23 @@ class GraphStatInputViewModel @Inject constructor(
         if (_state.value != GraphStatInputState.WAITING) return
         if (_configData.value == null) return
         _state.value = GraphStatInputState.ADDING
-        ioScope.launch {
-            dataInteractor.withTransaction {
-                val graphStatId = if (_updateMode.value!!) {
-                    dataInteractor.updateGraphOrStat(constructGraphOrStat())
-                    graphStatId!!
-                } else {
-                    shiftUpGraphStatViewIndexes()
-                    dataInteractor.insertGraphOrStat(constructGraphOrStat())
-                }
-
-                gsiProvider.getDataSourceAdapter(_graphStatType.value!!).writeConfig(
-                    graphStatId, _configData.value!!, _updateMode.value!!
-                )
+        viewModelScope.launch(io) {
+            val graphStatId = if (_updateMode.value!!) {
+                dataInteractor.updateGraphOrStat(constructGraphOrStat())
+                graphStatId!!
+            } else {
+                shiftUpGraphStatViewIndexes()
+                dataInteractor.insertGraphOrStat(constructGraphOrStat())
             }
-            withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
+
+            gsiProvider.getDataSourceAdapter(_graphStatType.value!!).writeConfig(
+                graphStatId, _configData.value!!, _updateMode.value!!
+            )
+            withContext(ui) { _state.value = GraphStatInputState.FINISHED }
         }
     }
 
-    private fun shiftUpGraphStatViewIndexes() {
+    private suspend fun shiftUpGraphStatViewIndexes() {
         val newList = dataInteractor.getAllGraphStatsSync().map {
             it.copy(displayIndex = it.displayIndex + 1)
         }
@@ -407,9 +408,4 @@ class GraphStatInputViewModel @Inject constructor(
         graphStatId ?: 0L, graphStatGroupId, _graphName.value!!, _graphStatType.value!!,
         graphStatDisplayIndex ?: 0
     )
-
-    override fun onCleared() {
-        super.onCleared()
-        ioScope.cancel()
-    }
 }

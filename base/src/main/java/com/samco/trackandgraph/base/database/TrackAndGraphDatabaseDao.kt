@@ -142,9 +142,6 @@ internal interface TrackAndGraphDatabaseDao {
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
-    fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
