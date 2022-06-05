@@ -97,9 +97,9 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         requireContext().showKeyboard()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        requireActivity().window.hideKeyboard()
+    override fun onStop() {
+        super.onStop()
+        requireActivity().window.hideKeyboard(requireActivity().currentFocus?.windowToken)
     }
 
     private fun listenToViewModelState() {
