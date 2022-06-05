@@ -34,7 +34,8 @@ import org.threeten.bp.OffsetDateTime
 internal class DataInteractorImpl(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
-    private val io: CoroutineDispatcher
+    private val io: CoroutineDispatcher,
+    private val featureUpdater: FeatureUpdater
 ) : DataInteractor {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
@@ -132,6 +133,32 @@ internal class DataInteractorImpl(
 
     override suspend fun updateFeature(feature: Feature) = withContext(io) {
         dao.updateFeature(feature.toEntity()).also { dataUpdateEvents.emit(Unit) }
+    }
+
+    override suspend fun updateFeature(
+        oldFeature: Feature,
+        discreteValueMap: Map<DiscreteValue, DiscreteValue>,
+        durationNumericConversionMode: FeatureUpdater.DurationNumericConversionMode?,
+        newName: String?,
+        newFeatureType: DataType?,
+        newDiscreteValues: List<DiscreteValue>?,
+        hasDefaultValue: Boolean?,
+        defaultValue: Double?,
+        featureDescription: String?
+    ) = withContext(io) {
+        featureUpdater.updateFeature(
+            oldFeature,
+            discreteValueMap,
+            durationNumericConversionMode,
+            newName,
+            newFeatureType,
+            newDiscreteValues,
+            hasDefaultValue,
+            defaultValue,
+            featureDescription
+        ).also {
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
     override suspend fun deleteFeature(id: Long) = withContext(io) {

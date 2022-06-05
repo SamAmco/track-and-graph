@@ -20,6 +20,7 @@ package com.samco.trackandgraph.di
 import android.content.ContentResolver
 import android.content.Context
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.DataInteractorFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -53,7 +54,7 @@ class AppModule {
     fun getDataInteractor(
         @ApplicationContext context: Context,
         @IODispatcher io: CoroutineDispatcher
-    ): DataInteractor = DataInteractor.getInstance(context, io)
+    ): DataInteractor = DataInteractorFactory().createDataInteractor(context, io)
 
     @Provides
     fun getContentResolver(@ApplicationContext context: Context): ContentResolver =

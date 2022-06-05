@@ -17,27 +17,17 @@
 
 package com.samco.trackandgraph.base.model
 
-import android.content.Context
 import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
 
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
-interface DataInteractor {
-    companion object {
-        fun getInstance(context: Context, ioDispatcher: CoroutineDispatcher): DataInteractor {
-            val database = TrackAndGraphDatabase.getInstance(context)
-            return DataInteractorImpl(database, database.trackAndGraphDatabaseDao, ioDispatcher)
-        }
-    }
-
+interface DataInteractor : FeatureUpdater {
     @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 
