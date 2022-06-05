@@ -59,7 +59,7 @@ object CSVReadWriter {
         outStream.writer().use {
             val csvWriter = CSVPrinter(it, CSVFormat.DEFAULT.withHeader(HEADERS::class.java))
             for (feature in features) {
-                val dataPoints = dataInteractor.getDataPointsForFeatureSync(feature.id)
+                val dataPoints = dataInteractor.getDataSampleForFeatureId(feature.id).getAllRawDataPoints()
 
                 val dataPointToString = when (feature.featureType) {
                     DataType.DISCRETE -> { dp: DataPoint ->
@@ -145,7 +145,7 @@ object CSVReadWriter {
         if (newDataPoints.isNotEmpty()) dataInteractor.insertDataPoints(newDataPoints)
     }
 
-    private fun addDataPointToNewFeature(
+    private suspend fun addDataPointToNewFeature(
         dataInteractor: DataInteractor,
         existingFeatures: MutableList<Feature>,
         existingFeaturesByName: MutableMap<String, Feature>,
@@ -182,7 +182,7 @@ object CSVReadWriter {
         }
     }
 
-    private fun addDataPointToExistingFeature(
+    private suspend fun addDataPointToExistingFeature(
         dataInteractor: DataInteractor,
         existingFeatures: MutableList<Feature>,
         existingFeaturesByName: MutableMap<String, Feature>,
@@ -259,7 +259,7 @@ object CSVReadWriter {
         }
     }
 
-    private fun addDiscreteValueToFeature(
+    private suspend fun addDiscreteValueToFeature(
         dataInteractor: DataInteractor,
         existingFeatures: MutableList<Feature>,
         existingFeaturesByName: MutableMap<String, Feature>,
@@ -344,7 +344,7 @@ object CSVReadWriter {
         )
     }
 
-    private fun createNewFeature(
+    private suspend fun createNewFeature(
         dataInteractor: DataInteractor,
         rec: RecordData,
         trackGroupId: Long,
@@ -378,18 +378,13 @@ object CSVReadWriter {
         }
     }
 
-    private fun tryAddDiscreteValueToFeature(
+    private suspend fun tryAddDiscreteValueToFeature(
         dataInteractor: DataInteractor,
         feature: Feature,
         discreteValue: DiscreteValue,
         lineNumber: Int
     ): Feature {
         val newDiscreteValues = feature.discreteValues.toMutableList()
-        if (newDiscreteValues.size == dataVisColorList.size)
-            throw ImportFeaturesException(
-                R.string.import_exception_max_discrete_values_reached,
-                listOf(dataVisColorList.size.toString())
-            )
         if (newDiscreteValues.map { dv -> dv.index }.contains(discreteValue.index))
             throw ImportFeaturesException(
                 R.string.import_exception_discrete_value_index_exists,

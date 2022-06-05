@@ -190,11 +190,9 @@ class GroupViewModel @Inject constructor(
                 )
             }
         }
-        dataInteractor.withTransaction {
-            dataInteractor.updateFeatures(displayFeatures.map { it.asFeature() })
-            dataInteractor.updateGraphStats(graphs)
-            dataInteractor.updateGroups(groups)
-        }
+        dataInteractor.updateFeatures(displayFeatures.map { it.asFeature() })
+        dataInteractor.updateGraphStats(graphs)
+        dataInteractor.updateGroups(groups)
     }
 
     private fun toGraphStatViewDataWithIndex(obj: Any, index: Int): GraphOrStat {
@@ -216,10 +214,8 @@ class GroupViewModel @Inject constructor(
 
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         viewModelScope.launch(ioDispatcher) {
-            dataInteractor.withTransaction {
-                val gs = graphOrStatViewData.graphOrStat
-                gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs)
-            }
+            val gs = graphOrStatViewData.graphOrStat
+            gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs)
         }
     }
 }

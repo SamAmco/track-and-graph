@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -37,11 +38,15 @@ import com.samco.trackandgraph.base.database.dto.CheckedDays
 import com.samco.trackandgraph.base.database.dto.Reminder
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
+import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import org.threeten.bp.LocalTime
-import java.util.concurrent.Executors
 import javax.inject.Inject
 
 const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
@@ -214,22 +219,37 @@ class RemindersFragment : Fragment() {
 
 @HiltViewModel
 class RemindersViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
-    //I use an executor here rather than kotlin co-routines because I want everything executed in the
-    // order that it is called
-    private val executor = Executors.newSingleThreadExecutor()
 
     val allReminders: LiveData<List<Reminder>> = dataInteractor.getAllReminders()
 
-    override fun onCleared() {
-        super.onCleared()
-        executor.shutdown()
+    private sealed class ReminderEvent {
+        data class Insert(val reminder: Reminder) : ReminderEvent()
+        data class Update(val reminder: Reminder) : ReminderEvent()
+        data class Delete(val reminder: Reminder) : ReminderEvent()
+        data class Order(val reminders: List<Reminder>) : ReminderEvent()
+    }
+
+    private val eventFlow = MutableSharedFlow<ReminderEvent>(extraBufferCapacity = 100)
+
+    init {
+        viewModelScope.launch(io) {
+            eventFlow.collect {
+                when (it) {
+                    is ReminderEvent.Insert -> dataInteractor.insertReminder(it.reminder)
+                    is ReminderEvent.Delete -> dataInteractor.deleteReminder(it.reminder)
+                    is ReminderEvent.Update -> dataInteractor.updateReminder(it.reminder)
+                    is ReminderEvent.Order -> dataInteractor.updateReminders(it.reminders)
+                }
+            }
+        }
     }
 
     fun addReminder(defaultName: String) {
-        executor.submit {
-            dataInteractor.insertReminder(
+        eventFlow.tryEmit(
+            ReminderEvent.Insert(
                 Reminder(
                     0,
                     0,
@@ -238,24 +258,20 @@ class RemindersViewModel @Inject constructor(
                     CheckedDays.none()
                 )
             )
-        }
+        )
     }
 
     fun deleteReminder(reminder: Reminder) {
-        executor.submit { dataInteractor.deleteReminder(reminder) }
+        eventFlow.tryEmit(ReminderEvent.Delete(reminder))
     }
 
     fun adjustDisplayIndexes(reminders: List<Reminder>) {
-        executor.submit {
-            val newList = allReminders.value?.let { oldList ->
-                reminders.mapIndexed { i, r ->
-                    oldList.firstOrNull { or -> or.id == r.id }?.copy(displayIndex = i)
-                }.filterNotNull()
-            }
-            newList?.let {
-                dataInteractor.updateReminders(it)
-            }
+        val newList = allReminders.value?.let { oldList ->
+            reminders.mapIndexed { i, r ->
+                oldList.firstOrNull { or -> or.id == r.id }?.copy(displayIndex = i)
+            }.filterNotNull()
         }
+        newList?.let { eventFlow.tryEmit(ReminderEvent.Order(it)) }
     }
 
     fun daysChanged(reminder: Reminder, checkedDays: CheckedDays) =
@@ -268,11 +284,9 @@ class RemindersViewModel @Inject constructor(
         updateReminder(reminder) { it.copy(alarmName = name) }
 
     private fun updateReminder(reminder: Reminder, onFound: (Reminder) -> Reminder) {
-        executor.submit {
-            allReminders.value?.firstOrNull { it.id == reminder.id }?.let {
-                val newReminder = onFound(it)
-                dataInteractor.updateReminder(newReminder)
-            }
+        allReminders.value?.firstOrNull { it.id == reminder.id }?.let {
+            val newReminder = onFound(it)
+            eventFlow.tryEmit(ReminderEvent.Update(newReminder))
         }
     }
 }
