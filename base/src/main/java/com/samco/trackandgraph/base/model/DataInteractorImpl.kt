@@ -30,12 +30,15 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
+import java.io.InputStream
+import java.io.OutputStream
 
 internal class DataInteractorImpl(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
     private val io: CoroutineDispatcher,
-    private val featureUpdater: FeatureUpdater
+    private val featureUpdater: FeatureUpdater,
+    private val csvReadWriter: CSVReadWriter
 ) : DataInteractor {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
@@ -374,4 +377,17 @@ internal class DataInteractorImpl(
     override suspend fun getGroupsForGroupSync(id: Long): List<Group> = withContext(io) {
         dao.getGroupsForGroupSync(id).map { it.toDto() }
     }
+
+    override suspend fun writeFeaturesToCSV(outStream: OutputStream, featureIds: List<Long>) =
+        withContext(io) {
+            val featureMap =
+                featureIds.associate { getFeatureById(it) to getDataSampleForFeatureId(it) }
+            csvReadWriter.writeFeaturesToCSV(outStream, featureMap)
+        }
+
+    override suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long) =
+        withContext(io) {
+            csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
+            dataUpdateEvents.emit(Unit)
+        }
 }

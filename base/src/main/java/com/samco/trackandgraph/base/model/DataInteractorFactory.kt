@@ -24,7 +24,16 @@ import kotlinx.coroutines.CoroutineDispatcher
 class DataInteractorFactory {
     fun createDataInteractor(context: Context, ioDispatcher: CoroutineDispatcher): DataInteractor {
         val database = TrackAndGraphDatabase.getInstance(context)
-        val featureUpdater = FeatureUpdaterImpl(database, database.trackAndGraphDatabaseDao, ioDispatcher)
-        return DataInteractorImpl(database, database.trackAndGraphDatabaseDao, ioDispatcher, featureUpdater)
+        val featureUpdater =
+            FeatureUpdaterImpl(database, database.trackAndGraphDatabaseDao, ioDispatcher)
+        val csvReadWriter =
+            CSVReadWriterImpl(database, database.trackAndGraphDatabaseDao, ioDispatcher)
+        return DataInteractorImpl(
+            database,
+            database.trackAndGraphDatabaseDao,
+            ioDispatcher,
+            featureUpdater,
+            csvReadWriter
+        )
     }
 }
