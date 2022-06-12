@@ -112,9 +112,6 @@ dependencies {
     //Date/Time
     testImplementation 'org.threeten:threetenbp:1.4.0'
 
-    //CSV
-    implementation 'org.apache.commons:commons-csv:1.7'
-
     //Graph drawing
     implementation 'com.androidplot:androidplot-core:1.5.7'
     implementation 'com.google.android:flexbox:1.1.1'

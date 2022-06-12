@@ -24,6 +24,8 @@ import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
+import java.io.InputStream
+import java.io.OutputStream
 
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
@@ -177,4 +179,8 @@ interface DataInteractor : FeatureUpdater {
     suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 
     suspend fun getGroupsForGroupSync(id: Long): List<Group>
+
+    suspend fun writeFeaturesToCSV(outStream: OutputStream, featureIds: List<Long>)
+
+    suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long)
 }
