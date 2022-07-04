@@ -148,7 +148,7 @@
                     android:id="@+id/stopwatchButton"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
-                    android:button="@drawable/reminders_icon"
+                    android:button="@drawable/stopwatch"
                     android:text="ToggleButton"
                     app:layout_constraintBottom_toBottomOf="@id/durationInput"
                     app:layout_constraintLeft_toRightOf="@id/durationInput"
