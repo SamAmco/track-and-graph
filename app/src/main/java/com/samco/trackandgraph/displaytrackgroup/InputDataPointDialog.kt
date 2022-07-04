@@ -42,6 +42,8 @@ import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
 import kotlinx.android.synthetic.main.data_point_input_dialog.*
 import kotlinx.coroutines.*
+import java.util.*
+import kotlin.concurrent.timerTask
 
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
@@ -50,6 +52,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private lateinit var binding: DataPointInputDialogBinding
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,6 +70,12 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             listenToFeatures()
             listenToIndex()
             listenToState()
+
+            Timer().scheduleAtFixedRate(timerTask {
+                getActivity()?.runOnUiThread {
+                    (binding.viewPager.adapter as ViewPagerAdapter).updateStopwatch()
+                }
+            }, 1000, 1000)
 
             binding.viewPager.addOnPageChangeListener(this)
             dialog?.setCanceledOnTouchOutside(true)
@@ -176,6 +185,10 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             existingViews.forEach { dpiv -> dpiv.updateDateTimes() }
         }
 
+        fun updateStopwatch() {
+            existingViews.forEach { dpiv -> dpiv.updateStopwatchIfNeeded() }
+        }
+
         override fun getCount() = features.size
     }
 
@@ -208,6 +221,8 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun onAddClicked() {
         val currIndex = viewModel.currentFeatureIndex.value!!
         val currFeature = viewModel.features.value!![currIndex]
+        (binding.viewPager.adapter as ViewPagerAdapter).updateStopwatch()
+
         viewModel.uiStates[currFeature]?.timeFixed = true
         onAddClicked(currFeature)
     }

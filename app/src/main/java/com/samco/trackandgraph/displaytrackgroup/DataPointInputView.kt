@@ -25,8 +25,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
+import com.google.android.material.internal.ContextUtils.getActivity
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.*
 import com.samco.trackandgraph.database.entity.DataPoint
@@ -37,10 +39,13 @@ import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.ui.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText
 import com.samco.trackandgraph.util.showKeyboard
+import kotlinx.android.synthetic.main.data_point_input_view.*
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
+import java.util.*
+import kotlin.concurrent.timerTask
 
 class DataPointInputView : FrameLayout {
     private val titleText: TextView
@@ -52,6 +57,11 @@ class DataPointInputView : FrameLayout {
     private val buttonsScroll: HorizontalScrollView
     private val buttonsLayout: LinearLayout
     private val durationInput: DurationInputView
+    private val stopwatchButton: ToggleButton
+    private val durationInputContainer: ConstraintLayout
+
+    private var startTime: Long = 0L
+    var isStopwatched = false
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -70,6 +80,13 @@ class DataPointInputView : FrameLayout {
         buttonsScroll = view.findViewById(R.id.buttonsScrollView)
         buttonsLayout = view.findViewById(R.id.buttonsLayout)
         durationInput = view.findViewById(R.id.durationInput)
+        stopwatchButton = view.findViewById(R.id.stopwatchButton)
+        durationInputContainer = view.findViewById(R.id.durationInputContainer)
+
+        stopwatchButton.setOnClickListener { _ ->
+            startTime = GregorianCalendar.getInstance().timeInMillis
+            isStopwatched = stopwatchButton.isChecked
+        }
     }
 
     private lateinit var state: DataPointInputData
@@ -100,7 +117,7 @@ class DataPointInputView : FrameLayout {
     private fun initDuration() {
         buttonsScroll.visibility = View.GONE
         numberInput.visibility = View.GONE
-        durationInput.visibility = View.VISIBLE
+        durationInputContainer.visibility = View.VISIBLE
         durationInput.setTimeInSeconds(state.value.toLong())
         durationInput.setDurationChangedListener { state.value = it.toDouble() }
         durationInput.setDoneListener {
@@ -132,7 +149,7 @@ class DataPointInputView : FrameLayout {
     private fun initDiscrete() {
         buttonsScroll.visibility = View.VISIBLE
         numberInput.visibility = View.GONE
-        durationInput.visibility = View.GONE
+        durationInputContainer.visibility = View.GONE
         createButtons()
         if (state.label.isNotEmpty()) {
             buttonsLayout.children
@@ -145,7 +162,7 @@ class DataPointInputView : FrameLayout {
     private fun initContinuous() {
         buttonsScroll.visibility = View.GONE
         numberInput.visibility = View.VISIBLE
-        durationInput.visibility = View.GONE
+        durationInputContainer.visibility = View.GONE
         numberInput.addTextChangedListener {
             if (it.toString().isNotBlank()) {
                 state.value = getDoubleFromText(it.toString())
@@ -205,6 +222,13 @@ class DataPointInputView : FrameLayout {
                 .forEach { kvp -> kvp.value.isChecked = false }
             clickListener!!.onClick(state.feature)
         }
+    }
+
+    fun updateStopwatchIfNeeded() {
+        if (state.feature.featureType == FeatureType.DURATION && isStopwatched)
+            durationInput.setTimeInSeconds(
+                (Calendar.getInstance().timeInMillis - (startTime ?: 0L)) / 1000
+            )
     }
 
     fun updateDateTimes() = setSelectedDateTime(state.dateTime)
