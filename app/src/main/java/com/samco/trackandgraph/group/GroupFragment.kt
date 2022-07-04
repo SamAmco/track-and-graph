@@ -230,7 +230,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         this::onFeatureMoveToClicked,
         this::onFeatureDescriptionClicked,
         this::onFeatureAddClicked,
-        this::onFeatureStopwatchClicked,
         this::onFeatureHistoryClicked
     )
 
@@ -253,18 +252,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             showAddDataPoint(argBundle)
         }
     }
-
-    private fun onFeatureStopwatchClicked(feature: DisplayFeature) {
-        /**
-         * @param useDefault: if false the default value will be ignored and the user will be queried for the value
-         */
-            val argBundle = Bundle()
-            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(feature.id))
-            showAddStopwatchDataPoint(argBundle)
-
-    }
-
-
 
     private fun onFeatureDescriptionClicked(feature: DisplayFeature) {
         showFeatureDescriptionDialog(requireContext(), feature.name, feature.description)
@@ -298,11 +285,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
     private fun showAddDataPoint(argBundle: Bundle) {
         val dialog = InputDataPointDialog()
-        dialog.arguments = argBundle
-        childFragmentManager.let { dialog.show(it, "input_data_points_dialog") }
-    }
-    private fun showAddStopwatchDataPoint(argBundle: Bundle) {
-        val dialog = InputDataPointDialog(true)
         dialog.arguments = argBundle
         childFragmentManager.let { dialog.show(it, "input_data_points_dialog") }
     }

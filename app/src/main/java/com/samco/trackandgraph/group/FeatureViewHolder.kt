@@ -50,7 +50,6 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         binding.quickAddButton.setOnLongClickListener {
             clickListener.onAdd(feature, false).let { true }
         }
-        binding.stopwatchAddButton.setOnClickListener { clickListener.onStopwatch(feature) }
 
         if (feature.hasDefaultValue) {
             binding.addButton.visibility = View.INVISIBLE
@@ -58,9 +57,6 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         } else {
             binding.addButton.visibility = View.VISIBLE
             binding.quickAddButton.visibility = View.INVISIBLE
-        }
-        if (feature.featureType == FeatureType.DURATION) {
-            binding.stopwatchAddButton.visibility = View.VISIBLE
         }
         binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
     }
@@ -139,7 +135,6 @@ class FeatureClickListener(
     private val onMoveToListener: (feature: DisplayFeature) -> Unit,
     private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
     private val onAddListener: (feature: DisplayFeature, useDefault: Boolean) -> Unit,
-    private val onStopwatchListener: (feature: DisplayFeature) -> Unit,
     private val onHistoryListener: (feature: DisplayFeature) -> Unit
 ) {
     fun onEdit(feature: DisplayFeature) = onEditListener(feature)
@@ -148,7 +143,6 @@ class FeatureClickListener(
     fun onDescription(feature: DisplayFeature) = onDescriptionListener(feature)
     fun onAdd(feature: DisplayFeature, useDefault: Boolean = true) =
         onAddListener(feature, useDefault)
-    fun onStopwatch(feature: DisplayFeature) =        onStopwatchListener(feature)
 
     fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
 }

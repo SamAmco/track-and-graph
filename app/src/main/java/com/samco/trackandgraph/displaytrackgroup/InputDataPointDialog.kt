@@ -41,7 +41,6 @@ import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
 import kotlinx.android.synthetic.main.data_point_input_dialog.*
-import kotlinx.android.synthetic.main.data_point_input_view.*
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.concurrent.timerTask
@@ -49,13 +48,12 @@ import kotlin.concurrent.timerTask
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 
-open class InputDataPointDialog(val isStopwatched: Boolean = false) : DialogFragment(),
+open class InputDataPointDialog : DialogFragment(),
     ViewPager.OnPageChangeListener {
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private lateinit var binding: DataPointInputDialogBinding
 
-    private val startTime = GregorianCalendar.getInstance().timeInMillis
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,10 +72,11 @@ open class InputDataPointDialog(val isStopwatched: Boolean = false) : DialogFrag
             listenToIndex()
             listenToState()
 
-            if (isStopwatched)
-                Timer().scheduleAtFixedRate(timerTask {
-                    getActivity()?.runOnUiThread { updateDurationInput() }
-                }, 1000, 1000)
+            Timer().scheduleAtFixedRate(timerTask {
+                getActivity()?.runOnUiThread {
+                    (binding.viewPager.adapter as ViewPagerAdapter).updateStopwatch()
+                }
+            }, 1000, 1000)
 
 
             binding.viewPager.addOnPageChangeListener(this)
@@ -188,6 +187,10 @@ open class InputDataPointDialog(val isStopwatched: Boolean = false) : DialogFrag
             existingViews.forEach { dpiv -> dpiv.updateDateTimes() }
         }
 
+        fun updateStopwatch() {
+            existingViews.forEach { dpiv -> dpiv.updateStopwatchIfNeeded() }
+        }
+
         override fun getCount() = features.size
     }
 
@@ -217,15 +220,11 @@ open class InputDataPointDialog(val isStopwatched: Boolean = false) : DialogFrag
         )
     }
 
-    private fun updateDurationInput() {
-        durationInput.setTimeInSeconds((Calendar.getInstance().timeInMillis - startTime) / 1000)
-    }
 
     private fun onAddClicked() {
         val currIndex = viewModel.currentFeatureIndex.value!!
         val currFeature = viewModel.features.value!![currIndex]
-        if (currFeature.featureType == FeatureType.DURATION && isStopwatched)
-            updateDurationInput()
+        (binding.viewPager.adapter as ViewPagerAdapter).updateStopwatch()
 
         viewModel.uiStates[currFeature]?.timeFixed = true
         onAddClicked(currFeature)

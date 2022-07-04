@@ -128,12 +128,33 @@
                 tools:ignore="HardcodedText"
                 tools:text="33" />
 
-            <com.samco.trackandgraph.ui.DurationInputView
-                android:id="@+id/durationInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/durationInputContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.samco.trackandgraph.ui.DurationInputView
+                    android:id="@+id/durationInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </com.samco.trackandgraph.ui.DurationInputView>
+
+                <ToggleButton
+                    android:id="@+id/stopwatchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:button="@drawable/reminders_icon"
+                    android:text="ToggleButton"
+                    app:layout_constraintBottom_toBottomOf="@id/durationInput"
+                    app:layout_constraintLeft_toRightOf="@id/durationInput"
+                    app:layout_constraintTop_toTopOf="@id/durationInput" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <HorizontalScrollView
                 android:id="@+id/buttonsScrollView"
@@ -147,8 +168,11 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:orientation="horizontal" />
+                    android:orientation="horizontal" >
+
+                </LinearLayout>
             </HorizontalScrollView>
+
         </FrameLayout>
 
     </LinearLayout>
