@@ -23,6 +23,7 @@ import android.view.View
 import androidx.fragment.app.DialogFragment
 import org.threeten.bp.OffsetDateTime
 import android.content.DialogInterface
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
@@ -41,15 +42,22 @@ import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
 import kotlinx.android.synthetic.main.data_point_input_dialog.*
+import kotlinx.android.synthetic.main.data_point_input_view.*
+import kotlinx.android.synthetic.main.data_point_input_view.view.*
+import kotlinx.android.synthetic.main.duration_input_layout.view.*
 import kotlinx.coroutines.*
+import java.time.Duration
+import java.util.*
 
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 
-open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
+open class InputDataPointDialog (val isStopwatched: Boolean=false): DialogFragment(), ViewPager.OnPageChangeListener {
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private lateinit var binding: DataPointInputDialogBinding
+
+    private val startTime =  GregorianCalendar.getInstance().timeInMillis
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -208,6 +216,11 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun onAddClicked() {
         val currIndex = viewModel.currentFeatureIndex.value!!
         val currFeature = viewModel.features.value!![currIndex]
+        if (currFeature.featureType == FeatureType.DURATION && isStopwatched)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                durationInput.setTimeInSeconds((Calendar.getInstance().timeInMillis-startTime)/1000)
+            }
+
         viewModel.uiStates[currFeature]?.timeFixed = true
         onAddClicked(currFeature)
     }
