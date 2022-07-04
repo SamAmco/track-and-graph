@@ -25,12 +25,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.ui.doubleFormatter
@@ -41,6 +42,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
+import java.util.*
 
 class DataPointInputView : FrameLayout {
     private val titleText: TextView
@@ -52,6 +54,11 @@ class DataPointInputView : FrameLayout {
     private val buttonsScroll: HorizontalScrollView
     private val buttonsLayout: LinearLayout
     private val durationInput: DurationInputView
+    private val stopwatchButton: ToggleButton
+    private val durationInputContainer: ConstraintLayout
+
+    private var startTime: Long = 0L
+    private var isStopwatched = false
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -70,6 +77,13 @@ class DataPointInputView : FrameLayout {
         buttonsScroll = view.findViewById(R.id.buttonsScrollView)
         buttonsLayout = view.findViewById(R.id.buttonsLayout)
         durationInput = view.findViewById(R.id.durationInput)
+        stopwatchButton = view.findViewById(R.id.stopwatchButton)
+        durationInputContainer = view.findViewById(R.id.durationInputContainer)
+
+        stopwatchButton.setOnClickListener {
+            startTime = GregorianCalendar.getInstance().timeInMillis
+            isStopwatched = stopwatchButton.isChecked
+        }
     }
 
     private lateinit var state: DataPointInputData
@@ -100,7 +114,7 @@ class DataPointInputView : FrameLayout {
     private fun initDuration() {
         buttonsScroll.visibility = View.GONE
         numberInput.visibility = View.GONE
-        durationInput.visibility = View.VISIBLE
+        durationInputContainer.visibility = View.VISIBLE
         durationInput.setTimeInSeconds(state.value.toLong())
         durationInput.setDurationChangedListener { state.value = it.toDouble() }
         durationInput.setDoneListener {
@@ -132,7 +146,7 @@ class DataPointInputView : FrameLayout {
     private fun initDiscrete() {
         buttonsScroll.visibility = View.VISIBLE
         numberInput.visibility = View.GONE
-        durationInput.visibility = View.GONE
+        durationInputContainer.visibility = View.GONE
         createButtons()
         if (state.label.isNotEmpty()) {
             buttonsLayout.children
@@ -145,7 +159,7 @@ class DataPointInputView : FrameLayout {
     private fun initContinuous() {
         buttonsScroll.visibility = View.GONE
         numberInput.visibility = View.VISIBLE
-        durationInput.visibility = View.GONE
+        durationInputContainer.visibility = View.GONE
         numberInput.addTextChangedListener {
             if (it.toString().isNotBlank()) {
                 state.value = getDoubleFromText(it.toString())
@@ -207,6 +221,13 @@ class DataPointInputView : FrameLayout {
         }
     }
 
+    fun updateStopwatchIfNeeded() {
+        if (state.feature.featureType == DataType.DURATION && isStopwatched)
+            durationInput.setTimeInSeconds(
+                (Calendar.getInstance().timeInMillis - startTime) / 1000
+            )
+    }
+
     fun updateDateTimes() = setSelectedDateTime(state.dateTime)
 
     private fun setSelectedDateTime(dateTime: OffsetDateTime) {
@@ -219,7 +240,7 @@ class DataPointInputView : FrameLayout {
         dateButton.setOnClickListener {
             val picker = DatePickerDialog(
                 context!!,
-                DatePickerDialog.OnDateSetListener { _, year, month, day ->
+                { _, year, month, day ->
                     setSelectedDateTime(
                         ZonedDateTime.of(state.dateTime.toLocalDateTime(), ZoneId.systemDefault())
                             .withYear(year)
@@ -239,7 +260,7 @@ class DataPointInputView : FrameLayout {
         timeButton.setOnClickListener {
             val picker = TimePickerDialog(
                 context!!,
-                TimePickerDialog.OnTimeSetListener { _, hour, minute ->
+                { _, hour, minute ->
                     setSelectedDateTime(
                         ZonedDateTime.of(state.dateTime.toLocalDateTime(), ZoneId.systemDefault())
                             .withHour(hour)

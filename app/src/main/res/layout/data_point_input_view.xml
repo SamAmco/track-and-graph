@@ -128,12 +128,32 @@
                 tools:ignore="HardcodedText"
                 tools:text="33" />
 
-            <com.samco.trackandgraph.ui.DurationInputView
-                android:id="@+id/durationInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/durationInputContainer"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <com.samco.trackandgraph.ui.DurationInputView
+                    android:id="@+id/durationInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <ToggleButton
+                    android:id="@+id/stopwatchButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="4dp"
+                    android:button="@drawable/stopwatch"
+                    app:layout_constraintBottom_toBottomOf="@id/durationInput"
+                    app:layout_constraintLeft_toRightOf="@id/durationInput"
+                    app:layout_constraintTop_toTopOf="@id/durationInput"
+                    app:layout_constraintVertical_bias="0.0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <HorizontalScrollView
                 android:id="@+id/buttonsScrollView"
