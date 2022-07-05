@@ -19,16 +19,17 @@ package com.samco.trackandgraph.graphstatview.decorators
 
 import android.content.Context
 import android.view.View
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dataVisColorGenerator
-import com.samco.trackandgraph.database.dataVisColorList
-import com.samco.trackandgraph.database.entity.TimeHistogramWindow
+import com.samco.trackandgraph.TimeHistogramWindowData
+import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
+import com.samco.trackandgraph.ui.dataVisColorGenerator
+import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -48,8 +49,17 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     private var context: Context? = null
     private var data: ITimeHistogramViewData? = null
 
-    private lateinit var legendKeys: List<Int>
-    private lateinit var nameMap: Map<Int, String>
+    private fun getNameForWindow(window: TimeHistogramWindowData): String {
+        return when (window.window) {
+            TimeHistogramWindow.HOUR -> context!!.getString(R.string.minutes)
+            TimeHistogramWindow.DAY -> context!!.getString(R.string.hours)
+            TimeHistogramWindow.WEEK -> context!!.getString(R.string.days)
+            TimeHistogramWindow.MONTH -> context!!.getString(R.string.days)
+            TimeHistogramWindow.THREE_MONTHS -> context!!.getString(R.string.weeks)
+            TimeHistogramWindow.SIX_MONTHS -> context!!.getString(R.string.weeks)
+            TimeHistogramWindow.YEAR -> context!!.getString(R.string.months)
+        }
+    }
 
     private fun getLabelInterval(window: TimeHistogramWindow) = when (window) {
         TimeHistogramWindow.HOUR -> 5
@@ -94,8 +104,8 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     private fun setUpXAxisTitle() {
-        var title = context!!.getString(data!!.window!!.subTitleId)
-        if (data!!.window!! == TimeHistogramWindow.WEEK) {
+        var title = getNameForWindow(data!!.window!!)
+        if (data!!.window!!.window == TimeHistogramWindow.WEEK) {
             val weekDayNameIds = mapOf(
                 DayOfWeek.MONDAY to R.string.mon,
                 DayOfWeek.TUESDAY to R.string.tue,
@@ -135,15 +145,15 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
                         // day of the week or day of the month, etc.
                         // Since there is a hour 0 and a minute 0, but not a day or week 0 we have
                         // to add an offset of 1 to the labels if talking about days or weeks.
-                        if (data!!.window!! == TimeHistogramWindow.DAY
-                            || data!!.window!! == TimeHistogramWindow.HOUR)
+                        if (data!!.window!!.window == TimeHistogramWindow.DAY
+                            || data!!.window!!.window == TimeHistogramWindow.HOUR)
                             0  // there is a minute 0 and a hour 0: index 0 -> label 0
                         else 1 // but there is no day 0 or week 0:  index 0 -> label 1
 
                     val index = (obj as Double).roundToInt() + zeroIndexOffset
                     val str = if (index >= zeroIndexOffset
                                     && index <= data!!.window!!.numBins) {
-                        val labelInterval = getLabelInterval(data!!.window!!)
+                        val labelInterval = getLabelInterval(data!!.window!!.window)
                         if (index == zeroIndexOffset
                             || index == data!!.window!!.numBins
                             || index % labelInterval == 0
@@ -178,14 +188,12 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     private fun drawLegend() {
-        legendKeys = data!!.barValues!!.keys.toList().sorted()
-        nameMap = data!!.discreteValues!!.map { it.index to it.label }.toMap()
-        if (legendKeys.size > 1) {
-            for (l in legendKeys) {
-                val colorIndex = (l * dataVisColorGenerator) % dataVisColorList.size
-                nameMap.getOrElse(l) { null }?.let { name ->
-                    inflateGraphLegendItem(binding!!, context!!, colorIndex, name)
-                }
+        val labels = data!!.barValues!!.keys.toList()
+        if (labels.size > 1) {
+            labels.forEachIndexed { i, l ->
+                val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
+                val color = getColor(context!!, dataVisColorList[colorIndex])
+                inflateGraphLegendItem(binding!!, context!!, color, l)
             }
         } else {
             binding?.legendFlexboxLayout?.removeAllViews()
@@ -195,12 +203,11 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     private fun drawBars() {
         val outlineColor = context!!.getColorFromAttr(R.attr.colorOnSurface)
 
-        for (key in legendKeys) {
+        data!!.barValues!!.keys.forEachIndexed { i, key ->
             val series = (data!!.barValues!![key] ?: error("")).toTypedArray()
-            val name = nameMap[key] ?: error("")
-            val xySeries = SimpleXYSeries(SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, name, *series)
-            val colorIndex = (key * dataVisColorGenerator) % dataVisColorList.size
-            val color = ContextCompat.getColor(context!!, dataVisColorList[colorIndex])
+            val xySeries = SimpleXYSeries(SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, key, *series)
+            val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
+            val color = getColor(context!!, dataVisColorList[colorIndex])
             val seriesFormatter = BarFormatter(color, outlineColor)
             seriesFormatter.borderPaint.strokeWidth = PixelUtils.dpToPix(1f)
             binding!!.xyPlot.addSeries(xySeries, seriesFormatter)

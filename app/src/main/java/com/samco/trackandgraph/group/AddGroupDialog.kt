@@ -33,18 +33,21 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.dataVisColorList
-import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
+import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.showKeyboard
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 const val ADD_GROUP_DIALOG_ID_KEY = "ADD_GROUP_DIALOG_ID_KEY"
 const val ADD_GROUP_DIALOG_PARENT_ID_KEY = "ADD_GROUP_DIALOG_PARENT_ID_KEY"
 
+@AndroidEntryPoint
 class AddGroupDialog : DialogFragment(), TextWatcher {
     private lateinit var alertDialog: AlertDialog
 
@@ -59,10 +62,7 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
         val parentGroupId = arguments?.getLong(ADD_GROUP_DIALOG_PARENT_ID_KEY) ?: 0
 
         val dialog = initDialog(groupId != null)
-        val dao = TrackAndGraphDatabase
-            .getInstance(requireActivity().application)
-            .trackAndGraphDatabaseDao
-        viewModel.initViewModel(dao, groupId, parentGroupId)
+        viewModel.initViewModel(groupId, parentGroupId)
         observeViewModel()
         return dialog
     }
@@ -149,13 +149,14 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
     }
 }
 
-class AddGroupDialogViewModel : ViewModel() {
+@HiltViewModel
+class AddGroupDialogViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor
+) : ViewModel() {
     enum class AddGroupDialogViewModelState { INIT, READY, DONE }
 
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
-
-    private lateinit var dao: TrackAndGraphDatabaseDao
 
     private val _groupName = MutableLiveData("")
     val groupName: LiveData<String> get() = _groupName
@@ -168,16 +169,18 @@ class AddGroupDialogViewModel : ViewModel() {
 
     private var groupId: Long? = null
     private var parentGroupId: Long = 0
+    private var initialized: Boolean = false
 
-    fun initViewModel(dao: TrackAndGraphDatabaseDao, groupId: Long?, parentGroupId: Long) {
-        if (this::dao.isInitialized) return
-        this.dao = dao
+    fun initViewModel(groupId: Long?, parentGroupId: Long) {
+        if (initialized) return
+        initialized = true
+
         this.groupId = groupId
         this.parentGroupId = parentGroupId
 
         ioScope.launch {
             if (groupId != null) {
-                val group = dao.getGroupById(groupId)
+                val group = dataInteractor.getGroupById(groupId)
                 withContext(Dispatchers.Main) {
                     _colorIndex.value = group.colorIndex
                     _groupName.value = group.name
@@ -197,10 +200,10 @@ class AddGroupDialogViewModel : ViewModel() {
         if (newName == null || newColor == null) return@launch
         val newId = groupId
         if (newId != null) {
-            val group = dao.getGroupById(newId)
-            dao.updateGroup(group.copy(name = newName, colorIndex = newColor))
+            val group = dataInteractor.getGroupById(newId)
+            dataInteractor.updateGroup(group.copy(name = newName, colorIndex = newColor))
         } else {
-            dao.insertGroup(Group(0, newName, 0, parentGroupId, newColor))
+            dataInteractor.insertGroup(Group(0, newName, 0, parentGroupId, newColor))
         }
         withContext(Dispatchers.Main) { _state.value = AddGroupDialogViewModelState.DONE }
     }

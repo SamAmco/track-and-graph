@@ -30,12 +30,12 @@ import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import com.google.android.material.internal.ContextUtils.getActivity
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DiscreteValue
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.base.database.dto.DiscreteValue
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.ui.DurationInputView
+import com.samco.trackandgraph.ui.doubleFormatter
 import com.samco.trackandgraph.ui.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText
 import com.samco.trackandgraph.util.showKeyboard
@@ -108,9 +108,9 @@ class DataPointInputView : FrameLayout {
         setSelectedDateTime(state.dateTime)
 
         when (state.feature.featureType) {
-            FeatureType.CONTINUOUS -> initContinuous()
-            FeatureType.DISCRETE -> initDiscrete()
-            FeatureType.DURATION -> initDuration()
+            DataType.CONTINUOUS -> initContinuous()
+            DataType.DISCRETE -> initDiscrete()
+            DataType.DURATION -> initDuration()
         }
     }
 
@@ -142,7 +142,7 @@ class DataPointInputView : FrameLayout {
     }
 
     override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
-        return if (state.feature.featureType == FeatureType.CONTINUOUS) numberInput.requestFocus()
+        return if (state.feature.featureType == DataType.CONTINUOUS) numberInput.requestFocus()
         else super.requestFocus(direction, previouslyFocusedRect)
     }
 

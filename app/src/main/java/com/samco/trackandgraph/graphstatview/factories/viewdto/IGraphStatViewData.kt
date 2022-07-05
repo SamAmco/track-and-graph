@@ -17,8 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
 
 interface IGraphStatViewData {
     enum class State {
@@ -28,7 +27,7 @@ interface IGraphStatViewData {
     }
     val state: State
     val graphOrStat: GraphOrStat
-    val error: GraphStatInitException?
+    val error: Throwable?
         get() = null
 
     companion object {

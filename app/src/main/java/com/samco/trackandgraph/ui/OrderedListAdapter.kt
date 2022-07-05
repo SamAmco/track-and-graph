@@ -27,6 +27,7 @@ abstract class OrderedListAdapter<T, G : RecyclerView.ViewHolder>(
     diffCallback: DiffUtil.ItemCallback<T>
 ) : ListAdapter<T, G>(diffCallback) {
 
+    //TODO shouldn't do this either
     init { setHasStableIds(true) }
 
     private var list: MutableList<T> = mutableListOf()

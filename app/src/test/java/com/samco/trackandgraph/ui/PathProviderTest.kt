@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.ui
 
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
-import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.Group
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 
@@ -36,15 +36,15 @@ class PathProviderTest {
 
     private val features = listOf(
         Feature(
-            0L, "Test", 0, FeatureType.CONTINUOUS, emptyList(),
+            0L, "Test", 0, DataType.CONTINUOUS, emptyList(),
             0, false, 0.0, ""
         ),
         Feature(
-            1L, "Test2", 1, FeatureType.CONTINUOUS, emptyList(),
+            1L, "Test2", 1, DataType.CONTINUOUS, emptyList(),
             0, false, 0.0, ""
         ),
         Feature(
-            2L, "Test3", 2, FeatureType.CONTINUOUS, emptyList(),
+            2L, "Test3", 2, DataType.CONTINUOUS, emptyList(),
             0, false, 0.0, ""
         )
     )

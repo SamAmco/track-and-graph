@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.displaytrackgroup
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -33,21 +32,25 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.odtFromString
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
-import kotlinx.android.synthetic.main.data_point_input_dialog.*
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.concurrent.timerTask
+import javax.inject.Inject
 
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 
+@AndroidEntryPoint
 open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
@@ -125,7 +128,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
                 viewModel.uiStates,
                 inputViews
             )
-            if (features.size == 1) indexText.visibility = View.INVISIBLE
+            if (features.size == 1) binding.indexText.visibility = View.INVISIBLE
         })
     }
 
@@ -133,7 +136,6 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         val timestampStr = requireArguments().getString(DATA_POINT_TIMESTAMP_KEY)
         val timestamp = if (timestampStr != null) odtFromString(timestampStr) else null
         viewModel.init(
-            requireActivity(),
             requireArguments().getLongArray(FEATURE_LIST_KEY)!!.toList(),
             timestamp
         )
@@ -200,12 +202,12 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun setupViewFeature(feature: Feature, index: Int) {
-        if (feature.featureType != FeatureType.DISCRETE) binding.addButton.visibility = View.VISIBLE
+        if (feature.featureType != DataType.DISCRETE) binding.addButton.visibility = View.VISIBLE
         else binding.addButton.visibility = View.INVISIBLE
-        indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
+        binding.indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
-        if (feature.featureType != FeatureType.DISCRETE) context?.showKeyboard()
+        if (feature.featureType != DataType.DISCRETE) context?.showKeyboard()
         else activity?.window?.hideKeyboard(view?.windowToken, 0)
         requireActivity().currentFocus?.clearFocus()
     }
@@ -254,8 +256,11 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 }
 
 enum class InputDataPointDialogState { LOADING, WAITING, ADDING, ADDED }
-class InputDataPointDialogViewModel : ViewModel() {
-    private lateinit var dao: TrackAndGraphDatabaseDao
+
+@HiltViewModel
+class InputDataPointDialogViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor
+) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
@@ -290,15 +295,17 @@ class InputDataPointDialogViewModel : ViewModel() {
         return@lazy index
     }
 
-    fun init(activity: Activity, featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?) {
-        if (features.value!!.isNotEmpty()) return
-        val application = activity.application
-        dao = TrackAndGraphDatabase.getInstance(application).trackAndGraphDatabaseDao
+    private var initialized = false
+
+    fun init(featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?) {
+        if (initialized) return
+        initialized = true
+
         _state.value = InputDataPointDialogState.LOADING
         ioScope.launch {
-            val featureData = dao.getFeaturesByIdsSync(featureIds)
+            val featureData = dataInteractor.getFeaturesByIdsSync(featureIds)
             val dataPointData = dataPointTimestamp?.let {
-                dao.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
+                dataInteractor.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
             }
             uiStates = getUIStatesForFeatures(featureData, dataPointData)
 
@@ -320,7 +327,7 @@ class InputDataPointDialogViewModel : ViewModel() {
             val dataPointValue = when {
                 dataPointData?.value != null -> dataPointData.value
                 f.hasDefaultValue -> f.defaultValue
-                f.featureType == FeatureType.CONTINUOUS -> 1.0
+                f.featureType == DataType.CONTINUOUS -> 1.0
                 else -> 0.0
             }
             val dataPointLabel = dataPointData?.label
@@ -351,8 +358,8 @@ class InputDataPointDialogViewModel : ViewModel() {
         if (state.value != InputDataPointDialogState.WAITING) return
         _state.value = InputDataPointDialogState.ADDING
         ioScope.launch {
-            if (oldDataPoint != null) dao.deleteDataPoint(oldDataPoint)
-            dao.insertDataPoint(newDataPoint)
+            if (oldDataPoint != null) dataInteractor.deleteDataPoint(oldDataPoint)
+            dataInteractor.insertDataPoint(newDataPoint)
             withContext(Dispatchers.Main) { _state.value = InputDataPointDialogState.ADDED }
         }
     }

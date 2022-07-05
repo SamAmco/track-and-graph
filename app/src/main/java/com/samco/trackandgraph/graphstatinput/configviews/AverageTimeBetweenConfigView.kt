@@ -21,12 +21,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatSpinner
-import com.samco.trackandgraph.database.entity.AverageTimeBetweenStat
-import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
+import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.databinding.AverageTimeBetweenInputLayoutBinding
+import com.samco.trackandgraph.maxGraphPeriodDurations
 import com.samco.trackandgraph.ui.DurationInputView
 
 internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
@@ -64,47 +65,62 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
     override fun getConfigData(): Any = configData
 
     private fun createEmptyConfig() = AverageTimeBetweenStat(
-        0,
-        0,
-        allFeatures.getOrElse(0) { null }?.id ?: 0,
-        "0.0",
-        "1.0",
-        null,
-        emptyList(),
-        null
+        id = 0,
+        graphStatId = 0,
+        //Shouldn't actually be possible to get here without at least one feature
+        featureId = allFeatureData.getOrElse(0) { null }?.feature?.id ?: 0,
+        fromValue = 0.0,
+        toValue = 1.0,
+        duration = null,
+        labels = emptyList(),
+        endDate = null,
+        filterByRange = false,
+        filterByLabels = false
     )
 
     override fun getCurrentFeatureId(): Long = configData.featureId
-    override fun getCurrentFromValue(): Double = configData.fromValue.toDouble()
-    override fun getCurrentToValue(): Double = configData.toValue.toDouble()
-    override fun getDiscreteValues(): List<Int> = configData.discreteValues
-
+    override fun getCurrentFromValue(): Double = configData.fromValue
+    override fun getCurrentToValue(): Double = configData.toValue
+    override fun getLabels(): Set<String> = configData.labels.toSet()
+    override fun getFilterByLabel(): Boolean = configData.filterByLabels
+    override fun getFilterByRange(): Boolean = configData.filterByRange
 
     override fun getFeatureSpinner(): AppCompatSpinner = binding.valueStatFeatureSpinner
-    override fun getDiscreteValueButtonsLayout(): LinearLayout =
-        binding.valueStatDiscreteValueButtonsLayout
+    override fun getLabelButtonsLayout(): LinearLayout = binding.incLabelCard.valueStatLabelsInputLayout
 
-    override fun getDiscreteValueInputLayout(): View = binding.valueStatDiscreteValueInputLayout
-    override fun getDurationRangeInput(): View = binding.valueStatDurationRangeInput
-    override fun getContinuousValueInputLayout(): View = binding.valueStatContinuousValueInputLayout
-    override fun getToInput(): EditText = binding.valueStatToInput
-    override fun getFromInput(): EditText = binding.valueStatFromInput
-    override fun getFromDurationInput(): DurationInputView = binding.valueStatDurationFromInput
-    override fun getToDurationInput(): DurationInputView = binding.valueStatDurationToInput
+    override fun getLabelCardLayout(): View = binding.incLabelCard.cardLabelInput
+    override fun getLabelCardContentLayout(): View = binding.incLabelCard.labelButtonScrollView
+
+    override fun getDurationRangeInput(): View = binding.incRangeCard.valueStatDurationRangeInput
+    override fun getContinuousValueInputLayout(): View = binding.incRangeCard.valueStatContinuousValueInputLayout
+    override fun getToInput(): EditText = binding.incRangeCard.valueStatToInput
+    override fun getFromInput(): EditText = binding.incRangeCard.valueStatFromInput
+    override fun getFromDurationInput(): DurationInputView = binding.incRangeCard.valueStatDurationFromInput
+    override fun getToDurationInput(): DurationInputView = binding.incRangeCard.valueStatDurationToInput
+    override fun getFilterByLabelCheckbox(): CheckBox = binding.incLabelCard.checkFilterByLabel
+    override fun getFilterByValueCheckbox(): CheckBox = binding.incRangeCard.checkFilterByValue
 
     override fun onNewFeatureId(featureId: Long) {
         configData = configData.copy(featureId = featureId)
     }
 
-    override fun onNewDiscreteValues(discreteValues: List<Int>) {
-        configData = configData.copy(discreteValues = discreteValues)
+    override fun onNewLabels(labels: Set<String>) {
+        configData = configData.copy(labels = labels.toList())
     }
 
     override fun onNewToValue(value: Double) {
-        configData = configData.copy(toValue = value.toString())
+        configData = configData.copy(toValue = value)
     }
 
     override fun onNewFromValue(value: Double) {
-        configData = configData.copy(fromValue = value.toString())
+        configData = configData.copy(fromValue = value)
+    }
+
+    override fun onFilterByLabelChanged(value: Boolean) {
+        configData = configData.copy(filterByLabels = value)
+    }
+
+    override fun onFilterByValueChanged(value: Boolean) {
+        configData = configData.copy(filterByRange = value)
     }
 }

@@ -17,13 +17,10 @@
 package com.samco.trackandgraph.util
 
 import android.app.Activity
-import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
 import android.widget.Button
 import androidx.appcompat.app.AlertDialog
-import androidx.core.content.ContextCompat
-import com.samco.trackandgraph.R
 
 object ImportExportFeatureUtils {
     fun setFileButtonTextFromUri(activity: Activity?, uri: Uri, fileButton: Button, alertDialog: AlertDialog) {

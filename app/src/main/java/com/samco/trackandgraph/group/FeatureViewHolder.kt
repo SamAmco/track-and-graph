@@ -18,14 +18,13 @@
 package com.samco.trackandgraph.group
 
 import android.graphics.drawable.RippleDrawable
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 
@@ -76,12 +75,10 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
     }
 
     private fun onQuickAddClicked() {
-        if (Build.VERSION.SDK_INT >= 21) {
-            val ripple = binding.cardView.foreground as RippleDrawable
-            ripple.setHotspot(ripple.bounds.right.toFloat(), ripple.bounds.bottom.toFloat())
-            ripple.state = intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
-            ripple.state = intArrayOf()
-        }
+        val ripple = binding.cardView.foreground as RippleDrawable
+        ripple.setHotspot(ripple.bounds.right.toFloat(), ripple.bounds.bottom.toFloat())
+        ripple.state = intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
+        ripple.state = intArrayOf()
         feature?.let { clickListener?.onAdd(it) }
     }
 

@@ -16,8 +16,8 @@
 */
 package com.samco.trackandgraph.displaytrackgroup
 
-import android.app.Activity
 import android.app.Dialog
+import android.content.ContentResolver
 import android.content.DialogInterface
 import android.content.Intent
 import android.net.Uri
@@ -30,17 +30,21 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
-import androidx.room.withTransaction
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.util.CSVReadWriter
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
 import com.samco.trackandgraph.util.getColorFromAttr
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 const val OPEN_FILE_REQUEST_CODE = 124
 
 enum class ImportState { WAITING, IMPORTING, DONE }
+
+@AndroidEntryPoint
 class ImportFeaturesDialog : DialogFragment() {
     private var trackGroupName: String? = null
     private var trackGroupId: Long? = null
@@ -152,7 +156,7 @@ class ImportFeaturesDialog : DialogFragment() {
 
     private fun onImportClicked() {
         progressBar.visibility = View.VISIBLE
-        viewModel.beginImport(requireActivity(), trackGroupId!!)
+        viewModel.beginImport(trackGroupId!!)
     }
 
     override fun onCancel(dialog: DialogInterface) {
@@ -161,7 +165,11 @@ class ImportFeaturesDialog : DialogFragment() {
     }
 }
 
-class ImportFeaturesViewModel : ViewModel() {
+@HiltViewModel
+class ImportFeaturesViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor,
+    private val contentResolver: ContentResolver
+) : ViewModel() {
     private var updateJob = Job()
     private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
@@ -185,20 +193,18 @@ class ImportFeaturesViewModel : ViewModel() {
         return@lazy exception
     }
 
-    fun beginImport(activity: Activity, trackGroupId: Long) {
+    //TODO this should probably be scheduled to run in a service
+    fun beginImport(trackGroupId: Long) {
         if (_importState.value == ImportState.IMPORTING) return
         selectedFileUri.value?.let {
             _importState.value = ImportState.IMPORTING
             uiScope.launch {
                 try {
                     withContext(Dispatchers.IO) {
-                        val inputStream = activity.contentResolver.openInputStream(it)
+                        val inputStream = contentResolver.openInputStream(it)
                         if (inputStream != null) {
-                            val application = activity.application
-                            val database = TrackAndGraphDatabase.getInstance(application)
-                            val dao = database.trackAndGraphDatabaseDao
-                            database.withTransaction {
-                                CSVReadWriter.readFeaturesFromCSV(dao, inputStream, trackGroupId)
+                            dataInteractor.withTransaction {
+                                CSVReadWriter.readFeaturesFromCSV(dataInteractor, inputStream, trackGroupId)
                             }
                         }
                     }

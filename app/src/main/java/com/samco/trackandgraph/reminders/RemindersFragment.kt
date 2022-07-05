@@ -26,8 +26,6 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,16 +33,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.CheckedDays
-import com.samco.trackandgraph.database.entity.Reminder
+import com.samco.trackandgraph.base.database.dto.CheckedDays
+import com.samco.trackandgraph.base.database.dto.Reminder
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
 import com.samco.trackandgraph.util.hideKeyboard
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import org.threeten.bp.LocalTime
 import java.util.concurrent.Executors
+import javax.inject.Inject
 
 const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
 
+@AndroidEntryPoint
 class RemindersFragment : Fragment() {
     private lateinit var binding: RemindersFragmentBinding
     private val viewModel by viewModels<RemindersViewModel>()
@@ -106,8 +108,7 @@ class RemindersFragment : Fragment() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.initViewModel(requireActivity())
-        listenToViewModel()
+        observeAndUpdateReminders()
     }
 
     override fun onStop() {
@@ -153,7 +154,7 @@ class RemindersFragment : Fragment() {
             viewHolder: RecyclerView.ViewHolder,
             target: RecyclerView.ViewHolder
         ): Boolean {
-            adapter.moveItem(viewHolder.adapterPosition, target.adapterPosition)
+            adapter.moveItem(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
             return true
         }
 
@@ -173,14 +174,8 @@ class RemindersFragment : Fragment() {
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
     }
 
-    private fun listenToViewModel() {
-        viewModel.state.observe(viewLifecycleOwner, Observer {
-            if (it == RemindersViewModelState.WAITING) observeAndUpdateReminders()
-        })
-    }
-
     private fun observeAndUpdateReminders() {
-        viewModel.allReminders.observe(viewLifecycleOwner, Observer {
+        viewModel.allReminders.observe(viewLifecycleOwner) {
             val displayIndexesAreTheSame =
                 adapter.currentList.map { item -> item.displayIndex } == it.map { item -> item.displayIndex }
 
@@ -189,7 +184,7 @@ class RemindersFragment : Fragment() {
                 if (it.isNullOrEmpty()) binding.noRemindersHintText.visibility = View.VISIBLE
                 else binding.noRemindersHintText.visibility = View.GONE
             }
-        })
+        }
     }
 
 
@@ -217,29 +212,15 @@ class RemindersFragment : Fragment() {
     }
 }
 
-enum class RemindersViewModelState { INITIALIZING, WAITING }
-class RemindersViewModel : ViewModel() {
+@HiltViewModel
+class RemindersViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor
+) : ViewModel() {
     //I use an executor here rather than kotlin co-routines because I want everything executed in the
     // order that it is called
     private val executor = Executors.newSingleThreadExecutor()
-    private var dataSource: TrackAndGraphDatabaseDao? = null
 
-    lateinit var allReminders: LiveData<List<Reminder>>
-        private set
-
-    val state: LiveData<RemindersViewModelState>
-        get() {
-            return _state
-        }
-    private val _state = MutableLiveData(RemindersViewModelState.INITIALIZING)
-
-    fun initViewModel(activity: Activity) {
-        if (dataSource != null) return
-        dataSource =
-            TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
-        allReminders = dataSource!!.getAllReminders()
-        _state.value = RemindersViewModelState.WAITING
-    }
+    val allReminders: LiveData<List<Reminder>> = dataInteractor.getAllReminders()
 
     override fun onCleared() {
         super.onCleared()
@@ -248,7 +229,7 @@ class RemindersViewModel : ViewModel() {
 
     fun addReminder(defaultName: String) {
         executor.submit {
-            dataSource?.insertReminder(
+            dataInteractor.insertReminder(
                 Reminder(
                     0,
                     0,
@@ -261,7 +242,7 @@ class RemindersViewModel : ViewModel() {
     }
 
     fun deleteReminder(reminder: Reminder) {
-        executor.submit { dataSource?.deleteReminder(reminder) }
+        executor.submit { dataInteractor.deleteReminder(reminder) }
     }
 
     fun adjustDisplayIndexes(reminders: List<Reminder>) {
@@ -272,7 +253,7 @@ class RemindersViewModel : ViewModel() {
                 }.filterNotNull()
             }
             newList?.let {
-                dataSource!!.updateReminders(it)
+                dataInteractor.updateReminders(it)
             }
         }
     }
@@ -290,7 +271,7 @@ class RemindersViewModel : ViewModel() {
         executor.submit {
             allReminders.value?.firstOrNull { it.id == reminder.id }?.let {
                 val newReminder = onFound(it)
-                dataSource?.updateReminder(newReminder)
+                dataInteractor.updateReminder(newReminder)
             }
         }
     }

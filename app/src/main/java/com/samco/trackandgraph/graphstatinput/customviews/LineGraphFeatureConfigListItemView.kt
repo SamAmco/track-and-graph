@@ -27,19 +27,26 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
+import com.samco.trackandgraph.graphstatinput.configviews.FeatureDataProvider
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getDoubleFromText
 import java.text.DecimalFormat
 
 class LineGraphFeatureConfigListItemView(
     context: Context,
-    private val featurePathProvider: FeaturePathProvider,
+    private val featureDataProvider: FeatureDataProvider,
     private val lineGraphFeature: LineGraphFeatureConfig
 ) : LinearLayout(context) {
+
+    private val pointStyleDrawableResources = listOf(
+        R.drawable.point_style_none_icon,
+        R.drawable.point_style_circles_icon,
+        R.drawable.point_style_circles_and_numbers_icon
+    )
+
     private val binding =
         ListItemLineGraphFeatureBinding.inflate(LayoutInflater.from(context), this, true)
     private var onRemoveListener: ((LineGraphFeature) -> Unit)? = null
@@ -167,7 +174,8 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupFeatureSpinner() {
-        val items = featurePathProvider.features.flatMap { getSpinnerItemsForFeature(it) }
+        val items =
+            featureDataProvider.featureDataAlphabetical().flatMap { getSpinnerItemsForFeature(it) }
         val itemNames = items.map { it.third }
         val adapter =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
@@ -209,10 +217,11 @@ class LineGraphFeatureConfigListItemView(
         }
     }
 
-    private fun getSpinnerItemsForFeature(feature: Feature)
+    private fun getSpinnerItemsForFeature(featureData: FeatureDataProvider.FeatureData)
             : List<Triple<Feature, DurationPlottingMode, String>> {
-        val name = featurePathProvider.getPathForFeature(feature.id)
-        return if (feature.featureType == FeatureType.DURATION) {
+        val feature = featureData.feature
+        val name = featureDataProvider.getPathForFeature(feature.id)
+        return if (featureData.dataProperties.isDuration) {
             val time = context.getString(R.string.time_duration)
             val hours = context.getString(R.string.hours)
             val minutes = context.getString(R.string.minutes)
@@ -235,7 +244,7 @@ class LineGraphFeatureConfigListItemView(
             newFeatureName
         )
         val oldFeatureDBName =
-            featurePathProvider.features.firstOrNull { f -> f.id == oldFeatureId }?.name ?: return
+            featureDataProvider.features.firstOrNull { f -> f.id == oldFeatureId }?.name ?: return
         if (oldFeatureDBName == oldFeatureName || oldFeatureName == "") {
             binding.lineGraphFeatureName.setText(newFeatureName)
         }

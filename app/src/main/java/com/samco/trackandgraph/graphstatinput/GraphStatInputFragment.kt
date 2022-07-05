@@ -24,31 +24,33 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
 import androidx.core.widget.addTextChangedListener
+import android.widget.*
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.room.withTransaction
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.*
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
-import com.samco.trackandgraph.graphclassmappings.graphStatTypes
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatinput.configviews.*
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.util.hideKeyboard
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import java.lang.Exception
-import kotlin.reflect.full.primaryConstructor
+import javax.inject.Inject
 
-
+@AndroidEntryPoint
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
     private val args: GraphStatInputFragmentArgs by navArgs()
@@ -61,6 +63,9 @@ class GraphStatInputFragment : Fragment() {
 
     private var lastPreviewButtonDownPosY = 0f
 
+    @Inject
+    lateinit var gsiProvider: GraphStatInteractorProvider
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -69,11 +74,7 @@ class GraphStatInputFragment : Fragment() {
         this.navController = container?.findNavController()
         binding = FragmentGraphStatInputBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        viewModel.initViewModel(
-            TrackAndGraphDatabase.getInstance(requireContext()),
-            args.groupId,
-            args.graphStatId
-        )
+        viewModel.initViewModel(args.groupId, args.graphStatId)
         listenToViewModelState()
         return binding.root
     }
@@ -188,17 +189,18 @@ class GraphStatInputFragment : Fragment() {
     private fun updateViewForSelectedGraphStatType(graphStatType: GraphStatType) {
         binding.configLayout.removeAllViews()
         inflateConfigView(graphStatType)
-        currentConfigView.initFromConfigData(viewModel.configData.value, viewModel.featurePathProvider)
+        currentConfigView.initFromConfigData(
+            viewModel.configData.value,
+            viewModel.featureDataProvider
+        )
         listenToConfigView()
     }
 
     private fun inflateConfigView(graphStatType: GraphStatType) {
-        graphStatTypes[graphStatType]?.configViewClass
-            ?.primaryConstructor?.call(requireContext(), null, 0)
-            ?.let {
-                currentConfigView = it
-                binding.configLayout.addView(it)
-            }
+        gsiProvider.getConfigView(graphStatType, requireContext()).let {
+            currentConfigView = it
+            binding.configLayout.addView(it)
+        }
     }
 
     private fun listenToFormValid() {
@@ -220,7 +222,8 @@ class GraphStatInputFragment : Fragment() {
                 binding.previewOverlay.visibility = View.GONE
             } else {
                 binding.btnPreivew.visibility = View.VISIBLE
-                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, true)
+                val decorator = gsiProvider.getDecorator(data.graphOrStat.type, true)
+                binding.demoGraphStatCardView.graphStatView.initFromGraphStat(data, decorator)
             }
             if (viewModel.formValid.value != null) {
                 binding.demoGraphStatCardView.graphStatView.initError(
@@ -239,11 +242,12 @@ class GraphStatInputFragment : Fragment() {
 
 enum class GraphStatInputState { INITIALIZING, WAITING, ADDING, FINISHED }
 class ValidationException(val errorMessageId: Int) : Exception()
-class GraphStatInputViewModel : ViewModel() {
 
-    private var database: TrackAndGraphDatabase? = null
-    private var dataSource: TrackAndGraphDatabaseDao? = null
-
+@HiltViewModel
+class GraphStatInputViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor,
+    private val gsiProvider: GraphStatInteractorProvider
+) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
     private val workScope = CoroutineScope(Dispatchers.Default + updateJob)
@@ -277,33 +281,38 @@ class GraphStatInputViewModel : ViewModel() {
     val demoViewData: LiveData<IGraphStatViewData?> get() = _demoViewData
     private val _demoViewData = MutableLiveData<IGraphStatViewData?>(null)
 
-    lateinit var featurePathProvider: FeaturePathProvider private set
+    lateinit var featureDataProvider: FeatureDataProvider private set
 
-    fun initViewModel(database: TrackAndGraphDatabase, graphStatGroupId: Long, graphStatId: Long) {
-        if (this.database != null) return
-        this.database = database
-        this.dataSource = database.trackAndGraphDatabaseDao
+    fun initViewModel(graphStatGroupId: Long, graphStatId: Long) {
+        if (this.graphStatGroupId != -1L) return
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
         ioScope.launch {
-            val allFeatures = dataSource!!.getAllFeaturesSync()
-            val allGroups = dataSource!!.getAllGroupsSync()
-            featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
+            val allFeatures = dataInteractor.getAllFeaturesSync()
+            val allGroups = dataInteractor.getAllGroupsSync()
+            //TODO Need to get an actual data sample and iterate to get actual labels and properties
+            val featureData = allFeatures.map { feat ->
+                FeatureDataProvider.FeatureData(
+                    feat,
+                    feat.discreteValues.map { it.label }.toSet(),
+                    DataSampleProperties(null, feat.featureType == DataType.DURATION)
+                )
+            }
+            featureDataProvider = FeatureDataProvider(featureData, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
             else withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
         }
     }
 
     private suspend fun initFromExistingGraphStat(graphStatId: Long) {
-        val graphStat = dataSource!!.tryGetGraphStatById(graphStatId)
+        val graphStat = dataInteractor.tryGetGraphStatById(graphStatId)
 
         if (graphStat == null) {
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.WAITING }
             return
         }
 
-        val configData = graphStatTypes[graphStat.type]
-            ?.dataSourceAdapter!!.getConfigData(dataSource!!, graphStatId)
+        val configData = gsiProvider.getDataSourceAdapter(graphStat.type).getConfigData(graphStatId)
 
         configData?.first?.let {
             withContext(Dispatchers.Main) {
@@ -351,10 +360,9 @@ class GraphStatInputViewModel : ViewModel() {
         withContext(Dispatchers.Main) {
             _demoViewData.value = IGraphStatViewData.loading(graphOrStat)
         }
-        val graphStatType = graphStatTypes[graphOrStat.type]
-        val demoData = graphStatType?.dataFactory
-            ?.getViewData(dataSource!!, graphOrStat, _configData.value!!) {}
-        withContext(Dispatchers.Main) { demoData?.let { _demoViewData.value = it } }
+        val demoData = gsiProvider.getDataFactory(graphOrStat.type)
+            .getViewData(graphOrStat, _configData.value!!) {}
+        withContext(Dispatchers.Main) { _demoViewData.value = demoData }
     }
 
     private fun validateConfiguration() {
@@ -371,17 +379,17 @@ class GraphStatInputViewModel : ViewModel() {
         if (_configData.value == null) return
         _state.value = GraphStatInputState.ADDING
         ioScope.launch {
-            database!!.withTransaction {
+            dataInteractor.withTransaction {
                 val graphStatId = if (_updateMode.value!!) {
-                    dataSource!!.updateGraphOrStat(constructGraphOrStat())
+                    dataInteractor.updateGraphOrStat(constructGraphOrStat())
                     graphStatId!!
                 } else {
                     shiftUpGraphStatViewIndexes()
-                    dataSource!!.insertGraphOrStat(constructGraphOrStat())
+                    dataInteractor.insertGraphOrStat(constructGraphOrStat())
                 }
 
-                graphStatTypes[_graphStatType.value]?.dataSourceAdapter?.writeConfig(
-                    dataSource!!, graphStatId, _configData.value!!, _updateMode.value!!
+                gsiProvider.getDataSourceAdapter(_graphStatType.value!!).writeConfig(
+                    graphStatId, _configData.value!!, _updateMode.value!!
                 )
             }
             withContext(Dispatchers.Main) { _state.value = GraphStatInputState.FINISHED }
@@ -389,10 +397,10 @@ class GraphStatInputViewModel : ViewModel() {
     }
 
     private fun shiftUpGraphStatViewIndexes() {
-        val newList = dataSource!!.getAllGraphStatsSync().map {
+        val newList = dataInteractor.getAllGraphStatsSync().map {
             it.copy(displayIndex = it.displayIndex + 1)
         }
-        dataSource!!.updateGraphStats(newList)
+        dataInteractor.updateGraphStats(newList)
     }
 
     private fun constructGraphOrStat() = GraphOrStat(

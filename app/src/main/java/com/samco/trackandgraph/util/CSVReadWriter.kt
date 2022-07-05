@@ -17,11 +17,14 @@
 package com.samco.trackandgraph.util
 
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.DiscreteValue
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
+import com.samco.trackandgraph.base.database.dto.DiscreteValue
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.odtFromString
+import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.ui.dataVisColorList
+import com.samco.trackandgraph.ui.getDisplayValue
 import kotlinx.coroutines.yield
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
@@ -33,6 +36,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.lang.Exception
 
+//TODO should refactor this into a class and inject it where needed
 object CSVReadWriter {
     enum class REQUIRED_HEADERS {
         FeatureName,
@@ -49,20 +53,20 @@ object CSVReadWriter {
 
     suspend fun writeFeaturesToCSV(
         features: List<Feature>,
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         outStream: OutputStream
     ) {
         outStream.writer().use {
             val csvWriter = CSVPrinter(it, CSVFormat.DEFAULT.withHeader(HEADERS::class.java))
             for (feature in features) {
-                val dataPoints = dataSource.getDataPointsForFeatureSync(feature.id)
+                val dataPoints = dataInteractor.getDataPointsForFeatureSync(feature.id)
 
                 val dataPointToString = when (feature.featureType) {
-                    FeatureType.DISCRETE -> { dp: DataPoint ->
+                    DataType.DISCRETE -> { dp: DataPoint ->
                         DiscreteValue.fromDataPoint(dp).toString()
                     }
-                    FeatureType.CONTINUOUS -> { dp: DataPoint -> dp.value.toString() }
-                    FeatureType.DURATION -> { dp: DataPoint -> DataPoint.getDisplayValue(dp, FeatureType.DURATION) }
+                    DataType.CONTINUOUS -> { dp: DataPoint -> dp.value.toString() }
+                    DataType.DURATION -> { dp: DataPoint -> dp.getDisplayValue(DataType.DURATION) }
                 }
 
                 dataPoints.forEach { dp ->
@@ -80,7 +84,7 @@ object CSVReadWriter {
     }
 
     suspend fun readFeaturesFromCSV(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         inputStream: InputStream,
         trackGroupId: Long
     ) {
@@ -91,7 +95,7 @@ object CSVReadWriter {
                     .parse(it)
                 val headerMap = records.headerMap
                 validateHeaderMap(headerMap)
-                ingestRecords(dataSource, records, trackGroupId)
+                ingestRecords(dataInteractor, records, trackGroupId)
             }
         } catch (e: Exception) {
             Timber.e(e)
@@ -101,11 +105,11 @@ object CSVReadWriter {
     }
 
     private suspend fun ingestRecords(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         records: Iterable<CSVRecord>,
         trackGroupId: Long
     ) {
-        val existingFeatures = dataSource.getFeaturesForGroupSync(trackGroupId).toMutableList()
+        val existingFeatures = dataInteractor.getFeaturesForGroupSync(trackGroupId).toMutableList()
         val existingFeaturesByName = existingFeatures.map { it.name to it }.toMap().toMutableMap()
         val newDataPoints = mutableListOf<DataPoint>()
 
@@ -114,7 +118,7 @@ object CSVReadWriter {
             val rec = getValidRecordData(record, lineNumber)
             if (existingFeaturesByName.containsKey(rec.featureName)) {
                 addDataPointToExistingFeature(
-                    dataSource,
+                    dataInteractor,
                     existingFeatures,
                     existingFeaturesByName,
                     newDataPoints,
@@ -123,7 +127,7 @@ object CSVReadWriter {
                 )
             } else {
                 addDataPointToNewFeature(
-                    dataSource,
+                    dataInteractor,
                     existingFeatures,
                     existingFeaturesByName,
                     newDataPoints,
@@ -133,16 +137,16 @@ object CSVReadWriter {
                 )
             }
             if (lineNumber % 1000 == 0) {
-                dataSource.insertDataPoints(newDataPoints)
+                dataInteractor.insertDataPoints(newDataPoints)
                 newDataPoints.clear()
             }
             yield()
         }
-        if (newDataPoints.isNotEmpty()) dataSource.insertDataPoints(newDataPoints)
+        if (newDataPoints.isNotEmpty()) dataInteractor.insertDataPoints(newDataPoints)
     }
 
     private fun addDataPointToNewFeature(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         existingFeatures: MutableList<Feature>,
         existingFeaturesByName: MutableMap<String, Feature>,
         points: MutableList<DataPoint>,
@@ -150,10 +154,10 @@ object CSVReadWriter {
         rec: RecordData,
         lineNumber: Int
     ) {
-        val newFeature = createNewFeature(dataSource, rec, trackGroupId, lineNumber)
+        val newFeature = createNewFeature(dataInteractor, rec, trackGroupId, lineNumber)
         insertFeature(existingFeatures, existingFeaturesByName, newFeature)
         when (newFeature.featureType) {
-            FeatureType.DISCRETE -> addDiscreteDataPoint(
+            DataType.DISCRETE -> addDiscreteDataPoint(
                 points,
                 rec.value,
                 rec.timestamp,
@@ -161,14 +165,14 @@ object CSVReadWriter {
                 rec.note,
                 lineNumber
             )
-            FeatureType.CONTINUOUS -> addContinuousDataPoint(
+            DataType.CONTINUOUS -> addContinuousDataPoint(
                 points,
                 rec.value.toDoubleOrNull(),
                 rec.timestamp,
                 newFeature.id,
                 rec.note
             )
-            FeatureType.DURATION -> addDurationDataPoint(
+            DataType.DURATION -> addDurationDataPoint(
                 points,
                 rec.value,
                 rec.timestamp,
@@ -179,7 +183,7 @@ object CSVReadWriter {
     }
 
     private fun addDataPointToExistingFeature(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         existingFeatures: MutableList<Feature>,
         existingFeaturesByName: MutableMap<String, Feature>,
         points: MutableList<DataPoint>,
@@ -188,8 +192,8 @@ object CSVReadWriter {
     ) {
         val feature = existingFeaturesByName[rec.featureName]!!
         when (getFeatureTypeForValue(rec.value)) {
-            FeatureType.DISCRETE -> {
-                validateFeatureType(feature, FeatureType.DISCRETE, lineNumber)
+            DataType.DISCRETE -> {
+                validateFeatureType(feature, DataType.DISCRETE, lineNumber)
                 val discreteValue =
                     addDiscreteDataPoint(
                         points,
@@ -201,7 +205,7 @@ object CSVReadWriter {
                     )
                 if (!feature.discreteValues.contains(discreteValue)) {
                     addDiscreteValueToFeature(
-                        dataSource,
+                        dataInteractor,
                         existingFeatures,
                         existingFeaturesByName,
                         feature,
@@ -210,8 +214,8 @@ object CSVReadWriter {
                     )
                 }
             }
-            FeatureType.CONTINUOUS -> {
-                validateFeatureType(feature, FeatureType.CONTINUOUS, lineNumber)
+            DataType.CONTINUOUS -> {
+                validateFeatureType(feature, DataType.CONTINUOUS, lineNumber)
                 addContinuousDataPoint(
                     points,
                     rec.value.toDoubleOrNull(),
@@ -220,8 +224,8 @@ object CSVReadWriter {
                     rec.note
                 )
             }
-            FeatureType.DURATION -> {
-                validateFeatureType(feature, FeatureType.DURATION, lineNumber)
+            DataType.DURATION -> {
+                validateFeatureType(feature, DataType.DURATION, lineNumber)
                 addDurationDataPoint(
                     points,
                     rec.value,
@@ -256,7 +260,7 @@ object CSVReadWriter {
     }
 
     private fun addDiscreteValueToFeature(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         existingFeatures: MutableList<Feature>,
         existingFeaturesByName: MutableMap<String, Feature>,
         feature: Feature,
@@ -267,7 +271,7 @@ object CSVReadWriter {
         existingFeatures.remove(feature)
         existingFeaturesByName.remove(feature.name)
         val newFeature =
-            tryAddDiscreteValueToFeature(dataSource, feature, discreteValue, lineNumber)
+            tryAddDiscreteValueToFeature(dataInteractor, feature, discreteValue, lineNumber)
         existingFeatures.add(newFeature)
         existingFeaturesByName[newFeature.name] = newFeature
     }
@@ -341,14 +345,14 @@ object CSVReadWriter {
     }
 
     private fun createNewFeature(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         rec: RecordData,
         trackGroupId: Long,
         lineNumber: Int
     ): Feature {
         val featureType = getFeatureTypeForValue(rec.value)
         val discreteValues =
-            if (featureType == FeatureType.DISCRETE) listOf(
+            if (featureType == DataType.DISCRETE) listOf(
                 tryGetDiscreteValueFromString(
                     rec.value,
                     lineNumber
@@ -359,7 +363,7 @@ object CSVReadWriter {
             0, rec.featureName, trackGroupId, featureType,
             discreteValues, 0, false, 1.0, ""
         )
-        val featureId = dataSource.insertFeature(newFeature)
+        val featureId = dataInteractor.insertFeature(newFeature)
         return newFeature.copy(id = featureId)
     }
 
@@ -375,7 +379,7 @@ object CSVReadWriter {
     }
 
     private fun tryAddDiscreteValueToFeature(
-        dataSource: TrackAndGraphDatabaseDao,
+        dataInteractor: DataInteractor,
         feature: Feature,
         discreteValue: DiscreteValue,
         lineNumber: Int
@@ -397,11 +401,11 @@ object CSVReadWriter {
                 listOf(lineNumber.toString(), discreteValue.label)
             )
         newDiscreteValues.add(discreteValue)
-        dataSource.updateFeature(feature.copy(discreteValues = newDiscreteValues))
+        dataInteractor.updateFeature(feature.copy(discreteValues = newDiscreteValues))
         return feature.copy(discreteValues = newDiscreteValues)
     }
 
-    private fun validateFeatureType(feature: Feature, expectedType: FeatureType, lineNumber: Int) {
+    private fun validateFeatureType(feature: Feature, expectedType: DataType, lineNumber: Int) {
         if (feature.featureType != expectedType)
             throw ImportFeaturesException(
                 R.string.import_exception_inconsistent_data_type,
@@ -409,12 +413,12 @@ object CSVReadWriter {
             )
     }
 
-    private fun getFeatureTypeForValue(value: String): FeatureType {
+    private fun getFeatureTypeForValue(value: String): DataType {
         val durationRegex = Regex("\\d*:\\d{2}:\\d{2}")
         return when {
-            value.matches(durationRegex) -> FeatureType.DURATION
-            value.contains(":") -> FeatureType.DISCRETE
-            else -> FeatureType.CONTINUOUS
+            value.matches(durationRegex) -> DataType.DURATION
+            value.contains(":") -> DataType.DISCRETE
+            else -> DataType.CONTINUOUS
         }
     }
 

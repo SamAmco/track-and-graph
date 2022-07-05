@@ -29,7 +29,10 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.DEFAULT_ALL
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.model.DataInteractor
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
 class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context?, intent: Intent?) {
@@ -59,7 +62,12 @@ class AlarmReceiver : BroadcastReceiver() {
     }
 }
 
+@AndroidEntryPoint
 class RecreateAlarms : BroadcastReceiver() {
+
+    @Inject
+    lateinit var dataInteractor: DataInteractor
+
     override fun onReceive(context: Context?, intent: Intent?) {
         val validActions = listOf(
             "action.REMINDERS_CHANGED",
@@ -69,6 +77,6 @@ class RecreateAlarms : BroadcastReceiver() {
         )
         if (!validActions.contains(intent?.action)) return
         if (context == null) return
-        runBlocking { RemindersHelper.syncAlarms(context) }
+        runBlocking { RemindersHelper.syncAlarms(context, dataInteractor) }
     }
 }
