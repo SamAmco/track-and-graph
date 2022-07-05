@@ -60,7 +60,7 @@ class DataPointInputView : FrameLayout {
     private val stopwatchButton: ToggleButton
     private val durationInputContainer: ConstraintLayout
 
-    private val startTime = GregorianCalendar.getInstance().timeInMillis
+    private var startTime: Long = 0L
     var isStopwatched = false
 
     constructor(context: Context) : this(context, null)
@@ -83,7 +83,8 @@ class DataPointInputView : FrameLayout {
         stopwatchButton = view.findViewById(R.id.stopwatchButton)
         durationInputContainer = view.findViewById(R.id.durationInputContainer)
 
-        stopwatchButton.setOnClickListener { view ->
+        stopwatchButton.setOnClickListener { _ ->
+            startTime = GregorianCalendar.getInstance().timeInMillis
             isStopwatched = stopwatchButton.isChecked
         }
     }
@@ -225,7 +226,9 @@ class DataPointInputView : FrameLayout {
 
     fun updateStopwatchIfNeeded() {
         if (state.feature.featureType == FeatureType.DURATION && isStopwatched)
-            durationInput.setTimeInSeconds((Calendar.getInstance().timeInMillis - startTime) / 1000)
+            durationInput.setTimeInSeconds(
+                (Calendar.getInstance().timeInMillis - (startTime ?: 0L)) / 1000
+            )
     }
 
     fun updateDateTimes() = setSelectedDateTime(state.dateTime)
