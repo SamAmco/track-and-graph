@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatinput
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -46,6 +47,7 @@ import com.samco.trackandgraph.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,7 +62,7 @@ class GraphStatInputFragment : Fragment() {
     private lateinit var binding: FragmentGraphStatInputBinding
     private val viewModel by viewModels<GraphStatInputViewModel>()
 
-    private val updateDemoHandler = Handler()
+    private val updateDemoHandler = Handler(Looper.getMainLooper())
 
     private lateinit var currentConfigView: GraphStatConfigView
 
@@ -74,7 +76,7 @@ class GraphStatInputFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        this.navController = container?.findNavController()
+        navController = container?.findNavController()
         binding = FragmentGraphStatInputBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel.initViewModel(args.groupId, args.graphStatId)
@@ -111,6 +113,7 @@ class GraphStatInputFragment : Fragment() {
                     listenToDemoViewData()
                     listenToAddButton()
                     listenToPreviewButton()
+                    binding.graphStatNameInput.focusAndShowKeyboard()
                 }
                 GraphStatInputState.ADDING -> binding.inputProgressBar.visibility = View.VISIBLE
                 else -> navController?.popBackStack()
