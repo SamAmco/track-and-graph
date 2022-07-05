@@ -48,8 +48,7 @@ import kotlin.concurrent.timerTask
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 
-open class InputDataPointDialog : DialogFragment(),
-    ViewPager.OnPageChangeListener {
+open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private lateinit var binding: DataPointInputDialogBinding
@@ -77,7 +76,6 @@ open class InputDataPointDialog : DialogFragment(),
                     (binding.viewPager.adapter as ViewPagerAdapter).updateStopwatch()
                 }
             }, 1000, 1000)
-
 
             binding.viewPager.addOnPageChangeListener(this)
             dialog?.setCanceledOnTouchOutside(true)
@@ -219,7 +217,6 @@ open class InputDataPointDialog : DialogFragment(),
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
     }
-
 
     private fun onAddClicked() {
         val currIndex = viewModel.currentFeatureIndex.value!!

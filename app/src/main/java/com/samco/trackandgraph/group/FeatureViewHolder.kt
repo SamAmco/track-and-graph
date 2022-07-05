@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.database.dto.DisplayFeature
-import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
 
@@ -47,10 +46,7 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
-        binding.quickAddButton.setOnLongClickListener {
-            clickListener.onAdd(feature, false).let { true }
-        }
-
+        binding.quickAddButton.setOnLongClickListener { clickListener.onAdd(feature, false).let { true } }
         if (feature.hasDefaultValue) {
             binding.addButton.visibility = View.INVISIBLE
             binding.quickAddButton.visibility = View.VISIBLE
@@ -134,15 +130,13 @@ class FeatureClickListener(
     private val onDeleteListener: (feature: DisplayFeature) -> Unit,
     private val onMoveToListener: (feature: DisplayFeature) -> Unit,
     private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
-    private val onAddListener: (feature: DisplayFeature, useDefault: Boolean) -> Unit,
+    private val onAddListener: (feature: DisplayFeature, useDefault:Boolean) -> Unit,
     private val onHistoryListener: (feature: DisplayFeature) -> Unit
 ) {
     fun onEdit(feature: DisplayFeature) = onEditListener(feature)
     fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
     fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
     fun onDescription(feature: DisplayFeature) = onDescriptionListener(feature)
-    fun onAdd(feature: DisplayFeature, useDefault: Boolean = true) =
-        onAddListener(feature, useDefault)
-
+    fun onAdd(feature: DisplayFeature, useDefault:Boolean=true) = onAddListener(feature, useDefault)
     fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
 }

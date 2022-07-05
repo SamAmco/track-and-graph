@@ -140,19 +140,19 @@
                     android:layout_gravity="center_horizontal"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                </com.samco.trackandgraph.ui.DurationInputView>
+                    app:layout_constraintTop_toTopOf="parent"/>
 
                 <ToggleButton
                     android:id="@+id/stopwatchButton"
                     android:layout_width="wrap_content"
                     android:layout_height="0dp"
+                    android:layout_marginStart="4dp"
                     android:button="@drawable/stopwatch"
-                    android:text="ToggleButton"
+                    android:textAlignment="viewEnd"
                     app:layout_constraintBottom_toBottomOf="@id/durationInput"
                     app:layout_constraintLeft_toRightOf="@id/durationInput"
-                    app:layout_constraintTop_toTopOf="@id/durationInput" />
+                    app:layout_constraintTop_toTopOf="@id/durationInput"
+                    app:layout_constraintVertical_bias="0.0" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -168,11 +168,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:orientation="horizontal" >
-
-                </LinearLayout>
+                    android:orientation="horizontal" />
             </HorizontalScrollView>
-
         </FrameLayout>
 
     </LinearLayout>
