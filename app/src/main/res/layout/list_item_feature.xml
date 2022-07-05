@@ -126,25 +126,6 @@
                 app:srcCompat="@drawable/add_box" />
 
             <ImageButton
-                android:id="@+id/stopwatchAddButton"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_gravity="bottom|end"
-                android:layout_marginEnd="55dp"
-                android:background="@null"
-                android:contentDescription="@string/add_data_point_button_content_description"
-                android:paddingStart="10dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="2dp"
-                android:paddingBottom="2dp"
-                android:scaleType="fitXY"
-                android:tint="?attr/colorControlNormal"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/reminders_icon" />
-
-            <ImageButton
                 android:id="@+id/quickAddButton"
                 android:layout_width="55dp"
                 android:layout_height="55dp"
