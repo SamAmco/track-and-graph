@@ -148,7 +148,6 @@
                     android:layout_height="0dp"
                     android:layout_marginStart="4dp"
                     android:button="@drawable/stopwatch"
-                    android:textAlignment="viewEnd"
                     app:layout_constraintBottom_toBottomOf="@id/durationInput"
                     app:layout_constraintLeft_toRightOf="@id/durationInput"
                     app:layout_constraintTop_toTopOf="@id/durationInput"
