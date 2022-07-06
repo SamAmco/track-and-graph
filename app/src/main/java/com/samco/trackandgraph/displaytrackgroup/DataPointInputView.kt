@@ -23,6 +23,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -38,11 +39,13 @@ import com.samco.trackandgraph.ui.doubleFormatter
 import com.samco.trackandgraph.ui.formatDayMonthYear
 import com.samco.trackandgraph.util.getDoubleFromText
 import com.samco.trackandgraph.util.showKeyboard
+import com.samco.trackandgraph.util.window
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import java.util.*
+
 
 class DataPointInputView : FrameLayout {
     private val titleText: TextView
@@ -83,6 +86,10 @@ class DataPointInputView : FrameLayout {
         stopwatchButton.setOnClickListener {
             startTime = GregorianCalendar.getInstance().timeInMillis
             isStopwatched = stopwatchButton.isChecked
+            context.window?.run {
+                // https://developer.android.com/training/scheduling/wakelock
+                if (isStopwatched) addFlags(FLAG_KEEP_SCREEN_ON) else clearFlags(FLAG_KEEP_SCREEN_ON)
+            }
         }
     }
 
@@ -275,3 +282,4 @@ class DataPointInputView : FrameLayout {
         }
     }
 }
+

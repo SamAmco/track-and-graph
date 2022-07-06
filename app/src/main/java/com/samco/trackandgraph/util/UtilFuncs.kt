@@ -19,6 +19,7 @@ package com.samco.trackandgraph.util
 
 import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import android.os.IBinder
 import android.os.VibrationEffect
@@ -29,6 +30,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
+import com.samco.trackandgraph.displaytrackgroup.DataPointInputView
 import java.lang.NumberFormatException
 
 /**
@@ -74,6 +76,19 @@ fun Context.getColorFromAttr(
     theme.resolveAttribute(attrColor, typedValue, resolveRefs)
     return typedValue.data
 }
+
+val Context.window: Window?
+    // https://stackoverflow.com/a/32973351/13310191
+    get() {
+        var context_ = this
+        while (context_ is ContextWrapper) {
+            if (context_ is Activity) {
+                return context_.window
+            }
+            context_ = context_.baseContext
+        }
+        return null
+    }
 
 fun Window.hideKeyboard(windowToken: IBinder? = null, flags: Int = 0) {
     val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
