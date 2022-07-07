@@ -79,7 +79,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun listenToState() {
-        viewModel.state.observe(this, Observer { state ->
+        viewModel.state.observe(this) { state ->
             when (state) {
                 InputDataPointDialogState.LOADING -> {
                     binding.addButton.isEnabled = false
@@ -97,16 +97,15 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
                         viewModel.onFinishedTransition()
                     } else dismiss()
                 }
-                else -> {
-                }
+                else -> {}
             }
-        })
+        }
     }
 
     private fun listenToIndex() {
-        viewModel.currentFeatureIndex.observe(this, Observer { index ->
-            if (index != null) setupViewFeature(viewModel.features.value!![index], index)
-        })
+        viewModel.currentFeatureIndex.observe(this) { index ->
+            index?.run { setupViewFeature(viewModel.features.value!![index], index) }
+        }
     }
 
     private fun listenToFeatures() {
@@ -119,7 +118,13 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
                 viewModel.uiStates,
                 inputViews
             )
-            if (features.size == 1) binding.indexText.visibility = View.INVISIBLE
+            if (features.size == 1) {
+                // only show skip button if there is the pager contains multiple inputs
+                // if there is only a single input, there is nothing to "skip"
+                //      and the button should therefore not be shown
+                binding.indexText.visibility = View.GONE
+                binding.skipButton.visibility = View.GONE
+            }
         })
     }
 
@@ -170,13 +175,11 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         }
 
         override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-            if (existingViews.contains(`object`)) existingViews.remove(`object`)
+            existingViews.remove(`object`) // does nothing if missing
             container.removeView(`object` as View)
         }
 
-        fun updateAllDateTimes() {
-            existingViews.forEach { dpiv -> dpiv.updateDateTimes() }
-        }
+        fun updateAllDateTimes() = existingViews.forEach { dpiv -> dpiv.updateDateTimes() }
 
         override fun getCount() = features.size
     }
@@ -308,7 +311,7 @@ class InputDataPointDialogViewModel @Inject constructor(
     ): Map<Feature, DataPointInputView.DataPointInputData> {
         val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
         val timeFixed = dataPointData != null
-        return featureData.map { f ->
+        return featureData.associateWith { f ->
             val dataPointValue = when {
                 dataPointData?.value != null -> dataPointData.value
                 f.hasDefaultValue -> f.defaultValue
@@ -318,7 +321,7 @@ class InputDataPointDialogViewModel @Inject constructor(
             val dataPointLabel = dataPointData?.label
                 ?: if (f.hasDefaultValue) f.getDefaultLabel() else ""
             val dataPointNote = dataPointData?.note ?: ""
-            f to DataPointInputView.DataPointInputData(
+            DataPointInputView.DataPointInputData(
                 f,
                 timestamp,
                 dataPointValue,
@@ -328,7 +331,7 @@ class InputDataPointDialogViewModel @Inject constructor(
                 this@InputDataPointDialogViewModel::onDateTimeSelected,
                 dataPointData
             )
-        }.toMap()
+        }
     }
 
     private fun onDateTimeSelected(dateTime: OffsetDateTime) {
@@ -343,7 +346,7 @@ class InputDataPointDialogViewModel @Inject constructor(
         if (state.value != InputDataPointDialogState.WAITING) return
         _state.value = InputDataPointDialogState.ADDING
         ioScope.launch {
-            if (oldDataPoint != null) dataInteractor.deleteDataPoint(oldDataPoint)
+            oldDataPoint?.let { dataInteractor.deleteDataPoint(it) }
             dataInteractor.insertDataPoint(newDataPoint)
             withContext(Dispatchers.Main) { _state.value = InputDataPointDialogState.ADDED }
         }
