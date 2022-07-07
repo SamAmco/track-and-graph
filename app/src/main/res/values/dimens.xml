@@ -18,6 +18,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <dimen name="card_margin_small">4dp</dimen>
     <dimen name="card_padding">10dp</dimen>
+    <dimen name="half_card_padding">5dp</dimen>
     <dimen name="card_corner_radius">4dp</dimen>
     <dimen name="dialog_input_spacing">10dp</dimen>
     <dimen name="input_spacing_large">20dp</dimen>
