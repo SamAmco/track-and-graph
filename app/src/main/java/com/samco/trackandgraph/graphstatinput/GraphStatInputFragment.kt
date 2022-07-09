@@ -382,6 +382,7 @@ class GraphStatInputViewModel @Inject constructor(
         if (_configData.value == null) return
         _state.value = GraphStatInputState.ADDING
         viewModelScope.launch(io) {
+            //TODO this should all be done in a transaction somehow
             val graphStatId = if (_updateMode.value!!) {
                 dataInteractor.updateGraphOrStat(constructGraphOrStat())
                 graphStatId!!
