@@ -252,7 +252,6 @@
     <string name="create">Erstellen</string>
     <string name="use_default_value">Einen Standardwert festlegen</string>
     <string name="default_value_description_hint">(Ihr Standardwert wird automatisch verwendet, wenn Sie einen Datenpunkt hinzufügen, aber Sie können jederzeit zurückgehen und ihn ändern).</string>
-    <string name="check_all_relevant_values">Überprüfe alle relevanten Werte: </string>
     <string name="backup_and_restore">Sichern und Wiederherstellen</string>
     <string name="backup_hint_text">Die Sicherung sichert alle Ihre Anwendungsdaten einschließlich aller verfolgten Daten, Grafiken und Erinnerungen. Sie sollten Ihre Daten regelmäßig auf ein externes Gerät oder einen Cloud Speicher sichern, für den Fall, dass Ihr Gerät verloren geht oder kaputt geht.</string>
     <string name="restore_hint_text">WARNUNG: Das Wiederherstellen aus einer Sicherung löscht alle Daten und Einstellungen, die sich derzeit in der App befinden. Track &amp; Graph wird nach Abschluss der Wiederherstellung neu gestartet.</string>
