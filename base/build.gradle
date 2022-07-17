@@ -29,6 +29,16 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
 
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+
+        sourceSets {
+            androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+        }
+
         kapt {
             arguments {
                 arg("room.schemaLocation", "$projectDir/schemas".toString())
@@ -64,7 +74,13 @@ dependencies {
     api "com.squareup.moshi:moshi:1.13.0"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:1.13.0"
 
+    //CSV
+    implementation 'org.apache.commons:commons-csv:1.7'
+
     testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
     testImplementation 'junit:junit:4.13.2'
+
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    androidTestImplementation "androidx.room:room-testing:2.4.2"
 }

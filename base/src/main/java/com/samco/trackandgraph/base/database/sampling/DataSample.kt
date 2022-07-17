@@ -66,7 +66,17 @@ abstract class DataSample(
 
     /**
      * Get a list of all the raw data points that have been used so far to generate this
-     * data sample.
+     * data sample. This will not contain any data points that have not yet been iterated in the
+     * sequence.
      */
     abstract fun getRawDataPoints(): List<DataPoint>
+
+    /**
+     * Get a list of all the raw data points for this data sample. This will iterate the entire
+     * sequence and then retrieve all accessed raw data points.
+     */
+    open fun getAllRawDataPoints(): List<DataPoint> {
+        iterator().let { while (it.hasNext()) it.next() }
+        return getRawDataPoints()
+    }
 }

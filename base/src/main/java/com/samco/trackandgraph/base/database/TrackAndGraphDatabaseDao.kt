@@ -142,13 +142,13 @@ internal interface TrackAndGraphDatabaseDao {
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
-    fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
+
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
+    fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp = :timestamp")
     fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
@@ -238,7 +238,6 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat)
 
-    //TODO consider managing GraphOrStat automatically in the model
     @Insert
     fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
 
@@ -252,7 +251,7 @@ internal interface TrackAndGraphDatabaseDao {
     fun updateTimeHistogram(timeHistogram: TimeHistogram)
 
     @Insert
-    fun insertTimeHistogram(timeHistogram: TimeHistogram)
+    fun insertTimeHistogram(timeHistogram: TimeHistogram): Long
 
     @Query("SELECT * FROM time_histograms_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?

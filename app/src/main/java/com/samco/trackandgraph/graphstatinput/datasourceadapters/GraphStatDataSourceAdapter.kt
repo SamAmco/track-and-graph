@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.model.DataInteractor
-import javax.inject.Inject
 
 /**
  * An abstract adapter for retrieving and writing graph or stat configs to a database
@@ -30,7 +29,7 @@ abstract class GraphStatDataSourceAdapter<I>(
     protected val dataInteractor: DataInteractor
 ) {
     protected abstract suspend fun writeConfigToDatabase(
-        graphOrStatId: Long,
+        graphOrStat: GraphOrStat,
         config: I,
         updateMode: Boolean
     )
@@ -44,8 +43,8 @@ abstract class GraphStatDataSourceAdapter<I>(
     }
 
     @Suppress("UNCHECKED_CAST")
-    suspend fun writeConfig(graphOrStatId: Long, config: Any, updateMode: Boolean) {
-        writeConfigToDatabase(graphOrStatId, config as I, updateMode)
+    suspend fun writeConfig(graphOrStat: GraphOrStat, config: Any, updateMode: Boolean) {
+        writeConfigToDatabase(graphOrStat, config as I, updateMode)
     }
 
     protected abstract suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean
@@ -56,11 +55,5 @@ abstract class GraphStatDataSourceAdapter<I>(
         }
     }
 
-    protected abstract suspend fun duplicate(oldGraphId: Long, newGraphId: Long)
-
-    suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        val originalId = graphOrStat.id
-        val newId = dataInteractor.insertGraphOrStat(graphOrStat.copy(id = 0))
-        duplicate(originalId, newId)
-    }
+    abstract suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat)
 }

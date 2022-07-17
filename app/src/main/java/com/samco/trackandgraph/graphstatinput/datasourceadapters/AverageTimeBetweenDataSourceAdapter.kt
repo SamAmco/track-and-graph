@@ -26,12 +26,12 @@ class AverageTimeBetweenDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<AverageTimeBetweenStat>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        graphOrStatId: Long,
+        graphOrStat: GraphOrStat,
         config: AverageTimeBetweenStat,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateAverageTimeBetweenStat(config.copy(graphStatId = graphOrStatId))
-        else dataInteractor.insertAverageTimeBetweenStat(config.copy(graphStatId = graphOrStatId))
+        if (updateMode) dataInteractor.updateAverageTimeBetweenStat(graphOrStat, config)
+        else dataInteractor.insertAverageTimeBetweenStat(graphOrStat, config)
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, AverageTimeBetweenStat>? {
@@ -44,9 +44,7 @@ class AverageTimeBetweenDataSourceAdapter @Inject constructor(
         return dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id) == null
     }
 
-    override suspend fun duplicate(oldGraphId: Long, newGraphId: Long) {
-        val avTimeStat = dataInteractor.getAverageTimeBetweenStatByGraphStatId(oldGraphId)
-        val copy = avTimeStat?.copy(id = 0, graphStatId = newGraphId)
-        copy?.let { dataInteractor.insertAverageTimeBetweenStat(it) }
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
+        dataInteractor.duplicateAverageTimeBetweenStat(graphOrStat)
     }
 }

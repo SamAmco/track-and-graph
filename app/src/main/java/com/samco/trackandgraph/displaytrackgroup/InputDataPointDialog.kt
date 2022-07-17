@@ -26,10 +26,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.samco.trackandgraph.base.database.dto.DataPoint
@@ -38,6 +35,8 @@ import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
+import com.samco.trackandgraph.di.IODispatcher
+import com.samco.trackandgraph.di.MainDispatcher
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.showKeyboard
 import dagger.hilt.android.AndroidEntryPoint
@@ -247,10 +246,10 @@ enum class InputDataPointDialogState { LOADING, WAITING, ADDING, ADDED }
 
 @HiltViewModel
 class InputDataPointDialogViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
     val state: LiveData<InputDataPointDialogState>
         get() {
@@ -290,14 +289,14 @@ class InputDataPointDialogViewModel @Inject constructor(
         initialized = true
 
         _state.value = InputDataPointDialogState.LOADING
-        ioScope.launch {
+        viewModelScope.launch(io) {
             val featureData = dataInteractor.getFeaturesByIdsSync(featureIds)
             val dataPointData = dataPointTimestamp?.let {
                 dataInteractor.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
             }
             uiStates = getUIStatesForFeatures(featureData, dataPointData)
 
-            withContext(Dispatchers.Main) {
+            withContext(ui) {
                 _features.value = featureData
                 _currentFeatureIndex.value = 0
                 _state.value = InputDataPointDialogState.WAITING
@@ -345,19 +344,16 @@ class InputDataPointDialogViewModel @Inject constructor(
     fun onDataPointInput(newDataPoint: DataPoint, oldDataPoint: DataPoint?) {
         if (state.value != InputDataPointDialogState.WAITING) return
         _state.value = InputDataPointDialogState.ADDING
-        ioScope.launch {
-            oldDataPoint?.let { dataInteractor.deleteDataPoint(it) }
-            dataInteractor.insertDataPoint(newDataPoint)
-            withContext(Dispatchers.Main) { _state.value = InputDataPointDialogState.ADDED }
+        viewModelScope.launch(io) {
+            if (oldDataPoint != newDataPoint) {
+                if (oldDataPoint != null) dataInteractor.deleteDataPoint(oldDataPoint)
+                dataInteractor.insertDataPoint(newDataPoint)
+            }
+            withContext(ui) { _state.value = InputDataPointDialogState.ADDED }
         }
     }
 
     fun onFinishedTransition() {
         _state.value = InputDataPointDialogState.WAITING
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        ioScope.cancel()
     }
 }
