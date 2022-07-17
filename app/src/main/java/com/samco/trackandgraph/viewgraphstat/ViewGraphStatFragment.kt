@@ -311,7 +311,7 @@ class ViewGraphStatViewModel @Inject constructor(
         withContext(Dispatchers.Main) { _notes.value = mergedList ?: emptyList() }
     }
 
-    private fun getAllFeatureAttributes() {
+    private suspend fun getAllFeatureAttributes() {
         val allFeatures = dataInteractor.getAllFeaturesSync()
         val allGroups = dataInteractor.getAllGroupsSync()
         featurePathProvider = FeaturePathProvider(allFeatures, allGroups)

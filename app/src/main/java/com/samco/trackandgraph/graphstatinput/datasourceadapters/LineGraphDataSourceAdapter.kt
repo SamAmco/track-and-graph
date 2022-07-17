@@ -26,20 +26,12 @@ class LineGraphDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<LineGraphWithFeatures>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        graphOrStatId: Long,
+        graphOrStat: GraphOrStat,
         config: LineGraphWithFeatures,
         updateMode: Boolean
     ) {
-        val newLineGraphId = if (updateMode) {
-            dataInteractor.deleteFeaturesForLineGraph(config.id)
-            dataInteractor.updateLineGraph(config.toLineGraph().copy(graphStatId = graphOrStatId))
-            config.id
-        } else {
-            dataInteractor.insertLineGraph(config.toLineGraph().copy(graphStatId = graphOrStatId))
-        }
-        val lineGraphFeatures = config.features
-            .map { it.copy(lineGraphId = newLineGraphId) }
-        dataInteractor.insertLineGraphFeatures(lineGraphFeatures)
+        if (updateMode) dataInteractor.updateLineGraph(graphOrStat, config)
+        else dataInteractor.insertLineGraph(graphOrStat, config)
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LineGraphWithFeatures>? {
@@ -56,15 +48,7 @@ class LineGraphDataSourceAdapter @Inject constructor(
         }
     }
 
-    override suspend fun duplicate(oldGraphId: Long, newGraphId: Long) {
-        val lineGraph = dataInteractor.getLineGraphByGraphStatId(oldGraphId)
-        lineGraph?.let {
-            val copy = it.toLineGraph().copy(id = 0, graphStatId = newGraphId)
-            val newLineGraphId = dataInteractor.insertLineGraph(copy)
-            val newFeatures = lineGraph.features.map { f ->
-                f.copy(id = 0, lineGraphId = newLineGraphId)
-            }
-            dataInteractor.insertLineGraphFeatures(newFeatures)
-        }
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
+        dataInteractor.duplicateLineGraph(graphOrStat)
     }
 }

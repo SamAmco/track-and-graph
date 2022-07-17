@@ -23,7 +23,9 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.samco.trackandgraph.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class TrackWidgetConfigureActivity : AppCompatActivity(),
     TrackWidgetConfigureDialog.TrackWidgetConfigureDialogListener {
     private var appWidgetId: Int? = null

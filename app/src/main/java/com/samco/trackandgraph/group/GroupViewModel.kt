@@ -54,8 +54,11 @@ class GroupViewModel @Inject constructor(
 
     private var initialized = false
 
+    private var groupId: Long? = null
+
     fun setGroup(groupId: Long) {
         if (initialized) return
+        this.groupId = groupId
         initialized = true
         hasFeatures = Transformations.map(dataInteractor.getAllFeatures()) { it.isNotEmpty() }
         initGroupChildren(groupId)
@@ -90,14 +93,14 @@ class GroupViewModel @Inject constructor(
     }
 
     private fun sortChildren(children: MutableList<GroupChild>) = children.sortWith { a, b ->
-        val aInd = a.displayIndex()
-        val bInd = b.displayIndex()
+        val aInd = a.displayIndex
+        val bInd = b.displayIndex
         when {
             aInd < bInd -> -1
             bInd < aInd -> 1
             else -> {
-                val aId = a.id()
-                val bId = b.id()
+                val aId = a.id
+                val bId = b.id
                 when {
                     aId > bId -> -1
                     bId > aId -> 1
@@ -109,13 +112,13 @@ class GroupViewModel @Inject constructor(
 
     private fun getFeatureChildrenAsync(groupId: Long) = viewModelScope.async(ioDispatcher) {
         return@async dataInteractor.getDisplayFeaturesForGroupSync(groupId).map {
-            GroupChild(GroupChildType.FEATURE, it, it::id, it::displayIndex)
+            GroupChild(GroupChildType.FEATURE, it, it.id, it.displayIndex)
         }
     }
 
     private fun getGroupChildrenAsync(groupId: Long) = viewModelScope.async(ioDispatcher) {
         return@async dataInteractor.getGroupsForGroupSync(groupId).map {
-            GroupChild(GroupChildType.GROUP, it, it::id, it::displayIndex)
+            GroupChild(GroupChildType.GROUP, it, it.id, it.displayIndex)
         }
     }
 
@@ -145,8 +148,8 @@ class GroupViewModel @Inject constructor(
             GroupChild(
                 GroupChildType.GRAPH,
                 it,
-                { it.second.graphOrStat.id },
-                { it.second.graphOrStat.displayIndex }
+                it.second.graphOrStat.id,
+                it.second.graphOrStat.displayIndex
             )
         }
     }
@@ -170,43 +173,8 @@ class GroupViewModel @Inject constructor(
     }
 
     fun adjustDisplayIndexes(items: List<GroupChild>) = viewModelScope.launch(ioDispatcher) {
-        val displayFeatures = mutableListOf<DisplayFeature>()
-        val groups = mutableListOf<Group>()
-        val graphs = mutableListOf<GraphOrStat>()
-        items.forEachIndexed { index, groupChild ->
-            when (groupChild.type) {
-                GroupChildType.GROUP -> groups.add(toGroupWithIndex(groupChild.obj, index))
-                GroupChildType.FEATURE -> displayFeatures.add(
-                    toDisplayFeatureWithIndex(
-                        groupChild.obj,
-                        index
-                    )
-                )
-                GroupChildType.GRAPH -> graphs.add(
-                    toGraphStatViewDataWithIndex(
-                        groupChild.obj,
-                        index
-                    )
-                )
-            }
-        }
-        dataInteractor.withTransaction {
-            dataInteractor.updateFeatures(displayFeatures.map { it.asFeature() })
-            dataInteractor.updateGraphStats(graphs)
-            dataInteractor.updateGroups(groups)
-        }
+        groupId?.let { dataInteractor.updateGroupChildOrder(it, items) }
     }
-
-    private fun toGraphStatViewDataWithIndex(obj: Any, index: Int): GraphOrStat {
-        val pair = obj as Pair<*, *>
-        val viewData = pair.second as IGraphStatViewData
-        return viewData.graphOrStat.copy(displayIndex = index)
-    }
-
-    private fun toDisplayFeatureWithIndex(obj: Any, index: Int) =
-        (obj as DisplayFeature).copy(displayIndex = index)
-
-    private fun toGroupWithIndex(obj: Any, index: Int) = (obj as Group).copy(displayIndex = index)
 
     fun onDeleteGraphStat(id: Long) =
         viewModelScope.launch(ioDispatcher) { dataInteractor.deleteGraphOrStat(id) }
@@ -216,10 +184,8 @@ class GroupViewModel @Inject constructor(
 
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         viewModelScope.launch(ioDispatcher) {
-            dataInteractor.withTransaction {
-                val gs = graphOrStatViewData.graphOrStat
-                gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs)
-            }
+            val gs = graphOrStatViewData.graphOrStat
+            gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs)
         }
     }
 }

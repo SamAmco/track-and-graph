@@ -30,10 +30,12 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.util.CSVReadWriter
+import com.samco.trackandgraph.di.IODispatcher
+import com.samco.trackandgraph.di.MainDispatcher
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
 import com.samco.trackandgraph.util.getColorFromAttr
 import dagger.hilt.android.AndroidEntryPoint
@@ -198,11 +200,10 @@ class ExportFeaturesDialog : DialogFragment() {
 @HiltViewModel
 class ExportFeaturesViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
+    @MainDispatcher private val ui: CoroutineDispatcher,
+    @IODispatcher private val io: CoroutineDispatcher,
     private val contentResolver: ContentResolver
 ) : ViewModel() {
-    private var updateJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
-
     lateinit var features: List<Feature>
 
     val exportState: LiveData<ExportState>
@@ -234,9 +235,9 @@ class ExportFeaturesViewModel @Inject constructor(
 
     fun loadFeatures(groupId: Long) {
         if (_featuresLoaded.value == false) {
-            uiScope.launch {
+            viewModelScope.launch(ui) {
                 _exportState.value = ExportState.LOADING
-                withContext(Dispatchers.IO) {
+                withContext(io) {
                     features = dataInteractor.getFeaturesForGroupSync(groupId).toMutableList()
                 }
                 selectedFeatures = features.toMutableList()
@@ -248,22 +249,21 @@ class ExportFeaturesViewModel @Inject constructor(
 
     //TODO this should probably be scheduled to run in a service
     fun beginExport() {
-        selectedFileUri.value?.let {
-            uiScope.launch {
+        selectedFileUri.value?.let { uri ->
+            viewModelScope.launch(ui) {
                 _exportState.value = ExportState.EXPORTING
-                withContext(Dispatchers.IO) {
-                    val outStream = contentResolver.openOutputStream(it)
-                    if (outStream != null) {
-                        CSVReadWriter.writeFeaturesToCSV(selectedFeatures, dataInteractor, outStream)
-                    }
-                }
+                doExport(uri)
                 _exportState.value = ExportState.DONE
             }
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        updateJob.cancel()
+    private suspend fun doExport(uri: Uri) = runCatching {
+        withContext(io) {
+            contentResolver.openOutputStream(uri)?.let { outStream ->
+                val featureIds = selectedFeatures.map { it.id }
+                dataInteractor.writeFeaturesToCSV(outStream, featureIds)
+            }
+        }
     }
 }

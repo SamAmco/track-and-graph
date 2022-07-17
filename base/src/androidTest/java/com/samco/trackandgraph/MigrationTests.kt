@@ -19,9 +19,9 @@ package com.samco.trackandgraph
 
 import androidx.room.Room
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
+import androidx.room.testing.MigrationTestHelper
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
-import androidx.room.testing.MigrationTestHelper
 import com.samco.trackandgraph.base.database.*
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue

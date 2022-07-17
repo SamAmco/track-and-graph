@@ -25,10 +25,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -39,14 +35,16 @@ import androidx.core.view.children
 import androidx.core.view.forEachIndexed
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.*
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
+import com.samco.trackandgraph.di.MainDispatcher
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -58,6 +56,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.lang.Exception
 import javax.inject.Inject
 import kotlin.math.absoluteValue
+import com.samco.trackandgraph.base.model.FeatureUpdater.DurationNumericConversionMode as DurationNumericConversionMode
 
 @AndroidEntryPoint
 class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
@@ -98,9 +97,9 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         requireContext().showKeyboard()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        requireActivity().window.hideKeyboard()
+    override fun onStop() {
+        super.onStop()
+        requireActivity().window.hideKeyboard(requireActivity().currentFocus?.windowToken)
     }
 
     private fun listenToViewModelState() {
@@ -256,6 +255,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
                     binding.defaultNumericalInput.visibility = View.GONE
                     binding.defaultDurationInput.visibility = View.VISIBLE
                 }
+                null -> {}
             }
         } else {
             binding.defaultDiscreteScrollView.visibility = View.GONE
@@ -328,7 +328,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         val layout = binding.defaultDiscreteButtonsLayout
         val item =
             layoutInflater.inflate(R.layout.discrete_value_input_button, layout, false) as CheckBox
-        item.text = label.value
+        item.text = label.label
         val index = viewModel.discreteValues.indexOf(label)
         item.isChecked =
             viewModel.featureHasDefaultValue.value!! && index == viewModel.featureDefaultValue.value?.toInt()
@@ -341,7 +341,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
     private fun updateDefaultValueButtonsText() {
         binding.defaultDiscreteButtonsLayout.children.forEachIndexed { i, view ->
-            (view as CheckBox).text = viewModel.discreteValues[i].value
+            (view as CheckBox).text = viewModel.discreteValues[i].label
         }
     }
 
@@ -353,11 +353,11 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         )
         val inputText = item.discreteValueNameText
         inputText.addTextChangedListener {
-            label.value = it.toString().trim()
+            label.label = it.toString().trim()
             updateDefaultValueButtonsText()
             validateForm()
         }
-        inputText.setText(label.value)
+        inputText.setText(label.label)
         item.deleteButton.setOnClickListener {
             onDeleteDiscreteValue(item)
             validateForm()
@@ -387,12 +387,12 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         var errorSet = false
         val discreteValueStrings = viewModel.discreteValues
         if (viewModel.featureType.value!! == DataType.DISCRETE) {
-            if (discreteValueStrings.isNullOrEmpty() || discreteValueStrings.size < 2) {
+            if (discreteValueStrings.isEmpty() || discreteValueStrings.size < 2) {
                 setErrorText(getString(R.string.discrete_feature_needs_at_least_two_values))
                 errorSet = true
             }
             for (s in discreteValueStrings) {
-                if (s.value.isEmpty()) {
+                if (s.label.isEmpty()) {
                     setErrorText(getString(R.string.discrete_value_must_have_name))
                     errorSet = true
                 }
@@ -532,16 +532,15 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 }
 
 enum class AddFeatureState { INITIALIZING, WAITING, ADDING, DONE, ERROR }
-enum class DurationNumericConversionMode { HOURS, MINUTES, SECONDS }
 
 @HiltViewModel
 class AddFeatureViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    class MutableLabel(var value: String = "", val updateIndex: Int = -1)
+    class MutableLabel(var label: String = "", val updateIndex: Int = -1)
 
     var featureName = ""
     var featureDescription = ""
@@ -573,14 +572,14 @@ class AddFeatureViewModel @Inject constructor(
 
         this.trackGroupId = trackGroupId
         this.existingFeatureNames = existingFeatureNames
-        ioScope.launch {
+        viewModelScope.launch(io) {
             if (existingFeatureId > -1) {
                 updateMode = true
                 existingFeature = dataInteractor.getFeatureById(existingFeatureId)
                 val existingDiscreteValues = existingFeature!!.discreteValues
                     .sortedBy { f -> f.index }
                     .map { f -> MutableLabel(f.label, f.index) }
-                withContext(Dispatchers.Main) {
+                withContext(ui) {
                     featureName = existingFeature!!.name
                     featureDescription = existingFeature!!.description
                     featureType.value = existingFeature!!.featureType
@@ -591,7 +590,7 @@ class AddFeatureViewModel @Inject constructor(
                     discreteValues.addAll(existingDiscreteValues)
                 }
             }
-            withContext(Dispatchers.Main) { _state.value = AddFeatureState.WAITING }
+            withContext(ui) { _state.value = AddFeatureState.WAITING }
         }
     }
 
@@ -615,152 +614,50 @@ class AddFeatureViewModel @Inject constructor(
 
     fun onAddOrUpdate() {
         _state.value = AddFeatureState.ADDING
-        ioScope.launch {
+        viewModelScope.launch(io) {
             try {
-                dataInteractor.withTransaction {
-                    if (updateMode) updateFeature()
-                    else addFeature()
-                }
-                withContext(Dispatchers.Main) { _state.value = AddFeatureState.DONE }
+                if (updateMode) updateFeature()
+                else addFeature()
+                withContext(ui) { _state.value = AddFeatureState.DONE }
             } catch (e: Exception) {
-                withContext(Dispatchers.Main) { _state.value = AddFeatureState.ERROR }
+                withContext(ui) { _state.value = AddFeatureState.ERROR }
             }
         }
     }
 
-    private fun updateFeature() {
-        val valOfDiscVal = { v: MutableLabel ->
-            if (discreteValues.size == 1) 1 else discreteValues.indexOf(v)
+    private suspend fun updateFeature() {
+        val existingDiscreteValues = existingFeature!!.discreteValues
+
+        val newDiscVals = discreteValues.associateWith { mutableLabel ->
+            val index = if (discreteValues.size == 1) 1 else discreteValues.indexOf(mutableLabel)
+            DiscreteValue(index, mutableLabel.label)
         }
 
-        updateAllExistingDataPointsForTransformation(valOfDiscVal)
-
-        val newDiscVals = discreteValues
-            .map { s ->
-                DiscreteValue(
-                    valOfDiscVal(s),
-                    s.value
-                )
+        val discValMap = existingDiscreteValues
+            .filter { dv -> discreteValues.map { it.updateIndex }.contains(dv.index) }
+            .associateWith {
+                newDiscVals.getOrElse(discreteValues.first { new -> new.updateIndex == it.index }) {
+                    throw Exception("Could not find discrete value update")
+                }
             }
 
-        val feature = Feature(
-            existingFeature!!.id,
-            featureName, trackGroupId,
-            featureType.value!!, newDiscVals, existingFeature!!.displayIndex,
-            featureHasDefaultValue.value!!, featureDefaultValue.value!!,
-            featureDescription
+        dataInteractor.updateFeature(
+            existingFeature!!,
+            discreteValueMap = discValMap,
+            durationNumericConversionMode = durationNumericConversionMode.value,
+            newName = featureName,
+            newFeatureType = featureType.value,
+            newDiscreteValues = newDiscVals.values.toList(),
+            hasDefaultValue = featureHasDefaultValue.value,
+            defaultValue = featureDefaultValue.value,
+            featureDescription = featureDescription
         )
-        dataInteractor.updateFeature(feature)
     }
 
-    private fun updateAllExistingDataPointsForTransformation(valOfDiscVal: (MutableLabel) -> Int) {
-        when (existingFeature!!.featureType) {
-            DataType.DISCRETE -> when (featureType.value) {
-                DataType.CONTINUOUS -> stripDataPointsToValue()
-                DataType.DISCRETE -> updateDiscreteValueDataPoints(valOfDiscVal)
-                else -> run {}
-            }
-            DataType.CONTINUOUS -> when (featureType.value) {
-                DataType.DURATION -> updateContinuousDataPointsToDurations()
-                else -> run {}
-            }
-            DataType.DURATION -> when (featureType.value) {
-                DataType.CONTINUOUS -> updateDurationDataPointsToContinuous()
-                else -> run {}
-            }
-        }
-    }
-
-    private fun updateDurationDataPointsToContinuous() {
-        val oldDataPoints = dataInteractor.getDataPointsForFeatureSync(existingFeature!!.id)
-        val divisor = when (durationNumericConversionMode.value) {
-            DurationNumericConversionMode.HOURS -> 3600.0
-            DurationNumericConversionMode.MINUTES -> 60.0
-            DurationNumericConversionMode.SECONDS -> 1.0
-            null -> 1.0
-        }
-        val newDataPoints = oldDataPoints.map {
-            val newValue = it.value / divisor
-            DataPoint(
-                it.timestamp,
-                it.featureId,
-                newValue,
-                "",
-                it.note
-            )
-        }
-        dataInteractor.updateDataPoints(newDataPoints)
-    }
-
-    private fun updateContinuousDataPointsToDurations() {
-        val oldDataPoints = dataInteractor.getDataPointsForFeatureSync(existingFeature!!.id)
-        val multiplier = when (durationNumericConversionMode.value) {
-            DurationNumericConversionMode.HOURS -> 3600.0
-            DurationNumericConversionMode.MINUTES -> 60.0
-            DurationNumericConversionMode.SECONDS -> 1.0
-            null -> 1.0
-        }
-        val newDataPoints = oldDataPoints.map {
-            val newValue = it.value * multiplier
-            DataPoint(
-                it.timestamp,
-                it.featureId,
-                newValue,
-                "",
-                it.note
-            )
-        }
-        dataInteractor.updateDataPoints(newDataPoints)
-    }
-
-    private fun updateDiscreteValueDataPoints(valOfDiscVal: (MutableLabel) -> Int) {
-        existingFeature!!.discreteValues.map { dv -> dv.index }
-            .filter { i -> !discreteValues.map { dv -> dv.updateIndex }.contains(i) }
-            .forEach { i -> removeExistingDataPointsForDiscreteValue(i) }
-
-        if (discreteValues.any { dv -> dv.updateIndex > -1 }) {
-            val valMap = discreteValues
-                .filter { dv -> dv.updateIndex > -1 }
-                .map { dv -> dv.updateIndex to Pair(valOfDiscVal(dv), dv.value) }
-                .toMap()
-            updateExistingDataPointsForDiscreteValue(valMap)
-        }
-    }
-
-    private fun stripDataPointsToValue() {
-        val oldDataPoints = dataInteractor.getDataPointsForFeatureSync(existingFeature!!.id)
-        val newDataPoints = oldDataPoints.map {
-            DataPoint(
-                it.timestamp,
-                it.featureId,
-                it.value,
-                "",
-                it.note
-            )
-        }
-        dataInteractor.updateDataPoints(newDataPoints)
-    }
-
-    private fun removeExistingDataPointsForDiscreteValue(index: Int) {
-        dataInteractor.deleteAllDataPointsForDiscreteValue(existingFeature!!.id, index.toDouble())
-    }
-
-    private fun updateExistingDataPointsForDiscreteValue(valMap: Map<Int, Pair<Int, String>>) {
-        val oldValues = dataInteractor.getDataPointsForFeatureSync(existingFeature!!.id)
-        val newValues = oldValues.map { v ->
-            DataPoint(
-                v.timestamp, v.featureId,
-                valMap[v.value.toInt()]!!.first.toDouble(),
-                valMap[v.value.toInt()]!!.second, v.note
-            )
-        }
-        dataInteractor.updateDataPoints(newValues)
-    }
-
-    private fun addFeature() {
+    private suspend fun addFeature() {
         val discVals = discreteValues.mapIndexed { i, s ->
             val index = if (discreteValues.size == 1) 1 else i
-            DiscreteValue(index, s.value)
+            DiscreteValue(index, s.label)
         }
         val feature = Feature(
             0,
@@ -770,10 +667,5 @@ class AddFeatureViewModel @Inject constructor(
             featureDescription
         )
         dataInteractor.insertFeature(feature)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        ioScope.cancel()
     }
 }

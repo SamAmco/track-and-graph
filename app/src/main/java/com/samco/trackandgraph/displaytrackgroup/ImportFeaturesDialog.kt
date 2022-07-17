@@ -32,7 +32,9 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.util.CSVReadWriter
+import com.samco.trackandgraph.base.model.ImportFeaturesException
+import com.samco.trackandgraph.di.IODispatcher
+import com.samco.trackandgraph.di.MainDispatcher
 import com.samco.trackandgraph.util.ImportExportFeatureUtils
 import com.samco.trackandgraph.util.getColorFromAttr
 import dagger.hilt.android.AndroidEntryPoint
@@ -96,13 +98,18 @@ class ImportFeaturesDialog : DialogFragment() {
     private fun listenToUri() {
         viewModel.selectedFileUri.observe(this, Observer { uri ->
             if (uri != null) {
-                ImportExportFeatureUtils.setFileButtonTextFromUri(activity, uri, fileButton, alertDialog)
+                ImportExportFeatureUtils.setFileButtonTextFromUri(
+                    activity,
+                    uri,
+                    fileButton,
+                    alertDialog
+                )
             }
         })
     }
 
     private fun listenToImportState() {
-        viewModel.importState.observe(this, Observer{ state ->
+        viewModel.importState.observe(this, Observer { state ->
             when (state) {
                 ImportState.WAITING -> {
                     progressBar.visibility = View.INVISIBLE
@@ -121,24 +128,66 @@ class ImportFeaturesDialog : DialogFragment() {
 
     private fun listenToException() {
         viewModel.importException.observe(this, Observer { exception ->
-            if (exception != null) {
-                val message =
-                    if (exception.stringArgs == null) getString(exception.stringId)
-                    else getString(exception.stringId, exception.stringArgs)
-                Toast.makeText(requireActivity(), message, Toast.LENGTH_LONG).show()
+            exception?.let {
+                Toast.makeText(
+                    requireActivity(),
+                    getStringForImportException(it),
+                    Toast.LENGTH_LONG
+                ).show()
             }
         })
+    }
+
+    private fun getStringForImportException(exception: ImportFeaturesException) = when (exception) {
+        is ImportFeaturesException.Unknown ->
+            getString(R.string.import_exception_unknown)
+        is ImportFeaturesException.DiscreteValueConflict -> getString(
+            R.string.import_exception_discrete_value_conflict,
+            exception.lineNumber
+        )
+        is ImportFeaturesException.BadDiscreteValue -> getString(
+            R.string.import_exception_bad_discrete_value,
+            exception.lineNumber
+        )
+        is ImportFeaturesException.DiscreteValueIndexExists -> getString(
+            R.string.import_exception_discrete_value_index_exists,
+            exception.lineNumber,
+            exception.discreteValueIndex
+        )
+        is ImportFeaturesException.DiscreteValueLabelExists -> getString(
+            R.string.import_exception_discrete_value_label_exists,
+            exception.lineNumber,
+            exception.label
+        )
+        is ImportFeaturesException.InconsistentDataType -> getString(
+            R.string.import_exception_inconsistent_data_type,
+            exception.lineNumber
+        )
+        is ImportFeaturesException.InconsistentRecord -> getString(
+            R.string.import_exception_inconsistent_record,
+            exception.lineNumber
+        )
+        is ImportFeaturesException.BadTimestamp -> getString(
+            R.string.import_exception_bad_timestamp,
+            exception.lineNumber
+        )
+        is ImportFeaturesException.BadHeaders -> getString(
+            R.string.import_exception_bad_headers,
+            exception.requiredHeaders
+        )
     }
 
     private fun onFileButtonClicked() {
         val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "text/csv"
-            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
-                "text/csv",
-                "application/csv",
-                "application/comma-separated-values",
-                "text/comma-separated-values"
-            ))
+            putExtra(
+                Intent.EXTRA_MIME_TYPES, arrayOf(
+                    "text/csv",
+                    "application/csv",
+                    "application/comma-separated-values",
+                    "text/comma-separated-values"
+                )
+            )
         }
         startActivityForResult(intent, OPEN_FILE_REQUEST_CODE)
     }
@@ -168,10 +217,10 @@ class ImportFeaturesDialog : DialogFragment() {
 @HiltViewModel
 class ImportFeaturesViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
-    private val contentResolver: ContentResolver
+    private val contentResolver: ContentResolver,
+    @MainDispatcher private val ui: CoroutineDispatcher,
+    @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
-    private var updateJob = Job()
-    private val uiScope = CoroutineScope(Dispatchers.Main + updateJob)
 
     val selectedFileUri: MutableLiveData<Uri?> by lazy {
         val uri = MutableLiveData<Uri?>()
@@ -179,43 +228,46 @@ class ImportFeaturesViewModel @Inject constructor(
         return@lazy uri
     }
 
-    val importState: LiveData<ImportState> get() { return _importState }
+    val importState: LiveData<ImportState>
+        get() {
+            return _importState
+        }
     private val _importState: MutableLiveData<ImportState> by lazy {
         val state = MutableLiveData<ImportState>()
         state.value = ImportState.WAITING
         return@lazy state
     }
 
-    val importException: LiveData<CSVReadWriter.ImportFeaturesException?> get() { return _importException }
-    private val _importException: MutableLiveData<CSVReadWriter.ImportFeaturesException?> by lazy {
-        val exception = MutableLiveData<CSVReadWriter.ImportFeaturesException?>()
+    private val _importException: MutableLiveData<ImportFeaturesException?> by lazy {
+        val exception = MutableLiveData<ImportFeaturesException?>()
         exception.value = null
         return@lazy exception
     }
 
+    val importException: LiveData<ImportFeaturesException?>
+        get() {
+            return _importException
+        }
+
     //TODO this should probably be scheduled to run in a service
     fun beginImport(trackGroupId: Long) {
         if (_importState.value == ImportState.IMPORTING) return
-        selectedFileUri.value?.let {
+        val uri = selectedFileUri.value ?: return
+        viewModelScope.launch(ui) {
             _importState.value = ImportState.IMPORTING
-            uiScope.launch {
-                try {
-                    withContext(Dispatchers.IO) {
-                        val inputStream = contentResolver.openInputStream(it)
-                        if (inputStream != null) {
-                            dataInteractor.withTransaction {
-                                CSVReadWriter.readFeaturesFromCSV(dataInteractor, inputStream, trackGroupId)
-                            }
-                        }
-                    }
-                } catch (e: CSVReadWriter.ImportFeaturesException) { _importException.value = e }
-                _importState.value = ImportState.DONE
+            doImport(uri, trackGroupId).exceptionOrNull()?.let {
+                if (it is ImportFeaturesException) _importException.value = it
+                else _importException.value = ImportFeaturesException.Unknown()
             }
+            _importState.value = ImportState.DONE
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        updateJob.cancel()
+    private suspend fun doImport(uri: Uri, trackGroupId: Long) = runCatching {
+        withContext(io) {
+            contentResolver.openInputStream(uri)?.let { inputStream ->
+                dataInteractor.readFeaturesFromCSV(inputStream, trackGroupId)
+            }
+        }
     }
 }
