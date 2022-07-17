@@ -27,6 +27,8 @@ import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
 
+//TODO This is too monolithic right now, needs to be split into multiple repository classes ideally.
+
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
 interface DataInteractor : FeatureUpdater {
@@ -42,8 +44,6 @@ interface DataInteractor : FeatureUpdater {
     suspend fun deleteGroup(id: Long)
 
     suspend fun updateGroup(group: Group)
-
-    suspend fun updateGroups(groups: List<Group>)
 
     fun getAllReminders(): LiveData<List<Reminder>>
 
@@ -67,7 +67,7 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getGroupById(id: Long): Group
 
-    suspend fun updateFeatures(features: List<Feature>)
+    suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>)
 
     suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature>
 
@@ -115,7 +115,10 @@ interface DataInteractor : FeatureUpdater {
     //TODO get rid of this and only return DataSample for a feature
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
 
-    suspend fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
+    suspend fun getDataPointByTimestampAndFeatureSync(
+        featureId: Long,
+        timestamp: OffsetDateTime
+    ): DataPoint
 
     suspend fun getGraphStatById(graphStatId: Long): GraphOrStat
 
@@ -145,36 +148,49 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getAllGlobalNotesSync(): List<GlobalNote>
 
-    suspend fun deleteFeaturesForLineGraph(lineGraphId: Long)
+    suspend fun duplicateLineGraph(graphOrStat: GraphOrStat): Long?
 
-    suspend fun insertLineGraphFeatures(lineGraphFeatures: List<LineGraphFeature>)
+    suspend fun duplicatePieChart(graphOrStat: GraphOrStat): Long?
 
-    suspend fun insertLineGraph(lineGraph: LineGraph): Long
+    suspend fun duplicateAverageTimeBetweenStat(graphOrStat: GraphOrStat): Long?
 
-    suspend fun updateLineGraph(lineGraph: LineGraph)
+    suspend fun duplicateTimeSinceLastStat(graphOrStat: GraphOrStat): Long?
 
-    suspend fun insertPieChart(pieChart: PieChart): Long
+    suspend fun duplicateTimeHistogram(graphOrStat: GraphOrStat): Long?
 
-    suspend fun updatePieChart(pieChart: PieChart)
+    suspend fun insertLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures): Long
 
-    suspend fun insertAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat): Long
+    suspend fun insertPieChart(graphOrStat: GraphOrStat, pieChart: PieChart): Long
 
-    suspend fun updateAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat)
+    suspend fun insertAverageTimeBetweenStat(
+        graphOrStat: GraphOrStat,
+        averageTimeBetweenStat: AverageTimeBetweenStat
+    ): Long
 
-    suspend fun insertTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat): Long
+    suspend fun insertTimeSinceLastStat(
+        graphOrStat: GraphOrStat,
+        timeSinceLastStat: TimeSinceLastStat
+    ): Long
 
-    suspend fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat)
+    suspend fun insertTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram): Long
 
-    //TODO consider managing GraphOrStat automatically in the model
-    suspend fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
+    suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart)
+
+    suspend fun updateAverageTimeBetweenStat(
+        graphOrStat: GraphOrStat,
+        averageTimeBetweenStat: AverageTimeBetweenStat
+    )
+
+    suspend fun updateLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures)
+
+    suspend fun updateTimeSinceLastStat(
+        graphOrStat: GraphOrStat,
+        timeSinceLastStat: TimeSinceLastStat
+    )
 
     suspend fun updateGraphOrStat(graphOrStat: GraphOrStat)
 
-    suspend fun updateGraphStats(graphStat: List<GraphOrStat>)
-
-    suspend fun updateTimeHistogram(timeHistogram: TimeHistogram)
-
-    suspend fun insertTimeHistogram(timeHistogram: TimeHistogram)
+    suspend fun updateTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram)
 
     suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 

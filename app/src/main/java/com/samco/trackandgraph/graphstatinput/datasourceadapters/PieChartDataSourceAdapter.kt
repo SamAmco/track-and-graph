@@ -26,12 +26,12 @@ class PieChartDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<PieChart>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        graphOrStatId: Long,
+        graphOrStat: GraphOrStat,
         config: PieChart,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updatePieChart(config.copy(graphStatId = graphOrStatId))
-        else dataInteractor.insertPieChart(config.copy(graphStatId = graphOrStatId))
+        if (updateMode) dataInteractor.updatePieChart(graphOrStat, config)
+        else dataInteractor.insertPieChart(graphOrStat, config)
     }
 
     override suspend fun getConfigDataFromDatabase(
@@ -47,12 +47,7 @@ class PieChartDataSourceAdapter @Inject constructor(
         return dataInteractor.getPieChartByGraphStatId(graphOrStat.id) == null
     }
 
-    override suspend fun duplicate(
-        oldGraphId: Long,
-        newGraphId: Long
-    ) {
-        val pieChart = dataInteractor.getPieChartByGraphStatId(oldGraphId)
-        val copy = pieChart?.copy(id = 0, graphStatId = newGraphId)
-        copy?.let { dataInteractor.insertPieChart(it) }
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
+        dataInteractor.duplicatePieChart(graphOrStat)
     }
 }

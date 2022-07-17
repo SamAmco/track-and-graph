@@ -382,27 +382,11 @@ class GraphStatInputViewModel @Inject constructor(
         if (_configData.value == null) return
         _state.value = GraphStatInputState.ADDING
         viewModelScope.launch(io) {
-            //TODO this should all be done in a transaction somehow
-            val graphStatId = if (_updateMode.value!!) {
-                dataInteractor.updateGraphOrStat(constructGraphOrStat())
-                graphStatId!!
-            } else {
-                shiftUpGraphStatViewIndexes()
-                dataInteractor.insertGraphOrStat(constructGraphOrStat())
-            }
-
-            gsiProvider.getDataSourceAdapter(_graphStatType.value!!).writeConfig(
-                graphStatId, _configData.value!!, _updateMode.value!!
-            )
+            gsiProvider
+                .getDataSourceAdapter(_graphStatType.value!!)
+                .writeConfig(constructGraphOrStat(), _configData.value!!, _updateMode.value!!)
             withContext(ui) { _state.value = GraphStatInputState.FINISHED }
         }
-    }
-
-    private suspend fun shiftUpGraphStatViewIndexes() {
-        val newList = dataInteractor.getAllGraphStatsSync().map {
-            it.copy(displayIndex = it.displayIndex + 1)
-        }
-        dataInteractor.updateGraphStats(newList)
     }
 
     private fun constructGraphOrStat() = GraphOrStat(

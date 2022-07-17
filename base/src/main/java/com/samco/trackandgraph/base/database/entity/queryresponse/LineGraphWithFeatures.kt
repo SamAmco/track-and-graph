@@ -19,6 +19,7 @@ package com.samco.trackandgraph.base.database.entity.queryresponse
 import androidx.room.ColumnInfo
 import androidx.room.Relation
 import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.base.database.entity.LineGraph
 import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -58,4 +59,6 @@ internal data class LineGraphWithFeatures(
         yTo,
         endDate
     )
+
+    fun toLineGraph() = LineGraph(id, graphStatId, duration, yRangeType, yFrom, yTo, endDate)
 }
