@@ -27,12 +27,12 @@ class TimeSinceDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<TimeSinceLastStat>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        graphOrStatId: Long,
+        graphOrStat: GraphOrStat,
         config: TimeSinceLastStat,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateTimeSinceLastStat(config.copy(graphStatId = graphOrStatId))
-        else dataInteractor.insertTimeSinceLastStat(config.copy(graphStatId = graphOrStatId))
+        if (updateMode) dataInteractor.updateTimeSinceLastStat(graphOrStat, config)
+        else dataInteractor.insertTimeSinceLastStat(graphOrStat, config)
     }
 
     override suspend fun getConfigDataFromDatabase(
@@ -48,12 +48,7 @@ class TimeSinceDataSourceAdapter @Inject constructor(
         return dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStat.id) == null
     }
 
-    override suspend fun duplicate(
-        oldGraphId: Long,
-        newGraphId: Long
-    ) {
-        val timeSinceStat = dataInteractor.getTimeSinceLastStatByGraphStatId(oldGraphId)
-        val copy = timeSinceStat?.copy(id = 0, graphStatId = newGraphId)
-        copy?.let { dataInteractor.insertTimeSinceLastStat(it) }
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
+        dataInteractor.duplicateTimeSinceLastStat(graphOrStat)
     }
 }

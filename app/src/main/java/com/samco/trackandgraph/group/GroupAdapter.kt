@@ -23,6 +23,8 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.base.database.dto.GroupChild
+import com.samco.trackandgraph.base.database.dto.GroupChildType
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import org.threeten.bp.Instant
@@ -101,7 +103,7 @@ private class ListDiffCallback(
     override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val old = oldList[oldItemPosition]
         val new = newList[newItemPosition]
-        return old.type == new.type && old.id() == new.id()
+        return old.type == new.type && old.id == new.id
     }
 
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

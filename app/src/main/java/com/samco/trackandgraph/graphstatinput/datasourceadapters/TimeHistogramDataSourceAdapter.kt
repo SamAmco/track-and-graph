@@ -26,12 +26,12 @@ class TimeHistogramDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
 ) : GraphStatDataSourceAdapter<TimeHistogram>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        graphOrStatId: Long,
+        graphOrStat: GraphOrStat,
         config: TimeHistogram,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateTimeHistogram(config.copy(graphStatId = graphOrStatId))
-        else dataInteractor.insertTimeHistogram(config.copy(graphStatId = graphOrStatId))
+        if (updateMode) dataInteractor.updateTimeHistogram(graphOrStat, config)
+        else dataInteractor.insertTimeHistogram(graphOrStat, config)
     }
 
     override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, TimeHistogram>? {
@@ -43,9 +43,7 @@ class TimeHistogramDataSourceAdapter @Inject constructor(
         return dataInteractor.getTimeHistogramByGraphStatId(graphOrStat.id) == null
     }
 
-    override suspend fun duplicate(oldGraphId: Long, newGraphId: Long) {
-        val timeHistogram = dataInteractor.getTimeHistogramByGraphStatId(oldGraphId)
-        val copy = timeHistogram?.copy(id = 0, graphStatId = newGraphId)
-        copy?.let { dataInteractor.insertTimeHistogram(it) }
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
+        dataInteractor.duplicateTimeHistogram(graphOrStat)
     }
 }

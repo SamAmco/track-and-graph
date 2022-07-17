@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.group
+package com.samco.trackandgraph.base.database.dto
 
 enum class GroupChildType { GROUP, FEATURE, GRAPH }
 
@@ -26,7 +26,8 @@ enum class GroupChildType { GROUP, FEATURE, GRAPH }
  */
 data class GroupChild(
     val type: GroupChildType,
+    //TODO move obj out of this class
     val obj: Any,
-    val id: () -> Long,
-    val displayIndex: () -> Int
+    val id: Long,
+    val displayIndex: Int
 )

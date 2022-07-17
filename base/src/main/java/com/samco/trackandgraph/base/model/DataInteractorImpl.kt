@@ -20,6 +20,7 @@ package com.samco.trackandgraph.base.model
 import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
+import androidx.room.withTransaction
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
@@ -68,10 +69,6 @@ internal class DataInteractorImpl(
         dao.updateGroup(group.toEntity()).also { dataUpdateEvents.emit(Unit) }
     }
 
-    override suspend fun updateGroups(groups: List<Group>) = withContext(io) {
-        dao.updateGroups(groups.map { it.toEntity() }).also { dataUpdateEvents.emit(Unit) }
-    }
-
     override fun getAllGroups(): LiveData<List<Group>> {
         return Transformations.map(dao.getAllGroups()) { groups -> groups.map { it.toDto() } }
     }
@@ -98,10 +95,6 @@ internal class DataInteractorImpl(
 
     override suspend fun getAllFeaturesSync(): List<Feature> = withContext(io) {
         dao.getAllFeaturesSync().map { it.toDto() }
-    }
-
-    override suspend fun updateFeatures(features: List<Feature>) = withContext(io) {
-        dao.updateFeatures(features.map { it.toEntity() }).also { dataUpdateEvents.emit(Unit) }
     }
 
     override suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature> =
@@ -166,10 +159,6 @@ internal class DataInteractorImpl(
 
     override suspend fun deleteFeature(id: Long) = withContext(io) {
         dao.deleteFeature(id).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    override suspend fun deleteFeaturesForLineGraph(lineGraphId: Long) = withContext(io) {
-        dao.deleteFeaturesForLineGraph(lineGraphId).also { dataUpdateEvents.emit(Unit) }
     }
 
     override suspend fun insertReminder(reminder: Reminder) = withContext(io) {
@@ -304,70 +293,214 @@ internal class DataInteractorImpl(
         dao.getAllGlobalNotesSync().map { it.toDto() }
     }
 
-    override suspend fun insertLineGraphFeatures(lineGraphFeatures: List<LineGraphFeature>) =
-        withContext(io) {
-            dao.insertLineGraphFeatures(lineGraphFeatures.map { it.toEntity() })
+    private fun duplicateGraphOrStat(graphOrStat: GraphOrStat) =
+        dao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity())
+
+    private suspend fun <R> performAtomicUpdate(block: suspend () -> R) = withContext(io) {
+        database
+            .withTransaction { block() }
+            .also { dataUpdateEvents.emit(Unit) }
+    }
+
+    private suspend fun shiftUpGroupChildIndexes(groupId: Long) = performAtomicUpdate {
+        //Update features
+        dao.getFeaturesForGroupSync(groupId).let { features ->
+            dao.updateFeatures(features.map { it.copy(displayIndex = it.displayIndex + 1) })
         }
 
-    override suspend fun insertLineGraph(lineGraph: LineGraph): Long = withContext(io) {
-        dao.insertLineGraph(lineGraph.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    override suspend fun updateLineGraph(lineGraph: LineGraph) = withContext(io) {
-        dao.updateLineGraph(lineGraph.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    override suspend fun insertPieChart(pieChart: PieChart): Long = withContext(io) {
-        dao.insertPieChart(pieChart.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    override suspend fun updatePieChart(pieChart: PieChart) = withContext(io) {
-        dao.updatePieChart(pieChart.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    override suspend fun insertAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat): Long =
-        withContext(io) {
-            dao.insertAverageTimeBetweenStat(averageTimeBetweenStat.toEntity())
-                .also { dataUpdateEvents.emit(Unit) }
+        //Update graphs
+        dao.getGraphsAndStatsByGroupIdSync(groupId).let { graphs ->
+            dao.updateGraphStats(graphs.map { it.copy(displayIndex = it.displayIndex + 1) })
         }
 
-    override suspend fun updateAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat) =
-        withContext(io) {
-            dao.updateAverageTimeBetweenStat(averageTimeBetweenStat.toEntity())
-                .also { dataUpdateEvents.emit(Unit) }
+        //Update groups
+        dao.getGroupsForGroupSync(groupId).let { groups ->
+            dao.updateGroups(groups.map { it.copy(displayIndex = it.displayIndex + 1) })
+        }
+    }
+
+    override suspend fun duplicateLineGraph(graphOrStat: GraphOrStat): Long? = performAtomicUpdate {
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val newGraphStat = duplicateGraphOrStat(graphOrStat)
+        dao.getLineGraphByGraphStatId(graphOrStat.id)?.let {
+            val copy = dao.insertLineGraph(
+                it.toLineGraph().copy(id = 0L, graphStatId = newGraphStat)
+            )
+            dao.insertLineGraphFeatures(it.features.map { f ->
+                f.copy(id = 0L, lineGraphId = copy)
+            })
+            copy
+        }
+    }
+
+    override suspend fun duplicatePieChart(graphOrStat: GraphOrStat): Long? = performAtomicUpdate {
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val newGraphStat = duplicateGraphOrStat(graphOrStat)
+        dao.getPieChartByGraphStatId(graphOrStat.id)?.let {
+            dao.insertPieChart(it.copy(id = 0L, graphStatId = newGraphStat))
+        }
+    }
+
+    override suspend fun duplicateAverageTimeBetweenStat(graphOrStat: GraphOrStat): Long? =
+        performAtomicUpdate {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val newGraphStat = duplicateGraphOrStat(graphOrStat)
+            dao.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)?.let {
+                dao.insertAverageTimeBetweenStat(it.copy(id = 0L, graphStatId = newGraphStat))
+            }
         }
 
-    override suspend fun insertTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat): Long =
-        withContext(io) {
-            dao.insertTimeSinceLastStat(timeSinceLastStat.toEntity())
-                .also { dataUpdateEvents.emit(Unit) }
+    override suspend fun duplicateTimeSinceLastStat(graphOrStat: GraphOrStat): Long? =
+        performAtomicUpdate {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val newGraphStat = duplicateGraphOrStat(graphOrStat)
+            dao.getTimeSinceLastStatByGraphStatId(graphOrStat.id)?.let {
+                dao.insertTimeSinceLastStat(it.copy(id = 0L, graphStatId = newGraphStat))
+            }
         }
 
-    override suspend fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat) =
-        withContext(io) {
-            dao.updateTimeSinceLastStat(timeSinceLastStat.toEntity())
-                .also { dataUpdateEvents.emit(Unit) }
+    override suspend fun duplicateTimeHistogram(graphOrStat: GraphOrStat): Long? =
+        performAtomicUpdate {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val newGraphStat = duplicateGraphOrStat(graphOrStat)
+            dao.getTimeHistogramByGraphStatId(graphOrStat.id)?.let {
+                dao.insertTimeHistogram(it.copy(id = 0L, graphStatId = newGraphStat))
+            }
         }
 
-    override suspend fun insertGraphOrStat(graphOrStat: GraphOrStat): Long = withContext(io) {
-        dao.insertGraphOrStat(graphOrStat.toEntity()).also { dataUpdateEvents.emit(Unit) }
+    private fun insertGraphStat(graphOrStat: GraphOrStat) =
+        dao.insertGraphOrStat(graphOrStat.copy(id = 0L, displayIndex = 0).toEntity())
+
+    override suspend fun insertLineGraph(
+        graphOrStat: GraphOrStat,
+        lineGraph: LineGraphWithFeatures
+    ): Long = performAtomicUpdate {
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val id = insertGraphStat(graphOrStat)
+        val lineGraphId =
+            dao.insertLineGraph(lineGraph.toLineGraph().copy(graphStatId = id).toEntity())
+        val features = lineGraph.features.map { it.copy(lineGraphId = lineGraphId).toEntity() }
+        dao.insertLineGraphFeatures(features)
+        lineGraphId
     }
 
-    override suspend fun updateGraphOrStat(graphOrStat: GraphOrStat) = withContext(io) {
-        dao.updateGraphOrStat(graphOrStat.toEntity()).also { dataUpdateEvents.emit(Unit) }
+    override suspend fun insertPieChart(graphOrStat: GraphOrStat, pieChart: PieChart): Long =
+        performAtomicUpdate {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val id = insertGraphStat(graphOrStat)
+            dao.insertPieChart(pieChart.copy(graphStatId = id).toEntity())
+        }
+
+    override suspend fun insertAverageTimeBetweenStat(
+        graphOrStat: GraphOrStat,
+        averageTimeBetweenStat: AverageTimeBetweenStat
+    ): Long = performAtomicUpdate {
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val id = insertGraphStat(graphOrStat)
+        dao.insertAverageTimeBetweenStat(
+            averageTimeBetweenStat.copy(graphStatId = id).toEntity()
+        )
     }
 
-    override suspend fun updateGraphStats(graphStat: List<GraphOrStat>) = withContext(io) {
-        dao.updateGraphStats(graphStat.map { it.toEntity() }).also { dataUpdateEvents.emit(Unit) }
+    override suspend fun insertTimeSinceLastStat(
+        graphOrStat: GraphOrStat,
+        timeSinceLastStat: TimeSinceLastStat
+    ): Long = performAtomicUpdate {
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val id = insertGraphStat(graphOrStat)
+        dao.insertTimeSinceLastStat(timeSinceLastStat.copy(graphStatId = id).toEntity())
     }
 
-    override suspend fun updateTimeHistogram(timeHistogram: TimeHistogram) = withContext(io) {
-        dao.updateTimeHistogram(timeHistogram.toEntity()).also { dataUpdateEvents.emit(Unit) }
+    override suspend fun insertTimeHistogram(
+        graphOrStat: GraphOrStat,
+        timeHistogram: TimeHistogram
+    ) = performAtomicUpdate {
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val id = insertGraphStat(graphOrStat)
+        dao.insertTimeHistogram(timeHistogram.copy(graphStatId = id).toEntity())
     }
 
-    override suspend fun insertTimeHistogram(timeHistogram: TimeHistogram) = withContext(io) {
-        dao.insertTimeHistogram(timeHistogram.toEntity()).also { dataUpdateEvents.emit(Unit) }
+    override suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart) =
+        performAtomicUpdate {
+            dao.updateGraphOrStat(graphOrStat.toEntity())
+            dao.updatePieChart(pieChart.toEntity())
+        }
+
+    override suspend fun updateAverageTimeBetweenStat(
+        graphOrStat: GraphOrStat,
+        averageTimeBetweenStat: AverageTimeBetweenStat
+    ) = performAtomicUpdate {
+        dao.updateGraphOrStat(graphOrStat.toEntity())
+        dao.updateAverageTimeBetweenStat(averageTimeBetweenStat.toEntity())
     }
+
+    override suspend fun updateLineGraph(
+        graphOrStat: GraphOrStat,
+        lineGraph: LineGraphWithFeatures
+    ) = performAtomicUpdate {
+        dao.updateGraphOrStat(graphOrStat.toEntity())
+        dao.updateLineGraph(lineGraph.toLineGraph().toEntity())
+        dao.deleteFeaturesForLineGraph(lineGraph.id)
+        dao.insertLineGraphFeatures(lineGraph.features.map {
+            it.copy(lineGraphId = lineGraph.id).toEntity()
+        })
+    }
+
+    override suspend fun updateTimeSinceLastStat(
+        graphOrStat: GraphOrStat,
+        timeSinceLastStat: TimeSinceLastStat
+    ) = performAtomicUpdate {
+        dao.updateGraphOrStat(graphOrStat.toEntity())
+        dao.updateTimeSinceLastStat(timeSinceLastStat.toEntity())
+    }
+
+    override suspend fun updateGraphOrStat(graphOrStat: GraphOrStat) = performAtomicUpdate {
+        dao.updateGraphOrStat(graphOrStat.toEntity())
+    }
+
+    override suspend fun updateTimeHistogram(
+        graphOrStat: GraphOrStat,
+        timeHistogram: TimeHistogram
+    ) = performAtomicUpdate {
+        dao.updateGraphOrStat(graphOrStat.toEntity())
+        dao.updateTimeHistogram(timeHistogram.toEntity())
+    }
+
+    override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>) =
+        performAtomicUpdate {
+            //Update features
+            dao.getFeaturesForGroupSync(groupId).let { features ->
+                val updates = features.map { feature ->
+                    val newDisplayIndex = children.indexOfFirst {
+                        it.type == GroupChildType.FEATURE && it.id == feature.id
+                    }
+                    feature.copy(displayIndex = newDisplayIndex)
+                }
+                dao.updateFeatures(updates)
+            }
+
+            //Update graphs
+            dao.getGraphsAndStatsByGroupIdSync(groupId).let { graphs ->
+                val updates = graphs.map { graph ->
+                    val newDisplayIndex = children.indexOfFirst {
+                        it.type == GroupChildType.GRAPH && it.id == graph.id
+                    }
+                    graph.copy(displayIndex = newDisplayIndex)
+                }
+                dao.updateGraphStats(updates)
+            }
+
+            //Update groups
+            dao.getGroupsForGroupSync(groupId).let { groups ->
+                val updates = groups.map { group ->
+                    val newDisplayIndex = children.indexOfFirst {
+                        it.type == GroupChildType.GROUP && it.id == group.id
+                    }
+                    group.copy(displayIndex = newDisplayIndex)
+                }
+                dao.updateGroups(updates)
+            }
+        }
 
     override suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram? =
         withContext(io) {
