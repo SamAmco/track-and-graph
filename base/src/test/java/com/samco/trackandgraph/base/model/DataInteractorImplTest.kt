@@ -22,8 +22,6 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.reduce
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.*
 import org.junit.Assert.assertEquals
@@ -34,19 +32,24 @@ import org.threeten.bp.OffsetDateTime
 @OptIn(ExperimentalCoroutinesApi::class)
 class DataInteractorImplTest {
 
-    private val testDispatcher = StandardTestDispatcher()
+    private val testDispatcher = UnconfinedTestDispatcher()
     private lateinit var uut: DataInteractorImpl
 
     private val database: TrackAndGraphDatabase = mock()
     private val dao: TrackAndGraphDatabaseDao = mock()
+    private val featureUpdater: FeatureUpdater = mock()
+    private val csvReadWriter: CSVReadWriter = mock()
 
     @Before
     fun before() {
         Dispatchers.setMain(testDispatcher)
+
         uut = DataInteractorImpl(
             database,
             dao,
-            testDispatcher
+            testDispatcher,
+            featureUpdater,
+            csvReadWriter
         )
     }
 
@@ -79,11 +82,11 @@ class DataInteractorImplTest {
             note = "hi hi"
         )
 
-        val updates = async {
+        var count = 0
+        val collectJob = launch(testDispatcher) {
             uut.getDataUpdateEvents()
-                .take(13)
-                .map { 1 }
-                .reduce { accumulator, value -> accumulator + value }
+                .take(12)
+                .collect { count++ }
         }
 
         //EXECUTE
@@ -92,7 +95,6 @@ class DataInteractorImplTest {
         yield()
 
         uut.deleteGroup(0L)
-        uut.updateFeatures(emptyList())
         uut.insertFeature(testFeature)
         uut.updateFeature(testFeature)
         uut.deleteFeature(0L)
@@ -106,7 +108,7 @@ class DataInteractorImplTest {
         uut.insertGlobalNote(testGlobalNote)
 
         //VERIFY
-        val answer = withTimeoutOrNull(100) { updates.await() }
-        assertEquals(13, answer)
+        assertEquals(12, count)
+        collectJob.cancel()
     }
 }

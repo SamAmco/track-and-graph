@@ -76,7 +76,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_features_table_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -85,7 +84,6 @@
             "columnNames": [
               "group_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_features_table_group_id` ON `${TABLE_NAME}` (`group_id`)"
           }
         ],
@@ -152,7 +150,6 @@
             "columnNames": [
               "feature_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_data_points_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
           }
         ],
@@ -218,7 +215,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_groups_table_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -227,7 +223,6 @@
             "columnNames": [
               "parent_group_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_groups_table_parent_group_id` ON `${TABLE_NAME}` (`parent_group_id`)"
           }
         ],
@@ -293,7 +288,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_graphs_and_stats_table2_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -302,7 +296,6 @@
             "columnNames": [
               "group_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_graphs_and_stats_table2_group_id` ON `${TABLE_NAME}` (`group_id`)"
           }
         ],
@@ -380,7 +373,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_line_graphs_table3_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -389,7 +381,6 @@
             "columnNames": [
               "graph_stat_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_line_graphs_table3_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
           }
         ],
@@ -485,7 +476,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -494,7 +484,6 @@
             "columnNames": [
               "graph_stat_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
           },
           {
@@ -503,7 +492,6 @@
             "columnNames": [
               "feature_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_average_time_between_stat_table4_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
           }
         ],
@@ -580,7 +568,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -589,7 +576,6 @@
             "columnNames": [
               "graph_stat_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
           },
           {
@@ -598,7 +584,6 @@
             "columnNames": [
               "feature_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_pie_charts_table2_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
           }
         ],
@@ -693,7 +678,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -702,7 +686,6 @@
             "columnNames": [
               "graph_stat_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
           },
           {
@@ -711,7 +694,6 @@
             "columnNames": [
               "feature_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
           }
         ],
@@ -788,7 +770,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_reminders_table_id` ON `${TABLE_NAME}` (`id`)"
           }
         ],
@@ -904,7 +885,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_line_graph_features_table2_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -913,7 +893,6 @@
             "columnNames": [
               "line_graph_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_line_graph_features_table2_line_graph_id` ON `${TABLE_NAME}` (`line_graph_id`)"
           },
           {
@@ -922,7 +901,6 @@
             "columnNames": [
               "feature_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_line_graph_features_table2_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
           }
         ],
@@ -1011,7 +989,6 @@
             "columnNames": [
               "id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_time_histograms_table_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
@@ -1020,7 +997,6 @@
             "columnNames": [
               "graph_stat_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_time_histograms_table_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
           },
           {
@@ -1029,7 +1005,6 @@
             "columnNames": [
               "feature_id"
             ],
-            "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_time_histograms_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
           }
         ],
