@@ -46,9 +46,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".reminders.AlarmReceiver" />
+        <receiver android:name=".base.model.AlarmReceiver" />
         <receiver
-            android:name=".reminders.RecreateAlarms"
+            android:name=".base.model.RecreateAlarms"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

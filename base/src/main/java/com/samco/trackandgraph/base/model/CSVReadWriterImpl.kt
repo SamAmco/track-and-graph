@@ -27,6 +27,7 @@ import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
@@ -39,13 +40,14 @@ import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
 import java.io.OutputStreamWriter
+import javax.inject.Inject
 
 import com.samco.trackandgraph.base.database.dto.Feature as FeatureDto
 
-internal class CSVReadWriterImpl(
+internal class CSVReadWriterImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
-    private val io: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher
 ) : CSVReadWriter {
     private enum class RequiredHeaders {
         FeatureName,

@@ -39,7 +39,7 @@ import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.reminders.RemindersHelper
+import com.samco.trackandgraph.base.model.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 import com.samco.trackandgraph.ui.DateFormatSetting
 import com.samco.trackandgraph.util.*
@@ -71,7 +71,8 @@ class MainActivity : AppCompatActivity() {
         initializeAppBar()
         onDrawerHideKeyboard()
         initDrawerSpinners()
-        RemindersHelper.syncAlarms(this, dataInteractor)
+        //TODO fix this
+        //RemindersHelper.syncAlarms(this, dataInteractor)
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
     }

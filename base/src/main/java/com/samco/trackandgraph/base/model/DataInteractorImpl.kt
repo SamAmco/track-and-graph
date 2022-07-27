@@ -27,17 +27,19 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.sampling.DataSampler
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
+import javax.inject.Inject
 
-internal class DataInteractorImpl(
+internal class DataInteractorImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
-    private val io: CoroutineDispatcher,
+    @IODispatcher private val io: CoroutineDispatcher,
     private val featureUpdater: FeatureUpdater,
     private val csvReadWriter: CSVReadWriter
 ) : DataInteractor {

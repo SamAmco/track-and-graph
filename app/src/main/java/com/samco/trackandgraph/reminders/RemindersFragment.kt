@@ -17,10 +17,7 @@
 
 package com.samco.trackandgraph.reminders
 
-import android.app.*
-import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
@@ -37,8 +34,9 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.CheckedDays
 import com.samco.trackandgraph.base.database.dto.Reminder
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.RecreateAlarms
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
-import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,8 +46,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.threeten.bp.LocalTime
 import javax.inject.Inject
-
-const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
 
 @AndroidEntryPoint
 class RemindersFragment : Fragment() {
@@ -82,7 +78,6 @@ class RemindersFragment : Fragment() {
 
         setHasOptionsMenu(true)
 
-        createNotificationChannel()
         return binding.root
     }
 
@@ -92,23 +87,6 @@ class RemindersFragment : Fragment() {
             NavButtonStyle.MENU,
             getString(R.string.reminders)
         )
-    }
-
-    private fun createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = getString(R.string.reminders_notifications_channel_name)
-            val descriptionText = getString(R.string.reminders_notifications_channel_description)
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(REMINDERS_CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-            // Register the channel with the system
-            val notificationManager: NotificationManager =
-                requireContext().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
     }
 
     override fun onStart() {
