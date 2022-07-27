@@ -15,25 +15,22 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.di
+package com.samco.trackandgraph.navigation
 
-import android.content.ContentResolver
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
-import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
+import javax.inject.Inject
 
-@Module
-@InstallIn(SingletonComponent::class)
-class AppModule {
-    @Provides
-    fun getContentResolver(@ApplicationContext context: Context): ContentResolver =
-        context.contentResolver
-
-    @Provides
-    fun getPendingIntentProvider(impl: PendingIntentProviderImpl): PendingIntentProvider = impl
+class PendingIntentProviderImpl @Inject constructor(
+    @ApplicationContext private val context: Context
+) : PendingIntentProvider {
+    override fun getMainActivityPendingIntent(): PendingIntent {
+        return Intent(context, MainActivity::class.java)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            .let { PendingIntent.getActivity(context, 0, it, 0) }
+    }
 }

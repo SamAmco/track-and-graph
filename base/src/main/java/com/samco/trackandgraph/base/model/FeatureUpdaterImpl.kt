@@ -24,14 +24,16 @@ import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.model.FeatureUpdater.DurationNumericConversionMode
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import com.samco.trackandgraph.base.database.entity.DataPoint as DataPointEntity
 
-internal class FeatureUpdaterImpl(
+internal class FeatureUpdaterImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
-    private val io: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher
 ) : FeatureUpdater {
     override suspend fun updateFeature(
         oldFeature: Feature,
