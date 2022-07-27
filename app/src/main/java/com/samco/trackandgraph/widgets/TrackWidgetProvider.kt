@@ -22,12 +22,8 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.os.Build
 import android.view.View
 import android.widget.RemoteViews
-import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.R
 
 const val WIDGET_PREFS_NAME = "TrackWidget"

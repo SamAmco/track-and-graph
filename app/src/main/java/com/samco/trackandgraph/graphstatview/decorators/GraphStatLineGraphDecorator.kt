@@ -20,17 +20,18 @@ package com.samco.trackandgraph.graphstatview.decorators
 import android.content.Context
 import android.graphics.Paint
 import android.view.View
-import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.getColor
 import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.*
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.*
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.dto.LineGraphFeature
+import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
+import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.ui.formatDayMonth
 import com.samco.trackandgraph.ui.formatMonthYear
 import com.samco.trackandgraph.ui.formatTimeDuration
@@ -210,7 +211,8 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     private suspend fun drawLineGraphFeatures() {
         for (kvp in data!!.plottableData) {
             withContext(Dispatchers.Main) {
-                inflateGraphLegendItem(binding!!, context!!, kvp.key.colorIndex, kvp.key.name)
+                val color = getColor(context!!, dataVisColorList[kvp.key.colorIndex])
+                inflateGraphLegendItem(binding!!, context!!, color, kvp.key.name)
             }
             kvp.value?.let { addSeries(it, kvp.key) }
         }
@@ -289,7 +291,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun getPaintColor(lineGraphFeature: LineGraphFeature) =
-        ContextCompat.getColor(context!!, dataVisColorList[lineGraphFeature.colorIndex])
+        getColor(context!!, dataVisColorList[lineGraphFeature.colorIndex])
 
     private fun getMarkerPaint(): Paint {
         val color = context!!.getColorFromAttr(R.attr.errorTextColor)

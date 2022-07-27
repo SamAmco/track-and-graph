@@ -23,12 +23,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.AdapterView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.entity.FeatureType
-import com.samco.trackandgraph.database.entity.TimeHistogram
-import com.samco.trackandgraph.database.entity.TimeHistogramWindow
-import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
+import com.samco.trackandgraph.base.database.dto.TimeHistogram
+import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.TimeHistogramInputViewBinding
 import com.samco.trackandgraph.graphstatinput.ValidationException
+import com.samco.trackandgraph.maxGraphPeriodDurations
 
 class TimeHistogramConfigView @JvmOverloads constructor(
     context: Context,
@@ -52,7 +51,7 @@ class TimeHistogramConfigView @JvmOverloads constructor(
     private fun createEmptyConfig() = TimeHistogram(
         0L,
         0L,
-        allFeatures.getOrElse(0) { null }?.id ?: -1,
+        allFeatureData.getOrElse(0) { null }?.feature?.id ?: -1,
         null,
         TimeHistogramWindow.DAY,
         false,
@@ -98,8 +97,8 @@ class TimeHistogramConfigView @JvmOverloads constructor(
     }
 
     override fun validateConfig(): ValidationException? {
-        return if (allFeatures.isNullOrEmpty()
-            || !allFeatures.map { it.id }.contains(configData.featureId)
+        return if (allFeatureData.isNullOrEmpty()
+            || !allFeatureData.map { it.feature.id }.contains(configData.featureId)
         ) {
             ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         } else null

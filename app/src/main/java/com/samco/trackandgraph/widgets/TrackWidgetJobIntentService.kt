@@ -20,37 +20,55 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import androidx.core.app.JobIntentService
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
+import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
+import com.samco.trackandgraph.di.MainDispatcher
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class TrackWidgetJobIntentService : JobIntentService() {
+
+    @Inject
+    @IODispatcher
+    lateinit var io: CoroutineDispatcher
+
+    @Inject
+    @MainDispatcher
+    lateinit var ui: CoroutineDispatcher
+
+    @Inject
+    lateinit var dataInteractor: DataInteractor
+
     companion object {
         fun enqueueWork(context: Context, work: Intent) {
             enqueueWork(context, TrackWidgetJobIntentService::class.java, 0, work)
         }
     }
 
-    override fun onHandleWork(intent: Intent) {
-        val appWidgetManager = AppWidgetManager.getInstance(this)
+    override fun onHandleWork(intent: Intent) = runBlocking {
+        val appWidgetManager = AppWidgetManager.getInstance(this@TrackWidgetJobIntentService)
 
         val appWidgetId = intent.getIntExtra(APP_WIDGET_ID_EXTRA, -1)
         val disableWidget = intent.getBooleanExtra(DISABLE_WIDGET_EXTRA, false)
 
-        val featureId = this.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).getLong(
+        val featureId = getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).getLong(
             TrackWidgetProvider.getFeatureIdPref(appWidgetId), -1
         )
 
-        val dao = TrackAndGraphDatabase.getInstance(this).trackAndGraphDatabaseDao
-
-        val feature = dao.tryGetFeatureByIdSync(featureId)
+        val feature = withContext(io) { dataInteractor.tryGetFeatureByIdSync(featureId) }
         val title = feature?.name
         val requireInput = !(feature?.hasDefaultValue ?: false)
         val remoteViews = TrackWidgetProvider.createRemoteViews(
-            this,
+            this@TrackWidgetJobIntentService,
             appWidgetId,
             title,
             requireInput,
             disableWidget
         )
-        appWidgetManager.updateAppWidget(appWidgetId, remoteViews)
+        withContext(ui) { appWidgetManager.updateAppWidget(appWidgetId, remoteViews) }
     }
 }

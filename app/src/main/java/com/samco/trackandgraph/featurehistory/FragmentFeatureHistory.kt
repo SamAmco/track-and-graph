@@ -28,9 +28,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.Feature
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.stringFromOdt
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentFeatureHistoryBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
@@ -39,8 +40,12 @@ import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
 
     private lateinit var binding: FragmentFeatureHistoryBinding
@@ -52,14 +57,13 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = DataBindingUtil.inflate(
             inflater, R.layout.fragment_feature_history, container, false
         )
         initPreLoadViewState()
 
-        val dao = TrackAndGraphDatabase.getInstance(requireContext()).trackAndGraphDatabaseDao
-        viewModel.initViewModel(args.feature, dao)
+        viewModel.setFeatureId(args.feature)
 
         observeFeature()
 
@@ -160,7 +164,10 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
     }
 }
 
-class FeatureHistoryViewModel : ViewModel() {
+@HiltViewModel
+class FeatureHistoryViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor
+): ViewModel() {
     private val _feature = MutableLiveData<Feature?>(null)
     val feature: LiveData<Feature?> = _feature
 
@@ -168,22 +175,23 @@ class FeatureHistoryViewModel : ViewModel() {
         private set
     var currentActionDataPoint: DataPoint? = null
 
-    var dataSource: TrackAndGraphDatabaseDao? = null
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    fun initViewModel(featureId: Long, dataSource: TrackAndGraphDatabaseDao) {
-        if (this.dataSource != null) return
-        this.dataSource = dataSource
-        this.dataPoints = dataSource.getDataPointsForFeature(featureId)
+    private var featureId: Long? = null
+
+    fun setFeatureId(featureId: Long) {
+        if (this.featureId != null) return
+        this.featureId = featureId
+        this.dataPoints = dataInteractor.getDataPointsForFeature(featureId)
         ioScope.launch {
-            val feature = dataSource.getFeatureById(featureId)
+            val feature = dataInteractor.getFeatureById(featureId)
             withContext(Dispatchers.Main) { _feature.value = feature }
         }
     }
 
     fun deleteDataPoint() = currentActionDataPoint?.let {
-        ioScope.launch { dataSource!!.deleteDataPoint(it) }
+        ioScope.launch { dataInteractor.deleteDataPoint(it) }
     }
 
     override fun onCleared() {

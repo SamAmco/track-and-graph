@@ -151,7 +151,7 @@
     <string name="graph_stat_validation_unknown">Une erreur inconnue s\'est produite</string>
     <string name="graph_stat_validation_no_name">Veuillez fournir un nom</string>
     <string name="graph_stat_validation_no_line_graph_features">Veuillez ajouter quelque chose au graphique</string>
-    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Veuillez sélectionner au moins une réponse à choix multiple</string>.
+    .
     <string name="graph_stat_validation_invalid_value_stat_from_to">Veuillez vous assurer que "Depuis" est antérieur ou égal à "Jusqu\'à"</string>.
     <string name="graph_stat_validation_unrecognised_color">Veuillez vous assurer que tous les ensembles de données ont une couleur</string>.
     <string name="graph_stat_validation_invalid_line_graph_feature">Ensemble de données de graphique linéaire non valide détecté</string>.
@@ -253,7 +253,6 @@
     <string name="create">Créer</string>
     <string name="use_default_value">Définir une valeur par défaut</string>
     <string name="default_value_description_hint">(Votre valeur par défaut sera utilisée automatiquement lorsque vous ajouterez un point de données, mais vous pourrez toujours revenir en arrière et la modifier.)</string>
-    <string name="check_all_relevant_values">Vérifier toutes les valeurs pertinentes : </string>
     <string name="backup_and_restore">Sauvegarde et restauration</string>
     <string name="backup_hint_text">La sauvegarde permet d\'enregistrer toutes les données de votre appli, y compris toutes les données suivies, les graphiques et les rappels. Vous devriez sauvegarder régulièrement vos données sur un périphérique externe ou un stockage dans le cloud au cas où votre appareil serait perdu ou cassé.</string>
     <string name="restore_hint_text">ATTENTION : La restauration à partir d\'une sauvegarde effacera toutes les données et la configuration actuellement dans l\'app. Track &amp; Graph redémarrera une fois la restauration terminée.</string>

@@ -17,43 +17,37 @@
 
 package com.samco.trackandgraph.graphstatinput.datasourceadapters
 
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.database.entity.PieChart
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.PieChart
+import com.samco.trackandgraph.base.model.DataInteractor
+import javax.inject.Inject
 
-class PieChartDataSourceAdapter : GraphStatDataSourceAdapter<PieChart>() {
+class PieChartDataSourceAdapter @Inject constructor(
+    dataInteractor: DataInteractor
+) : GraphStatDataSourceAdapter<PieChart>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
-        graphOrStatId: Long,
+        graphOrStat: GraphOrStat,
         config: PieChart,
         updateMode: Boolean
     ) {
-        if (updateMode) dataSource.updatePieChart(config.copy(graphStatId = graphOrStatId))
-        else dataSource.insertPieChart(config.copy(graphStatId = graphOrStatId))
+        if (updateMode) dataInteractor.updatePieChart(graphOrStat, config)
+        else dataInteractor.insertPieChart(graphOrStat, config)
     }
 
     override suspend fun getConfigDataFromDatabase(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStatId: Long
     ): Pair<Long, PieChart>? {
-        val pieChart = dataSource.getPieChartByGraphStatId(graphOrStatId) ?: return null
+        val pieChart = dataInteractor.getPieChartByGraphStatId(graphOrStatId) ?: return null
         return Pair(pieChart.id, pieChart)
     }
 
     override suspend fun shouldPreen(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat
     ): Boolean {
-        return dataSource.getPieChartByGraphStatId(graphOrStat.id) == null
+        return dataInteractor.getPieChartByGraphStatId(graphOrStat.id) == null
     }
 
-    override suspend fun duplicate(
-        dataSource: TrackAndGraphDatabaseDao,
-        oldGraphId: Long,
-        newGraphId: Long
-    ) {
-        val pieChart = dataSource.getPieChartByGraphStatId(oldGraphId)
-        val copy = pieChart?.copy(id = 0, graphStatId = newGraphId)
-        copy?.let { dataSource.insertPieChart(it) }
+    override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
+        dataInteractor.duplicatePieChart(graphOrStat)
     }
 }

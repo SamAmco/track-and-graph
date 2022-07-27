@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.graphstatview.decorators
 
 import android.content.Context
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 
 interface IDecoratableGraphStatView {

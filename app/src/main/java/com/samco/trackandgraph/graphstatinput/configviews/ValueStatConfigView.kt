@@ -27,11 +27,9 @@ import android.widget.LinearLayout
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.doubleFormatter
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.ui.DurationInputView
+import com.samco.trackandgraph.ui.doubleFormatter
 import com.samco.trackandgraph.util.getDoubleFromText
 
 internal abstract class ValueStatConfigView @JvmOverloads constructor(
@@ -46,35 +44,40 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
     protected abstract fun getCurrentFeatureId(): Long
     protected abstract fun getCurrentFromValue(): Double
     protected abstract fun getCurrentToValue(): Double
-    protected abstract fun getDiscreteValues(): List<Int>
+    protected abstract fun getLabels(): Set<String>
+    protected abstract fun getFilterByLabel(): Boolean
+    protected abstract fun getFilterByRange(): Boolean
+
     protected abstract fun getFeatureSpinner(): AppCompatSpinner
-    protected abstract fun getDiscreteValueButtonsLayout(): LinearLayout
-    protected abstract fun getDiscreteValueInputLayout(): View
+    protected abstract fun getLabelButtonsLayout(): LinearLayout
+    protected abstract fun getLabelCardLayout(): View
+    protected abstract fun getLabelCardContentLayout(): View
     protected abstract fun getDurationRangeInput(): View
     protected abstract fun getContinuousValueInputLayout(): View
     protected abstract fun getToInput(): EditText
     protected abstract fun getFromInput(): EditText
     protected abstract fun getFromDurationInput(): DurationInputView
     protected abstract fun getToDurationInput(): DurationInputView
+    protected abstract fun getFilterByLabelCheckbox(): CheckBox
+    protected abstract fun getFilterByValueCheckbox(): CheckBox
 
     protected abstract fun onNewFeatureId(featureId: Long)
-    protected abstract fun onNewDiscreteValues(discreteValues: List<Int>)
+    protected abstract fun onNewLabels(labels: Set<String>)
     protected abstract fun onNewToValue(value: Double)
     protected abstract fun onNewFromValue(value: Double)
+    protected abstract fun onFilterByLabelChanged(value: Boolean)
+    protected abstract fun onFilterByValueChanged(value: Boolean)
 
-    private fun getCurrentFeature(): Feature? {
+    private fun getCurrentFeatureData(): FeatureDataProvider.FeatureData? {
         val featId = getCurrentFeatureId()
-        return allFeatures.firstOrNull { it.id == featId }
+        return allFeatureData.firstOrNull { it.feature.id == featId }
     }
 
     override fun validateConfig(): ValidationException? {
-        val currFeature = getCurrentFeature()
-            ?: return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        if (currFeature.featureType == FeatureType.DISCRETE && getDiscreteValues().isEmpty()) {
-            return ValidationException(R.string.graph_stat_validation_invalid_value_stat_discrete_value)
-        } else if (getCurrentFromValue() > getCurrentToValue()){
+        if (getCurrentFeatureData() == null)
+            return ValidationException(R.string.graph_stat_validation_no_line_graph_features) //Shouldn't happen
+        if (getCurrentFromValue() > getCurrentToValue())
             return ValidationException(R.string.graph_stat_validation_invalid_value_stat_from_to)
-        }
         return null
     }
 
@@ -82,68 +85,84 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
         listenToValueStat()
         listenToContinuousRangeInputView()
         listenToDurationRangeInputView()
-        updateInputView(getCurrentFeature())
+        listenToFilterCheckboxes()
+        updateInputView()
+    }
+
+    private fun listenToFilterCheckboxes() {
+        getFilterByLabelCheckbox().setOnCheckedChangeListener { _, isChecked ->
+            onFilterByLabelChanged(isChecked)
+            setupLabelCardLayout(isChecked)
+            emitConfigChange()
+        }
+        getFilterByValueCheckbox().setOnCheckedChangeListener { _, isChecked ->
+            onFilterByValueChanged(isChecked)
+            setupRangeCardLayout(isChecked)
+            emitConfigChange()
+        }
+    }
+
+    private fun setupLabelCardLayout(isEnabled: Boolean) {
+        getLabelCardContentLayout().visibility = if (isEnabled) View.VISIBLE else View.GONE
+    }
+
+    private fun setupRangeCardLayout(isEnabled: Boolean) {
+        val featureData = getCurrentFeatureData() ?: return
+        val duration = featureData.dataProperties.isDuration
+        if (duration) {
+            getDurationRangeInput().visibility = if (isEnabled) View.VISIBLE else View.GONE
+            getContinuousValueInputLayout().visibility = View.GONE
+        } else {
+            getDurationRangeInput().visibility = View.GONE
+            getContinuousValueInputLayout().visibility = if (isEnabled) View.VISIBLE else View.GONE
+        }
     }
 
     private fun listenToValueStat() {
         listenToFeatureSpinner(this, getFeatureSpinner(), getCurrentFeatureId()) {
-            onNewFeatureId(it.id)
-            updateInputView(it)
-        }
-    }
-
-    private fun updateInputView(feature: Feature?) {
-        when (feature?.featureType) {
-            FeatureType.DISCRETE -> {
-                sanitizeValueStatDiscreteValues()
-                setUpDiscreteValueInputView()
-                getDiscreteValueInputLayout().visibility = View.VISIBLE
-                getDurationRangeInput().visibility = View.GONE
-                getContinuousValueInputLayout().visibility = View.GONE
-            }
-            FeatureType.CONTINUOUS -> {
-                setUpContinuousRangeInputView()
-                getDiscreteValueInputLayout().visibility = View.GONE
-                getDurationRangeInput().visibility = View.GONE
-                getContinuousValueInputLayout().visibility = View.VISIBLE
-            }
-            FeatureType.DURATION -> {
-                setUpDurationRangeInputView()
-                getDiscreteValueInputLayout().visibility = View.GONE
-                getContinuousValueInputLayout().visibility = View.GONE
-                getDurationRangeInput().visibility = View.VISIBLE
+            if (getCurrentFeatureId() != it.id) {
+                onFilterByValueChanged(false)
+                onFilterByLabelChanged(false)
+                onNewFeatureId(it.id)
+                updateInputView()
             }
         }
     }
 
-    private fun sanitizeValueStatDiscreteValues() {
-        val allowedDiscreteValues = getCurrentFeature()?.discreteValues?.map { it.index }
-        val newValues = if (allowedDiscreteValues != null) {
-            getDiscreteValues()
-                .filter { allowedDiscreteValues.contains(it) }
-                .distinct()
-        } else emptyList()
-        onNewDiscreteValues(newValues)
+    private fun updateInputView() {
+        val featureData = getCurrentFeatureData() ?: return
+        val labels = featureData.labels
+        getLabelCardLayout().visibility = if (labels.isNotEmpty()) View.VISIBLE else View.GONE
+        if (labels.isNotEmpty()) setUpLabelButtonsView(labels)
+
+        getFilterByLabelCheckbox().isChecked = getFilterByLabel()
+        getFilterByValueCheckbox().isChecked = getFilterByRange()
+
+        val duration = featureData.dataProperties.isDuration
+        getDurationRangeInput().visibility = if (duration) View.VISIBLE else View.GONE
+        setUpDurationRangeInputView()
+        setUpContinuousRangeInputView()
+        setupLabelCardLayout(getFilterByLabel())
+        setupRangeCardLayout(getFilterByRange())
         emitConfigChange()
     }
 
-    private fun setUpDiscreteValueInputView() {
-        val discreteValues = getCurrentFeature()?.discreteValues ?: emptyList()
-        val buttonsLayout = getDiscreteValueButtonsLayout()
+    private fun setUpLabelButtonsView(labels: Set<String>) {
+        val buttonsLayout = getLabelButtonsLayout()
         buttonsLayout.removeAllViews()
         val inflater = LayoutInflater.from(context)
-        for (discreteValue in discreteValues.sortedBy { it.index }) {
+        for (label in labels) {
             val item = inflater.inflate(
                 R.layout.discrete_value_input_button,
                 buttonsLayout, false
             ) as CheckBox
-            item.text = discreteValue.label
-            item.isChecked = getDiscreteValues().contains(discreteValue.index)
+            item.text = label
+            item.isChecked = getLabels().contains(label)
             item.setOnCheckedChangeListener { _, checked ->
-                val newDiscreteValues = getDiscreteValues().toMutableList()
-                if (checked) newDiscreteValues.add(discreteValue.index)
-                else newDiscreteValues.remove(discreteValue.index)
-                onNewDiscreteValues(newDiscreteValues)
+                val newLabels = getLabels().toMutableSet()
+                if (checked) newLabels.add(label)
+                else newLabels.remove(label)
+                onNewLabels(newLabels)
                 emitConfigChange()
             }
             buttonsLayout.addView(item)

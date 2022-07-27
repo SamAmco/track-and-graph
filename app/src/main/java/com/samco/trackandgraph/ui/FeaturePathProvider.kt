@@ -17,14 +17,17 @@
 
 package com.samco.trackandgraph.ui
 
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.Group
 
-class FeaturePathProvider(
+
+open class FeaturePathProvider(
     val features: List<Feature>,
     groups: List<Group>
 ) : GroupPathProvider(groups) {
     private val featuresById = features.map { it.id to it }.toMap()
+
+    fun featuresSortedAlphabetically() = features.sortedBy { getPathForFeature(it.id) }
 
     fun getPathForFeature(id: Long): String {
         val feature = featuresById[id] ?: return ""

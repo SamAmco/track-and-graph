@@ -22,19 +22,18 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
 import androidx.core.widget.addTextChangedListener
+import android.widget.AdapterView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.dataVisColorGenerator
-import com.samco.trackandgraph.database.dataVisColorList
-import com.samco.trackandgraph.database.doubleFormatter
-import com.samco.trackandgraph.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.database.dto.YRangeType
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.LineGraphInputViewBinding
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfig
 import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfigListItemView
+import com.samco.trackandgraph.maxGraphPeriodDurations
+import com.samco.trackandgraph.ui.dataVisColorGenerator
+import com.samco.trackandgraph.ui.dataVisColorList
+import com.samco.trackandgraph.ui.doubleFormatter
 import com.samco.trackandgraph.util.getDoubleFromText
 
 internal class LineGraphConfigView @JvmOverloads constructor(
@@ -159,7 +158,7 @@ internal class LineGraphConfigView @JvmOverloads constructor(
 
     private fun inflateLineGraphFeatureView(index: Int, lineGraphFeature: LineGraphFeature) {
         val featureConfig = LineGraphFeatureConfig.fromLineGraphFeature(lineGraphFeature)
-        val view = LineGraphFeatureConfigListItemView(context, featurePathProvider, featureConfig)
+        val view = LineGraphFeatureConfigListItemView(context, featureDataProvider, featureConfig)
         lgfConfigIndices.add(index, view)
         view.setOnRemoveListener {
             binding.lineGraphFeaturesLayout.removeView(view)
@@ -220,7 +219,7 @@ internal class LineGraphConfigView @JvmOverloads constructor(
     override fun validateConfig(): ValidationException? {
         if (configData.features.isEmpty())
             return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        val featureIds = allFeatures.map { feat -> feat.id }.toSet()
+        val featureIds = allFeatureData.map { data -> data.feature.id }.toSet()
         configData.features.forEach { f ->
             if (f.colorIndex !in dataVisColorList.indices)
                 return ValidationException(R.string.graph_stat_validation_unrecognised_color)

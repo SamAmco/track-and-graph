@@ -24,10 +24,7 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.observe
+import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -35,30 +32,18 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.withTransaction
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.TrackAndGraphDatabase
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.dto.DisplayFeature
-import com.samco.trackandgraph.database.entity.DataPoint
-import com.samco.trackandgraph.database.entity.FeatureType
-import com.samco.trackandgraph.database.entity.GraphOrStat
-import com.samco.trackandgraph.database.entity.Group
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
-import com.samco.trackandgraph.graphclassmappings.graphStatTypes
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import org.threeten.bp.Instant
-import org.threeten.bp.OffsetDateTime
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 /**
  * The group fragment is used on the home page and in any nested group to display the contents of
@@ -66,9 +51,13 @@ import org.threeten.bp.OffsetDateTime
  * The default value for args.groupId is 0L representing the root group or home page. The
  * args.groupName may be null or empty.
  */
+@AndroidEntryPoint
 class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
+
+    @Inject
+    lateinit var gsiProvider: GraphStatInteractorProvider
 
     private lateinit var binding: FragmentGroupBinding
     private lateinit var adapter: GroupAdapter
@@ -84,16 +73,15 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             .inflate(inflater, R.layout.fragment_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        val database = TrackAndGraphDatabase
-            .getInstance(requireActivity().application)
-        viewModel.initViewModel(database, args.groupId)
+        viewModel.setGroup(args.groupId)
 
         binding.emptyGroupText.visibility = View.INVISIBLE
 
         adapter = GroupAdapter(
             createFeatureClickListener(),
             createGraphStatClickListener(),
-            createGroupClickListener()
+            createGroupClickListener(),
+            gsiProvider
         )
         binding.itemList.adapter = adapter
         disableChangeAnimations()
@@ -218,8 +206,8 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     private fun onEditGraphStat(graphOrStat: IGraphStatViewData) {
         navController?.navigate(
             GroupFragmentDirections.actionGraphStatInput(
-                graphOrStat.graphOrStat.id,
-                args.groupId
+                graphStatId = graphOrStat.graphOrStat.id,
+                groupId = args.groupId
             )
         )
     }
@@ -306,12 +294,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun listenToViewModel() {
-        var skippedFirstDataPointsUpdate = false
         viewModel.hasFeatures.observe(viewLifecycleOwner) {}
-        viewModel.dataPoints.observe(viewLifecycleOwner) {
-            if (skippedFirstDataPointsUpdate) viewModel.updateAllGraphs()
-            else skippedFirstDataPointsUpdate = true
-        }
         viewModel.groupChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it)
             updateShowQueueTrackButton()
@@ -343,14 +326,14 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
     override fun onStart() {
         super.onStart()
-        requireActivity().toolbar.overflowIcon =
+        (requireActivity() as MainActivity).toolbar.overflowIcon =
             ContextCompat.getDrawable(requireContext(), R.drawable.add_icon)
     }
 
     override fun onStop() {
         super.onStop()
         if (navController?.currentDestination?.id != R.id.groupFragment) {
-            requireActivity().toolbar.overflowIcon =
+            (requireActivity() as MainActivity).toolbar.overflowIcon =
                 ContextCompat.getDrawable(requireContext(), R.drawable.list_menu_icon)
         }
     }
@@ -431,111 +414,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             getString(R.string.ru_sure_del_feature) -> id?.let { viewModel.onDeleteFeature(it.toLong()) }
             getString(R.string.ru_sure_del_group) -> id?.let { viewModel.onDeleteGroup(it.toLong()) }
             getString(R.string.ru_sure_del_graph) -> id?.let { viewModel.onDeleteGraphStat(it.toLong()) }
-        }
-    }
-}
-
-class GroupViewModel : ViewModel() {
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
-    private var database: TrackAndGraphDatabase? = null
-    private lateinit var dataSource: TrackAndGraphDatabaseDao
-
-    lateinit var dataPoints: LiveData<Instant>
-    lateinit var hasFeatures: LiveData<Boolean>
-
-    lateinit var groupChildren: GroupChildrenLiveData
-
-    val features
-        get() = groupChildren.value
-            ?.filter { it.type == GroupChildType.FEATURE }
-            ?.map { it.obj as DisplayFeature }
-            ?: emptyList()
-
-    fun initViewModel(database: TrackAndGraphDatabase, groupId: Long) {
-        if (this.database != null) return
-        this.database = database
-        this.dataSource = database.trackAndGraphDatabaseDao
-
-        dataPoints = Transformations.map(dataSource.getAllDataPoints()) { Instant.now() }
-        hasFeatures = Transformations.map(dataSource.getAllFeatures()) { it.isNotEmpty() }
-
-        groupChildren = GroupChildrenLiveData(updateJob, groupId, dataSource)
-    }
-
-    fun addDefaultFeatureValue(feature: DisplayFeature) = ioScope.launch {
-        val label = if (feature.featureType == FeatureType.DISCRETE) {
-            feature.discreteValues[feature.defaultValue.toInt()].label
-        } else ""
-        val newDataPoint = DataPoint(
-            OffsetDateTime.now(),
-            feature.id,
-            feature.defaultValue,
-            label,
-            ""
-        )
-        dataSource.insertDataPoint(newDataPoint)
-    }
-
-    fun onDeleteFeature(id: Long) = ioScope.launch {
-        dataSource.deleteFeature(id)
-        groupChildren.graphStatLiveData.preenGraphStats()
-    }
-
-    fun adjustDisplayIndexes(items: List<GroupChild>) = ioScope.launch {
-        val displayFeatures = mutableListOf<DisplayFeature>()
-        val groups = mutableListOf<Group>()
-        val graphs = mutableListOf<GraphOrStat>()
-        items.forEachIndexed { index, groupChild ->
-            when (groupChild.type) {
-                GroupChildType.GROUP -> groups.add(toGroupWithIndex(groupChild.obj, index))
-                GroupChildType.FEATURE -> displayFeatures.add(
-                    toDisplayFeatureWithIndex(
-                        groupChild.obj,
-                        index
-                    )
-                )
-                GroupChildType.GRAPH -> graphs.add(
-                    toGraphStatViewDataWithIndex(
-                        groupChild.obj,
-                        index
-                    )
-                )
-            }
-        }
-        database?.withTransaction {
-            dataSource.updateFeatures(displayFeatures.map { it.asFeature() })
-            dataSource.updateGraphStats(graphs)
-            dataSource.updateGroups(groups)
-        }
-    }
-
-    private fun toGraphStatViewDataWithIndex(obj: Any, index: Int): GraphOrStat {
-        val pair = obj as Pair<*, *>
-        val viewData = pair.second as IGraphStatViewData
-        return viewData.graphOrStat.copy(displayIndex = index)
-    }
-
-    private fun toDisplayFeatureWithIndex(obj: Any, index: Int) =
-        (obj as DisplayFeature).copy(displayIndex = index)
-
-    private fun toGroupWithIndex(obj: Any, index: Int) = (obj as Group).copy(displayIndex = index)
-
-    fun updateAllGraphs() = groupChildren.graphStatLiveData.updateAllGraphStats()
-
-    fun onDeleteGraphStat(id: Long) = ioScope.launch { dataSource.deleteGraphOrStat(id) }
-
-    fun onDeleteGroup(id: Long) = ioScope.launch {
-        dataSource.deleteGroup(id)
-        groupChildren.graphStatLiveData.preenGraphStats()
-    }
-
-    fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
-        ioScope.launch {
-            database?.withTransaction {
-                val gs = graphOrStatViewData.graphOrStat
-                graphStatTypes[gs.type]?.dataSourceAdapter?.duplicateGraphOrStat(dataSource, gs)
-            }
         }
     }
 }

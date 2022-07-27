@@ -19,7 +19,6 @@ package com.samco.trackandgraph.viewgraphstat
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.res.Configuration
 import android.graphics.Point
 import android.os.Bundle
@@ -32,25 +31,32 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.NoteType
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
-import com.samco.trackandgraph.graphclassmappings.graphStatTypes
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
     private val viewModel by viewModels<ViewGraphStatViewModel>()
@@ -66,15 +72,20 @@ class ViewGraphStatFragment : Fragment() {
 
     private var showHideNotesAnimator: ValueAnimator? = null
 
+    @Inject
+    lateinit var gsiProvider: GraphStatInteractorProvider
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         this.navController = container?.findNavController()
-        viewModel.init(requireActivity(), args.graphStatId)
         binding = FragmentViewGraphStatBinding.inflate(inflater, container, false)
         graphStatView = binding.graphStatView
+
+        viewModel.setGraphStatId(args.graphStatId)
+
         setViewInitialState()
         listenToState()
         listenToBinding()
@@ -107,8 +118,8 @@ class ViewGraphStatFragment : Fragment() {
                 val featureDisplayName =
                     viewModel.featurePathProvider.getPathForFeature(dataPoint.featureId)
                 val featureType =
-                    viewModel.featureTypes?.getOrElse(dataPoint.featureId) { FeatureType.CONTINUOUS }
-                        ?: FeatureType.CONTINUOUS
+                    viewModel.featureTypes?.getOrElse(dataPoint.featureId) { DataType.CONTINUOUS }
+                        ?: DataType.CONTINUOUS
                 showDataPointDescriptionDialog(
                     requireContext(),
                     layoutInflater,
@@ -132,19 +143,15 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun listenToState() {
-        viewModel.state.observe(
-            viewLifecycleOwner,
-            Observer { state -> onViewModelStateChanged(state) })
-        viewModel.showingNotes.observe(
-            viewLifecycleOwner,
-            Observer { b -> onShowingNotesChanged(b) })
+        viewModel.state.observe(viewLifecycleOwner) { state -> onViewModelStateChanged(state) }
+        viewModel.showingNotes.observe(viewLifecycleOwner) { b -> onShowingNotesChanged(b) }
     }
 
     private fun observeNoteMarker() {
-        viewModel.markedNote.observe(viewLifecycleOwner, Observer { note ->
-            if (note == null) return@Observer
+        viewModel.markedNote.observe(viewLifecycleOwner) { note ->
+            if (note == null) return@observe
             binding.graphStatView.placeMarker(note.timestamp)
-        })
+        }
     }
 
     private fun onNewNotesList(notes: List<GraphNote>) {
@@ -177,7 +184,7 @@ class ViewGraphStatFragment : Fragment() {
         binding.notesRecyclerView.layoutManager = LinearLayoutManager(
             context, RecyclerView.VERTICAL, false
         )
-        viewModel.notes.observe(viewLifecycleOwner, Observer { onNewNotesList(it) })
+        viewModel.notes.observe(viewLifecycleOwner) { onNewNotesList(it) }
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
@@ -237,17 +244,23 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun observeGraphStatViewData() {
-        viewModel.graphStatViewData.observe(viewLifecycleOwner, Observer {
-            graphStatView.initFromGraphStat(it, false)
-        })
+        viewModel.graphStatViewData.observe(viewLifecycleOwner) {
+            val decorator = gsiProvider.getDecorator(it.graphOrStat.type, false)
+            graphStatView.initFromGraphStat(it, decorator)
+        }
     }
 }
 
 enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
-class ViewGraphStatViewModel : ViewModel() {
+
+@HiltViewModel
+class ViewGraphStatViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor,
+    private val gsiProvider: GraphStatInteractorProvider
+) : ViewModel() {
     var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyList(), emptyList())
         private set
-    var featureTypes: Map<Long, FeatureType>? = null
+    var featureTypes: Map<Long, DataType>? = null
         private set
 
     val state: LiveData<ViewGraphStatViewModelState>
@@ -272,14 +285,12 @@ class ViewGraphStatViewModel : ViewModel() {
     private val currJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + currJob)
 
-    private var dataSource: TrackAndGraphDatabaseDao? = null
+    private var initialized = false
 
-    fun init(activity: Activity, graphStatId: Long) {
-        if (dataSource != null) return
-        dataSource =
-            TrackAndGraphDatabase.getInstance(activity.application).trackAndGraphDatabaseDao
-        _state.value =
-            ViewGraphStatViewModelState.INITIALIZING
+    fun setGraphStatId(graphStatId: Long) {
+        if (initialized) return
+        initialized = true
+
         ioScope.launch {
             initFromGraphStatId(graphStatId)
             getAllFeatureAttributes()
@@ -292,7 +303,7 @@ class ViewGraphStatViewModel : ViewModel() {
 
     //TODO we need to filter these by date/time and only show global notes relevant to the current graph/stat
     private suspend fun getAllGlobalNotes() = withContext(Dispatchers.IO) {
-        val globalNotes = dataSource!!.getAllGlobalNotesSync()
+        val globalNotes = dataInteractor.getAllGlobalNotesSync()
             .map { GraphNote(it) }
         val mergedList = _notes.value
             ?.union(globalNotes)
@@ -300,14 +311,14 @@ class ViewGraphStatViewModel : ViewModel() {
         withContext(Dispatchers.Main) { _notes.value = mergedList ?: emptyList() }
     }
 
-    private fun getAllFeatureAttributes() {
-        val allFeatures = dataSource!!.getAllFeaturesSync()
-        val allGroups = dataSource!!.getAllGroupsSync()
+    private suspend fun getAllFeatureAttributes() {
+        val allFeatures = dataInteractor.getAllFeaturesSync()
+        val allGroups = dataInteractor.getAllGroupsSync()
         featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
-        featureTypes = allFeatures.map { it.id to it.featureType }.toMap()
+        featureTypes = allFeatures.associate { it.id to it.featureType }
     }
 
-    private fun onSampledDataPoints(dataPoints: List<DataPointInterface>) {
+    private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
         ioScope.launch {
             val dataPointNotes = dataPoints
                 .filter { dp -> dp.note.isNotEmpty() }
@@ -321,9 +332,9 @@ class ViewGraphStatViewModel : ViewModel() {
     }
 
     private suspend fun initFromGraphStatId(graphStatId: Long) {
-        val graphStat = dataSource!!.getGraphStatById(graphStatId)
-        val viewData = graphStatTypes[graphStat.type]
-            ?.dataFactory!!.getViewData(dataSource!!, graphStat, this::onSampledDataPoints)
+        val graphStat = dataInteractor.getGraphStatById(graphStatId)
+        val viewData = gsiProvider.getDataFactory(graphStat.type)
+            .getViewData(graphStat, this::onSampledDataPoints)
         withContext(Dispatchers.Main) { _graphStatViewData.value = viewData }
     }
 

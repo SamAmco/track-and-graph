@@ -17,134 +17,117 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.*
+import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
+import com.samco.trackandgraph.functions.functions.DataSampleFunction
+import com.samco.trackandgraph.functions.functions.CompositeFunction
+import com.samco.trackandgraph.functions.functions.DataClippingFunction
+import com.samco.trackandgraph.functions.functions.FilterLabelFunction
+import com.samco.trackandgraph.functions.functions.FilterValueFunction
+import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
+import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import kotlin.math.max
+import javax.inject.Inject
 
-class AverageTimeBetweenDataFactory :
-    ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>() {
+class AverageTimeBetweenDataFactory @Inject constructor(
+    dataInteractor: DataInteractor,
+    @IODispatcher ioDispatcher: CoroutineDispatcher
+) : ViewDataFactory<AverageTimeBetweenStat, IAverageTimeBetweenViewData>(
+    dataInteractor,
+    ioDispatcher
+) {
 
     companion object {
         /**
          * Calculates the average duration between the timestamps of a set of data points. This is
-         * simply the duration divided by the number of points plus 1. The duration is calculated
-         * as start -> end. Start is end minus [duration] if it exists and first [dataPoints]
-         * timestamp otherwise. End is [endDate] if given and last [dataPoints] timestamp or [now]
-         * (whichever is later) otherwise. If there are not 2 or more elements in [dataPoints] with
-         * timestamps falling in this range then null is returned.
+         * simply the duration between first and last divided by the number of points minus 1.
+         * Points must be passed in in order from newest to oldest
          */
-        internal fun calculateAverageTimeBetweenOrNull(
-            now: OffsetDateTime,
-            endDate: OffsetDateTime?,
-            duration: Duration?,
-            dataPoints: List<DataPointInterface>
-        ): Double? {
-            if (duration == null && dataPoints.size < 2) return null
-            val last = dataPoints.lastOrNull()?.timestamp
-            val first = dataPoints.firstOrNull()?.timestamp
-            val latest = endDate ?: last?.let { listOf(now, it).maxOrNull() } ?: now
-            val start = duration?.let { latest.minus(it) } ?: first
-            //Although we will have only sampled points likely to be in the duration it is possible that
-            // we could have been passed points that start before (latest - duration). So this is a good
-            // final check.
-            val clippedPoints = dataPoints
-                .dropWhile { it.timestamp.isBefore(start) }
-                .dropLastWhile { it.timestamp.isAfter(latest) }
-            val totalMillis = Duration.between(start, latest).toMillis().toDouble()
-            var divisor = clippedPoints.size + 1
-            if (latest == last) divisor -= 1
-            if (start == first) divisor -= 1
-            return totalMillis / max(1.0, divisor.toDouble())
+        internal fun calculateAverageTimeBetween(
+            dataPoints: List<IDataPoint>
+        ): Double {
+            if (dataPoints.size < 2) throw Exception("Don't call this method with less than 2 data points.")
+            //The data points will be in order newest to oldest
+            val last = dataPoints.first().timestamp
+            val first = dataPoints.last().timestamp
+            return Duration.between(first, last).toMillis()
+                .toDouble() / (dataPoints.size - 1).toDouble()
         }
     }
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
-        val timeBetweenStat = dataSource.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
-            ?: return notEnoughData(graphOrStat)
-        return createViewData(dataSource, graphOrStat, timeBetweenStat, onDataSampled)
+        val timeBetweenStat = dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id)
+            ?: return graphNotFound(graphOrStat)
+        return createViewData(graphOrStat, timeBetweenStat, onDataSampled)
     }
 
     override suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: AverageTimeBetweenStat,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): IAverageTimeBetweenViewData {
-        val feature = dataSource.getFeatureById(config.featureId)
-        val dataPoints = getRelevantDataPoints(dataSource, config, feature)
-        val averageMillis =
-            calculateAverageTimeBetweenOrNull(
-                OffsetDateTime.now(),
-                config.endDate,
-                config.duration,
-                dataPoints
-            ) ?: return notEnoughData(graphOrStat)
-        onDataSampled(dataPoints)
-        return object : IAverageTimeBetweenViewData {
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.READY
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-            override val averageMillis: Double
-                get() = averageMillis
-            override val hasEnoughData: Boolean
-                get() = true
+        return try {
+            val dataSample = withContext(Dispatchers.IO) {
+                getRelevantDataPoints(config, config.featureId)
+            }
+            val dataPoints = withContext(Dispatchers.IO) {
+                dataSample.toList()
+            }
+            if (dataPoints.size < 2) return notEnoughData(graphOrStat, dataPoints.size)
+            val averageMillis = withContext(Dispatchers.Default) {
+                calculateAverageTimeBetween(dataPoints)
+            }
+            onDataSampled(dataSample.getRawDataPoints())
+            object : IAverageTimeBetweenViewData {
+                override val state = IGraphStatViewData.State.READY
+                override val graphOrStat = graphOrStat
+                override val averageMillis = averageMillis
+            }
+        } catch (throwable: Throwable) {
+            object : IAverageTimeBetweenViewData {
+                override val state = IGraphStatViewData.State.ERROR
+                override val graphOrStat = graphOrStat
+                override val error = throwable
+            }
         }
     }
 
-    private fun notEnoughData(graphOrStat: GraphOrStat) = object : IAverageTimeBetweenViewData {
-        override val state: IGraphStatViewData.State
-            get() = IGraphStatViewData.State.READY
-        override val graphOrStat: GraphOrStat
-            get() = graphOrStat
-    }
-
-    private fun getRelevantDataPoints(
-        dataSource: TrackAndGraphDatabaseDao,
-        timeBetweenStat: AverageTimeBetweenStat,
-        feature: Feature
-    ): List<DataPointInterface> {
-        val endDate = timeBetweenStat.endDate ?: when (feature.featureType) {
-            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
-                dataSource.getLastDataPointBetween(
-                    feature.id,
-                    timeBetweenStat.fromValue,
-                    timeBetweenStat.toValue
-                )
-            }
-            FeatureType.DISCRETE -> {
-                dataSource.getLastDataPointWithValue(feature.id, timeBetweenStat.discreteValues)
-            }
-        }?.timestamp?.plusSeconds(1) ?: return emptyList()
-
-        val startDate =
-            timeBetweenStat.duration?.let { endDate.minus(it) } ?: OffsetDateTime.MIN
-        return when (feature.featureType) {
-            FeatureType.CONTINUOUS, FeatureType.DURATION -> {
-                dataSource.getDataPointsBetweenInTimeRange(
-                    feature.id,
-                    timeBetweenStat.fromValue,
-                    timeBetweenStat.toValue,
-                    startDate,
-                    endDate
-                )
-            }
-            FeatureType.DISCRETE -> {
-                dataSource.getDataPointsWithValueInTimeRange(
-                    feature.id,
-                    timeBetweenStat.discreteValues,
-                    startDate,
-                    endDate
-                )
-            }
+    private fun graphNotFound(graphOrStat: GraphOrStat) =
+        object : IAverageTimeBetweenViewData {
+            override val error = GraphNotFoundException()
+            override val state = IGraphStatViewData.State.ERROR
+            override val graphOrStat = graphOrStat
         }
+
+    private fun notEnoughData(graphOrStat: GraphOrStat, numDataPoints: Int) =
+        object : IAverageTimeBetweenViewData {
+            override val error = NotEnoughDataException(numDataPoints)
+            override val state = IGraphStatViewData.State.ERROR
+            override val graphOrStat = graphOrStat
+        }
+
+    private suspend fun getRelevantDataPoints(
+        config: AverageTimeBetweenStat,
+        featureId: Long
+    ): DataSample {
+        val dataSample = dataInteractor.getDataSampleForFeatureId(featureId)
+        val filters = mutableListOf<DataSampleFunction>()
+        if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
+        if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
+        filters.add(DataClippingFunction(config.endDate, config.duration))
+        return CompositeFunction(filters).mapSample(dataSample)
     }
 }

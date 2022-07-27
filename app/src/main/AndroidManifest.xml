@@ -20,6 +20,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name="com.samco.trackandgraph.MainActivity"
+            android:exported="true"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
             <intent-filter>
@@ -36,6 +37,7 @@
 
         <activity
             android:name=".widgets.TrackWidgetConfigureActivity"
+            android:exported="true"
             android:label="Configure widget"
             android:theme="@style/TransparentTheme">
             <intent-filter>
@@ -47,7 +49,8 @@
         <receiver android:name=".reminders.AlarmReceiver" />
         <receiver
             android:name=".reminders.RecreateAlarms"
-            android:enabled="true">
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="action.REMINDERS_CHANGED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -55,7 +58,9 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".widgets.TrackWidgetProvider">
+        <receiver
+            android:name=".widgets.TrackWidgetProvider"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

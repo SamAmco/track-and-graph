@@ -151,7 +151,6 @@
     <string name="graph_stat_validation_unknown">Se ha producido un error desconocido</string>
     <string name="graph_stat_validation_no_name">Por favor, proporciona un nombre</string>
     <string name="graph_stat_validation_no_line_graph_features">Por favor, añade este detalle al gráfico</string>
-    <string name="graph_stat_validation_invalid_value_stat_discrete_value">Por favor, selecciona al menos una respuesta de opción múltiple</string>
     <string name="graph_stat_validation_invalid_value_stat_from_to">Asegúrate de que "From" es menor o igual que "To"</string>
     <string name="graph_stat_validation_unrecognised_color">Asegúrate de que todos los conjuntos de datos tienen un color</string>
     <string name="graph_stat_validation_invalid_line_graph_feature">Se ha detectado un conjunto inválido de datos de gráfico de líneas</string>
@@ -253,7 +252,6 @@
     <string name="create">Crear</string>
     <string name="use_default_value" >Establece un valor por defecto</string>
     <string name="default_value_description_hint">(Su valor predeterminado se utilizará automáticamente cuando añada un punto de datos, pero siempre puede volver atrás y cambiarlo.)</string>
-    <string name="check_all_relevant_values">Comprueba todos los valores relevantes: </string>
     <string name="backup_and_restore">Respaldo y restauración</string>
     <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluyendo todos los datos trazados, los gráficos y los recordatorios. Deberías hacer una copia de seguridad de tus datos en un dispositivo externo o en un almacenamiento en la nube con regularidad en caso de que tu dispositivo se pierda o se rompa.</string>
     <string name="restore_hint_text">ADVERTENCIA: La restauración desde una copia de seguridad borrará todos los datos y la configuración actual de la aplicación. Track &amp; Graph se reiniciará una vez completada la restauración.</string>
