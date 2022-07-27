@@ -1,22 +1,9 @@
 package com.samco.trackandgraph
 
-import com.samco.trackandgraph.database.databaseFormatter
-import com.samco.trackandgraph.util.CSVReadWriter
-import org.junit.Test
-
-import org.threeten.bp.OffsetDateTime
-import java.io.File
-import java.io.PrintWriter
-import kotlin.math.roundToInt
-import kotlin.math.sin
-import kotlin.random.Random
-
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
+/*
 class RandomCsvDataGenerator {
+
+    private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
     data class LineData(val featureName: String, val featureValue: String)
 
@@ -125,20 +112,4 @@ class RandomCsvDataGenerator {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+ */

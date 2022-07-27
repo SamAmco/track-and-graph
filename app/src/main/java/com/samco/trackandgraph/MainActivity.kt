@@ -38,13 +38,17 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 import com.samco.trackandgraph.ui.DateFormatSetting
 import com.samco.trackandgraph.util.*
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 enum class NavButtonStyle { UP, MENU }
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navController: NavController
@@ -54,6 +58,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var currentNavBarConfig: NavBarConfig
 
+    @Inject
+    lateinit var dataInteractor: DataInteractor
+
+    val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         readThemeValue()
@@ -62,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         initializeAppBar()
         onDrawerHideKeyboard()
         initDrawerSpinners()
-        RemindersHelper.syncAlarms(this)
+        RemindersHelper.syncAlarms(this, dataInteractor)
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
     }
@@ -77,7 +86,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeAppBar() {
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
         supportActionBar?.let {
             //The ActionBarDrawerToggle draws the navigation button/back button in the top left of

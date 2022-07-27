@@ -17,11 +17,10 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
 
 interface IAverageTimeBetweenViewData : IGraphStatViewData{
-    val hasEnoughData: Boolean
-        get() = false
+    //The total millis between the first and last data point
     val averageMillis: Double
         get() = 0.0
 

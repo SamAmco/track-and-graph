@@ -17,12 +17,15 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.database.entity.DataPointInterface
-import com.samco.trackandgraph.database.entity.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * An abstract factory for generating data for a graph or stat ready to be displayed by an appropriate
@@ -31,37 +34,34 @@ import kotlinx.coroutines.withContext
  * I is the store of configuration options that tells the factory how to generate the data
  * T is the type of data produced by this factory
  */
-abstract class ViewDataFactory<in I, out T : IGraphStatViewData> {
+abstract class ViewDataFactory<in I, out T : IGraphStatViewData>(
+    protected val dataInteractor: DataInteractor,
+    protected val ioDispatcher: CoroutineDispatcher
+) {
     protected abstract suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): T
 
     protected abstract suspend fun createViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: I,
-        onDataSampled: (List<DataPointInterface>) -> Unit
+        onDataSampled: (List<DataPoint>) -> Unit
     ): T
 
     @Suppress("UNCHECKED_CAST")
     suspend fun getViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
         config: Any,
-        onDataSampled: (List<DataPointInterface>) -> Unit = {}
-    ): T =
-        withContext(Dispatchers.IO) {
-            return@withContext createViewData(dataSource, graphOrStat, config as I, onDataSampled)
-        }
+        onDataSampled: (List<DataPoint>) -> Unit = {}
+    ): T = withContext(ioDispatcher) {
+        return@withContext createViewData(graphOrStat, config as I, onDataSampled)
+    }
 
     suspend fun getViewData(
-        dataSource: TrackAndGraphDatabaseDao,
         graphOrStat: GraphOrStat,
-        onDataSampled: (List<DataPointInterface>) -> Unit = {}
-    ): T =
-        withContext(Dispatchers.IO) {
-            return@withContext createViewData(dataSource, graphOrStat, onDataSampled)
-        }
+        onDataSampled: (List<DataPoint>) -> Unit = {}
+    ): T = withContext(ioDispatcher) {
+        return@withContext createViewData(graphOrStat, onDataSampled)
+    }
 }

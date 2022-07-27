@@ -27,10 +27,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.*
-import com.samco.trackandgraph.database.dto.DisplayNote
-import com.samco.trackandgraph.database.dto.NoteType
-import com.samco.trackandgraph.database.entity.GlobalNote
+import com.samco.trackandgraph.base.database.dto.DisplayNote
+import com.samco.trackandgraph.base.database.dto.GlobalNote
+import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.database.stringFromOdt
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
@@ -38,11 +39,15 @@ import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showNoteDialog
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NotesFragment : Fragment() {
     lateinit var binding: FragmentNotesBinding
     private val viewModel by viewModels<NotesViewModel>()
@@ -52,12 +57,9 @@ class NotesFragment : Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentNotesBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
-        val dataSource =
-            TrackAndGraphDatabase.getInstance(requireActivity().applicationContext).trackAndGraphDatabaseDao
-        viewModel.init(dataSource)
 
         listenToFeatureNameProvdier()
 
@@ -152,13 +154,14 @@ class NotesFragment : Fragment() {
     }
 }
 
-class NotesViewModel : ViewModel() {
-    private var dataSource: TrackAndGraphDatabaseDao? = null
+@HiltViewModel
+class NotesViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor
+) : ViewModel() {
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    lateinit var notes: LiveData<List<DisplayNote>>
-        private set
+    val notes: LiveData<List<DisplayNote>> = dataInteractor.getAllDisplayNotes()
 
     lateinit var featureNameProvider: LiveData<FeaturePathProvider> private set
 
@@ -167,17 +170,14 @@ class NotesViewModel : ViewModel() {
     private val _onNoteInsertedTop = MutableLiveData(false)
     val onNoteInsertedTop: LiveData<Boolean> = _onNoteInsertedTop
 
-    fun init(dataSource: TrackAndGraphDatabaseDao) {
-        if (this.dataSource != null) return
-        this.dataSource = dataSource
-        notes = dataSource.getAllDisplayNotes()
+    init {
         initOnNoteInsertedTop()
         initFeatureNameProvider()
     }
 
     private fun initFeatureNameProvider() {
         val mediator = MediatorLiveData<FeaturePathProvider>()
-        dataSource?.let {
+        dataInteractor.let {
             val groups = it.getAllGroups()
             val features = it.getAllFeatures()
             val onEmitted = {
@@ -209,15 +209,11 @@ class NotesViewModel : ViewModel() {
     fun deleteNote(note: DisplayNote) = ioScope.launch {
         when (note.noteType) {
             NoteType.DATA_POINT -> note.featureId?.let {
-                dataSource!!.removeNote(note.timestamp, note.featureId)
+                dataInteractor.removeNote(note.timestamp, it)
             }
             NoteType.GLOBAL_NOTE -> {
-                val globalNote =
-                    GlobalNote(
-                        note.timestamp,
-                        note.note
-                    )
-                dataSource!!.deleteGlobalNote(globalNote)
+                val globalNote = GlobalNote(note.timestamp, note.note)
+                dataInteractor.deleteGlobalNote(globalNote)
             }
         }
     }

@@ -23,7 +23,6 @@ import android.view.View
 import android.widget.FrameLayout
 import androidx.cardview.widget.CardView
 import com.samco.trackandgraph.databinding.GraphStatCardViewBinding
-import com.samco.trackandgraph.databinding.GraphStatViewBinding
 
 class GraphStatCardView : FrameLayout {
     private val binding = GraphStatCardViewBinding.inflate(LayoutInflater.from(context), this, true)

@@ -22,12 +22,12 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.database.entity.Feature
-import com.samco.trackandgraph.database.entity.FeatureType
-import com.samco.trackandgraph.database.entity.PieChart
-import com.samco.trackandgraph.database.entity.maxGraphPeriodDurations
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.databinding.PieChartInputViewBinding
 import com.samco.trackandgraph.graphstatinput.ValidationException
+import com.samco.trackandgraph.maxGraphPeriodDurations
 
 internal class PieChartConfigView @JvmOverloads constructor(
     context: Context,
@@ -49,11 +49,15 @@ internal class PieChartConfigView @JvmOverloads constructor(
     }
 
     private fun discreteFeatures(): List<Feature> {
-        return allFeatures.filter { ftg -> ftg.featureType == FeatureType.DISCRETE }
+        return allFeatureData
+            .filter { data -> data.labels.isNotEmpty() }
+            .map { it.feature }
     }
 
     private fun getCurrentFeature(): Feature? {
-        return allFeatures.firstOrNull { it.id == configData.featureId }
+        return allFeatureData
+            .firstOrNull { it.feature.id == configData.featureId }
+            ?.feature
     }
 
     private fun initFromPieChart() {
@@ -67,8 +71,8 @@ internal class PieChartConfigView @JvmOverloads constructor(
             updateEndDateText(this, binding.customEndDateText, it)
         }
 
-        listenToFeatureSpinner(this, binding.pieChartFeatureSpinner, configData.featureId, {
-            ftg -> ftg.featureType == FeatureType.DISCRETE
+        listenToFeatureSpinner(this, binding.pieChartFeatureSpinner, configData.featureId, { ftg ->
+            ftg.featureType == DataType.DISCRETE
         }, {
             configData = configData.copy(featureId = it.id)
         })
@@ -92,7 +96,7 @@ internal class PieChartConfigView @JvmOverloads constructor(
             binding.pieChartFeatureSpinner.visibility = View.VISIBLE
         }
         val currFeature = getCurrentFeature()
-        if (currFeature == null || currFeature.featureType != FeatureType.DISCRETE) {
+        if (currFeature == null || currFeature.featureType != DataType.DISCRETE) {
             return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         }
         return null

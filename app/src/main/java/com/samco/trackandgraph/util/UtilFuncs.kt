@@ -29,7 +29,6 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
-import com.samco.trackandgraph.database.entity.FeatureType
 import java.lang.NumberFormatException
 
 /**
@@ -77,12 +76,12 @@ fun Context.getColorFromAttr(
 }
 
 fun Window.hideKeyboard(windowToken: IBinder? = null, flags: Int = 0) {
-    val imm = context.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.hideSoftInputFromWindow(windowToken ?: decorView.windowToken, flags)
 }
 
 fun Context.showKeyboard() {
-    val imm = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY)
 }
 

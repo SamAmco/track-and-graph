@@ -19,11 +19,8 @@ package com.samco.trackandgraph.ui
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.getColor
 import androidx.fragment.app.DialogFragment
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.util.getColorFromAttr
 
 class YesCancelDialogFragment : DialogFragment() {
     lateinit var title: String
