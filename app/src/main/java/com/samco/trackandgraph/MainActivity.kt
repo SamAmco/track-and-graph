@@ -25,6 +25,7 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -32,17 +33,24 @@ import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
+import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 import com.samco.trackandgraph.ui.DateFormatSetting
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 enum class NavButtonStyle { UP, MENU }
@@ -60,6 +68,8 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var dataInteractor: DataInteractor
 
+    private val viewModel by viewModels<MainActivityViewModel>()
+
     val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,8 +80,7 @@ class MainActivity : AppCompatActivity() {
         initializeAppBar()
         onDrawerHideKeyboard()
         initDrawerSpinners()
-        //TODO fix this
-        //RemindersHelper.syncAlarms(this, dataInteractor)
+        viewModel.syncAlarms()
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
     }
@@ -292,6 +301,18 @@ class MainActivity : AppCompatActivity() {
             drawerLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
+        }
+    }
+}
+
+@HiltViewModel
+class MainActivityViewModel @Inject constructor(
+    private val alarmInteractor: AlarmInteractor,
+    @IODispatcher private val io: CoroutineDispatcher
+) : ViewModel() {
+    fun syncAlarms() {
+        viewModelScope.launch(io) {
+            alarmInteractor.syncAlarms()
         }
     }
 }

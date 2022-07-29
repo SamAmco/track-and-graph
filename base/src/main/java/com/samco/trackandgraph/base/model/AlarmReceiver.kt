@@ -39,6 +39,9 @@ class AlarmReceiver : BroadcastReceiver() {
     @Inject
     lateinit var pendingIntentProvider: PendingIntentProvider
 
+    @Inject
+    lateinit var alarmInteractor: AlarmInteractor
+
     companion object {
         private const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
     }
@@ -86,6 +89,9 @@ class AlarmReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(250, 250, 250, 250), -1))
         } else vibrator.vibrate(longArrayOf(250, 250, 250, 250), -1)
+
+        //Schedule the next notification
+        runBlocking { alarmInteractor.syncAlarms() }
     }
 }
 
@@ -93,17 +99,19 @@ class AlarmReceiver : BroadcastReceiver() {
 class RecreateAlarms : BroadcastReceiver() {
 
     @Inject
-    lateinit var dataInteractor: DataInteractor
+    lateinit var alarmInteractor: AlarmInteractor
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val validActions = listOf(
-            "action.REMINDERS_CHANGED",
+            "android.intent.action.DATE_CHANGED",
+            "android.intent.action.TIME_SET",
+            "android.intent.action.TIMEZONE_CHANGED",
             "android.intent.action.BOOT_COMPLETED",
             "android.intent.action.QUICKBOOT_POWERON",
             "android.intent.action.MY_PACKAGE_REPLACED"
         )
         if (!validActions.contains(intent?.action)) return
         if (context == null) return
-        runBlocking { dataInteractor.syncAlarms() }
+        runBlocking { alarmInteractor.syncAlarms() }
     }
 }

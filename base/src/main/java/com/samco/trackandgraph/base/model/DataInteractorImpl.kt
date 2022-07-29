@@ -42,7 +42,7 @@ internal class DataInteractorImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     private val featureUpdater: FeatureUpdater,
     private val csvReadWriter: CSVReadWriter,
-    private val remindersHelper: RemindersHelper
+    private val alarmInteractor: AlarmInteractor
 ) : DataInteractor {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
@@ -165,14 +165,14 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
-        remindersHelper.clearAlarms()
+        alarmInteractor.clearAlarms()
         database.withTransaction {
             dao.deleteReminders()
             dao.insertReminders(reminders.mapIndexed { index, reminder ->
                 reminder.copy(id = index.toLong()).toEntity()
             })
         }
-        remindersHelper.syncAlarms()
+        alarmInteractor.syncAlarms()
         dataUpdateEvents.emit(Unit)
     }
 
@@ -522,6 +522,4 @@ internal class DataInteractorImpl @Inject constructor(
             csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
             dataUpdateEvents.emit(Unit)
         }
-
-    override suspend fun syncAlarms() = withContext(io) { remindersHelper.syncAlarms() }
 }
