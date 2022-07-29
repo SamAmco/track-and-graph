@@ -29,18 +29,21 @@ import kotlinx.coroutines.*
 import org.threeten.bp.LocalTime
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Singleton
 
-internal interface RemindersHelper {
-
+interface AlarmInteractor {
     suspend fun syncAlarms()
 
     suspend fun clearAlarms()
+}
 
+internal interface RemindersHelper : AlarmInteractor {
     fun createAlarms(reminder: Reminder)
 
     fun deleteAlarms(reminder: Reminder)
 }
 
+@Singleton
 internal class RemindersHelperImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val dao: TrackAndGraphDatabaseDao,

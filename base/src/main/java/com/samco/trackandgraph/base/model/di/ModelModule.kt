@@ -55,4 +55,7 @@ class ModelModule {
 
     @Provides
     internal fun getRemindersHelper(impl: RemindersHelperImpl): RemindersHelper = impl
+
+    @Provides
+    internal fun getAlarmInteractor(impl: RemindersHelperImpl): AlarmInteractor = impl
 }

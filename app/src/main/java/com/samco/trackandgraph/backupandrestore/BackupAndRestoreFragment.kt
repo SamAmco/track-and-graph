@@ -32,6 +32,7 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -54,10 +55,6 @@ class BackupAndRestoreFragment : Fragment() {
 
     private lateinit var binding: BackupAndRestoreFragmentBinding
     private val viewModel by viewModels<BackupAndRestoreViewModel>()
-
-    //TODO need to re-write the alarm manager stuff, shouldn't need this in a fragment
-    @Inject
-    lateinit var dataInteractor: DataInteractor
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -98,8 +95,6 @@ class BackupAndRestoreFragment : Fragment() {
             when (it) {
                 true -> restartApp()
                 false -> {
-                    //TODO fix this
-                    //RemindersHelper.syncAlarms(requireContext(), dataInteractor)
                     val color =
                         binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.restoreFeedbackText.setTextColor(color)
@@ -173,8 +168,6 @@ class BackupAndRestoreFragment : Fragment() {
                 )
             }
             RESTORE_DATABASE_REQUEST_CODE -> {
-                //TODO fix this
-                //RemindersHelper.clearAlarms(requireContext(), dataInteractor)
                 viewModel.restoreDatabase(
                     resultData?.data?.let { activity?.contentResolver?.openInputStream(it) }
                 )
@@ -185,7 +178,8 @@ class BackupAndRestoreFragment : Fragment() {
 
 @HiltViewModel
 class BackupAndRestoreViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    private val alarmInteractor: AlarmInteractor
 ) : ViewModel() {
     class BackupRestoreException(val stringResource: Int?)
 
@@ -248,6 +242,7 @@ class BackupAndRestoreViewModel @Inject constructor(
     }
 
     fun restoreDatabase(inputStream: InputStream?) {
+
         val databaseFilePath = dataInteractor.getDatabaseFilePath()
 
         if (inputStream == null) {
@@ -264,6 +259,7 @@ class BackupAndRestoreViewModel @Inject constructor(
         _inProgress.value = true
         ioScope.launch {
             try {
+                alarmInteractor.clearAlarms()
                 dataInteractor.closeOpenHelper()
 
                 inputStream.use { inStream ->
