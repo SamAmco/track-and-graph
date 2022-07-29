@@ -331,4 +331,7 @@
     <string name="ru_sure_del_graph">Voulez-vous vraiment supprimer ce graphique? Vous ne pouvez pas inverser cela. Vous ne perdrez aucune donnée suivie.</string>
     <string name="open">Ouverte</string>
     <string name="close">Fermer</string>
+    <string name="filter_by_label">Filtrer par libellé</string>
+    <string name="filter_by_value">Filtrer par valeur</string>
+    <string name="save_changes">Sauvegarder les modifications</string>
 </resources>

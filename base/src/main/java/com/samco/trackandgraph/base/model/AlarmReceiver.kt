@@ -95,9 +95,6 @@ class RecreateAlarms : BroadcastReceiver() {
     @Inject
     lateinit var dataInteractor: DataInteractor
 
-    @Inject
-    lateinit var remindersHelper: RemindersHelper
-
     override fun onReceive(context: Context?, intent: Intent?) {
         val validActions = listOf(
             "action.REMINDERS_CHANGED",
@@ -107,6 +104,6 @@ class RecreateAlarms : BroadcastReceiver() {
         )
         if (!validActions.contains(intent?.action)) return
         if (context == null) return
-        runBlocking { remindersHelper.syncAlarms() }
+        runBlocking { dataInteractor.syncAlarms() }
     }
 }

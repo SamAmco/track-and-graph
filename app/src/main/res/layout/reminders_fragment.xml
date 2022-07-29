@@ -12,6 +12,8 @@
             android:id="@+id/remindersList"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:paddingBottom="80dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -27,6 +29,19 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/saveChangesButton"
+            style="@style/Style.WideBottomButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/input_spacing_large"
+            android:text="@string/save_changes"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <include
+            android:id="@+id/loadingOverlay"
+            layout="@layout/layout_loading_overlay" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

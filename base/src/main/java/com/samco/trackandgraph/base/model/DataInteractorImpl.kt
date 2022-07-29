@@ -41,7 +41,8 @@ internal class DataInteractorImpl @Inject constructor(
     private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher,
     private val featureUpdater: FeatureUpdater,
-    private val csvReadWriter: CSVReadWriter
+    private val csvReadWriter: CSVReadWriter,
+    private val remindersHelper: RemindersHelper
 ) : DataInteractor {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
@@ -163,20 +164,16 @@ internal class DataInteractorImpl @Inject constructor(
         dao.deleteFeature(id).also { dataUpdateEvents.emit(Unit) }
     }
 
-    override suspend fun insertReminder(reminder: Reminder) = withContext(io) {
-        dao.insertReminder(reminder.toEntity())
-    }
-
-    override suspend fun deleteReminder(reminder: Reminder) = withContext(io) {
-        dao.deleteReminder(reminder.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    override suspend fun updateReminder(reminder: Reminder) = withContext(io) {
-        dao.updateReminder(reminder.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
-        dao.updateReminders(reminders.map { it.toEntity() }).also { dataUpdateEvents.emit(Unit) }
+        remindersHelper.clearAlarms()
+        database.withTransaction {
+            dao.deleteReminders()
+            dao.insertReminders(reminders.mapIndexed { index, reminder ->
+                reminder.copy(id = index.toLong()).toEntity()
+            })
+        }
+        remindersHelper.syncAlarms()
+        dataUpdateEvents.emit(Unit)
     }
 
     override suspend fun deleteDataPoint(dataPoint: DataPoint) = withContext(io) {
@@ -525,4 +522,6 @@ internal class DataInteractorImpl @Inject constructor(
             csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
             dataUpdateEvents.emit(Unit)
         }
+
+    override suspend fun syncAlarms() = withContext(io) { remindersHelper.syncAlarms() }
 }

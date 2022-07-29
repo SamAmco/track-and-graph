@@ -54,5 +54,5 @@ class ModelModule {
     internal fun getDataInteractor(impl: DataInteractorImpl): DataInteractor = impl
 
     @Provides
-    fun getRemindersHelper(impl: RemindersHelperImpl): RemindersHelper = impl
+    internal fun getRemindersHelper(impl: RemindersHelperImpl): RemindersHelper = impl
 }

@@ -21,7 +21,8 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.samco.trackandgraph.base.database.dto.Reminder
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
@@ -29,7 +30,7 @@ import org.threeten.bp.LocalTime
 import java.util.*
 import javax.inject.Inject
 
-interface RemindersHelper {
+internal interface RemindersHelper {
 
     suspend fun syncAlarms()
 
@@ -40,9 +41,9 @@ interface RemindersHelper {
     fun deleteAlarms(reminder: Reminder)
 }
 
-class RemindersHelperImpl @Inject constructor(
+internal class RemindersHelperImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val dataInteractor: DataInteractor,
+    private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher
 ) : RemindersHelper {
 
@@ -52,15 +53,14 @@ class RemindersHelperImpl @Inject constructor(
         }
 
     override suspend fun syncAlarms() = withContext(io) {
-        for (reminder in dataInteractor.getAllRemindersSync()) {
+        for (reminder in dao.getAllRemindersSync()) {
             deleteAlarms(reminder)
             createAlarms(reminder)
         }
     }
 
     override suspend fun clearAlarms() = withContext(io) {
-        dataInteractor
-            .getAllRemindersSync()
+        dao.getAllRemindersSync()
             .forEach { deleteAlarms(it) }
     }
 
