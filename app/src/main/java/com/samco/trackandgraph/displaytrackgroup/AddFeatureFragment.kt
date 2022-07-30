@@ -49,7 +49,7 @@ import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
 import com.samco.trackandgraph.util.hideKeyboard
-import com.samco.trackandgraph.util.showKeyboard
+import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,8 +75,8 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = AddFeatureFragmentBinding.inflate(inflater, container, false)
         navController = container?.findNavController()
+        binding = AddFeatureFragmentBinding.inflate(inflater, container, false)
 
         viewModel.init(
             args.groupId,
@@ -85,6 +85,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         )
 
         listenToViewModelState()
+
         return binding.root
     }
 
@@ -94,7 +95,6 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
             NavButtonStyle.UP,
             getString(R.string.add_feature)
         )
-        requireContext().showKeyboard()
     }
 
     override fun onStop() {
@@ -107,6 +107,9 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
             when (state) {
                 AddFeatureState.INITIALIZING -> {
                     setInitialViewState()
+                }
+                AddFeatureState.SET_FOCUS -> {
+                    binding.featureNameText.focusAndShowKeyboard()
                 }
                 AddFeatureState.WAITING -> {
                     onViewModelReady()
@@ -531,7 +534,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     }
 }
 
-enum class AddFeatureState { INITIALIZING, WAITING, ADDING, DONE, ERROR }
+enum class AddFeatureState { INITIALIZING, SET_FOCUS, WAITING, ADDING, DONE, ERROR }
 
 @HiltViewModel
 class AddFeatureViewModel @Inject constructor(
@@ -590,7 +593,10 @@ class AddFeatureViewModel @Inject constructor(
                     discreteValues.addAll(existingDiscreteValues)
                 }
             }
-            withContext(ui) { _state.value = AddFeatureState.WAITING }
+            withContext(ui) {
+                _state.value = AddFeatureState.SET_FOCUS
+                _state.value = AddFeatureState.WAITING
+            }
         }
     }
 

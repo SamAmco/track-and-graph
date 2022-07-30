@@ -35,8 +35,8 @@ import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.ui.DurationInputView
 import com.samco.trackandgraph.ui.doubleFormatter
 import com.samco.trackandgraph.ui.formatDayMonthYear
+import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.util.getDoubleFromText
-import com.samco.trackandgraph.util.showKeyboard
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
@@ -118,15 +118,22 @@ class DataPointInputView : FrameLayout {
         addNoteButton.setOnClickListener {
             addNoteButton.visibility = View.GONE
             noteInput.visibility = View.VISIBLE
-            context.showKeyboard()
-            noteInput.post { noteInput.requestFocus() }
+            noteInput.focusAndShowKeyboard()
         }
         noteInput.addTextChangedListener { state.note = it.toString() }
     }
 
     override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
-        return if (state.feature.featureType == DataType.CONTINUOUS) numberInput.requestFocus()
-        else super.requestFocus(direction, previouslyFocusedRect)
+        return when (state.feature.featureType) {
+            DataType.CONTINUOUS -> {
+                numberInput.focusAndShowKeyboard()
+                numberInput.requestFocus()
+            }
+            DataType.DURATION -> {
+                durationInput.requestFocus()
+            }
+            else -> super.requestFocus(direction, previouslyFocusedRect)
+        }
     }
 
     private fun initDiscrete() {
