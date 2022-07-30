@@ -20,9 +20,11 @@ import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.entity.Feature
+import com.samco.trackandgraph.base.database.entity.FeatureTimer
 import com.samco.trackandgraph.base.database.entity.GlobalNote
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.Group
@@ -36,6 +38,7 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
@@ -56,9 +59,10 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         Reminder::class,
         GlobalNote::class,
         LineGraphFeature::class,
-        TimeHistogram::class
+        TimeHistogram::class,
+        FeatureTimer::class
     ],
-    version = 46
+    version = 47
 )
 @TypeConverters(Converters::class)
 internal abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -124,6 +128,12 @@ internal class Converters {
             onError()
         }
     }
+
+    @TypeConverter
+    fun instantToString(instant: Instant): String = instant.toString()
+
+    @TypeConverter
+    fun stringToInstant(string: String?): Instant? = string?.let { Instant.parse(it) }
 
     @TypeConverter
     fun stringToListOfStrings(value: String): List<String> {

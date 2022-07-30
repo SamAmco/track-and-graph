@@ -33,6 +33,8 @@ import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.model.di.DefaultDispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
@@ -40,6 +42,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 /**
@@ -55,6 +58,14 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
     @Inject
     lateinit var gsiProvider: GraphStatInteractorProvider
+
+    @Inject
+    @MainDispatcher
+    lateinit var ui: CoroutineDispatcher
+
+    @Inject
+    @DefaultDispatcher
+    lateinit var defaultDispatcher: CoroutineDispatcher
 
     private lateinit var binding: FragmentGroupBinding
     private lateinit var adapter: GroupAdapter
@@ -79,7 +90,9 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             createFeatureClickListener(),
             createGraphStatClickListener(),
             createGroupClickListener(),
-            gsiProvider
+            gsiProvider,
+            ui = ui,
+            defaultDispatcher = defaultDispatcher
         )
         binding.itemList.adapter = adapter
         disableChangeAnimations()
@@ -215,7 +228,9 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         this::onFeatureMoveToClicked,
         this::onFeatureDescriptionClicked,
         this::onFeatureAddClicked,
-        this::onFeatureHistoryClicked
+        this::onFeatureHistoryClicked,
+        viewModel::playTimer,
+        viewModel::stopTimer
     )
 
     private fun onFeatureHistoryClicked(feature: DisplayFeature) {
@@ -293,6 +308,14 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             binding.emptyGroupText.visibility =
                 if (it.isEmpty() && args.groupId == 0L) View.VISIBLE
                 else View.INVISIBLE
+        }
+        viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+            val argBundle = Bundle()
+            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(it.featureId))
+            argBundle.putLong(DURATION_SECONDS_KEY, it.duration.seconds)
+            showAddDataPoint(argBundle)
+            viewModel.onConsumedShowDurationInputDialog()
         }
     }
 

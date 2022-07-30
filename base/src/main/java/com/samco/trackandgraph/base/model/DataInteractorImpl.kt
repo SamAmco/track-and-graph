@@ -25,12 +25,15 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.entity.FeatureTimer
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
@@ -522,4 +525,15 @@ internal class DataInteractorImpl @Inject constructor(
             csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
             dataUpdateEvents.emit(Unit)
         }
+
+    override suspend fun playTimerForFeature(featureId: Long) = performAtomicUpdate {
+        dao.deleteFeatureTimer(featureId)
+        dao.insertFeatureTimer(FeatureTimer(0L, featureId, Instant.now()))
+    }
+
+    override suspend fun stopTimerForFeature(featureId: Long): Duration? = performAtomicUpdate {
+        val timer = dao.getFeatureTimer(featureId)
+        dao.deleteFeatureTimer(featureId)
+        timer?.let { Duration.between(it.startInstant, Instant.now()) }
+    }
 }
