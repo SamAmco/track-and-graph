@@ -214,12 +214,21 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         }
     }
 
+    private fun blankViews() {
+        binding.legendFlexboxLayout.visibility = View.INVISIBLE
+        binding.xyPlot.visibility = View.INVISIBLE
+        binding.pieChart.visibility = View.INVISIBLE
+        binding.errorMessage.visibility = View.INVISIBLE
+        binding.statMessage.visibility = View.INVISIBLE
+    }
+
     fun <T : IGraphStatViewData> initFromGraphStat(
         data: IGraphStatViewData,
         decorator: GraphStatViewDecorator<T>
     ) {
         if (data.state == IGraphStatViewData.State.LOADING) {
             currentDecorator = null
+            blankViews()
             val headerText = data.graphOrStat.name
             binding.headerText.text = headerText
             binding.progressBar.visibility = View.VISIBLE
