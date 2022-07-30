@@ -86,7 +86,6 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
         listenToViewModelState()
 
-        binding.featureNameText.focusAndShowKeyboard()
         return binding.root
     }
 
@@ -108,6 +107,9 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
             when (state) {
                 AddFeatureState.INITIALIZING -> {
                     setInitialViewState()
+                }
+                AddFeatureState.SET_FOCUS -> {
+                    binding.featureNameText.focusAndShowKeyboard()
                 }
                 AddFeatureState.WAITING -> {
                     onViewModelReady()
@@ -532,7 +534,7 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     }
 }
 
-enum class AddFeatureState { INITIALIZING, WAITING, ADDING, DONE, ERROR }
+enum class AddFeatureState { INITIALIZING, SET_FOCUS, WAITING, ADDING, DONE, ERROR }
 
 @HiltViewModel
 class AddFeatureViewModel @Inject constructor(
@@ -591,7 +593,10 @@ class AddFeatureViewModel @Inject constructor(
                     discreteValues.addAll(existingDiscreteValues)
                 }
             }
-            withContext(ui) { _state.value = AddFeatureState.WAITING }
+            withContext(ui) {
+                _state.value = AddFeatureState.SET_FOCUS
+                _state.value = AddFeatureState.WAITING
+            }
         }
     }
 

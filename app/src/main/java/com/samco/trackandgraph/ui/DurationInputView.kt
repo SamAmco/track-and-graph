@@ -51,11 +51,11 @@ class DurationInputView : FrameLayout {
             }
             return@setOnEditorActionListener false
         }
-        binding.hoursInput.focusAndShowKeyboard()
     }
 
     override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
-        return binding.hoursInput.requestFocus()
+        binding.hoursInput.focusAndShowKeyboard()
+        return true
     }
 
     private fun onDurationTextChanged() {

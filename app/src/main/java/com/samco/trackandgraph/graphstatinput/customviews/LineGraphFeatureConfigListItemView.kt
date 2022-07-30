@@ -67,9 +67,10 @@ class LineGraphFeatureConfigListItemView(
     }
 
     private fun setupGraphFeatureName() {
-        if (lineGraphFeature.name.isNotEmpty()) binding.lineGraphFeatureName.setText(
-            lineGraphFeature.name
-        )
+        if (lineGraphFeature.name.isNotEmpty()) {
+            binding.lineGraphFeatureName.setText(lineGraphFeature.name)
+            binding.lineGraphFeatureName.setSelection(lineGraphFeature.name.length)
+        }
         binding.lineGraphFeatureName.addTextChangedListener { text ->
             if (lineGraphFeature.name != text.toString()) {
                 lineGraphFeature.name = text.toString()
@@ -240,13 +241,16 @@ class LineGraphFeatureConfigListItemView(
         oldFeatureName: String,
         newFeatureName: String
     ) {
-        if (oldFeatureId == -1L || oldFeatureName == "") binding.lineGraphFeatureName.setText(
-            newFeatureName
-        )
+        if (oldFeatureId == -1L || oldFeatureName == "") {
+            binding.lineGraphFeatureName.setText(newFeatureName)
+            binding.lineGraphFeatureName.setSelection(newFeatureName.length)
+        }
+
         val oldFeatureDBName =
             featureDataProvider.features.firstOrNull { f -> f.id == oldFeatureId }?.name ?: return
         if (oldFeatureDBName == oldFeatureName || oldFeatureName == "") {
             binding.lineGraphFeatureName.setText(newFeatureName)
+            binding.lineGraphFeatureName.setSelection(newFeatureName.length)
         }
     }
 
