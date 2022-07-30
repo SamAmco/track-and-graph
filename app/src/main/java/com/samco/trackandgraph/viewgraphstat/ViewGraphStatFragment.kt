@@ -31,9 +31,7 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -41,8 +39,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatView
@@ -54,6 +55,8 @@ import com.samco.trackandgraph.ui.showNoteDialog
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -256,7 +259,9 @@ enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
 @HiltViewModel
 class ViewGraphStatViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
-    private val gsiProvider: GraphStatInteractorProvider
+    private val gsiProvider: GraphStatInteractorProvider,
+    @MainDispatcher private val ui: CoroutineDispatcher,
+    @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
     var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyList(), emptyList())
         private set
@@ -275,15 +280,31 @@ class ViewGraphStatViewModel @Inject constructor(
         get() = _showingNotes
     private val _showingNotes = MutableLiveData(false)
 
-    private val _notes = MutableLiveData<List<GraphNote>>(emptyList())
-    val notes: LiveData<List<GraphNote>> = _notes
+    private val globalNotes = MutableStateFlow<List<GlobalNote>>(emptyList())
+    private val dataPoints = MutableStateFlow<List<DataPoint>>(emptyList())
+
+    val notes: LiveData<List<GraphNote>> =
+        combine(dataPoints, globalNotes) { dataPoints, globalNotes ->
+            val filteredGlobalNotes = globalNotes
+                .filter { g ->
+                    val afterOldest =
+                        dataPoints.lastOrNull()?.let { g.timestamp >= it.timestamp } ?: false
+                    val beforeNewest =
+                        dataPoints.firstOrNull()?.let { g.timestamp <= it.timestamp } ?: false
+                    afterOldest && beforeNewest
+                }
+                .map { GraphNote(it) }
+            dataPoints
+                .filter { dp -> dp.note.isNotEmpty() }
+                .distinct()
+                .map { GraphNote(it) }
+                .union(filteredGlobalNotes)
+                .sortedByDescending { it.timestamp }
+        }.asLiveData(viewModelScope.coroutineContext)
 
     val markedNote: LiveData<GraphNote?>
         get() = _markedNote
     private val _markedNote = MutableLiveData<GraphNote?>(null)
-
-    private val currJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + currJob)
 
     private var initialized = false
 
@@ -291,24 +312,16 @@ class ViewGraphStatViewModel @Inject constructor(
         if (initialized) return
         initialized = true
 
-        ioScope.launch {
+        viewModelScope.launch(io) {
             initFromGraphStatId(graphStatId)
             getAllFeatureAttributes()
             getAllGlobalNotes()
-            withContext(Dispatchers.Main) {
-                _state.value = ViewGraphStatViewModelState.WAITING
-            }
+            withContext(ui) { _state.value = ViewGraphStatViewModelState.WAITING }
         }
     }
 
-    //TODO we need to filter these by date/time and only show global notes relevant to the current graph/stat
-    private suspend fun getAllGlobalNotes() = withContext(Dispatchers.IO) {
-        val globalNotes = dataInteractor.getAllGlobalNotesSync()
-            .map { GraphNote(it) }
-        val mergedList = _notes.value
-            ?.union(globalNotes)
-            ?.sortedByDescending { it -> it.timestamp }
-        withContext(Dispatchers.Main) { _notes.value = mergedList ?: emptyList() }
+    private suspend fun getAllGlobalNotes() = withContext(io) {
+        globalNotes.emit(dataInteractor.getAllGlobalNotesSync())
     }
 
     private suspend fun getAllFeatureAttributes() {
@@ -318,24 +331,14 @@ class ViewGraphStatViewModel @Inject constructor(
         featureTypes = allFeatures.associate { it.id to it.featureType }
     }
 
-    private fun onSampledDataPoints(dataPoints: List<DataPoint>) {
-        ioScope.launch {
-            val dataPointNotes = dataPoints
-                .filter { dp -> dp.note.isNotEmpty() }
-                .distinct()
-                .map { GraphNote(it) }
-            val mergedList = _notes.value
-                ?.union(dataPointNotes)
-                ?.sortedByDescending { it -> it.timestamp }
-            withContext(Dispatchers.Main) { _notes.value = mergedList ?: emptyList() }
-        }
-    }
-
     private suspend fun initFromGraphStatId(graphStatId: Long) {
         val graphStat = dataInteractor.getGraphStatById(graphStatId)
-        val viewData = gsiProvider.getDataFactory(graphStat.type)
-            .getViewData(graphStat, this::onSampledDataPoints)
-        withContext(Dispatchers.Main) { _graphStatViewData.value = viewData }
+        val viewData = gsiProvider
+            .getDataFactory(graphStat.type)
+            .getViewData(graphStat) {
+                viewModelScope.launch(io) { dataPoints.emit(it) }
+            }
+        withContext(ui) { _graphStatViewData.value = viewData }
     }
 
     fun showHideNotesClicked() {
@@ -344,10 +347,5 @@ class ViewGraphStatViewModel @Inject constructor(
 
     fun noteClicked(note: GraphNote) {
         _markedNote.value = note
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        ioScope.cancel()
     }
 }
