@@ -345,4 +345,5 @@
     <string name="close">Close</string>
     <string name="filter_by_label">Filter by label</string>
     <string name="filter_by_value">Filter by value range</string>
+    <string name="save_changes">Save Changes</string>
 </resources>

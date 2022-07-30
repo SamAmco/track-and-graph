@@ -15,10 +15,10 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.reminders
+package com.samco.trackandgraph.base.model
 
+import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -27,21 +27,51 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.DEFAULT_ALL
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.R
+import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class AlarmReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var pendingIntentProvider: PendingIntentProvider
+
+    @Inject
+    lateinit var alarmInteractor: AlarmInteractor
+
+    companion object {
+        private const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
+    }
+
+    private fun createNotificationChannel(context: Context) {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = context.getString(R.string.reminders_notifications_channel_name)
+            val descriptionText =
+                context.getString(R.string.reminders_notifications_channel_description)
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val channel = NotificationChannel(REMINDERS_CHANNEL_ID, name, importance).apply {
+                description = descriptionText
+            }
+            // Register the channel with the system
+            val notificationManager: NotificationManager =
+                context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context == null) return
+
+        createNotificationChannel(context)
+
         val message = (intent?.extras?.get("Message") as String?) ?: return
 
-        val pendingIntent = Intent(context, MainActivity::class.java)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            .let { PendingIntent.getActivity(context, 0, it, 0) }
+        val pendingIntent = pendingIntentProvider.getMainActivityPendingIntent()
 
         val notification = NotificationCompat.Builder(context, REMINDERS_CHANNEL_ID)
             .setContentTitle(message)
@@ -59,6 +89,9 @@ class AlarmReceiver : BroadcastReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(250, 250, 250, 250), -1))
         } else vibrator.vibrate(longArrayOf(250, 250, 250, 250), -1)
+
+        //Schedule the next notification
+        runBlocking { alarmInteractor.syncAlarms() }
     }
 }
 
@@ -66,17 +99,19 @@ class AlarmReceiver : BroadcastReceiver() {
 class RecreateAlarms : BroadcastReceiver() {
 
     @Inject
-    lateinit var dataInteractor: DataInteractor
+    lateinit var alarmInteractor: AlarmInteractor
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val validActions = listOf(
-            "action.REMINDERS_CHANGED",
+            "android.intent.action.DATE_CHANGED",
+            "android.intent.action.TIME_SET",
+            "android.intent.action.TIMEZONE_CHANGED",
             "android.intent.action.BOOT_COMPLETED",
             "android.intent.action.QUICKBOOT_POWERON",
             "android.intent.action.MY_PACKAGE_REPLACED"
         )
         if (!validActions.contains(intent?.action)) return
         if (context == null) return
-        runBlocking { RemindersHelper.syncAlarms(context, dataInteractor) }
+        runBlocking { alarmInteractor.syncAlarms() }
     }
 }

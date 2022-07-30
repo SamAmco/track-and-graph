@@ -330,4 +330,7 @@
     <string name="ru_sure_del_graph">¿Está seguro de que desea eliminar este gráfico? No puedes revertir esto. No perderá ningún dato rastreado.</string>
     <string name="open">Abierta</string>
     <string name="close">cerca</string>
+    <string name="save_changes">guardar cambios</string>
+    <string name="filter_by_label">filtrar por etiqueta</string>
+    <string name="filter_by_value">filtrar por valor</string>
 </resources>

@@ -30,6 +30,12 @@
         <item name="colorControlNormal">?attr/colorAccent</item>
     </style>
 
+    <style name="Style.WideBottomButton" parent="Style.ButtonStyle">
+        <item name="android:layout_marginBottom">20dp</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:elevation">10dp</item>
+    </style>
+
     <style name="Style.OverflowMenuStyle" parent="Widget.AppCompat.PopupMenu.Overflow">
         <item name="android:popupBackground">?attr/colorSurface</item>
     </style>
