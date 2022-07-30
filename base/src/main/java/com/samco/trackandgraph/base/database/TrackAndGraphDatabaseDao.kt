@@ -79,12 +79,16 @@ internal interface TrackAndGraphDatabaseDao {
     fun updateFeatures(features: List<Feature>)
 
     @Query(
-        """SELECT features_table.*, num_data_points, last_timestamp from features_table 
+        """SELECT features_table.*, num_data_points, last_timestamp, start_instant from features_table 
         LEFT JOIN (
             SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
             FROM data_points_table GROUP BY feature_id
         ) as feature_data 
         ON feature_data.id = features_table.id
+        LEFT JOIN (
+            SELECT * FROM feature_timers_table
+        ) as timer_data
+        ON timer_data.feature_id = features_table.id
 		WHERE group_id = :groupId
         ORDER BY features_table.display_index ASC, id DESC"""
     )
@@ -252,4 +256,13 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
     fun getGroupsForGroupSync(id: Long): List<Group>
+
+    @Insert
+    fun insertFeatureTimer(featureTimer: FeatureTimer)
+
+    @Query("DELETE FROM feature_timers_table WHERE feature_id=:featureId")
+    fun deleteFeatureTimer(featureId: Long)
+
+    @Query("SELECT * FROM feature_timers_table WHERE feature_id=:featureId LIMIT 1")
+    fun getFeatureTimer(featureId: Long): FeatureTimer?
 }

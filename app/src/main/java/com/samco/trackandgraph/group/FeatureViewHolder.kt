@@ -28,9 +28,21 @@ import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.ui.formatTimeDuration
+import kotlinx.coroutines.*
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
+import java.util.concurrent.TimeUnit
 
-class FeatureViewHolder private constructor(private val binding: ListItemFeatureBinding) :
+class FeatureViewHolder private constructor(
+    private val binding: ListItemFeatureBinding,
+    private val ui: CoroutineDispatcher,
+    private val defaultDispatcher: CoroutineDispatcher
+) :
     GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+
+    private var timerTextJob: Job? = null
+    private var timerTextScope: CoroutineScope? = null
 
     private var clickListener: FeatureClickListener? = null
     private var feature: DisplayFeature? = null
@@ -49,10 +61,50 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         initTimerControls(feature, clickListener)
     }
 
+    override fun onRecycled() {
+        super.onRecycled()
+        killTimerJob()
+    }
+
+    private fun killTimerJob() {
+        timerTextJob?.cancel()
+        timerTextJob = null
+        timerTextScope = null
+    }
+
     private fun initTimerControls(feature: DisplayFeature, clickListener: FeatureClickListener) {
         binding.timerLayoutGroup.visibility =
             if (feature.featureType == DataType.DURATION) View.VISIBLE
             else View.GONE
+        binding.playTimerButton.setOnClickListener {
+            clickListener.onPlayTimer(feature)
+        }
+        binding.stopTimerButton.setOnClickListener {
+            clickListener.onStopTimer(feature)
+        }
+        binding.playTimerButton.visibility =
+            if (feature.timerStartInstant == null) View.VISIBLE else View.GONE
+        binding.stopTimerButton.visibility =
+            if (feature.timerStartInstant == null) View.GONE else View.VISIBLE
+
+        if (feature.timerStartInstant != null) {
+            timerTextJob?.cancel()
+            timerTextJob = Job().also { timerTextScope = CoroutineScope(it + ui) }
+            timerTextScope?.launch {
+                while (true) {
+                    feature.timerStartInstant?.let { updateTimerText(it) }
+                    withContext(defaultDispatcher) { delay(1000) }
+                }
+            }
+        } else {
+            binding.timerText.text = formatTimeDuration(0)
+            killTimerJob()
+        }
+    }
+
+    private fun updateTimerText(instant: Instant) {
+        val duration = Duration.between(instant, Instant.now())
+        binding.timerText.text = formatTimeDuration(duration.seconds)
     }
 
     private fun initAddButton(feature: DisplayFeature, clickListener: FeatureClickListener) {
@@ -128,10 +180,14 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
     }
 
     companion object {
-        fun from(parent: ViewGroup): FeatureViewHolder {
+        fun from(
+            parent: ViewGroup,
+            ui: CoroutineDispatcher,
+            defaultDispatcher: CoroutineDispatcher
+        ): FeatureViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ListItemFeatureBinding.inflate(layoutInflater, parent, false)
-            return FeatureViewHolder(binding)
+            return FeatureViewHolder(binding, ui = ui, defaultDispatcher = defaultDispatcher)
         }
     }
 }
@@ -142,7 +198,9 @@ class FeatureClickListener(
     private val onMoveToListener: (feature: DisplayFeature) -> Unit,
     private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
     private val onAddListener: (feature: DisplayFeature, useDefault: Boolean) -> Unit,
-    private val onHistoryListener: (feature: DisplayFeature) -> Unit
+    private val onHistoryListener: (feature: DisplayFeature) -> Unit,
+    private val onPlayTimerListener: (feature: DisplayFeature) -> Unit,
+    private val onStopTimerListener: (feature: DisplayFeature) -> Unit,
 ) {
     fun onEdit(feature: DisplayFeature) = onEditListener(feature)
     fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
@@ -152,4 +210,6 @@ class FeatureClickListener(
         onAddListener(feature, useDefault)
 
     fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
+    fun onPlayTimer(feature: DisplayFeature) = onPlayTimerListener(feature)
+    fun onStopTimer(feature: DisplayFeature) = onStopTimerListener(feature)
 }

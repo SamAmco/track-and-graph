@@ -23,6 +23,7 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import kotlinx.coroutines.flow.SharedFlow
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
@@ -193,4 +194,8 @@ interface DataInteractor : FeatureUpdater {
     suspend fun writeFeaturesToCSV(outStream: OutputStream, featureIds: List<Long>)
 
     suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long)
+
+    suspend fun playTimerForFeature(featureId: Long)
+
+    suspend fun stopTimerForFeature(featureId: Long): Duration?
 }

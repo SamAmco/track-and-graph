@@ -28,6 +28,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
@@ -39,6 +40,14 @@ class GroupViewModel @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
+
+    data class DurationInputDialogData(
+        val featureId: Long,
+        val duration: Duration
+    )
+
+    private val _showDurationInputDialog = MutableLiveData<DurationInputDialogData?>()
+    val showDurationInputDialog: LiveData<DurationInputDialogData?> = _showDurationInputDialog
 
     lateinit var hasFeatures: LiveData<Boolean>
 
@@ -191,5 +200,21 @@ class GroupViewModel @Inject constructor(
             val gs = graphOrStatViewData.graphOrStat
             gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs)
         }
+    }
+
+    fun onConsumedShowDurationInputDialog() {
+        _showDurationInputDialog.value = null
+    }
+
+    fun stopTimer(feature: DisplayFeature) = viewModelScope.launch(io) {
+        dataInteractor.stopTimerForFeature(feature.id)?.let {
+            withContext(ui) {
+                _showDurationInputDialog.value = DurationInputDialogData(feature.id, it)
+            }
+        }
+    }
+
+    fun playTimer(feature: DisplayFeature) = viewModelScope.launch(io) {
+        dataInteractor.playTimerForFeature(feature.id)
     }
 }

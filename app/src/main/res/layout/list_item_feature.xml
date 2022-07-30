@@ -152,7 +152,7 @@
                 android:id="@+id/timerLayoutGroup"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:constraint_referenced_ids="playPauseButtons,timerText,divider2" />
+                app:constraint_referenced_ids="playStopButtons,timerText,divider2" />
 
             <View
                 android:id="@+id/divider2"
@@ -162,12 +162,12 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="@dimen/card_margin_small"
                 android:background="?attr/colorSecondary"
-                app:layout_constraintBottom_toTopOf="@id/playPauseButtons"
+                app:layout_constraintBottom_toTopOf="@id/playStopButtons"
                 app:layout_constraintTop_toBottomOf="@id/numEntriesText"
                 tools:ignore="ContentDescription" />
 
             <FrameLayout
-                android:id="@+id/playPauseButtons"
+                android:id="@+id/playStopButtons"
                 android:layout_width="@dimen/track_card_button_size"
                 android:layout_height="@dimen/track_card_button_size"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -203,7 +203,7 @@
                     android:scaleType="fitXY"
                     android:visibility="gone"
                     app:srcCompat="@drawable/ic_stop_timer"
-                    app:tint="?colorControlNormal" />
+                    app:tint="?colorError" />
             </FrameLayout>
 
             <TextView
@@ -218,7 +218,7 @@
                 android:lines="1"
                 android:text="00:00:00"
                 android:textAppearance="@style/TextAppearance.Headline6"
-                app:layout_constraintBottom_toBottomOf="@id/playPauseButtons"
+                app:layout_constraintBottom_toBottomOf="@id/playStopButtons"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider2"

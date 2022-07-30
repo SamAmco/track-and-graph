@@ -15,34 +15,31 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.dto
+package com.samco.trackandgraph.base.database.entity
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
 import org.threeten.bp.Instant
-import org.threeten.bp.OffsetDateTime
 
-data class DisplayFeature(
-    var id: Long,
-    val name: String,
-    val groupId: Long,
-    val featureType: DataType = DataType.CONTINUOUS,
-    val discreteValues: List<DiscreteValue>,
-    val hasDefaultValue: Boolean,
-    val defaultValue: Double,
-    val timestamp: OffsetDateTime?,
-    val numDataPoints: Long?,
-    val displayIndex: Int,
-    val description: String,
-    val timerStartInstant: Instant?
-) {
-    fun asFeature() = Feature(
-        id,
-        name,
-        groupId,
-        featureType,
-        discreteValues,
-        displayIndex,
-        hasDefaultValue,
-        defaultValue,
-        description
-    )
-}
+@Entity(
+    tableName = "feature_timers_table",
+    foreignKeys = [ForeignKey(
+        entity = Feature::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("feature_id"),
+        onDelete = ForeignKey.CASCADE
+    )]
+)
+internal data class FeatureTimer(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id", index = true)
+    val id: Long,
+
+    @ColumnInfo(name = "feature_id")
+    val featureId: Long,
+
+    @ColumnInfo(name = "start_instant", index = true)
+    val startInstant: Instant
+)

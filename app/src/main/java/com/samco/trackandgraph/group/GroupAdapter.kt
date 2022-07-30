@@ -28,21 +28,32 @@ import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.database.dto.GroupChild
 import com.samco.trackandgraph.base.database.dto.GroupChildType
+import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.CoroutineDispatcher
 
 class GroupAdapter(
     private val featureClickListener: FeatureClickListener,
     private val graphStatClickListener: GraphStatClickListener,
     private val groupClickListener: GroupClickListener,
-    private val gsiProvider: GraphStatInteractorProvider
+    private val gsiProvider: GraphStatInteractorProvider,
+    private val ui: CoroutineDispatcher,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : RecyclerView.Adapter<GroupChildViewHolder>() {
     private val groupChildren = mutableListOf<GroupChild>()
 
+    override fun onViewRecycled(holder: GroupChildViewHolder) {
+        super.onViewRecycled(holder)
+        holder.onRecycled()
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupChildViewHolder {
         return when (viewType) {
-            GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider).apply { setFullSpan(this) }
-            GroupChildType.FEATURE.ordinal -> FeatureViewHolder.from(parent)
+            GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
+                .apply { setFullSpan(this) }
+            GroupChildType.FEATURE.ordinal -> FeatureViewHolder
+                .from(parent, ui = ui, defaultDispatcher = defaultDispatcher)
             else -> GroupViewHolder.from(parent).apply { setFullSpan(this) }
         }
     }
@@ -142,4 +153,5 @@ private class ListDiffCallback(
 abstract class GroupChildViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     abstract fun elevateCard()
     abstract fun dropCard()
+    open fun onRecycled() {}
 }
