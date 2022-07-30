@@ -18,12 +18,14 @@
 package com.samco.trackandgraph.ui
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import android.widget.FrameLayout
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.databinding.DurationInputLayoutBinding
+import com.samco.trackandgraph.util.focusAndShowKeyboard
 
 class DurationInputView : FrameLayout {
     val binding = DurationInputLayoutBinding.inflate(LayoutInflater.from(context), this, true)
@@ -49,7 +51,11 @@ class DurationInputView : FrameLayout {
             }
             return@setOnEditorActionListener false
         }
-        binding.hoursInput.requestFocus()
+        binding.hoursInput.focusAndShowKeyboard()
+    }
+
+    override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
+        return binding.hoursInput.requestFocus()
     }
 
     private fun onDurationTextChanged() {
