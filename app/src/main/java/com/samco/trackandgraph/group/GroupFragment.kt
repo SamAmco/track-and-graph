@@ -28,10 +28,7 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
@@ -77,6 +74,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
         binding.emptyGroupText.visibility = View.INVISIBLE
 
+        initializeGridLayout()
         adapter = GroupAdapter(
             createFeatureClickListener(),
             createGraphStatClickListener(),
@@ -86,7 +84,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         binding.itemList.adapter = adapter
         disableChangeAnimations()
         addItemTouchHelper()
-        initializeGridLayout()
         scrollToTopOnItemAdded()
 
         binding.queueAddAllButton.hide()
@@ -281,15 +278,10 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         val dm = resources.displayMetrics
         val screenWidth = dm.widthPixels / dm.density
         val itemSize = (screenWidth / 2f).coerceAtMost(180f)
-        val gridLayout = GridLayoutManager(
-            context,
-            (screenWidth / itemSize).coerceAtLeast(2f).toInt()
+        val gridLayout = StaggeredGridLayoutManager(
+            (screenWidth / itemSize).coerceAtLeast(2f).toInt(),
+            StaggeredGridLayoutManager.VERTICAL
         )
-        gridLayout.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return adapter.getSpanSizeAtPosition(position)
-            }
-        }
         binding.itemList.layoutManager = gridLayout
     }
 

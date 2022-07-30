@@ -104,6 +104,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
             binding!!.xyPlot.redraw()
             withContext(Dispatchers.Main) {
                 binding!!.xyPlot.visibility = View.VISIBLE
+                binding!!.legendFlexboxLayout.visibility = View.VISIBLE
                 binding!!.progressBar.visibility = View.GONE
             }
         } else {

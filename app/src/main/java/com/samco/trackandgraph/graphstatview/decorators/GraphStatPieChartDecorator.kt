@@ -66,6 +66,7 @@ class GraphStatPieChartDecorator(listMode: Boolean) :
             .setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
 
         binding!!.pieChart.visibility = View.VISIBLE
+        binding!!.legendFlexboxLayout.visibility = View.VISIBLE
         binding!!.progressBar.visibility = View.GONE
     }
 
