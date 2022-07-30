@@ -38,7 +38,6 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
 import com.samco.trackandgraph.util.hideKeyboard
-import com.samco.trackandgraph.util.showKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -146,8 +145,8 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         private val existingViews = mutableListOf<DataPointInputView>()
         private var currentPosition = -1
 
-        override fun isViewFromObject(view: View, `object`: Any): Boolean {
-            return view == `object`
+        override fun isViewFromObject(view: View, obj: Any): Boolean {
+            return view == obj
         }
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
@@ -165,11 +164,11 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             return view
         }
 
-        override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
-            super.setPrimaryItem(container, position, `object`)
-            if (currentPosition != position && `object` is DataPointInputView) {
+        override fun setPrimaryItem(container: ViewGroup, position: Int, obj: Any) {
+            super.setPrimaryItem(container, position, obj)
+            if (currentPosition != position && obj is DataPointInputView) {
                 currentPosition = position
-                `object`.requestFocus()
+                obj.requestFocus()
             }
         }
 
@@ -196,8 +195,8 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         binding.indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
-        if (feature.featureType != DataType.DISCRETE) context?.showKeyboard()
-        else activity?.window?.hideKeyboard(view?.windowToken, 0)
+        if (feature.featureType == DataType.DISCRETE)
+            activity?.window?.hideKeyboard(view?.windowToken, 0)
         requireActivity().currentFocus?.clearFocus()
     }
 
@@ -223,7 +222,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     override fun onDismiss(dialog: DialogInterface) {
         super.onDismiss(dialog)
         requireActivity().currentFocus?.clearFocus()
-        requireActivity().window?.hideKeyboard(flags = InputMethodManager.HIDE_NOT_ALWAYS)
+        requireActivity().window?.hideKeyboard()
     }
 
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {

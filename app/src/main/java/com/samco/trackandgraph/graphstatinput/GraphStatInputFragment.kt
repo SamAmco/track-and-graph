@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatinput
 import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -46,6 +47,7 @@ import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,7 +62,7 @@ class GraphStatInputFragment : Fragment() {
     private lateinit var binding: FragmentGraphStatInputBinding
     private val viewModel by viewModels<GraphStatInputViewModel>()
 
-    private val updateDemoHandler = Handler()
+    private val updateDemoHandler = Handler(Looper.getMainLooper())
 
     private lateinit var currentConfigView: GraphStatConfigView
 
@@ -74,7 +76,7 @@ class GraphStatInputFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        this.navController = container?.findNavController()
+        navController = container?.findNavController()
         binding = FragmentGraphStatInputBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         viewModel.initViewModel(args.groupId, args.graphStatId)
@@ -102,6 +104,7 @@ class GraphStatInputFragment : Fragment() {
             when (it) {
                 GraphStatInputState.INITIALIZING -> binding.inputProgressBar.visibility =
                     View.VISIBLE
+                GraphStatInputState.SET_FOCUS -> binding.graphStatNameInput.focusAndShowKeyboard()
                 GraphStatInputState.WAITING -> {
                     binding.inputProgressBar.visibility = View.INVISIBLE
                     listenToUpdateMode()
@@ -243,7 +246,7 @@ class GraphStatInputFragment : Fragment() {
     }
 }
 
-enum class GraphStatInputState { INITIALIZING, WAITING, ADDING, FINISHED }
+enum class GraphStatInputState { INITIALIZING, SET_FOCUS, WAITING, ADDING, FINISHED }
 class ValidationException(val errorMessageId: Int) : Exception()
 
 @HiltViewModel
@@ -303,15 +306,20 @@ class GraphStatInputViewModel @Inject constructor(
             }
             featureDataProvider = FeatureDataProvider(featureData, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
-            else withContext(ui) { _state.value = GraphStatInputState.WAITING }
+            else moveToWaiting()
         }
+    }
+
+    private suspend fun moveToWaiting() = withContext(ui) {
+        _state.value = GraphStatInputState.SET_FOCUS
+        _state.value = GraphStatInputState.WAITING
     }
 
     private suspend fun initFromExistingGraphStat(graphStatId: Long) {
         val graphStat = dataInteractor.tryGetGraphStatById(graphStatId)
 
         if (graphStat == null) {
-            withContext(ui) { _state.value = GraphStatInputState.WAITING }
+            moveToWaiting()
             return
         }
 
@@ -327,7 +335,7 @@ class GraphStatInputViewModel @Inject constructor(
                 this@GraphStatInputViewModel._configData.value = configData.second
             }
         }
-        withContext(ui) { _state.value = GraphStatInputState.WAITING }
+        withContext(ui) { moveToWaiting() }
     }
 
     fun setGraphName(name: String) {
