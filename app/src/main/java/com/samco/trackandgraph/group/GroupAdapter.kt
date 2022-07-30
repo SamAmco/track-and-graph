@@ -27,7 +27,6 @@ import com.samco.trackandgraph.base.database.dto.GroupChild
 import com.samco.trackandgraph.base.database.dto.GroupChildType
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import org.threeten.bp.Instant
 
 class GroupAdapter(
     private val featureClickListener: FeatureClickListener,
@@ -112,18 +111,18 @@ private class ListDiffCallback(
         return when (old.type) {
             GroupChildType.GROUP -> {
                 val oldObj = (old.obj as Group).copy(displayIndex = 0)
-                val newObj =(new.obj as Group).copy(displayIndex = 0)
+                val newObj = (new.obj as Group).copy(displayIndex = 0)
                 oldObj == newObj
             }
             GroupChildType.FEATURE -> {
                 val oldObj = (old.obj as DisplayFeature).copy(displayIndex = 0)
-                val newObj = (new.obj as DisplayFeature).copy( displayIndex = 0 )
+                val newObj = (new.obj as DisplayFeature).copy(displayIndex = 0)
                 oldObj == newObj
             }
             GroupChildType.GRAPH -> {
                 val oldPair = old.obj as Pair<*, *>
                 val newPair = new.obj as Pair<*, *>
-                return (oldPair.first as Instant) == (newPair.first as Instant)
+                return (oldPair.first as Long) == (newPair.first as Long)
             }
         }
     }
