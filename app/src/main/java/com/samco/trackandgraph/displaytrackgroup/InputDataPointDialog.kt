@@ -21,10 +21,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import org.threeten.bp.OffsetDateTime
-import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.viewpager.widget.PagerAdapter
@@ -37,8 +35,6 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
-import com.samco.trackandgraph.util.hideKeyboard
-import com.samco.trackandgraph.util.showKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -48,7 +44,7 @@ const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 
 @AndroidEntryPoint
-open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
+open class InputDataPointDialog : DialogFragment() {
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private lateinit var binding: DataPointInputDialogBinding
@@ -70,7 +66,23 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             listenToIndex()
             listenToState()
 
-            binding.viewPager.addOnPageChangeListener(this)
+            binding.viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+                }
+
+
+                override fun onPageSelected(position: Int) {
+                    (binding.viewPager.adapter as ViewPagerAdapter).updateAllDateTimes()
+                    viewModel.currentFeatureIndex.value = position
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+                }
+            })
             dialog?.setCanceledOnTouchOutside(true)
 
             binding.root
@@ -168,8 +180,10 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
             super.setPrimaryItem(container, position, `object`)
             if (currentPosition != position && `object` is DataPointInputView) {
+                val view = `object`
                 currentPosition = position
-                `object`.requestFocus()
+                view.requestFocus()
+
             }
         }
 
@@ -183,22 +197,14 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
         override fun getCount() = features.size
     }
 
-    override fun onPageScrollStateChanged(state: Int) {}
-    override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
-    override fun onPageSelected(position: Int) {
-        (binding.viewPager.adapter as ViewPagerAdapter).updateAllDateTimes()
-        viewModel.currentFeatureIndex.value = position
-    }
 
     private fun setupViewFeature(feature: Feature, index: Int) {
-        if (feature.featureType != DataType.DISCRETE) binding.addButton.visibility = View.VISIBLE
-        else binding.addButton.visibility = View.INVISIBLE
         binding.indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
-
-        //SHOW/HIDE KEYBOARD
-        if (feature.featureType != DataType.DISCRETE) context?.showKeyboard()
-        else activity?.window?.hideKeyboard(view?.windowToken, 0)
-        requireActivity().currentFocus?.clearFocus()
+        if (feature.featureType != DataType.DISCRETE) {
+            binding.addButton.visibility = View.VISIBLE
+        } else {
+            binding.addButton.visibility = View.INVISIBLE
+        }
     }
 
     override fun onResume() {
@@ -207,6 +213,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT
         )
+        binding.viewPager.focusedChild?.requestFocus()
     }
 
     private fun onAddClicked() {
@@ -218,12 +225,6 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 
     private fun onAddClicked(feature: Feature) {
         onSubmitResult(viewModel.uiStates[feature]!!)
-    }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
-        requireActivity().currentFocus?.clearFocus()
-        requireActivity().window?.hideKeyboard(flags = InputMethodManager.HIDE_NOT_ALWAYS)
     }
 
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {

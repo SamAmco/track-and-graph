@@ -37,8 +37,8 @@ import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
 import com.samco.trackandgraph.ui.dataVisColorList
+import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.util.getColorFromAttr
-import com.samco.trackandgraph.util.showKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -50,7 +50,6 @@ const val ADD_GROUP_DIALOG_PARENT_ID_KEY = "ADD_GROUP_DIALOG_PARENT_ID_KEY"
 @AndroidEntryPoint
 class AddGroupDialog : DialogFragment(), TextWatcher {
     private lateinit var alertDialog: AlertDialog
-
     private lateinit var editText: EditText
     private lateinit var colorSpinner: Spinner
 
@@ -64,12 +63,8 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
         val dialog = initDialog(groupId != null)
         viewModel.initViewModel(groupId, parentGroupId)
         observeViewModel()
+        editText.focusAndShowKeyboard()
         return dialog
-    }
-
-    override fun onStart() {
-        super.onStart()
-        requireContext().showKeyboard()
     }
 
     private fun observeViewModel() {
