@@ -55,7 +55,6 @@
                 android:layout_marginTop="@dimen/input_spacing_large"
                 android:focusableInTouchMode="true"
                 android:hint="@string/note_input_hint"
-                android:inputType="textCapSentences"
                 android:importantForAutofill="no" />
 
             <FrameLayout
