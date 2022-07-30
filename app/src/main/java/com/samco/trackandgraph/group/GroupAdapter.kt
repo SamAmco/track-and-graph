@@ -19,8 +19,11 @@ package com.samco.trackandgraph.group
 
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.database.dto.GroupChild
@@ -38,17 +41,25 @@ class GroupAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupChildViewHolder {
         return when (viewType) {
-            GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
+            GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider).apply { setFullSpan(this) }
             GroupChildType.FEATURE.ordinal -> FeatureViewHolder.from(parent)
-            else -> GroupViewHolder.from(parent)
+            else -> GroupViewHolder.from(parent).apply { setFullSpan(this) }
         }
+    }
+
+    private fun setFullSpan(vh: RecyclerView.ViewHolder) {
+        val layoutParams = StaggeredGridLayoutManager.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+        layoutParams.isFullSpan = true
+        vh.itemView.layoutParams = layoutParams
     }
 
     override fun onBindViewHolder(holder: GroupChildViewHolder, position: Int) {
         val item = groupChildren[position]
         when (item.type) {
-            GroupChildType.GRAPH -> (holder as GraphStatViewHolder)
-                .bind(extractGraphViewData(item.obj), graphStatClickListener)
+            GroupChildType.GRAPH -> (holder as GraphStatViewHolder).bind(
+                extractGraphViewData(item.obj),
+                graphStatClickListener
+            )
             GroupChildType.FEATURE -> (holder as FeatureViewHolder)
                 .bind(item.obj as DisplayFeature, featureClickListener)
             GroupChildType.GROUP -> (holder as GroupViewHolder)

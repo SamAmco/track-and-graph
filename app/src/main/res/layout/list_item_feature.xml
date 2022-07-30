@@ -6,7 +6,7 @@
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="match_parent"
-        android:layout_height="170dp"
+        android:layout_height="wrap_content"
         android:layout_margin="@dimen/card_margin_small"
         android:clickable="true"
         android:focusable="true"
@@ -15,24 +15,39 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/menuButton"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top|end"
+                android:background="#00FFFFFF"
+                android:contentDescription="@string/tracked_data_menu_button_content_description"
+                android:padding="8dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/list_menu_icon"
+                app:tint="?attr/colorControlNormal" />
 
             <TextView
                 android:id="@+id/trackGroupNameText"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_marginStart="@dimen/card_margin_small"
-                android:layout_marginTop="@dimen/card_margin_small"
                 android:layout_marginEnd="@dimen/card_margin_small"
+                android:includeFontPadding="false"
+                android:minHeight="40dp"
                 android:ellipsize="end"
+                android:gravity="top|center"
+                android:maxLines="10"
                 android:textAppearance="@style/TextAppearance.Headline5"
                 android:textStyle="bold"
-                android:gravity="center"
-                android:maxLines="3"
                 app:layout_constrainedHeight="true"
                 app:layout_constraintBottom_toTopOf="@id/lastDateText"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Some name" />
+                app:layout_constraintTop_toBottomOf="@id/menuButton"
+                tools:text="Some name " />
 
             <TextView
                 android:id="@+id/lastDateText"
@@ -40,8 +55,8 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
                 android:layout_marginEnd="@dimen/card_margin_small"
-                android:paddingVertical="8dp"
                 android:gravity="start|center"
+                android:paddingVertical="8dp"
                 android:textAppearance="@style/TextAppearance.Body"
                 app:layout_constraintBottom_toTopOf="@id/divider"
                 app:layout_constraintLeft_toRightOf="@id/historyIcon"
@@ -65,7 +80,7 @@
                 app:srcCompat="@drawable/history"
                 app:tint="?attr/colorControlNormal" />
 
-            <ImageView
+            <View
                 android:id="@+id/divider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
@@ -73,9 +88,9 @@
                 android:layout_marginTop="5dp"
                 android:layout_marginEnd="@dimen/card_margin_small"
                 android:layout_marginBottom="5dp"
+                android:background="?attr/colorSecondary"
                 app:layout_constraintBottom_toTopOf="@id/numEntriesText"
                 app:layout_constraintTop_toBottomOf="@id/lastDateText"
-                app:srcCompat="?attr/colorSecondary"
                 tools:ignore="ContentDescription" />
 
             <TextView
@@ -95,20 +110,6 @@
                 tools:text="1345 Tracked" />
 
             <ImageButton
-                android:id="@+id/menuButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="top|end"
-                android:background="#00FFFFFF"
-                android:contentDescription="@string/tracked_data_menu_button_content_description"
-                android:padding="8dp"
-                android:scaleType="fitCenter"
-                android:tint="?attr/colorControlNormal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/list_menu_icon" />
-
-            <ImageButton
                 android:id="@+id/addButton"
                 android:layout_width="55dp"
                 android:layout_height="55dp"
@@ -120,10 +121,10 @@
                 android:paddingEnd="2dp"
                 android:paddingBottom="2dp"
                 android:scaleType="fitXY"
-                android:tint="?attr/colorControlNormal"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/add_box" />
+                app:srcCompat="@drawable/add_box"
+                app:tint="?attr/colorControlNormal" />
 
             <ImageButton
                 android:id="@+id/quickAddButton"
@@ -137,10 +138,11 @@
                 android:paddingEnd="2dp"
                 android:paddingBottom="2dp"
                 android:scaleType="fitXY"
-                android:tint="?attr/colorPrimary"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/add_box" />
+                app:srcCompat="@drawable/add_box"
+                app:tint="?attr/colorPrimary" />
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
