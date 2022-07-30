@@ -104,6 +104,7 @@ class GraphStatInputFragment : Fragment() {
             when (it) {
                 GraphStatInputState.INITIALIZING -> binding.inputProgressBar.visibility =
                     View.VISIBLE
+                GraphStatInputState.SET_FOCUS -> binding.graphStatNameInput.focusAndShowKeyboard()
                 GraphStatInputState.WAITING -> {
                     binding.inputProgressBar.visibility = View.INVISIBLE
                     listenToUpdateMode()
@@ -113,7 +114,6 @@ class GraphStatInputFragment : Fragment() {
                     listenToDemoViewData()
                     listenToAddButton()
                     listenToPreviewButton()
-                    binding.graphStatNameInput.focusAndShowKeyboard()
                 }
                 GraphStatInputState.ADDING -> binding.inputProgressBar.visibility = View.VISIBLE
                 else -> navController?.popBackStack()
@@ -246,7 +246,7 @@ class GraphStatInputFragment : Fragment() {
     }
 }
 
-enum class GraphStatInputState { INITIALIZING, WAITING, ADDING, FINISHED }
+enum class GraphStatInputState { INITIALIZING, SET_FOCUS, WAITING, ADDING, FINISHED }
 class ValidationException(val errorMessageId: Int) : Exception()
 
 @HiltViewModel
@@ -306,15 +306,20 @@ class GraphStatInputViewModel @Inject constructor(
             }
             featureDataProvider = FeatureDataProvider(featureData, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
-            else withContext(ui) { _state.value = GraphStatInputState.WAITING }
+            else moveToWaiting()
         }
+    }
+
+    private suspend fun moveToWaiting() = withContext(ui) {
+        _state.value = GraphStatInputState.SET_FOCUS
+        _state.value = GraphStatInputState.WAITING
     }
 
     private suspend fun initFromExistingGraphStat(graphStatId: Long) {
         val graphStat = dataInteractor.tryGetGraphStatById(graphStatId)
 
         if (graphStat == null) {
-            withContext(ui) { _state.value = GraphStatInputState.WAITING }
+            moveToWaiting()
             return
         }
 
@@ -330,7 +335,7 @@ class GraphStatInputViewModel @Inject constructor(
                 this@GraphStatInputViewModel._configData.value = configData.second
             }
         }
-        withContext(ui) { _state.value = GraphStatInputState.WAITING }
+        withContext(ui) { moveToWaiting() }
     }
 
     fun setGraphName(name: String) {

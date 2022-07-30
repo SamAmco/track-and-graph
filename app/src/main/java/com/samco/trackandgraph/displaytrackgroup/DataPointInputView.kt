@@ -124,13 +124,16 @@ class DataPointInputView : FrameLayout {
     }
 
     override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
-        return if (state.feature.featureType == DataType.CONTINUOUS) {
-            numberInput.focusAndShowKeyboard()
-            val result = numberInput.requestFocus()
-            result
-        } else if (state.feature.featureType == DataType.DURATION) {
-            durationInput.requestFocus()
-        } else super.requestFocus(direction, previouslyFocusedRect)
+        return when (state.feature.featureType) {
+            DataType.CONTINUOUS -> {
+                numberInput.focusAndShowKeyboard()
+                numberInput.requestFocus()
+            }
+            DataType.DURATION -> {
+                durationInput.requestFocus()
+            }
+            else -> super.requestFocus(direction, previouslyFocusedRect)
+        }
     }
 
     private fun initDiscrete() {
@@ -144,7 +147,6 @@ class DataPointInputView : FrameLayout {
                 .first { cb -> cb.text == state.label }
                 .isChecked = true
         }
-        numberInput.focusAndShowKeyboard()
     }
 
     private fun initContinuous() {
