@@ -49,7 +49,7 @@ import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
 import com.samco.trackandgraph.util.hideKeyboard
-import com.samco.trackandgraph.util.showKeyboard
+import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,8 +75,8 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = AddFeatureFragmentBinding.inflate(inflater, container, false)
         navController = container?.findNavController()
+        binding = AddFeatureFragmentBinding.inflate(inflater, container, false)
 
         viewModel.init(
             args.groupId,
@@ -85,6 +85,8 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         )
 
         listenToViewModelState()
+
+        binding.featureNameText.focusAndShowKeyboard()
         return binding.root
     }
 
@@ -94,7 +96,6 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
             NavButtonStyle.UP,
             getString(R.string.add_feature)
         )
-        requireContext().showKeyboard()
     }
 
     override fun onStop() {
