@@ -21,8 +21,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.JobIntentService
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.di.IODispatcher
-import com.samco.trackandgraph.di.MainDispatcher
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking

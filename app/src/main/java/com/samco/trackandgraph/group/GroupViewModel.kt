@@ -20,9 +20,9 @@ package com.samco.trackandgraph.group
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.di.DefaultDispatcher
-import com.samco.trackandgraph.di.IODispatcher
-import com.samco.trackandgraph.di.MainDispatcher
+import com.samco.trackandgraph.base.model.di.DefaultDispatcher
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel

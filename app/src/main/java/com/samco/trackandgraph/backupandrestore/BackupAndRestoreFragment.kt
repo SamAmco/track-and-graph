@@ -1,3 +1,20 @@
+/*
+ * This file is part of Track & Graph
+ *
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Track & Graph is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.samco.trackandgraph.backupandrestore
 
 import android.app.AlarmManager
@@ -15,9 +32,9 @@ import androidx.sqlite.db.SimpleSQLiteQuery
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
-import com.samco.trackandgraph.reminders.RemindersHelper
 import com.samco.trackandgraph.util.getColorFromAttr
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,10 +55,6 @@ class BackupAndRestoreFragment : Fragment() {
 
     private lateinit var binding: BackupAndRestoreFragmentBinding
     private val viewModel by viewModels<BackupAndRestoreViewModel>()
-
-    //TODO need to re-write the alarm manager stuff, shouldn't need this in a fragment
-    @Inject
-    lateinit var dataInteractor: DataInteractor
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -82,7 +95,6 @@ class BackupAndRestoreFragment : Fragment() {
             when (it) {
                 true -> restartApp()
                 false -> {
-                    RemindersHelper.syncAlarms(requireContext(), dataInteractor)
                     val color =
                         binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.restoreFeedbackText.setTextColor(color)
@@ -156,7 +168,6 @@ class BackupAndRestoreFragment : Fragment() {
                 )
             }
             RESTORE_DATABASE_REQUEST_CODE -> {
-                RemindersHelper.clearAlarms(requireContext(), dataInteractor)
                 viewModel.restoreDatabase(
                     resultData?.data?.let { activity?.contentResolver?.openInputStream(it) }
                 )
@@ -167,7 +178,8 @@ class BackupAndRestoreFragment : Fragment() {
 
 @HiltViewModel
 class BackupAndRestoreViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    private val alarmInteractor: AlarmInteractor
 ) : ViewModel() {
     class BackupRestoreException(val stringResource: Int?)
 
@@ -230,6 +242,7 @@ class BackupAndRestoreViewModel @Inject constructor(
     }
 
     fun restoreDatabase(inputStream: InputStream?) {
+
         val databaseFilePath = dataInteractor.getDatabaseFilePath()
 
         if (inputStream == null) {
@@ -246,6 +259,7 @@ class BackupAndRestoreViewModel @Inject constructor(
         _inProgress.value = true
         ioScope.launch {
             try {
+                alarmInteractor.clearAlarms()
                 dataInteractor.closeOpenHelper()
 
                 inputStream.use { inStream ->

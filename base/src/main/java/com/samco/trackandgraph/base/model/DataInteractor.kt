@@ -57,12 +57,6 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getAllFeaturesSync(): List<Feature>
 
-    suspend fun insertReminder(reminder: Reminder)
-
-    suspend fun deleteReminder(reminder: Reminder)
-
-    suspend fun updateReminder(reminder: Reminder)
-
     suspend fun updateReminders(reminders: List<Reminder>)
 
     suspend fun getGroupById(id: Long): Group

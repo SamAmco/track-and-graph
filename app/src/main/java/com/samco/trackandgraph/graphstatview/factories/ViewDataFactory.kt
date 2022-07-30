@@ -20,12 +20,9 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
 /**
  * An abstract factory for generating data for a graph or stat ready to be displayed by an appropriate

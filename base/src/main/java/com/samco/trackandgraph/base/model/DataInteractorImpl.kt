@@ -27,19 +27,22 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.sampling.DataSampler
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
+import javax.inject.Inject
 
-internal class DataInteractorImpl(
+internal class DataInteractorImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
-    private val io: CoroutineDispatcher,
+    @IODispatcher private val io: CoroutineDispatcher,
     private val featureUpdater: FeatureUpdater,
-    private val csvReadWriter: CSVReadWriter
+    private val csvReadWriter: CSVReadWriter,
+    private val alarmInteractor: AlarmInteractor
 ) : DataInteractor {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
@@ -161,20 +164,16 @@ internal class DataInteractorImpl(
         dao.deleteFeature(id).also { dataUpdateEvents.emit(Unit) }
     }
 
-    override suspend fun insertReminder(reminder: Reminder) = withContext(io) {
-        dao.insertReminder(reminder.toEntity())
-    }
-
-    override suspend fun deleteReminder(reminder: Reminder) = withContext(io) {
-        dao.deleteReminder(reminder.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    override suspend fun updateReminder(reminder: Reminder) = withContext(io) {
-        dao.updateReminder(reminder.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
-        dao.updateReminders(reminders.map { it.toEntity() }).also { dataUpdateEvents.emit(Unit) }
+        alarmInteractor.clearAlarms()
+        database.withTransaction {
+            dao.deleteReminders()
+            dao.insertReminders(reminders.mapIndexed { index, reminder ->
+                reminder.copy(id = index.toLong()).toEntity()
+            })
+        }
+        alarmInteractor.syncAlarms()
+        dataUpdateEvents.emit(Unit)
     }
 
     override suspend fun deleteDataPoint(dataPoint: DataPoint) = withContext(io) {

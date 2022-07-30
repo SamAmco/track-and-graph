@@ -40,9 +40,9 @@ import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.di.DefaultDispatcher
-import com.samco.trackandgraph.di.IODispatcher
-import com.samco.trackandgraph.di.MainDispatcher
+import com.samco.trackandgraph.base.model.di.DefaultDispatcher
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData

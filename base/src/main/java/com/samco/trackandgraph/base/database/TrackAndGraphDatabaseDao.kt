@@ -67,16 +67,10 @@ internal interface TrackAndGraphDatabaseDao {
     fun getAllFeaturesSync(): List<Feature>
 
     @Insert
-    fun insertReminder(reminder: Reminder)
+    fun insertReminders(reminders: List<Reminder>)
 
-    @Delete
-    fun deleteReminder(reminder: Reminder)
-
-    @Update
-    fun updateReminder(reminder: Reminder)
-
-    @Update
-    fun updateReminders(reminders: List<Reminder>)
+    @Query("DELETE FROM reminders_table")
+    fun deleteReminders()
 
     @Query("SELECT * FROM groups_table WHERE id = :id LIMIT 1")
     fun getGroupById(id: Long): Group

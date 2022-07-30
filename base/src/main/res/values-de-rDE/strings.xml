@@ -330,4 +330,7 @@
     <string name="ru_sure_del_graph">Möchten Sie diese Grafik wirklich löschen? Sie können dies nicht rückgängig machen. Sie werden keine verfolgten Daten verlieren.</string>
     <string name="open">Offen</string>
     <string name="close">Schließen</string>
+    <string name="filter_by_label">nach Etikett filtern</string>
+    <string name="filter_by_value">nach Wert filtern</string>
+    <string name="save_changes">Änderungen speichern</string>
 </resources>
