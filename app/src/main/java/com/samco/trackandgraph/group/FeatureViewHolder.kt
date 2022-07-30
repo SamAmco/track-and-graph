@@ -24,6 +24,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
 import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
@@ -43,6 +44,18 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         setNumEntriesText()
         binding.trackGroupNameText.text = feature.name
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
+        binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
+        initAddButton(feature, clickListener)
+        initTimerControls(feature, clickListener)
+    }
+
+    private fun initTimerControls(feature: DisplayFeature, clickListener: FeatureClickListener) {
+        binding.timerLayoutGroup.visibility =
+            if (feature.featureType == DataType.DURATION) View.VISIBLE
+            else View.GONE
+    }
+
+    private fun initAddButton(feature: DisplayFeature, clickListener: FeatureClickListener) {
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
         binding.quickAddButton.setOnLongClickListener {
@@ -55,7 +68,6 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
             binding.addButton.visibility = View.VISIBLE
             binding.quickAddButton.visibility = View.INVISIBLE
         }
-        binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
     }
 
     private fun setLastDateText() {
