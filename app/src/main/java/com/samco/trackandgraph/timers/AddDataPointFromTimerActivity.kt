@@ -18,14 +18,23 @@
 package com.samco.trackandgraph.timers
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.displaytrackgroup.DURATION_SECONDS_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.widgets.TrackWidgetInputDataPointDialog
 import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class AddDataPointFromTimerActivity : AppCompatActivity() {
@@ -34,6 +43,8 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
         const val FEATURE_ID_KEY = "FEATURE_ID_KEY"
         const val START_TIME_KEY = "START_TIME_KEY"
     }
+
+    private val viewModel by viewModels<AddDataPointFromTimerViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +59,7 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
             val startInstant = Instant.parse(startTimeStr)
             val duration = Duration.between(startInstant, Instant.now()).seconds
             showDialog(featureId, duration)
+            viewModel.stopTimer(featureId)
         }
     }
 
@@ -64,4 +76,17 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
         super.onDestroy()
         window.hideKeyboard()
     }
+}
+
+@HiltViewModel
+class AddDataPointFromTimerViewModel @Inject constructor(
+    private val dataInteractor: DataInteractor,
+    @IODispatcher private val io: CoroutineDispatcher
+): ViewModel() {
+    fun stopTimer(featureId: Long) {
+        viewModelScope.launch(io) {
+            dataInteractor.stopTimerForFeature(featureId)
+        }
+    }
+
 }
