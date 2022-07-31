@@ -72,7 +72,7 @@ class FeatureViewHolder private constructor(
     }
 
     private fun initTimerControls(feature: DisplayFeature, clickListener: FeatureClickListener) {
-        binding.timerLayoutGroup.visibility =
+        binding.playStopButtons.visibility =
             if (feature.featureType == DataType.DURATION) View.VISIBLE
             else View.GONE
         binding.playTimerButton.setOnClickListener {
@@ -89,6 +89,7 @@ class FeatureViewHolder private constructor(
         if (feature.timerStartInstant != null) {
             timerTextJob?.cancel()
             timerTextJob = Job().also { timerTextScope = CoroutineScope(it + ui) }
+            binding.timerText.visibility = View.VISIBLE
             timerTextScope?.launch {
                 while (true) {
                     feature.timerStartInstant?.let { updateTimerText(it) }
@@ -96,6 +97,7 @@ class FeatureViewHolder private constructor(
                 }
             }
         } else {
+            binding.timerText.visibility = View.GONE
             binding.timerText.text = formatTimeDuration(0)
             killTimerJob()
         }
