@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
+import com.samco.trackandgraph.timers.AddDataPointFromTimerActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -32,5 +33,24 @@ class PendingIntentProviderImpl @Inject constructor(
         return Intent(context, MainActivity::class.java)
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             .let { PendingIntent.getActivity(context, 0, it, 0) }
+    }
+
+    override fun getDurationInputActivityPendingIntent(
+        featureId: Long,
+        startInstant: String
+    ): PendingIntent {
+        return Intent(context, AddDataPointFromTimerActivity::class.java)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            .putExtra(AddDataPointFromTimerActivity.FEATURE_ID_KEY, featureId)
+            .putExtra(AddDataPointFromTimerActivity.START_TIME_KEY, startInstant)
+            .let {
+                PendingIntent.getActivity(
+                    context,
+                    //A key unique to this request to allow updating notification
+                    startInstant.hashCode() + featureId.toInt(),
+                    it,
+                    0
+                )
+            }
     }
 }

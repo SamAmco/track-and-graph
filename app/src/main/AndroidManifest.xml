@@ -3,6 +3,7 @@
     package="com.samco.trackandgraph"
     android:installLocation="internalOnly">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -30,6 +31,12 @@
         </activity>
 
         <activity
+            android:name=".timers.AddDataPointFromTimerActivity"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/TransparentTheme" />
+
+        <activity
             android:name=".widgets.TrackWidgetInputDataPointActivity"
             android:excludeFromRecents="true"
             android:noHistory="true"
@@ -46,9 +53,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".base.model.AlarmReceiver" />
+        <receiver android:name=".base.service.AlarmReceiver" />
         <receiver
-            android:name=".base.model.RecreateAlarms"
+            android:name=".base.service.RecreateAlarms"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -74,6 +81,10 @@
         <service
             android:name=".widgets.TrackWidgetJobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".base.service.TimerNotificationService"
+            android:enabled="true" />
     </application>
 
 </manifest>

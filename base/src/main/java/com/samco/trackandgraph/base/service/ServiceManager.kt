@@ -15,16 +15,21 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.util
+package com.samco.trackandgraph.base.service
 
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-const val THEME_SETTING_PREF_KEY = "theme_setting"
-const val DATE_FORMAT_SETTING_PREF_KEY = "date_format_setting"
-const val FIRST_RUN_PREF_KEY = "firstrun2"
+internal interface ServiceManager {
+    fun startTimerNotificationService()
+}
 
-fun getPrefs(context: Context, mode: Int = AppCompatActivity.MODE_PRIVATE): SharedPreferences {
-    return context.getSharedPreferences("com.samco.trackandgraph", mode)
+internal class ServiceManagerImpl @Inject constructor(
+    @ApplicationContext private val context: Context
+): ServiceManager {
+    override fun startTimerNotificationService() {
+        context.startService(Intent(context, TimerNotificationService::class.java))
+    }
 }

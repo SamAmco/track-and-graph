@@ -15,7 +15,7 @@
  * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.model
+package com.samco.trackandgraph.base.service
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -28,6 +28,7 @@ import android.os.Vibrator
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.DEFAULT_ALL
 import com.samco.trackandgraph.base.R
+import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*

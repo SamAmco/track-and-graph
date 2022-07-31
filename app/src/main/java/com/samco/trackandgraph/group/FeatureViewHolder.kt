@@ -26,13 +26,12 @@ import android.widget.PopupMenu
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
-import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
-import com.samco.trackandgraph.ui.formatTimeDuration
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
-import java.util.concurrent.TimeUnit
 
 class FeatureViewHolder private constructor(
     private val binding: ListItemFeatureBinding,

@@ -29,6 +29,20 @@ import org.threeten.bp.OffsetDateTime
 private const val getFeatureByIdQuery =
     """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
 
+private const val getDisplayFeaturesQuery =
+    """SELECT features_table.*, num_data_points, last_timestamp, start_instant from features_table 
+        LEFT JOIN (
+            SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
+            FROM data_points_table GROUP BY feature_id
+        ) as feature_data 
+        ON feature_data.id = features_table.id
+        LEFT JOIN (
+            SELECT * FROM feature_timers_table
+        ) as timer_data
+        ON timer_data.feature_id = features_table.id 
+        """
+
+
 //TODO it would probably be better if we migrated from LiveData to flow here to remove lifecycle
 // awareness from the model layer
 @Dao
@@ -78,20 +92,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateFeatures(features: List<Feature>)
 
-    @Query(
-        """SELECT features_table.*, num_data_points, last_timestamp, start_instant from features_table 
-        LEFT JOIN (
-            SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
-            FROM data_points_table GROUP BY feature_id
-        ) as feature_data 
-        ON feature_data.id = features_table.id
-        LEFT JOIN (
-            SELECT * FROM feature_timers_table
-        ) as timer_data
-        ON timer_data.feature_id = features_table.id
-		WHERE group_id = :groupId
-        ORDER BY features_table.display_index ASC, id DESC"""
-    )
+    @Query(getDisplayFeaturesQuery + """WHERE group_id = :groupId ORDER BY features_table.display_index ASC, id DESC""")
     fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature>
 
     @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
@@ -265,4 +266,7 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM feature_timers_table WHERE feature_id=:featureId LIMIT 1")
     fun getFeatureTimer(featureId: Long): FeatureTimer?
+
+    @Query(getDisplayFeaturesQuery + """WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC""")
+    fun getAllActiveTimerFeatures(): List<DisplayFeature>
 }

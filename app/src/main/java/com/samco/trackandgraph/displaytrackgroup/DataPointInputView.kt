@@ -32,9 +32,9 @@ import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.helpers.doubleFormatter
+import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.ui.DurationInputView
-import com.samco.trackandgraph.ui.doubleFormatter
-import com.samco.trackandgraph.ui.formatDayMonthYear
 import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.util.getDoubleFromText
 import org.threeten.bp.OffsetDateTime

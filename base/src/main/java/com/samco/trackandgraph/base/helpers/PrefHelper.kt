@@ -15,11 +15,16 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.navigation
+package com.samco.trackandgraph.base.helpers
 
-import android.app.PendingIntent
+import android.content.Context
+import android.content.SharedPreferences
+import androidx.appcompat.app.AppCompatActivity
 
-interface PendingIntentProvider {
-    fun getMainActivityPendingIntent(): PendingIntent
-    fun getDurationInputActivityPendingIntent(featureId: Long, startInstant: String): PendingIntent
+const val THEME_SETTING_PREF_KEY = "theme_setting"
+const val DATE_FORMAT_SETTING_PREF_KEY = "date_format_setting"
+const val FIRST_RUN_PREF_KEY = "firstrun2"
+
+fun getPrefs(context: Context, mode: Int = AppCompatActivity.MODE_PRIVATE): SharedPreferences {
+    return context.getSharedPreferences("com.samco.trackandgraph", mode)
 }

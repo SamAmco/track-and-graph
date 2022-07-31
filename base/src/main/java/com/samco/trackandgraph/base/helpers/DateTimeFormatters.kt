@@ -15,19 +15,19 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.ui
+package com.samco.trackandgraph.base.helpers
 
 import android.content.Context
-import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.R
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.util.DATE_FORMAT_SETTING_PREF_KEY
-import com.samco.trackandgraph.util.getPrefs
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
 import java.text.DecimalFormat
+
+//TODO should really refactor all this stuff into classes and interfaces
 
 val doubleFormatter = DecimalFormat("#.##################")
 
