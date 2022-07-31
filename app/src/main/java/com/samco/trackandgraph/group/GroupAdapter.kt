@@ -104,13 +104,19 @@ class GroupAdapter(
         notifyItemMoved(start, end)
     }
 
-    fun getSpanSizeAtPosition(position: Int): Int {
-        if (position < 0 || position > groupChildren.size) return 0
+    fun getSpanModeForItem(position: Int): SpanMode? {
+        if (position < 0 || position > groupChildren.size) return null
         return when (groupChildren[position].type) {
-            GroupChildType.FEATURE -> 1
-            else -> 2
+            GroupChildType.FEATURE -> SpanMode.NumSpans(1)
+            GroupChildType.GROUP -> SpanMode.NumSpans(2)
+            GroupChildType.GRAPH -> SpanMode.FullWidth
         }
     }
+}
+
+sealed class SpanMode {
+    object FullWidth : SpanMode()
+    data class NumSpans(val spans: Int) : SpanMode()
 }
 
 private class ListDiffCallback(
