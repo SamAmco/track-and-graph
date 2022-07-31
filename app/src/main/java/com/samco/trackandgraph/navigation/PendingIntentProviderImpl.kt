@@ -40,7 +40,7 @@ class PendingIntentProviderImpl @Inject constructor(
         startInstant: String
     ): PendingIntent {
         return Intent(context, AddDataPointFromTimerActivity::class.java)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             .putExtra(AddDataPointFromTimerActivity.FEATURE_ID_KEY, featureId)
             .putExtra(AddDataPointFromTimerActivity.START_TIME_KEY, startInstant)
             .let {

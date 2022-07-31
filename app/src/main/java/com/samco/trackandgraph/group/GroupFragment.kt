@@ -293,10 +293,17 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         val dm = resources.displayMetrics
         val screenWidth = dm.widthPixels / dm.density
         val itemSize = (screenWidth / 2f).coerceAtMost(180f)
-        val gridLayout = StaggeredGridLayoutManager(
-            (screenWidth / itemSize).coerceAtLeast(2f).toInt(),
-            StaggeredGridLayoutManager.VERTICAL
-        )
+        val spanCount = (screenWidth / itemSize).coerceAtLeast(2f).toInt()
+        val gridLayout = GridLayoutManager(context, spanCount)
+        gridLayout.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                return when (val spanMode = adapter.getSpanModeForItem(position)) {
+                    SpanMode.FullWidth -> spanCount
+                    is SpanMode.NumSpans -> spanMode.spans
+                    null -> 1
+                }
+            }
+        }
         binding.itemList.layoutManager = gridLayout
     }
 
