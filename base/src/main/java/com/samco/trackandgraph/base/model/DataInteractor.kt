@@ -198,4 +198,6 @@ interface DataInteractor : FeatureUpdater {
     suspend fun playTimerForFeature(featureId: Long)
 
     suspend fun stopTimerForFeature(featureId: Long): Duration?
+
+    suspend fun getAllActiveTimerFeatures(): List<DisplayFeature>
 }

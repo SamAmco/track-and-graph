@@ -333,4 +333,6 @@
     <string name="filter_by_label">nach Etikett filtern</string>
     <string name="filter_by_value">nach Wert filtern</string>
     <string name="save_changes">Änderungen speichern</string>
+    <string name="timer_notification_channel_name">Timer</string>
+    <string name="stop">Halt</string>
 </resources>

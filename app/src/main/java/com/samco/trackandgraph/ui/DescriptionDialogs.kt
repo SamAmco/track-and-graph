@@ -26,6 +26,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
+import com.samco.trackandgraph.base.helpers.getDisplayValue
+import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
 import org.threeten.bp.OffsetDateTime
 

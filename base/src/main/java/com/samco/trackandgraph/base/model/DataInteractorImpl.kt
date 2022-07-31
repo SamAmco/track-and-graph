@@ -29,6 +29,7 @@ import com.samco.trackandgraph.base.database.entity.FeatureTimer
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.service.ServiceManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -45,7 +46,8 @@ internal class DataInteractorImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     private val featureUpdater: FeatureUpdater,
     private val csvReadWriter: CSVReadWriter,
-    private val alarmInteractor: AlarmInteractor
+    private val alarmInteractor: AlarmInteractor,
+    private val serviceManager: ServiceManager
 ) : DataInteractor {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
@@ -529,11 +531,15 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun playTimerForFeature(featureId: Long) = performAtomicUpdate {
         dao.deleteFeatureTimer(featureId)
         dao.insertFeatureTimer(FeatureTimer(0L, featureId, Instant.now()))
-    }
+    }.also { serviceManager.startTimerNotificationService() }
 
     override suspend fun stopTimerForFeature(featureId: Long): Duration? = performAtomicUpdate {
         val timer = dao.getFeatureTimer(featureId)
         dao.deleteFeatureTimer(featureId)
         timer?.let { Duration.between(it.startInstant, Instant.now()) }
+    }
+
+    override suspend fun getAllActiveTimerFeatures(): List<DisplayFeature> = withContext(io) {
+        dao.getAllActiveTimerFeatures().map { it.toDto() }
     }
 }

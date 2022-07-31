@@ -333,4 +333,6 @@
     <string name="save_changes">guardar cambios</string>
     <string name="filter_by_label">filtrar por etiqueta</string>
     <string name="filter_by_value">filtrar por valor</string>
+    <string name="timer_notification_channel_name">Temporizadores</string>
+    <string name="stop">Deténgase</string>
 </resources>

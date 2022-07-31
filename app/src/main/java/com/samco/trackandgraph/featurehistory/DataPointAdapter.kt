@@ -24,9 +24,9 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
+import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
-import com.samco.trackandgraph.ui.formatDayMonthYearHourMinuteWeekDayTwoLines
-import com.samco.trackandgraph.ui.getDisplayValue
 
 class DataPointAdapter(
     private val clickListener: DataPointClickListener,

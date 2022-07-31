@@ -25,10 +25,10 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
+import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
-import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
-import com.samco.trackandgraph.ui.getDisplayValue
 
 class NotesAdapter(
     private val featurePathProvider: FeaturePathProvider,

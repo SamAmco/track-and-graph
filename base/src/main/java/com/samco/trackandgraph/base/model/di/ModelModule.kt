@@ -23,6 +23,8 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.model.*
 import com.samco.trackandgraph.base.model.DataInteractorImpl
 import com.samco.trackandgraph.base.model.FeatureUpdaterImpl
+import com.samco.trackandgraph.base.service.ServiceManager
+import com.samco.trackandgraph.base.service.ServiceManagerImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -58,4 +60,7 @@ class ModelModule {
 
     @Provides
     internal fun getAlarmInteractor(impl: RemindersHelperImpl): AlarmInteractor = impl
+
+    @Provides
+    internal fun getServiceManager(impl: ServiceManagerImpl): ServiceManager = impl
 }

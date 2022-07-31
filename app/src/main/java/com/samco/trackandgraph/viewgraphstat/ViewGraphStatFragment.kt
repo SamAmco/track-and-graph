@@ -41,6 +41,7 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
@@ -49,7 +50,6 @@ import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.FeaturePathProvider
-import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
 import dagger.hilt.android.AndroidEntryPoint
