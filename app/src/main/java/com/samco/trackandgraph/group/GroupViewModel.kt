@@ -159,13 +159,18 @@ class GroupViewModel @Inject constructor(
     }
 
     fun addDefaultFeatureValue(feature: DisplayFeature) = viewModelScope.launch(io) {
+        val ts = OffsetDateTime.now()
+        var defaultValue = feature.defaultValue
+        if (feature.featureType == DataType.TIMESTAMP) {
+            defaultValue = ts.second + ts.minute * 60.0 + ts.hour * 3600.0
+        }
         val label = if (feature.featureType == DataType.DISCRETE) {
             feature.discreteValues[feature.defaultValue.toInt()].label
         } else ""
         val newDataPoint = DataPoint(
-            OffsetDateTime.now(),
+            ts,
             feature.id,
-            feature.defaultValue,
+            defaultValue,
             label,
             ""
         )

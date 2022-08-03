@@ -91,6 +91,7 @@
         <item>Choix multiple</item>
         <item>Numérique</item>
         <item>Durée</item>
+        <item>Horodatage</item>
     </string-array>
     <string-array name="graph_types">
         <item>Graphique linéraire</item>

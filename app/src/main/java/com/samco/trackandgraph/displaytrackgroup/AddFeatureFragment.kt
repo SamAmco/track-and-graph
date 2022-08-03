@@ -20,6 +20,7 @@ import android.app.AlertDialog
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,7 +68,8 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     private val featureTypeList = listOf(
         DataType.DISCRETE,
         DataType.CONTINUOUS,
-        DataType.DURATION
+        DataType.DURATION,
+        DataType.TIMESTAMP
     )
 
     override fun onCreateView(
@@ -257,6 +259,11 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
                     binding.defaultDiscreteScrollView.visibility = View.GONE
                     binding.defaultNumericalInput.visibility = View.GONE
                     binding.defaultDurationInput.visibility = View.VISIBLE
+                }
+                DataType.TIMESTAMP -> {
+                    binding.defaultDiscreteScrollView.visibility = View.GONE
+                    binding.defaultNumericalInput.visibility = View.GONE
+                    binding.defaultDurationInput.visibility = View.GONE
                 }
                 null -> {}
             }
@@ -614,6 +621,8 @@ class AddFeatureViewModel @Inject constructor(
                     || existingFeature!!.featureType == DataType.DISCRETE
                     || existingFeature!!.featureType == DataType.CONTINUOUS
             DataType.DURATION -> existingFeature!!.featureType == DataType.CONTINUOUS
+                    || existingFeature!!.featureType == DataType.DURATION
+            DataType.TIMESTAMP -> existingFeature!!.featureType == DataType.CONTINUOUS
                     || existingFeature!!.featureType == DataType.DURATION
         }
     }

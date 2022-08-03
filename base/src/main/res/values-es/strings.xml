@@ -91,6 +91,7 @@
         <item>Selección múltiple</item>
         <item>Numérico</item>
         <item>Duración del tiempo</item>
+        <item>Marca de tiempo</item>
     </string-array>
     <string-array name="graph_types">
         <item>Gráfico de líneas</item>

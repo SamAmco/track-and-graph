@@ -301,7 +301,10 @@ class GraphStatInputViewModel @Inject constructor(
                 FeatureDataProvider.FeatureData(
                     feat,
                     feat.discreteValues.map { it.label }.toSet(),
-                    DataSampleProperties(null, feat.featureType == DataType.DURATION)
+                    DataSampleProperties(
+                        null,
+                        feat.featureType == DataType.DURATION || feat.featureType == DataType.TIMESTAMP
+                    )
                 )
             }
             featureDataProvider = FeatureDataProvider(featureData, allGroups)

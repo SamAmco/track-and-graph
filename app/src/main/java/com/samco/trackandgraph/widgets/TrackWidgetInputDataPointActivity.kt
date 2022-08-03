@@ -24,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
@@ -107,10 +108,15 @@ class TrackWidgetInputDataPointViewModel @Inject constructor(
 
     fun addDefaultDataPoint() = feature.value?.let {
         ioScope.launch {
+            val ts = OffsetDateTime.now()
+            var defaultValue = it.defaultValue
+            if (it.featureType == DataType.TIMESTAMP) {
+                defaultValue = ts.second + ts.minute * 60.0 + ts.hour * 3600.0
+            }
             val newDataPoint = DataPoint(
-                OffsetDateTime.now(),
+                ts,
                 it.id,
-                it.defaultValue,
+                defaultValue,
                 it.getDefaultLabel(),
                 ""
             )

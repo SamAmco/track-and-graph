@@ -104,6 +104,7 @@
         <item>Multiple choice</item>
         <item>Numerical</item>
         <item>Time duration</item>
+        <item>Timestamp</item>
     </string-array>
     <string-array name="graph_types">
         <item>Line Graph</item>

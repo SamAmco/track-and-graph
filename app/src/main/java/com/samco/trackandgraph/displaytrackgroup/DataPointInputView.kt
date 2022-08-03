@@ -94,7 +94,14 @@ class DataPointInputView : FrameLayout {
             DataType.CONTINUOUS -> initContinuous()
             DataType.DISCRETE -> initDiscrete()
             DataType.DURATION -> initDuration()
+            DataType.TIMESTAMP -> initTimestamp()
         }
+    }
+
+    private fun initTimestamp() {
+        buttonsScroll.visibility = View.GONE
+        numberInput.visibility = View.GONE
+        durationInput.visibility = View.GONE
     }
 
     private fun initDuration() {
@@ -218,6 +225,9 @@ class DataPointInputView : FrameLayout {
 
     private fun setSelectedDateTime(dateTime: OffsetDateTime) {
         state.dateTime = dateTime
+        if(state.feature.featureType == DataType.TIMESTAMP) {
+            state.value = dateTime.second + dateTime.minute * 60.0 + dateTime.hour * 3600.0;
+        }
         dateButton.text = formatDayMonthYear(context, dateTime)
         timeButton.text = dateTime.format(timeDisplayFormatter)
     }

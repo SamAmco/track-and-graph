@@ -91,6 +91,7 @@
         <item>Multiple-Choice</item>
         <item>Numerisch</item>
         <item>Dauer</item>
+        <item>Zeit</item>
     </string-array>
     <string-array name="graph_types">
         <item>Liniendiagramm</item>

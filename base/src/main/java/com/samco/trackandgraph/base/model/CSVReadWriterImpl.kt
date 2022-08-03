@@ -470,8 +470,10 @@ internal class CSVReadWriterImpl @Inject constructor(
 
     private fun getFeatureTypeForValue(value: String): DataType {
         val durationRegex = Regex("\\d*:\\d{2}:\\d{2}")
+        val timestampRegex = Regex("\\d\\d?:\\d{2}")
         return when {
             value.matches(durationRegex) -> DataType.DURATION
+            value.matches(timestampRegex) -> DataType.TIMESTAMP
             value.contains(":") -> DataType.DISCRETE
             else -> DataType.CONTINUOUS
         }
