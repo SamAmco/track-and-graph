@@ -36,7 +36,7 @@ android {
 
     defaultConfig {
         applicationId "com.samco.trackandgraph"
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion 31
         versionCode 200201
         versionName "2.2.1"
