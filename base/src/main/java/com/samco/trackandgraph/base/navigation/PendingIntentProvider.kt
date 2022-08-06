@@ -44,6 +44,17 @@ interface PendingIntentProvider {
     fun getTrackWidgetInputDataPointActivityPendingIntent(appWidgetId: Int): PendingIntent
 
     /**
+     * Get an intent to broadcast to the TrackWidgetProvider that a given feature has been delete
+     */
+    fun getTrackWidgetDisableForFeatureByIdIntent(featureId: Long): Intent
+
+    /**
+     * Get an intent to broadcast to the TrackWidgetProvider that a given feature has been updated
+     * and therefore any widgets referencing that feature need to be updated also
+     */
+    fun getTrackWidgetUpdateForFeatureIdIntent(featureId: Long): Intent
+
+    /**
      * Get a pending intent that will broadcast to the TrackWidgetProvider (a broadcast receiver)
      * that it should start/stop the timer for a given duration based feature and then update
      * all widgets referencing that feature.

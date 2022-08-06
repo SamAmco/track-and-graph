@@ -69,19 +69,16 @@ class TrackWidgetJobIntentService : JobIntentService() {
     }
 
     override fun onHandleWork(intent: Intent) {
-        println("samsam: doWork called: $intent")
         val extras = intent.extras ?: return
-        val appWidgetId = extras.getInt(APP_WIDGET_ID_EXTRA, -1) ?: return
+        val appWidgetId = extras.getInt(APP_WIDGET_ID_EXTRA, -1)
         val featureId = applicationContext
             .getSharedPreferences(WIDGET_PREFS_NAME, MODE_PRIVATE)
             .getLong(TrackWidgetProvider.getFeatureIdPref(appWidgetId), -1)
-        val disableWidget = extras.getBoolean(DISABLE_WIDGET_EXTRA, false)
-        if (extras.containsKey(UPDATE_FEATURE_TIMER_EXTRA) ?: false) {
+        if (extras.getBoolean(DISABLE_WIDGET_EXTRA, false)) {
+            forceDisableWidget(appWidgetId)
+        } else if (extras.containsKey(UPDATE_FEATURE_TIMER_EXTRA)) {
             updateTimer(featureId, extras.getBoolean(UPDATE_FEATURE_TIMER_EXTRA, false))
-        }
-        return updateWidgetView(appWidgetId, featureId, disableWidget).also {
-            println("samsam: returning $it")
-        }
+        } else return updateWidgetView(appWidgetId, featureId)
     }
 
     private fun updateTimer(featureId: Long, startTimer: Boolean) = runBlocking {
@@ -96,23 +93,38 @@ class TrackWidgetJobIntentService : JobIntentService() {
         }
     }
 
-    private fun updateWidgetView(appWidgetId: Int, featureId: Long, disableWidget: Boolean) =
+    private fun forceDisableWidget(appWidgetId: Int) = runBlocking {
+        val appWidgetManager = AppWidgetManager.getInstance(applicationContext)
+        val remoteViews = RemoteViews(applicationContext.packageName, R.layout.track_widget)
+        remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.VISIBLE)
+        remoteViews.setViewVisibility(R.id.play_button, View.INVISIBLE)
+        remoteViews.setViewVisibility(R.id.stop_button, View.INVISIBLE)
+        remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.INVISIBLE)
+        remoteViews.setViewVisibility(R.id.track_widget_icon, View.INVISIBLE)
+        withContext(ui) { appWidgetManager.updateAppWidget(appWidgetId, remoteViews) }
+    }
+
+    private fun updateWidgetView(appWidgetId: Int, featureId: Long) =
         runBlocking {
             val appWidgetManager = AppWidgetManager.getInstance(applicationContext)
 
             val feature = withContext(io) {
                 dataInteractor.tryGetDisplayFeatureByIdSync(featureId)
-            } ?: return@runBlocking
+            }
+
+            if (feature == null) {
+                forceDisableWidget(appWidgetId)
+                return@runBlocking
+            }
 
             val title = feature.name
-            val requireInput = feature.hasDefaultValue
+            val requireInput = !feature.hasDefaultValue
             val remoteViews = createRemoteViews(
                 applicationContext,
                 appWidgetId,
                 featureId,
                 title,
                 requireInput,
-                disableWidget,
                 feature.featureType == DataType.DURATION,
                 feature.timerStartInstant != null
             )
@@ -128,30 +140,20 @@ class TrackWidgetJobIntentService : JobIntentService() {
         featureId: Long,
         title: String?,
         requireInput: Boolean? = true,
-        disable: Boolean = false,
         isDuration: Boolean = false,
         timerRunning: Boolean = false
     ): RemoteViews {
         val remoteViews = RemoteViews(context.packageName, R.layout.track_widget)
 
-        if (disable) {
-            remoteViews.setTextViewText(R.id.track_widget_title, "")
-            setTrackButtonPendingIntent(
-                remoteViews,
-                PendingIntent.getActivity(context, appWidgetId, Intent(), 0)
-            )
-            setUpPlayStopButtons(appWidgetId, featureId, remoteViews, false, false)
-        } else {
-            setTrackButtonPendingIntent(
-                remoteViews,
-                pendingIntentProvider.getTrackWidgetInputDataPointActivityPendingIntent(appWidgetId)
-            )
-            setUpPlayStopButtons(appWidgetId, featureId, remoteViews, isDuration, timerRunning)
+        setTrackButtonPendingIntent(
+            remoteViews,
+            pendingIntentProvider.getTrackWidgetInputDataPointActivityPendingIntent(appWidgetId)
+        )
+        setUpPlayStopButtons(appWidgetId, featureId, remoteViews, isDuration, timerRunning)
 
-            title?.let { remoteViews.setTextViewText(R.id.track_widget_title, it) }
-        }
+        title?.let { remoteViews.setTextViewText(R.id.track_widget_title, it) }
 
-        setWidgetTrackButtonDrawable(disable, requireInput, remoteViews)
+        setWidgetTrackButtonDrawable(requireInput, remoteViews)
 
         return remoteViews
     }
@@ -205,26 +207,17 @@ class TrackWidgetJobIntentService : JobIntentService() {
      * Set the appropriate drawable for the widget according to the status of the widget.
      */
     private fun setWidgetTrackButtonDrawable(
-        disable: Boolean,
         requireInput: Boolean?,
         remoteViews: RemoteViews
     ) {
-        when {
-            disable -> {
-                remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.VISIBLE)
-                remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.INVISIBLE)
-                remoteViews.setViewVisibility(R.id.track_widget_icon, View.INVISIBLE)
-            }
-            requireInput == false -> {
-                remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.INVISIBLE)
-                remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.VISIBLE)
-                remoteViews.setViewVisibility(R.id.track_widget_icon, View.INVISIBLE)
-            }
-            else -> {
-                remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.INVISIBLE)
-                remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.INVISIBLE)
-                remoteViews.setViewVisibility(R.id.track_widget_icon, View.VISIBLE)
-            }
+        if (requireInput == true) {
+            remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.INVISIBLE)
+            remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.INVISIBLE)
+            remoteViews.setViewVisibility(R.id.track_widget_icon, View.VISIBLE)
+        } else {
+            remoteViews.setViewVisibility(R.id.track_widget_icon_warning, View.INVISIBLE)
+            remoteViews.setViewVisibility(R.id.track_widget_icon_default, View.VISIBLE)
+            remoteViews.setViewVisibility(R.id.track_widget_icon, View.INVISIBLE)
         }
     }
 
