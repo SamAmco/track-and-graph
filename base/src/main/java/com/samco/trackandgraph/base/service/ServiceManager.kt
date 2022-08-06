@@ -20,8 +20,14 @@ package com.samco.trackandgraph.base.service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 internal interface ServiceManager {
@@ -32,16 +38,26 @@ internal interface ServiceManager {
 
 internal class ServiceManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val pendingIntentProvider: PendingIntentProvider
+    private val pendingIntentProvider: PendingIntentProvider,
+    @IODispatcher private val io: CoroutineDispatcher,
+    private val dao: TrackAndGraphDatabaseDao
 ) : ServiceManager {
 
+    private val ioJob = CoroutineScope(Job() + io)
+
     init {
-        //Launch the service, if there are no timers it will stop its self immediately,
-        // if there are timers it will display notifications and if it's already running
-        // the call will be ignored. This works around the issue of the service being killed
-        // and it not being possible to re-start it even if there are technically timers running
-        // e.g. if you restore from a database that has running timers
-        startTimerNotificationService()
+        //Launch the timer notification service if there are any timers currently active.
+        // Although the service is launched when timers are started it's possible that the database
+        // contains active timers already that are unknown to the data interactor. For example
+        // when restoring a database with active timers in it. Or if the service is killed in the
+        // background for any reason.
+        //
+        //We must also only start the service if there are active timers because otherwise it will
+        // not call startForeground when it is started which will crash the app.
+        ioJob.launch {
+            if (dao.getAllActiveTimerFeatures().isNotEmpty())
+                startTimerNotificationService()
+        }
     }
 
     override fun startTimerNotificationService() {
