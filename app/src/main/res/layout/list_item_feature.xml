@@ -3,147 +3,196 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="170dp"
-        android:layout_margin="@dimen/card_margin_small"
-        android:clickable="true"
-        android:focusable="true"
-        android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="@dimen/card_corner_radius">
+        android:layout_height="wrap_content">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/card_margin_small"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            app:cardCornerRadius="@dimen/card_corner_radius">
 
-            <TextView
-                android:id="@+id/trackGroupNameText"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/card_margin_small"
-                android:layout_marginTop="@dimen/card_margin_small"
-                android:layout_marginEnd="@dimen/card_margin_small"
-                android:ellipsize="end"
-                android:textAppearance="@style/TextAppearance.Headline5"
-                android:textStyle="bold"
-                android:gravity="center"
-                android:maxLines="3"
-                app:layout_constrainedHeight="true"
-                app:layout_constraintBottom_toTopOf="@id/lastDateText"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Some name" />
+                android:layout_height="wrap_content">
 
-            <TextView
-                android:id="@+id/lastDateText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="@dimen/card_margin_small"
-                android:paddingVertical="8dp"
-                android:gravity="start|center"
-                android:textAppearance="@style/TextAppearance.Body"
-                app:layout_constraintBottom_toTopOf="@id/divider"
-                app:layout_constraintLeft_toRightOf="@id/historyIcon"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/trackGroupNameText"
-                tools:text="02/03/19  20:18" />
+                <ImageButton
+                    android:id="@+id/menuButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="top|end"
+                    android:background="#00FFFFFF"
+                    android:contentDescription="@string/tracked_data_menu_button_content_description"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/list_menu_icon"
+                    app:tint="?attr/colorControlNormal" />
 
-            <ImageView
-                android:id="@+id/historyIcon"
-                android:layout_width="28dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="@dimen/card_margin_small"
-                android:alpha="0.55"
-                android:background="@null"
-                android:contentDescription="@string/tracked_data_history_button_content_description"
-                android:scaleType="fitCenter"
-                app:layout_constraintBottom_toBottomOf="@id/lastDateText"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/lastDateText"
-                app:layout_constraintTop_toTopOf="@id/lastDateText"
-                app:srcCompat="@drawable/history"
-                app:tint="?attr/colorControlNormal" />
+                <TextView
+                    android:id="@+id/trackGroupNameText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/card_margin_small"
+                    android:layout_marginEnd="@dimen/card_margin_small"
+                    android:ellipsize="end"
+                    android:gravity="top|center"
+                    android:includeFontPadding="false"
+                    android:maxLines="10"
+                    android:minHeight="40dp"
+                    android:textAppearance="@style/TextAppearance.Headline5"
+                    android:textStyle="bold"
+                    app:layout_constrainedHeight="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toTopOf="@id/lastDateText"
+                    app:layout_constraintTop_toBottomOf="@id/menuButton"
+                    tools:text="Some name " />
 
-            <ImageView
-                android:id="@+id/divider"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:layout_marginStart="@dimen/card_margin_small"
-                android:layout_marginTop="5dp"
-                android:layout_marginEnd="@dimen/card_margin_small"
-                android:layout_marginBottom="5dp"
-                app:layout_constraintBottom_toTopOf="@id/numEntriesText"
-                app:layout_constraintTop_toBottomOf="@id/lastDateText"
-                app:srcCompat="?attr/colorSecondary"
-                tools:ignore="ContentDescription" />
+                <TextView
+                    android:id="@+id/lastDateText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:layout_marginEnd="@dimen/card_margin_small"
+                    android:gravity="start|center"
+                    android:paddingVertical="8dp"
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintBottom_toTopOf="@id/divider"
+                    app:layout_constraintLeft_toRightOf="@id/historyIcon"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/trackGroupNameText"
+                    tools:text="02/03/19  20:18" />
 
-            <TextView
-                android:id="@+id/numEntriesText"
-                android:layout_width="0dp"
-                android:layout_height="35dp"
-                android:layout_marginStart="@dimen/card_margin_small"
-                android:layout_marginEnd="@dimen/card_margin_small"
-                android:layout_marginBottom="@dimen/card_margin_small"
-                android:gravity="center|start"
-                android:lines="1"
-                android:textAppearance="@style/TextAppearance.Body"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/divider"
-                tools:text="1345 Tracked" />
+                <ImageView
+                    android:id="@+id/historyIcon"
+                    android:layout_width="28dp"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="@dimen/card_margin_small"
+                    android:alpha="0.55"
+                    android:background="@null"
+                    android:contentDescription="@string/tracked_data_history_button_content_description"
+                    android:scaleType="fitCenter"
+                    app:layout_constraintBottom_toBottomOf="@id/lastDateText"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/lastDateText"
+                    app:layout_constraintTop_toTopOf="@id/lastDateText"
+                    app:srcCompat="@drawable/history"
+                    app:tint="?attr/colorControlNormal" />
 
-            <ImageButton
-                android:id="@+id/menuButton"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="top|end"
-                android:background="#00FFFFFF"
-                android:contentDescription="@string/tracked_data_menu_button_content_description"
-                android:padding="8dp"
-                android:scaleType="fitCenter"
-                android:tint="?attr/colorControlNormal"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/list_menu_icon" />
+                <View
+                    android:id="@+id/divider"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="@dimen/card_margin_small"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="@dimen/card_margin_small"
+                    android:background="?attr/colorSecondary"
+                    app:layout_constraintBottom_toTopOf="@id/addButtons"
+                    app:layout_constraintTop_toBottomOf="@id/lastDateText"
+                    tools:ignore="ContentDescription" />
 
-            <ImageButton
-                android:id="@+id/addButton"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_gravity="bottom|end"
-                android:background="@null"
-                android:contentDescription="@string/add_data_point_button_content_description"
-                android:paddingStart="10dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="2dp"
-                android:paddingBottom="2dp"
-                android:scaleType="fitXY"
-                android:tint="?attr/colorControlNormal"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/add_box" />
+                <TextView
+                    android:id="@+id/numEntriesText"
+                    android:layout_width="0dp"
+                    android:layout_height="35dp"
+                    android:layout_marginStart="@dimen/card_margin_small"
+                    android:layout_marginEnd="@dimen/card_margin_small"
+                    android:gravity="bottom|start"
+                    android:lines="1"
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintBottom_toBottomOf="@id/addButtons"
+                    app:layout_constraintEnd_toStartOf="@id/playStopButtons"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider"
+                    tools:text="1345 Tracked" />
 
-            <ImageButton
-                android:id="@+id/quickAddButton"
-                android:layout_width="55dp"
-                android:layout_height="55dp"
-                android:layout_gravity="bottom|end"
-                android:background="@null"
-                android:contentDescription="@string/add_data_point_button_content_description"
-                android:paddingStart="10dp"
-                android:paddingTop="10dp"
-                android:paddingEnd="2dp"
-                android:paddingBottom="2dp"
-                android:scaleType="fitXY"
-                android:tint="?attr/colorPrimary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/add_box" />
+                <FrameLayout
+                    android:id="@+id/addButtons"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    app:layout_constraintBottom_toTopOf="@id/timerText"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/divider">
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
+                    <ImageButton
+                        android:id="@+id/addButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom|end"
+                        android:background="@null"
+                        android:contentDescription="@string/add_data_point_button_content_description"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/add_box"
+                        app:tint="?attr/colorControlNormal" />
 
-    </androidx.cardview.widget.CardView>
+                    <ImageButton
+                        android:id="@+id/quickAddButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom|end"
+                        android:background="@null"
+                        android:contentDescription="@string/add_data_point_button_content_description"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/add_box"
+                        app:tint="?attr/colorPrimary" />
+                </FrameLayout>
+
+                <FrameLayout
+                    android:id="@+id/playStopButtons"
+                    android:layout_width="45dp"
+                    android:layout_height="45dp"
+                    app:layout_constraintEnd_toStartOf="@id/addButtons"
+                    app:layout_constraintTop_toTopOf="@id/addButtons">
+
+                    <ImageButton
+                        android:id="@+id/playTimerButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom|end"
+                        android:background="@null"
+                        android:contentDescription="@string/add_data_point_button_content_description"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/ic_play_timer"
+                        app:tint="?colorOnError" />
+
+                    <ImageButton
+                        android:id="@+id/stopTimerButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_gravity="bottom|end"
+                        android:background="@null"
+                        android:contentDescription="@string/add_data_point_button_content_description"
+                        android:scaleType="fitXY"
+                        android:visibility="gone"
+                        app:srcCompat="@drawable/ic_stop_timer"
+                        app:tint="?colorError" />
+                </FrameLayout>
+
+                <TextView
+                    android:id="@+id/timerText"
+                    android:layout_width="0dp"
+                    android:layout_height="35dp"
+                    android:gravity="center|bottom"
+                    android:lines="1"
+                    android:text="0:00:00"
+                    android:textAppearance="@style/TextAppearance.Headline6"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/addButtons"
+                    tools:ignore="HardcodedText"
+                    tools:text="00:00:00" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.cardview.widget.CardView>
+    </FrameLayout>
 
 </layout>

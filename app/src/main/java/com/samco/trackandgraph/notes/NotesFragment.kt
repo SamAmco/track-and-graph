@@ -31,13 +31,13 @@ import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.database.stringFromOdt
+import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.FeaturePathProvider
-import com.samco.trackandgraph.ui.getWeekDayNames
 import com.samco.trackandgraph.ui.showNoteDialog
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel

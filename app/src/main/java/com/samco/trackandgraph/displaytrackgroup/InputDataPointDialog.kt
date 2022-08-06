@@ -24,7 +24,6 @@ import org.threeten.bp.OffsetDateTime
 import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.viewpager.widget.PagerAdapter
@@ -45,6 +44,7 @@ import javax.inject.Inject
 
 const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
+const val DURATION_SECONDS_KEY = "DURATION_SECONDS_KEY"
 
 @AndroidEntryPoint
 open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
@@ -129,9 +129,13 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun initViewModel() {
         val timestampStr = requireArguments().getString(DATA_POINT_TIMESTAMP_KEY)
         val timestamp = if (timestampStr != null) odtFromString(timestampStr) else null
+        val duration = requireArguments().getLong(DURATION_SECONDS_KEY).let {
+            if (it > 0) it.toDouble() else null
+        }
         viewModel.init(
             requireArguments().getLongArray(FEATURE_LIST_KEY)!!.toList(),
-            timestamp
+            timestamp,
+            duration
         )
     }
 
@@ -283,7 +287,7 @@ class InputDataPointDialogViewModel @Inject constructor(
 
     private var initialized = false
 
-    fun init(featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?) {
+    fun init(featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?, durationSeconds: Double?) {
         if (initialized) return
         initialized = true
 
@@ -293,7 +297,7 @@ class InputDataPointDialogViewModel @Inject constructor(
             val dataPointData = dataPointTimestamp?.let {
                 dataInteractor.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
             }
-            uiStates = getUIStatesForFeatures(featureData, dataPointData)
+            uiStates = getUIStatesForFeatures(featureData, dataPointData, durationSeconds)
 
             withContext(ui) {
                 _features.value = featureData
@@ -305,13 +309,15 @@ class InputDataPointDialogViewModel @Inject constructor(
 
     private fun getUIStatesForFeatures(
         featureData: List<Feature>,
-        dataPointData: DataPoint?
+        dataPointData: DataPoint?,
+        durationSeconds: Double?
     ): Map<Feature, DataPointInputView.DataPointInputData> {
         val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
         val timeFixed = dataPointData != null
         return featureData.associateWith { f ->
             val dataPointValue = when {
                 dataPointData?.value != null -> dataPointData.value
+                durationSeconds != null -> durationSeconds
                 f.hasDefaultValue -> f.defaultValue
                 f.featureType == DataType.CONTINUOUS -> 1.0
                 else -> 0.0

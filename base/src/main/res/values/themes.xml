@@ -41,7 +41,8 @@
         <item name="colorPrimaryVariant">@color/dark_blue</item>
         <item name="colorSecondaryVariant">@color/dark_orange</item>
         <item name="errorTextColor">@color/dark_orange</item>
-        <item name="colorOnError">@color/green</item>
+        <item name="colorOnError">@color/faded_green</item>
+        <item name="colorError">@color/dark_orange</item>
         <item name="colorControlNormal">@color/blue_black</item>
         <item name="colorControlHighlight">@color/light_gray</item>
         <item name="toolbarBackgroundColor">@color/blue_white_pastel</item>

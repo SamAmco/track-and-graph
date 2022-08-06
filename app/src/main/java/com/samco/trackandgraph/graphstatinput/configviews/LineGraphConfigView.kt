@@ -26,6 +26,7 @@ import androidx.core.widget.addTextChangedListener
 import android.widget.AdapterView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.helpers.doubleFormatter
 import com.samco.trackandgraph.databinding.LineGraphInputViewBinding
 import com.samco.trackandgraph.graphstatinput.ValidationException
 import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfig
@@ -33,7 +34,6 @@ import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfig
 import com.samco.trackandgraph.maxGraphPeriodDurations
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
-import com.samco.trackandgraph.ui.doubleFormatter
 import com.samco.trackandgraph.util.getDoubleFromText
 
 internal class LineGraphConfigView @JvmOverloads constructor(

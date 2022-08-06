@@ -23,18 +23,19 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.service.TrackWidgetProvider
+import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
@@ -90,12 +91,10 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
 
 @HiltViewModel
 class TrackWidgetInputDataPointViewModel @Inject constructor(
-    private var dataInteractor: DataInteractor
+    private var dataInteractor: DataInteractor,
+    @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
     lateinit var feature: LiveData<Feature?> private set
-
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
     private var initialized = false
 
@@ -106,7 +105,7 @@ class TrackWidgetInputDataPointViewModel @Inject constructor(
     }
 
     fun addDefaultDataPoint() = feature.value?.let {
-        ioScope.launch {
+        viewModelScope.launch(io) {
             val newDataPoint = DataPoint(
                 OffsetDateTime.now(),
                 it.id,
