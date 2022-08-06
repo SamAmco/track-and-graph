@@ -21,9 +21,6 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import com.samco.trackandgraph.base.service.TrackWidgetJobIntentService.Companion.APP_WIDGET_ID_EXTRA
 import com.samco.trackandgraph.base.service.TrackWidgetJobIntentService.Companion.DISABLE_WIDGET_EXTRA
 import com.samco.trackandgraph.base.service.TrackWidgetJobIntentService.Companion.UPDATE_FEATURE_TIMER_EXTRA
