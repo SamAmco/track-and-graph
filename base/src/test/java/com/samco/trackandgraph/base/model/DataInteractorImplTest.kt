@@ -21,6 +21,7 @@ import com.nhaarman.mockitokotlin2.mock
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.service.ServiceManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.*
@@ -39,6 +40,8 @@ class DataInteractorImplTest {
     private val dao: TrackAndGraphDatabaseDao = mock()
     private val featureUpdater: FeatureUpdater = mock()
     private val csvReadWriter: CSVReadWriter = mock()
+    private val alarmInteractor: AlarmInteractor = mock()
+    private val serviceManager: ServiceManager = mock()
 
     @Before
     fun before() {
@@ -49,7 +52,9 @@ class DataInteractorImplTest {
             dao,
             testDispatcher,
             featureUpdater,
-            csvReadWriter
+            csvReadWriter,
+            alarmInteractor,
+            serviceManager
         )
     }
 
