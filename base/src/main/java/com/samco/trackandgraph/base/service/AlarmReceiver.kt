@@ -45,6 +45,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
     companion object {
         private const val REMINDERS_CHANNEL_ID = "reminder_notifications_channel"
+        const val ALARM_MESSAGE_KEY = "Message"
     }
 
     private fun createNotificationChannel(context: Context) {
@@ -70,7 +71,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         createNotificationChannel(context)
 
-        val message = (intent?.extras?.get("Message") as String?) ?: return
+        val message = (intent?.extras?.get(ALARM_MESSAGE_KEY) as String?) ?: return
 
         val pendingIntent = pendingIntentProvider.getMainActivityPendingIntent()
 

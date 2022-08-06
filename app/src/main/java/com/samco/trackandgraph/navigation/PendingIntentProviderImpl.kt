@@ -38,7 +38,7 @@ class PendingIntentProviderImpl @Inject constructor(
     override fun getMainActivityPendingIntent(): PendingIntent {
         return Intent(context, MainActivity::class.java)
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            .let { PendingIntent.getActivity(context, 0, it, 0) }
+            .let { PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_IMMUTABLE) }
     }
 
     override fun getDurationInputActivityIntent(featureId: Long, startInstant: String): Intent {
@@ -59,7 +59,7 @@ class PendingIntentProviderImpl @Inject constructor(
                 //A key unique to this request to allow updating notification
                 startInstant.hashCode() + featureId.toInt(),
                 it,
-                0
+                PendingIntent.FLAG_IMMUTABLE
             )
         }
     }
@@ -73,7 +73,7 @@ class PendingIntentProviderImpl @Inject constructor(
                 context,
                 appWidgetId,
                 it,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
     }
@@ -108,7 +108,7 @@ class PendingIntentProviderImpl @Inject constructor(
                 context,
                 appWidgetId,
                 it,
-                PendingIntent.FLAG_CANCEL_CURRENT
+                PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
     }

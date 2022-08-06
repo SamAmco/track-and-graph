@@ -131,7 +131,7 @@ class BackupAndRestoreFragment : Fragment() {
             context,
             8375,
             mStartActivity,
-            PendingIntent.FLAG_CANCEL_CURRENT
+            PendingIntent.FLAG_CANCEL_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
         val mgr = requireContext().getSystemService(Context.ALARM_SERVICE) as AlarmManager
         mgr[AlarmManager.RTC, System.currentTimeMillis() + 100] = mPendingIntent
