@@ -72,6 +72,8 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun tryGetFeatureByIdSync(featureId: Long): Feature?
 
+    suspend fun tryGetDisplayFeatureByIdSync(featureId: Long): DisplayFeature?
+
     fun tryGetFeatureById(featureId: Long): LiveData<Feature?>
 
     suspend fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>

@@ -23,6 +23,7 @@ import timber.log.Timber
 
 @HiltAndroidApp
 class TrackAndGraphApplication : Application() {
+
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
