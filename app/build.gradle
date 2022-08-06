@@ -22,7 +22,7 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: "dagger.hilt.android.plugin"
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 32
 
     compileOptions {
         sourceCompatibility 1.8
@@ -37,9 +37,9 @@ android {
     defaultConfig {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 23
-        targetSdkVersion 31
-        versionCode 200201
-        versionName "2.2.1"
+        targetSdkVersion 32
+        versionCode 200300
+        versionName "2.3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {

@@ -1,0 +1,5 @@
+- Stability improvements to reminders
+- Adds timer functionality to tracker cards and widgets including notifications
+- Global notes under graphs are filtered by date range
+- Fix for graphs stuck loading and duplicate graph not working
+- Keyboard fixes 
