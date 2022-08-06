@@ -62,6 +62,7 @@ class TimerNotificationService : Service() {
 
     private val job = Job()
     private val jobScope by lazy { CoroutineScope(job + defaultDispatcher) }
+    private var updateJobIsRunning = false
 
     private val notificationManager by lazy {
         ContextCompat.getSystemService(
@@ -128,6 +129,9 @@ class TimerNotificationService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (updateJobIsRunning) return super.onStartCommand(intent, flags, startId)
+
+        updateJobIsRunning = true
         createChannel()
         jobScope.launch {
             dataInteractor.getDataUpdateEvents()
@@ -145,12 +149,14 @@ class TimerNotificationService : Service() {
                     } else notificationUpdater.setNotifications(newFeatures)
                 }
         }
+
         return super.onStartCommand(intent, flags, startId)
     }
 
 
     override fun onDestroy() {
         job.cancel()
+        updateJobIsRunning = false
         super.onDestroy()
     }
 
@@ -172,8 +178,7 @@ class TimerNotificationService : Service() {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(name)
             .setOngoing(true)
-            //TODO use a different small icon ?
-            .setSmallIcon(R.drawable.notification_icon)
+            .setSmallIcon(R.drawable.timer_notification_icon)
             .setContentText(formatTimeDuration(durationSecs))
             .setWhen(startTimeInstant.epochSecond * 1000L)
             .setUsesChronometer(true)
