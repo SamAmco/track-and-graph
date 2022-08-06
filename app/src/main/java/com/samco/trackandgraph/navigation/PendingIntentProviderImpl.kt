@@ -24,6 +24,7 @@ import android.content.Intent
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import com.samco.trackandgraph.base.service.TrackWidgetProvider
+import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.DELETE_FEATURE_ID
 import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.UPDATE_FEATURE_ID
 import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.UPDATE_FEATURE_TIMER
 import com.samco.trackandgraph.timers.AddDataPointFromTimerActivity
@@ -75,6 +76,20 @@ class PendingIntentProviderImpl @Inject constructor(
                 PendingIntent.FLAG_UPDATE_CURRENT
             )
         }
+    }
+
+    override fun getTrackWidgetDisableForFeatureByIdIntent(featureId: Long): Intent {
+        return Intent(
+            AppWidgetManager.ACTION_APPWIDGET_UPDATE,
+            null, context, TrackWidgetProvider::class.java
+        ).apply { putExtra(DELETE_FEATURE_ID, featureId) }
+    }
+
+    override fun getTrackWidgetUpdateForFeatureIdIntent(featureId: Long): Intent {
+        return Intent(
+            AppWidgetManager.ACTION_APPWIDGET_UPDATE,
+            null, context, TrackWidgetProvider::class.java
+        ).apply { putExtra(UPDATE_FEATURE_ID, featureId) }
     }
 
     override fun getTrackWidgetStartStopTimerIntent(

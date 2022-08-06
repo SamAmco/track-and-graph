@@ -75,8 +75,6 @@ class TrackWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         intent.extras?.let { extras ->
             when {
-                //TODO these should be broadcast from the model layer but they're currently broadcast
-                // from the view layer
                 extras.containsKey(UPDATE_FEATURE_ID) -> {
                     val id = extras.getLong(UPDATE_FEATURE_ID)
                     val updateTimer =

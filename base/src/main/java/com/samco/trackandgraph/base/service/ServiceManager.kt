@@ -20,16 +20,20 @@ package com.samco.trackandgraph.base.service
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 internal interface ServiceManager {
     fun startTimerNotificationService()
+    fun requestWidgetUpdatesForFeatureId(featureId: Long)
+    fun requestWidgetsDisabledForFeatureId(featureId: Long)
 }
 
 internal class ServiceManagerImpl @Inject constructor(
-    @ApplicationContext private val context: Context
-): ServiceManager {
+    @ApplicationContext private val context: Context,
+    private val pendingIntentProvider: PendingIntentProvider
+) : ServiceManager {
     override fun startTimerNotificationService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(Intent(context, TimerNotificationService::class.java))
@@ -37,4 +41,12 @@ internal class ServiceManagerImpl @Inject constructor(
             context.startService(Intent(context, TimerNotificationService::class.java))
         }
     }
+
+    override fun requestWidgetUpdatesForFeatureId(featureId: Long) = context.sendBroadcast(
+        pendingIntentProvider.getTrackWidgetUpdateForFeatureIdIntent(featureId)
+    )
+
+    override fun requestWidgetsDisabledForFeatureId(featureId: Long) = context.sendBroadcast(
+        pendingIntentProvider.getTrackWidgetDisableForFeatureByIdIntent(featureId)
+    )
 }
