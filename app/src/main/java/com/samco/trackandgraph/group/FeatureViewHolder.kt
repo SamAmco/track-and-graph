@@ -37,8 +37,7 @@ class FeatureViewHolder private constructor(
     private val binding: ListItemFeatureBinding,
     private val ui: CoroutineDispatcher,
     private val defaultDispatcher: CoroutineDispatcher
-) :
-    GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+) : GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
 
     private var timerTextJob: Job? = null
     private var timerTextScope: CoroutineScope? = null
