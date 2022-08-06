@@ -25,6 +25,7 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.AlarmReceiver
+import com.samco.trackandgraph.base.service.AlarmReceiver.Companion.ALARM_MESSAGE_KEY
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import org.threeten.bp.LocalTime
@@ -96,14 +97,14 @@ internal class RemindersHelperImpl @Inject constructor(
             .filter { kvp -> !filterUnchecked || kvp.value }
             .map { day ->
                 day.key to Intent(context, AlarmReceiver::class.java)
-                    .putExtra("Message", reminder.alarmName)
+                    .putExtra(ALARM_MESSAGE_KEY, reminder.alarmName)
                     .let { intent ->
                         val id = ((reminder.id * 10) + day.key).toInt()
                         PendingIntent.getBroadcast(
                             context,
                             id,
                             intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                         )
                     }
             }.toMap()
