@@ -71,6 +71,8 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     private lateinit var adapter: GroupAdapter
     private val viewModel by viewModels<GroupViewModel>()
 
+    private var forceNextNotifyDataSetChanged: Boolean = false
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -230,8 +232,16 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         this::onFeatureAddClicked,
         this::onFeatureHistoryClicked,
         viewModel::playTimer,
-        viewModel::stopTimer
+        this::onStopTimerClicked
     )
+
+    private fun onStopTimerClicked(feature: DisplayFeature) {
+        //Due to a bug with the GridLayoutManager when you stop a timer and the timer text disappears
+        // the views heights are not properly re-calculated and we need to call notifyDataSetChanged
+        // to get the view heights right again
+        forceNextNotifyDataSetChanged = true
+        viewModel.stopTimer(feature)
+    }
 
     private fun onFeatureHistoryClicked(feature: DisplayFeature) {
         navController?.navigate(
@@ -294,8 +304,8 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         val screenWidth = dm.widthPixels / dm.density
         val itemSize = (screenWidth / 2f).coerceAtMost(180f)
         val spanCount = (screenWidth / itemSize).coerceAtLeast(2f).toInt()
-        val gridLayout = GridLayoutManager(context, spanCount)
-        gridLayout.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+        val gridLayoutManager = GridLayoutManager(context, spanCount)
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
                 return when (val spanMode = adapter.getSpanModeForItem(position)) {
                     SpanMode.FullWidth -> spanCount
@@ -304,13 +314,14 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
                 }
             }
         }
-        binding.itemList.layoutManager = gridLayout
+        binding.itemList.layoutManager = gridLayoutManager
     }
 
     private fun listenToViewModel() {
         viewModel.hasFeatures.observe(viewLifecycleOwner) {}
         viewModel.groupChildren.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+            adapter.submitList(it, forceNextNotifyDataSetChanged)
+            if (forceNextNotifyDataSetChanged) forceNextNotifyDataSetChanged = false
             updateShowQueueTrackButton()
             binding.emptyGroupText.visibility =
                 if (it.isEmpty() && args.groupId == 0L) View.VISIBLE

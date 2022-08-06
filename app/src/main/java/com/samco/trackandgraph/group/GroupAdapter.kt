@@ -87,12 +87,18 @@ class GroupAdapter(
 
     override fun getItemCount(): Int = groupChildren.size
 
-    fun submitList(newChildren: List<GroupChild>) {
-        val diffCallback = ListDiffCallback(groupChildren, newChildren)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        groupChildren.clear()
-        groupChildren.addAll(newChildren)
-        diffResult.dispatchUpdatesTo(this)
+    fun submitList(newChildren: List<GroupChild>, forceNotifyDataSetChanged: Boolean) {
+        if (forceNotifyDataSetChanged) {
+            groupChildren.clear()
+            groupChildren.addAll(newChildren)
+            notifyDataSetChanged()
+        } else {
+            val diffCallback = ListDiffCallback(groupChildren, newChildren)
+            val diffResult = DiffUtil.calculateDiff(diffCallback)
+            groupChildren.clear()
+            groupChildren.addAll(newChildren)
+            diffResult.dispatchUpdatesTo(this)
+        }
     }
 
     fun getItems(): List<GroupChild> = groupChildren
