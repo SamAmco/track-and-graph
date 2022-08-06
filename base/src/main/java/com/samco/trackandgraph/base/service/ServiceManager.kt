@@ -34,6 +34,16 @@ internal class ServiceManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val pendingIntentProvider: PendingIntentProvider
 ) : ServiceManager {
+
+    init {
+        //Launch the service, if there are no timers it will stop its self immediately,
+        // if there are timers it will display notifications and if it's already running
+        // the call will be ignored. This works around the issue of the service being killed
+        // and it not being possible to re-start it even if there are technically timers running
+        // e.g. if you restore from a database that has running timers
+        startTimerNotificationService()
+    }
+
     override fun startTimerNotificationService() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(Intent(context, TimerNotificationService::class.java))
