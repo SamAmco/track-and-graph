@@ -269,4 +269,7 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query(getDisplayFeaturesQuery + """WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC""")
     fun getAllActiveTimerFeatures(): List<DisplayFeature>
+
+    @Query(getDisplayFeaturesQuery + """WHERE features_table.id=:featureId LIMIT 1""")
+    fun getDisplayFeatureByIdSync(featureId: Long): DisplayFeature?
 }

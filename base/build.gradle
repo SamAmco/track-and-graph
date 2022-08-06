@@ -66,7 +66,7 @@ dependencies {
     api 'com.jakewharton.threetenabp:threetenabp:1.2.1'
 
     implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'androidx.appcompat:appcompat:1.4.2'
 
     //Dependency Injection
     implementation "com.google.dagger:hilt-android:2.38.1"

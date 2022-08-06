@@ -19,6 +19,7 @@ package com.samco.trackandgraph.base.service
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -30,6 +31,10 @@ internal class ServiceManagerImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ): ServiceManager {
     override fun startTimerNotificationService() {
-        context.startService(Intent(context, TimerNotificationService::class.java))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(Intent(context, TimerNotificationService::class.java))
+        } else {
+            context.startService(Intent(context, TimerNotificationService::class.java))
+        }
     }
 }

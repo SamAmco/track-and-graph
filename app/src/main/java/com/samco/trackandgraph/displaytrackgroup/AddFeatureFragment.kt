@@ -17,8 +17,6 @@
 package com.samco.trackandgraph.displaytrackgroup
 
 import android.app.AlertDialog
-import android.appwidget.AppWidgetManager
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -50,7 +48,6 @@ import com.samco.trackandgraph.util.getColorFromAttr
 import com.samco.trackandgraph.util.getDoubleFromText
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.focusAndShowKeyboard
-import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.lang.Exception
@@ -120,7 +117,6 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
                     binding.progressBar.visibility = View.VISIBLE
                 }
                 AddFeatureState.DONE -> {
-                    updateAnyExistingWidgets()
                     navController?.popBackStack()
                 }
                 AddFeatureState.ERROR -> {
@@ -144,18 +140,6 @@ class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         binding.durationNumericConversionModeSpinner.visibility = View.INVISIBLE
         binding.durationToNumericModeHeader.visibility = View.INVISIBLE
         binding.numericToDurationModeHeader.visibility = View.INVISIBLE
-    }
-
-    private fun updateAnyExistingWidgets() {
-        val intent = Intent(
-            AppWidgetManager.ACTION_APPWIDGET_UPDATE,
-            null, context, TrackWidgetProvider::class.java
-        )
-        intent.putExtra(
-            com.samco.trackandgraph.widgets.UPDATE_FEATURE_ID,
-            args.editFeatureId
-        )
-        activity?.sendBroadcast(intent)
     }
 
     private fun onViewModelReady() {

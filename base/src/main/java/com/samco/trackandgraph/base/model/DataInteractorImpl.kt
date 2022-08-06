@@ -122,6 +122,12 @@ internal class DataInteractorImpl @Inject constructor(
         dao.tryGetFeatureByIdSync(featureId)?.toDto()
     }
 
+    override suspend fun tryGetDisplayFeatureByIdSync(
+        featureId: Long
+    ): DisplayFeature? = withContext(io) {
+        dao.getDisplayFeatureByIdSync(featureId)?.toDto()
+    }
+
     override fun tryGetFeatureById(featureId: Long): LiveData<Feature?> {
         return Transformations.map(dao.tryGetFeatureById(featureId)) { it?.toDto() }
     }
