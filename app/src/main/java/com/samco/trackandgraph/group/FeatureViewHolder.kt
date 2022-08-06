@@ -24,12 +24,23 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
-import com.samco.trackandgraph.ui.formatDayMonthYearHourMinute
+import kotlinx.coroutines.*
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 
-class FeatureViewHolder private constructor(private val binding: ListItemFeatureBinding) :
-    GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+class FeatureViewHolder private constructor(
+    private val binding: ListItemFeatureBinding,
+    private val ui: CoroutineDispatcher,
+    private val defaultDispatcher: CoroutineDispatcher
+) : GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+
+    private var timerTextJob: Job? = null
+    private var timerTextScope: CoroutineScope? = null
 
     private var clickListener: FeatureClickListener? = null
     private var feature: DisplayFeature? = null
@@ -43,9 +54,65 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
         setNumEntriesText()
         binding.trackGroupNameText.text = feature.name
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
+        binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
+        initAddButton(feature, clickListener)
+        initTimerControls(feature, clickListener)
+    }
+
+    override fun onRecycled() {
+        super.onRecycled()
+        killTimerJob()
+    }
+
+    private fun killTimerJob() {
+        timerTextJob?.cancel()
+        timerTextJob = null
+        timerTextScope = null
+    }
+
+    private fun initTimerControls(feature: DisplayFeature, clickListener: FeatureClickListener) {
+        binding.playStopButtons.visibility =
+            if (feature.featureType == DataType.DURATION) View.VISIBLE
+            else View.GONE
+        binding.playTimerButton.setOnClickListener {
+            clickListener.onPlayTimer(feature)
+        }
+        binding.stopTimerButton.setOnClickListener {
+            clickListener.onStopTimer(feature)
+        }
+        binding.playTimerButton.visibility =
+            if (feature.timerStartInstant == null) View.VISIBLE else View.GONE
+        binding.stopTimerButton.visibility =
+            if (feature.timerStartInstant == null) View.GONE else View.VISIBLE
+
+        if (feature.timerStartInstant != null) {
+            timerTextJob?.cancel()
+            timerTextJob = Job().also { timerTextScope = CoroutineScope(it + ui) }
+            binding.timerText.visibility = View.VISIBLE
+            timerTextScope?.launch {
+                while (true) {
+                    feature.timerStartInstant?.let { updateTimerText(it) }
+                    withContext(defaultDispatcher) { delay(1000) }
+                }
+            }
+        } else {
+            binding.timerText.visibility = View.GONE
+            binding.timerText.text = formatTimeDuration(0)
+            killTimerJob()
+        }
+    }
+
+    private fun updateTimerText(instant: Instant) {
+        val duration = Duration.between(instant, Instant.now())
+        binding.timerText.text = formatTimeDuration(duration.seconds)
+    }
+
+    private fun initAddButton(feature: DisplayFeature, clickListener: FeatureClickListener) {
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
-        binding.quickAddButton.setOnLongClickListener { clickListener.onAdd(feature, false).let { true } }
+        binding.quickAddButton.setOnLongClickListener {
+            clickListener.onAdd(feature, false).let { true }
+        }
         if (feature.hasDefaultValue) {
             binding.addButton.visibility = View.INVISIBLE
             binding.quickAddButton.visibility = View.VISIBLE
@@ -53,7 +120,6 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
             binding.addButton.visibility = View.VISIBLE
             binding.quickAddButton.visibility = View.INVISIBLE
         }
-        binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
     }
 
     private fun setLastDateText() {
@@ -114,10 +180,14 @@ class FeatureViewHolder private constructor(private val binding: ListItemFeature
     }
 
     companion object {
-        fun from(parent: ViewGroup): FeatureViewHolder {
+        fun from(
+            parent: ViewGroup,
+            ui: CoroutineDispatcher,
+            defaultDispatcher: CoroutineDispatcher
+        ): FeatureViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ListItemFeatureBinding.inflate(layoutInflater, parent, false)
-            return FeatureViewHolder(binding)
+            return FeatureViewHolder(binding, ui = ui, defaultDispatcher = defaultDispatcher)
         }
     }
 }
@@ -127,13 +197,19 @@ class FeatureClickListener(
     private val onDeleteListener: (feature: DisplayFeature) -> Unit,
     private val onMoveToListener: (feature: DisplayFeature) -> Unit,
     private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
-    private val onAddListener: (feature: DisplayFeature, useDefault:Boolean) -> Unit,
-    private val onHistoryListener: (feature: DisplayFeature) -> Unit
+    private val onAddListener: (feature: DisplayFeature, useDefault: Boolean) -> Unit,
+    private val onHistoryListener: (feature: DisplayFeature) -> Unit,
+    private val onPlayTimerListener: (feature: DisplayFeature) -> Unit,
+    private val onStopTimerListener: (feature: DisplayFeature) -> Unit,
 ) {
     fun onEdit(feature: DisplayFeature) = onEditListener(feature)
     fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
     fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
     fun onDescription(feature: DisplayFeature) = onDescriptionListener(feature)
-    fun onAdd(feature: DisplayFeature, useDefault:Boolean=true) = onAddListener(feature, useDefault)
+    fun onAdd(feature: DisplayFeature, useDefault: Boolean = true) =
+        onAddListener(feature, useDefault)
+
     fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
+    fun onPlayTimer(feature: DisplayFeature) = onPlayTimerListener(feature)
+    fun onStopTimer(feature: DisplayFeature) = onStopTimerListener(feature)
 }

@@ -21,6 +21,7 @@ import androidx.room.ColumnInfo
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
 internal data class DisplayFeature(
@@ -55,7 +56,10 @@ internal data class DisplayFeature(
     val displayIndex: Int,
 
     @ColumnInfo(name = "feature_description")
-    val description: String
+    val description: String,
+
+    @ColumnInfo(name = "start_instant")
+    val timerStartInstant: Instant?
 ) {
     fun toDto() = DisplayFeature(
         id,
@@ -68,6 +72,7 @@ internal data class DisplayFeature(
         timestamp,
         numDataPoints,
         displayIndex,
-        description
+        description,
+        timerStartInstant
     )
 }

@@ -18,7 +18,50 @@
 package com.samco.trackandgraph.base.navigation
 
 import android.app.PendingIntent
+import android.content.Intent
 
 interface PendingIntentProvider {
+    /**
+     * Get a pending intent that will start the main activity of the app
+     */
     fun getMainActivityPendingIntent(): PendingIntent
+
+    /**
+     * Get an intent to start the duration input activity directly
+     */
+    fun getDurationInputActivityIntent(featureId: Long, startInstant: String): Intent
+
+    /**
+     * Get a pending intent that will start the duration input activity
+     * (used when a timer is stopped via a notification action)
+     */
+    fun getDurationInputActivityPendingIntent(featureId: Long, startInstant: String): PendingIntent
+
+    /**
+     * Get a pending intent that will start the track widget input data point activity for a given
+     * widget id.
+     */
+    fun getTrackWidgetInputDataPointActivityPendingIntent(appWidgetId: Int): PendingIntent
+
+    /**
+     * Get an intent to broadcast to the TrackWidgetProvider that a given feature has been delete
+     */
+    fun getTrackWidgetDisableForFeatureByIdIntent(featureId: Long): Intent
+
+    /**
+     * Get an intent to broadcast to the TrackWidgetProvider that a given feature has been updated
+     * and therefore any widgets referencing that feature need to be updated also
+     */
+    fun getTrackWidgetUpdateForFeatureIdIntent(featureId: Long): Intent
+
+    /**
+     * Get a pending intent that will broadcast to the TrackWidgetProvider (a broadcast receiver)
+     * that it should start/stop the timer for a given duration based feature and then update
+     * all widgets referencing that feature.
+     */
+    fun getTrackWidgetStartStopTimerIntent(
+        appWidgetId: Int,
+        featureId: Long,
+        startTimer: Boolean
+    ): PendingIntent
 }

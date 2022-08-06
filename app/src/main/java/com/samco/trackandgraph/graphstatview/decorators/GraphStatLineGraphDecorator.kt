@@ -28,13 +28,13 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.LineGraphFeature
 import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.base.helpers.formatDayMonth
+import com.samco.trackandgraph.base.helpers.formatMonthYear
+import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.ui.dataVisColorList
-import com.samco.trackandgraph.ui.formatDayMonth
-import com.samco.trackandgraph.ui.formatMonthYear
-import com.samco.trackandgraph.ui.formatTimeDuration
 import com.samco.trackandgraph.util.getColorFromAttr
 import kotlinx.coroutines.*
 import org.threeten.bp.Duration
@@ -104,6 +104,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
             binding!!.xyPlot.redraw()
             withContext(Dispatchers.Main) {
                 binding!!.xyPlot.visibility = View.VISIBLE
+                binding!!.legendFlexboxLayout.visibility = View.VISIBLE
                 binding!!.progressBar.visibility = View.GONE
             }
         } else {

@@ -8,7 +8,7 @@
                 android:left="@dimen/card_margin_small"
                 android:right="@dimen/card_margin_small"
                 android:top="@dimen/card_margin_small" />
-            <solid android:color="@color/ap_transparent" />
+            <solid android:color="@android:color/transparent" />
         </shape>
     </item>
 
@@ -19,14 +19,14 @@
                 android:left="-4dp"
                 android:right="4dp"
                 android:top="-4dp" />
-            <solid android:color="@color/faded_light_blue" />
+            <solid android:color="@color/light_blue" />
             <corners android:radius="@dimen/card_corner_radius" />
         </shape>
     </item>
     <!-- Background -->
     <item>
         <shape>
-            <solid android:color="@color/mid_charcoal" />
+            <solid android:color="@color/white" />
             <corners android:radius="@dimen/card_corner_radius" />
         </shape>
     </item>

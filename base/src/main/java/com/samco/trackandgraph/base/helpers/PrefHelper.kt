@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.util
+package com.samco.trackandgraph.base.helpers
 
 import android.content.Context
 import android.content.SharedPreferences

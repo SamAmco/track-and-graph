@@ -1032,6 +1032,22 @@ val MIGRATION_45_46 = object : Migration(45, 46) {
     }
 }
 
+val MIGRATION_46_47 = object : Migration(46, 47) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL(
+            """
+                CREATE TABLE IF NOT EXISTS `feature_timers_table` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `feature_id` INTEGER NOT NULL,
+                    `start_instant` TEXT NOT NULL, 
+                    FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_feature_timers_table_id` ON `feature_timers_table` (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_feature_timers_table_start_instant` ON `feature_timers_table` (`start_instant`)")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -1049,5 +1065,6 @@ val allMigrations = arrayOf(
     MIGRATION_42_43,
     MIGRATION_43_44,
     MIGRATION_44_45,
-    MIGRATION_45_46
+    MIGRATION_45_46,
+    MIGRATION_46_47,
 )

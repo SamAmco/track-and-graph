@@ -28,14 +28,13 @@ import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.*
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.model.di.DefaultDispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
@@ -43,6 +42,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 /**
@@ -59,9 +59,19 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     @Inject
     lateinit var gsiProvider: GraphStatInteractorProvider
 
+    @Inject
+    @MainDispatcher
+    lateinit var ui: CoroutineDispatcher
+
+    @Inject
+    @DefaultDispatcher
+    lateinit var defaultDispatcher: CoroutineDispatcher
+
     private lateinit var binding: FragmentGroupBinding
     private lateinit var adapter: GroupAdapter
     private val viewModel by viewModels<GroupViewModel>()
+
+    private var forceNextNotifyDataSetChanged: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,16 +87,18 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
         binding.emptyGroupText.visibility = View.INVISIBLE
 
+        initializeGridLayout()
         adapter = GroupAdapter(
             createFeatureClickListener(),
             createGraphStatClickListener(),
             createGroupClickListener(),
-            gsiProvider
+            gsiProvider,
+            ui = ui,
+            defaultDispatcher = defaultDispatcher
         )
         binding.itemList.adapter = adapter
         disableChangeAnimations()
         addItemTouchHelper()
-        initializeGridLayout()
         scrollToTopOnItemAdded()
 
         binding.queueAddAllButton.hide()
@@ -218,8 +230,18 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         this::onFeatureMoveToClicked,
         this::onFeatureDescriptionClicked,
         this::onFeatureAddClicked,
-        this::onFeatureHistoryClicked
+        this::onFeatureHistoryClicked,
+        viewModel::playTimer,
+        this::onStopTimerClicked
     )
+
+    private fun onStopTimerClicked(feature: DisplayFeature) {
+        //Due to a bug with the GridLayoutManager when you stop a timer and the timer text disappears
+        // the views heights are not properly re-calculated and we need to call notifyDataSetChanged
+        // to get the view heights right again
+        forceNextNotifyDataSetChanged = true
+        viewModel.stopTimer(feature)
+    }
 
     private fun onFeatureHistoryClicked(feature: DisplayFeature) {
         navController?.navigate(
@@ -281,26 +303,37 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         val dm = resources.displayMetrics
         val screenWidth = dm.widthPixels / dm.density
         val itemSize = (screenWidth / 2f).coerceAtMost(180f)
-        val gridLayout = GridLayoutManager(
-            context,
-            (screenWidth / itemSize).coerceAtLeast(2f).toInt()
-        )
-        gridLayout.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+        val spanCount = (screenWidth / itemSize).coerceAtLeast(2f).toInt()
+        val gridLayoutManager = GridLayoutManager(context, spanCount)
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
-                return adapter.getSpanSizeAtPosition(position)
+                return when (val spanMode = adapter.getSpanModeForItem(position)) {
+                    SpanMode.FullWidth -> spanCount
+                    is SpanMode.NumSpans -> spanMode.spans
+                    null -> 1
+                }
             }
         }
-        binding.itemList.layoutManager = gridLayout
+        binding.itemList.layoutManager = gridLayoutManager
     }
 
     private fun listenToViewModel() {
         viewModel.hasFeatures.observe(viewLifecycleOwner) {}
         viewModel.groupChildren.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
+            adapter.submitList(it, forceNextNotifyDataSetChanged)
+            if (forceNextNotifyDataSetChanged) forceNextNotifyDataSetChanged = false
             updateShowQueueTrackButton()
             binding.emptyGroupText.visibility =
                 if (it.isEmpty() && args.groupId == 0L) View.VISIBLE
                 else View.INVISIBLE
+        }
+        viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+            val argBundle = Bundle()
+            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(it.featureId))
+            argBundle.putLong(DURATION_SECONDS_KEY, it.duration.seconds)
+            showAddDataPoint(argBundle)
+            viewModel.onConsumedShowDurationInputDialog()
         }
     }
 

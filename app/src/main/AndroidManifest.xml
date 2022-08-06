@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.samco.trackandgraph"
     android:installLocation="internalOnly">
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -18,6 +20,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name="com.samco.trackandgraph.MainActivity"
             android:exported="true"
@@ -28,6 +31,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".timers.AddDataPointFromTimerActivity"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/TransparentTheme" />
 
         <activity
             android:name=".widgets.TrackWidgetInputDataPointActivity"
@@ -46,9 +55,9 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".base.model.AlarmReceiver" />
+        <receiver android:name=".base.service.AlarmReceiver" />
         <receiver
-            android:name=".base.model.RecreateAlarms"
+            android:name=".base.service.RecreateAlarms"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -61,8 +70,8 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".widgets.TrackWidgetProvider"
-            android:exported="true">
+            android:name=".base.service.TrackWidgetProvider"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -72,8 +81,12 @@
         </receiver>
 
         <service
-            android:name=".widgets.TrackWidgetJobIntentService"
+            android:name=".base.service.TrackWidgetJobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <service
+            android:name=".base.service.TimerNotificationService"
+            android:enabled="true" />
     </application>
 
 </manifest>

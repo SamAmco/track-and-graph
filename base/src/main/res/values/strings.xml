@@ -346,4 +346,6 @@
     <string name="filter_by_label">Filter by label</string>
     <string name="filter_by_value">Filter by value range</string>
     <string name="save_changes">Save Changes</string>
+    <string name="timer_notification_channel_name">Timers</string>
+    <string name="stop">Stop</string>
 </resources>

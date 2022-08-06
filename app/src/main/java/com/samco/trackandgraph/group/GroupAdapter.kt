@@ -19,36 +19,58 @@ package com.samco.trackandgraph.group
 
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.samco.trackandgraph.base.database.dto.DisplayFeature
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.database.dto.GroupChild
 import com.samco.trackandgraph.base.database.dto.GroupChildType
+import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.CoroutineDispatcher
 
 class GroupAdapter(
     private val featureClickListener: FeatureClickListener,
     private val graphStatClickListener: GraphStatClickListener,
     private val groupClickListener: GroupClickListener,
-    private val gsiProvider: GraphStatInteractorProvider
+    private val gsiProvider: GraphStatInteractorProvider,
+    private val ui: CoroutineDispatcher,
+    private val defaultDispatcher: CoroutineDispatcher
 ) : RecyclerView.Adapter<GroupChildViewHolder>() {
     private val groupChildren = mutableListOf<GroupChild>()
+
+    override fun onViewRecycled(holder: GroupChildViewHolder) {
+        super.onViewRecycled(holder)
+        holder.onRecycled()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupChildViewHolder {
         return when (viewType) {
             GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
-            GroupChildType.FEATURE.ordinal -> FeatureViewHolder.from(parent)
-            else -> GroupViewHolder.from(parent)
+                .apply { setFullSpan(this) }
+            GroupChildType.FEATURE.ordinal -> FeatureViewHolder
+                .from(parent, ui = ui, defaultDispatcher = defaultDispatcher)
+            else -> GroupViewHolder.from(parent).apply { setFullSpan(this) }
         }
+    }
+
+    private fun setFullSpan(vh: RecyclerView.ViewHolder) {
+        val layoutParams = StaggeredGridLayoutManager.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+        layoutParams.isFullSpan = true
+        vh.itemView.layoutParams = layoutParams
     }
 
     override fun onBindViewHolder(holder: GroupChildViewHolder, position: Int) {
         val item = groupChildren[position]
         when (item.type) {
-            GroupChildType.GRAPH -> (holder as GraphStatViewHolder)
-                .bind(extractGraphViewData(item.obj), graphStatClickListener)
+            GroupChildType.GRAPH -> (holder as GraphStatViewHolder).bind(
+                extractGraphViewData(item.obj),
+                graphStatClickListener
+            )
             GroupChildType.FEATURE -> (holder as FeatureViewHolder)
                 .bind(item.obj as DisplayFeature, featureClickListener)
             GroupChildType.GROUP -> (holder as GroupViewHolder)
@@ -65,12 +87,18 @@ class GroupAdapter(
 
     override fun getItemCount(): Int = groupChildren.size
 
-    fun submitList(newChildren: List<GroupChild>) {
-        val diffCallback = ListDiffCallback(groupChildren, newChildren)
-        val diffResult = DiffUtil.calculateDiff(diffCallback)
-        groupChildren.clear()
-        groupChildren.addAll(newChildren)
-        diffResult.dispatchUpdatesTo(this)
+    fun submitList(newChildren: List<GroupChild>, forceNotifyDataSetChanged: Boolean) {
+        if (forceNotifyDataSetChanged) {
+            groupChildren.clear()
+            groupChildren.addAll(newChildren)
+            notifyDataSetChanged()
+        } else {
+            val diffCallback = ListDiffCallback(groupChildren, newChildren)
+            val diffResult = DiffUtil.calculateDiff(diffCallback)
+            groupChildren.clear()
+            groupChildren.addAll(newChildren)
+            diffResult.dispatchUpdatesTo(this)
+        }
     }
 
     fun getItems(): List<GroupChild> = groupChildren
@@ -82,13 +110,19 @@ class GroupAdapter(
         notifyItemMoved(start, end)
     }
 
-    fun getSpanSizeAtPosition(position: Int): Int {
-        if (position < 0 || position > groupChildren.size) return 0
+    fun getSpanModeForItem(position: Int): SpanMode? {
+        if (position < 0 || position > groupChildren.size) return null
         return when (groupChildren[position].type) {
-            GroupChildType.FEATURE -> 1
-            else -> 2
+            GroupChildType.FEATURE -> SpanMode.NumSpans(1)
+            GroupChildType.GROUP -> SpanMode.NumSpans(2)
+            GroupChildType.GRAPH -> SpanMode.FullWidth
         }
     }
+}
+
+sealed class SpanMode {
+    object FullWidth : SpanMode()
+    data class NumSpans(val spans: Int) : SpanMode()
 }
 
 private class ListDiffCallback(
@@ -131,4 +165,5 @@ private class ListDiffCallback(
 abstract class GroupChildViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     abstract fun elevateCard()
     abstract fun dropCard()
+    open fun onRecycled() {}
 }

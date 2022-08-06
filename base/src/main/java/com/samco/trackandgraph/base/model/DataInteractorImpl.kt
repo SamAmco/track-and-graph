@@ -25,12 +25,16 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.entity.FeatureTimer
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.service.ServiceManager
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
@@ -42,7 +46,8 @@ internal class DataInteractorImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     private val featureUpdater: FeatureUpdater,
     private val csvReadWriter: CSVReadWriter,
-    private val alarmInteractor: AlarmInteractor
+    private val alarmInteractor: AlarmInteractor,
+    private val serviceManager: ServiceManager
 ) : DataInteractor {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
@@ -65,7 +70,17 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun deleteGroup(id: Long) = withContext(io) {
-        dao.deleteGroup(id).also { dataUpdateEvents.emit(Unit) }
+        //Get all feature ids before we delete the group
+        val allFeaturIdsBeforeDelete = dao.getAllFeaturesSync().map { it.id }.toSet()
+        //Delete the group
+        dao.deleteGroup(id)
+        //Get all feature ids after deleting the group
+        val allFeatureIdsAfterDelete = dao.getAllFeaturesSync().map { it.id }.toSet()
+        val deletedFeatureIds = allFeaturIdsBeforeDelete.minus(allFeatureIdsAfterDelete)
+        //Trigger a feature delete request for all deleted features
+        deletedFeatureIds.forEach { serviceManager.requestWidgetsDisabledForFeatureId(it) }
+        //Emit a data update event
+        dataUpdateEvents.emit(Unit)
     }
 
     override suspend fun updateGroup(group: Group) = withContext(io) {
@@ -117,6 +132,12 @@ internal class DataInteractorImpl @Inject constructor(
         dao.tryGetFeatureByIdSync(featureId)?.toDto()
     }
 
+    override suspend fun tryGetDisplayFeatureByIdSync(
+        featureId: Long
+    ): DisplayFeature? = withContext(io) {
+        dao.getDisplayFeatureByIdSync(featureId)?.toDto()
+    }
+
     override fun tryGetFeatureById(featureId: Long): LiveData<Feature?> {
         return Transformations.map(dao.tryGetFeatureById(featureId)) { it?.toDto() }
     }
@@ -132,6 +153,7 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateFeature(feature: Feature) = withContext(io) {
         dao.updateFeature(feature.toEntity()).also { dataUpdateEvents.emit(Unit) }
+        serviceManager.requestWidgetUpdatesForFeatureId(featureId = feature.id)
     }
 
     override suspend fun updateFeature(
@@ -156,12 +178,15 @@ internal class DataInteractorImpl @Inject constructor(
             defaultValue,
             featureDescription
         ).also {
+            serviceManager.requestWidgetUpdatesForFeatureId(featureId = oldFeature.id)
             dataUpdateEvents.emit(Unit)
         }
     }
 
     override suspend fun deleteFeature(id: Long) = withContext(io) {
-        dao.deleteFeature(id).also { dataUpdateEvents.emit(Unit) }
+        dao.deleteFeature(id)
+        serviceManager.requestWidgetsDisabledForFeatureId(featureId = id)
+        dataUpdateEvents.emit(Unit)
     }
 
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
@@ -522,4 +547,24 @@ internal class DataInteractorImpl @Inject constructor(
             csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
             dataUpdateEvents.emit(Unit)
         }
+
+    override suspend fun playTimerForFeature(featureId: Long) = performAtomicUpdate {
+        dao.deleteFeatureTimer(featureId)
+        dao.insertFeatureTimer(FeatureTimer(0L, featureId, Instant.now()))
+    }.also {
+        serviceManager.startTimerNotificationService()
+        serviceManager.requestWidgetUpdatesForFeatureId(featureId)
+    }
+
+    override suspend fun stopTimerForFeature(featureId: Long): Duration? = performAtomicUpdate {
+        val timer = dao.getFeatureTimer(featureId)
+        dao.deleteFeatureTimer(featureId)
+        timer?.let { Duration.between(it.startInstant, Instant.now()) }
+    }.also {
+        serviceManager.requestWidgetUpdatesForFeatureId(featureId)
+    }
+
+    override suspend fun getAllActiveTimerFeatures(): List<DisplayFeature> = withContext(io) {
+        dao.getAllActiveTimerFeatures().map { it.toDto() }
+    }
 }

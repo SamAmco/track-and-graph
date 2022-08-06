@@ -31,9 +31,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.database.odtFromString
+import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.GlobalNoteInputDialogBinding
-import com.samco.trackandgraph.ui.formatDayMonthYear
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*

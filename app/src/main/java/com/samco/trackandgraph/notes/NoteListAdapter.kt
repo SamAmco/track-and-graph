@@ -28,9 +28,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.database.dto.NoteType
+import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
 import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
-import com.samco.trackandgraph.ui.formatDayWeekDayMonthYearHourMinuteOneLine
 
 internal class NoteListAdapter(
     private val clickListener: NoteClickListener,
