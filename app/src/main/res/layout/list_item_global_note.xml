@@ -20,7 +20,7 @@
             android:layout_gravity="end|top"
             android:paddingTop="8dp"
             android:paddingEnd="4dp"
-            android:tint="?attr/colorControlNormal"
+            app:tint="?attr/colorControlNormal"
             app:srcCompat="@drawable/list_menu_icon"
             tools:ignore="RtlSymmetry" />
 

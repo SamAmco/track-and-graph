@@ -44,7 +44,7 @@
                 android:layout_marginTop="@dimen/dialog_input_spacing"
                 android:alpha="0.4"
                 android:scaleType="fitXY"
-                android:tint="?attr/colorControlActivated"
+                app:tint="?attr/colorControlActivated"
                 app:srcCompat="@drawable/warning_icon" />
 
             <TextView
