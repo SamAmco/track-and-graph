@@ -138,8 +138,11 @@ class TimerNotificationService : Service() {
                         dataInteractor.getAllActiveTimerFeatures()
                             .filter { it.timerStartInstant != null }
                     }
-                    if (newFeatures.isEmpty()) stopSelf()
-                    else notificationUpdater.setNotifications(newFeatures)
+                    if (newFeatures.isEmpty()) {
+                        notificationUpdater.setNotifications(emptyList())
+                        stopForeground(true)
+                        stopSelf()
+                    } else notificationUpdater.setNotifications(newFeatures)
                 }
         }
         return super.onStartCommand(intent, flags, startId)
