@@ -51,7 +51,7 @@
             android:layout_gravity="top|end"
             android:background="@null"
             android:padding="10dp"
-            android:tint="?attr/colorControlNormal"
+            app:tint="?attr/colorControlNormal"
             app:srcCompat="@drawable/list_menu_icon" />
     </FrameLayout>
 </layout>
