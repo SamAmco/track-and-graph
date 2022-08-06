@@ -259,9 +259,7 @@ class RemindersViewModel @Inject constructor(
 
     fun deleteReminder(reminder: Reminder) {
         _currentReminders.value = _currentReminders.value?.let { reminders ->
-            reminders.toMutableList().apply {
-                removeIf { it.id == reminder.id }
-            }
+            reminders.filter { it.id != reminder.id }
         }
         onRemindersUpdated()
     }
