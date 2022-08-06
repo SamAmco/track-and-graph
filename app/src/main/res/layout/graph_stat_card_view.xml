@@ -27,7 +27,7 @@
             android:paddingTop="6dp"
             android:paddingEnd="6dp"
             android:paddingBottom="12dp"
-            android:tint="?attr/colorControlNormal"
+            app:tint="?attr/colorControlNormal"
             app:srcCompat="@drawable/list_menu_icon" />
     </androidx.cardview.widget.CardView>
 </layout>

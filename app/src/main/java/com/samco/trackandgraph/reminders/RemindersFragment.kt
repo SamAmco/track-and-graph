@@ -19,8 +19,6 @@ package com.samco.trackandgraph.reminders
 
 import android.os.Bundle
 import android.view.*
-import androidx.core.view.doOnLayout
-import androidx.core.view.doOnNextLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*

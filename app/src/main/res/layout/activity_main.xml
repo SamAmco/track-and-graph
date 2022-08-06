@@ -75,7 +75,7 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                android:tint="@color/ap_white"
+                app:tint="@color/ap_white"
                 app:srcCompat="@drawable/filled_circle"
                 tools:ignore="ContentDescription" />
 
@@ -84,7 +84,7 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                android:tint="@color/ap_white"
+                app:tint="@color/ap_white"
                 app:srcCompat="@drawable/filled_circle"
                 tools:ignore="ContentDescription" />
 
@@ -93,7 +93,7 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                android:tint="@color/ap_white"
+                app:tint="@color/ap_white"
                 app:srcCompat="@drawable/filled_circle"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
