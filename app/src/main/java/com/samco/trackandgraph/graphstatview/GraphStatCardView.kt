@@ -52,5 +52,5 @@ class GraphStatCardView : FrameLayout {
         binding.menuButton.visibility = View.GONE
     }
 
-    fun dispose() = graphStatView.dispose()
+    fun update() = graphStatView.update()
 }

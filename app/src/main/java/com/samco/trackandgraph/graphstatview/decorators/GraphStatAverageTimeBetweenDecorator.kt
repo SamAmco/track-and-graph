@@ -30,7 +30,7 @@ class GraphStatAverageTimeBetweenDecorator(listMode: Boolean) :
     private var context: Context? = null
     private var data: IAverageTimeBetweenViewData? = null
 
-    override suspend fun decorate(
+    override fun decorate(
         view: IDecoratableGraphStatView,
         data: IAverageTimeBetweenViewData
     ) {
