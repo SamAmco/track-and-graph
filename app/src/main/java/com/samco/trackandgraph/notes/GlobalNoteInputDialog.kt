@@ -34,6 +34,7 @@ import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.GlobalNoteInputDialogBinding
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -48,7 +49,7 @@ const val GLOBAL_NOTE_TIMESTAMP_KEY = "GLOBAL_NOTE_TIME_ID"
 @AndroidEntryPoint
 class GlobalNoteInputDialog : DialogFragment() {
     private val viewModel by viewModels<GlobalNoteInputViewModel>()
-    private lateinit var binding: GlobalNoteInputDialogBinding
+    private var binding: GlobalNoteInputDialogBinding by bindingForViewLifecycle()
 
     private val timeDisplayFormatter: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm")

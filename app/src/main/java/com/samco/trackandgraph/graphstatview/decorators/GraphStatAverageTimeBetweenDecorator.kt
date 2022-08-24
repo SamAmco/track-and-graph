@@ -30,7 +30,7 @@ class GraphStatAverageTimeBetweenDecorator(listMode: Boolean) :
     private var context: Context? = null
     private var data: IAverageTimeBetweenViewData? = null
 
-    override suspend fun decorate(
+    override fun decorate(
         view: IDecoratableGraphStatView,
         data: IAverageTimeBetweenViewData
     ) {
@@ -43,6 +43,12 @@ class GraphStatAverageTimeBetweenDecorator(listMode: Boolean) :
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {}
+
+    override fun dispose() {
+        binding = null
+        context = null
+        data = null
+    }
 
     @SuppressLint("SetTextI18n")
     private fun initAverageTimeBetweenStatBody() {

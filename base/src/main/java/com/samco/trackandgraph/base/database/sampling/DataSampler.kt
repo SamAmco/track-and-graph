@@ -17,28 +17,20 @@
 
 package com.samco.trackandgraph.base.database.sampling
 
-import android.database.Cursor
 import com.samco.trackandgraph.base.model.DataSource
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.sequencehelpers.cache
 
 internal class DataSampler(private val dao: TrackAndGraphDatabaseDao) {
     private fun emptyDataSample() = DataSample.fromSequence(emptySequence())
 
-    private fun dataSampleFromDb(cursor: Cursor): DataSample {
-        val cursorSequence = DataPointCursorSequence(cursor)
-        return DataSample.fromSequence(
-            cursorSequence.cache(),
-            DataSampleProperties(),
-            cursorSequence::getRawDataPoints
-        )
-    }
-
     fun getDataSampleForSource(dataSource: DataSource): DataSample {
         return when (dataSource) {
             is DataSource.FeatureDataSource -> {
-                dataSampleFromDb(
-                    dao.getDataPointsCursorForFeatureSync(dataSource.featureId)
+                val cursorSequence = DataPointSequence(dao, dataSource.featureId)
+                return DataSample.fromSequence(
+                    cursorSequence,
+                    DataSampleProperties(),
+                    cursorSequence::getRawDataPoints
                 )
             }
             //TODO actually probably don't want two different types of data source. Just use feature

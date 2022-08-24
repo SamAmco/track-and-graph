@@ -35,6 +35,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.getColorFromAttr
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -53,7 +54,7 @@ const val SQLITE_MIME_TYPE = "application/vnd.sqlite3"
 @AndroidEntryPoint
 class BackupAndRestoreFragment : Fragment() {
 
-    private lateinit var binding: BackupAndRestoreFragmentBinding
+    private var binding: BackupAndRestoreFragmentBinding by bindingForViewLifecycle()
     private val viewModel by viewModels<BackupAndRestoreViewModel>()
 
     override fun onCreateView(

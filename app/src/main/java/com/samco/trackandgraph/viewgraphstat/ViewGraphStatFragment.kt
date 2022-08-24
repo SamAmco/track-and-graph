@@ -52,6 +52,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -64,7 +65,7 @@ class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
     private val viewModel by viewModels<ViewGraphStatViewModel>()
     private lateinit var graphStatView: GraphStatView
-    private lateinit var binding: FragmentViewGraphStatBinding
+    private var binding: FragmentViewGraphStatBinding by bindingForViewLifecycle()
     private lateinit var adapter: NotesAdapter
     private val args: ViewGraphStatFragmentArgs by navArgs()
     private val windowSize = Point()
@@ -239,11 +240,6 @@ class ViewGraphStatFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         (activity as AppCompatActivity).supportActionBar!!.show()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        graphStatView.dispose()
     }
 
     private fun observeGraphStatViewData() {

@@ -39,7 +39,7 @@ class GraphStatPieChartDecorator(listMode: Boolean) :
     private var context: Context? = null
     private var data: IPieChartViewData? = null
 
-    override suspend fun decorate(
+    override fun decorate(
         view: IDecoratableGraphStatView,
         data: IPieChartViewData
     ) {
@@ -51,6 +51,12 @@ class GraphStatPieChartDecorator(listMode: Boolean) :
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {}
+
+    override fun dispose() {
+        binding = null
+        context = null
+        data = null
+    }
 
     private fun initFromPieChartBody() {
         binding!!.pieChart.visibility = View.INVISIBLE

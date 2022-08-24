@@ -18,7 +18,6 @@ package com.samco.trackandgraph.featurehistory
 
 import android.os.Bundle
 import android.view.*
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
@@ -40,6 +39,7 @@ import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -48,7 +48,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
 
-    private lateinit var binding: FragmentFeatureHistoryBinding
+    private var binding: FragmentFeatureHistoryBinding by bindingForViewLifecycle()
     private val viewModel by viewModels<FeatureHistoryViewModel>()
     private lateinit var adapter: DataPointAdapter
     private val args: FragmentFeatureHistoryArgs by navArgs()
@@ -58,9 +58,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = DataBindingUtil.inflate(
-            inflater, R.layout.fragment_feature_history, container, false
-        )
+        binding = FragmentFeatureHistoryBinding.inflate(inflater, container, false)
         initPreLoadViewState()
 
         viewModel.setFeatureId(args.feature)
