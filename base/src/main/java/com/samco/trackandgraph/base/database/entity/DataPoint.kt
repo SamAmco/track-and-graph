@@ -20,6 +20,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.IDataPoint
 import org.threeten.bp.OffsetDateTime
 
 @Entity(
@@ -36,20 +37,20 @@ import org.threeten.bp.OffsetDateTime
 )
 internal data class DataPoint(
     @ColumnInfo(name = "timestamp")
-    val timestamp: OffsetDateTime = OffsetDateTime.now(),
+    override val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
     @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,
 
     @ColumnInfo(name = "value")
-    val value: Double,
+    override val value: Double,
 
     @ColumnInfo(name = "label")
-    val label: String,
+    override val label: String,
 
     @ColumnInfo(name = "note")
     val note: String
-) {
+) : IDataPoint() {
     fun toDto() = DataPoint(
         timestamp,
         featureId,
