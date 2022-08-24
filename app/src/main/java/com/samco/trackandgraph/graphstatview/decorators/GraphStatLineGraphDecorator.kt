@@ -72,6 +72,13 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         initFromLineGraphBody(listMode)
     }
 
+    override fun dispose() {
+        binding = null
+        context = null
+        graphStatView = null
+        data = null
+    }
+
     override fun setTimeMarker(time: OffsetDateTime) {
         binding!!.xyPlot.removeMarkers()
         val markerPaint = getMarkerPaint()

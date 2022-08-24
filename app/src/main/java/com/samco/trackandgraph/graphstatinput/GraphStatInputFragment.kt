@@ -47,6 +47,7 @@ import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
@@ -59,7 +60,7 @@ import javax.inject.Inject
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
     private val args: GraphStatInputFragmentArgs by navArgs()
-    private lateinit var binding: FragmentGraphStatInputBinding
+    private var binding: FragmentGraphStatInputBinding by bindingForViewLifecycle()
     private val viewModel by viewModels<GraphStatInputViewModel>()
 
     private val updateDemoHandler = Handler(Looper.getMainLooper())

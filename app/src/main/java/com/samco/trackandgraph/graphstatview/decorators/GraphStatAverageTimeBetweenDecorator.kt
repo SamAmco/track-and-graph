@@ -44,6 +44,12 @@ class GraphStatAverageTimeBetweenDecorator(listMode: Boolean) :
 
     override fun setTimeMarker(time: OffsetDateTime) {}
 
+    override fun dispose() {
+        binding = null
+        context = null
+        data = null
+    }
+
     @SuppressLint("SetTextI18n")
     private fun initAverageTimeBetweenStatBody() {
         binding!!.statMessage.text =

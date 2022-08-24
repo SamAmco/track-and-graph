@@ -152,6 +152,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
 
     private fun onDecorateThrew(graphOrStat: GraphOrStat?, throwable: Throwable) {
         cleanAllViews()
+        currentDecorator?.dispose()
         currentDecorator = null
         val headerText = graphOrStat?.name ?: ""
         binding.headerText.text = headerText
@@ -174,6 +175,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         decorator: GraphStatViewDecorator<T>,
         data: T
     ) {
+        currentDecorator?.dispose()
         currentDecorator = decorator
         val headerText = graphOrStat.name
         binding.headerText.text = headerText
@@ -203,6 +205,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         decorator: GraphStatViewDecorator<T>
     ) {
         if (data.state == IGraphStatViewData.State.LOADING) {
+            currentDecorator?.dispose()
             currentDecorator = null
             blankViews()
             val headerText = data.graphOrStat.name

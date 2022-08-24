@@ -52,6 +52,12 @@ class GraphStatPieChartDecorator(listMode: Boolean) :
 
     override fun setTimeMarker(time: OffsetDateTime) {}
 
+    override fun dispose() {
+        binding = null
+        context = null
+        data = null
+    }
+
     private fun initFromPieChartBody() {
         binding!!.pieChart.visibility = View.INVISIBLE
         binding!!.progressBar.visibility = View.VISIBLE

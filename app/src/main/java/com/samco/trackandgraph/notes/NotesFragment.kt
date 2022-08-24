@@ -39,6 +39,7 @@ import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.showNoteDialog
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +50,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class NotesFragment : Fragment() {
-    lateinit var binding: FragmentNotesBinding
+    private var binding: FragmentNotesBinding by bindingForViewLifecycle()
     private val viewModel by viewModels<NotesViewModel>()
     private lateinit var adapter: NoteListAdapter
 

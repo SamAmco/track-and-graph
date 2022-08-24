@@ -58,4 +58,10 @@ class GraphStatTimeSinceDecorator(listMode: Boolean) :
             binding!!.statMessage.text = formatTimeToDaysHoursMinutesSeconds(context!!, duration.toMillis())
         }
     }
+
+    override fun dispose() {
+        binding = null
+        context = null
+        data = null
+    }
 }

@@ -33,6 +33,7 @@ import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.ListItemMoveToGroupBinding
 import com.samco.trackandgraph.databinding.MoveToGroupDialogBinding
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -52,7 +53,7 @@ enum class MoveDialogType { TRACKER, GRAPH, GROUP }
 @AndroidEntryPoint
 class MoveToDialogFragment : DialogFragment() {
     private val viewModel by viewModels<MoveToDialogViewModel>()
-    private lateinit var binding: MoveToGroupDialogBinding
+    private var binding: MoveToGroupDialogBinding by bindingForViewLifecycle()
 
     override fun onCreateView(
         inflater: LayoutInflater,

@@ -35,6 +35,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,7 +47,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RemindersFragment : Fragment() {
-    private lateinit var binding: RemindersFragmentBinding
+    private var binding: RemindersFragmentBinding by bindingForViewLifecycle()
     private val viewModel by viewModels<RemindersViewModel>()
     private lateinit var adapter: ReminderListAdapter
 
