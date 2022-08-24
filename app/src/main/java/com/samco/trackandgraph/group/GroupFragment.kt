@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
@@ -38,6 +37,7 @@ import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.*
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
@@ -58,7 +58,8 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     @Inject
     lateinit var gsiProvider: GraphStatInteractorProvider
 
-    private lateinit var binding: FragmentGroupBinding
+    private var binding: FragmentGroupBinding by bindingForViewLifecycle()
+
     private lateinit var adapter: GroupAdapter
     private val viewModel by viewModels<GroupViewModel>()
 
@@ -69,9 +70,9 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        binding = FragmentGroupBinding.inflate(inflater, container, false)
+
         this.navController = container?.findNavController()
-        binding = DataBindingUtil
-            .inflate(inflater, R.layout.fragment_group, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
         viewModel.setGroup(args.groupId)
@@ -108,7 +109,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
      * the adapter every second for diffing.
      */
     private fun launchUpdateChildrenLoop() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             while (true) {
                 delay(1000)
                 for (i in 0..(binding.itemList.adapter?.itemCount ?: 0)) {

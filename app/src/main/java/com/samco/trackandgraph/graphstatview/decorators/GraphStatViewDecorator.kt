@@ -28,6 +28,11 @@ interface IGraphStatViewDecorator {
      * view should be updated in any way.
      */
     fun update() { }
+
+    /**
+     * Clear all references to binding or context etc here
+     */
+    fun dispose()
 }
 
 abstract class GraphStatViewDecorator<T : IGraphStatViewData>(protected val listMode: Boolean) :
