@@ -36,7 +36,6 @@ import com.samco.trackandgraph.graphstatview.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
-import kotlinx.coroutines.*
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
@@ -64,14 +63,13 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     private var graphStatView: IDecoratableGraphStatView? = null
     private var data: ILineGraphViewData? = null
 
-    override suspend fun decorate(view: IDecoratableGraphStatView, data: ILineGraphViewData) {
+    override fun decorate(view: IDecoratableGraphStatView, data: ILineGraphViewData) {
         this.data = data
         this.graphStatView = view
         binding = view.getBinding()
         context = view.getContext()
 
-        yield()
-        withContext(Dispatchers.Default) { initFromLineGraphBody(listMode) }
+        initFromLineGraphBody(listMode)
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {
@@ -90,29 +88,24 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         binding!!.xyPlot.redraw()
     }
 
-    private suspend fun initFromLineGraphBody(listMode: Boolean) {
-        yield()
-        withContext(Dispatchers.Main) {
-            binding!!.xyPlot.visibility = View.INVISIBLE
-            binding!!.progressBar.visibility = View.VISIBLE
-        }
+    private fun initFromLineGraphBody(listMode: Boolean) {
+        binding!!.xyPlot.visibility = View.INVISIBLE
+        binding!!.progressBar.visibility = View.VISIBLE
         if (data!!.hasPlottableData) {
             drawLineGraphFeatures()
             setUpLineGraphXAxis()
             setUpLineGraphYAxis()
             setLineGraphBounds(listMode)
             binding!!.xyPlot.redraw()
-            withContext(Dispatchers.Main) {
-                binding!!.xyPlot.visibility = View.VISIBLE
-                binding!!.legendFlexboxLayout.visibility = View.VISIBLE
-                binding!!.progressBar.visibility = View.GONE
-            }
+            binding!!.xyPlot.visibility = View.VISIBLE
+            binding!!.legendFlexboxLayout.visibility = View.VISIBLE
+            binding!!.progressBar.visibility = View.GONE
         } else {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_graph)
         }
     }
 
-    private suspend fun setLineGraphBounds(listMode: Boolean) {
+    private fun setLineGraphBounds(listMode: Boolean) {
         // since we now calculate the bounds to fit the number of intervals we almost always want
         // to set the rangeBoundaries to the bounds.
         // The only exception is when the graph is viewed fullscreen-mode (listMode == False) while dynamic
@@ -125,13 +118,12 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         setLineGraphPaddingFromBounds(bounds)
     }
 
-    private suspend fun setLineGraphPaddingFromBounds(bounds: RectRegion) {
+    private fun setLineGraphPaddingFromBounds(bounds: RectRegion) {
         //Set up Y padding
         val minY = bounds.minY.toDouble()
         val maxY = bounds.maxY.toDouble()
         val maxBound = max(abs(minY), abs(maxY))
         val numDigits = log10(maxBound).toFloat() + 3
-        yield()
         binding!!.xyPlot.graph.paddingLeft =
             (numDigits - 1) * (context!!.resources.displayMetrics.scaledDensity) * 3.5f
 
@@ -209,22 +201,19 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         }
     }
 
-    private suspend fun drawLineGraphFeatures() {
+    private fun drawLineGraphFeatures() {
         for (kvp in data!!.plottableData) {
-            withContext(Dispatchers.Main) {
-                val color = getColor(context!!, dataVisColorList[kvp.key.colorIndex])
-                inflateGraphLegendItem(binding!!, context!!, color, kvp.key.name)
-            }
+            val color = getColor(context!!, dataVisColorList[kvp.key.colorIndex])
+            inflateGraphLegendItem(binding!!, context!!, color, kvp.key.name)
             kvp.value?.let { addSeries(it, kvp.key) }
         }
     }
 
-    private suspend fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
+    private fun addSeries(series: FastXYSeries, lineGraphFeature: LineGraphFeature) {
         val seriesFormat =
             if (listMode && lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
                 getFastLineAndPointFormatter(lineGraphFeature)
             else getLineAndPointFormatter(lineGraphFeature)
-        yield()
         binding!!.xyPlot.addSeries(series, seriesFormat)
     }
 

@@ -240,7 +240,6 @@ class GraphStatInputFragment : Fragment() {
     }
 
     override fun onDestroyView() {
-        binding.demoGraphStatCardView.graphStatView.dispose()
         super.onDestroyView()
         requireActivity().window.hideKeyboard()
     }

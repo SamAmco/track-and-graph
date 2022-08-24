@@ -38,22 +38,14 @@ class GroupAdapter(
     private val graphStatClickListener: GraphStatClickListener,
     private val groupClickListener: GroupClickListener,
     private val gsiProvider: GraphStatInteractorProvider,
-    private val ui: CoroutineDispatcher,
-    private val defaultDispatcher: CoroutineDispatcher
 ) : RecyclerView.Adapter<GroupChildViewHolder>() {
     private val groupChildren = mutableListOf<GroupChild>()
-
-    override fun onViewRecycled(holder: GroupChildViewHolder) {
-        super.onViewRecycled(holder)
-        holder.onRecycled()
-    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupChildViewHolder {
         return when (viewType) {
             GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
                 .apply { setFullSpan(this) }
-            GroupChildType.FEATURE.ordinal -> FeatureViewHolder
-                .from(parent, ui = ui, defaultDispatcher = defaultDispatcher)
+            GroupChildType.FEATURE.ordinal -> FeatureViewHolder.from(parent)
             else -> GroupViewHolder.from(parent).apply { setFullSpan(this) }
         }
     }
@@ -165,5 +157,5 @@ private class ListDiffCallback(
 abstract class GroupChildViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     abstract fun elevateCard()
     abstract fun dropCard()
-    open fun onRecycled() {}
+    open fun update() {}
 }

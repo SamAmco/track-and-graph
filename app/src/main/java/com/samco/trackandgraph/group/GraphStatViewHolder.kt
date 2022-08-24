@@ -26,6 +26,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import kotlinx.coroutines.*
 
 class GraphStatViewHolder(
     private val graphStatCardView: GraphStatCardView,
@@ -48,9 +49,15 @@ class GraphStatViewHolder(
         graphStatCardView.graphStatView.initFromGraphStat(graphStat, decorator)
     }
 
+    override fun update() {
+        super.update()
+        graphStatCardView.update()
+    }
+
     override fun elevateCard() {
         graphStatCardView.cardView.postDelayed({
-            graphStatCardView.cardView.cardElevation = graphStatCardView.cardView.cardElevation * 3f
+            graphStatCardView.cardView.cardElevation =
+                graphStatCardView.cardView.cardElevation * 3f
         }, 10)
     }
 
@@ -80,7 +87,10 @@ class GraphStatViewHolder(
     }
 
     companion object {
-        fun from(parent: ViewGroup, gsiProvider: GraphStatInteractorProvider): GraphStatViewHolder {
+        fun from(
+            parent: ViewGroup,
+            gsiProvider: GraphStatInteractorProvider
+        ): GraphStatViewHolder {
             val graphStat = GraphStatCardView(parent.context)
             graphStat.layoutParams = FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,

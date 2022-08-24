@@ -35,13 +35,7 @@ import org.threeten.bp.Instant
 
 class FeatureViewHolder private constructor(
     private val binding: ListItemFeatureBinding,
-    private val ui: CoroutineDispatcher,
-    private val defaultDispatcher: CoroutineDispatcher
 ) : GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
-
-    private var timerTextJob: Job? = null
-    private var timerTextScope: CoroutineScope? = null
-
     private var clickListener: FeatureClickListener? = null
     private var feature: DisplayFeature? = null
     private var dropElevation = 0f
@@ -57,17 +51,6 @@ class FeatureViewHolder private constructor(
         binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
         initAddButton(feature, clickListener)
         initTimerControls(feature, clickListener)
-    }
-
-    override fun onRecycled() {
-        super.onRecycled()
-        killTimerJob()
-    }
-
-    private fun killTimerJob() {
-        timerTextJob?.cancel()
-        timerTextJob = null
-        timerTextScope = null
     }
 
     private fun initTimerControls(feature: DisplayFeature, clickListener: FeatureClickListener) {
@@ -86,25 +69,24 @@ class FeatureViewHolder private constructor(
             if (feature.timerStartInstant == null) View.GONE else View.VISIBLE
 
         if (feature.timerStartInstant != null) {
-            timerTextJob?.cancel()
-            timerTextJob = Job().also { timerTextScope = CoroutineScope(it + ui) }
+            updateTimerText()
             binding.timerText.visibility = View.VISIBLE
-            timerTextScope?.launch {
-                while (true) {
-                    feature.timerStartInstant?.let { updateTimerText(it) }
-                    withContext(defaultDispatcher) { delay(1000) }
-                }
-            }
         } else {
             binding.timerText.visibility = View.GONE
             binding.timerText.text = formatTimeDuration(0)
-            killTimerJob()
         }
     }
 
-    private fun updateTimerText(instant: Instant) {
-        val duration = Duration.between(instant, Instant.now())
-        binding.timerText.text = formatTimeDuration(duration.seconds)
+    override fun update() {
+        super.update()
+        updateTimerText()
+    }
+
+    private fun updateTimerText() {
+        feature?.timerStartInstant?.let {
+            val duration = Duration.between(it, Instant.now())
+            binding.timerText.text = formatTimeDuration(duration.seconds)
+        }
     }
 
     private fun initAddButton(feature: DisplayFeature, clickListener: FeatureClickListener) {
@@ -180,14 +162,10 @@ class FeatureViewHolder private constructor(
     }
 
     companion object {
-        fun from(
-            parent: ViewGroup,
-            ui: CoroutineDispatcher,
-            defaultDispatcher: CoroutineDispatcher
-        ): FeatureViewHolder {
+        fun from(parent: ViewGroup): FeatureViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
             val binding = ListItemFeatureBinding.inflate(layoutInflater, parent, false)
-            return FeatureViewHolder(binding, ui = ui, defaultDispatcher = defaultDispatcher)
+            return FeatureViewHolder(binding)
         }
     }
 }

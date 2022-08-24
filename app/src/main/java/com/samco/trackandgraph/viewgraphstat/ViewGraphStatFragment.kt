@@ -241,11 +241,6 @@ class ViewGraphStatFragment : Fragment() {
         (activity as AppCompatActivity).supportActionBar!!.show()
     }
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        graphStatView.dispose()
-    }
-
     private fun observeGraphStatViewData() {
         viewModel.graphStatViewData.observe(viewLifecycleOwner) {
             val decorator = gsiProvider.getDecorator(it.graphOrStat.type, false)

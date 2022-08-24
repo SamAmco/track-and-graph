@@ -33,8 +33,6 @@ import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.model.di.DefaultDispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
@@ -42,7 +40,8 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -58,14 +57,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
     @Inject
     lateinit var gsiProvider: GraphStatInteractorProvider
-
-    @Inject
-    @MainDispatcher
-    lateinit var ui: CoroutineDispatcher
-
-    @Inject
-    @DefaultDispatcher
-    lateinit var defaultDispatcher: CoroutineDispatcher
 
     private lateinit var binding: FragmentGroupBinding
     private lateinit var adapter: GroupAdapter
@@ -92,9 +83,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             createFeatureClickListener(),
             createGraphStatClickListener(),
             createGroupClickListener(),
-            gsiProvider,
-            ui = ui,
-            defaultDispatcher = defaultDispatcher
+            gsiProvider
         )
         binding.itemList.adapter = adapter
         disableChangeAnimations()
@@ -108,7 +97,25 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         setHasOptionsMenu(true)
 
         listenToViewModel()
+        launchUpdateChildrenLoop()
         return binding.root
+    }
+
+    /**
+     * Calls an update function on all children of the recycler view once a second. This is
+     * because graphs/statistics and features can have timers in the view holder that need to
+     * be updated every second and it could be too costly to emit an entire new set of data to
+     * the adapter every second for diffing.
+     */
+    private fun launchUpdateChildrenLoop() {
+        lifecycleScope.launch {
+            while (true) {
+                delay(1000)
+                for (i in 0..(binding.itemList.adapter?.itemCount ?: 0)) {
+                    (binding.itemList.findViewHolderForAdapterPosition(i) as GroupChildViewHolder?)?.update()
+                }
+            }
+        }
     }
 
     private fun disableChangeAnimations() {
