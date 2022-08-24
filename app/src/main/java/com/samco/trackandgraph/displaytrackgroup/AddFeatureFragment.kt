@@ -44,10 +44,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
-import com.samco.trackandgraph.util.getColorFromAttr
-import com.samco.trackandgraph.util.getDoubleFromText
-import com.samco.trackandgraph.util.hideKeyboard
-import com.samco.trackandgraph.util.focusAndShowKeyboard
+import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.lang.Exception
@@ -58,7 +55,7 @@ import com.samco.trackandgraph.base.model.FeatureUpdater.DurationNumericConversi
 @AndroidEntryPoint
 class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
     private val args: AddFeatureFragmentArgs by navArgs()
-    private lateinit var binding: AddFeatureFragmentBinding
+    private var binding: AddFeatureFragmentBinding by bindingForViewLifecycle()
     private val viewModel by viewModels<AddFeatureViewModel>()
     private var navController: NavController? = null
     private val featureTypeList = listOf(

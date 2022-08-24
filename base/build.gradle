@@ -66,17 +66,16 @@ dependencies {
     api 'com.jakewharton.threetenabp:threetenabp:1.2.1'
 
     api 'androidx.core:core-ktx:1.8.0'
-    api 'androidx.appcompat:appcompat:1.4.2'
-    api 'com.google.android.material:material:1.6.1'
+    api 'androidx.appcompat:appcompat:1.5.0'
 
     //Dependency Injection
-    implementation "com.google.dagger:hilt-android:2.38.1"
-    kapt "com.google.dagger:hilt-compiler:2.38.1"
+    implementation "com.google.dagger:hilt-android:2.41"
+    kapt "com.google.dagger:hilt-compiler:2.41"
 
     //Database
-    kapt "androidx.room:room-compiler:2.4.2"
-    api "androidx.room:room-runtime:2.4.2"
-    api "androidx.room:room-ktx:2.4.2"
+    kapt "androidx.room:room-compiler:2.4.3"
+    api "androidx.room:room-runtime:2.4.3"
+    api "androidx.room:room-ktx:2.4.3"
     api "com.squareup.moshi:moshi:1.13.0"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:1.13.0"
 

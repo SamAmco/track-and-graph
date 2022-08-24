@@ -32,7 +32,7 @@ class GraphStatTimeSinceDecorator(listMode: Boolean) :
     private var context: Context? = null
     private var data: ITimeSinceViewData? = null
 
-    override suspend fun decorate(view: IDecoratableGraphStatView, data: ITimeSinceViewData) {
+    override fun decorate(view: IDecoratableGraphStatView, data: ITimeSinceViewData) {
         binding = view.getBinding()
         context = view.getContext()
         this.data = data
@@ -43,13 +43,13 @@ class GraphStatTimeSinceDecorator(listMode: Boolean) :
 
     override fun setTimeMarker(time: OffsetDateTime) {}
 
-    private suspend fun initTimeSinceStatBody() {
+    private fun initTimeSinceStatBody() {
         update()
         binding!!.statMessage.visibility = View.VISIBLE
         binding!!.progressBar.visibility = View.GONE
     }
 
-    override suspend fun update() {
+    override fun update() {
         val dataPoint = data!!.lastDataPoint
         if (dataPoint == null) {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
@@ -57,5 +57,11 @@ class GraphStatTimeSinceDecorator(listMode: Boolean) :
             val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
             binding!!.statMessage.text = formatTimeToDaysHoursMinutesSeconds(context!!, duration.toMillis())
         }
+    }
+
+    override fun dispose() {
+        binding = null
+        context = null
+        data = null
     }
 }

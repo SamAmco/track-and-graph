@@ -36,6 +36,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.DataPointInputDialogBinding
+import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -50,7 +51,7 @@ const val DURATION_SECONDS_KEY = "DURATION_SECONDS_KEY"
 open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
-    private lateinit var binding: DataPointInputDialogBinding
+    private var binding: DataPointInputDialogBinding by bindingForViewLifecycle()
 
     override fun onCreateView(
         inflater: LayoutInflater,

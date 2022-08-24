@@ -21,12 +21,11 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.LinearLayout
+import android.widget.FrameLayout
 import com.androidplot.Plot
 import com.androidplot.ui.*
 import com.androidplot.xy.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
-import kotlinx.coroutines.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.graphstatview.decorators.*
@@ -35,30 +34,17 @@ import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
 import java.text.DecimalFormat
 
-//TODO there shouldn't be a job in here. It's probably fine to have suspending functions though
-class GraphStatView : LinearLayout, IDecoratableGraphStatView {
+class GraphStatView : FrameLayout, IDecoratableGraphStatView {
     constructor(context: Context) : super(context, null)
     constructor(context: Context, attrSet: AttributeSet) : super(context, attrSet)
 
     private var binding = GraphStatViewBinding.inflate(LayoutInflater.from(context), this, true)
     override fun getBinding() = binding
 
-    private var viewJob: Job? = null
-    private var viewScope: CoroutineScope? = null
-    private var decorJob: Job? = null
-
     private var currentDecorator: IGraphStatViewDecorator? = null
 
     init {
         xyPlotSetup()
-    }
-
-    private fun resetJob() {
-        decorJob?.cancel()
-        decorJob = null
-        viewJob?.cancel()
-        viewJob = Job()
-        viewScope = CoroutineScope(Dispatchers.Main + viewJob!!)
     }
 
     fun setGraphHeight(height: Int) {
@@ -136,7 +122,6 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     }
 
     fun initLoading() {
-        resetJob()
         cleanAllViews()
         binding.progressBar.visibility = View.VISIBLE
     }
@@ -150,29 +135,24 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         decorator: GraphStatViewDecorator<T>,
         data: Any
     ) {
-        resetJob()
-        var graphOrStat: GraphOrStat? = null
-        decorJob = viewScope?.launch {
-            //We fix the view height while we prepare the view to avoid the layout jumping around in the
-            //scroll view
-            fixViewHeight()
-            cleanAllViews()
-            try {
-                graphOrStat = (data as T).graphOrStat
-                decorate(data.graphOrStat, decorator, data)
-                setDynamicViewHeight()
-                while (true) {
-                    delay(1000)
-                    decorator.update()
-                }
-            } catch (throwable: Throwable) {
-                onDecorateThrew(graphOrStat, throwable)
-            }
+        val graphOrStat = (data as T).graphOrStat
+        //We fix the view height while we prepare the view to avoid the layout jumping around in the
+        //scroll view
+        fixViewHeight()
+        cleanAllViews()
+        try {
+            decorate(data.graphOrStat, decorator, data)
+            setDynamicViewHeight()
+        } catch (throwable: Throwable) {
+            onDecorateThrew(graphOrStat, throwable)
         }
     }
 
+    fun update() = currentDecorator?.update()
+
     private fun onDecorateThrew(graphOrStat: GraphOrStat?, throwable: Throwable) {
         cleanAllViews()
+        currentDecorator?.dispose()
         currentDecorator = null
         val headerText = graphOrStat?.name ?: ""
         binding.headerText.text = headerText
@@ -190,11 +170,12 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         layoutParams = layoutParams.apply { height = WRAP_CONTENT }
     }
 
-    private suspend fun <T : IGraphStatViewData> decorate(
+    private fun <T : IGraphStatViewData> decorate(
         graphOrStat: GraphOrStat,
         decorator: GraphStatViewDecorator<T>,
         data: T
     ) {
+        currentDecorator?.dispose()
         currentDecorator = decorator
         val headerText = graphOrStat.name
         binding.headerText.text = headerText
@@ -206,12 +187,9 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
     }
 
     fun initError(errorTextId: Int) {
-        resetJob()
-        decorJob = viewScope?.launch {
-            cleanAllViews()
-            binding.errorMessage.visibility = View.VISIBLE
-            binding.errorMessage.text = context.getString(errorTextId)
-        }
+        cleanAllViews()
+        binding.errorMessage.visibility = View.VISIBLE
+        binding.errorMessage.text = context.getString(errorTextId)
     }
 
     private fun blankViews() {
@@ -227,6 +205,7 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         decorator: GraphStatViewDecorator<T>
     ) {
         if (data.state == IGraphStatViewData.State.LOADING) {
+            currentDecorator?.dispose()
             currentDecorator = null
             blankViews()
             val headerText = data.graphOrStat.name
@@ -237,5 +216,4 @@ class GraphStatView : LinearLayout, IDecoratableGraphStatView {
         }
     }
 
-    fun dispose() = viewJob?.cancel()
 }

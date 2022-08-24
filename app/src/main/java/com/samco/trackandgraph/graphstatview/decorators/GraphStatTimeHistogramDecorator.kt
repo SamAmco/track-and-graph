@@ -31,8 +31,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramVie
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.WeekFields
@@ -69,7 +67,7 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
         else -> 1
     }
 
-    override suspend fun decorate(
+    override fun decorate(
         view: IDecoratableGraphStatView,
         data: ITimeHistogramViewData
     ) {
@@ -81,11 +79,9 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
         initTimeHistogramBody()
     }
 
-    private suspend fun initTimeHistogramBody() {
-        withContext(Dispatchers.Main) {
-            binding!!.xyPlot.visibility = View.INVISIBLE
-            binding!!.progressBar.visibility = View.VISIBLE
-        }
+    private fun initTimeHistogramBody() {
+        binding!!.xyPlot.visibility = View.INVISIBLE
+        binding!!.progressBar.visibility = View.VISIBLE
         if (!data!!.barValues.isNullOrEmpty()) {
             drawLegend()
             setUpXAxis()
@@ -94,10 +90,8 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
             setUpBounds()
             drawBars()
             binding!!.xyPlot.redraw()
-            withContext(Dispatchers.Main) {
-                binding!!.xyPlot.visibility = View.VISIBLE
-                binding!!.progressBar.visibility = View.GONE
-            }
+            binding!!.xyPlot.visibility = View.VISIBLE
+            binding!!.progressBar.visibility = View.GONE
         } else {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_graph)
         }
@@ -141,18 +135,20 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
                     pos: FieldPosition
                 ): StringBuffer {
                     val zeroIndexOffset =
-                        // The bins we get start at index 0. The bin index can represent minutes, hours,
-                        // day of the week or day of the month, etc.
-                        // Since there is a hour 0 and a minute 0, but not a day or week 0 we have
+                    // The bins we get start at index 0. The bin index can represent minutes, hours,
+                    // day of the week or day of the month, etc.
+                    // Since there is a hour 0 and a minute 0, but not a day or week 0 we have
                         // to add an offset of 1 to the labels if talking about days or weeks.
                         if (data!!.window!!.window == TimeHistogramWindow.DAY
-                            || data!!.window!!.window == TimeHistogramWindow.HOUR)
+                            || data!!.window!!.window == TimeHistogramWindow.HOUR
+                        )
                             0  // there is a minute 0 and a hour 0: index 0 -> label 0
                         else 1 // but there is no day 0 or week 0:  index 0 -> label 1
 
                     val index = (obj as Double).roundToInt() + zeroIndexOffset
                     val str = if (index >= zeroIndexOffset
-                                    && index <= data!!.window!!.numBins) {
+                        && index <= data!!.window!!.numBins
+                    ) {
                         val labelInterval = getLabelInterval(data!!.window!!.window)
                         if (index == zeroIndexOffset
                             || index == data!!.window!!.numBins
@@ -219,5 +215,11 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {}
+
+    override fun dispose() {
+        binding = null
+        context = null
+        data = null
+    }
 }
 
