@@ -20,11 +20,11 @@ import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.base.database.entity.FeatureTimer
+import com.samco.trackandgraph.base.database.entity.FunctionEntity
 import com.samco.trackandgraph.base.database.entity.GlobalNote
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.Group
@@ -60,9 +60,10 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         GlobalNote::class,
         LineGraphFeature::class,
         TimeHistogram::class,
-        FeatureTimer::class
+        FeatureTimer::class,
+        FunctionEntity::class
     ],
-    version = 47
+    version = 48
 )
 @TypeConverters(Converters::class)
 internal abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -134,6 +135,19 @@ internal class Converters {
 
     @TypeConverter
     fun stringToInstant(string: String?): Instant? = string?.let { Instant.parse(it) }
+
+    @TypeConverter
+    fun stringToListOfLongs(value: String): List<Long> {
+        if (value.isBlank()) return emptyList()
+        val listType = Types.newParameterizedType(List::class.java, Long::class.java)
+        return fromJson(moshi.adapter(listType), value) { emptyList() }
+    }
+
+    @TypeConverter
+    fun listOfLongToString(values: List<Long>): String {
+        val listType = Types.newParameterizedType(List::class.java, Long::class.java)
+        return toJson(moshi.adapter(listType), values)
+    }
 
     @TypeConverter
     fun stringToListOfStrings(value: String): List<String> {

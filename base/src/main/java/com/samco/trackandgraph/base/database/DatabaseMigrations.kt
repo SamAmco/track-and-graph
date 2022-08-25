@@ -1048,6 +1048,26 @@ val MIGRATION_46_47 = object : Migration(46, 47) {
     }
 }
 
+val MIGRATION_47_48 = object : Migration(47, 48) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        val tableName = "functions_table"
+        database.execSQL(
+            """
+                CREATE TABLE IF NOT EXISTS `$tableName` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `name` TEXT NOT NULL,
+                    `group_id` INTEGER NOT NULL, 
+                    `feature_description` TEXT NOT NULL, 
+                    `feature_ids` TEXT NOT NULL, 
+                    `script` TEXT NOT NULL, 
+                    FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
+            """.trimMargin()
+        )
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_functions_table_id` ON `$tableName` (`id`)")
+        database.execSQL("CREATE INDEX IF NOT EXISTS `index_functions_table_group_id` ON `$tableName` (`group_id`)")
+    }
+}
+
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -1067,4 +1087,5 @@ val allMigrations = arrayOf(
     MIGRATION_44_45,
     MIGRATION_45_46,
     MIGRATION_46_47,
+    MIGRATION_47_48,
 )
