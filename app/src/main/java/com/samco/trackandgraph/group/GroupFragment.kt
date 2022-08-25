@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
@@ -95,11 +96,36 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         binding.queueAddAllButton.setOnClickListener { onQueueAddAllClicked() }
         registerForContextMenu(binding.itemList)
 
-        setHasOptionsMenu(true)
-
         listenToViewModel()
         launchUpdateChildrenLoop()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(
+            GroupMenuProvider(),
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
+    }
+
+    private inner class GroupMenuProvider : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.group_menu, menu)
+        }
+
+        override fun onMenuItemSelected(item: MenuItem): Boolean {
+            when (item.itemId) {
+                R.id.add_tracker -> onAddTrackerClicked()
+                R.id.add_graph_stat -> onAddGraphStatClicked()
+                R.id.add_group -> onAddGroupClicked()
+                R.id.export_button -> onExportClicked()
+                R.id.import_button -> onImportClicked()
+                else -> return false
+            }
+            return true
+        }
     }
 
     /**
@@ -377,22 +403,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
             (requireActivity() as MainActivity).toolbar.overflowIcon =
                 ContextCompat.getDrawable(requireContext(), R.drawable.list_menu_icon)
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.add_tracker -> onAddTrackerClicked()
-            R.id.add_graph_stat -> onAddGraphStatClicked()
-            R.id.add_group -> onAddGroupClicked()
-            R.id.export_button -> onExportClicked()
-            R.id.import_button -> onImportClicked()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.group_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
     }
 
     private fun onExportClicked() {
