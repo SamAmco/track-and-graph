@@ -21,11 +21,11 @@ apply plugin: 'kotlin-kapt'
 apply plugin: "dagger.hilt.android.plugin"
 
 android {
-    compileSdk 31
+    compileSdk 32
 
     defaultConfig {
         minSdk 23
-        targetSdk 31
+        targetSdk 32
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -67,6 +67,8 @@ dependencies {
 
     api 'androidx.core:core-ktx:1.8.0'
     api 'androidx.appcompat:appcompat:1.5.0'
+    //Apparently we need material for the instrumented tests to build. idk why
+    api 'com.google.android.material:material:1.6.1'
 
     //Dependency Injection
     implementation "com.google.dagger:hilt-android:2.41"
