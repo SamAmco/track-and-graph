@@ -80,8 +80,8 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeaturesSync(): List<Feature>
 
-    @Insert
-    fun insertReminders(reminders: List<Reminder>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertReminder(reminder: Reminder)
 
     @Query("DELETE FROM reminders_table")
     fun deleteReminders()
