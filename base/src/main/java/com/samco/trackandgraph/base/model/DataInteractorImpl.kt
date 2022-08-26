@@ -191,12 +191,10 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
         alarmInteractor.clearAlarms()
-        database.withTransaction {
-            dao.deleteReminders()
-            dao.insertReminders(reminders.mapIndexed { index, reminder ->
-                reminder.copy(id = index.toLong()).toEntity()
-            })
-        }
+        dao.deleteReminders()
+        reminders
+            .map { it.toEntity() }
+            .forEach { dao.insertReminder(it) }
         alarmInteractor.syncAlarms()
         dataUpdateEvents.emit(Unit)
     }
