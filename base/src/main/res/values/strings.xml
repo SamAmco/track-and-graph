@@ -284,7 +284,7 @@
     <string name="backup_error_failed_to_copy_database">Something went wrong while copying the database file.</string>
     <string name="restore_error_failed_to_copy_database">Something went wrong while restoring the database.</string>
     <string name="restore_failed">Restore failed. %1$s</string>
-    <string name="feature_description_input_hint">Add a longer description (optional)</string>
+    <string name="add_a_longer_description_optional">Add a longer description (optional)</string>
     <string name="no_data_points_history_fragment_hint">Your tracking history will show up here when you have input some data.</string>
     <string name="info">Info</string>
     <string name="no_description">No description</string>
@@ -349,4 +349,8 @@
     <string name="timer_notification_channel_name">Timers</string>
     <string name="stop">Stop</string>
     <string name="function">Function (experimental)</string>
+    <string name="add_function">Add a Function</string>
+    <string name="name_your_function">Name your function: </string>
+    <string name="write_your_function_here"># Write your function here</string>
+    <string name="add_some_data_sources">Add some data sources</string>
 </resources>

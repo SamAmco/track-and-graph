@@ -41,7 +41,7 @@
                     android:id="@+id/featureDescriptionText"
                     style="@style/Style.ExpansiveTextInputStyle"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:hint="@string/feature_description_input_hint" />
+                    android:hint="@string/add_a_longer_description_optional" />
 
                 <TextView
                     android:id="@+id/featureTypeLabel"
