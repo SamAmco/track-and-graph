@@ -266,7 +266,7 @@
     <string name="backup_error_failed_to_copy_database">Algo salió mal mientras se copiaba el archivo de la base de datos.</string>
     <string name="restore_error_failed_to_copy_database">Algo salió mal al restaurar la base de datos.</string>
     <string name="restore_failed">Fallo en la restauración. %1$s</string>
-    <string name="feature_description_input_hint">Añadir una descripción más larga (opcional)</string>
+    <string name="add_a_longer_description_optional">Añadir una descripción más larga (opcional)</string>
     <string name="no_data_points_history_fragment_hint">Su historial de traza se mostrará aquí cuando haya introducido algunos datos.</string>
     <string name="info">Info</string>
     <string name="no_description">Sin descripción</string>

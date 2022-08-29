@@ -267,7 +267,7 @@
     <string name="backup_error_failed_to_copy_database">Quelque chose s\'est mal passé lors de la copie du fichier de base de données.</string>
     <string name="restore_error_failed_to_copy_database">Quelque chose s\'est mal passé lors de la restauration de la base de données.</string>
     <string name="restore_failed">Restauration échouée. %1$s</string>
-    <string name="feature_description_input_hint">Ajoutez une description plus longue (facultative)</string>.
+    <string name="add_a_longer_description_optional">Ajoutez une description plus longue (facultative)</string>.
     <string name="no_data_points_history_fragment_hint">Votre historique de suivi s\'affichera ici lorsque vous aurez saisi des données.</string>
     <string name="info">Info</string>
     <string name="no_description">Aucune description</string>
