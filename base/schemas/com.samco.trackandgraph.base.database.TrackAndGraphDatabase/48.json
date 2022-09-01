@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 48,
-    "identityHash": "ae3d3caf362b6a95486e4b07a958e060",
+    "identityHash": "871984210a417efa3f3c171ab95da1ca",
     "entities": [
       {
         "tableName": "features_table",
@@ -1123,7 +1123,7 @@
       },
       {
         "tableName": "functions_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `group_id` INTEGER NOT NULL, `feature_description` TEXT NOT NULL, `feature_ids` TEXT NOT NULL, `script` TEXT NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `group_id` INTEGER NOT NULL, `function_description` TEXT NOT NULL, `data_sources` TEXT NOT NULL, `script` TEXT NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1145,13 +1145,13 @@
           },
           {
             "fieldPath": "description",
-            "columnName": "feature_description",
+            "columnName": "function_description",
             "affinity": "TEXT",
             "notNull": true
           },
           {
             "fieldPath": "featureIds",
-            "columnName": "feature_ids",
+            "columnName": "data_sources",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -1206,7 +1206,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ae3d3caf362b6a95486e4b07a958e060')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '871984210a417efa3f3c171ab95da1ca')"
     ]
   }
 }

@@ -20,8 +20,10 @@ import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.DataSourceDescriptor
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.base.database.entity.FeatureTimer
 import com.samco.trackandgraph.base.database.entity.FunctionEntity
@@ -137,15 +139,17 @@ internal class Converters {
     fun stringToInstant(string: String?): Instant? = string?.let { Instant.parse(it) }
 
     @TypeConverter
-    fun stringToListOfLongs(value: String): List<Long> {
+    fun stringToListOfDataSourceDescriptor(value: String): List<DataSourceDescriptor> {
         if (value.isBlank()) return emptyList()
-        val listType = Types.newParameterizedType(List::class.java, Long::class.java)
+        val listType =
+            Types.newParameterizedType(List::class.java, DataSourceDescriptor::class.java)
         return fromJson(moshi.adapter(listType), value) { emptyList() }
     }
 
     @TypeConverter
-    fun listOfLongToString(values: List<Long>): String {
-        val listType = Types.newParameterizedType(List::class.java, Long::class.java)
+    fun listOfDataSourceDescriptorToString(values: List<DataSourceDescriptor>): String {
+        val listType =
+            Types.newParameterizedType(List::class.java, DataSourceDescriptor::class.java)
         return toJson(moshi.adapter(listType), values)
     }
 

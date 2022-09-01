@@ -5,6 +5,14 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
+internal enum class DataSourceType { FEATURE, FUNCTION }
+
+internal data class DataSourceDescriptor(
+    val name: String,
+    val type: DataSourceType,
+    val id: Long
+)
+
 @Entity(
     tableName = "functions_table",
     foreignKeys = [ForeignKey(
@@ -27,11 +35,11 @@ internal data class FunctionEntity(
     @ColumnInfo(name = "group_id", index = true)
     val groupId: Long,
 
-    @ColumnInfo(name = "feature_description")
+    @ColumnInfo(name = "function_description")
     val description: String,
 
-    @ColumnInfo(name = "feature_ids")
-    val featureIds: List<Long>,
+    @ColumnInfo(name = "data_sources")
+    val featureIds: List<DataSourceDescriptor>,
 
     @ColumnInfo(name = "script")
     val script: String

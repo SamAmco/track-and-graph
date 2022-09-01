@@ -1058,7 +1058,7 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
                     `name` TEXT NOT NULL,
                     `group_id` INTEGER NOT NULL, 
                     `feature_description` TEXT NOT NULL, 
-                    `feature_ids` TEXT NOT NULL, 
+                    `data_sources` TEXT NOT NULL, 
                     `script` TEXT NOT NULL, 
                     FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
             """.trimMargin()
