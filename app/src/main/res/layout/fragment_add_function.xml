@@ -37,7 +37,7 @@
                     android:maxLines="1" />
 
                 <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/featureDescriptionText"
+                    android:id="@+id/functionDescriptionText"
                     style="@style/Style.ExpansiveTextInputStyle"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:hint="@string/add_a_longer_description_optional" />

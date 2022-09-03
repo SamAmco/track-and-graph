@@ -278,4 +278,13 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :id")
     fun getNumberOfDataPointsForFeature(id: Long): Int
+
+    @Query("SELECT * FROM functions_table WHERE id = :functionId LIMIT 1")
+    fun getFunctionById(functionId: Long): FunctionEntity?
+
+    @Update
+    fun updateFunction(function: FunctionEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun createFunction(function: FunctionEntity)
 }

@@ -565,4 +565,16 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun getAllActiveTimerFeatures(): List<DisplayFeature> = withContext(io) {
         dao.getAllActiveTimerFeatures().map { it.toDto() }
     }
+
+    override suspend fun getFunctionById(functionId: Long): FunctionDto? = withContext(io) {
+        dao.getFunctionById(functionId)?.toDto()
+    }
+
+    override suspend fun updateFunction(function: FunctionDto) = withContext(io) {
+        dao.updateFunction(function.toEntity())
+    }
+
+    override suspend fun createFunction(function: FunctionDto) = withContext(io) {
+        dao.createFunction(function.toEntity())
+    }
 }
