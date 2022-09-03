@@ -3,81 +3,90 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <ScrollView
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <ScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="@dimen/card_padding"
-                android:orientation="vertical"
-                tools:context=".functions.AddFunctionFragment">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:labelFor="@id/featureNameText"
-                    android:text="@string/name_your_function"
-                    android:textAppearance="@style/TextAppearance.Body" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/functionNameText"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:importantForAutofill="no"
-                    android:inputType="textCapSentences"
-                    android:maxLines="1" />
-
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/functionDescriptionText"
-                    style="@style/Style.ExpansiveTextInputStyle"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:hint="@string/add_a_longer_description_optional" />
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/input_spacing_large"
-                    android:text="@string/add_some_data_sources"
-                    android:textAppearance="@style/TextAppearance.Body" />
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
                 <LinearLayout
-                    android:id="@+id/featureContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:orientation="vertical" />
+                    android:layout_margin="@dimen/card_padding"
+                    android:orientation="vertical"
+                    tools:context=".functions.AddFunctionFragment">
 
-                <ImageButton
-                    android:id="@+id/addFeatureButton"
-                    style="@style/Style.AddBarButton"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:layout_marginBottom="@dimen/dialog_input_spacing"
-                    android:contentDescription="@string/add_multiple_choice_answer_button_content_description"
-                    app:srcCompat="@drawable/add_icon" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dialog_input_spacing"
+                        android:labelFor="@id/featureNameText"
+                        android:text="@string/name_your_function"
+                        android:textAppearance="@style/TextAppearance.Body" />
 
-                <androidx.appcompat.widget.AppCompatEditText
-                    android:id="@+id/functionBodyText"
-                    style="@style/Style.ExpansiveTextInputStyle"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:layout_marginBottom="30dp"
-                    android:gravity="top"
-                    android:hint="@string/write_your_function_here"
-                    android:minHeight="200dp" />
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/functionNameText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="no"
+                        android:inputType="textCapSentences"
+                        android:maxLines="1" />
 
-            </LinearLayout>
-        </ScrollView>
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/functionDescriptionText"
+                        style="@style/Style.ExpansiveTextInputStyle"
+                        android:layout_marginTop="@dimen/dialog_input_spacing"
+                        android:hint="@string/add_a_longer_description_optional" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/input_spacing_large"
+                        android:text="@string/add_some_data_sources"
+                        android:textAppearance="@style/TextAppearance.Body" />
+
+                    <LinearLayout
+                        android:id="@+id/featureContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/dialog_input_spacing"
+                        android:orientation="vertical" />
+
+                    <ImageButton
+                        android:id="@+id/addFeatureButton"
+                        style="@style/Style.AddBarButton"
+                        android:layout_marginTop="@dimen/dialog_input_spacing"
+                        android:layout_marginBottom="@dimen/dialog_input_spacing"
+                        android:contentDescription="@string/add_multiple_choice_answer_button_content_description"
+                        app:srcCompat="@drawable/add_icon" />
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/functionBodyText"
+                        style="@style/Style.ExpansiveTextInputStyle"
+                        android:layout_marginTop="@dimen/dialog_input_spacing"
+                        android:layout_marginBottom="30dp"
+                        android:gravity="top"
+                        android:hint="@string/write_your_function_here"
+                        android:minHeight="200dp" />
+
+                </LinearLayout>
+            </ScrollView>
+
+            <include
+                android:id="@+id/addBar"
+                layout="@layout/validate_add_footer" />
+        </LinearLayout>
 
         <include
-            android:id="@+id/addBar"
-            layout="@layout/validate_add_footer" />
-    </LinearLayout>
+            android:id="@+id/loadingOverlay"
+            layout="@layout/layout_loading_overlay" />
+    </FrameLayout>
 </layout>

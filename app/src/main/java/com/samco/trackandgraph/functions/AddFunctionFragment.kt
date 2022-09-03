@@ -46,7 +46,13 @@ class AddFunctionFragment : Fragment() {
         bindFunctionDescription()
         bindFunctionBody()
         bindFinishButton()
-        //TODO add loading state
+        bindLoadingOverlay()
+    }
+
+    private fun bindLoadingOverlay() {
+        viewModel.isLoading.observe(viewLifecycleOwner) {
+            binding.loadingOverlay.visibility = if (it) View.VISIBLE else View.GONE
+        }
     }
 
     private fun bindFinishButton() {
