@@ -202,4 +202,10 @@ interface DataInteractor : FeatureUpdater {
     suspend fun stopTimerForFeature(featureId: Long): Duration?
 
     suspend fun getAllActiveTimerFeatures(): List<DisplayFeature>
+
+    suspend fun getFunctionById(functionId: Long): FunctionDto?
+
+    suspend fun updateFunction(function: FunctionDto)
+
+    suspend fun createFunction(function: FunctionDto)
 }
