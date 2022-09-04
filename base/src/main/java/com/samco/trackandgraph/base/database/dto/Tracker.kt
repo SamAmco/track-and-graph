@@ -20,7 +20,10 @@ package com.samco.trackandgraph.base.database.dto
 data class Tracker(
     val id: Long,
     val name: String,
+    val groupId: Long,
     val featureId: Long,
+    val displayIndex: Int,
+    val description: String,
     val dataType: DataType,
     val discreteValues: List<DiscreteValue>,
     val hasDefaultValue: Boolean,

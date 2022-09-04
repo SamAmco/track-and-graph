@@ -21,7 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
-import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -54,11 +53,7 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getAllGroupsSync(): List<Group>
 
-    fun getAllFeatures(): LiveData<List<Feature>>
-
-    suspend fun getAllFeaturesSync(): List<Feature>
-
-    suspend fun getAllDataSourcesSync(): List<DataSourceDescriptor>
+    suspend fun getAllTrackersSync(): List<Tracker>
 
     suspend fun updateReminders(reminders: List<Reminder>)
 
@@ -66,33 +61,36 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>)
 
-    suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayTracker>
+    suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
 
     suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
+    suspend fun getTrackerById(trackerId: Long): Tracker?
+
     suspend fun getFeatureById(featureId: Long): Feature?
 
-    suspend fun tryGetFeatureByIdSync(featureId: Long): Feature?
+    suspend fun tryGetDisplayTrackerByIdSync(trackerId: Long): DisplayTracker?
 
-    suspend fun tryGetDisplayFeatureByIdSync(featureId: Long): DisplayTracker?
+    suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker>
 
-    fun tryGetFeatureById(featureId: Long): LiveData<Feature?>
+    suspend fun insertTracker(tracker: Tracker): Long
 
-    suspend fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
-
-    suspend fun insertFeature(feature: Feature): Long
-
-    suspend fun updateFeature(feature: Feature)
+    //TODO tracker and function (dto's) might as well contain all relevant info from their feature parent
+    //TODO implement the interface changes and get base compiling.
+    //TODO make sure the migration tests pass
+    //TODO fix up app layer. good luck!
+    suspend fun updateTracker(tracker: Tracker)
 
     suspend fun deleteDataPoint(dataPoint: DataPoint)
 
-    suspend fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double)
+    //TODO rename this function back once you're confident you've correctly used it
+    suspend fun deleteAllDataPointsForDiscreteValue2(trackerId: Long, index: Double)
 
     suspend fun deleteGraphOrStat(id: Long)
 
     suspend fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
-    suspend fun deleteFeature(id: Long)
+    suspend fun deleteTracker(trackerId: Long)
 
     suspend fun insertDataPoint(dataPoint: DataPoint): Long
 
@@ -102,17 +100,19 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getDataSampleForFeatureId(featureId: Long): DataSample
 
+    suspend fun getLabelsForFeature(feature: Feature): Set<String>
+
+    suspend fun getDataSampleForFeature(feature: Feature): DataSample
+
     /**
      * Emits a unit every time currently displayed data may have changed.
      * For example if you create/update/remove a data point.
      */
+    //TODO function add/update/delete actions should trigger this
     fun getDataUpdateEvents(): SharedFlow<Unit>
 
-    //TODO get rid of this and only return DataSample for a feature
-    fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
-
-    suspend fun getDataPointByTimestampAndFeatureSync(
-        featureId: Long,
+    suspend fun getDataPointByTimestampAndTrackerSync(
+        trackerId: Long,
         timestamp: OffsetDateTime
     ): DataPoint
 
@@ -134,7 +134,8 @@ interface DataInteractor : FeatureUpdater {
 
     fun getAllDisplayNotes(): LiveData<List<DisplayNote>>
 
-    suspend fun removeNote(timestamp: OffsetDateTime, featureId: Long)
+    //TODO rename this back once you've ensured it's used correctly everywhere
+    suspend fun removeNote2(timestamp: OffsetDateTime, trackerId: Long)
 
     suspend fun deleteGlobalNote(note: GlobalNote)
 
@@ -196,19 +197,15 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long)
 
-    suspend fun playTimerForFeature(featureId: Long)
+    suspend fun playTimerForTracker(trackerId: Long)
 
-    suspend fun stopTimerForFeature(featureId: Long): Duration?
+    suspend fun stopTimerForTracker(trackerId: Long): Duration?
 
-    suspend fun getAllActiveTimerFeatures(): List<DisplayTracker>
+    suspend fun getAllActiveTimerTrackers(): List<DisplayTracker>
 
     suspend fun getFunctionById(functionId: Long): FunctionDto?
 
     suspend fun updateFunction(function: FunctionDto)
 
     suspend fun createFunction(function: FunctionDto)
-
-    suspend fun getLabelsForDataSource(source: DataSourceDescriptor): Set<String>
-
-    suspend fun getDataSamplePropertiesForSource(source: DataSourceDescriptor): DataSampleProperties
 }

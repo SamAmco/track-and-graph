@@ -22,13 +22,18 @@ package com.samco.trackandgraph.base.database.dto
 data class FunctionDto(
     val id: Long,
     val name: String,
+    val featureId: Long,
     val dataSources: List<Feature>,
-    val script: String
+    val script: String,
+    val groupId: Long,
+    val displayIndex: Int,
+    val description: String,
 ) {
     internal fun toEntity() = com.samco.trackandgraph.base.database.entity.FunctionEntity(
-        id,
-        name,
-        dataSources.map { it.toEntity() },
-        script
+        id = id,
+        featureId = featureId,
+        name = name,
+        dataSources = dataSources.map { it.toEntity() },
+        script = script
     )
 }

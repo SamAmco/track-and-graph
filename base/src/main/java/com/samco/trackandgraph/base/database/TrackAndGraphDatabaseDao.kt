@@ -21,15 +21,13 @@ import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.entity.*
-import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayFeature
+import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayTracker
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
 import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
 import org.threeten.bp.OffsetDateTime
 
-private const val getFeatureByIdQuery =
-    """SELECT * FROM features_table WHERE id = :featureId LIMIT 1"""
-
-private const val getDisplayFeaturesQuery =
+//TODO get from the trackers table and join the features table
+private const val getDisplayTrackersQuery =
     """SELECT features_table.*, num_data_points, last_timestamp, start_instant from features_table 
         LEFT JOIN (
             SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
@@ -92,20 +90,14 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateFeatures(features: List<Feature>)
 
-    @Query(getDisplayFeaturesQuery + """WHERE group_id = :groupId ORDER BY features_table.display_index ASC, id DESC""")
-    fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature>
+    @Query(getDisplayTrackersQuery + """WHERE group_id = :groupId ORDER BY features_table.display_index ASC, id DESC""")
+    fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
 
     @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
-    @Query(getFeatureByIdQuery)
+    @Query("SELECT * FROM features_table WHERE id = :featureId LIMIT 1")
     fun getFeatureById(featureId: Long): Feature?
-
-    @Query(getFeatureByIdQuery)
-    fun tryGetFeatureByIdSync(featureId: Long): Feature?
-
-    @Query(getFeatureByIdQuery)
-    fun tryGetFeatureById(featureId: Long): LiveData<Feature?>
 
     @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
@@ -270,11 +262,11 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM feature_timers_table WHERE feature_id=:featureId LIMIT 1")
     fun getFeatureTimer(featureId: Long): FeatureTimer?
 
-    @Query(getDisplayFeaturesQuery + """WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC""")
-    fun getAllActiveTimerFeatures(): List<DisplayFeature>
+    @Query(getDisplayTrackersQuery + """WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC""")
+    fun getAllActiveTimerTrackers(): List<DisplayTracker>
 
-    @Query(getDisplayFeaturesQuery + """WHERE features_table.id=:featureId LIMIT 1""")
-    fun getDisplayFeatureByIdSync(featureId: Long): DisplayFeature?
+    @Query(getDisplayTrackersQuery + """WHERE features_table.id=:featureId LIMIT 1""")
+    fun getDisplayTrackerByIdSync(featureId: Long): DisplayTracker?
 
     @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :id")
     fun getNumberOfDataPointsForFeature(id: Long): Int

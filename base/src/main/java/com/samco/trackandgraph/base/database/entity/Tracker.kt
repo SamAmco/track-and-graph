@@ -55,14 +55,4 @@ data class Tracker(
 
     @ColumnInfo(name = "default_value")
     val defaultValue: Double,
-) {
-    fun toDto() = com.samco.trackandgraph.base.database.dto.Tracker(
-        id,
-        name,
-        featureId,
-        dataType,
-        discreteValues,
-        hasDefaultValue,
-        defaultValue
-    )
-}
+)
