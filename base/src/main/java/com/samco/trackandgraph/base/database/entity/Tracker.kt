@@ -33,13 +33,10 @@ import com.samco.trackandgraph.base.database.dto.DiscreteValue
         onDelete = ForeignKey.CASCADE
     )]
 )
-data class Tracker(
+internal data class Tracker(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
-
-    @ColumnInfo(name = "name")
-    val name: String,
 
     @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,

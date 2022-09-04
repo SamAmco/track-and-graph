@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.Feature
+
 data class Tracker(
     val id: Long,
     val name: String,
@@ -34,7 +36,25 @@ data class Tracker(
             discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
         else ""
 
-    fun toEntity() = com.samco.trackandgraph.base.database.entity.Tracker(
+    companion object {
+        internal fun fromEntities(
+            tracker: com.samco.trackandgraph.base.database.entity.Tracker,
+            feature: Feature
+        ) = Tracker(
+            id = tracker.id,
+            name = feature.name,
+            groupId = feature.groupId,
+            featureId = feature.id,
+            displayIndex = feature.displayIndex,
+            description = feature.description,
+            dataType = tracker.dataType,
+            discreteValues = tracker.discreteValues,
+            hasDefaultValue = tracker.hasDefaultValue,
+            defaultValue = tracker.defaultValue,
+        )
+    }
+
+    internal fun toEntity() = com.samco.trackandgraph.base.database.entity.Tracker(
         id,
         name,
         featureId,

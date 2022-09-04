@@ -26,7 +26,6 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.entity.FeatureTimer
 import com.samco.trackandgraph.base.database.sampling.DataSample
-import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.ServiceManager
@@ -95,6 +94,13 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllGroupsSync().map { it.toDto() }
     }
 
+    override suspend fun getAllTrackersSync(): List<Tracker> = withContext(io) {
+        dao.getAllTrackersSync().map {
+            val feature = dao.getFeatureById(it.featureId) ?: return@map null
+            Tracker.fromEntities(it, feature)
+        }.filterNotNull()
+    }
+
     override suspend fun getGroupById(id: Long): Group = withContext(io) {
         dao.getGroupById(id).toDto()
     }
@@ -109,11 +115,18 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker> =
         withContext(io) {
-            dao.getDisplayFeaturesForGroupSync(groupId).map { it.toDto() }
+            dao.getDisplayTrackersForGroupSync(groupId).map { it.toDto() }
         }
 
     override suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature> = withContext(io) {
         dao.getFeaturesForGroupSync(groupId).map { it.toDto() }
+    }
+
+    override suspend fun getTrackerById(trackerId: Long): Tracker? = withContext(io) {
+        dao.getTrackerById(trackerId)?.let {
+            val feature = dao.getFeatureById(it.featureId) ?: return@let null
+            Tracker.fromEntities(it, feature)
+        }
     }
 
     override suspend fun getFeatureById(featureId: Long): Feature? = withContext(io) {
@@ -127,8 +140,7 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker> =
         withContext(io) {
-            //TODO implement this
-            dao.getTrackerById(featureIds).map { it.toDto() }
+            trackerIds.mapNotNull { getTrackerById(it) }
         }
 
     override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
