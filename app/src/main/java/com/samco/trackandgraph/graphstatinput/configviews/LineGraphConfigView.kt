@@ -219,7 +219,7 @@ internal class LineGraphConfigView @JvmOverloads constructor(
     override fun validateConfig(): ValidationException? {
         if (configData.features.isEmpty())
             return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        val featureIds = allFeatureData.map { data -> data.feature.id }.toSet()
+        val featureIds = allFeatureData.map { data -> data.descriptor.id }.toSet()
         configData.features.forEach { f ->
             if (f.colorIndex !in dataVisColorList.indices)
                 return ValidationException(R.string.graph_stat_validation_unrecognised_color)

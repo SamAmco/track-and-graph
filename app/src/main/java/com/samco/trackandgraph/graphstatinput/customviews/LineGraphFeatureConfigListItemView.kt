@@ -29,7 +29,7 @@ import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.ListItemLineGraphFeatureBinding
-import com.samco.trackandgraph.graphstatinput.configviews.FeatureDataProvider
+import com.samco.trackandgraph.graphstatinput.configviews.DataSourceDataProvider
 import com.samco.trackandgraph.ui.ColorSpinnerAdapter
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getDoubleFromText
@@ -37,7 +37,7 @@ import java.text.DecimalFormat
 
 class LineGraphFeatureConfigListItemView(
     context: Context,
-    private val featureDataProvider: FeatureDataProvider,
+    private val featureDataProvider: DataSourceDataProvider,
     private val lineGraphFeature: LineGraphFeatureConfig
 ) : LinearLayout(context) {
 
@@ -176,7 +176,7 @@ class LineGraphFeatureConfigListItemView(
 
     private fun setupFeatureSpinner() {
         val items =
-            featureDataProvider.featureDataAlphabetical().flatMap { getSpinnerItemsForFeature(it) }
+            featureDataProvider.dataSourceDataAlphabetically().flatMap { getSpinnerItemsForFeature(it) }
         val itemNames = items.map { it.third }
         val adapter =
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
@@ -218,9 +218,9 @@ class LineGraphFeatureConfigListItemView(
         }
     }
 
-    private fun getSpinnerItemsForFeature(featureData: FeatureDataProvider.FeatureData)
+    private fun getSpinnerItemsForFeature(featureData: DataSourceDataProvider.DataSourceData)
             : List<Triple<Feature, DurationPlottingMode, String>> {
-        val feature = featureData.feature
+        val feature = featureData.descriptor
         val name = featureDataProvider.getPathForFeature(feature.id)
         return if (featureData.dataProperties.isDuration) {
             val time = context.getString(R.string.time_duration)

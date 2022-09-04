@@ -45,9 +45,9 @@ abstract class GraphStatConfigView constructor(
     attrs,
     defStyleAttr
 ) {
-    protected lateinit var featureDataProvider: FeatureDataProvider
+    protected lateinit var featureDataProvider: DataSourceDataProvider
 
-    protected val allFeatureData: List<FeatureDataProvider.FeatureData> get() = featureDataProvider.featureData
+    protected val allFeatureData: List<DataSourceDataProvider.DataSourceData> get() = featureDataProvider.dataSourceData
 
     private var configChangedListener: ((Any?, ValidationException?) -> Unit)? = null
     protected var onScrollListener: ((Int) -> Unit)? = null
@@ -55,7 +55,7 @@ abstract class GraphStatConfigView constructor(
 
     abstract fun initFromConfigData(configData: Any?)
 
-    internal fun initFromConfigData(configData: Any?, featurePathProvider: FeatureDataProvider) {
+    internal fun initFromConfigData(configData: Any?, featurePathProvider: DataSourceDataProvider) {
         this.featureDataProvider = featurePathProvider
         initFromConfigData(configData)
     }

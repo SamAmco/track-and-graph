@@ -22,6 +22,7 @@ import androidx.lifecycle.LiveData
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -58,6 +59,8 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getAllFeaturesSync(): List<Feature>
 
+    suspend fun getAllDataSourcesSync(): List<DataSourceDescriptor>
+
     suspend fun updateReminders(reminders: List<Reminder>)
 
     suspend fun getGroupById(id: Long): Group
@@ -68,7 +71,7 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
-    suspend fun getFeatureById(featureId: Long): Feature
+    suspend fun getFeatureById(featureId: Long): Feature?
 
     suspend fun tryGetFeatureByIdSync(featureId: Long): Feature?
 
@@ -105,9 +108,6 @@ interface DataInteractor : FeatureUpdater {
      * For example if you create/update/remove a data point.
      */
     fun getDataUpdateEvents(): SharedFlow<Unit>
-
-    //TODO get rid of this and only return DataSample for a feature
-    suspend fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
 
     //TODO get rid of this and only return DataSample for a feature
     fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
@@ -208,4 +208,8 @@ interface DataInteractor : FeatureUpdater {
     suspend fun updateFunction(function: FunctionDto)
 
     suspend fun createFunction(function: FunctionDto)
+
+    suspend fun getLabelsForDataSource(source: DataSourceDescriptor): Set<String>
+
+    suspend fun getDataSamplePropertiesForSource(source: DataSourceDescriptor): DataSampleProperties
 }

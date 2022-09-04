@@ -37,7 +37,7 @@ import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.displaytrackgroup.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.ui.DataSourcePathProvider
 import com.samco.trackandgraph.ui.showNoteDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -111,7 +111,7 @@ class NotesFragment : Fragment() {
         })
     }
 
-    private fun initListAdapter(featurePathProvider: FeaturePathProvider) {
+    private fun initListAdapter(featurePathProvider: DataSourcePathProvider) {
         adapter = NoteListAdapter(
             NoteClickListener(
                 this::onNoteClicked,
@@ -164,7 +164,7 @@ class NotesViewModel @Inject constructor(
 
     val notes: LiveData<List<DisplayNote>> = dataInteractor.getAllDisplayNotes()
 
-    lateinit var featureNameProvider: LiveData<FeaturePathProvider> private set
+    lateinit var featureNameProvider: LiveData<DataSourcePathProvider> private set
 
     private var topNote: DisplayNote? = null
     private var notesObserver: Observer<List<DisplayNote>>? = null
@@ -177,7 +177,7 @@ class NotesViewModel @Inject constructor(
     }
 
     private fun initFeatureNameProvider() {
-        val mediator = MediatorLiveData<FeaturePathProvider>()
+        val mediator = MediatorLiveData<DataSourcePathProvider>()
         dataInteractor.let {
             val groups = it.getAllGroups()
             val features = it.getAllFeatures()
@@ -185,7 +185,7 @@ class NotesViewModel @Inject constructor(
                 val featureList = features.value
                 val groupList = groups.value
                 if (groupList != null && featureList != null) {
-                    mediator.value = FeaturePathProvider(featureList, groupList)
+                    mediator.value = DataSourcePathProvider(featureList, groupList)
                 }
             }
             mediator.addSource(groups) { onEmitted() }

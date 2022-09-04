@@ -19,10 +19,11 @@ internal enum class DataSourceType {
 internal data class DataSourceDescriptor(
     val name: String,
     val type: DataSourceType,
-    val id: Long
+    val id: Long,
+    val groupId: Long
 ) {
     fun toDto() = com.samco.trackandgraph.base.database.dto.DataSourceDescriptor(
-        name, type.toDto(), id
+        name, type.toDto(), id, groupId
     )
 }
 

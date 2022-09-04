@@ -8,13 +8,16 @@ import com.samco.trackandgraph.base.database.dto.FunctionDto
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.ui.DataSourcePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.seconds
+
+interface AddFunctionDataSourceViewModel {
+    val dataSourcePathProvider: DataSourcePathProvider
+}
 
 interface AddFunctionViewModel {
     fun initViewModel(groupId: Long, functionId: Long)

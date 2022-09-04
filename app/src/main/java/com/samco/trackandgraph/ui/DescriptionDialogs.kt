@@ -99,13 +99,13 @@ fun getNoteDialogHeader(
 
 fun showDataPointDescriptionDialog(
     context: Context, inflater: LayoutInflater, dataPoint: DataPoint,
-    dataType: DataType, featureDispalayName: String? = null
+    isDuration: Boolean, featureDispalayName: String? = null
 ) {
     showDataPointDescriptionDialog(
         context,
         inflater,
         dataPoint.timestamp,
-        dataPoint.getDisplayValue(dataType),
+        dataPoint.getDisplayValue(isDuration),
         dataPoint.note,
         featureDispalayName
     )

@@ -30,12 +30,12 @@ import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
 import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.ui.DataSourcePathProvider
 
 internal class NoteListAdapter(
     private val clickListener: NoteClickListener,
     private val weekDayNames: List<String>,
-    private val featurePathProvider: FeaturePathProvider
+    private val featurePathProvider: DataSourcePathProvider
 ) : ListAdapter<DisplayNote, NoteViewHolder>(NoteDiffCallback()) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NoteViewHolder {
         return NoteViewHolder.from(parent, weekDayNames)
@@ -66,7 +66,7 @@ internal class NoteViewHolder private constructor(
 
     fun bind(
         note: DisplayNote,
-        featurePathProvider: FeaturePathProvider,
+        featurePathProvider: DataSourcePathProvider,
         clickListener: NoteClickListener
     ) {
         this.note = note

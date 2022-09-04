@@ -51,13 +51,13 @@ internal class PieChartConfigView @JvmOverloads constructor(
     private fun discreteFeatures(): List<Feature> {
         return allFeatureData
             .filter { data -> data.labels.isNotEmpty() }
-            .map { it.feature }
+            .map { it.descriptor }
     }
 
     private fun getCurrentFeature(): Feature? {
         return allFeatureData
-            .firstOrNull { it.feature.id == configData.featureId }
-            ?.feature
+            .firstOrNull { it.descriptor.id == configData.featureId }
+            ?.descriptor
     }
 
     private fun initFromPieChart() {

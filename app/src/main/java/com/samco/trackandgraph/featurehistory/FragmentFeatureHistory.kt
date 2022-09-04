@@ -28,7 +28,8 @@ import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.DataSourceDescriptor
+import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.base.model.DataInteractor
@@ -61,7 +62,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         binding = FragmentFeatureHistoryBinding.inflate(inflater, container, false)
         initPreLoadViewState()
 
-        viewModel.setFeatureId(args.feature)
+        viewModel.initViewModel(args.dataSource)
 
         observeFeature()
 
@@ -166,8 +167,8 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 class FeatureHistoryViewModel @Inject constructor(
     private val dataInteractor: DataInteractor
 ): ViewModel() {
-    private val _feature = MutableLiveData<Feature?>(null)
-    val feature: LiveData<Feature?> = _feature
+    private val _dataSample = MutableLiveData<DataSample?>(null)
+    val dataSample: LiveData<DataSample?> = _dataSample
 
     lateinit var dataPoints: LiveData<List<DataPoint>>
         private set
@@ -176,14 +177,15 @@ class FeatureHistoryViewModel @Inject constructor(
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    private var featureId: Long? = null
+    private var dataSource: DataSourceDescriptor? = null
 
-    fun setFeatureId(featureId: Long) {
-        if (this.featureId != null) return
-        this.featureId = featureId
-        this.dataPoints = dataInteractor.getDataPointsForFeature(featureId)
+    fun initViewModel(dataSourceDescriptor: DataSourceDescriptor) {
+        if (this.dataSource != null) return
+        this.dataSource = dataSourceDescriptor
+        this.dataPoints = dataInteractor.getDataSampleForFeatureId()
         ioScope.launch {
             val feature = dataInteractor.getFeatureById(featureId)
+
             withContext(Dispatchers.Main) { _feature.value = feature }
         }
     }

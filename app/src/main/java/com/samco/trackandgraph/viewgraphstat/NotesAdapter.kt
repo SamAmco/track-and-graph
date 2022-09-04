@@ -23,15 +23,16 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.trackandgraph.base.database.dto.DataSourceType
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.ui.DataSourcePathProvider
 
 class NotesAdapter(
-    private val featurePathProvider: FeaturePathProvider,
+    private val featurePathProvider: DataSourcePathProvider,
     private val featureTypes: Map<Long, DataType>,
     private val weekDayNames: List<String>,
     private val clickListener: NoteClickListener
@@ -55,7 +56,7 @@ class NotesAdapter(
 
     class ViewHolder private constructor(
         private val binding: ListItemNoteBinding,
-        private val featurePathProvider: FeaturePathProvider,
+        private val featurePathProvider: DataSourcePathProvider,
         private val weekDayNames: List<String>,
         private val featureTypes: Map<Long, DataType>,
         private val clickListener: NoteClickListener
@@ -89,10 +90,13 @@ class NotesAdapter(
         private fun initFromDataPointNote() {
             val dataPoint = note!!.dataPoint!!
             binding.valueText.visibility = View.VISIBLE
-            val featureType = featureTypes.getOrElse(dataPoint.featureId) { DataType.CONTINUOUS }
-            binding.valueText.text = note!!.dataPoint!!.getDisplayValue(featureType)
+            val isDuration = featureTypes[note!!.dataPoint!!.featureId] == DataType.DURATION
+            binding.valueText.text = note!!.dataPoint!!.getDisplayValue(isDuration)
             binding.featureNameText.visibility = View.VISIBLE
-            binding.featureNameText.text = featurePathProvider.getPathForFeature(dataPoint.featureId)
+            binding.featureNameText.text = featurePathProvider.getPathForDataSource(
+                dataPoint.featureId,
+                DataSourceType.FEATURE
+            )
             binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
             binding.noteText.visibility = View.VISIBLE
             binding.noteText.text = dataPoint.note
@@ -101,7 +105,7 @@ class NotesAdapter(
         companion object {
             fun from(
                 parent: ViewGroup,
-                featurePathProvider: FeaturePathProvider,
+                featurePathProvider: DataSourcePathProvider,
                 weekDayNames: List<String>,
                 featureTypes: Map<Long, DataType>,
                 clickListener: NoteClickListener
