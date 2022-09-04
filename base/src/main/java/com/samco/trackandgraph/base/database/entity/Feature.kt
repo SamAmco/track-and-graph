@@ -25,7 +25,7 @@ import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.Feature
 
 @Entity(
-    tableName = "features_table",
+    tableName = "features_table2",
     foreignKeys = [ForeignKey(
         entity = Group::class,
         parentColumns = arrayOf("id"),
@@ -44,20 +44,8 @@ internal data class Feature(
     @ColumnInfo(name = "group_id", index = true)
     val groupId: Long,
 
-    @ColumnInfo(name = "type")
-    val featureType: DataType,
-
-    @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<DiscreteValue>,
-
     @ColumnInfo(name = "display_index")
     val displayIndex: Int,
-
-    @ColumnInfo(name = "has_default_value")
-    val hasDefaultValue: Boolean,
-
-    @ColumnInfo(name = "default_value")
-    val defaultValue: Double,
 
     @ColumnInfo(name = "feature_description")
     val description: String
@@ -66,11 +54,7 @@ internal data class Feature(
         id,
         name,
         groupId,
-        featureType,
-        discreteValues,
         displayIndex,
-        hasDefaultValue,
-        defaultValue,
         description
     )
 }

@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.base.model
 
-import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.room.withTransaction
@@ -126,7 +125,7 @@ internal class DataInteractorImpl @Inject constructor(
         )
     }
 
-    override suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature> =
+    override suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayTracker> =
         withContext(io) {
             dao.getDisplayFeaturesForGroupSync(groupId).map { it.toDto() }
         }
@@ -145,7 +144,7 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun tryGetDisplayFeatureByIdSync(
         featureId: Long
-    ): DisplayFeature? = withContext(io) {
+    ): DisplayTracker? = withContext(io) {
         dao.getDisplayFeatureByIdSync(featureId)?.toDto()
     }
 
@@ -569,7 +568,7 @@ internal class DataInteractorImpl @Inject constructor(
         serviceManager.requestWidgetUpdatesForFeatureId(featureId)
     }
 
-    override suspend fun getAllActiveTimerFeatures(): List<DisplayFeature> = withContext(io) {
+    override suspend fun getAllActiveTimerFeatures(): List<DisplayTracker> = withContext(io) {
         dao.getAllActiveTimerFeatures().map { it.toDto() }
     }
 

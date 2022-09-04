@@ -25,7 +25,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.CATEGORY_STOPWATCH
 import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.base.R
-import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
@@ -79,7 +79,7 @@ class TimerNotificationService : Service() {
             this.updateJobs?.forEach { it.cancel() }
         }
 
-        private fun createUpdateJob(feature: DisplayFeature, isPrimary: Boolean): Job? {
+        private fun createUpdateJob(feature: DisplayTracker, isPrimary: Boolean): Job? {
             val instant = feature.timerStartInstant ?: return null
             val builder = buildNotification(feature.id, feature.name, instant)
             return jobScope.launch {
@@ -95,7 +95,7 @@ class TimerNotificationService : Service() {
             }
         }
 
-        fun setNotifications(features: List<DisplayFeature>) =
+        fun setNotifications(features: List<DisplayTracker>) =
             synchronized(this@TimerNotificationService) {
                 clearOldNotifications()
 

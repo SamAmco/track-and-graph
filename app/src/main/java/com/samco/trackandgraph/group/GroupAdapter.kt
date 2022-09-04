@@ -24,14 +24,12 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.database.dto.GroupChild
 import com.samco.trackandgraph.base.database.dto.GroupChildType
-import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import kotlinx.coroutines.CoroutineDispatcher
 
 class GroupAdapter(
     private val featureClickListener: FeatureClickListener,
@@ -64,7 +62,7 @@ class GroupAdapter(
                 graphStatClickListener
             )
             GroupChildType.FEATURE -> (holder as FeatureViewHolder)
-                .bind(item.obj as DisplayFeature, featureClickListener)
+                .bind(item.obj as DisplayTracker, featureClickListener)
             GroupChildType.GROUP -> (holder as GroupViewHolder)
                 .bind(item.obj as Group, groupClickListener)
         }
@@ -141,8 +139,8 @@ private class ListDiffCallback(
                 oldObj == newObj
             }
             GroupChildType.FEATURE -> {
-                val oldObj = (old.obj as DisplayFeature).copy(displayIndex = 0)
-                val newObj = (new.obj as DisplayFeature).copy(displayIndex = 0)
+                val oldObj = (old.obj as DisplayTracker).copy(displayIndex = 0)
+                val newObj = (new.obj as DisplayTracker).copy(displayIndex = 0)
                 oldObj == newObj
             }
             GroupChildType.GRAPH -> {

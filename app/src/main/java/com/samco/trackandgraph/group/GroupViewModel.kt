@@ -57,7 +57,7 @@ class GroupViewModel @Inject constructor(
     val features
         get() = groupChildren.value
             ?.filter { it.type == GroupChildType.FEATURE }
-            ?.map { it.obj as DisplayFeature }
+            ?.map { it.obj as DisplayTracker }
             ?: emptyList()
 
     private var initialized = false
@@ -167,7 +167,7 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    fun addDefaultFeatureValue(feature: DisplayFeature) = viewModelScope.launch(io) {
+    fun addDefaultFeatureValue(feature: DisplayTracker) = viewModelScope.launch(io) {
         val label = if (feature.featureType == DataType.DISCRETE) {
             feature.discreteValues[feature.defaultValue.toInt()].label
         } else ""
@@ -206,7 +206,7 @@ class GroupViewModel @Inject constructor(
         _showDurationInputDialog.value = null
     }
 
-    fun stopTimer(feature: DisplayFeature) = viewModelScope.launch(io) {
+    fun stopTimer(feature: DisplayTracker) = viewModelScope.launch(io) {
         dataInteractor.stopTimerForFeature(feature.id)?.let {
             withContext(ui) {
                 _showDurationInputDialog.value = DurationInputDialogData(feature.id, it)
@@ -214,7 +214,7 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    fun playTimer(feature: DisplayFeature) = viewModelScope.launch(io) {
+    fun playTimer(feature: DisplayTracker) = viewModelScope.launch(io) {
         dataInteractor.playTimerForFeature(feature.id)
     }
 }

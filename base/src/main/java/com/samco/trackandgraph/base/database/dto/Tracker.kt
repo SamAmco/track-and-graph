@@ -17,32 +17,27 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-import org.threeten.bp.Instant
-import org.threeten.bp.OffsetDateTime
-
-data class DisplayFeature(
-    var id: Long,
+data class Tracker(
+    val id: Long,
     val name: String,
-    val groupId: Long,
-    val featureType: DataType = DataType.CONTINUOUS,
+    val featureId: Long,
+    val dataType: DataType,
     val discreteValues: List<DiscreteValue>,
     val hasDefaultValue: Boolean,
     val defaultValue: Double,
-    val timestamp: OffsetDateTime?,
-    val numDataPoints: Long?,
-    val displayIndex: Int,
-    val description: String,
-    val timerStartInstant: Instant?
 ) {
-    fun asFeature() = Feature(
+    fun getDefaultLabel(): String =
+        if (dataType == DataType.DISCRETE)
+            discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
+        else ""
+
+    fun toEntity() = com.samco.trackandgraph.base.database.entity.Tracker(
         id,
         name,
-        groupId,
-        featureType,
+        featureId,
+        dataType,
         discreteValues,
-        displayIndex,
         hasDefaultValue,
-        defaultValue,
-        description
+        defaultValue
     )
 }

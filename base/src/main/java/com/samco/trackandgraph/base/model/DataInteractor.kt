@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.base.model
 
-import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.dto.*
@@ -67,7 +66,7 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>)
 
-    suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature>
+    suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayTracker>
 
     suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
@@ -75,7 +74,7 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun tryGetFeatureByIdSync(featureId: Long): Feature?
 
-    suspend fun tryGetDisplayFeatureByIdSync(featureId: Long): DisplayFeature?
+    suspend fun tryGetDisplayFeatureByIdSync(featureId: Long): DisplayTracker?
 
     fun tryGetFeatureById(featureId: Long): LiveData<Feature?>
 
@@ -201,7 +200,7 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun stopTimerForFeature(featureId: Long): Duration?
 
-    suspend fun getAllActiveTimerFeatures(): List<DisplayFeature>
+    suspend fun getAllActiveTimerFeatures(): List<DisplayTracker>
 
     suspend fun getFunctionById(functionId: Long): FunctionDto?
 

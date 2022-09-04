@@ -20,10 +20,8 @@ import android.content.Context
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.entity.DataPoint
-import com.samco.trackandgraph.base.database.entity.DataSourceDescriptor
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.base.database.entity.FeatureTimer
 import com.samco.trackandgraph.base.database.entity.FunctionEntity
@@ -36,6 +34,8 @@ import com.samco.trackandgraph.base.database.entity.PieChart
 import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.database.entity.TimeHistogram
 import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
+import com.samco.trackandgraph.base.database.entity.Tracker
+import com.samco.trackandgraph.base.database.migrations.allMigrations
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
@@ -51,6 +51,7 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
 @Database(
     entities = [
         Feature::class,
+        Tracker::class,
         DataPoint::class,
         Group::class,
         GraphOrStat::class,
@@ -139,17 +140,15 @@ internal class Converters {
     fun stringToInstant(string: String?): Instant? = string?.let { Instant.parse(it) }
 
     @TypeConverter
-    fun stringToListOfDataSourceDescriptor(value: String): List<DataSourceDescriptor> {
+    fun stringToListOfFeature(value: String): List<Feature> {
         if (value.isBlank()) return emptyList()
-        val listType =
-            Types.newParameterizedType(List::class.java, DataSourceDescriptor::class.java)
+        val listType = Types.newParameterizedType(List::class.java, Feature::class.java)
         return fromJson(moshi.adapter(listType), value) { emptyList() }
     }
 
     @TypeConverter
-    fun listOfDataSourceDescriptorToString(values: List<DataSourceDescriptor>): String {
-        val listType =
-            Types.newParameterizedType(List::class.java, DataSourceDescriptor::class.java)
+    fun listOfFeatureToString(values: List<Feature>): String {
+        val listType = Types.newParameterizedType(List::class.java, Feature::class.java)
         return toJson(moshi.adapter(listType), values)
     }
 
@@ -219,16 +218,6 @@ internal class Converters {
     @TypeConverter
     fun checkedDaysFromString(value: String): CheckedDays =
         fromJson(moshi.adapter(CheckedDays::class.java), value) { CheckedDays.none() }
-
-    //This use of || to concat Ints is here for legacy reasons. It avoids migrating old databases.
-    // If it ain't broke don't fix it. It should probably use Moshi for consistency though.
-    @TypeConverter
-    fun listOfIntsToString(ints: List<Int>) = ints.joinToString("||") { it.toString() }
-
-    @TypeConverter
-    fun stringToListOfInts(intsString: String) = intsString.split("||").mapNotNull {
-        it.toIntOrNull()
-    }
 
     @TypeConverter
     fun yRangeTypeToInt(yRangeType: YRangeType) = yRangeType.ordinal

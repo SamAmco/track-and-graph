@@ -276,7 +276,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         this::onStopTimerClicked
     )
 
-    private fun onStopTimerClicked(feature: DisplayFeature) {
+    private fun onStopTimerClicked(feature: DisplayTracker) {
         //Due to a bug with the GridLayoutManager when you stop a timer and the timer text disappears
         // the views heights are not properly re-calculated and we need to call notifyDataSetChanged
         // to get the view heights right again
@@ -284,13 +284,13 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         viewModel.stopTimer(feature)
     }
 
-    private fun onFeatureHistoryClicked(feature: DisplayFeature) {
+    private fun onFeatureHistoryClicked(feature: DisplayTracker) {
         navController?.navigate(
             GroupFragmentDirections.actionFeatureHistory(feature.id, feature.name)
         )
     }
 
-    private fun onFeatureAddClicked(feature: DisplayFeature, useDefault: Boolean = true) {
+    private fun onFeatureAddClicked(feature: DisplayTracker, useDefault: Boolean = true) {
         /**
          * @param useDefault: if false the default value will be ignored and the user will be queried for the value
          */
@@ -304,11 +304,11 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         }
     }
 
-    private fun onFeatureDescriptionClicked(feature: DisplayFeature) {
+    private fun onFeatureDescriptionClicked(feature: DisplayTracker) {
         showFeatureDescriptionDialog(requireContext(), feature.name, feature.description)
     }
 
-    private fun onFeatureMoveToClicked(feature: DisplayFeature) {
+    private fun onFeatureMoveToClicked(feature: DisplayTracker) {
         val dialog = MoveToDialogFragment()
         val args = Bundle()
         args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_TRACK)
@@ -317,7 +317,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         childFragmentManager.let { dialog.show(it, "move_dialog") }
     }
 
-    private fun onFeatureEditClicked(feature: DisplayFeature) {
+    private fun onFeatureEditClicked(feature: DisplayTracker) {
         val featureNames = viewModel.features.map { f -> f.name }.toTypedArray()
         navController?.navigate(
             GroupFragmentDirections
@@ -458,7 +458,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         dialog.show(childFragmentManager, "add_group_dialog")
     }
 
-    private fun onFeatureDeleteClicked(feature: DisplayFeature) {
+    private fun onFeatureDeleteClicked(feature: DisplayTracker) {
         val dialog = YesCancelDialogFragment()
         val args = Bundle()
         args.putString("title", getString(R.string.ru_sure_del_feature))
