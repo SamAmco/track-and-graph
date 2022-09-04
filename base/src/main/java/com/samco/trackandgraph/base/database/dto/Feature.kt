@@ -22,27 +22,14 @@ data class Feature(
     val id: Long,
     val name: String,
     val groupId: Long,
-    val featureType: DataType,
-    val discreteValues: List<DiscreteValue>,
     val displayIndex: Int,
-    val hasDefaultValue: Boolean,
-    val defaultValue: Double,
     val description: String,
 ) {
-    fun getDefaultLabel(): String =
-        if (featureType == DataType.DISCRETE)
-            discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
-        else ""
-
     internal fun toEntity() = Feature(
         id,
         name,
         groupId,
-        featureType,
-        discreteValues,
         displayIndex,
-        hasDefaultValue,
-        defaultValue,
         description
     )
 }

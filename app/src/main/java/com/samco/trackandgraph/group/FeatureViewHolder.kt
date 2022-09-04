@@ -25,11 +25,10 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.ListItemFeatureBinding
-import kotlinx.coroutines.*
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 
@@ -37,10 +36,10 @@ class FeatureViewHolder private constructor(
     private val binding: ListItemFeatureBinding,
 ) : GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
     private var clickListener: FeatureClickListener? = null
-    private var feature: DisplayFeature? = null
+    private var feature: DisplayTracker? = null
     private var dropElevation = 0f
 
-    fun bind(feature: DisplayFeature, clickListener: FeatureClickListener) {
+    fun bind(feature: DisplayTracker, clickListener: FeatureClickListener) {
         this.feature = feature
         this.clickListener = clickListener
         this.dropElevation = binding.cardView.cardElevation
@@ -53,7 +52,7 @@ class FeatureViewHolder private constructor(
         initTimerControls(feature, clickListener)
     }
 
-    private fun initTimerControls(feature: DisplayFeature, clickListener: FeatureClickListener) {
+    private fun initTimerControls(feature: DisplayTracker, clickListener: FeatureClickListener) {
         binding.playStopButtons.visibility =
             if (feature.featureType == DataType.DURATION) View.VISIBLE
             else View.GONE
@@ -89,7 +88,7 @@ class FeatureViewHolder private constructor(
         }
     }
 
-    private fun initAddButton(feature: DisplayFeature, clickListener: FeatureClickListener) {
+    private fun initAddButton(feature: DisplayTracker, clickListener: FeatureClickListener) {
         binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
         binding.quickAddButton.setOnLongClickListener {
@@ -171,23 +170,23 @@ class FeatureViewHolder private constructor(
 }
 
 class FeatureClickListener(
-    private val onEditListener: (feature: DisplayFeature) -> Unit,
-    private val onDeleteListener: (feature: DisplayFeature) -> Unit,
-    private val onMoveToListener: (feature: DisplayFeature) -> Unit,
-    private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
-    private val onAddListener: (feature: DisplayFeature, useDefault: Boolean) -> Unit,
-    private val onHistoryListener: (feature: DisplayFeature) -> Unit,
-    private val onPlayTimerListener: (feature: DisplayFeature) -> Unit,
-    private val onStopTimerListener: (feature: DisplayFeature) -> Unit,
+    private val onEditListener: (feature: DisplayTracker) -> Unit,
+    private val onDeleteListener: (feature: DisplayTracker) -> Unit,
+    private val onMoveToListener: (feature: DisplayTracker) -> Unit,
+    private val onDescriptionListener: (feature: DisplayTracker) -> Unit,
+    private val onAddListener: (feature: DisplayTracker, useDefault: Boolean) -> Unit,
+    private val onHistoryListener: (feature: DisplayTracker) -> Unit,
+    private val onPlayTimerListener: (feature: DisplayTracker) -> Unit,
+    private val onStopTimerListener: (feature: DisplayTracker) -> Unit,
 ) {
-    fun onEdit(feature: DisplayFeature) = onEditListener(feature)
-    fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
-    fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
-    fun onDescription(feature: DisplayFeature) = onDescriptionListener(feature)
-    fun onAdd(feature: DisplayFeature, useDefault: Boolean = true) =
+    fun onEdit(feature: DisplayTracker) = onEditListener(feature)
+    fun onDelete(feature: DisplayTracker) = onDeleteListener(feature)
+    fun onMoveTo(feature: DisplayTracker) = onMoveToListener(feature)
+    fun onDescription(feature: DisplayTracker) = onDescriptionListener(feature)
+    fun onAdd(feature: DisplayTracker, useDefault: Boolean = true) =
         onAddListener(feature, useDefault)
 
-    fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
-    fun onPlayTimer(feature: DisplayFeature) = onPlayTimerListener(feature)
-    fun onStopTimer(feature: DisplayFeature) = onStopTimerListener(feature)
+    fun onHistory(feature: DisplayTracker) = onHistoryListener(feature)
+    fun onPlayTimer(feature: DisplayTracker) = onPlayTimerListener(feature)
+    fun onStopTimer(feature: DisplayTracker) = onStopTimerListener(feature)
 }

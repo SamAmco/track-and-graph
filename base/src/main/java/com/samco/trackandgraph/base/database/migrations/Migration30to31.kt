@@ -15,20 +15,16 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.dto
+package com.samco.trackandgraph.base.database.migrations
 
-//This is the only dto with the explicit name Dto because Function is too common of a name
-// and causes naming conflicts with basic types
-data class FunctionDto(
-    val id: Long,
-    val name: String,
-    val dataSources: List<Feature>,
-    val script: String
-) {
-    internal fun toEntity() = com.samco.trackandgraph.base.database.entity.FunctionEntity(
-        id,
-        name,
-        dataSources.map { it.toEntity() },
-        script
-    )
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
+
+
+val MIGRATION_30_31 = object : Migration(30, 31) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.execSQL("ALTER TABLE line_graphs_table ADD y_range_type INTEGER NOT NULL DEFAULT  0")
+        database.execSQL("ALTER TABLE line_graphs_table ADD y_from REAL NOT NULL DEFAULT  0")
+        database.execSQL("ALTER TABLE line_graphs_table ADD y_to REAL NOT NULL DEFAULT  1")
+    }
 }

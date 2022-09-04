@@ -17,18 +17,20 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-import java.io.Serializable
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
 
-data class DataSourceDescriptor(
+data class DisplayTracker(
+    var id: Long,
     val name: String,
-    val type: DataSourceType,
-    val id: Long,
-    val groupId: Long
-): Serializable {
-    internal fun toEntity() = com.samco.trackandgraph.base.database.entity.DataSourceDescriptor(
-        name,
-        type.toEntity(),
-        id,
-        groupId
-    )
-}
+    val groupId: Long,
+    val featureType: DataType = DataType.CONTINUOUS,
+    val discreteValues: List<DiscreteValue>,
+    val hasDefaultValue: Boolean,
+    val defaultValue: Double,
+    val timestamp: OffsetDateTime?,
+    val numDataPoints: Long?,
+    val displayIndex: Int,
+    val description: String,
+    val timerStartInstant: Instant?
+)
