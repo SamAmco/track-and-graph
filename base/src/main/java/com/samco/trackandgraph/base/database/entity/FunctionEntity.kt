@@ -32,11 +32,4 @@ internal data class FunctionEntity(
 
     @ColumnInfo(name = "script")
     val script: String
-) {
-    fun toDto() = com.samco.trackandgraph.base.database.dto.FunctionDto(
-        id,
-        name,
-        dataSources.map { it.toDto() },
-        script
-    )
-}
+)

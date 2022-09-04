@@ -24,7 +24,7 @@ import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
-internal data class DisplayFeature(
+internal data class DisplayTracker(
     @ColumnInfo(name = "id")
     var id: Long,
 

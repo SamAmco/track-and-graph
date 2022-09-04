@@ -55,7 +55,7 @@ internal class ServiceManagerImpl @Inject constructor(
         //We must also only start the service if there are active timers because otherwise it will
         // not call startForeground when it is started which will crash the app.
         ioJob.launch {
-            if (dao.getAllActiveTimerFeatures().isNotEmpty())
+            if (dao.getAllActiveTimerTrackers().isNotEmpty())
                 startTimerNotificationService()
         }
     }

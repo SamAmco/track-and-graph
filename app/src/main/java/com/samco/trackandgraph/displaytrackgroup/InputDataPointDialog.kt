@@ -296,6 +296,7 @@ class InputDataPointDialogViewModel @Inject constructor(
         viewModelScope.launch(io) {
             val featureData = dataInteractor.getFeaturesByIdsSync(featureIds)
             val dataPointData = dataPointTimestamp?.let {
+                //TODO Should use tracker id
                 dataInteractor.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
             }
             uiStates = getUIStatesForFeatures(featureData, dataPointData, durationSeconds)
