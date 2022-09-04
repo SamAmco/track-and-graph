@@ -24,9 +24,6 @@ internal data class FunctionEntity(
     @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,
 
-    @ColumnInfo(name = "name")
-    val name: String,
-
     @ColumnInfo(name = "data_sources")
     val dataSources: List<Feature>,
 

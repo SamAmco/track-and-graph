@@ -26,9 +26,10 @@ import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
 import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
 import org.threeten.bp.OffsetDateTime
 
-//TODO get from the trackers table and join the features table
 private const val getDisplayTrackersQuery =
-    """SELECT features_table.*, num_data_points, last_timestamp, start_instant from features_table 
+    """SELECT features_table.name, features_table.group_id, features_table.display_index, trackers_table.*, num_data_points, last_timestamp, start_instant 
+        FROM trackers_table
+        LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
         LEFT JOIN (
             SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
             FROM data_points_table GROUP BY feature_id
@@ -93,13 +94,13 @@ internal interface TrackAndGraphDatabaseDao {
     @Query(getDisplayTrackersQuery + """WHERE group_id = :groupId ORDER BY features_table.display_index ASC, id DESC""")
     fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
 
-    @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
+    @Query("SELECT features_table2.* FROM features_table2 WHERE group_id = :groupId ORDER BY features_table2.display_index ASC")
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
-    @Query("SELECT * FROM features_table WHERE id = :featureId LIMIT 1")
+    @Query("SELECT * FROM features_table2 WHERE id = :featureId LIMIT 1")
     fun getFeatureById(featureId: Long): Feature?
 
-    @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT * from features_table2 WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
 
     @Insert
@@ -120,7 +121,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Delete
     fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
-    @Query("DELETE FROM features_table WHERE id = :id")
+    @Query("DELETE FROM features_table2 WHERE id = :id")
     fun deleteFeature(id: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -176,7 +177,7 @@ internal interface TrackAndGraphDatabaseDao {
             SELECT * FROM (
                 SELECT dp.timestamp as timestamp, 0 as note_type, dp.feature_id as feature_id, f.name as feature_name, t.id as group_id, dp.note as note
                 FROM data_points_table as dp 
-                LEFT JOIN features_table as f ON dp.feature_id = f.id
+                LEFT JOIN features_table2 as f ON dp.feature_id = f.id
                 LEFT JOIN groups_table as t ON f.group_id = t.id
                 WHERE dp.note IS NOT NULL AND dp.note != ""
             ) UNION SELECT * FROM (
@@ -265,7 +266,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Query(getDisplayTrackersQuery + """WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC""")
     fun getAllActiveTimerTrackers(): List<DisplayTracker>
 
-    @Query(getDisplayTrackersQuery + """WHERE features_table.id=:featureId LIMIT 1""")
+    @Query(getDisplayTrackersQuery + """WHERE feature_id=:featureId LIMIT 1""")
     fun getDisplayTrackerByIdSync(featureId: Long): DisplayTracker?
 
     @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :id")
@@ -282,4 +283,10 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM functions_table")
     fun getAllFunctionsSync(): List<FunctionEntity>
+
+    @Query("SELECT * FROM trackers_table")
+    fun getAllTrackersSync(): List<Tracker>
+
+    @Query("SELECT * FROM trackers_table WHERE id = :trackerId LIMIT 1")
+    fun getTrackerById(trackerId: Long): Tracker?
 }

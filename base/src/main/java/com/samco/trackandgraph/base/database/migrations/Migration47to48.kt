@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.base.database.migrations
 
+import androidx.room.ColumnInfo
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
@@ -37,7 +38,6 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
                 CREATE TABLE IF NOT EXISTS `${tableName}` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                     `feature_id` INTEGER NOT NULL, 
-                    `name` TEXT NOT NULL, 
                     `data_sources` TEXT NOT NULL, 
                     `script` TEXT NOT NULL, 
                     FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
@@ -54,8 +54,8 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
     private fun copyOldFeaturesToNewTrackersTable(database: SupportSQLiteDatabase) {
         database.execSQL(
             """
-                INSERT INTO trackers_table
-                SELECT name, feature_id, type, discrete_values, has_default_value, default_value
+                INSERT INTO trackers_table(feature_id, type, discrete_values, has_default_value, default_value)
+                SELECT feature_id, type, discrete_values, has_default_value, default_value
                 FROM features_table
             """.trimIndent()
         )
@@ -77,7 +77,6 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
             """
                 CREATE TABLE IF NOT EXISTS `${tableName}` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    `name` TEXT NOT NULL, 
                     `feature_id` INTEGER NOT NULL, 
                     `type` INTEGER NOT NULL, 
                     `discrete_values` TEXT NOT NULL, 
@@ -97,7 +96,6 @@ val MIGRATION_47_48 = object : Migration(47, 48) {
             """
                 CREATE TABLE IF NOT EXISTS `${tableName}` (
                     `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    `name` TEXT NOT NULL, 
                     `group_id` INTEGER NOT NULL, 
                     `display_index` INTEGER NOT NULL, 
                     `feature_description` TEXT NOT NULL, 
