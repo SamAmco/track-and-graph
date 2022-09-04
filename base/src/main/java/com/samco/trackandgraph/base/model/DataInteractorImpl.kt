@@ -27,6 +27,7 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.entity.FeatureTimer
 import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.ServiceManager
@@ -115,6 +116,16 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllFeaturesSync().map { it.toDto() }
     }
 
+    override suspend fun getAllDataSourcesSync(): List<DataSourceDescriptor> = withContext(io) {
+        dao.getAllFeaturesSync().map {
+            DataSourceDescriptor(it.name, DataSourceType.FEATURE, it.id, it.groupId)
+        }.plus(
+            dao.getAllFunctionsSync().map {
+                DataSourceDescriptor(it.name, DataSourceType.FUNCTION, it.id, it.groupId)
+            }
+        )
+    }
+
     override suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature> =
         withContext(io) {
             dao.getDisplayFeaturesForGroupSync(groupId).map { it.toDto() }
@@ -124,8 +135,8 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getFeaturesForGroupSync(groupId).map { it.toDto() }
     }
 
-    override suspend fun getFeatureById(featureId: Long): Feature = withContext(io) {
-        dao.getFeatureById(featureId).toDto()
+    override suspend fun getFeatureById(featureId: Long): Feature? = withContext(io) {
+        dao.getFeatureById(featureId)?.toDto()
     }
 
     override suspend fun tryGetFeatureByIdSync(featureId: Long): Feature? = withContext(io) {
@@ -237,11 +248,6 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override fun getDataUpdateEvents(): SharedFlow<Unit> = dataUpdateEvents
-
-    override suspend fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor =
-        withContext(io) {
-            dao.getDataPointsCursorForFeatureSync(featureId)
-        }
 
     override fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>> {
         return Transformations.map(dao.getDataPointsForFeature(featureId)) { dataPoints -> dataPoints.map { it.toDto() } }
@@ -535,8 +541,9 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun writeFeaturesToCSV(outStream: OutputStream, featureIds: List<Long>) =
         withContext(io) {
-            val featureMap =
-                featureIds.associate { getFeatureById(it) to getDataSampleForFeatureId(it) }
+            val featureMap = featureIds
+                .mapNotNull { getFeatureById(it) }
+                .associateWith { getDataSampleForFeatureId(it.id) }
             csvReadWriter.writeFeaturesToCSV(outStream, featureMap)
         }
 
@@ -577,4 +584,28 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun createFunction(function: FunctionDto) = withContext(io) {
         dao.createFunction(function.toEntity())
     }
+
+    //TODO we need some sort of interface for resolving the data/properties of functions
+    override suspend fun getLabelsForDataSource(source: DataSourceDescriptor): Set<String> {
+        return when (source.type) {
+            DataSourceType.FEATURE -> dao.getFeatureById(source.id)
+                ?.discreteValues
+                ?.map { it.label }
+                ?.toSet() ?: emptySet()
+            //TODO implement collecting labels for a function data source
+            DataSourceType.FUNCTION -> emptySet()
+        }
+    }
+
+    override suspend fun getDataSamplePropertiesForSource(source: DataSourceDescriptor): DataSampleProperties =
+        withContext(io) {
+            return@withContext when (source.type) {
+                DataSourceType.FEATURE -> {
+                    val feature = dao.getFeatureById(source.id)
+                    DataSampleProperties(null, feature?.featureType == DataType.DURATION)
+                }
+                //TODO implement getting data sample properties for a function
+                DataSourceType.FUNCTION -> DataSampleProperties(null, false)
+            }
+        }
 }

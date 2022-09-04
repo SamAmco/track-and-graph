@@ -17,20 +17,20 @@
 
 package com.samco.trackandgraph.graphstatinput.configviews
 
-import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.DataSourceDescriptor
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.ui.DataSourcePathProvider
 
-class FeatureDataProvider(
-    val featureData: List<FeatureData>,
-    groups: List<Group>
-) : FeaturePathProvider(featureData.map { it.feature }, groups) {
+class DataSourceDataProvider(
+    val dataSourceData: Map<DataSourceData, Group>
+) : DataSourcePathProvider(dataSourceData.map { it.key.descriptor to it.value }.toMap()) {
 
-    fun featureDataAlphabetical() = featureData.sortedBy { getPathForFeature(it.feature.id) }
+    fun dataSourceDataAlphabetically() =
+        dataSourceData.keys.sortedBy { getPathForDataSource(it.descriptor.id, it.descriptor.type) }
 
-    data class FeatureData(
-        val feature: Feature,
+    data class DataSourceData(
+        val descriptor: DataSourceDescriptor,
         val labels: Set<String>,
         val dataProperties: DataSampleProperties
     )

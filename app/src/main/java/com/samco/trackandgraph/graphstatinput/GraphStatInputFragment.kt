@@ -35,11 +35,9 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
-import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -287,24 +285,28 @@ class GraphStatInputViewModel @Inject constructor(
     val demoViewData: LiveData<IGraphStatViewData?> get() = _demoViewData
     private val _demoViewData = MutableLiveData<IGraphStatViewData?>(null)
 
-    lateinit var featureDataProvider: FeatureDataProvider private set
+    lateinit var featureDataProvider: DataSourceDataProvider private set
 
     fun initViewModel(graphStatGroupId: Long, graphStatId: Long) {
         if (this.graphStatGroupId != -1L) return
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
         viewModelScope.launch(io) {
-            val allFeatures = dataInteractor.getAllFeaturesSync()
+            val allDataSources = dataInteractor.getAllDataSourcesSync()
             val allGroups = dataInteractor.getAllGroupsSync()
-            //TODO Need to get an actual data sample and iterate to get actual labels and properties
-            val featureData = allFeatures.map { feat ->
-                FeatureDataProvider.FeatureData(
-                    feat,
-                    feat.discreteValues.map { it.label }.toSet(),
-                    DataSampleProperties(null, feat.featureType == DataType.DURATION)
+            val dataSourceData = allDataSources.map { source ->
+                DataSourceDataProvider.DataSourceData(
+                    source,
+                    dataInteractor.getLabelsForDataSource(source),
+                    dataInteractor.getDataSamplePropertiesForSource(source)
                 )
             }
-            featureDataProvider = FeatureDataProvider(featureData, allGroups)
+            featureDataProvider =
+                DataSourceDataProvider(dataSourceData.mapNotNull { data ->
+                    val group = allGroups.firstOrNull { it.id == data.descriptor.groupId }
+                        ?: return@mapNotNull null
+                    data to group
+                }.toMap())
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
             else moveToWaiting()
         }

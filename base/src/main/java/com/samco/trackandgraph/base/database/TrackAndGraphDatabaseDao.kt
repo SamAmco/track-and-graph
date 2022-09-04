@@ -99,7 +99,7 @@ internal interface TrackAndGraphDatabaseDao {
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
     @Query(getFeatureByIdQuery)
-    fun getFeatureById(featureId: Long): Feature
+    fun getFeatureById(featureId: Long): Feature?
 
     @Query(getFeatureByIdQuery)
     fun tryGetFeatureByIdSync(featureId: Long): Feature?
@@ -287,4 +287,7 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun createFunction(function: FunctionEntity)
+
+    @Query("SELECT * FROM functions_table")
+    fun getAllFunctionsSync(): List<FunctionEntity>
 }

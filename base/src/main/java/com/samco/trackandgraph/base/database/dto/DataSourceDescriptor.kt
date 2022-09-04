@@ -17,14 +17,18 @@
 
 package com.samco.trackandgraph.base.database.dto
 
+import java.io.Serializable
+
 data class DataSourceDescriptor(
     val name: String,
     val type: DataSourceType,
-    val id: Long
-) {
+    val id: Long,
+    val groupId: Long
+): Serializable {
     internal fun toEntity() = com.samco.trackandgraph.base.database.entity.DataSourceDescriptor(
         name,
         type.toEntity(),
-        id
+        id,
+        groupId
     )
 }

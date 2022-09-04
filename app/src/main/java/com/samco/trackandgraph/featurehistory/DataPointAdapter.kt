@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.databinding.ListItemDataPointBinding
@@ -31,11 +31,11 @@ import com.samco.trackandgraph.databinding.ListItemDataPointBinding
 class DataPointAdapter(
     private val clickListener: DataPointClickListener,
     private val weekDayNames: List<String>,
-    private val dataType: DataType
+    private val dataSampleProperties: DataSampleProperties
 ) : ListAdapter<DataPoint, DataPointAdapter.ViewHolder>(DataPointDiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder.from(parent, clickListener, weekDayNames, dataType)
+        return ViewHolder.from(parent, clickListener, weekDayNames, dataSampleProperties)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
@@ -47,11 +47,11 @@ class DataPointAdapter(
         private val binding: ListItemDataPointBinding,
         private val clickListener: DataPointClickListener,
         private val weekDayNames: List<String>,
-        private val dataType: DataType
+        private val dataSampleProperties: DataSampleProperties
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(dataPoint: DataPoint) {
-            binding.valueText.text = dataPoint.getDisplayValue(dataType)
+            binding.valueText.text = dataPoint.getDisplayValue(dataSampleProperties.isDuration)
             binding.timestampText.text = formatDayMonthYearHourMinuteWeekDayTwoLines(
                 binding.timestampText.context,
                 weekDayNames,
@@ -76,11 +76,11 @@ class DataPointAdapter(
                 parent: ViewGroup,
                 clickListener: DataPointClickListener,
                 weekDayNames: List<String>,
-                dataType: DataType
+                dataSampleProperties: DataSampleProperties
             ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemDataPointBinding.inflate(layoutInflater, parent, false)
-                return ViewHolder(binding, clickListener, weekDayNames, dataType)
+                return ViewHolder(binding, clickListener, weekDayNames, dataSampleProperties)
             }
         }
     }

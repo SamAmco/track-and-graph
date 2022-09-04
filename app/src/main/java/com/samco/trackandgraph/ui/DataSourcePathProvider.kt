@@ -17,23 +17,21 @@
 
 package com.samco.trackandgraph.ui
 
-import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.DataSourceDescriptor
+import com.samco.trackandgraph.base.database.dto.DataSourceType
 import com.samco.trackandgraph.base.database.dto.Group
 
+open class DataSourcePathProvider(
+    private val dataSources: Map<DataSourceDescriptor, Group>,
+) : GroupPathProvider(dataSources.values) {
+    fun sortedAlphabetically() = dataSources.keys.sortedBy { getPathForDataSource(it.id, it.type) }
 
-open class FeaturePathProvider(
-    val features: List<Feature>,
-    groups: List<Group>
-) : GroupPathProvider(groups) {
-    private val featuresById = features.map { it.id to it }.toMap()
-
-    fun featuresSortedAlphabetically() = features.sortedBy { getPathForFeature(it.id) }
-
-    fun getPathForFeature(id: Long): String {
-        val feature = featuresById[id] ?: return ""
-        val groupPath = getPathForGroup(feature.groupId)
+    fun getPathForDataSource(id: Long, type: DataSourceType): String {
+        val dataSource = dataSources.keys.firstOrNull { it.id == id && it.type == type } ?: return ""
+        val group = dataSources[dataSource] ?: return ""
+        val groupPath = getPathForGroup(group.id)
         var path = groupPath
         if (groupPath.lastOrNull() != '/') path += '/'
-        return path + feature.name
+        return path + dataSource.name
     }
 }
