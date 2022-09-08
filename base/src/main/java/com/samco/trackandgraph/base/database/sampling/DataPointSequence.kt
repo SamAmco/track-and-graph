@@ -33,7 +33,8 @@ internal class DataPointSequence(
 
     private var visited: Int = 0
     private val cached = mutableListOf<DataPoint>()
-    private val dataSize by lazy { dao.getNumberOfDataPointsForFeature(featureId)
+    private val dataSize by lazy {
+        dao.getNumberOfDataPointsForFeature(featureId)
     }
 
     private fun bufferNext() {
@@ -47,7 +48,7 @@ internal class DataPointSequence(
     override fun iterator(): Iterator<IDataPoint> = object : Iterator<IDataPoint> {
         private var position = 0
 
-        override fun hasNext(): Boolean = position < dataSize - 1
+        override fun hasNext(): Boolean = position < dataSize
 
         override fun next(): IDataPoint {
             if (position + 1 > cached.size) bufferNext()
