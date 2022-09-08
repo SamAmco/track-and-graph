@@ -139,19 +139,24 @@ internal class DataInteractorImpl @Inject constructor(
         }
 
     override suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker> =
-        withContext(io) {
-            trackerIds.mapNotNull { getTrackerById(it) }
-        }
+        withContext(io) { trackerIds.mapNotNull { getTrackerById(it) } }
 
     override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
-        //TODO implement this
-        dao.insertFeature(feature.toEntity()).also { dataUpdateEvents.emit(Unit) }
+        val id = database.withTransaction {
+            val featureId = dao.insertFeature(tracker.toFeatureEntity())
+            dao.insertTracker(tracker.toEntity().copy(featureId = featureId))
+        }
+        dataUpdateEvents.emit(Unit)
+        return@withContext id
     }
 
     override suspend fun updateTracker(tracker: Tracker) = withContext(io) {
-        //TODO implement this
-        dao.updateFeature(feature.toEntity()).also { dataUpdateEvents.emit(Unit) }
-        serviceManager.requestWidgetUpdatesForFeatureId(featureId = feature.id)
+        database.withTransaction {
+            dao.updateFeature(tracker.toFeatureEntity())
+            dao.updateTracker(tracker.toEntity())
+        }
+        dataUpdateEvents.emit(Unit)
+        serviceManager.requestWidgetUpdatesForFeatureId(featureId = tracker.featureId)
     }
 
     override suspend fun updateFeature(
@@ -165,6 +170,7 @@ internal class DataInteractorImpl @Inject constructor(
         defaultValue: Double?,
         featureDescription: String?
     ) = withContext(io) {
+        //TODO review this
         featureUpdater.updateFeature(
             oldFeature,
             discreteValueMap,

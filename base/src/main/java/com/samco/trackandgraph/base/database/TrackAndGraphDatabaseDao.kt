@@ -49,7 +49,7 @@ internal interface TrackAndGraphDatabaseDao {
     @RawQuery
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGroup(group: Group): Long
 
     @Query("DELETE FROM groups_table WHERE id = :id")
@@ -103,7 +103,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("""SELECT * from features_table2 WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFeature(feature: Feature): Long
 
     @Update
@@ -132,12 +132,6 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Update
     fun updateDataPoints(dataPoint: List<DataPoint>)
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
-    fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
-
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
-    fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
@@ -206,34 +200,34 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("DELETE FROM line_graph_features_table2 WHERE line_graph_id = :lineGraphId")
     fun deleteFeaturesForLineGraph(lineGraphId: Long)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLineGraphFeatures(lineGraphFeatures: List<LineGraphFeature>)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLineGraph(lineGraph: LineGraph): Long
 
     @Update
     fun updateLineGraph(lineGraph: LineGraph)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertPieChart(pieChart: PieChart): Long
 
     @Update
     fun updatePieChart(pieChart: PieChart)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat): Long
 
     @Update
     fun updateAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat): Long
 
     @Update
     fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
 
     @Update
@@ -245,7 +239,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateTimeHistogram(timeHistogram: TimeHistogram)
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTimeHistogram(timeHistogram: TimeHistogram): Long
 
     @Query("SELECT * FROM time_histograms_table WHERE graph_stat_id = :graphStatId LIMIT 1")
@@ -254,7 +248,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
     fun getGroupsForGroupSync(id: Long): List<Group>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFeatureTimer(featureTimer: FeatureTimer)
 
     @Query("DELETE FROM feature_timers_table WHERE feature_id=:featureId")
@@ -289,4 +283,10 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM trackers_table WHERE id = :trackerId LIMIT 1")
     fun getTrackerById(trackerId: Long): Tracker?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertTracker(tracker: Tracker): Long
+
+    @Update
+    fun updateTracker(tracker: Tracker)
 }
