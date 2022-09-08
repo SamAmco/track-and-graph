@@ -1,0 +1,2 @@
+Fix bug reminders crashing when first created
+Fix bug graphs missing first data point
