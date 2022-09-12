@@ -38,7 +38,7 @@ class DataInteractorImplTest {
 
     private val database: TrackAndGraphDatabase = mock()
     private val dao: TrackAndGraphDatabaseDao = mock()
-    private val featureUpdater: FeatureUpdater = mock()
+    private val trackerUpdater: TrackerUpdater = mock()
     private val csvReadWriter: CSVReadWriter = mock()
     private val alarmInteractor: AlarmInteractor = mock()
     private val serviceManager: ServiceManager = mock()
@@ -51,7 +51,7 @@ class DataInteractorImplTest {
             database,
             dao,
             testDispatcher,
-            featureUpdater,
+            trackerUpdater,
             csvReadWriter,
             alarmInteractor,
             serviceManager
@@ -101,7 +101,7 @@ class DataInteractorImplTest {
 
         uut.deleteGroup(0L)
         uut.insertFeature(testFeature)
-        uut.updateFeature(testFeature)
+        uut.updateTracker(testFeature)
         uut.deleteFeature(0L)
         uut.deleteDataPoint(testDataPoint)
         uut.deleteAllDataPointsForDiscreteValue(0L, 0.0)

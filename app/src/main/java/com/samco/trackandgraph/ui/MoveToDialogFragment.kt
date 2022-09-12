@@ -179,7 +179,7 @@ class MoveToDialogViewModel @Inject constructor(
         when (mode) {
             MoveDialogType.TRACKER -> {
                 val newFeature = feature.copy(groupId = newGroupId)
-                dataInteractor.updateFeature(newFeature)
+                dataInteractor.updateTracker(newFeature)
             }
             MoveDialogType.GRAPH -> {
                 val newGraphStat = graphStat.copy(groupId = newGroupId)

@@ -22,7 +22,7 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.model.*
 import com.samco.trackandgraph.base.model.DataInteractorImpl
-import com.samco.trackandgraph.base.model.FeatureUpdaterImpl
+import com.samco.trackandgraph.base.model.TrackerUpdaterImpl
 import com.samco.trackandgraph.base.service.ServiceManager
 import com.samco.trackandgraph.base.service.ServiceManagerImpl
 import dagger.Module
@@ -49,7 +49,7 @@ class ModelModule {
     internal fun getCSVReadWriter(impl: CSVReadWriterImpl): CSVReadWriter = impl
 
     @Provides
-    internal fun getFeatureUpdater(impl: FeatureUpdaterImpl): FeatureUpdater = impl
+    internal fun getTrackerUpdater(impl: TrackerUpdaterImpl): TrackerUpdater = impl
 
     @Provides
     @Singleton
