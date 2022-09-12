@@ -32,7 +32,6 @@ data class FunctionDto(
     internal fun toEntity() = com.samco.trackandgraph.base.database.entity.FunctionEntity(
         id = id,
         featureId = featureId,
-        name = name,
         dataSources = dataSources.map { it.toEntity() },
         script = script
     )

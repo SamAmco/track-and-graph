@@ -22,25 +22,25 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.model.FeatureUpdater.DurationNumericConversionMode
+import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.model.TrackerUpdater.DurationNumericConversionMode
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.samco.trackandgraph.base.database.entity.DataPoint as DataPointEntity
 
-internal class FeatureUpdaterImpl @Inject constructor(
+internal class TrackerUpdaterImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher
-) : FeatureUpdater {
-    override suspend fun updateFeature(
-        oldFeature: Feature,
+) : TrackerUpdater {
+    override suspend fun updateTracker(
+        oldTracker: Tracker,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>,
         durationNumericConversionMode: DurationNumericConversionMode?,
         newName: String?,
-        newFeatureType: DataType?,
+        newType: DataType?,
         newDiscreteValues: List<DiscreteValue>?,
         hasDefaultValue: Boolean?,
         defaultValue: Double?,
@@ -48,11 +48,11 @@ internal class FeatureUpdaterImpl @Inject constructor(
     ) = withContext(io) {
         database.withTransaction {
             updateFeatureImpl(
-                oldFeature,
+                oldTracker,
                 discreteValueMap,
                 durationNumericConversionMode,
                 newName,
-                newFeatureType,
+                newType,
                 newDiscreteValues,
                 hasDefaultValue,
                 defaultValue,
@@ -62,66 +62,71 @@ internal class FeatureUpdaterImpl @Inject constructor(
     }
 
     private fun updateFeatureImpl(
-        oldFeature: Feature,
+        oldTracker: Tracker,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>,
-        durationNumericConversionMode: DurationNumericConversionMode? = null,
-        newName: String? = null,
-        newFeatureType: DataType? = null,
-        newDiscreteValues: List<DiscreteValue>? = null,
-        hasDefaultValue: Boolean? = null,
-        defaultValue: Double? = null,
-        featureDescription: String? = null
+        durationNumericConversionMode: DurationNumericConversionMode?,
+        newName: String?,
+        newDataType: DataType?,
+        newDiscreteValues: List<DiscreteValue>?,
+        hasDefaultValue: Boolean?,
+        defaultValue: Double?,
+        featureDescription: String?
     ) {
-        val newType = newFeatureType ?: oldFeature.featureType
+        val newType = newDataType ?: oldTracker.dataType
 
         updateAllExistingDataPointsForTransformation(
-            oldFeature,
+            oldTracker,
             newType,
             discreteValueMap,
             durationNumericConversionMode
         )
 
-        val feature = Feature(
-            oldFeature.id,
-            newName ?: oldFeature.name,
-            oldFeature.groupId,
-            newType,
-            newDiscreteValues ?: oldFeature.discreteValues,
-            oldFeature.displayIndex,
-            hasDefaultValue ?: oldFeature.hasDefaultValue,
-            defaultValue ?: oldFeature.defaultValue,
-            featureDescription ?: oldFeature.description
+        val newFeature = com.samco.trackandgraph.base.database.entity.Feature(
+            id = oldTracker.featureId,
+            name = newName ?: oldTracker.name,
+            groupId = oldTracker.groupId,
+            displayIndex = oldTracker.displayIndex,
+            description = featureDescription ?: oldTracker.description
         )
-        dao.updateFeature(feature.toEntity())
+        val newTracker = com.samco.trackandgraph.base.database.entity.Tracker(
+            id = oldTracker.id,
+            featureId = oldTracker.featureId,
+            dataType = newType,
+            discreteValues = newDiscreteValues ?: oldTracker.discreteValues,
+            hasDefaultValue = hasDefaultValue ?: oldTracker.hasDefaultValue,
+            defaultValue = defaultValue ?: oldTracker.defaultValue
+        )
+        dao.updateFeature(newFeature)
+        dao.updateTracker(newTracker)
     }
 
     private fun updateAllExistingDataPointsForTransformation(
-        oldFeature: Feature,
-        newFeatureType: DataType,
+        oldTracker: Tracker,
+        newType: DataType,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>,
         durationNumericConversionMode: DurationNumericConversionMode?
     ) {
-        when (oldFeature.featureType) {
-            DataType.DISCRETE -> when (newFeatureType) {
-                DataType.CONTINUOUS -> stripDataPointsToValue(oldFeature)
-                DataType.DISCRETE -> updateDiscreteValueDataPoints(oldFeature, discreteValueMap)
+        when (oldTracker.dataType) {
+            DataType.DISCRETE -> when (newType) {
+                DataType.CONTINUOUS -> stripDataPointsToValue(oldTracker)
+                DataType.DISCRETE -> updateDiscreteValueDataPoints(oldTracker, discreteValueMap)
                 else -> {}
             }
-            DataType.CONTINUOUS -> when (newFeatureType) {
+            DataType.CONTINUOUS -> when (newType) {
                 DataType.DURATION -> {
                     if (durationNumericConversionMode == null) noConversionModeError()
                     updateContinuousDataPointsToDurations(
-                        oldFeature,
+                        oldTracker,
                         durationNumericConversionMode
                     )
                 }
                 else -> {}
             }
-            DataType.DURATION -> when (newFeatureType) {
+            DataType.DURATION -> when (newType) {
                 DataType.CONTINUOUS -> {
                     if (durationNumericConversionMode == null) noConversionModeError()
                     updateDurationDataPointsToContinuous(
-                        oldFeature,
+                        oldTracker,
                         durationNumericConversionMode
                     )
                 }
@@ -134,10 +139,10 @@ internal class FeatureUpdaterImpl @Inject constructor(
         throw Exception("You must provide durationNumericConversionMode if you convert from CONTINUOUS TO DURATION")
 
     private fun updateDurationDataPointsToContinuous(
-        oldFeature: Feature,
+        oldTracker: Tracker,
         durationNumericConversionMode: DurationNumericConversionMode
     ) {
-        val oldDataPoints = getAllDataPoints(oldFeature)
+        val oldDataPoints = getAllDataPoints(oldTracker.featureId)
         val divisor = when (durationNumericConversionMode) {
             DurationNumericConversionMode.HOURS -> 3600.0
             DurationNumericConversionMode.MINUTES -> 60.0
@@ -156,11 +161,12 @@ internal class FeatureUpdaterImpl @Inject constructor(
         dao.updateDataPoints(newDataPoints)
     }
 
+    //TODO this would probably be faster in SQL
     private fun updateContinuousDataPointsToDurations(
-        oldFeature: Feature,
+        oldTracker: Tracker,
         durationNumericConversionMode: DurationNumericConversionMode
     ) {
-        val oldDataPoints = getAllDataPoints(oldFeature)
+        val oldDataPoints = getAllDataPoints(oldTracker.featureId)
         val multiplier = when (durationNumericConversionMode) {
             DurationNumericConversionMode.HOURS -> 3600.0
             DurationNumericConversionMode.MINUTES -> 60.0
@@ -179,8 +185,9 @@ internal class FeatureUpdaterImpl @Inject constructor(
         dao.updateDataPoints(newDataPoints)
     }
 
-    private fun stripDataPointsToValue(oldFeature: Feature) {
-        val oldDataPoints = getAllDataPoints(oldFeature)
+    //TODO this would probably be faster in SQL
+    private fun stripDataPointsToValue(oldTracker: Tracker) {
+        val oldDataPoints = getAllDataPoints(oldTracker.featureId)
         val newDataPoints = oldDataPoints.map {
             DataPointEntity(
                 it.timestamp,
@@ -193,28 +200,29 @@ internal class FeatureUpdaterImpl @Inject constructor(
         dao.updateDataPoints(newDataPoints)
     }
 
-    private fun getAllDataPoints(feature: Feature) = dao.getDataPointsForFeatureSync(feature.id)
+    private fun getAllDataPoints(featureId: Long) = dao.getDataPointsForFeatureSync(featureId)
 
     private fun updateDiscreteValueDataPoints(
-        oldFeature: Feature,
+        oldTracker: Tracker,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>
     ) {
         //Remove any discrete values that have no mapping
-        oldFeature.discreteValues
+        oldTracker.discreteValues
             .filter { dv -> !discreteValueMap.keys.contains(dv) }
-            .forEach { i -> removeExistingDataPointsForDiscreteValue(oldFeature.id, i.index) }
+            .forEach { i -> removeExistingDataPointsForDiscreteValue(oldTracker.featureId, i.index) }
 
         //Update existing data points to their new discrete values
         if (discreteValueMap.any { it.key != it.value }) {
-            updateExistingDataPointsForDiscreteValue(oldFeature, discreteValueMap)
+            updateExistingDataPointsForDiscreteValue(oldTracker.featureId, discreteValueMap)
         }
     }
 
+    //TODO this would probably be faster in SQL
     private fun updateExistingDataPointsForDiscreteValue(
-        feature: Feature,
+        featureId: Long,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>
     ) {
-        val oldValues = getAllDataPoints(feature)
+        val oldValues = getAllDataPoints(featureId)
         val newValues = oldValues.map { v ->
             val newDisc = discreteValueMap[DiscreteValue(v.value.toInt(), v.label)]!!
             DataPointEntity(

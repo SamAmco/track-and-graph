@@ -43,7 +43,7 @@ internal class DataInteractorImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher,
-    private val featureUpdater: FeatureUpdater,
+    private val trackerUpdater: TrackerUpdater,
     private val csvReadWriter: CSVReadWriter,
     private val alarmInteractor: AlarmInteractor,
     private val serviceManager: ServiceManager
@@ -159,38 +159,36 @@ internal class DataInteractorImpl @Inject constructor(
         serviceManager.requestWidgetUpdatesForFeatureId(featureId = tracker.featureId)
     }
 
-    override suspend fun updateFeature(
-        oldFeature: Feature,
+    override suspend fun updateTracker(
+        oldTracker: Tracker,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>,
-        durationNumericConversionMode: FeatureUpdater.DurationNumericConversionMode?,
+        durationNumericConversionMode: TrackerUpdater.DurationNumericConversionMode?,
         newName: String?,
-        newFeatureType: DataType?,
+        newType: DataType?,
         newDiscreteValues: List<DiscreteValue>?,
         hasDefaultValue: Boolean?,
         defaultValue: Double?,
         featureDescription: String?
     ) = withContext(io) {
-        //TODO review this
-        featureUpdater.updateFeature(
-            oldFeature,
+        trackerUpdater.updateTracker(
+            oldTracker,
             discreteValueMap,
             durationNumericConversionMode,
             newName,
-            newFeatureType,
+            newType,
             newDiscreteValues,
             hasDefaultValue,
             defaultValue,
             featureDescription
         ).also {
-            serviceManager.requestWidgetUpdatesForFeatureId(featureId = oldFeature.id)
+            serviceManager.requestWidgetUpdatesForFeatureId(featureId = oldTracker.featureId)
             dataUpdateEvents.emit(Unit)
         }
     }
 
-    override suspend fun deleteTracker(trackerId: Long) = withContext(io) {
-        //TODO implement this
-        dao.deleteFeature(id)
-        serviceManager.requestWidgetsDisabledForFeatureId(featureId = id)
+    override suspend fun deleteFeature(featureId: Long) = withContext(io) {
+        dao.deleteFeature(featureId)
+        serviceManager.requestWidgetsDisabledForFeatureId(featureId = featureId)
         dataUpdateEvents.emit(Unit)
     }
 
@@ -207,13 +205,6 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun deleteDataPoint(dataPoint: DataPoint) = withContext(io) {
         dao.deleteDataPoint(dataPoint.toEntity()).also { dataUpdateEvents.emit(Unit) }
     }
-
-    override suspend fun deleteAllDataPointsForDiscreteValue2(trackerId: Long, index: Double) =
-        withContext(io) {
-            //TODO implement this
-            dao.deleteAllDataPointsForDiscreteValue(featureId, index)
-                .also { dataUpdateEvents.emit(Unit) }
-        }
 
     override suspend fun deleteGraphOrStat(id: Long) = withContext(io) {
         dao.deleteGraphOrStat(id).also { dataUpdateEvents.emit(Unit) }
@@ -247,9 +238,10 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun getDataPointByTimestampAndTrackerSync(
         trackerId: Long,
         timestamp: OffsetDateTime
-    ): DataPoint = withContext(io) {
-        //TODO implement this
-        dao.getDataPointByTimestampAndFeatureSync(featureId, timestamp).toDto()
+    ): DataPoint? = withContext(io) {
+        return@withContext dao.getTrackerById(trackerId)?.featureId?.let {
+            dao.getDataPointByTimestampAndFeatureSync(it, timestamp).toDto()
+        }
     }
 
     override suspend fun getGraphStatById(graphStatId: Long): GraphOrStat = withContext(io) {
@@ -292,9 +284,12 @@ internal class DataInteractorImpl @Inject constructor(
         return Transformations.map(dao.getAllDisplayNotes()) { notes -> notes.map { it.toDto() } }
     }
 
-    override suspend fun removeNote2(timestamp: OffsetDateTime, trackerId: Long) = withContext(io) {
-        //TODO implement this
-        dao.removeNote(timestamp, featureId).also { dataUpdateEvents.emit(Unit) }
+    override suspend fun removeNote2(timestamp: OffsetDateTime, trackerId: Long) {
+        withContext(io) {
+            dao.getTrackerById(trackerId)?.featureId?.let {
+                dao.removeNote(timestamp, it).also { dataUpdateEvents.emit(Unit) }
+            }
+        }
     }
 
     override suspend fun deleteGlobalNote(note: GlobalNote) = withContext(io) {

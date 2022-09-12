@@ -31,7 +31,7 @@ import java.io.OutputStream
 
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
-interface DataInteractor : FeatureUpdater {
+interface DataInteractor : TrackerUpdater {
     @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 
@@ -75,7 +75,6 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun insertTracker(tracker: Tracker): Long
 
-    //TODO tracker and function (dto's) might as well contain all relevant info from their feature parent
     //TODO implement the interface changes and get base compiling.
     //TODO make sure the migration tests pass
     //TODO fix up app layer. good luck!
@@ -83,14 +82,11 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun deleteDataPoint(dataPoint: DataPoint)
 
-    //TODO rename this function back once you're confident you've correctly used it
-    suspend fun deleteAllDataPointsForDiscreteValue2(trackerId: Long, index: Double)
-
     suspend fun deleteGraphOrStat(id: Long)
 
     suspend fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
-    suspend fun deleteTracker(trackerId: Long)
+    suspend fun deleteFeature(featureId: Long)
 
     suspend fun insertDataPoint(dataPoint: DataPoint): Long
 
@@ -114,7 +110,7 @@ interface DataInteractor : FeatureUpdater {
     suspend fun getDataPointByTimestampAndTrackerSync(
         trackerId: Long,
         timestamp: OffsetDateTime
-    ): DataPoint
+    ): DataPoint?
 
     suspend fun getGraphStatById(graphStatId: Long): GraphOrStat
 
