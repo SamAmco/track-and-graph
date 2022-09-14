@@ -20,21 +20,22 @@ package com.samco.trackandgraph.base.model
 import androidx.room.withTransaction
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.dto.Tracker
-import com.samco.trackandgraph.base.model.TrackerUpdater.DurationNumericConversionMode
+import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.model.TrackerHelper.DurationNumericConversionMode
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 import com.samco.trackandgraph.base.database.entity.DataPoint as DataPointEntity
 
-internal class TrackerUpdaterImpl @Inject constructor(
+internal class TrackerHelperImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher
-) : TrackerUpdater {
+) : TrackerHelper {
     override suspend fun updateTracker(
         oldTracker: Tracker,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>,
@@ -209,7 +210,12 @@ internal class TrackerUpdaterImpl @Inject constructor(
         //Remove any discrete values that have no mapping
         oldTracker.discreteValues
             .filter { dv -> !discreteValueMap.keys.contains(dv) }
-            .forEach { i -> removeExistingDataPointsForDiscreteValue(oldTracker.featureId, i.index) }
+            .forEach { i ->
+                removeExistingDataPointsForDiscreteValue(
+                    oldTracker.featureId,
+                    i.index
+                )
+            }
 
         //Update existing data points to their new discrete values
         if (discreteValueMap.any { it.key != it.value }) {
@@ -238,6 +244,97 @@ internal class TrackerUpdaterImpl @Inject constructor(
 
     private fun removeExistingDataPointsForDiscreteValue(featureId: Long, index: Int) {
         dao.deleteAllDataPointsForDiscreteValue(featureId, index.toDouble())
+    }
+
+    override suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker> =
+        withContext(io) { trackerIds.mapNotNull { getTrackerById(it) } }
+
+    override suspend fun getTrackerById(trackerId: Long): Tracker? = withContext(io) {
+        dao.getTrackerById(trackerId)?.let {
+            val feature = dao.getFeatureById(it.featureId) ?: return@let null
+            Tracker.fromEntities(it, feature)
+        }
+    }
+
+    override suspend fun playTimerForTracker(trackerId: Long): Long? {
+        return dao.getTrackerById(trackerId)?.featureId?.also { featureId ->
+            dao.deleteFeatureTimer(featureId)
+            val timer = com.samco.trackandgraph.base.database.entity.FeatureTimer(
+                0L,
+                featureId,
+                Instant.now()
+            )
+            dao.insertFeatureTimer(timer)
+        }
+    }
+
+    override suspend fun stopTimerForTracker(trackerId: Long): Duration? =
+        dao.getTrackerById(trackerId)?.featureId?.let { featureId ->
+            val timer = dao.getFeatureTimer(featureId)
+            dao.deleteFeatureTimer(featureId)
+            timer?.let { Duration.between(it.startInstant, Instant.now()) }
+        }
+
+    override suspend fun getAllActiveTimerTrackers(): List<DisplayTracker> = withContext(io) {
+        dao.getAllActiveTimerTrackers().map { it.toDto() }
+    }
+
+    override suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker> {
+        return dao.getFeaturesForGroupSync(groupId)
+            .mapNotNull { feature ->
+                dao.getTrackerByFeatureId(feature.id)?.let { tracker ->
+                    Pair(tracker, feature)
+                }
+            }
+            .map { Tracker.fromEntities(it.first, it.second) }
+    }
+
+    override suspend fun getTrackerByFeatureId(featureId: Long): Tracker? {
+        return dao.getTrackerByFeatureId(featureId)?.let { tracker ->
+            dao.getFeatureById(tracker.featureId)?.let { feature ->
+                Tracker.fromEntities(tracker, feature)
+            }
+        }
+    }
+
+    override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
+        return@withContext database.withTransaction {
+            val featureId = dao.insertFeature(tracker.toFeatureEntity())
+            dao.insertTracker(tracker.toEntity().copy(featureId = featureId))
+        }
+    }
+
+    override suspend fun updateTracker(tracker: Tracker) = withContext(io) {
+        database.withTransaction {
+            dao.updateFeature(tracker.toFeatureEntity())
+            dao.updateTracker(tracker.toEntity())
+        }
+    }
+
+    override suspend fun getAllTrackersSync(): List<Tracker> = withContext(io) {
+        dao.getAllTrackersSync().map {
+            val feature = dao.getFeatureById(it.featureId) ?: return@map null
+            Tracker.fromEntities(it, feature)
+        }.filterNotNull()
+    }
+
+    override suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker> =
+        withContext(io) {
+            dao.getDisplayTrackersForGroupSync(groupId).map { it.toDto() }
+        }
+
+    override suspend fun tryGetDisplayTrackerByIdSync(trackerId: Long): DisplayTracker? =
+        withContext(io) {
+            dao.getDisplayTrackerByIdSync(trackerId)?.toDto()
+        }
+
+    override suspend fun getDataPointByTimestampAndTrackerSync(
+        trackerId: Long,
+        timestamp: OffsetDateTime
+    ): DataPoint? = withContext(io) {
+        return@withContext dao.getTrackerById(trackerId)?.featureId?.let {
+            dao.getDataPointByTimestampAndFeatureSync(it, timestamp).toDto()
+        }
     }
 
 }

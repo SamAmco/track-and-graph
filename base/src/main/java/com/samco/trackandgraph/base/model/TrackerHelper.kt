@@ -17,9 +17,9 @@
 
 package com.samco.trackandgraph.base.model
 
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.database.dto.*
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
 /**
  * An interface for updating features. Do not use this interface directly, it is implemented by
@@ -29,7 +29,7 @@ import com.samco.trackandgraph.base.database.dto.Tracker
  * a feature as well as the feature its self. It will perform all changes inside a transaction and
  * throw an exception if anything goes wrong.
  */
-interface TrackerUpdater {
+interface TrackerHelper {
 
     enum class DurationNumericConversionMode { HOURS, MINUTES, SECONDS }
 
@@ -44,4 +44,36 @@ interface TrackerUpdater {
         defaultValue: Double? = null,
         featureDescription: String? = null
     )
+
+    suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker>
+
+    suspend fun getTrackerById(trackerId: Long): Tracker?
+
+    suspend fun insertTracker(tracker: Tracker): Long
+
+    suspend fun updateTracker(tracker: Tracker)
+
+    suspend fun getAllTrackersSync(): List<Tracker>
+
+    suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
+
+    suspend fun tryGetDisplayTrackerByIdSync(trackerId: Long): DisplayTracker?
+
+    suspend fun getDataPointByTimestampAndTrackerSync(
+        trackerId: Long,
+        timestamp: OffsetDateTime
+    ): DataPoint?
+
+    /**
+     * Returns the feature id of the started timer tracker
+     */
+    suspend fun playTimerForTracker(trackerId: Long): Long?
+
+    suspend fun stopTimerForTracker(trackerId: Long): Duration?
+
+    suspend fun getAllActiveTimerTrackers(): List<DisplayTracker>
+
+    suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker>
+
+    suspend fun getTrackerByFeatureId(featureId: Long): Tracker?
 }

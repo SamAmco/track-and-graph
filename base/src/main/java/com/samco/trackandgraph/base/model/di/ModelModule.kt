@@ -24,7 +24,7 @@ import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.database.sampling.DataSamplerImpl
 import com.samco.trackandgraph.base.model.*
 import com.samco.trackandgraph.base.model.DataInteractorImpl
-import com.samco.trackandgraph.base.model.TrackerUpdaterImpl
+import com.samco.trackandgraph.base.model.TrackerHelperImpl
 import com.samco.trackandgraph.base.service.ServiceManager
 import com.samco.trackandgraph.base.service.ServiceManagerImpl
 import dagger.Module
@@ -51,7 +51,7 @@ class ModelModule {
     internal fun getCSVReadWriter(impl: CSVReadWriterImpl): CSVReadWriter = impl
 
     @Provides
-    internal fun getTrackerUpdater(impl: TrackerUpdaterImpl): TrackerUpdater = impl
+    internal fun getTrackerUpdater(impl: TrackerHelperImpl): TrackerHelper = impl
 
     @Provides
     @Singleton

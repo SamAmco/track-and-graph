@@ -68,8 +68,6 @@ class TrackWidgetJobIntentService : JobIntentService() {
         }
     }
 
-    //TODO look into use of feature vs tracker in this class
-
     override fun onHandleWork(intent: Intent) {
         val extras = intent.extras ?: return
         val appWidgetId = extras.getInt(APP_WIDGET_ID_EXTRA, -1)
@@ -84,11 +82,11 @@ class TrackWidgetJobIntentService : JobIntentService() {
     }
 
     private fun updateTimer(featureId: Long, startTimer: Boolean) = runBlocking {
-        //TODO you probably need a get tracker by feature ID function in data interactor
-        if (startTimer) dataInteractor.playTimerForFeature(featureId)
+        val tracker = dataInteractor.getTrackerByFeatureId(featureId) ?: return@runBlocking
+        if (startTimer) dataInteractor.playTimerForTracker(tracker.id)
         else {
             dataInteractor.tryGetDisplayTrackerByIdSync(featureId)?.timerStartInstant?.let {
-                dataInteractor.stopTimerForFeature(featureId)
+                dataInteractor.stopTimerForTracker(tracker.id)
                 val intent = pendingIntentProvider
                     .getDurationInputActivityIntent(featureId, it.toString())
                 applicationContext.startActivity(intent)

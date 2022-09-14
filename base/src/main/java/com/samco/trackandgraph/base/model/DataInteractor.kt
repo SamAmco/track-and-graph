@@ -31,7 +31,7 @@ import java.io.OutputStream
 
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
-interface DataInteractor : TrackerUpdater, DataSampler {
+interface DataInteractor : TrackerHelper, DataSampler {
     @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 
@@ -53,32 +53,15 @@ interface DataInteractor : TrackerUpdater, DataSampler {
 
     suspend fun getAllGroupsSync(): List<Group>
 
-    suspend fun getAllTrackersSync(): List<Tracker>
-
     suspend fun updateReminders(reminders: List<Reminder>)
 
     suspend fun getGroupById(id: Long): Group
 
     suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>)
 
-    suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
-
     suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
-    suspend fun getTrackerById(trackerId: Long): Tracker?
-
     suspend fun getFeatureById(featureId: Long): Feature?
-
-    suspend fun tryGetDisplayTrackerByIdSync(trackerId: Long): DisplayTracker?
-
-    suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker>
-
-    suspend fun insertTracker(tracker: Tracker): Long
-
-    //TODO implement the interface changes and get base compiling.
-    //TODO make sure the migration tests pass
-    //TODO fix up app layer. good luck!
-    suspend fun updateTracker(tracker: Tracker)
 
     suspend fun deleteDataPoint(dataPoint: DataPoint)
 
@@ -100,11 +83,6 @@ interface DataInteractor : TrackerUpdater, DataSampler {
      */
     //TODO function add/update/delete actions should trigger this
     fun getDataUpdateEvents(): SharedFlow<Unit>
-
-    suspend fun getDataPointByTimestampAndTrackerSync(
-        trackerId: Long,
-        timestamp: OffsetDateTime
-    ): DataPoint?
 
     suspend fun getGraphStatById(graphStatId: Long): GraphOrStat
 
@@ -186,12 +164,6 @@ interface DataInteractor : TrackerUpdater, DataSampler {
     suspend fun writeFeaturesToCSV(outStream: OutputStream, featureIds: List<Long>)
 
     suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long)
-
-    suspend fun playTimerForTracker(trackerId: Long)
-
-    suspend fun stopTimerForTracker(trackerId: Long): Duration?
-
-    suspend fun getAllActiveTimerTrackers(): List<DisplayTracker>
 
     suspend fun getFunctionById(functionId: Long): FunctionDto?
 

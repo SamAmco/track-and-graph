@@ -139,7 +139,7 @@ class TimerNotificationService : Service() {
                 .debounce(200)
                 .collect {
                     val newFeatures = withContext(io) {
-                        dataInteractor.getAllActiveTimerFeatures()
+                        dataInteractor.getAllActiveTimerTrackers()
                             .filter { it.timerStartInstant != null }
                     }
                     if (newFeatures.isEmpty()) {

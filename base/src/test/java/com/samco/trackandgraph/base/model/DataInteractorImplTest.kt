@@ -38,7 +38,7 @@ class DataInteractorImplTest {
 
     private val database: TrackAndGraphDatabase = mock()
     private val dao: TrackAndGraphDatabaseDao = mock()
-    private val trackerUpdater: TrackerUpdater = mock()
+    private val trackerHelper: TrackerHelper = mock()
     private val csvReadWriter: CSVReadWriter = mock()
     private val alarmInteractor: AlarmInteractor = mock()
     private val serviceManager: ServiceManager = mock()
@@ -51,7 +51,7 @@ class DataInteractorImplTest {
             database,
             dao,
             testDispatcher,
-            trackerUpdater,
+            trackerHelper,
             csvReadWriter,
             alarmInteractor,
             serviceManager
