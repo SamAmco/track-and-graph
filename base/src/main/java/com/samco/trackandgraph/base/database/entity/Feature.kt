@@ -25,7 +25,7 @@ import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.Feature
 
 @Entity(
-    tableName = "features_table2",
+    tableName = "features_table",
     foreignKeys = [ForeignKey(
         entity = Group::class,
         parentColumns = arrayOf("id"),

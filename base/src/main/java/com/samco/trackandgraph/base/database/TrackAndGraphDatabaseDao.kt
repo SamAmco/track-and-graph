@@ -27,10 +27,10 @@ import org.threeten.bp.OffsetDateTime
 
 private const val getDisplayTrackersQuery =
     """SELECT 
-         features_table2.name as name,
-         features_table2.group_id as group_id,
-         features_table2.display_index as display_index,
-         features_table2.feature_description as feature_description,
+         features_table.name as name,
+         features_table.group_id as group_id,
+         features_table.display_index as display_index,
+         features_table.feature_description as feature_description,
          trackers_table.id as id,
          trackers_table.feature_id as feature_id,
          trackers_table.type as type,
@@ -42,7 +42,7 @@ private const val getDisplayTrackersQuery =
          start_instant as start_instant
        FROM (
             trackers_table
-            LEFT JOIN features_table2 ON trackers_table.feature_id = features_table2.id
+            LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
             LEFT JOIN (
                 SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
                 FROM data_points_table GROUP BY feature_id
@@ -87,10 +87,10 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroupsSync(): List<Group>
 
-    @Query("""SELECT features_table2.* FROM features_table2 ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeatures(): LiveData<List<Feature>>
 
-    @Query("""SELECT features_table2.* FROM features_table2 ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
     fun getAllFeaturesSync(): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -105,16 +105,16 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateFeatures(features: List<Feature>)
 
-    @Query("$getDisplayTrackersQuery WHERE group_id = :groupId ORDER BY features_table2.display_index ASC, id DESC")
+    @Query("$getDisplayTrackersQuery WHERE group_id = :groupId ORDER BY features_table.display_index ASC, id DESC")
     fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
 
-    @Query("SELECT features_table2.* FROM features_table2 WHERE group_id = :groupId ORDER BY features_table2.display_index ASC")
+    @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
-    @Query("SELECT * FROM features_table2 WHERE id = :featureId LIMIT 1")
+    @Query("SELECT * FROM features_table WHERE id = :featureId LIMIT 1")
     fun getFeatureById(featureId: Long): Feature?
 
-    @Query("""SELECT * from features_table2 WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT * from features_table WHERE id IN (:featureIds) ORDER BY display_index ASC, id DESC""")
     fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -135,7 +135,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Delete
     fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
-    @Query("DELETE FROM features_table2 WHERE id = :id")
+    @Query("DELETE FROM features_table WHERE id = :id")
     fun deleteFeature(id: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -186,7 +186,7 @@ internal interface TrackAndGraphDatabaseDao {
             SELECT * FROM (
                 SELECT dp.timestamp as timestamp, 0 as note_type, dp.feature_id as feature_id, f.name as feature_name, t.id as group_id, dp.note as note
                 FROM data_points_table as dp 
-                LEFT JOIN features_table2 as f ON dp.feature_id = f.id
+                LEFT JOIN features_table as f ON dp.feature_id = f.id
                 LEFT JOIN groups_table as t ON f.group_id = t.id
                 WHERE dp.note IS NOT NULL AND dp.note != ""
             ) UNION SELECT * FROM (
