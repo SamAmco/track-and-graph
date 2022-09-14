@@ -24,7 +24,6 @@ import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.service.ServiceManager
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -62,7 +61,7 @@ class DataInteractorImplTest {
     }
 
     @Test
-    fun `Modifying the data tracked should cause a data update event`() = runTest {
+    fun `Modifying the data should cause a data update event`() = runTest {
 
         //PREPARE
         val testTracker = Tracker(
