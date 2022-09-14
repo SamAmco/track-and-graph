@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.base.database.dto
 
+import com.samco.trackandgraph.base.database.entity.FunctionEntity
+
 //This is the only dto with the explicit name Dto because Function is too common of a name
 // and causes naming conflicts with basic types
 data class FunctionDto(
@@ -29,6 +31,23 @@ data class FunctionDto(
     val displayIndex: Int,
     val description: String,
 ) {
+
+    companion object {
+        internal fun fromEntities(
+            functionEntity: FunctionEntity,
+            feature: com.samco.trackandgraph.base.database.entity.Feature
+        ) = FunctionDto(
+            id = functionEntity.id,
+            name = feature.name,
+            featureId = feature.id,
+            dataSources = functionEntity.dataSources.map { it.toDto() },
+            script = functionEntity.script,
+            groupId = feature.groupId,
+            displayIndex = feature.displayIndex,
+            description = feature.description
+        )
+    }
+
     internal fun toEntity() = com.samco.trackandgraph.base.database.entity.FunctionEntity(
         id = id,
         featureId = featureId,

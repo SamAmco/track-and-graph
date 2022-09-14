@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.ui
 
 import com.samco.trackandgraph.base.database.dto.DataSourceDescriptor
-import com.samco.trackandgraph.base.database.dto.DataSourceType
 import com.samco.trackandgraph.base.database.dto.Group
 
 open class DataSourcePathProvider(

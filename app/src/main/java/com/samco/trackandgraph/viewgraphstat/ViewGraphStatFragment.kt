@@ -37,7 +37,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.dto.DataSourceType
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.helpers.getWeekDayNames

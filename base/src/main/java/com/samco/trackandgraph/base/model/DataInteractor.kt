@@ -20,7 +20,7 @@ package com.samco.trackandgraph.base.model
 import androidx.lifecycle.LiveData
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSampler
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -31,7 +31,7 @@ import java.io.OutputStream
 
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
-interface DataInteractor : TrackerUpdater {
+interface DataInteractor : TrackerUpdater, DataSampler {
     @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 
@@ -93,12 +93,6 @@ interface DataInteractor : TrackerUpdater {
     suspend fun insertDataPoints(dataPoint: List<DataPoint>)
 
     suspend fun updateDataPoints(dataPoint: List<DataPoint>)
-
-    suspend fun getDataSampleForFeatureId(featureId: Long): DataSample
-
-    suspend fun getLabelsForFeature(feature: Feature): Set<String>
-
-    suspend fun getDataSampleForFeature(feature: Feature): DataSample
 
     /**
      * Emits a unit every time currently displayed data may have changed.

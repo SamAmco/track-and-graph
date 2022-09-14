@@ -25,7 +25,6 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.entity.FeatureTimer
-import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.ServiceManager
@@ -46,8 +45,9 @@ internal class DataInteractorImpl @Inject constructor(
     private val trackerUpdater: TrackerUpdater,
     private val csvReadWriter: CSVReadWriter,
     private val alarmInteractor: AlarmInteractor,
-    private val serviceManager: ServiceManager
-) : DataInteractor {
+    private val serviceManager: ServiceManager,
+    private val dataSampler: DataSampler
+) : DataInteractor, DataSampler by dataSampler {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
 
@@ -224,13 +224,6 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateDataPoints(dataPoint: List<DataPoint>) = withContext(io) {
         dao.updateDataPoints(dataPoint.map { it.toEntity() }).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    //TODO probably can do better than this
-    override suspend fun getDataSampleForFeatureId(featureId: Long): DataSample = withContext(io) {
-        val dataSampler = DataSampler(dao)
-        val dataSource = DataSource.FeatureDataSource(featureId)
-        dataSampler.getDataSampleForSource(dataSource)
     }
 
     override fun getDataUpdateEvents(): SharedFlow<Unit> = dataUpdateEvents
@@ -541,31 +534,39 @@ internal class DataInteractorImpl @Inject constructor(
             dataUpdateEvents.emit(Unit)
         }
 
-    override suspend fun playTimerForTracker(trackerId: Long) = performAtomicUpdate {
-        //TODO implement this
-        dao.deleteFeatureTimer(featureId)
-        dao.insertFeatureTimer(FeatureTimer(0L, featureId, Instant.now()))
-    }.also {
-        serviceManager.startTimerNotificationService()
-        serviceManager.requestWidgetUpdatesForFeatureId(featureId)
+    override suspend fun playTimerForTracker(trackerId: Long) {
+        dao.getTrackerById(trackerId)?.featureId?.let { featureId ->
+            performAtomicUpdate {
+                dao.deleteFeatureTimer(featureId)
+                dao.insertFeatureTimer(FeatureTimer(0L, featureId, Instant.now()))
+            }.also {
+                serviceManager.startTimerNotificationService()
+                serviceManager.requestWidgetUpdatesForFeatureId(featureId)
+            }
+        }
     }
 
-    override suspend fun stopTimerForTracker(trackerId: Long): Duration? = performAtomicUpdate {
-        //TODO implement this
-        val timer = dao.getFeatureTimer(featureId)
-        dao.deleteFeatureTimer(featureId)
-        timer?.let { Duration.between(it.startInstant, Instant.now()) }
-    }.also {
-        serviceManager.requestWidgetUpdatesForFeatureId(featureId)
-    }
+    override suspend fun stopTimerForTracker(trackerId: Long): Duration? =
+        dao.getTrackerById(trackerId)?.featureId?.let { featureId ->
+            performAtomicUpdate {
+                val timer = dao.getFeatureTimer(featureId)
+                dao.deleteFeatureTimer(featureId)
+                timer?.let { Duration.between(it.startInstant, Instant.now()) }
+            }.also {
+                serviceManager.requestWidgetUpdatesForFeatureId(featureId)
+            }
+        }
 
     override suspend fun getAllActiveTimerTrackers(): List<DisplayTracker> = withContext(io) {
-        //TODO implement this (probably close, i think you just need to fix the query?)
         dao.getAllActiveTimerTrackers().map { it.toDto() }
     }
 
     override suspend fun getFunctionById(functionId: Long): FunctionDto? = withContext(io) {
-        dao.getFunctionById(functionId)?.toDto()
+        dao.getFunctionById(functionId)?.let { functionEntity ->
+            dao.getFeatureById(functionEntity.featureId)?.let { feature ->
+                FunctionDto.fromEntities(functionEntity, feature)
+            }
+        }
     }
 
     override suspend fun updateFunction(function: FunctionDto) = withContext(io) {
@@ -574,22 +575,5 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun createFunction(function: FunctionDto) = withContext(io) {
         dao.createFunction(function.toEntity())
-    }
-
-    //TODO we need some sort of interface for resolving the data/properties of functions
-    override suspend fun getLabelsForFeature(feature: Feature): Set<String> {
-        //TODO implement this
-        return when (source.type) {
-            DataSourceType.FEATURE -> dao.getFeatureById(source.id)
-                ?.discreteValues
-                ?.map { it.label }
-                ?.toSet() ?: emptySet()
-            //TODO implement collecting labels for a function data source
-            DataSourceType.FUNCTION -> emptySet()
-        }
-    }
-
-    suspend fun getDataSampleForFeature(feature: Feature): DataSample = withContext(io) {
-        //TODO implement this
     }
 }

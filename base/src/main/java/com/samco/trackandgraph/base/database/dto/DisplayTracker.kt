@@ -22,6 +22,7 @@ import org.threeten.bp.OffsetDateTime
 
 data class DisplayTracker(
     var id: Long,
+    var featureId: Long,
     val name: String,
     val groupId: Long,
     val featureType: DataType = DataType.CONTINUOUS,

@@ -17,25 +17,35 @@
 
 package com.samco.trackandgraph.base.database.sampling
 
-import com.samco.trackandgraph.base.model.DataSource
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import javax.inject.Inject
 
-internal class DataSampler(private val dao: TrackAndGraphDatabaseDao) {
-    private fun emptyDataSample() = DataSample.fromSequence(emptySequence())
+interface DataSampler {
+    fun getDataSampleForFeatureId(featureId: Long): DataSample
 
-    fun getDataSampleForSource(dataSource: DataSource): DataSample {
-        return when (dataSource) {
-            is DataSource.FeatureDataSource -> {
-                val cursorSequence = DataPointSequence(dao, dataSource.featureId)
-                return DataSample.fromSequence(
-                    cursorSequence,
-                    DataSampleProperties(),
-                    cursorSequence::getRawDataPoints
-                )
-            }
-            //TODO actually probably don't want two different types of data source. Just use feature
-            // and a feature may point to a function and have data type FUNCTION .. ?
-            is DataSource.FunctionDataSource -> emptyDataSample()
-        }
+    suspend fun getLabelsForFeatureId(featureId: Long): Set<String>
+}
+
+internal class DataSamplerImpl @Inject constructor(
+    private val dao: TrackAndGraphDatabaseDao
+) : DataSampler {
+    override fun getDataSampleForFeatureId(featureId: Long): DataSample {
+        val tracker = dao.getTrackerByFeatureId(featureId)
+        return tracker?.let {
+            val cursorSequence = DataPointSequence(dao, featureId)
+            DataSample.fromSequence(
+                cursorSequence,
+                DataSampleProperties(),
+                cursorSequence::getRawDataPoints
+            )
+        } ?: DataSample.fromSequence(emptySequence())
+        //TODO if there is a function for the feature ID we need to return a data sample for the function
+    }
+
+    override suspend fun getLabelsForFeatureId(featureId: Long): Set<String> {
+        val tracker = dao.getTrackerByFeatureId(featureId)
+        return tracker?.discreteValues?.map { it.label }?.toSet()
+            ?: emptySet()
+        //TODO implement collecting labels for a function data source
     }
 }
