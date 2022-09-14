@@ -519,10 +519,12 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun updateFunction(function: FunctionDto) = withContext(io) {
-        dao.updateFunction(function.toEntity()).also { dataUpdateEvents.emit(Unit) }
+        dao.updateFunction(function.toEntity()).also {
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
-    override suspend fun createFunction(function: FunctionDto) = withContext(io) {
+    override suspend fun insertFunction(function: FunctionDto) = withContext(io) {
         dao.createFunction(function.toEntity()).also { dataUpdateEvents.emit(Unit) }
     }
 }
