@@ -50,7 +50,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.lang.Exception
 import javax.inject.Inject
 import kotlin.math.absoluteValue
-import com.samco.trackandgraph.base.model.TrackerUpdater.DurationNumericConversionMode as DurationNumericConversionMode
+import com.samco.trackandgraph.base.model.TrackerHelper.DurationNumericConversionMode as DurationNumericConversionMode
 
 @AndroidEntryPoint
 class AddFeatureFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
