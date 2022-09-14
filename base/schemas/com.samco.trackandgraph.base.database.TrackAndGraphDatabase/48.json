@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 48,
-    "identityHash": "49adc94a91daa07fc7a9c09d46b4e79a",
+    "identityHash": "6ab07432ecb16a40bbdd31f4d67319dc",
     "entities": [
       {
-        "tableName": "features_table2",
+        "tableName": "features_table",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `group_id` INTEGER NOT NULL, `display_index` INTEGER NOT NULL, `feature_description` TEXT NOT NULL, FOREIGN KEY(`group_id`) REFERENCES `groups_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
@@ -47,22 +47,22 @@
         },
         "indices": [
           {
-            "name": "index_features_table2_id",
+            "name": "index_features_table_id",
             "unique": false,
             "columnNames": [
               "id"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_features_table2_id` ON `${TABLE_NAME}` (`id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_features_table_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
-            "name": "index_features_table2_group_id",
+            "name": "index_features_table_group_id",
             "unique": false,
             "columnNames": [
               "group_id"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_features_table2_group_id` ON `${TABLE_NAME}` (`group_id`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_features_table_group_id` ON `${TABLE_NAME}` (`group_id`)"
           }
         ],
         "foreignKeys": [
@@ -81,7 +81,7 @@
       },
       {
         "tableName": "trackers_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, `has_default_value` INTEGER NOT NULL, `default_value` REAL NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, `has_default_value` INTEGER NOT NULL, `default_value` REAL NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -148,7 +148,7 @@
         ],
         "foreignKeys": [
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -162,7 +162,7 @@
       },
       {
         "tableName": "data_points_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` TEXT NOT NULL, `feature_id` INTEGER NOT NULL, `value` REAL NOT NULL, `label` TEXT NOT NULL, `note` TEXT NOT NULL, PRIMARY KEY(`timestamp`, `feature_id`), FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` TEXT NOT NULL, `feature_id` INTEGER NOT NULL, `value` REAL NOT NULL, `label` TEXT NOT NULL, `note` TEXT NOT NULL, PRIMARY KEY(`timestamp`, `feature_id`), FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "timestamp",
@@ -215,7 +215,7 @@
         ],
         "foreignKeys": [
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -466,7 +466,7 @@
       },
       {
         "tableName": "average_time_between_stat_table4",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` REAL NOT NULL, `to_value` REAL NOT NULL, `duration` TEXT, `labels` TEXT NOT NULL, `end_date` TEXT, `filter_by_range` INTEGER NOT NULL, `filter_by_labels` INTEGER NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` REAL NOT NULL, `to_value` REAL NOT NULL, `duration` TEXT, `labels` TEXT NOT NULL, `end_date` TEXT, `filter_by_range` INTEGER NOT NULL, `filter_by_labels` INTEGER NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -577,7 +577,7 @@
             ]
           },
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -591,7 +591,7 @@
       },
       {
         "tableName": "pie_charts_table2",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `duration` TEXT, `end_date` TEXT, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `duration` TEXT, `end_date` TEXT, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -672,7 +672,7 @@
             ]
           },
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -686,7 +686,7 @@
       },
       {
         "tableName": "time_since_last_stat_table4",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` REAL NOT NULL, `to_value` REAL NOT NULL, `labels` TEXT NOT NULL, `filter_by_range` INTEGER NOT NULL, `filter_by_labels` INTEGER NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` REAL NOT NULL, `to_value` REAL NOT NULL, `labels` TEXT NOT NULL, `filter_by_range` INTEGER NOT NULL, `filter_by_labels` INTEGER NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -785,7 +785,7 @@
             ]
           },
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -879,7 +879,7 @@
       },
       {
         "tableName": "line_graph_features_table2",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `line_graph_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `color_index` INTEGER NOT NULL, `averaging_mode` INTEGER NOT NULL, `plotting_mode` INTEGER NOT NULL, `point_style` INTEGER NOT NULL, `offset` REAL NOT NULL, `scale` REAL NOT NULL, `duration_plotting_mode` INTEGER NOT NULL, FOREIGN KEY(`line_graph_id`) REFERENCES `line_graphs_table3`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `line_graph_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `color_index` INTEGER NOT NULL, `averaging_mode` INTEGER NOT NULL, `plotting_mode` INTEGER NOT NULL, `point_style` INTEGER NOT NULL, `offset` REAL NOT NULL, `scale` REAL NOT NULL, `duration_plotting_mode` INTEGER NOT NULL, FOREIGN KEY(`line_graph_id`) REFERENCES `line_graphs_table3`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -996,7 +996,7 @@
             ]
           },
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -1010,7 +1010,7 @@
       },
       {
         "tableName": "time_histograms_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `duration` TEXT, `window` INTEGER NOT NULL, `sum_by_count` INTEGER NOT NULL, `end_date` TEXT, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `duration` TEXT, `window` INTEGER NOT NULL, `sum_by_count` INTEGER NOT NULL, `end_date` TEXT, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1103,7 +1103,7 @@
             ]
           },
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -1117,7 +1117,7 @@
       },
       {
         "tableName": "feature_timers_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `start_instant` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `start_instant` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1166,7 +1166,7 @@
         ],
         "foreignKeys": [
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -1180,7 +1180,7 @@
       },
       {
         "tableName": "functions_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `data_sources` TEXT NOT NULL, `script` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `data_sources` TEXT NOT NULL, `script` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1235,7 +1235,7 @@
         ],
         "foreignKeys": [
           {
-            "table": "features_table2",
+            "table": "features_table",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -1251,7 +1251,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '49adc94a91daa07fc7a9c09d46b4e79a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6ab07432ecb16a40bbdd31f4d67319dc')"
     ]
   }
 }
