@@ -20,6 +20,8 @@ package com.samco.trackandgraph.base.model.di
 import android.content.Context
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.sampling.DataSampler
+import com.samco.trackandgraph.base.database.sampling.DataSamplerImpl
 import com.samco.trackandgraph.base.model.*
 import com.samco.trackandgraph.base.model.DataInteractorImpl
 import com.samco.trackandgraph.base.model.TrackerUpdaterImpl
@@ -63,4 +65,7 @@ class ModelModule {
 
     @Provides
     internal fun getServiceManager(impl: ServiceManagerImpl): ServiceManager = impl
+
+    @Provides
+    internal fun getDataSampler(impl: DataSamplerImpl): DataSampler = impl
 }

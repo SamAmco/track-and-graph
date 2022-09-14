@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 48,
-    "identityHash": "8bd1ad3e876d06e886963a6b2d077bee",
+    "identityHash": "49adc94a91daa07fc7a9c09d46b4e79a",
     "entities": [
       {
         "tableName": "features_table2",
@@ -81,18 +81,12 @@
       },
       {
         "tableName": "trackers_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `feature_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, `has_default_value` INTEGER NOT NULL, `default_value` REAL NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `discrete_values` TEXT NOT NULL, `has_default_value` INTEGER NOT NULL, `default_value` REAL NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
             "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -1186,7 +1180,7 @@
       },
       {
         "tableName": "functions_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `data_sources` TEXT NOT NULL, `script` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `data_sources` TEXT NOT NULL, `script` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1198,12 +1192,6 @@
             "fieldPath": "featureId",
             "columnName": "feature_id",
             "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -1263,7 +1251,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8bd1ad3e876d06e886963a6b2d077bee')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '49adc94a91daa07fc7a9c09d46b4e79a')"
     ]
   }
 }

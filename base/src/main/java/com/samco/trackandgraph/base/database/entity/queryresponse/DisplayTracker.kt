@@ -28,6 +28,9 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "id")
     var id: Long,
 
+    @ColumnInfo(name = "feature_id")
+    var featureId: Long,
+
     @ColumnInfo(name = "name")
     val name: String,
 
@@ -62,17 +65,18 @@ internal data class DisplayTracker(
     val timerStartInstant: Instant?
 ) {
     fun toDto() = DisplayTracker(
-        id,
-        name,
-        groupId,
-        featureType,
-        discreteValues,
-        hasDefaultValue,
-        defaultValue,
-        timestamp,
-        numDataPoints,
-        displayIndex,
-        description,
-        timerStartInstant
+        id = id,
+        featureId = featureId,
+        name = name,
+        groupId = groupId,
+        featureType = featureType,
+        discreteValues = discreteValues,
+        hasDefaultValue = hasDefaultValue,
+        defaultValue = defaultValue,
+        timestamp = timestamp,
+        numDataPoints = numDataPoints,
+        displayIndex = displayIndex,
+        description = description,
+        timerStartInstant = timerStartInstant
     )
 }

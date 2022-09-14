@@ -23,7 +23,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.dto.DataSourceType
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine

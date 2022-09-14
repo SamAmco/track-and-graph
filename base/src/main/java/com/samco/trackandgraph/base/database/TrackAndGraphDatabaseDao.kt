@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.base.database
 
-import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -27,19 +26,34 @@ import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithF
 import org.threeten.bp.OffsetDateTime
 
 private const val getDisplayTrackersQuery =
-    """SELECT features_table.name, features_table.group_id, features_table.display_index, trackers_table.*, num_data_points, last_timestamp, start_instant 
-        FROM trackers_table
-        LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
-        LEFT JOIN (
-            SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
-            FROM data_points_table GROUP BY feature_id
-        ) as feature_data 
-        ON feature_data.id = features_table.id
-        LEFT JOIN (
-            SELECT * FROM feature_timers_table
-        ) as timer_data
-        ON timer_data.feature_id = features_table.id 
-        """
+    """SELECT 
+         features_table2.name as name,
+         features_table2.group_id as group_id,
+         features_table2.display_index as display_index,
+         features_table2.feature_description as feature_description,
+         trackers_table.id as id,
+         trackers_table.feature_id as feature_id,
+         trackers_table.type as type,
+         trackers_table.discrete_values as discrete_values,
+         trackers_table.has_default_value as has_default_value,
+         trackers_table.default_value as default_value,
+         num_data_points as num_data_points,
+         last_timestamp as last_timestamp,
+         start_instant as start_instant
+       FROM (
+            trackers_table
+            LEFT JOIN features_table2 ON trackers_table.feature_id = features_table2.id
+            LEFT JOIN (
+                SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
+                FROM data_points_table GROUP BY feature_id
+            ) as feature_data 
+            ON feature_data.id = trackers_table.feature_id
+            LEFT JOIN (
+                SELECT * FROM feature_timers_table
+            ) as timer_data
+            ON timer_data.feature_id = trackers_table.feature_id 
+        )
+    """
 
 
 //TODO it would probably be better if we migrated from LiveData to flow here to remove lifecycle
@@ -73,10 +87,10 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroupsSync(): List<Group>
 
-    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT features_table2.* FROM features_table2 ORDER BY display_index ASC, id DESC""")
     fun getAllFeatures(): LiveData<List<Feature>>
 
-    @Query("""SELECT features_table.* FROM features_table ORDER BY display_index ASC, id DESC""")
+    @Query("""SELECT features_table2.* FROM features_table2 ORDER BY display_index ASC, id DESC""")
     fun getAllFeaturesSync(): List<Feature>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -91,7 +105,7 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateFeatures(features: List<Feature>)
 
-    @Query(getDisplayTrackersQuery + """WHERE group_id = :groupId ORDER BY features_table.display_index ASC, id DESC""")
+    @Query("$getDisplayTrackersQuery WHERE group_id = :groupId ORDER BY features_table2.display_index ASC, id DESC")
     fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
 
     @Query("SELECT features_table2.* FROM features_table2 WHERE group_id = :groupId ORDER BY features_table2.display_index ASC")
@@ -149,6 +163,7 @@ internal interface TrackAndGraphDatabaseDao {
     fun tryGetGraphStatById(graphStatId: Long): GraphOrStat?
 
     @Query("SELECT * FROM line_graphs_table3 WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Transaction
     fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
 
     @Query("SELECT * FROM pie_charts_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
@@ -257,10 +272,10 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM feature_timers_table WHERE feature_id=:featureId LIMIT 1")
     fun getFeatureTimer(featureId: Long): FeatureTimer?
 
-    @Query(getDisplayTrackersQuery + """WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC""")
+    @Query("$getDisplayTrackersQuery WHERE start_instant IS NOT NULL ORDER BY start_instant ASC, id DESC")
     fun getAllActiveTimerTrackers(): List<DisplayTracker>
 
-    @Query(getDisplayTrackersQuery + """WHERE feature_id=:featureId LIMIT 1""")
+    @Query("$getDisplayTrackersQuery WHERE trackers_table.feature_id=:featureId LIMIT 1")
     fun getDisplayTrackerByIdSync(featureId: Long): DisplayTracker?
 
     @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :id")
@@ -289,4 +304,7 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Update
     fun updateTracker(tracker: Tracker)
+
+    @Query("SELECT * FROM trackers_table WHERE feature_id = :featureId LIMIT 1")
+    fun getTrackerByFeatureId(featureId: Long): Tracker?
 }
