@@ -98,7 +98,7 @@ class AddFunctionViewModelImpl @Inject constructor(
 
             //TODO validate the input first
             if (functionId != null) dataInteractor.updateFunction(createDto())
-            else dataInteractor.createFunction(createDto())
+            else dataInteractor.insertFunction(createDto())
 
             withContext(ui) {
                 isLoading.value = false

@@ -169,5 +169,5 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun updateFunction(function: FunctionDto)
 
-    suspend fun createFunction(function: FunctionDto)
+    suspend fun insertFunction(function: FunctionDto)
 }
