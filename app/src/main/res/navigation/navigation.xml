@@ -102,13 +102,10 @@
     </fragment>
     <fragment
         android:id="@+id/addFeatureFragment"
-        android:name="com.samco.trackandgraph.displaytrackgroup.AddFeatureFragment">
+        android:name="com.samco.trackandgraph.addtracker.AddTrackerFragment">
         <argument
             android:name="groupId"
             app:argType="long" />
-        <argument
-            android:name="existingFeatureNames"
-            app:argType="string[]" />
         <argument
             android:name="editFeatureId"
             android:defaultValue="-1L"

@@ -16,7 +16,7 @@
   -->
 <resources>
     <string name="home">Accueil</string>
-    <string name="add_feature">Suivre quelquechose : </string>
+    <string name="add_tracker">Suivre quelquechose : </string>
     <string name="add">Ajouter</string>
     <string name="group_name">ex. Activités quotidiennes</string>
     <string name="delete">Supprimer</string>
@@ -24,8 +24,8 @@
     <string name="update">Mettre à jour</string>
     <string name="new_name">Nouveau nom : </string>
     <string name="graph_or_stat_name">Nom du graphique : </string>
-    <string name="feature_name">Que voulez vous suivre ?</string>
-    <string name="feature_type">De quel type de données s\'agit-il ?</string>
+    <string name="tracker_name">Que voulez vous suivre ?</string>
+    <string name="tracker_type">De quel type de données s\'agit-il ?</string>
     <string name="yes">Oui</string>
     <string name="cancel">Annuler</string>
     <string name="select_file">Sélectionner un fichier</string>
@@ -35,10 +35,10 @@
     <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ces données ?</string>
     <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette donnée ?</string>
     <string name="discrete_values">Ajoutez quelques choix ci-dessous.</string>
-    <string name="feature_name_cannot_be_null">Veuillez ajouter un nom</string>
-    <string name="feature_with_that_name_exists">Vous suivez déjà quelque chose avec ce nom</string>
+    <string name="tracker_name_cannot_be_null">Veuillez ajouter un nom</string>
+    <string name="tracker_with_that_name_exists">Vous suivez déjà quelque chose avec ce nom</string>
     <string name="discrete_value_must_have_name">Veuillez vous assurer que tous vos choix ont un nom</string>
-    <string name="discrete_feature_needs_at_least_two_values">Veuillez ajouter au moins deux réponses à choix multiple</string>
+    <string name="discrete_tracker_needs_at_least_two_values">Veuillez ajouter au moins deux réponses à choix multiple</string>
     <string name="data_points">%1$d Suivi</string>
     <string name="no_data">Aucune donnée</string>
     <string name="add_data_point_hint">Entrez une valeur pour : </string>
@@ -87,7 +87,7 @@
         <item>Nombre de minutes</item>
         <item>Nombre de secondes</item>
     </string-array>
-    <string-array name="feature_types">
+    <string-array name="tracker_types">
         <item>Choix multiple</item>
         <item>Numérique</item>
         <item>Durée</item>
@@ -227,11 +227,11 @@
     <string name="move_to">Déplacer vers</string>
 
     <string name="feature_add_or_update_error_occurred">Une erreur est survenue, vos modifications n\'ont pas pu être effectuées.</string>
-    <string name="ru_sure_update_feature">Cette mise à jour peut modifier de manière irréversible les données que vous avez déjà suivies. Il est fortement recommandé de sauvegarder les données existantes avant de continuer.</string>
+    <string name="ru_sure_update_tracker">Cette mise à jour peut modifier de manière irréversible les données que vous avez déjà suivies. Il est fortement recommandé de sauvegarder les données existantes avant de continuer.</string>
     <string name="warning">Avertissement</string>
     <string name="ok">OK</string>
-    <string name="on_feature_type_change_numerical_warning">Si vous mettez à jour votre type d\'entrée en numérique, vos données suivies existantes perdront leurs étiquettes.</string>
-    <string name="on_feature_delete_discrete_value_warning">Si vous supprimez des réponses à choix multiples, tous les points de données suivies existants pour cette valeur seront supprimés.</string>
+    <string name="on_tracker_type_change_numerical_warning">Si vous mettez à jour votre type d\'entrée en numérique, vos données suivies existantes perdront leurs étiquettes.</string>
+    <string name="on_tracker_delete_discrete_value_warning">Si vous supprimez des réponses à choix multiples, tous les points de données suivies existants pour cette valeur seront supprimés.</string>
 
     <string name="rate_the_app">Notez l\'application</string>
     <string name="reminders">Notifications de rappel</string>

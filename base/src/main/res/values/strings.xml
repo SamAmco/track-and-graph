@@ -21,7 +21,7 @@
     <string name="group">Group</string>
     <string name="tracker">Tracker</string>
     <string name="graph_or_stat">Graph or Statistic</string>
-    <string name="add_feature">Track something:</string>
+    <string name="add_tracker">Track something:</string>
     <string name="add">Add</string>
     <string name="group_name">e.g. Daily Activities</string>
     <string name="delete">Delete</string>
@@ -29,8 +29,8 @@
     <string name="update">Update</string>
     <string name="new_name">New name: </string>
     <string name="graph_or_stat_name">Graph name: </string>
-    <string name="feature_name">What would you like to track?</string>
-    <string name="feature_type">What type of data is this?</string>
+    <string name="tracker_name">What would you like to track?</string>
+    <string name="tracker_type">What type of data is this?</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="select_file">Select File</string>
@@ -43,10 +43,10 @@
     <string name="export_file_name_suffix" translatable="false">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
     <string name="backup_file_name_suffix" translatable="false">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.db</string>
     <string name="discrete_values">Add some choices below.</string>
-    <string name="feature_name_cannot_be_null">Please add a name</string>
-    <string name="feature_with_that_name_exists">You are already tracking something with that name</string>
+    <string name="tracker_name_cannot_be_null">Please add a name</string>
+    <string name="tracker_with_that_name_exists">You are already tracking something with that name</string>
     <string name="discrete_value_must_have_name">Please make sure all your choices have names</string>
-    <string name="discrete_feature_needs_at_least_two_values">Please add at least two multiple choice answers</string>
+    <string name="discrete_tracker_needs_at_least_two_values">Please add at least two multiple choice answers</string>
     <string name="data_points">%1$d Tracked</string>
     <string name="no_data">No Data</string>
     <string name="add_data_point_hint">Enter a value for:</string>
@@ -100,7 +100,7 @@
         <item>Number of minutes</item>
         <item>Number of seconds</item>
     </string-array>
-    <string-array name="feature_types">
+    <string-array name="tracker_types">
         <item>Multiple choice</item>
         <item>Numerical</item>
         <item>Time duration</item>
@@ -244,11 +244,11 @@
     <string name="move_to">Move to</string>
 
     <string name="feature_add_or_update_error_occurred">An error occurred, your changes could not be made.</string>
-    <string name="ru_sure_update_feature">This update may irreversibly modify the data you have already tracked. It is highly recommended that you backup existing data before continuing.\n\n Would you like to continue?</string>
+    <string name="ru_sure_update_tracker">This update may irreversibly modify the data you have already tracked. It is highly recommended that you backup existing data before continuing.\n\n Would you like to continue?</string>
     <string name="warning">Warning</string>
     <string name="ok">OK</string>
-    <string name="on_feature_type_change_numerical_warning">If you update your input type to numerical your existing tracked data will lose its labels.</string>
-    <string name="on_feature_delete_discrete_value_warning">Deleting multiple choice answers will delete all existing tracked data points for that value.</string>
+    <string name="on_tracker_type_change_numerical_warning">If you update your input type to numerical your existing tracked data will lose its labels.</string>
+    <string name="on_tracker_delete_discrete_value_warning">Deleting multiple choice answers will delete all existing tracked data points for that value.</string>
 
     <string name="rate_the_app">Rate the app</string>
     <string name="reminders">Reminders</string>

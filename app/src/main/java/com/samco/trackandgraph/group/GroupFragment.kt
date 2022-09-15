@@ -34,7 +34,7 @@ import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
-import com.samco.trackandgraph.displaytrackgroup.*
+import com.samco.trackandgraph.addtracker.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.*

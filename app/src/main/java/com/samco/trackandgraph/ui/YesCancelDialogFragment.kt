@@ -25,6 +25,18 @@ import com.samco.trackandgraph.R
 class YesCancelDialogFragment : DialogFragment() {
     lateinit var title: String
 
+    companion object {
+        private const val TITLE_KEY = "title"
+        private const val ID_KEY = "id"
+
+        fun create(id: String, title: String) = YesCancelDialogFragment().apply {
+            val args = Bundle()
+            args.putString(TITLE_KEY, title)
+            args.putString(ID_KEY, id)
+            arguments = args
+        }
+    }
+
     interface YesCancelDialogListener {
         fun onDialogYes(dialog: YesCancelDialogFragment, id: String?)
     }
@@ -37,7 +49,12 @@ class YesCancelDialogFragment : DialogFragment() {
             AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme).apply {
                 setMessage(title)
                     .setCancelable(true)
-                    .setPositiveButton(R.string.yes) { _, _ -> listener.onDialogYes(this@YesCancelDialogFragment, id) }
+                    .setPositiveButton(R.string.yes) { _, _ ->
+                        listener.onDialogYes(
+                            this@YesCancelDialogFragment,
+                            id
+                        )
+                    }
                     .setNegativeButton(R.string.cancel) { _, _ -> run {} }
             }.create()
         } ?: throw IllegalStateException("Activity cannot be null")

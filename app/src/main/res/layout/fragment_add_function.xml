@@ -28,7 +28,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/dialog_input_spacing"
-                        android:labelFor="@id/featureNameText"
+                        android:labelFor="@id/tracker_name_text"
                         android:text="@string/name_your_function"
                         android:textAppearance="@style/TextAppearance.Body" />
 
