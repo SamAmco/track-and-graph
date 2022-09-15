@@ -9,7 +9,7 @@
         android:theme="@style/AppTheme.AlertDialogTheme">
 
         <TextView
-            android:id="@+id/featureTypeLabel"
+            android:id="@+id/trackerTypeLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/input_spacing_large"

@@ -16,7 +16,7 @@
 */
 package com.samco.trackandgraph.widgets
 
-import com.samco.trackandgraph.displaytrackgroup.InputDataPointDialog
+import com.samco.trackandgraph.addtracker.InputDataPointDialog
 
 class TrackWidgetInputDataPointDialog : InputDataPointDialog() {
     override fun onPause() {

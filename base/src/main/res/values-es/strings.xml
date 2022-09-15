@@ -16,7 +16,7 @@
   -->
 <resources>
     <string name="home">Inicio</string>
-    <string name="add_feature">Añadir trazas:</string>
+    <string name="add_tracker">Añadir trazas:</string>
     <string name="add">Añadir</string>
     <string name="group_name">Por ejemplo, las actividades diarias</string>
     <string name="delete">Borrar</string>
@@ -24,8 +24,8 @@
     <string name="update">Actualizar</string>
     <string name="new_name">Nuevo nombre: </string>
     <string name="graph_or_stat_name">Nombre del gráfico: </string>
-    <string name="feature_name">¿Qué le gustaría rastrear?</string>
-    <string name="feature_type">¿Qué tipo de datos son?</string>
+    <string name="tracker_name">¿Qué le gustaría rastrear?</string>
+    <string name="tracker_type">¿Qué tipo de datos son?</string>
     <string name="yes">Sí</string>
     <string name="cancel">Cancelar</string>
     <string name="select_file">Seleccionar archivo</string>
@@ -35,10 +35,10 @@
     <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
     <string name="ru_sure_del_data_point">¿Está seguro de querer eliminar este punto de datos?</string>
     <string name="discrete_values">Añade algunas opciones a continuación.</string>
-    <string name="feature_name_cannot_be_null">Por favor, añade un nombre</string>
-    <string name="feature_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
+    <string name="tracker_name_cannot_be_null">Por favor, añade un nombre</string>
+    <string name="tracker_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
     <string name="discrete_value_must_have_name">Por favor, asegúrate de que todas tus opciones tienen nombre</string>
-    <string name="discrete_feature_needs_at_least_two_values">Por favor, añade al menos dos respuestas de opción múltiple</string>
+    <string name="discrete_tracker_needs_at_least_two_values">Por favor, añade al menos dos respuestas de opción múltiple</string>
     <string name="data_points">%1$d trazado</string>
     <string name="no_data">Sin datos</string>
     <string name="add_data_point_hint">Introducir un valor para:</string>
@@ -87,7 +87,7 @@
         <item>Número de minutos</item>
         <item>Número de segundos</item>
     </string-array>
-    <string-array name="feature_types">
+    <string-array name="tracker_types">
         <item>Selección múltiple</item>
         <item>Numérico</item>
         <item>Duración del tiempo</item>
@@ -226,11 +226,11 @@
     <string name="move_to">Mover a</string>
 
     <string name="feature_add_or_update_error_occurred">Se ha producido un error, no se han podido realizar los cambios.</string>
-    <string name="ru_sure_update_feature">Esta actualización puede modificar irreversiblemente los datos que ya has trazado. Se recomienda encarecidamente hacer una copia de seguridad de los datos existentes antes de continuar. ¿Desea continuar?</string>
+    <string name="ru_sure_update_tracker">Esta actualización puede modificar irreversiblemente los datos que ya has trazado. Se recomienda encarecidamente hacer una copia de seguridad de los datos existentes antes de continuar. ¿Desea continuar?</string>
     <string name="warning">Atención</string>
     <string name="ok">Aceptar</string>
-    <string name="on_feature_type_change_numerical_warning">Si actualiza su tipo de entrada a numérico sus datos trazados existentes perderán sus etiquetas.</string>
-    <string name="on_feature_delete_discrete_value_warning">Si se borran las respuestas de opción múltiple se borrarán todos los puntos de datos rastreados existentes para ese valor.</string>
+    <string name="on_tracker_type_change_numerical_warning">Si actualiza su tipo de entrada a numérico sus datos trazados existentes perderán sus etiquetas.</string>
+    <string name="on_tracker_delete_discrete_value_warning">Si se borran las respuestas de opción múltiple se borrarán todos los puntos de datos rastreados existentes para ese valor.</string>
 
     <string name="rate_the_app">Calificar la aplicación</string>
     <string name="reminders">Recordatorios</string>

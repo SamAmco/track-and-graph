@@ -24,8 +24,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.displaytrackgroup.DURATION_SECONDS_KEY
-import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
+import com.samco.trackandgraph.addtracker.DURATION_SECONDS_KEY
+import com.samco.trackandgraph.addtracker.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.widgets.TrackWidgetInputDataPointDialog
 import dagger.hilt.android.AndroidEntryPoint
