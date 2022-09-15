@@ -36,7 +36,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.addtracker.FEATURE_LIST_KEY
-import com.samco.trackandgraph.addtracker.InputDataPointDialog
+import com.samco.trackandgraph.addtracker.DataPointInputDialog
 import com.samco.trackandgraph.ui.DataSourcePathProvider
 import com.samco.trackandgraph.ui.showNoteDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
@@ -137,7 +137,7 @@ class NotesFragment : Fragment() {
     private fun onEditNote(note: DisplayNote) {
         when (note.noteType) {
             NoteType.DATA_POINT -> note.featureId?.let { featureId ->
-                val dialog = InputDataPointDialog()
+                val dialog = DataPointInputDialog()
                 val argBundle = Bundle()
                 argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(featureId))
                 argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(note.timestamp))

@@ -74,7 +74,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
     }
 
     private fun showDialog(featureId: Long) {
-        val dialog = TrackWidgetInputDataPointDialog()
+        val dialog = TrackWidgetDataPointInputDialog()
         val args = Bundle()
         args.putLongArray(FEATURE_LIST_KEY, longArrayOf(featureId))
         dialog.arguments = args

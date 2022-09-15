@@ -27,7 +27,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.addtracker.DURATION_SECONDS_KEY
 import com.samco.trackandgraph.addtracker.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
-import com.samco.trackandgraph.widgets.TrackWidgetInputDataPointDialog
+import com.samco.trackandgraph.widgets.TrackWidgetDataPointInputDialog
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -64,7 +64,7 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
     }
 
     private fun showDialog(featureId: Long, duration: Long) {
-        val dialog = TrackWidgetInputDataPointDialog()
+        val dialog = TrackWidgetDataPointInputDialog()
         val args = Bundle()
         args.putLongArray(FEATURE_LIST_KEY, longArrayOf(featureId))
         args.putLong(DURATION_SECONDS_KEY, duration)

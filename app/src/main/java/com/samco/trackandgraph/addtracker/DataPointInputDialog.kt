@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.addtracker
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.view.View
@@ -25,12 +26,15 @@ import android.content.DialogInterface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.viewpager.widget.PagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -43,12 +47,12 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
-const val FEATURE_LIST_KEY = "FEATURE_LIST_KEY"
+const val TRACKER_LIST_KEY = "TRACKER_LIST_KEY"
 const val DATA_POINT_TIMESTAMP_KEY = "DATA_POINT_ID"
 const val DURATION_SECONDS_KEY = "DURATION_SECONDS_KEY"
 
 @AndroidEntryPoint
-open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListener {
+open class DataPointInputDialog : DialogFragment(), ViewPager.OnPageChangeListener {
     private val viewModel by viewModels<InputDataPointDialogViewModel>()
     private val inputViews = mutableMapOf<Int, DataPointInputView>()
     private var binding: DataPointInputDialogBinding by bindingForViewLifecycle()
@@ -78,7 +82,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun listenToState() {
-        viewModel.state.observe(this) { state ->
+        viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 InputDataPointDialogState.LOADING -> {
                     binding.addButton.isEnabled = false
@@ -91,7 +95,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
                 }
                 InputDataPointDialogState.ADDED -> {
                     binding.addButton.isEnabled = true
-                    if (viewModel.currentFeatureIndex.value!! < viewModel.features.value!!.size - 1) {
+                    if (viewModel.currentTrackerIndex.value!! < viewModel.trackers.value!!.size - 1) {
                         skip()
                         viewModel.onFinishedTransition()
                     } else dismiss()
@@ -102,14 +106,14 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun listenToIndex() {
-        viewModel.currentFeatureIndex.observe(this) { index ->
-            index?.run { setupViewFeature(viewModel.features.value!![index], index) }
+        viewModel.currentTrackerIndex.observe(viewLifecycleOwner) { index ->
+            index?.run { setupViewFeature(viewModel.trackers.value!![index], index) }
         }
     }
 
     private fun listenToFeatures() {
-        viewModel.features.observe(this, Observer { features ->
-            if (features.isEmpty()) return@Observer
+        viewModel.trackers.observe(viewLifecycleOwner) { features ->
+            if (features.isEmpty()) return@observe
             binding.viewPager.adapter = ViewPagerAdapter(
                 requireContext(),
                 features,
@@ -124,7 +128,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
                 binding.indexText.visibility = View.GONE
                 binding.skipButton.visibility = View.GONE
             }
-        })
+        }
     }
 
     private fun initViewModel() {
@@ -134,7 +138,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
             if (it > 0) it.toDouble() else null
         }
         viewModel.init(
-            requireArguments().getLongArray(FEATURE_LIST_KEY)!!.toList(),
+            requireArguments().getLongArray(TRACKER_LIST_KEY)!!.toList(),
             timestamp,
             duration
         )
@@ -142,9 +146,9 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 
     private class ViewPagerAdapter(
         val context: Context,
-        val features: List<Feature>,
+        val trackers: List<Tracker>,
         val clickListener: DataPointInputView.DataPointInputClickListener,
-        val uiStates: Map<Feature, DataPointInputView.DataPointInputData>,
+        val uiStates: Map<Tracker, DataPointInputView.DataPointInputData>,
         val inputViews: MutableMap<Int, DataPointInputView>
     ) : PagerAdapter() {
         private val existingViews = mutableListOf<DataPointInputView>()
@@ -156,7 +160,7 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 
         override fun instantiateItem(container: ViewGroup, position: Int): Any {
             val view = DataPointInputView(context)
-            view.initialize(uiStates[features[position]]!!)
+            view.initialize(uiStates[trackers[position]]!!)
             val params = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -184,23 +188,24 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
 
         fun updateAllDateTimes() = existingViews.forEach { dpiv -> dpiv.updateDateTimes() }
 
-        override fun getCount() = features.size
+        override fun getCount() = trackers.size
     }
 
     override fun onPageScrollStateChanged(state: Int) {}
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
     override fun onPageSelected(position: Int) {
         (binding.viewPager.adapter as ViewPagerAdapter).updateAllDateTimes()
-        viewModel.currentFeatureIndex.value = position
+        viewModel.currentTrackerIndex.value = position
     }
 
-    private fun setupViewFeature(feature: Feature, index: Int) {
-        if (feature.featureType != DataType.DISCRETE) binding.addButton.visibility = View.VISIBLE
+    @SuppressLint("SetTextI18n")
+    private fun setupViewFeature(tracker: Tracker, index: Int) {
+        if (tracker.dataType != DataType.DISCRETE) binding.addButton.visibility = View.VISIBLE
         else binding.addButton.visibility = View.INVISIBLE
-        binding.indexText.text = "${index + 1} / ${viewModel.features.value!!.size}"
+        binding.indexText.text = "${index + 1} / ${viewModel.trackers.value!!.size}"
 
         //SHOW/HIDE KEYBOARD
-        if (feature.featureType == DataType.DISCRETE)
+        if (tracker.dataType == DataType.DISCRETE)
             activity?.window?.hideKeyboard(view?.windowToken, 0)
         requireActivity().currentFocus?.clearFocus()
     }
@@ -214,14 +219,14 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     }
 
     private fun onAddClicked() {
-        val currIndex = viewModel.currentFeatureIndex.value!!
-        val currFeature = viewModel.features.value!![currIndex]
-        viewModel.uiStates[currFeature]?.timeFixed = true
-        onAddClicked(currFeature)
+        val currIndex = viewModel.currentTrackerIndex.value!!
+        val currTracker = viewModel.trackers.value!![currIndex]
+        viewModel.uiStates[currTracker]?.timeFixed = true
+        onAddClicked(currTracker)
     }
 
-    private fun onAddClicked(feature: Feature) {
-        onSubmitResult(viewModel.uiStates[feature]!!)
+    private fun onAddClicked(tracker: Tracker) {
+        onSubmitResult(viewModel.uiStates[tracker]!!)
     }
 
     override fun onDismiss(dialog: DialogInterface) {
@@ -233,15 +238,18 @@ open class InputDataPointDialog : DialogFragment(), ViewPager.OnPageChangeListen
     private fun onSubmitResult(dataPointInputData: DataPointInputView.DataPointInputData) {
         viewModel.onDataPointInput(
             DataPoint(
-                dataPointInputData.dateTime, dataPointInputData.feature.id,
-                dataPointInputData.value, dataPointInputData.label, dataPointInputData.note
+                dataPointInputData.dateTime,
+                dataPointInputData.tracker.featureId,
+                dataPointInputData.value,
+                dataPointInputData.label,
+                dataPointInputData.note
             ),
             dataPointInputData.oldDataPoint
         )
     }
 
     private fun skip() {
-        if (binding.viewPager.currentItem == viewModel.features.value!!.size - 1) dismiss()
+        if (binding.viewPager.currentItem == viewModel.trackers.value!!.size - 1) dismiss()
         else binding.viewPager.setCurrentItem(binding.viewPager.currentItem + 1, true)
     }
 }
@@ -255,73 +263,56 @@ class InputDataPointDialogViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
 
-    val state: LiveData<InputDataPointDialogState>
-        get() {
-            return _state
-        }
-    private val _state by lazy {
-        val state = MutableLiveData<InputDataPointDialogState>()
-        state.value = InputDataPointDialogState.LOADING
-        return@lazy state
-    }
+    private val _state = MutableLiveData(InputDataPointDialogState.LOADING)
+    val state: LiveData<InputDataPointDialogState> get() = _state
 
-    lateinit var uiStates: Map<Feature, DataPointInputView.DataPointInputData>
-    val features: LiveData<List<Feature>>
-        get() {
-            return _features
-        }
-    private val _features by lazy {
-        val feats = MutableLiveData<List<Feature>>()
-        feats.value = listOf()
-        return@lazy feats
-    }
+    lateinit var uiStates: Map<Tracker, DataPointInputView.DataPointInputData>
 
-    val currentFeatureIndex: MutableLiveData<Int?>
-        get() {
-            return _currentFeatureIndex
-        }
-    private val _currentFeatureIndex by lazy {
-        val index = MutableLiveData<Int?>()
-        index.value = null
-        return@lazy index
-    }
+    private val _trackers = MutableLiveData<List<Tracker>>(emptyList())
+    val trackers: LiveData<List<Tracker>> get() = _trackers
+
+    private val _currentTrackerIndex = MutableLiveData<Int?>(null)
+    val currentTrackerIndex: MutableLiveData<Int?> get() = _currentTrackerIndex
 
     private var initialized = false
 
-    fun init(featureIds: List<Long>, dataPointTimestamp: OffsetDateTime?, durationSeconds: Double?) {
+    fun init(
+        trackerIds: List<Long>,
+        dataPointTimestamp: OffsetDateTime?,
+        durationSeconds: Double?
+    ) {
         if (initialized) return
         initialized = true
 
         _state.value = InputDataPointDialogState.LOADING
         viewModelScope.launch(io) {
-            val featureData = dataInteractor.getFeaturesByIdsSync(featureIds)
+            val trackers = dataInteractor.getTrackersByIdsSync(trackerIds)
             val dataPointData = dataPointTimestamp?.let {
-                //TODO Should use tracker id
-                dataInteractor.getDataPointByTimestampAndFeatureSync(featureData[0].id, it)
+                dataInteractor.getDataPointByTimestampAndTrackerSync(trackers[0].id, it)
             }
-            uiStates = getUIStatesForFeatures(featureData, dataPointData, durationSeconds)
+            uiStates = getUIStatesForFeatures(trackers, dataPointData, durationSeconds)
 
             withContext(ui) {
-                _features.value = featureData
-                _currentFeatureIndex.value = 0
+                _trackers.value = trackers
+                _currentTrackerIndex.value = 0
                 _state.value = InputDataPointDialogState.WAITING
             }
         }
     }
 
     private fun getUIStatesForFeatures(
-        featureData: List<Feature>,
+        trackers: List<Tracker>,
         dataPointData: DataPoint?,
         durationSeconds: Double?
-    ): Map<Feature, DataPointInputView.DataPointInputData> {
+    ): Map<Tracker, DataPointInputView.DataPointInputData> {
         val timestamp = dataPointData?.timestamp ?: OffsetDateTime.now()
         val timeFixed = dataPointData != null
-        return featureData.associateWith { f ->
+        return trackers.associateWith { f ->
             val dataPointValue = when {
                 dataPointData?.value != null -> dataPointData.value
                 durationSeconds != null -> durationSeconds
                 f.hasDefaultValue -> f.defaultValue
-                f.featureType == DataType.CONTINUOUS -> 1.0
+                f.dataType == DataType.CONTINUOUS -> 1.0
                 else -> 0.0
             }
             val dataPointLabel = dataPointData?.label
