@@ -85,8 +85,11 @@
         android:name="com.samco.trackandgraph.featurehistory.FragmentFeatureHistory"
         tools:layout="@layout/fragment_feature_history">
         <argument
-            android:name="dataSource"
-            app:argType="com.samco.trackandgraph.base.database.dto.DataSourceDescriptor" />
+            android:name="featureId"
+            app:argType="Long" />
+        <argument
+            android:name="featureName"
+            app:argType="String" />
     </fragment>
     <fragment
         android:id="@+id/graphStatInputFragment"

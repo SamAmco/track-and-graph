@@ -18,9 +18,13 @@ package com.samco.trackandgraph.featurehistory
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -28,15 +32,17 @@ import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.DataSourceDescriptor
-import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentFeatureHistoryBinding
 import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
-import com.samco.trackandgraph.addtracker.FEATURE_LIST_KEY
 import com.samco.trackandgraph.addtracker.DataPointInputDialog
+import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
@@ -61,13 +67,65 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
     ): View {
         binding = FragmentFeatureHistoryBinding.inflate(inflater, container, false)
         initPreLoadViewState()
+        initAdapter()
 
-        viewModel.initViewModel(args.dataSource)
+        viewModel.initViewModel(args.featureId)
 
-        observeFeature()
+        observeIsTracker()
+        observeIsDuration()
+        observeDataPoints()
 
-        setHasOptionsMenu(true)
+        initMenuProvider()
         return binding.root
+    }
+
+    private fun initMenuProvider() {
+        requireActivity().addMenuProvider(
+            FeatureHistoryMenuProvider(),
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
+    }
+
+    private inner class FeatureHistoryMenuProvider : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.feature_history_menu, menu)
+        }
+
+        override fun onMenuItemSelected(item: MenuItem): Boolean {
+            when (item.itemId) {
+                R.id.infoButton -> showInfo()
+                else -> return false
+            }
+            return true
+        }
+    }
+
+    private fun observeIsTracker() {
+        viewModel.tracker.observe(viewLifecycleOwner) {
+            adapter.submitIsTracker(it != null)
+        }
+    }
+
+    private fun observeIsDuration() {
+        viewModel.isDuration.observe(viewLifecycleOwner) {
+            adapter.submitIsDuration(it)
+        }
+    }
+
+    private fun initAdapter() {
+        adapter = DataPointAdapter(
+            DataPointClickListener(
+                this::onEditDataPointClicked,
+                this::onDeleteDataPointClicked,
+                this::onViewDataPointClicked
+            ),
+            getWeekDayNames(requireContext())
+        )
+        binding.dataPointList.adapter = adapter
+        binding.dataPointList.layoutManager = LinearLayoutManager(
+            context, RecyclerView.VERTICAL, false
+        )
     }
 
     override fun onResume() {
@@ -81,40 +139,8 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.infoButton -> showInfo()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.feature_history_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
     private fun initPreLoadViewState() {
         binding.noDataPointsHintText.visibility = View.GONE
-    }
-
-    private fun observeFeature() {
-        viewModel.feature.observe(viewLifecycleOwner, Observer {
-            if (it == null) return@Observer
-            adapter = DataPointAdapter(
-                DataPointClickListener(
-                    this::onEditDataPointClicked,
-                    this::onDeleteDataPointClicked,
-                    this::onViewDataPointClicked
-                ),
-                getWeekDayNames(requireContext()),
-                it.featureType
-            )
-            binding.dataPointList.adapter = adapter
-            binding.dataPointList.layoutManager = LinearLayoutManager(
-                context, RecyclerView.VERTICAL, false
-            )
-            observeDataPoints()
-        })
     }
 
     private fun onViewDataPointClicked(dataPoint: DataPoint) {
@@ -122,37 +148,34 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
             requireContext(),
             layoutInflater,
             dataPoint,
-            viewModel.feature.value!!.featureType
+            viewModel.isDuration.value ?: false
         )
     }
 
     private fun observeDataPoints() {
-        viewModel.dataPoints.observe(viewLifecycleOwner, Observer {
-            it?.let {
-                adapter.submitList(it)
-                binding.noDataPointsHintText.visibility =
-                    if (it.isEmpty()) View.VISIBLE else View.GONE
-            }
-        })
+        viewModel.dataPoints.observe(viewLifecycleOwner) {
+            if (it == null) return@observe
+            adapter.submitDataPoints(it)
+            binding.noDataPointsHintText.visibility =
+                if (it.isEmpty()) View.VISIBLE else View.GONE
+        }
     }
 
     private fun onEditDataPointClicked(dataPoint: DataPoint) {
-        viewModel.feature.value?.let {
+        viewModel.tracker.value?.let { tracker ->
             val dialog = DataPointInputDialog()
             val argBundle = Bundle()
-            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(args.feature))
+            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(tracker.id))
             argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(dataPoint.timestamp))
             dialog.arguments = argBundle
-            childFragmentManager.let { dialog.show(it, "input_data_point_dialog") }
+            dialog.show(childFragmentManager, "input_data_point_dialog")
         }
     }
 
     private fun onDeleteDataPointClicked(dataPoint: DataPoint) {
         viewModel.currentActionDataPoint = dataPoint
-        val dialog = YesCancelDialogFragment()
-        val args = Bundle()
-        args.putString("title", getString(R.string.ru_sure_del_data_point))
-        dialog.arguments = args
+        val dialog = YesCancelDialogFragment
+            .create("no id", getString(R.string.ru_sure_del_data_point))
         childFragmentManager.let { dialog.show(it, "ru_sure_del_data_point_fragment") }
     }
 
@@ -165,28 +188,45 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
 @HiltViewModel
 class FeatureHistoryViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
-): ViewModel() {
-    private val _dataSample = MutableLiveData<DataSample?>(null)
-    val dataSample: LiveData<DataSample?> = _dataSample
+    private val dataInteractor: DataInteractor,
+    @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher
+) : ViewModel() {
+    private val _isDuration = MutableLiveData(false)
+    val isDuration: LiveData<Boolean> get() = _isDuration
 
-    lateinit var dataPoints: LiveData<List<DataPoint>>
-        private set
+    private val _dataPoints = MutableLiveData<List<DataPoint>>(emptyList())
+    val dataPoints: LiveData<List<DataPoint>> = _dataPoints
+
+    private val _feature = MutableLiveData<Feature?>(null)
+    val feature: LiveData<Feature?> get() = _feature
+
+    private val _tracker = MutableLiveData<Tracker?>(null)
+    val tracker: LiveData<Tracker?> get() = _tracker
+
     var currentActionDataPoint: DataPoint? = null
 
     private var updateJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
 
-    private var dataSource: DataSourceDescriptor? = null
+    private var featureId: Long? = null
 
-    fun initViewModel(dataSourceDescriptor: DataSourceDescriptor) {
-        if (this.dataSource != null) return
-        this.dataSource = dataSourceDescriptor
-        this.dataPoints = dataInteractor.getDataSampleForFeatureId()
-        ioScope.launch {
+    fun initViewModel(featureId: Long) {
+        if (this.featureId != null) return
+        this.featureId = featureId
+        ioScope.launch(io) {
+            val dataSample = dataInteractor.getDataSampleForFeatureId(featureId)
+            dataSample.iterator().apply { while (hasNext()) next() }
+            val rawData = dataSample.getRawDataPoints()
             val feature = dataInteractor.getFeatureById(featureId)
+            val tracker = dataInteractor.getTrackerByFeatureId(featureId)
 
-            withContext(Dispatchers.Main) { _feature.value = feature }
+            withContext(ui) {
+                _isDuration.value = dataSample.dataSampleProperties.isDuration
+                _dataPoints.value = rawData
+                _tracker.value = tracker
+                _feature.value = feature
+            }
         }
     }
 
