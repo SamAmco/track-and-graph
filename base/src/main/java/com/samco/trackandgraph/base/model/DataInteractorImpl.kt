@@ -527,4 +527,8 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun insertFunction(function: FunctionDto) = withContext(io) {
         dao.createFunction(function.toEntity()).also { dataUpdateEvents.emit(Unit) }
     }
+
+    override suspend fun getAllFeaturesSync(): List<Feature> = withContext(io) {
+        dao.getAllFeaturesSync().map { it.toDto() }
+    }
 }

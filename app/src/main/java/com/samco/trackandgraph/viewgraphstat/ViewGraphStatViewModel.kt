@@ -26,7 +26,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.ui.DataSourcePathProvider
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,7 +44,7 @@ class ViewGraphStatViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
-    var dataSourcePathProvider: DataSourcePathProvider = DataSourcePathProvider(emptyMap())
+    var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyMap())
         private set
     var featureTypes: Map<Long, DataType>? = null
         private set
@@ -114,7 +114,7 @@ class ViewGraphStatViewModel @Inject constructor(
                 ?: return@mapNotNull null
             dataSource to group
         }.toMap()
-        dataSourcePathProvider = DataSourcePathProvider(dataSourceMap)
+        featurePathProvider = FeaturePathProvider(dataSourceMap)
         featureTypes = allFeatures.associate { it.id to it.featureType }
     }
 

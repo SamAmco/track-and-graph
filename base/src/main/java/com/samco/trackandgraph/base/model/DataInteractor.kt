@@ -170,4 +170,6 @@ interface DataInteractor : TrackerHelper, DataSampler {
     suspend fun updateFunction(function: FunctionDto)
 
     suspend fun insertFunction(function: FunctionDto)
+
+    suspend fun getAllFeaturesSync(): List<Feature>
 }

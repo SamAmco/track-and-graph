@@ -108,7 +108,7 @@ class ViewGraphStatFragment : Fragment() {
             )
             NoteType.DATA_POINT -> {
                 val dataPoint = note.dataPoint!!
-                val featureDisplayName = viewModel.dataSourcePathProvider.getPathForDataSource(
+                val featureDisplayName = viewModel.featurePathProvider.getPathForFeature(
                     dataPoint.featureId,
                     DataSourceType.FEATURE
                 )
@@ -166,7 +166,7 @@ class ViewGraphStatFragment : Fragment() {
     }
 
     private fun initNotesAdapterFromViewModel() {
-        val featurePathProvider = viewModel.dataSourcePathProvider
+        val featurePathProvider = viewModel.featurePathProvider
         val featureTypes = viewModel.featureTypes ?: emptyMap()
         adapter = NotesAdapter(
             featurePathProvider,

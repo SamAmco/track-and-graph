@@ -45,9 +45,9 @@ abstract class GraphStatConfigView constructor(
     attrs,
     defStyleAttr
 ) {
-    protected lateinit var featureDataProvider: DataSourceDataProvider
+    protected lateinit var featureDataProvider: FeatureDataProvider
 
-    protected val allFeatureData: List<DataSourceDataProvider.DataSourceData> get() = featureDataProvider.dataSourceData
+    protected val allFeatureData: Set<FeatureDataProvider.DataSourceData> get() = featureDataProvider.dataSourceData.keys
 
     private var configChangedListener: ((Any?, ValidationException?) -> Unit)? = null
     protected var onScrollListener: ((Int) -> Unit)? = null
@@ -55,8 +55,8 @@ abstract class GraphStatConfigView constructor(
 
     abstract fun initFromConfigData(configData: Any?)
 
-    internal fun initFromConfigData(configData: Any?, featurePathProvider: DataSourceDataProvider) {
-        this.featureDataProvider = featurePathProvider
+    internal fun initFromConfigData(configData: Any?, featureDataProvider: FeatureDataProvider) {
+        this.featureDataProvider = featureDataProvider
         initFromConfigData(configData)
     }
 
@@ -89,7 +89,7 @@ abstract class GraphStatConfigView constructor(
             featureFilter: (Feature) -> Boolean,
             onItemSelected: (Feature) -> Unit
         ) {
-            val allFeatures = view.featureDataProvider.featuresSortedAlphabetically().filter(featureFilter)
+            val allFeatures = view.featureDataProvider.sortedAlphabetically().filter(featureFilter)
             val context = view.context
             val itemNames = allFeatures.map { ft -> view.featureDataProvider.getPathForFeature(ft.id) }
             val adapter =
@@ -189,7 +189,7 @@ abstract class GraphStatConfigView constructor(
             onItemSelected(suggestedDate)
             view.emitConfigChange()
             val picker = DatePickerDialog(
-                view.context, DatePickerDialog.OnDateSetListener { _, year, month, day ->
+                view.context, { _, year, month, day ->
                     val selectedDate =
                         ZonedDateTime.of(suggestedDate.toLocalDateTime(), ZoneId.systemDefault())
                             .withYear(year)

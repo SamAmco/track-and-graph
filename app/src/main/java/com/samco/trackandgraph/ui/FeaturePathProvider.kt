@@ -15,23 +15,22 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatinput.configviews
+package com.samco.trackandgraph.ui
 
-import com.samco.trackandgraph.base.database.dto.DataSourceDescriptor
+import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Group
-import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
-import com.samco.trackandgraph.ui.DataSourcePathProvider
 
-class DataSourceDataProvider(
-    val dataSourceData: Map<DataSourceData, Group>
-) : DataSourcePathProvider(dataSourceData.map { it.key.descriptor to it.value }.toMap()) {
+open class FeaturePathProvider(
+    private val featureGroupMap: Map<Feature, Group>,
+) : GroupPathProvider(featureGroupMap.values) {
+    fun sortedAlphabetically() = featureGroupMap.keys.sortedBy { getPathForFeature(it.id) }
 
-    fun dataSourceDataAlphabetically() =
-        dataSourceData.keys.sortedBy { getPathForDataSource(it.descriptor.id, it.descriptor.type) }
-
-    data class DataSourceData(
-        val descriptor: DataSourceDescriptor,
-        val labels: Set<String>,
-        val dataProperties: DataSampleProperties
-    )
+    fun getPathForFeature(id: Long): String {
+        val dataSource = featureGroupMap.keys.firstOrNull { it.id == id } ?: return ""
+        val group = featureGroupMap[dataSource] ?: return ""
+        val groupPath = getPathForGroup(group.id)
+        var path = groupPath
+        if (groupPath.lastOrNull() != '/') path += '/'
+        return path + dataSource.name
+    }
 }

@@ -285,25 +285,26 @@ class GraphStatInputViewModel @Inject constructor(
     val demoViewData: LiveData<IGraphStatViewData?> get() = _demoViewData
     private val _demoViewData = MutableLiveData<IGraphStatViewData?>(null)
 
-    lateinit var featureDataProvider: DataSourceDataProvider private set
+    lateinit var featureDataProvider: FeatureDataProvider private set
 
     fun initViewModel(graphStatGroupId: Long, graphStatId: Long) {
         if (this.graphStatGroupId != -1L) return
         this.graphStatGroupId = graphStatGroupId
         _state.value = GraphStatInputState.INITIALIZING
         viewModelScope.launch(io) {
-            val allDataSources = dataInteractor.getAllDataSourcesSync()
+            val allFeatures = dataInteractor.getAllFeaturesSync()
             val allGroups = dataInteractor.getAllGroupsSync()
-            val dataSourceData = allDataSources.map { source ->
-                DataSourceDataProvider.DataSourceData(
-                    source,
-                    dataInteractor.getLabelsForDataSource(source),
-                    dataInteractor.getDataSamplePropertiesForSource(source)
+            val dataSourceData = allFeatures.map { feature ->
+                FeatureDataProvider.DataSourceData(
+                    feature,
+                    dataInteractor.getLabelsForFeatureId(feature.id),
+                    dataInteractor.getDataSampleForFeatureId(feature.id).dataSampleProperties
                 )
             }
             featureDataProvider =
-                DataSourceDataProvider(dataSourceData.mapNotNull { data ->
-                    val group = allGroups.firstOrNull { it.id == data.descriptor.groupId }
+                FeatureDataProvider(dataSourceData.mapNotNull { data ->
+                    val group = allGroups
+                        .firstOrNull { it.id == data.feature.groupId }
                         ?: return@mapNotNull null
                     data to group
                 }.toMap())

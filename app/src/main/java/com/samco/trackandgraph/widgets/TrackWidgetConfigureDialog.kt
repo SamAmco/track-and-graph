@@ -31,7 +31,7 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
-import com.samco.trackandgraph.ui.DataSourcePathProvider
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -107,11 +107,11 @@ class TrackWidgetConfigureDialog : DialogFragment() {
 class TrackWidgetConfigureDialogViewModel @Inject constructor(
     dataInteractor: DataInteractor
 ) : ViewModel() {
-    val featurePathProvider: LiveData<DataSourcePathProvider>
+    val featurePathProvider: LiveData<FeaturePathProvider>
     var featureId: Long? = null
 
     init {
-        val mediator = MediatorLiveData<DataSourcePathProvider>()
+        val mediator = MediatorLiveData<FeaturePathProvider>()
         dataInteractor.let {
             val groups = it.getAllGroups()
             val features = it.getAllFeatures()
@@ -119,7 +119,7 @@ class TrackWidgetConfigureDialogViewModel @Inject constructor(
                 val featureList = features.value
                 val groupList = groups.value
                 if (groupList != null && featureList != null) {
-                    mediator.value = DataSourcePathProvider(featureList, groupList)
+                    mediator.value = FeaturePathProvider(featureList, groupList)
                 }
             }
             mediator.addSource(groups) { onEmitted() }
