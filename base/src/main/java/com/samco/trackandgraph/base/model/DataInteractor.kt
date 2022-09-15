@@ -23,7 +23,6 @@ import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
@@ -82,7 +81,6 @@ interface DataInteractor : TrackerHelper, DataSampler {
      * Emits a unit every time currently displayed data may have changed.
      * For example if you create/update/remove a data point.
      */
-    //TODO function add/update/delete actions should trigger this
     fun getDataUpdateEvents(): SharedFlow<Unit>
 
     suspend fun getGraphStatById(graphStatId: Long): GraphOrStat
@@ -101,10 +99,9 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun getAllGraphStatsSync(): List<GraphOrStat>
 
-    fun getAllDisplayNotes(): LiveData<List<DisplayNote>>
+    fun getAllDisplayNotes(): Flow<List<DisplayNote>>
 
-    //TODO rename this back once you've ensured it's used correctly everywhere
-    suspend fun removeNote2(timestamp: OffsetDateTime, trackerId: Long)
+    suspend fun removeNote(timestamp: OffsetDateTime, trackerId: Long)
 
     suspend fun deleteGlobalNote(note: GlobalNote)
 

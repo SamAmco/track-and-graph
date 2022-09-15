@@ -131,7 +131,7 @@ class DataInteractorImplTest {
         uut.insertDataPoint(testDataPoint)
         uut.insertDataPoints(listOf(testDataPoint))
         uut.updateDataPoints(listOf(testDataPoint))
-        uut.removeNote2(OffsetDateTime.MAX, 0L)
+        uut.removeNote(OffsetDateTime.MAX, 0L)
         uut.deleteGlobalNote(testGlobalNote)
         uut.insertGlobalNote(testGlobalNote)
         uut.insertFunction(testFunction)

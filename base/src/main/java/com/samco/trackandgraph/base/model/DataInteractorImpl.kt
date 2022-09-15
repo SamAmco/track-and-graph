@@ -31,6 +31,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.map
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
@@ -232,11 +233,13 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllGraphStatsSync().map { it.toDto() }
     }
 
-    override fun getAllDisplayNotes(): LiveData<List<DisplayNote>> {
-        return Transformations.map(dao.getAllDisplayNotes()) { notes -> notes.map { it.toDto() } }
+    override fun getAllDisplayNotes(): Flow<List<DisplayNote>> {
+        return dao.getAllDisplayNotes().map { notes ->
+            notes.map { it.toDto() }
+        }
     }
 
-    override suspend fun removeNote2(timestamp: OffsetDateTime, trackerId: Long) {
+    override suspend fun removeNote(timestamp: OffsetDateTime, trackerId: Long) {
         withContext(io) {
             dao.getTrackerById(trackerId)?.featureId?.let {
                 dao.removeNote(timestamp, it).also { dataUpdateEvents.emit(Unit) }

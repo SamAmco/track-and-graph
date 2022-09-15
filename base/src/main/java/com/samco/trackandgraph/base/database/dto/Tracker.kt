@@ -20,17 +20,17 @@ package com.samco.trackandgraph.base.database.dto
 import com.samco.trackandgraph.base.database.entity.Feature
 
 data class Tracker(
-    val id: Long,
-    val name: String,
-    val groupId: Long,
+    override val id: Long,
+    override val name: String,
+    override val groupId: Long,
     val featureId: Long,
-    val displayIndex: Int,
-    val description: String,
+    override val displayIndex: Int,
+    override val description: String,
     val dataType: DataType,
     val discreteValues: List<DiscreteValue>,
     val hasDefaultValue: Boolean,
     val defaultValue: Double,
-) {
+) : com.samco.trackandgraph.base.database.dto.Feature {
     fun getDefaultLabel(): String =
         if (dataType == DataType.DISCRETE)
             discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
