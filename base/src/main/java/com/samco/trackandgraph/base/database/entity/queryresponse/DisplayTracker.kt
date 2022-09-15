@@ -69,7 +69,7 @@ internal data class DisplayTracker(
         featureId = featureId,
         name = name,
         groupId = groupId,
-        featureType = featureType,
+        dataType = featureType,
         discreteValues = discreteValues,
         hasDefaultValue = hasDefaultValue,
         defaultValue = defaultValue,

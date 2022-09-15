@@ -55,8 +55,8 @@
             app:popEnterAnim="@anim/slide_in_right"
             app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/action_add_feature"
-            app:destination="@id/addFeatureFragment"
+            android:id="@+id/action_add_tracker"
+            app:destination="@id/addTrackerFragment"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_right"
@@ -104,7 +104,7 @@
             app:argType="long" />
     </fragment>
     <fragment
-        android:id="@+id/addFeatureFragment"
+        android:id="@+id/addTrackerFragment"
         android:name="com.samco.trackandgraph.addtracker.AddTrackerFragment">
         <argument
             android:name="groupId"

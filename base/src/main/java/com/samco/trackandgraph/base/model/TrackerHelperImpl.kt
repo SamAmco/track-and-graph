@@ -24,6 +24,8 @@ import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.TrackerHelper.DurationNumericConversionMode
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
@@ -295,6 +297,10 @@ internal class TrackerHelperImpl @Inject constructor(
                 Tracker.fromEntities(tracker, feature)
             }
         }
+    }
+
+    override fun hasAtLeastOneTracker(): Flow<Boolean> {
+        return dao.numTrackers().map { it > 0 }
     }
 
     override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {

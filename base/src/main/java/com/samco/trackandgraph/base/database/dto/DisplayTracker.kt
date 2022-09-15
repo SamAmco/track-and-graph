@@ -25,7 +25,7 @@ data class DisplayTracker(
     var featureId: Long,
     val name: String,
     val groupId: Long,
-    val featureType: DataType = DataType.CONTINUOUS,
+    val dataType: DataType = DataType.CONTINUOUS,
     val discreteValues: List<DiscreteValue>,
     val hasDefaultValue: Boolean,
     val defaultValue: Double,

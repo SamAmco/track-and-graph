@@ -89,7 +89,7 @@ class PieChartDataFactory @Inject constructor(
     ): List<IDataPoint>? {
         val feature = withContext(Dispatchers.IO) {
             dataInteractor.getFeatureById(pieChart.featureId)
-        }
+        } ?: return null
         val dataSample = DataClippingFunction(pieChart.endDate, pieChart.duration)
             .mapSample(dataInteractor.getDataSampleForFeatureId(feature.id))
         val dataPoints = dataSample

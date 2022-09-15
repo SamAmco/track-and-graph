@@ -24,7 +24,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -290,16 +291,16 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         )
     }
 
-    private fun onFeatureAddClicked(feature: DisplayTracker, useDefault: Boolean = true) {
+    private fun onFeatureAddClicked(tracker: DisplayTracker, useDefault: Boolean = true) {
         /**
          * @param useDefault: if false the default value will be ignored and the user will be queried for the value
          */
-        if (feature.hasDefaultValue && useDefault) {
+        if (tracker.hasDefaultValue && useDefault) {
             requireContext().performTrackVibrate()
-            viewModel.addDefaultFeatureValue(feature)
+            viewModel.addDefaultTrackerValue(tracker)
         } else {
             val argBundle = Bundle()
-            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(feature.id))
+            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(tracker.id))
             showAddDataPoint(argBundle)
         }
     }
@@ -318,18 +319,17 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun onFeatureEditClicked(feature: DisplayTracker) {
-        val featureNames = viewModel.features.map { f -> f.name }.toTypedArray()
         navController?.navigate(
             GroupFragmentDirections
-                .actionAddFeature(args.groupId, featureNames, feature.id)
+                .actionAddTracker(args.groupId, feature.id)
         )
     }
 
     private fun onQueueAddAllClicked() {
-        viewModel.features.let { feats ->
-            if (feats.isEmpty()) return
+        viewModel.trackers.let { trackers ->
+            if (trackers.isEmpty()) return
             val argBundle = Bundle()
-            argBundle.putLongArray(FEATURE_LIST_KEY, feats.map { f -> f.id }.toLongArray())
+            argBundle.putLongArray(TRACKER_LIST_KEY, trackers.map { it.id }.toLongArray())
             showAddDataPoint(argBundle)
         }
     }
@@ -359,7 +359,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun listenToViewModel() {
-        viewModel.hasFeatures.observe(viewLifecycleOwner) {}
+        viewModel.hasTrackers.observe(viewLifecycleOwner) {}
         viewModel.groupChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it, forceNextNotifyDataSetChanged)
             if (forceNextNotifyDataSetChanged) forceNextNotifyDataSetChanged = false
@@ -371,7 +371,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
             if (it == null) return@observe
             val argBundle = Bundle()
-            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(it.featureId))
+            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(it.trackerId))
             argBundle.putLong(DURATION_SECONDS_KEY, it.duration.seconds)
             showAddDataPoint(argBundle)
             viewModel.onConsumedShowDurationInputDialog()
@@ -388,7 +388,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun updateShowQueueTrackButton() {
-        if (viewModel.features.isNotEmpty()) {
+        if (viewModel.trackers.isNotEmpty()) {
             binding.queueAddAllButton.show()
             binding.itemList.removeOnScrollListener(queueAddAllButtonShowHideListener)
             binding.itemList.addOnScrollListener(queueAddAllButtonShowHideListener)
@@ -431,14 +431,11 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun onAddTrackerClicked() {
-        val featureNames = viewModel.features.map { f -> f.name }.toTypedArray()
-        navController?.navigate(
-            GroupFragmentDirections.actionAddFeature(args.groupId, featureNames)
-        )
+        navController?.navigate(GroupFragmentDirections.actionAddTracker(args.groupId))
     }
 
     private fun onAddGraphStatClicked() {
-        if (viewModel.hasFeatures.value != true) {
+        if (viewModel.hasTrackers.value != true) {
             AlertDialog.Builder(requireContext())
                 .setMessage(R.string.no_features_graph_stats_hint)
                 .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }

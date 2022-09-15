@@ -42,21 +42,23 @@ class GroupViewModel @Inject constructor(
 ) : ViewModel() {
 
     data class DurationInputDialogData(
-        val featureId: Long,
+        val trackerId: Long,
         val duration: Duration
     )
 
     private val _showDurationInputDialog = MutableLiveData<DurationInputDialogData?>()
     val showDurationInputDialog: LiveData<DurationInputDialogData?> = _showDurationInputDialog
 
-    lateinit var hasFeatures: LiveData<Boolean>
+    val hasTrackers: LiveData<Boolean> = dataInteractor
+        .hasAtLeastOneTracker()
+        .asLiveData(viewModelScope.coroutineContext)
 
     lateinit var groupChildren: LiveData<List<GroupChild>>
         private set
 
-    val features
+    val trackers
         get() = groupChildren.value
-            ?.filter { it.type == GroupChildType.FEATURE }
+            ?.filter { it.type == GroupChildType.TRACKER }
             ?.map { it.obj as DisplayTracker }
             ?: emptyList()
 
@@ -68,7 +70,6 @@ class GroupViewModel @Inject constructor(
         if (initialized) return
         this.groupId = groupId
         initialized = true
-        hasFeatures = Transformations.map(dataInteractor.getAllFeatures()) { it.isNotEmpty() }
         initGroupChildren(groupId)
     }
 
@@ -79,16 +80,16 @@ class GroupViewModel @Inject constructor(
             .debounce(100)
             .flatMapLatest {
                 flow {
-                    //Start getting the features and groups
-                    val featureDataDeferred = getFeatureChildrenAsync(groupId)
+                    //Start getting the trackers and groups
+                    val trackerDataDeferred = getTrackerChildrenAsync(groupId)
                     val groupDataDeferred = getGroupChildrenAsync(groupId)
                     //Then get the graphs
                     getGraphViewData(groupId).collect { graphDataPairs ->
-                        val featureData = featureDataDeferred.await()
+                        val trackerData = trackerDataDeferred.await()
                         val groupData = groupDataDeferred.await()
                         val graphData = graphsToGroupChildren(graphDataPairs)
                         val children = mutableListOf<GroupChild>().apply {
-                            addAll(featureData)
+                            addAll(trackerData)
                             addAll(groupData)
                             addAll(graphData)
                         }
@@ -120,9 +121,9 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    private fun getFeatureChildrenAsync(groupId: Long) = viewModelScope.async(io) {
-        return@async dataInteractor.getDisplayFeaturesForGroupSync(groupId).map {
-            GroupChild(GroupChildType.FEATURE, it, it.id, it.displayIndex)
+    private fun getTrackerChildrenAsync(groupId: Long) = viewModelScope.async(io) {
+        return@async dataInteractor.getTrackersForGroupSync(groupId).map {
+            GroupChild(GroupChildType.TRACKER, it, it.id, it.displayIndex)
         }
     }
 
@@ -167,14 +168,14 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    fun addDefaultFeatureValue(feature: DisplayTracker) = viewModelScope.launch(io) {
-        val label = if (feature.featureType == DataType.DISCRETE) {
-            feature.discreteValues[feature.defaultValue.toInt()].label
+    fun addDefaultTrackerValue(tracker: DisplayTracker) = viewModelScope.launch(io) {
+        val label = if (tracker.dataType == DataType.DISCRETE) {
+            tracker.discreteValues[tracker.defaultValue.toInt()].label
         } else ""
         val newDataPoint = DataPoint(
             OffsetDateTime.now(),
-            feature.id,
-            feature.defaultValue,
+            tracker.id,
+            tracker.defaultValue,
             label,
             ""
         )
@@ -206,15 +207,15 @@ class GroupViewModel @Inject constructor(
         _showDurationInputDialog.value = null
     }
 
-    fun stopTimer(feature: DisplayTracker) = viewModelScope.launch(io) {
-        dataInteractor.stopTimerForFeature(feature.id)?.let {
+    fun stopTimer(tracker: DisplayTracker) = viewModelScope.launch(io) {
+        dataInteractor.stopTimerForTracker(tracker.id)?.let {
             withContext(ui) {
-                _showDurationInputDialog.value = DurationInputDialogData(feature.id, it)
+                _showDurationInputDialog.value = DurationInputDialogData(tracker.id, it)
             }
         }
     }
 
-    fun playTimer(feature: DisplayTracker) = viewModelScope.launch(io) {
-        dataInteractor.playTimerForFeature(feature.id)
+    fun playTimer(tracker: DisplayTracker) = viewModelScope.launch(io) {
+        dataInteractor.playTimerForTracker(tracker.id)
     }
 }

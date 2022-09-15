@@ -28,6 +28,7 @@ import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.ServiceManager
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.threeten.bp.Duration
@@ -439,7 +440,7 @@ internal class DataInteractorImpl @Inject constructor(
             dao.getFeaturesForGroupSync(groupId).let { features ->
                 val updates = features.map { feature ->
                     val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.FEATURE && it.id == feature.id
+                        it.type == GroupChildType.TRACKER && it.id == feature.id
                     }
                     feature.copy(displayIndex = newDisplayIndex)
                 }

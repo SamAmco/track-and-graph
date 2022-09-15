@@ -23,6 +23,7 @@ import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayTracker
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
 import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
+import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.OffsetDateTime
 
 private const val getDisplayTrackersQuery =
@@ -307,4 +308,7 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT * FROM trackers_table WHERE feature_id = :featureId LIMIT 1")
     fun getTrackerByFeatureId(featureId: Long): Tracker?
+
+    @Query("SELECT COUNT(*) FROM trackers_table")
+    fun numTrackers(): Flow<Int>
 }

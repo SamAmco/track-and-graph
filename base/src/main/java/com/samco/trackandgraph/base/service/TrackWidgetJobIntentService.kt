@@ -126,7 +126,7 @@ class TrackWidgetJobIntentService : JobIntentService() {
                 featureId,
                 title,
                 requireInput,
-                feature.featureType == DataType.DURATION,
+                feature.dataType == DataType.DURATION,
                 feature.timerStartInstant != null
             )
             withContext(ui) { appWidgetManager.updateAppWidget(appWidgetId, remoteViews) }

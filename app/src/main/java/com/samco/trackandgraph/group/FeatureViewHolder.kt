@@ -54,7 +54,7 @@ class FeatureViewHolder private constructor(
 
     private fun initTimerControls(feature: DisplayTracker, clickListener: FeatureClickListener) {
         binding.playStopButtons.visibility =
-            if (feature.featureType == DataType.DURATION) View.VISIBLE
+            if (feature.dataType == DataType.DURATION) View.VISIBLE
             else View.GONE
         binding.playTimerButton.setOnClickListener {
             clickListener.onPlayTimer(feature)
