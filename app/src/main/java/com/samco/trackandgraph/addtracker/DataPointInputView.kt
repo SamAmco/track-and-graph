@@ -28,13 +28,10 @@ import android.widget.*
 import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.helpers.doubleFormatter
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
-import com.samco.trackandgraph.ui.DurationInputView
+import com.samco.trackandgraph.databinding.DataPointInputViewBinding
 import com.samco.trackandgraph.util.focusAndShowKeyboard
 import com.samco.trackandgraph.util.getDoubleFromText
 import org.threeten.bp.OffsetDateTime
@@ -43,15 +40,8 @@ import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 class DataPointInputView : FrameLayout {
-    private val titleText: TextView
-    private val noteInput: EditText
-    private val addNoteButton: View
-    private val numberInput: EditText
-    private val dateButton: Button
-    private val timeButton: Button
-    private val buttonsScroll: HorizontalScrollView
-    private val buttonsLayout: LinearLayout
-    private val durationInput: DurationInputView
+
+    private val binding: DataPointInputViewBinding
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -60,16 +50,7 @@ class DataPointInputView : FrameLayout {
         attrs,
         defStyleAttr
     ) {
-        val view = inflate(context, R.layout.data_point_input_view, this)
-        noteInput = view.findViewById(R.id.noteInputText)
-        addNoteButton = view.findViewById(R.id.addNoteButton)
-        numberInput = view.findViewById(R.id.numberInput)
-        titleText = view.findViewById(R.id.titleText)
-        dateButton = view.findViewById(R.id.dateButton)
-        timeButton = view.findViewById(R.id.timeButton)
-        buttonsScroll = view.findViewById(R.id.buttonsScrollView)
-        buttonsLayout = view.findViewById(R.id.buttonsLayout)
-        durationInput = view.findViewById(R.id.durationInput)
+        binding = DataPointInputViewBinding.inflate(LayoutInflater.from(context), this, true)
     }
 
     private lateinit var state: DataPointInputData
@@ -83,14 +64,14 @@ class DataPointInputView : FrameLayout {
 
     fun initialize(state: DataPointInputData) {
         this.state = state
-        titleText.text = state.feature.name
+        binding.titleText.text = state.tracker.name
 
         initDateButton()
         initTimeButton()
         initNoteTextInput()
         setSelectedDateTime(state.dateTime)
 
-        when (state.feature.featureType) {
+        when (state.tracker.dataType) {
             DataType.CONTINUOUS -> initContinuous()
             DataType.DISCRETE -> initDiscrete()
             DataType.DURATION -> initDuration()
@@ -98,51 +79,51 @@ class DataPointInputView : FrameLayout {
     }
 
     private fun initDuration() {
-        buttonsScroll.visibility = View.GONE
-        numberInput.visibility = View.GONE
-        durationInput.visibility = View.VISIBLE
-        durationInput.setTimeInSeconds(state.value.toLong())
-        durationInput.setDurationChangedListener { state.value = it.toDouble() }
-        durationInput.setDoneListener {
+        binding.buttonsScrollView.visibility = View.GONE
+        binding.numberInput.visibility = View.GONE
+        binding.durationInput.visibility = View.VISIBLE
+        binding.durationInput.setTimeInSeconds(state.value.toLong())
+        binding.durationInput.setDurationChangedListener { state.value = it.toDouble() }
+        binding.durationInput.setDoneListener {
             state.timeFixed = true
-            clickListener?.onClick?.invoke(state.feature)
+            clickListener?.onClick?.invoke(state.tracker)
         }
     }
 
     private fun initNoteTextInput() {
         if (state.note.isNotEmpty()) {
-            noteInput.setText(state.note)
-            addNoteButton.visibility = View.GONE
-            noteInput.visibility = View.VISIBLE
+            binding.noteInputText.setText(state.note)
+            binding.addNoteButton.visibility = View.GONE
+            binding.noteInputText.visibility = View.VISIBLE
         }
-        addNoteButton.setOnClickListener {
-            addNoteButton.visibility = View.GONE
-            noteInput.visibility = View.VISIBLE
-            noteInput.focusAndShowKeyboard()
+        binding.addNoteButton.setOnClickListener {
+            binding.addNoteButton.visibility = View.GONE
+            binding.noteInputText.visibility = View.VISIBLE
+            binding.noteInputText.focusAndShowKeyboard()
         }
-        noteInput.addTextChangedListener { state.note = it.toString() }
+        binding.noteInputText.addTextChangedListener { state.note = it.toString() }
     }
 
     override fun requestFocus(direction: Int, previouslyFocusedRect: Rect?): Boolean {
-        return when (state.feature.featureType) {
+        return when (state.tracker.dataType) {
             DataType.CONTINUOUS -> {
-                numberInput.focusAndShowKeyboard()
-                numberInput.requestFocus()
+                binding.numberInput.focusAndShowKeyboard()
+                binding.numberInput.requestFocus()
             }
             DataType.DURATION -> {
-                durationInput.requestFocus()
+                binding.durationInput.requestFocus()
             }
             else -> super.requestFocus(direction, previouslyFocusedRect)
         }
     }
 
     private fun initDiscrete() {
-        buttonsScroll.visibility = View.VISIBLE
-        numberInput.visibility = View.GONE
-        durationInput.visibility = View.GONE
+        binding.buttonsScrollView.visibility = View.VISIBLE
+        binding.numberInput.visibility = View.GONE
+        binding.durationInput.visibility = View.GONE
         createButtons()
         if (state.label.isNotEmpty()) {
-            buttonsLayout.children
+            binding.buttonsLayout.children
                 .map { v -> v.findViewById<CheckBox>(R.id.checkbox) }
                 .first { cb -> cb.text == state.label }
                 .isChecked = true
@@ -150,28 +131,28 @@ class DataPointInputView : FrameLayout {
     }
 
     private fun initContinuous() {
-        buttonsScroll.visibility = View.GONE
-        numberInput.visibility = View.VISIBLE
-        durationInput.visibility = View.GONE
-        numberInput.addTextChangedListener {
+        binding.buttonsScrollView.visibility = View.GONE
+        binding.numberInput.visibility = View.VISIBLE
+        binding.durationInput.visibility = View.GONE
+        binding.numberInput.addTextChangedListener {
             if (it.toString().isNotBlank()) {
                 state.value = getDoubleFromText(it.toString())
             } else state.value = 1.0
         }
-        numberInput.setOnEditorActionListener { _, i, _ ->
+        binding.numberInput.setOnEditorActionListener { _, i, _ ->
             return@setOnEditorActionListener if ((i and EditorInfo.IME_MASK_ACTION) != 0) {
                 state.timeFixed = true
-                clickListener?.onClick?.invoke(state.feature)
+                clickListener?.onClick?.invoke(state.tracker)
                 true
             } else false
         }
         val text = if (state.value == 1.0) "" else doubleFormatter.format(state.value)
-        numberInput.setText(text)
-        numberInput.setSelection(numberInput.text.length)
+        binding.numberInput.setText(text)
+        binding.numberInput.setSelection(binding.numberInput.text.length)
     }
 
     class DataPointInputData(
-        var feature: Feature,
+        var tracker: Tracker,
         var dateTime: OffsetDateTime,
         var value: Double,
         var label: String,
@@ -181,7 +162,7 @@ class DataPointInputView : FrameLayout {
         val oldDataPoint: DataPoint?
     )
 
-    class DataPointInputClickListener(val onClick: (Feature) -> Unit)
+    class DataPointInputClickListener(val onClick: (Tracker) -> Unit)
 
     fun setOnClickListener(clickListener: DataPointInputClickListener) {
         this.clickListener = clickListener
@@ -190,16 +171,16 @@ class DataPointInputView : FrameLayout {
     private fun createButtons() {
         discreteValueCheckBoxes = mutableMapOf()
         val inflater = LayoutInflater.from(context)
-        for (discreteValue in state.feature.discreteValues.sortedBy { f -> f.index }) {
+        for (discreteValue in state.tracker.discreteValues.sortedBy { f -> f.index }) {
             val item = inflater.inflate(
                 R.layout.discrete_value_input_button,
-                buttonsLayout,
+                binding.buttonsLayout,
                 false
             ) as CheckBox
             item.text = discreteValue.label
             item.setOnClickListener { onDiscreteValueClicked(discreteValue) }
             discreteValueCheckBoxes[discreteValue] = item
-            buttonsLayout.addView(item)
+            binding.buttonsLayout.addView(item)
         }
     }
 
@@ -210,7 +191,7 @@ class DataPointInputView : FrameLayout {
             state.timeFixed = true
             discreteValueCheckBoxes.filter { kvp -> kvp.key != discreteValue }
                 .forEach { kvp -> kvp.value.isChecked = false }
-            clickListener!!.onClick(state.feature)
+            clickListener!!.onClick(state.tracker)
         }
     }
 
@@ -218,15 +199,15 @@ class DataPointInputView : FrameLayout {
 
     private fun setSelectedDateTime(dateTime: OffsetDateTime) {
         state.dateTime = dateTime
-        dateButton.text = formatDayMonthYear(context, dateTime)
-        timeButton.text = dateTime.format(timeDisplayFormatter)
+        binding.dateButton.text = formatDayMonthYear(context, dateTime)
+        binding.timeButton.text = dateTime.format(timeDisplayFormatter)
     }
 
     private fun initDateButton() {
-        dateButton.setOnClickListener {
+        binding.dateButton.setOnClickListener {
             val picker = DatePickerDialog(
                 context!!,
-                DatePickerDialog.OnDateSetListener { _, year, month, day ->
+                { _, year, month, day ->
                     setSelectedDateTime(
                         ZonedDateTime.of(state.dateTime.toLocalDateTime(), ZoneId.systemDefault())
                             .withYear(year)
@@ -243,10 +224,10 @@ class DataPointInputView : FrameLayout {
     }
 
     private fun initTimeButton() {
-        timeButton.setOnClickListener {
+        binding.timeButton.setOnClickListener {
             val picker = TimePickerDialog(
                 context!!,
-                TimePickerDialog.OnTimeSetListener { _, hour, minute ->
+                { _, hour, minute ->
                     setSelectedDateTime(
                         ZonedDateTime.of(state.dateTime.toLocalDateTime(), ZoneId.systemDefault())
                             .withHour(hour)

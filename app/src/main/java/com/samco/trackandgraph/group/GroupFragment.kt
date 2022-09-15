@@ -335,7 +335,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun showAddDataPoint(argBundle: Bundle) {
-        val dialog = InputDataPointDialog()
+        val dialog = DataPointInputDialog()
         dialog.arguments = argBundle
         childFragmentManager.let { dialog.show(it, "input_data_points_dialog") }
     }

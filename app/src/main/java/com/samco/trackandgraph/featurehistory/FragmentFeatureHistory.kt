@@ -36,7 +36,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentFeatureHistoryBinding
 import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.addtracker.FEATURE_LIST_KEY
-import com.samco.trackandgraph.addtracker.InputDataPointDialog
+import com.samco.trackandgraph.addtracker.DataPointInputDialog
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
@@ -138,7 +138,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
     private fun onEditDataPointClicked(dataPoint: DataPoint) {
         viewModel.feature.value?.let {
-            val dialog = InputDataPointDialog()
+            val dialog = DataPointInputDialog()
             val argBundle = Bundle()
             argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(args.feature))
             argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(dataPoint.timestamp))
