@@ -98,8 +98,11 @@ fun getNoteDialogHeader(
 }
 
 fun showDataPointDescriptionDialog(
-    context: Context, inflater: LayoutInflater, dataPoint: DataPoint,
-    isDuration: Boolean, featureDispalayName: String? = null
+    context: Context,
+    inflater: LayoutInflater,
+    dataPoint: DataPoint,
+    isDuration: Boolean,
+    featureDispalayName: String? = null
 ) {
     showDataPointDescriptionDialog(
         context,
