@@ -23,6 +23,15 @@ import com.samco.trackandgraph.base.database.dto.Group
 open class FeaturePathProvider(
     private val featureGroupMap: Map<Feature, Group>,
 ) : GroupPathProvider(featureGroupMap.values) {
+
+    constructor(features: List<Feature>, groups: List<Group>) : this(
+        features.mapNotNull { feature ->
+            val group = groups.firstOrNull { it.id == feature.groupId }
+                ?: return@mapNotNull null
+            feature to group
+        }.toMap()
+    )
+
     fun sortedAlphabetically() = featureGroupMap.keys.sortedBy { getPathForFeature(it.id) }
 
     fun getPathForFeature(id: Long): String {

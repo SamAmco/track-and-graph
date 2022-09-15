@@ -86,10 +86,10 @@
         tools:layout="@layout/fragment_feature_history">
         <argument
             android:name="featureId"
-            app:argType="Long" />
+            app:argType="long" />
         <argument
             android:name="featureName"
-            app:argType="String" />
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/graphStatInputFragment"

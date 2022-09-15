@@ -19,34 +19,27 @@ package com.samco.trackandgraph.notes
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
+import com.samco.trackandgraph.addtracker.DataPointInputDialog
+import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
 import com.samco.trackandgraph.base.database.dto.DisplayNote
-import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
-import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
-import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
-import com.samco.trackandgraph.addtracker.FEATURE_LIST_KEY
-import com.samco.trackandgraph.addtracker.DataPointInputDialog
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.showNoteDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class NotesFragment : Fragment() {
@@ -62,11 +55,33 @@ class NotesFragment : Fragment() {
         binding = FragmentNotesBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        listenToFeatureNameProvdier()
-
-        setHasOptionsMenu(true)
+        listenToFeatureNameProvider()
 
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(
+            NotesMenuProvider(),
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
+    }
+
+    private inner class NotesMenuProvider : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.notes_menu, menu)
+        }
+
+        override fun onMenuItemSelected(item: MenuItem): Boolean {
+            if (item.itemId == R.id.add_global_note) {
+                val dialog = GlobalNoteInputDialog()
+                childFragmentManager.let { dialog.show(it, "note_input_dialog") }
+                return true
+            }
+            return false
+        }
     }
 
     override fun onResume() {
@@ -77,38 +92,25 @@ class NotesFragment : Fragment() {
         )
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.notes_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.add_global_note) {
-            val dialog = GlobalNoteInputDialog()
-            childFragmentManager.let { dialog.show(it, "note_input_dialog") }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    private fun listenToFeatureNameProvdier() {
-        viewModel.featureNameProvider.observe(viewLifecycleOwner, Observer {
+    private fun listenToFeatureNameProvider() {
+        viewModel.featureNameProvider.observe(viewLifecycleOwner) {
             initListAdapter(it)
             listenToNotes()
-        })
+        }
     }
 
     private fun listenToNotes() {
-        viewModel.notes.observe(viewLifecycleOwner, Observer { notes ->
-            if (notes == null) return@Observer
+        viewModel.notes.observe(viewLifecycleOwner) { notes ->
+            if (notes == null) return@observe
             if (notes.isNotEmpty()) binding.noNotesHintText.visibility = View.GONE
             else binding.noNotesHintText.visibility = View.VISIBLE
             adapter.submitList(notes)
-        })
-        viewModel.onNoteInsertedTop.observe(viewLifecycleOwner, Observer {
+        }
+        viewModel.onNoteInsertedTop.observe(viewLifecycleOwner) {
             if (it) binding.notesList.postDelayed({
                 binding.notesList.smoothScrollToPosition(0)
             }, 100)
-        })
+        }
     }
 
     private fun initListAdapter(featurePathProvider: FeaturePathProvider) {
@@ -136,10 +138,10 @@ class NotesFragment : Fragment() {
 
     private fun onEditNote(note: DisplayNote) {
         when (note.noteType) {
-            NoteType.DATA_POINT -> note.featureId?.let { featureId ->
+            NoteType.DATA_POINT -> note.trackerId?.let { trackerId ->
                 val dialog = DataPointInputDialog()
                 val argBundle = Bundle()
-                argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(featureId))
+                argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(trackerId))
                 argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
                 dialog.arguments = argBundle
                 childFragmentManager.let { dialog.show(it, "input_data_point_dialog") }
@@ -152,76 +154,5 @@ class NotesFragment : Fragment() {
                 childFragmentManager.let { dialog.show(it, "global_note_edit_dialog") }
             }
         }
-    }
-}
-
-@HiltViewModel
-class NotesViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
-) : ViewModel() {
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
-
-    val notes: LiveData<List<DisplayNote>> = dataInteractor.getAllDisplayNotes()
-
-    lateinit var featureNameProvider: LiveData<FeaturePathProvider> private set
-
-    private var topNote: DisplayNote? = null
-    private var notesObserver: Observer<List<DisplayNote>>? = null
-    private val _onNoteInsertedTop = MutableLiveData(false)
-    val onNoteInsertedTop: LiveData<Boolean> = _onNoteInsertedTop
-
-    init {
-        initOnNoteInsertedTop()
-        initFeatureNameProvider()
-    }
-
-    private fun initFeatureNameProvider() {
-        val mediator = MediatorLiveData<FeaturePathProvider>()
-        dataInteractor.let {
-            val groups = it.getAllGroups()
-            val features = it.getAllFeatures()
-            val onEmitted = {
-                val featureList = features.value
-                val groupList = groups.value
-                if (groupList != null && featureList != null) {
-                    mediator.value = FeaturePathProvider(featureList, groupList)
-                }
-            }
-            mediator.addSource(groups) { onEmitted() }
-            mediator.addSource(features) { onEmitted() }
-        }
-        featureNameProvider = mediator
-    }
-
-    private fun initOnNoteInsertedTop() {
-        notesObserver = Observer {
-            if (it.isNullOrEmpty()) return@Observer
-            val newTopNote = it.first()
-            if (topNote != null && topNote != newTopNote) {
-                _onNoteInsertedTop.value = true
-                _onNoteInsertedTop.value = false
-            }
-            topNote = newTopNote
-        }
-        notes.observeForever(notesObserver!!)
-    }
-
-    fun deleteNote(note: DisplayNote) = ioScope.launch {
-        when (note.noteType) {
-            NoteType.DATA_POINT -> note.featureId?.let {
-                dataInteractor.removeNote(note.timestamp, it)
-            }
-            NoteType.GLOBAL_NOTE -> {
-                val globalNote = GlobalNote(note.timestamp, note.note)
-                dataInteractor.deleteGlobalNote(globalNote)
-            }
-        }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        notesObserver?.let { notes.removeObserver(it) }
-        updateJob.cancel()
     }
 }

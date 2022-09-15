@@ -29,8 +29,8 @@ internal data class DisplayNote(
     @ColumnInfo(name = "note_type")
     val noteType: NoteType,
 
-    @ColumnInfo(name = "feature_id")
-    val featureId: Long?,
+    @ColumnInfo(name = "tracker_id")
+    val trackerId: Long?,
 
     @ColumnInfo(name = "feature_name")
     val featureName: String?,
@@ -42,11 +42,11 @@ internal data class DisplayNote(
     val note: String
 ) {
     fun toDto() = DisplayNote(
-        timestamp,
-        noteType,
-        featureId,
-        featureName,
-        groupId,
-        note
+        timestamp = timestamp,
+        noteType = noteType,
+        trackerId = trackerId,
+        featureName = featureName,
+        groupId = groupId,
+        note = note
     )
 }
