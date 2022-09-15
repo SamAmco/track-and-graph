@@ -43,7 +43,7 @@ class GroupAdapter(
         return when (viewType) {
             GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
                 .apply { setFullSpan(this) }
-            GroupChildType.FEATURE.ordinal -> FeatureViewHolder.from(parent)
+            GroupChildType.TRACKER.ordinal -> FeatureViewHolder.from(parent)
             else -> GroupViewHolder.from(parent).apply { setFullSpan(this) }
         }
     }
@@ -61,7 +61,7 @@ class GroupAdapter(
                 extractGraphViewData(item.obj),
                 graphStatClickListener
             )
-            GroupChildType.FEATURE -> (holder as FeatureViewHolder)
+            GroupChildType.TRACKER -> (holder as FeatureViewHolder)
                 .bind(item.obj as DisplayTracker, featureClickListener)
             GroupChildType.GROUP -> (holder as GroupViewHolder)
                 .bind(item.obj as Group, groupClickListener)
@@ -103,7 +103,7 @@ class GroupAdapter(
     fun getSpanModeForItem(position: Int): SpanMode? {
         if (position < 0 || position > groupChildren.size) return null
         return when (groupChildren[position].type) {
-            GroupChildType.FEATURE -> SpanMode.NumSpans(1)
+            GroupChildType.TRACKER -> SpanMode.NumSpans(1)
             GroupChildType.GROUP -> SpanMode.NumSpans(2)
             GroupChildType.GRAPH -> SpanMode.FullWidth
         }
@@ -138,7 +138,7 @@ private class ListDiffCallback(
                 val newObj = (new.obj as Group).copy(displayIndex = 0)
                 oldObj == newObj
             }
-            GroupChildType.FEATURE -> {
+            GroupChildType.TRACKER -> {
                 val oldObj = (old.obj as DisplayTracker).copy(displayIndex = 0)
                 val newObj = (new.obj as DisplayTracker).copy(displayIndex = 0)
                 oldObj == newObj

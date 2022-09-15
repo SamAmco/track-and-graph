@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.base.model
 
 import com.samco.trackandgraph.base.database.dto.*
+import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -76,4 +77,6 @@ interface TrackerHelper {
     suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker>
 
     suspend fun getTrackerByFeatureId(featureId: Long): Tracker?
+
+    fun hasAtLeastOneTracker(): Flow<Boolean>
 }
