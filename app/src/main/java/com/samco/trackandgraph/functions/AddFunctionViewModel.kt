@@ -8,7 +8,7 @@ import com.samco.trackandgraph.base.database.dto.FunctionDto
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.ui.DataSourcePathProvider
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -16,7 +16,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface AddFunctionDataSourceViewModel {
-    val dataSourcePathProvider: DataSourcePathProvider
+    val featurePathProvider: FeaturePathProvider
 }
 
 interface AddFunctionViewModel {
@@ -97,7 +97,7 @@ class AddFunctionViewModelImpl @Inject constructor(
             withContext(ui) { isLoading.value = true }
 
             //TODO validate the input first
-            if (functionId != null) dataInteractor.updateFunction(createDto())
+            if (functionId != null) updateFunction()
             else dataInteractor.insertFunction(createDto())
 
             withContext(ui) {
@@ -107,12 +107,19 @@ class AddFunctionViewModelImpl @Inject constructor(
         }
     }
 
+    private suspend fun updateFunction() {
+        //TODO update an existing function
+        //dataInteractor.updateFunction(...)
+    }
+
     private fun createDto() = FunctionDto(
-        functionId ?: 0L,
-        functionName.value!!,
-        groupId!!,
-        functionDescription.value!!,
-        emptyList(),//TODO implement data sources list
-        functionScript.value!!
+        id = 0L,
+        name = functionName.value!!,
+        featureId = 0L,
+        dataSources = emptyList(),//TODO implement data sources list
+        script = functionScript.value!!,
+        groupId = groupId!!,
+        displayIndex = 0,
+        description = functionDescription.value!!,
     )
 }

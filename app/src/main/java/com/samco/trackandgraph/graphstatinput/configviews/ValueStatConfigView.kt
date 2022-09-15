@@ -68,9 +68,9 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
     protected abstract fun onFilterByLabelChanged(value: Boolean)
     protected abstract fun onFilterByValueChanged(value: Boolean)
 
-    private fun getCurrentFeatureData(): DataSourceDataProvider.DataSourceData? {
+    private fun getCurrentFeatureData(): FeatureDataProvider.DataSourceData? {
         val featId = getCurrentFeatureId()
-        return allFeatureData.firstOrNull { it.descriptor.id == featId }
+        return allFeatureData.firstOrNull { it.feature.id == featId }
     }
 
     override fun validateConfig(): ValidationException? {

@@ -76,7 +76,7 @@ class PathProviderTest {
     @Test
     fun test_feature_path_provider() {
         //PREPARE
-        val provider = DataSourcePathProvider(features, groups)
+        val provider = FeaturePathProvider(features, groups)
 
         //EXECUTE
         val ans0 = provider.getPathForFeature(0)

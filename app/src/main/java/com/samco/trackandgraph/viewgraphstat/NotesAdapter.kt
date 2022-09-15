@@ -28,10 +28,10 @@ import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
-import com.samco.trackandgraph.ui.DataSourcePathProvider
+import com.samco.trackandgraph.ui.FeaturePathProvider
 
 class NotesAdapter(
-    private val featurePathProvider: DataSourcePathProvider,
+    private val featurePathProvider: FeaturePathProvider,
     private val featureTypes: Map<Long, DataType>,
     private val weekDayNames: List<String>,
     private val clickListener: NoteClickListener
@@ -55,7 +55,7 @@ class NotesAdapter(
 
     class ViewHolder private constructor(
         private val binding: ListItemNoteBinding,
-        private val featurePathProvider: DataSourcePathProvider,
+        private val featurePathProvider: FeaturePathProvider,
         private val weekDayNames: List<String>,
         private val featureTypes: Map<Long, DataType>,
         private val clickListener: NoteClickListener
@@ -92,7 +92,7 @@ class NotesAdapter(
             val isDuration = featureTypes[note!!.dataPoint!!.featureId] == DataType.DURATION
             binding.valueText.text = note!!.dataPoint!!.getDisplayValue(isDuration)
             binding.featureNameText.visibility = View.VISIBLE
-            binding.featureNameText.text = featurePathProvider.getPathForDataSource(
+            binding.featureNameText.text = featurePathProvider.getPathForFeature(
                 dataPoint.featureId,
                 DataSourceType.FEATURE
             )
@@ -104,7 +104,7 @@ class NotesAdapter(
         companion object {
             fun from(
                 parent: ViewGroup,
-                featurePathProvider: DataSourcePathProvider,
+                featurePathProvider: FeaturePathProvider,
                 weekDayNames: List<String>,
                 featureTypes: Map<Long, DataType>,
                 clickListener: NoteClickListener
