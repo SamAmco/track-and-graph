@@ -20,10 +20,10 @@ package com.samco.trackandgraph.base.database.dto
 import com.samco.trackandgraph.base.database.entity.Feature
 
 data class Tracker(
-    override val id: Long,
+    val id: Long,
     override val name: String,
     override val groupId: Long,
-    val featureId: Long,
+    override val featureId: Long,
     override val displayIndex: Int,
     override val description: String,
     val dataType: DataType,
@@ -55,7 +55,7 @@ data class Tracker(
     }
 
     internal fun toEntity() = com.samco.trackandgraph.base.database.entity.Tracker(
-        id,
+        featureId,
         featureId,
         dataType,
         discreteValues,

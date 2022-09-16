@@ -115,7 +115,8 @@ class ViewGraphStatViewModel @Inject constructor(
             dataSource to group
         }.toMap()
         featurePathProvider = FeaturePathProvider(dataSourceMap)
-        featureTypes = allFeatures.associate { it.id to it.featureType }
+        //TODO this is wrong
+        featureTypes = allFeatures.associate { it.featureId to it.featureType }
     }
 
     private suspend fun initFromGraphStatId(graphStatId: Long) {

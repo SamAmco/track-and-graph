@@ -221,14 +221,14 @@ internal class CSVReadWriterImpl @Inject constructor(
                 points,
                 rec.value.toDoubleOrNull(),
                 rec.timestamp,
-                newTracker.id,
+                newTracker.featureId,
                 rec.note
             )
             DataType.DURATION -> addDurationDataPoint(
                 points,
                 rec.value,
                 rec.timestamp,
-                newTracker.id,
+                newTracker.featureId,
                 rec.note
             )
         }
@@ -270,7 +270,7 @@ internal class CSVReadWriterImpl @Inject constructor(
                     points,
                     rec.value.toDoubleOrNull(),
                     rec.timestamp,
-                    tracker.id,
+                    tracker.featureId,
                     rec.note
                 )
             }
@@ -280,7 +280,7 @@ internal class CSVReadWriterImpl @Inject constructor(
                     points,
                     rec.value,
                     rec.timestamp,
-                    tracker.id,
+                    tracker.featureId,
                     rec.note
                 )
             }
@@ -420,7 +420,7 @@ internal class CSVReadWriterImpl @Inject constructor(
             1.0
         )
         val trackerId = trackerHelper.insertTracker(newTracker)
-        return newTracker.copy(id = trackerId)
+        return newTracker.copy(featureId = trackerId)
     }
 
     private fun tryGetDiscreteValueFromString(string: String, lineNumber: Int): DiscreteValue {

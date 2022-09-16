@@ -83,10 +83,10 @@ class TrackWidgetJobIntentService : JobIntentService() {
 
     private fun updateTimer(featureId: Long, startTimer: Boolean) = runBlocking {
         val tracker = dataInteractor.getTrackerByFeatureId(featureId) ?: return@runBlocking
-        if (startTimer) dataInteractor.playTimerForTracker(tracker.id)
+        if (startTimer) dataInteractor.playTimerForTracker(tracker.featureId)
         else {
             dataInteractor.tryGetDisplayTrackerByIdSync(featureId)?.timerStartInstant?.let {
-                dataInteractor.stopTimerForTracker(tracker.id)
+                dataInteractor.stopTimerForTracker(tracker.featureId)
                 val intent = pendingIntentProvider
                     .getDurationInputActivityIntent(featureId, it.toString())
                 applicationContext.startActivity(intent)

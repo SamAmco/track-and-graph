@@ -32,10 +32,10 @@ open class FeaturePathProvider(
         }.toMap()
     )
 
-    fun sortedAlphabetically() = featureGroupMap.keys.sortedBy { getPathForFeature(it.id) }
+    fun sortedAlphabetically() = featureGroupMap.keys.sortedBy { getPathForFeature(it.featureId) }
 
-    fun getPathForFeature(id: Long): String {
-        val dataSource = featureGroupMap.keys.firstOrNull { it.id == id } ?: return ""
+    fun getPathForFeature(featureId: Long): String {
+        val dataSource = featureGroupMap.keys.firstOrNull { it.featureId == featureId } ?: return ""
         val group = featureGroupMap[dataSource] ?: return ""
         val groupPath = getPathForGroup(group.id)
         var path = groupPath

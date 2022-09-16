@@ -184,7 +184,7 @@ class LineGraphFeatureConfigListItemView(
             ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
         binding.featureSpinner.adapter = adapter
         var featureSpinnerStartIndex =
-            items.indexOfFirst { it.first.id == lineGraphFeature.featureId && it.second == lineGraphFeature.durationPlottingMode }
+            items.indexOfFirst { it.first.featureId == lineGraphFeature.featureId && it.second == lineGraphFeature.durationPlottingMode }
         if (featureSpinnerStartIndex == -1) featureSpinnerStartIndex = 0
         binding.featureSpinner.setSelection(featureSpinnerStartIndex)
         binding.featureSpinner.onItemSelectedListener =
@@ -196,7 +196,7 @@ class LineGraphFeatureConfigListItemView(
                         lineGraphFeature.name,
                         items[index].first.name
                     )
-                    lineGraphFeature.featureId = items[index].first.id
+                    lineGraphFeature.featureId = items[index].first.featureId
                     lineGraphFeature.durationPlottingMode = items[index].second
                     adjustPointStyleSpinnerForFeature()
                     onUpdatedListener?.invoke(
@@ -223,7 +223,7 @@ class LineGraphFeatureConfigListItemView(
     private fun getSpinnerItemsForFeature(featureData: FeatureDataProvider.DataSourceData)
             : List<Triple<Feature, DurationPlottingMode, String>> {
         val feature = featureData.feature
-        val name = featureDataProvider.getPathForFeature(feature.id)
+        val name = featureDataProvider.getPathForFeature(feature.featureId)
         return if (featureData.dataProperties.isDuration) {
             val time = context.getString(R.string.time_duration)
             val hours = context.getString(R.string.hours)
@@ -250,7 +250,7 @@ class LineGraphFeatureConfigListItemView(
 
         val oldFeatureDBName = featureDataProvider.dataSourceData.keys
             .map { it.feature }
-            .firstOrNull { f -> f.id == oldFeatureId }
+            .firstOrNull { f -> f.featureId == oldFeatureId }
             ?.name ?: return
         if (oldFeatureDBName == oldFeatureName || oldFeatureName == "") {
             binding.lineGraphFeatureName.setText(newFeatureName)

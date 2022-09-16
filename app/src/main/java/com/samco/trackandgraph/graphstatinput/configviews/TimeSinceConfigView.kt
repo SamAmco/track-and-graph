@@ -51,7 +51,7 @@ internal class TimeSinceConfigView @JvmOverloads constructor(
     private fun createEmptyConfig() = TimeSinceLastStat(
         id = 0,
         graphStatId = 0,
-        featureId = allFeatureData.firstOrNull()?.feature?.id ?: 0,
+        featureId = allFeatureData.firstOrNull()?.feature?.featureId ?: 0,
         fromValue = 0.0,
         toValue = 1.0,
         labels = emptyList(),

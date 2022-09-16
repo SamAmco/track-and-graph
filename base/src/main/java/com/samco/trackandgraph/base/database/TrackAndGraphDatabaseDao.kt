@@ -185,14 +185,14 @@ internal interface TrackAndGraphDatabaseDao {
     @Query(
         """
             SELECT * FROM (
-                SELECT dp.timestamp as timestamp, 0 as note_type, t.id as tracker_id, f.name as feature_name, g.id as group_id, dp.note as note
+                SELECT dp.timestamp as timestamp, t.id as tracker_id, dp.feature_id as feature_id, f.name as feature_name, g.id as group_id, dp.note as note
                 FROM data_points_table as dp 
                 LEFT JOIN features_table as f ON dp.feature_id = f.id
                 LEFT JOIN trackers_table as t ON dp.feature_id = t.feature_id
                 LEFT JOIN groups_table as g ON f.group_id = g.id
                 WHERE dp.note IS NOT NULL AND dp.note != ""
             ) UNION SELECT * FROM (
-                SELECT n.timestamp as timestamp, 1 as note_type, NULL as tracker_id, NULL as feature_name, NULL as group_id, n.note as note
+                SELECT n.timestamp as timestamp, NULL as tracker_id, NULL as feature_id, NULL as feature_name, NULL as group_id, n.note as note
                 FROM notes_table as n
             ) ORDER BY timestamp DESC
         """

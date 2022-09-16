@@ -226,9 +226,6 @@ internal class Converters {
     fun intToYRangeType(index: Int) = YRangeType.values()[index]
 
     @TypeConverter
-    fun intToNoteType(index: Int) = NoteType.values()[index]
-
-    @TypeConverter
     fun averagingModeToInt(averagingMode: LineGraphAveraginModes) = averagingMode.ordinal
 
     @TypeConverter

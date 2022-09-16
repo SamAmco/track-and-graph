@@ -68,7 +68,7 @@ internal class AverageTimeBetweenConfigView @JvmOverloads constructor(
         id = 0,
         graphStatId = 0,
         //Shouldn't actually be possible to get here without at least one feature
-        featureId = allFeatureData.firstOrNull()?.feature?.id ?: 0,
+        featureId = allFeatureData.firstOrNull()?.feature?.featureId ?: 0,
         fromValue = 0.0,
         toValue = 1.0,
         duration = null,

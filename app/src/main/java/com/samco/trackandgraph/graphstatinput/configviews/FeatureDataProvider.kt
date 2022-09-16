@@ -27,7 +27,7 @@ class FeatureDataProvider(
 ) : FeaturePathProvider(dataSourceData.map { it.key.feature to it.value }.toMap()) {
 
     fun dataSourceDataAlphabetically() =
-        dataSourceData.keys.sortedBy { getPathForFeature(it.feature.id) }
+        dataSourceData.keys.sortedBy { getPathForFeature(it.feature.featureId) }
 
     data class DataSourceData(
         val feature: Feature,

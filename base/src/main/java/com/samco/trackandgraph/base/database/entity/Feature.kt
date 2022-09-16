@@ -50,7 +50,7 @@ internal data class Feature(
     val description: String
 ) {
     fun toDto(): Feature = FeatureDtoImpl(
-        id = this@Feature.id,
+        featureId = this@Feature.id,
         name = this@Feature.name,
         groupId = this@Feature.groupId,
         displayIndex = this@Feature.displayIndex,

@@ -32,7 +32,6 @@ import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
 import com.samco.trackandgraph.addtracker.DataPointInputDialog
 import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
 import com.samco.trackandgraph.base.database.dto.DisplayNote
-import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
@@ -137,22 +136,19 @@ class NotesFragment : Fragment() {
     }
 
     private fun onEditNote(note: DisplayNote) {
-        when (note.noteType) {
-            NoteType.DATA_POINT -> note.trackerId?.let { trackerId ->
-                val dialog = DataPointInputDialog()
-                val argBundle = Bundle()
-                argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(trackerId))
-                argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
-                dialog.arguments = argBundle
-                childFragmentManager.let { dialog.show(it, "input_data_point_dialog") }
-            }
-            NoteType.GLOBAL_NOTE -> run {
-                val dialog = GlobalNoteInputDialog()
-                val argBundle = Bundle()
-                argBundle.putString(GLOBAL_NOTE_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
-                dialog.arguments = argBundle
-                childFragmentManager.let { dialog.show(it, "global_note_edit_dialog") }
-            }
+        note.trackerId?.let { trackerId ->
+            val dialog = DataPointInputDialog()
+            val argBundle = Bundle()
+            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(trackerId))
+            argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
+            dialog.arguments = argBundle
+            childFragmentManager.let { dialog.show(it, "input_data_point_dialog") }
+        } ?: run {
+            val dialog = GlobalNoteInputDialog()
+            val argBundle = Bundle()
+            argBundle.putString(GLOBAL_NOTE_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
+            dialog.arguments = argBundle
+            childFragmentManager.let { dialog.show(it, "global_note_edit_dialog") }
         }
     }
 }

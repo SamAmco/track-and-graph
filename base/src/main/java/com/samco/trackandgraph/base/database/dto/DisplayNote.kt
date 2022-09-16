@@ -21,8 +21,8 @@ import org.threeten.bp.OffsetDateTime
 
 data class DisplayNote(
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
-    val noteType: NoteType,
     val trackerId: Long?,
+    val featureId: Long?,
     val featureName: String?,
     val groupId: Long?,
     val note: String
