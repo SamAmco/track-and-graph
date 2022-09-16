@@ -122,7 +122,7 @@ class GroupViewModel @Inject constructor(
     }
 
     private fun getTrackerChildrenAsync(groupId: Long) = viewModelScope.async(io) {
-        return@async dataInteractor.getTrackersForGroupSync(groupId).map {
+        return@async dataInteractor.getDisplayTrackersForGroupSync(groupId).map {
             GroupChild(GroupChildType.TRACKER, it, it.id, it.displayIndex)
         }
     }
