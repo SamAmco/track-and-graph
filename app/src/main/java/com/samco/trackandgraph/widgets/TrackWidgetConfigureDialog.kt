@@ -27,13 +27,19 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -61,30 +67,38 @@ class TrackWidgetConfigureDialog : DialogFragment() {
                 dismiss()
                 listener.onDismiss()
             }
-            binding.createButton.setOnClickListener { listener.onCreateWidget(viewModel.featureId) }
             observeAllFeatures()
+            observeOnCreateClicked()
 
             dialog?.setCanceledOnTouchOutside(true)
             binding.root
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
-    private fun observeAllFeatures() = viewModel.featurePathProvider
-        .observe(this) { featurePathProvider ->
-            val features = featurePathProvider.features
+    private fun observeOnCreateClicked() {
+        binding.createButton.setOnClickListener {
+            viewModel.onCreateClicked()
+        }
+        viewModel.onCreateWidget.observe(viewLifecycleOwner) {
+            listener.onCreateWidget(it)
+        }
+    }
+
+    private fun observeAllFeatures() =
+        viewModel.featurePathProvider.observe(viewLifecycleOwner) { featurePathProvider ->
+            val features = featurePathProvider.features.toList()
             if (features.isEmpty()) {
                 listener.onNoFeatures()
             }
-            val itemNames = features.map { ft -> featurePathProvider.getPathForFeature(ft.id) }
-            val adapter =
-                ArrayAdapter(
-                    requireContext(),
-                    android.R.layout.simple_spinner_dropdown_item,
-                    itemNames
-                )
-            binding.featureSpinner.adapter = adapter
-            binding.featureSpinner.setSelection(0)
-            binding.featureSpinner.onItemSelectedListener =
+            val itemNames = features.map { ft -> featurePathProvider.getPathForFeature(ft.featureId) }
+            val adapter = ArrayAdapter(
+                requireContext(),
+                android.R.layout.simple_spinner_dropdown_item,
+                itemNames
+            )
+            binding.trackerSpinner.adapter = adapter
+            binding.trackerSpinner.setSelection(0)
+            binding.trackerSpinner.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
                     override fun onNothingSelected(parent: AdapterView<*>?) {}
                     override fun onItemSelected(
@@ -93,7 +107,7 @@ class TrackWidgetConfigureDialog : DialogFragment() {
                         position: Int,
                         id: Long
                     ) {
-                        viewModel.featureId = features[position].id
+                        viewModel.onFeatureSelected(features[position].featureId)
                     }
                 }
         }
@@ -105,26 +119,34 @@ class TrackWidgetConfigureDialog : DialogFragment() {
 
 @HiltViewModel
 class TrackWidgetConfigureDialogViewModel @Inject constructor(
-    dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
-    val featurePathProvider: LiveData<FeaturePathProvider>
-    var featureId: Long? = null
+
+    private val _featurePathProvider = MutableLiveData<FeaturePathProvider>()
+    val featurePathProvider: LiveData<FeaturePathProvider> get() = _featurePathProvider
+
+    private val _onCreateWidget = MutableLiveData<Long?>()
+    val onCreateWidget: LiveData<Long?> get() = _onCreateWidget
+
+    private var selectedFeatureId: Long? = null
 
     init {
-        val mediator = MediatorLiveData<FeaturePathProvider>()
-        dataInteractor.let {
-            val groups = it.getAllGroups()
-            val features = it.getAllFeatures()
-            val onEmitted = {
-                val featureList = features.value
-                val groupList = groups.value
-                if (groupList != null && featureList != null) {
-                    mediator.value = FeaturePathProvider(featureList, groupList)
-                }
+        viewModelScope.launch(io) {
+            val groups = dataInteractor.getAllGroupsSync()
+            val trackers = dataInteractor.getAllTrackersSync()
+            withContext(ui) {
+                _featurePathProvider.value = FeaturePathProvider(trackers, groups)
             }
-            mediator.addSource(groups) { onEmitted() }
-            mediator.addSource(features) { onEmitted() }
         }
-        featurePathProvider = mediator
+    }
+
+    fun onCreateClicked() {
+        _onCreateWidget.value = selectedFeatureId
+    }
+
+    fun onFeatureSelected(featureId: Long) {
+        selectedFeatureId = featureId
     }
 }
