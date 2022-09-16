@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.ui
 
-import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Group
 import junit.framework.Assert.assertEquals
@@ -34,19 +33,19 @@ class PathProviderTest {
         group("group2childChild", 6, 5),
     )
 
+    private data class FeatureDto(
+        override val featureId: Long,
+        override val name: String,
+        override val groupId: Long,
+    ) : Feature {
+        override val displayIndex: Int = 0
+        override val description: String = ""
+    }
+
     private val features = listOf(
-        Feature(
-            0L, "Test", 0, DataType.CONTINUOUS, emptyList(),
-            0, false, 0.0, ""
-        ),
-        Feature(
-            1L, "Test2", 1, DataType.CONTINUOUS, emptyList(),
-            0, false, 0.0, ""
-        ),
-        Feature(
-            2L, "Test3", 2, DataType.CONTINUOUS, emptyList(),
-            0, false, 0.0, ""
-        )
+        FeatureDto(0L, "Test", 0),
+        FeatureDto(1L, "Test2", 1),
+        FeatureDto(2L, "Test3", 2)
     )
 
     @Test
