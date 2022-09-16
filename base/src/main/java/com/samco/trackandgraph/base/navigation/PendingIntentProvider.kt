@@ -29,13 +29,13 @@ interface PendingIntentProvider {
     /**
      * Get an intent to start the duration input activity directly
      */
-    fun getDurationInputActivityIntent(featureId: Long, startInstant: String): Intent
+    fun getDurationInputActivityIntent(trackerId: Long, startInstant: String): Intent
 
     /**
      * Get a pending intent that will start the duration input activity
      * (used when a timer is stopped via a notification action)
      */
-    fun getDurationInputActivityPendingIntent(featureId: Long, startInstant: String): PendingIntent
+    fun getDurationInputActivityPendingIntent(trackerId: Long, startInstant: String): PendingIntent
 
     /**
      * Get a pending intent that will start the track widget input data point activity for a given

@@ -83,12 +83,14 @@ class TrackWidgetJobIntentService : JobIntentService() {
 
     private fun updateTimer(featureId: Long, startTimer: Boolean) = runBlocking {
         val tracker = dataInteractor.getTrackerByFeatureId(featureId) ?: return@runBlocking
-        if (startTimer) dataInteractor.playTimerForTracker(tracker.featureId)
+        if (startTimer) dataInteractor.playTimerForTracker(tracker.id)
         else {
-            dataInteractor.tryGetDisplayTrackerByIdSync(featureId)?.timerStartInstant?.let {
-                dataInteractor.stopTimerForTracker(tracker.featureId)
+            //TODO might be worth writing a simpler function for this as tryGetDisplayTrackerByIdSync
+            // counts all data points in the tracker. Seems a bit excessive when all we need is timerStartInstant
+            dataInteractor.tryGetDisplayTrackerByIdSync(tracker.id)?.timerStartInstant?.let {
+                dataInteractor.stopTimerForTracker(tracker.id)
                 val intent = pendingIntentProvider
-                    .getDurationInputActivityIntent(featureId, it.toString())
+                    .getDurationInputActivityIntent(tracker.id, it.toString())
                 applicationContext.startActivity(intent)
             }
         }
