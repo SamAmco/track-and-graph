@@ -60,7 +60,7 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
         viewModel.initViewModel(args.featureId)
 
-        observeIsTracker()
+        observeTrackerAndFeature()
         observeIsDuration()
         observeDataPoints()
 
@@ -90,10 +90,13 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         }
     }
 
-    private fun observeIsTracker() {
+    private fun observeTrackerAndFeature() {
         viewModel.tracker.observe(viewLifecycleOwner) {
             adapter.submitIsTracker(it != null)
         }
+        //Empty observer makes sure we get the feature because we will need it
+        // to be present when we click the info button
+        viewModel.feature.observe(viewLifecycleOwner) {}
     }
 
     private fun observeIsDuration() {
