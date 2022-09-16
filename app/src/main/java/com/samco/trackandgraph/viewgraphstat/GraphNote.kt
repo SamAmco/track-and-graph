@@ -22,24 +22,24 @@ import com.samco.trackandgraph.base.database.dto.GlobalNote
 import org.threeten.bp.OffsetDateTime
 
 class GraphNote {
-    val noteType: NoteType
     val dataPoint: DataPoint?
     val globalNote: GlobalNote?
     val timestamp: OffsetDateTime
 
     constructor(dataPoint: DataPoint) {
-        this.noteType = NoteType.DATA_POINT
         this.dataPoint = dataPoint
         this.globalNote = null
         this.timestamp = dataPoint.timestamp
     }
 
     constructor(globalNote: GlobalNote) {
-        this.noteType = NoteType.GLOBAL_NOTE
         this.globalNote = globalNote
         this.dataPoint = null
         this.timestamp = globalNote.timestamp
     }
+
+    fun isDataPoint() = dataPoint != null
+    fun isGlobalNote() = globalNote != null
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -47,7 +47,6 @@ class GraphNote {
 
         other as GraphNote
 
-        if (noteType != other.noteType) return false
         if (dataPoint != other.dataPoint) return false
         if (globalNote != other.globalNote) return false
 
@@ -55,9 +54,9 @@ class GraphNote {
     }
 
     override fun hashCode(): Int {
-        var result = noteType.hashCode()
-        result = 31 * result + (dataPoint?.hashCode() ?: 0)
+        var result = dataPoint?.hashCode() ?: 0
         result = 31 * result + (globalNote?.hashCode() ?: 0)
+        result = 31 * result + timestamp.hashCode()
         return result
     }
 }

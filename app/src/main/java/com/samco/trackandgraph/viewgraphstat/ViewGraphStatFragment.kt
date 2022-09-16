@@ -31,13 +31,11 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
@@ -51,7 +49,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
-    private val viewModel by viewModels<ViewGraphStatViewModel>()
+    private val viewModel: ViewGraphStatViewModel by viewModels<ViewGraphStatViewModelImpl>()
     private lateinit var graphStatView: GraphStatView
     private var binding: FragmentViewGraphStatBinding by bindingForViewLifecycle()
     private lateinit var adapter: NotesAdapter
@@ -76,12 +74,30 @@ class ViewGraphStatFragment : Fragment() {
         binding = FragmentViewGraphStatBinding.inflate(inflater, container, false)
         graphStatView = binding.graphStatView
 
-        viewModel.setGraphStatId(args.graphStatId)
+        viewModel.initFromGraphStatId(args.graphStatId)
 
         setViewInitialState()
-        listenToState()
+        observeGraphStatViewData()
+        listenToShowingNotes()
+        listenToFeaturePathProvider()
+        observeNoteMarker()
         listenToBinding()
         return binding.root
+    }
+
+    private fun listenToFeaturePathProvider() {
+        viewModel.featureDataProvider.observe(viewLifecycleOwner) { featureDataProvider ->
+            adapter = NotesAdapter(
+                featureDataProvider,
+                getWeekDayNames(requireContext()),
+                NoteClickListener(this::onViewNoteClicked)
+            )
+            binding.notesRecyclerView.adapter = adapter
+            binding.notesRecyclerView.layoutManager = LinearLayoutManager(
+                context, RecyclerView.VERTICAL, false
+            )
+            viewModel.notes.observe(viewLifecycleOwner) { onNewNotesList(it) }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -94,25 +110,24 @@ class ViewGraphStatFragment : Fragment() {
 
     private fun setViewInitialState() {
         graphStatView.addLineGraphPanAndZoom()
+        graphStatView.initLoading()
         binding.showNotesButton.visibility = View.GONE
     }
 
     private fun onViewNoteClicked(note: GraphNote) {
         viewModel.noteClicked(note)
-        when (note.noteType) {
-            NoteType.GLOBAL_NOTE -> showNoteDialog(
+        when {
+            note.isGlobalNote() -> showNoteDialog(
                 layoutInflater,
                 requireContext(),
                 note.globalNote!!
             )
-            NoteType.DATA_POINT -> {
+            note.isDataPoint() -> {
                 val dataPoint = note.dataPoint!!
-                val featureDisplayName = viewModel.featurePathProvider.getPathForFeature(
-                    dataPoint.featureId,
-                    DataSourceType.FEATURE
-                )
-                val isDuration = viewModel.featureTypes
-                    ?.get(dataPoint.featureId) == DataType.DURATION
+                val dataProvider = viewModel.featureDataProvider.value
+                val featureDisplayName = dataProvider?.getPathForFeature(dataPoint.featureId) ?: ""
+                val isDuration = dataProvider?.getDataSampleProperties(dataPoint.featureId)
+                    ?.isDuration ?: false
                 showDataPointDescriptionDialog(
                     requireContext(),
                     layoutInflater,
@@ -135,8 +150,7 @@ class ViewGraphStatFragment : Fragment() {
         }
     }
 
-    private fun listenToState() {
-        viewModel.state.observe(viewLifecycleOwner) { state -> onViewModelStateChanged(state) }
+    private fun listenToShowingNotes() {
         viewModel.showingNotes.observe(viewLifecycleOwner) { b -> onShowingNotesChanged(b) }
     }
 
@@ -151,33 +165,6 @@ class ViewGraphStatFragment : Fragment() {
         if (notes.isEmpty()) return
         binding.showNotesButton.visibility = View.VISIBLE
         adapter.submitList(notes)
-    }
-
-    private fun onViewModelStateChanged(state: ViewGraphStatViewModelState) {
-        when (state) {
-            ViewGraphStatViewModelState.INITIALIZING -> graphStatView.initLoading()
-            ViewGraphStatViewModelState.WAITING -> {
-                observeGraphStatViewData()
-                initNotesAdapterFromViewModel()
-                observeNoteMarker()
-            }
-        }
-    }
-
-    private fun initNotesAdapterFromViewModel() {
-        val featurePathProvider = viewModel.featurePathProvider
-        val featureTypes = viewModel.featureTypes ?: emptyMap()
-        adapter = NotesAdapter(
-            featurePathProvider,
-            featureTypes,
-            getWeekDayNames(requireContext()),
-            NoteClickListener(this::onViewNoteClicked)
-        )
-        binding.notesRecyclerView.adapter = adapter
-        binding.notesRecyclerView.layoutManager = LinearLayoutManager(
-            context, RecyclerView.VERTICAL, false
-        )
-        viewModel.notes.observe(viewLifecycleOwner) { onNewNotesList(it) }
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {

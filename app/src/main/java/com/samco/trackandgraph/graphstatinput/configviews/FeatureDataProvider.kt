@@ -26,8 +26,20 @@ class FeatureDataProvider(
     val dataSourceData: Map<DataSourceData, Group>
 ) : FeaturePathProvider(dataSourceData.map { it.key.feature to it.value }.toMap()) {
 
+    constructor(dataSourceData: List<DataSourceData>, groups: List<Group>) : this(
+        dataSourceData.mapNotNull { dataSource ->
+            val group = groups.firstOrNull { it.id == dataSource.feature.groupId }
+                ?: return@mapNotNull null
+            dataSource to group
+        }.toMap()
+    )
+
     fun dataSourceDataAlphabetically() =
         dataSourceData.keys.sortedBy { getPathForFeature(it.feature.featureId) }
+
+    fun getDataSampleProperties(featureId: Long) = dataSourceData.keys.firstOrNull {
+        it.feature.featureId == featureId
+    }?.dataProperties
 
     data class DataSourceData(
         val feature: Feature,
