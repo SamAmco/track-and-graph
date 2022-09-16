@@ -25,6 +25,7 @@ import com.samco.trackandgraph.base.model.TrackerHelper.DurationNumericConversio
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
@@ -258,8 +259,8 @@ internal class TrackerHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun playTimerForTracker(trackerId: Long): Long? {
-        return dao.getTrackerById(trackerId)?.featureId?.also { featureId ->
+    override suspend fun playTimerForTracker(trackerId: Long): Long? = withContext(io) {
+        dao.getTrackerById(trackerId)?.featureId?.also { featureId ->
             dao.deleteFeatureTimer(featureId)
             val timer = com.samco.trackandgraph.base.database.entity.FeatureTimer(
                 0L,
@@ -270,19 +271,20 @@ internal class TrackerHelperImpl @Inject constructor(
         }
     }
 
-    override suspend fun stopTimerForTracker(trackerId: Long): Duration? =
+    override suspend fun stopTimerForTracker(trackerId: Long): Duration? = withContext(io) {
         dao.getTrackerById(trackerId)?.featureId?.let { featureId ->
             val timer = dao.getFeatureTimer(featureId)
             dao.deleteFeatureTimer(featureId)
             timer?.let { Duration.between(it.startInstant, Instant.now()) }
         }
+    }
 
     override suspend fun getAllActiveTimerTrackers(): List<DisplayTracker> = withContext(io) {
         dao.getAllActiveTimerTrackers().map { it.toDto() }
     }
 
-    override suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker> {
-        return dao.getFeaturesForGroupSync(groupId)
+    override suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker> = withContext(io) {
+        dao.getFeaturesForGroupSync(groupId)
             .mapNotNull { feature ->
                 dao.getTrackerByFeatureId(feature.id)?.let { tracker ->
                     Pair(tracker, feature)
@@ -291,8 +293,9 @@ internal class TrackerHelperImpl @Inject constructor(
             .map { Tracker.fromEntities(it.first, it.second) }
     }
 
-    override suspend fun getTrackerByFeatureId(featureId: Long): Tracker? {
-        return dao.getTrackerByFeatureId(featureId)?.let { tracker ->
+
+    override suspend fun getTrackerByFeatureId(featureId: Long): Tracker? = withContext(io) {
+        dao.getTrackerByFeatureId(featureId)?.let { tracker ->
             dao.getFeatureById(tracker.featureId)?.let { feature ->
                 Tracker.fromEntities(tracker, feature)
             }
@@ -300,7 +303,7 @@ internal class TrackerHelperImpl @Inject constructor(
     }
 
     override fun hasAtLeastOneTracker(): Flow<Boolean> {
-        return dao.numTrackers().map { it > 0 }
+        return dao.numTrackers().map { it > 0 }.flowOn(io)
     }
 
     override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
