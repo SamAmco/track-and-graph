@@ -497,20 +497,16 @@ internal class DataInteractorImpl @Inject constructor(
         }
 
     override suspend fun playTimerForTracker(trackerId: Long): Long? {
-        return performAtomicUpdate {
-            trackerHelper.playTimerForTracker(trackerId)?.also {
-                serviceManager.startTimerNotificationService()
-                serviceManager.requestWidgetUpdatesForFeatureId(it)
-            }
+        return trackerHelper.playTimerForTracker(trackerId)?.also {
+            serviceManager.startTimerNotificationService()
+            serviceManager.requestWidgetUpdatesForFeatureId(it)
         }
     }
 
     override suspend fun stopTimerForTracker(trackerId: Long): Duration? =
         trackerHelper.getTrackerById(trackerId)?.let { tracker ->
-            performAtomicUpdate {
-                trackerHelper.stopTimerForTracker(trackerId).also {
-                    serviceManager.requestWidgetUpdatesForFeatureId(tracker.featureId)
-                }
+            trackerHelper.stopTimerForTracker(trackerId).also {
+                serviceManager.requestWidgetUpdatesForFeatureId(tracker.featureId)
             }
         }
 
