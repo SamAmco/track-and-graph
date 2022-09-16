@@ -22,10 +22,9 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.addtracker.DURATION_SECONDS_KEY
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.addtracker.DURATION_SECONDS_KEY
-import com.samco.trackandgraph.addtracker.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.widgets.TrackWidgetDataPointInputDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +39,7 @@ import javax.inject.Inject
 class AddDataPointFromTimerActivity : AppCompatActivity() {
 
     companion object {
-        const val FEATURE_ID_KEY = "FEATURE_ID_KEY"
+        const val TRACKER_ID_KEY = "TRACKER_ID_KEY"
         const val START_TIME_KEY = "START_TIME_KEY"
     }
 
@@ -50,23 +49,23 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         val bundle = intent.extras
-        val featureId = bundle?.getLong(FEATURE_ID_KEY)
+        val trackerId = bundle?.getLong(TRACKER_ID_KEY)
         val startTimeStr = bundle?.getString(START_TIME_KEY)
 
-        if (featureId == null || startTimeStr == null) {
+        if (trackerId == null || startTimeStr == null) {
             finish()
         } else {
             val startInstant = Instant.parse(startTimeStr)
             val duration = Duration.between(startInstant, Instant.now()).seconds
-            showDialog(featureId, duration)
-            viewModel.stopTimer(featureId)
+            viewModel.stopTimer(trackerId)
+            showDialog(trackerId, duration)
         }
     }
 
     private fun showDialog(featureId: Long, duration: Long) {
         val dialog = TrackWidgetDataPointInputDialog()
         val args = Bundle()
-        args.putLongArray(FEATURE_LIST_KEY, longArrayOf(featureId))
+        args.putLongArray(TRACKER_ID_KEY, longArrayOf(featureId))
         args.putLong(DURATION_SECONDS_KEY, duration)
         dialog.arguments = args
         supportFragmentManager.let { dialog.show(it, "input_data_points_dialog") }
@@ -82,10 +81,10 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
 class AddDataPointFromTimerViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher
-): ViewModel() {
-    fun stopTimer(featureId: Long) {
+) : ViewModel() {
+    fun stopTimer(trackerId: Long) {
         viewModelScope.launch(io) {
-            dataInteractor.stopTimerForFeature(featureId)
+            dataInteractor.stopTimerForTracker(trackerId)
         }
     }
 

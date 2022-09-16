@@ -79,14 +79,14 @@ class TimerNotificationService : Service() {
             this.updateJobs?.forEach { it.cancel() }
         }
 
-        private fun createUpdateJob(feature: DisplayTracker, isPrimary: Boolean): Job? {
-            val instant = feature.timerStartInstant ?: return null
-            val builder = buildNotification(feature.id, feature.name, instant)
+        private fun createUpdateJob(tracker: DisplayTracker, isPrimary: Boolean): Job? {
+            val instant = tracker.timerStartInstant ?: return null
+            val builder = buildNotification(tracker.id, tracker.name, instant)
             return jobScope.launch {
                 while (true) {
                     val durationSecs = Duration.between(instant, Instant.now()).seconds
                     builder.setContentText(formatTimeDuration(durationSecs))
-                    val id = feature.id.toInt()
+                    val id = tracker.id.toInt()
                     val notification = builder.build()
                     if (isPrimary) startForeground(id, notification)
                     else notificationManager.notify(id, notification)
@@ -161,13 +161,13 @@ class TimerNotificationService : Service() {
     }
 
     private fun buildNotification(
-        id: Long,
+        trackerId: Long,
         name: String,
         startTimeInstant: Instant
     ): NotificationCompat.Builder {
         val durationSecs = Duration.between(startTimeInstant, Instant.now()).seconds
         val pendingIntent = pendingIntentProvider
-            .getDurationInputActivityPendingIntent(id, startTimeInstant.toString())
+            .getDurationInputActivityPendingIntent(trackerId, startTimeInstant.toString())
 
         val stopAction = NotificationCompat.Action(
             R.drawable.ic_stop_timer,
