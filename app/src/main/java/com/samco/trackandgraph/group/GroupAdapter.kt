@@ -32,7 +32,7 @@ import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 
 class GroupAdapter(
-    private val featureClickListener: FeatureClickListener,
+    private val trackerClickListener: TrackerClickListener,
     private val graphStatClickListener: GraphStatClickListener,
     private val groupClickListener: GroupClickListener,
     private val gsiProvider: GraphStatInteractorProvider,
@@ -43,7 +43,7 @@ class GroupAdapter(
         return when (viewType) {
             GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
                 .apply { setFullSpan(this) }
-            GroupChildType.TRACKER.ordinal -> FeatureViewHolder.from(parent)
+            GroupChildType.TRACKER.ordinal -> TrackerViewHolder.from(parent)
             else -> GroupViewHolder.from(parent).apply { setFullSpan(this) }
         }
     }
@@ -61,8 +61,8 @@ class GroupAdapter(
                 extractGraphViewData(item.obj),
                 graphStatClickListener
             )
-            GroupChildType.TRACKER -> (holder as FeatureViewHolder)
-                .bind(item.obj as DisplayTracker, featureClickListener)
+            GroupChildType.TRACKER -> (holder as TrackerViewHolder)
+                .bind(item.obj as DisplayTracker, trackerClickListener)
             GroupChildType.GROUP -> (holder as GroupViewHolder)
                 .bind(item.obj as Group, groupClickListener)
         }

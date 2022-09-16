@@ -128,7 +128,10 @@ class NotesFragment : Fragment() {
     }
 
     private fun onNoteClicked(note: DisplayNote) {
-        showNoteDialog(layoutInflater, requireContext(), note)
+        val featurePath = note.featureId?.let {
+            viewModel.featureNameProvider.value?.getPathForFeature(it)
+        } ?: note.featureName
+        showNoteDialog(layoutInflater, requireContext(), note, featurePath)
     }
 
     private fun onDeleteNote(note: DisplayNote) {
