@@ -301,13 +301,7 @@ class GraphStatInputViewModel @Inject constructor(
                     dataInteractor.getDataSampleForFeatureId(feature.featureId).dataSampleProperties
                 )
             }
-            featureDataProvider =
-                FeatureDataProvider(dataSourceData.mapNotNull { data ->
-                    val group = allGroups
-                        .firstOrNull { it.id == data.feature.groupId }
-                        ?: return@mapNotNull null
-                    data to group
-                }.toMap())
+            featureDataProvider = FeatureDataProvider(dataSourceData, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
             else moveToWaiting()
         }
