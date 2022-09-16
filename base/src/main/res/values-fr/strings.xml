@@ -30,7 +30,7 @@
     <string name="cancel">Annuler</string>
     <string name="select_file">Sélectionner un fichier</string>
     <string name="empty_group_hint">Bienvenue sur Track &amp; Graph!\n\n Appuyez ici pour créer vos premiers groupes de suivi et graphiques.</string>
-    <string name="no_features_graph_stats_hint">Veuillez créer un suivi avant de créer des graphiques.</string>
+    <string name="no_trackers_graph_stats_hint">Veuillez créer un suivi avant de créer des graphiques.</string>
     <string name="ru_sure_del_group">Êtes-vous sûr de vouloir supprimer ce groupe et tout ce qu\'il contient ? Vous ne pouvez pas faire marche arrière.</string>
     <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ces données ?</string>
     <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette donnée ?</string>

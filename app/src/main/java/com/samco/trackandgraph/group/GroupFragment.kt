@@ -83,7 +83,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
         initializeGridLayout()
         adapter = GroupAdapter(
-            createFeatureClickListener(),
+            createTrackerClickListener(),
             createGraphStatClickListener(),
             createGroupClickListener(),
             gsiProvider
@@ -138,7 +138,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
     /**
      * Calls an update function on all children of the recycler view once a second. This is
-     * because graphs/statistics and features can have timers in the view holder that need to
+     * because graphs/statistics and trackers can have timers in the view holder that need to
      * be updated every second and it could be too costly to emit an entire new set of data to
      * the adapter every second for diffing.
      */
@@ -266,32 +266,32 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         )
     }
 
-    private fun createFeatureClickListener() = FeatureClickListener(
-        this::onFeatureEditClicked,
-        this::onFeatureDeleteClicked,
-        this::onFeatureMoveToClicked,
-        this::onFeatureDescriptionClicked,
-        this::onFeatureAddClicked,
-        this::onFeatureHistoryClicked,
+    private fun createTrackerClickListener() = TrackerClickListener(
+        this::onTrackerEditClicked,
+        this::onTrackerDeleteClicked,
+        this::onTrackerMoveClicked,
+        this::onTrackerDescriptionClicked,
+        this::onTrackerAddClicked,
+        this::onTrackerHistoryClicked,
         viewModel::playTimer,
         this::onStopTimerClicked
     )
 
-    private fun onStopTimerClicked(feature: DisplayTracker) {
+    private fun onStopTimerClicked(tracker: DisplayTracker) {
         //Due to a bug with the GridLayoutManager when you stop a timer and the timer text disappears
         // the views heights are not properly re-calculated and we need to call notifyDataSetChanged
         // to get the view heights right again
         forceNextNotifyDataSetChanged = true
-        viewModel.stopTimer(feature)
+        viewModel.stopTimer(tracker)
     }
 
-    private fun onFeatureHistoryClicked(feature: DisplayTracker) {
+    private fun onTrackerHistoryClicked(tracker: DisplayTracker) {
         navController?.navigate(
-            GroupFragmentDirections.actionFeatureHistory(feature.id, feature.name)
+            GroupFragmentDirections.actionFeatureHistory(tracker.featureId, tracker.name)
         )
     }
 
-    private fun onFeatureAddClicked(tracker: DisplayTracker, useDefault: Boolean = true) {
+    private fun onTrackerAddClicked(tracker: DisplayTracker, useDefault: Boolean = true) {
         /**
          * @param useDefault: if false the default value will be ignored and the user will be queried for the value
          */
@@ -305,23 +305,22 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         }
     }
 
-    private fun onFeatureDescriptionClicked(feature: DisplayTracker) {
-        showFeatureDescriptionDialog(requireContext(), feature.name, feature.description)
+    private fun onTrackerDescriptionClicked(tracker: DisplayTracker) {
+        showFeatureDescriptionDialog(requireContext(), tracker.name, tracker.description)
     }
 
-    private fun onFeatureMoveToClicked(feature: DisplayTracker) {
+    private fun onTrackerMoveClicked(tracker: DisplayTracker) {
         val dialog = MoveToDialogFragment()
         val args = Bundle()
         args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_TRACK)
-        args.putLong(MOVE_DIALOG_GROUP_KEY, feature.id)
+        args.putLong(MOVE_DIALOG_GROUP_KEY, tracker.id)
         dialog.arguments = args
         childFragmentManager.let { dialog.show(it, "move_dialog") }
     }
 
-    private fun onFeatureEditClicked(feature: DisplayTracker) {
+    private fun onTrackerEditClicked(tracker: DisplayTracker) {
         navController?.navigate(
-            GroupFragmentDirections
-                .actionAddTracker(args.groupId, feature.id)
+            GroupFragmentDirections.actionAddTracker(args.groupId, tracker.id)
         )
     }
 
@@ -437,7 +436,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     private fun onAddGraphStatClicked() {
         if (viewModel.hasTrackers.value != true) {
             AlertDialog.Builder(requireContext())
-                .setMessage(R.string.no_features_graph_stats_hint)
+                .setMessage(R.string.no_trackers_graph_stats_hint)
                 .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                 .show()
         } else {
@@ -455,11 +454,11 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         dialog.show(childFragmentManager, "add_group_dialog")
     }
 
-    private fun onFeatureDeleteClicked(feature: DisplayTracker) {
+    private fun onTrackerDeleteClicked(tracker: DisplayTracker) {
         val dialog = YesCancelDialogFragment()
         val args = Bundle()
         args.putString("title", getString(R.string.ru_sure_del_feature))
-        args.putString("id", feature.id.toString())
+        args.putString("id", tracker.featureId.toString())
         dialog.arguments = args
         childFragmentManager.let { dialog.show(it, "ru_sure_del_feature_fragment") }
     }

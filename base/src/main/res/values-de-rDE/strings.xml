@@ -30,7 +30,7 @@
     <string name="cancel">Abbrechen</string>
     <string name="select_file">Datei wählen</string>
     <string name="empty_group_hint">Willkommen bei Track &amp; Graph!\n\n Tippen Sie hier, um Ihre erste Track-Gruppe zu erstellen und loszulegen.</string>
-    <string name="no_features_graph_stats_hint">Bitte erstellen Sie einen beobachten, bevor Sie Grafiken erstellen.</string>
+    <string name="no_trackers_graph_stats_hint">Bitte erstellen Sie einen beobachten, bevor Sie Grafiken erstellen.</string>
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
