@@ -91,11 +91,11 @@ abstract class GraphStatConfigView constructor(
         ) {
             val allFeatures = view.featureDataProvider.sortedAlphabetically().filter(featureFilter)
             val context = view.context
-            val itemNames = allFeatures.map { ft -> view.featureDataProvider.getPathForFeature(ft.id) }
+            val itemNames = allFeatures.map { ft -> view.featureDataProvider.getPathForFeature(ft.featureId) }
             val adapter =
                 ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
             spinner.adapter = adapter
-            val selected = allFeatures.indexOfFirst { it.id == selectedId }
+            val selected = allFeatures.indexOfFirst { it.featureId == selectedId }
             if (selected >= 0) spinner.setSelection(selected)
             spinner.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {

@@ -26,7 +26,7 @@ package com.samco.trackandgraph.base.database.dto
  * module.
  */
 interface Feature {
-    val id: Long
+    val featureId: Long
     val name: String
     val groupId: Long
     val displayIndex: Int
@@ -34,7 +34,7 @@ interface Feature {
 }
 
 internal data class FeatureDtoImpl(
-    override val id: Long,
+    override val featureId: Long,
     override val name: String,
     override val groupId: Long,
     override val displayIndex: Int,
@@ -42,7 +42,7 @@ internal data class FeatureDtoImpl(
 ) : Feature
 
 internal fun Feature.toEntity() = com.samco.trackandgraph.base.database.entity.Feature(
-    id,
+    featureId,
     name,
     groupId,
     displayIndex,

@@ -3,7 +3,6 @@ package com.samco.trackandgraph.notes
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.database.dto.GlobalNote
-import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.ui.FeaturePathProvider
@@ -49,14 +48,10 @@ class NotesViewModel @Inject constructor(
 
 
     fun deleteNote(note: DisplayNote) = viewModelScope.launch(io) {
-        when (note.noteType) {
-            NoteType.DATA_POINT -> note.trackerId?.let {
-                dataInteractor.removeNote(note.timestamp, it)
-            }
-            NoteType.GLOBAL_NOTE -> {
-                val globalNote = GlobalNote(note.timestamp, note.note)
-                dataInteractor.deleteGlobalNote(globalNote)
-            }
+        note.trackerId?.let {
+            dataInteractor.removeNote(note.timestamp, it)
+        } ?: run {
+            dataInteractor.deleteGlobalNote(GlobalNote(note.timestamp, note.note))
         }
     }
 }

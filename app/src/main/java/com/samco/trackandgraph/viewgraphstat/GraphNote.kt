@@ -19,7 +19,6 @@ package com.samco.trackandgraph.viewgraphstat
 
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GlobalNote
-import com.samco.trackandgraph.base.database.dto.NoteType
 import org.threeten.bp.OffsetDateTime
 
 class GraphNote {

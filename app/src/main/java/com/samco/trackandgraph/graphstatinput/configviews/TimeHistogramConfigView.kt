@@ -51,7 +51,7 @@ class TimeHistogramConfigView @JvmOverloads constructor(
     private fun createEmptyConfig() = TimeHistogram(
         0L,
         0L,
-        allFeatureData.firstOrNull()?.feature?.id ?: -1,
+        allFeatureData.firstOrNull()?.feature?.featureId ?: -1,
         null,
         TimeHistogramWindow.DAY,
         false,
@@ -69,7 +69,7 @@ class TimeHistogramConfigView @JvmOverloads constructor(
             updateEndDateText(this, binding.customEndDateText, it)
         }
         listenToFeatureSpinner(this, binding.featureSpinner, configData.featureId) {
-            configData = configData.copy(featureId = it.id)
+            configData = configData.copy(featureId = it.featureId)
         }
         listenToTimeWindowSize()
         listenToSumByDiscreteValueCheckbox()
@@ -98,7 +98,7 @@ class TimeHistogramConfigView @JvmOverloads constructor(
 
     override fun validateConfig(): ValidationException? {
         return if (allFeatureData.isEmpty()
-            || !allFeatureData.map { it.feature.id }.contains(configData.featureId)
+            || !allFeatureData.map { it.feature.featureId }.contains(configData.featureId)
         ) {
             ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         } else null

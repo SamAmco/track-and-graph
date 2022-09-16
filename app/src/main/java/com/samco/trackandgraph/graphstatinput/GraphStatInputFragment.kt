@@ -297,8 +297,8 @@ class GraphStatInputViewModel @Inject constructor(
             val dataSourceData = allFeatures.map { feature ->
                 FeatureDataProvider.DataSourceData(
                     feature,
-                    dataInteractor.getLabelsForFeatureId(feature.id),
-                    dataInteractor.getDataSampleForFeatureId(feature.id).dataSampleProperties
+                    dataInteractor.getLabelsForFeatureId(feature.featureId),
+                    dataInteractor.getDataSampleForFeatureId(feature.featureId).dataSampleProperties
                 )
             }
             featureDataProvider =

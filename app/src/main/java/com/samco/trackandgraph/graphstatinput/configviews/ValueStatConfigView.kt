@@ -70,7 +70,7 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
 
     private fun getCurrentFeatureData(): FeatureDataProvider.DataSourceData? {
         val featId = getCurrentFeatureId()
-        return allFeatureData.firstOrNull { it.feature.id == featId }
+        return allFeatureData.firstOrNull { it.feature.featureId == featId }
     }
 
     override fun validateConfig(): ValidationException? {
@@ -120,10 +120,10 @@ internal abstract class ValueStatConfigView @JvmOverloads constructor(
 
     private fun listenToValueStat() {
         listenToFeatureSpinner(this, getFeatureSpinner(), getCurrentFeatureId()) {
-            if (getCurrentFeatureId() != it.id) {
+            if (getCurrentFeatureId() != it.featureId) {
                 onFilterByValueChanged(false)
                 onFilterByLabelChanged(false)
-                onNewFeatureId(it.id)
+                onNewFeatureId(it.featureId)
                 updateInputView()
             }
         }

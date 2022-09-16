@@ -22,9 +22,9 @@ import com.samco.trackandgraph.base.database.entity.FunctionEntity
 //This is the only dto with the explicit name Dto because Function is too common of a name
 // and causes naming conflicts with basic types
 data class FunctionDto(
-    override val id: Long,
+    val id: Long,
     override val name: String,
-    val featureId: Long,
+    override val featureId: Long,
     val dataSources: List<Feature>,
     val script: String,
     override val groupId: Long,
@@ -49,7 +49,7 @@ data class FunctionDto(
     }
 
     internal fun toEntity() = com.samco.trackandgraph.base.database.entity.FunctionEntity(
-        id = id,
+        id = featureId,
         featureId = featureId,
         dataSources = dataSources.map { it.toEntity() },
         script = script

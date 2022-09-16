@@ -69,7 +69,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
                 performTrackVibrate()
                 finish()
             }
-            else -> showDialog(feature.id)
+            else -> showDialog(feature.featureId)
         }
     }
 
@@ -108,7 +108,7 @@ class TrackWidgetInputDataPointViewModel @Inject constructor(
         viewModelScope.launch(io) {
             val newDataPoint = DataPoint(
                 OffsetDateTime.now(),
-                it.id,
+                it.featureId,
                 it.defaultValue,
                 it.getDefaultLabel(),
                 ""

@@ -56,7 +56,7 @@ internal class PieChartConfigView @JvmOverloads constructor(
     private fun getCurrentFeature(): Feature? {
         return allFeatureData
             .map { it.feature }
-            .firstOrNull { it.id == configData.featureId }
+            .firstOrNull { it.featureId == configData.featureId }
     }
 
     private fun initFromPieChart() {
@@ -72,17 +72,17 @@ internal class PieChartConfigView @JvmOverloads constructor(
 
         listenToFeatureSpinner(this, binding.pieChartFeatureSpinner, configData.featureId,
             { ftg -> hasLabels(ftg) },
-            { configData = configData.copy(featureId = it.id) }
+            { configData = configData.copy(featureId = it.featureId) }
         )
     }
 
     private fun hasLabels(feature: Feature) =
-        allFeatureData.firstOrNull { it.feature.id == feature.id }?.labels?.isNotEmpty() == true
+        allFeatureData.firstOrNull { it.feature.featureId == feature.featureId }?.labels?.isNotEmpty() == true
 
     private fun createEmptyConfig(): PieChart = PieChart(
         0,
         0,
-        discreteFeatures().getOrElse(0) { null }?.id ?: -1,
+        discreteFeatures().getOrElse(0) { null }?.featureId ?: -1,
         null,
         null
     )

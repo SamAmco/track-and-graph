@@ -486,7 +486,7 @@ internal class DataInteractorImpl @Inject constructor(
         withContext(io) {
             val featureMap = featureIds
                 .mapNotNull { getFeatureById(it) }
-                .associateWith { getDataSampleForFeatureId(it.id) }
+                .associateWith { getDataSampleForFeatureId(it.featureId) }
             csvReadWriter.writeFeaturesToCSV(outStream, featureMap)
         }
 
