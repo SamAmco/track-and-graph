@@ -86,11 +86,9 @@ class TrackWidgetConfigureDialog : DialogFragment() {
 
     private fun observeAllFeatures() =
         viewModel.featurePathProvider.observe(viewLifecycleOwner) { featurePathProvider ->
-            val features = featurePathProvider.features.toList()
-            if (features.isEmpty()) {
-                listener.onNoFeatures()
-            }
-            val itemNames = features.map { ft -> featurePathProvider.getPathForFeature(ft.featureId) }
+            val sortedFeatures = featurePathProvider.sortedPaths()
+            if (sortedFeatures.isEmpty()) listener.onNoFeatures()
+            val itemNames = sortedFeatures.map { it.second }
             val adapter = ArrayAdapter(
                 requireContext(),
                 android.R.layout.simple_spinner_dropdown_item,
@@ -107,7 +105,7 @@ class TrackWidgetConfigureDialog : DialogFragment() {
                         position: Int,
                         id: Long
                     ) {
-                        viewModel.onFeatureSelected(features[position].featureId)
+                        viewModel.onFeatureSelected(sortedFeatures[position].first.featureId)
                     }
                 }
         }
