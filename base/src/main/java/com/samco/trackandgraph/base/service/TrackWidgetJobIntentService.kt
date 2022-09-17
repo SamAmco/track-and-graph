@@ -82,12 +82,12 @@ class TrackWidgetJobIntentService : JobIntentService() {
     }
 
     private fun updateTimer(featureId: Long, startTimer: Boolean) = runBlocking {
-        val tracker = dataInteractor.getTrackerByFeatureId(featureId) ?: return@runBlocking
+        val tracker = dataInteractor.tryGetDisplayTrackerByFeatureIdSync(featureId) ?: return@runBlocking
         if (startTimer) dataInteractor.playTimerForTracker(tracker.id)
         else {
             //TODO might be worth writing a simpler function for this as tryGetDisplayTrackerByIdSync
             // counts all data points in the tracker. Seems a bit excessive when all we need is timerStartInstant
-            dataInteractor.tryGetDisplayTrackerByIdSync(tracker.id)?.timerStartInstant?.let {
+            tracker.timerStartInstant?.let {
                 dataInteractor.stopTimerForTracker(tracker.id)
                 val intent = pendingIntentProvider
                     .getDurationInputActivityIntent(tracker.id, it.toString())
@@ -111,25 +111,25 @@ class TrackWidgetJobIntentService : JobIntentService() {
         runBlocking {
             val appWidgetManager = AppWidgetManager.getInstance(applicationContext)
 
-            val feature = withContext(io) {
-                dataInteractor.tryGetDisplayTrackerByIdSync(featureId)
+            val tracker = withContext(io) {
+                dataInteractor.tryGetDisplayTrackerByFeatureIdSync(featureId)
             }
 
-            if (feature == null) {
+            if (tracker == null) {
                 forceDisableWidget(appWidgetId)
                 return@runBlocking
             }
 
-            val title = feature.name
-            val requireInput = !feature.hasDefaultValue
+            val title = tracker.name
+            val requireInput = !tracker.hasDefaultValue
             val remoteViews = createRemoteViews(
-                applicationContext,
-                appWidgetId,
-                featureId,
-                title,
-                requireInput,
-                feature.dataType == DataType.DURATION,
-                feature.timerStartInstant != null
+                context = applicationContext,
+                appWidgetId = appWidgetId,
+                featureId = featureId,
+                title = title,
+                requireInput = requireInput,
+                isDuration = tracker.dataType == DataType.DURATION,
+                timerRunning = tracker.timerStartInstant != null
             )
             withContext(ui) { appWidgetManager.updateAppWidget(appWidgetId, remoteViews) }
         }

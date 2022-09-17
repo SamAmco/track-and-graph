@@ -30,6 +30,7 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.base.service.TrackWidgetProvider
 import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
 import com.samco.trackandgraph.util.hideKeyboard
@@ -70,7 +71,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
                 performTrackVibrate()
                 finish()
             }
-            else -> showDialog(tracker.featureId)
+            else -> showDialog(tracker.id)
         }
     }
 
@@ -91,7 +92,8 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
 @HiltViewModel
 class TrackWidgetInputDataPointViewModel @Inject constructor(
     private var dataInteractor: DataInteractor,
-    @IODispatcher private val io: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
 
     private val _tracker = MutableLiveData<Tracker?>()
@@ -103,18 +105,19 @@ class TrackWidgetInputDataPointViewModel @Inject constructor(
         if (initialized) return
         initialized = true
         viewModelScope.launch(io) {
-            _tracker.value = dataInteractor.getTrackerByFeatureId(featureId)
+            val tracker = dataInteractor.getTrackerByFeatureId(featureId)
+            withContext(ui) { _tracker.value = tracker }
         }
     }
 
     fun addDefaultDataPoint() = tracker.value?.let {
         viewModelScope.launch(io) {
             val newDataPoint = DataPoint(
-                OffsetDateTime.now(),
-                it.featureId,
-                it.defaultValue,
-                it.getDefaultLabel(),
-                ""
+                timestamp = OffsetDateTime.now(),
+                featureId = it.featureId,
+                value = it.defaultValue,
+                label = it.getDefaultLabel(),
+                note = ""
             )
             dataInteractor.insertDataPoint(newDataPoint)
         }
