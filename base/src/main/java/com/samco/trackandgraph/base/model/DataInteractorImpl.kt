@@ -439,14 +439,14 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>) =
         performAtomicUpdate {
-            //Update features
-            dao.getFeaturesForGroupSync(groupId).let { features ->
+            //Update trackers
+            dao.getTrackersForGroupSync(groupId).let { features ->
                 val updates = features.map { feature ->
                     val newDisplayIndex = children.indexOfFirst {
                         it.type == GroupChildType.TRACKER && it.id == feature.id
                     }
                     feature.copy(displayIndex = newDisplayIndex)
-                }
+                }.map { it.toFeatureEntity() }
                 dao.updateFeatures(updates)
             }
 

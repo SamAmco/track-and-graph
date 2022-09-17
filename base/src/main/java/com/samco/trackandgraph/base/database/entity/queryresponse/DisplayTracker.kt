@@ -26,7 +26,7 @@ import org.threeten.bp.OffsetDateTime
 
 internal data class DisplayTracker(
     @ColumnInfo(name = "id")
-    var id: Long,
+    val id: Long,
 
     @ColumnInfo(name = "feature_id")
     var featureId: Long,

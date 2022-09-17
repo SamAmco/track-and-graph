@@ -253,10 +253,7 @@ internal class TrackerHelperImpl @Inject constructor(
         withContext(io) { trackerIds.mapNotNull { getTrackerById(it) } }
 
     override suspend fun getTrackerById(trackerId: Long): Tracker? = withContext(io) {
-        dao.getTrackerById(trackerId)?.let {
-            val feature = dao.getFeatureById(it.featureId) ?: return@let null
-            Tracker.fromEntities(it, feature)
-        }
+        dao.getTrackerById(trackerId)?.let { Tracker.fromTrackerWithFeature(it) }
     }
 
     override suspend fun playTimerForTracker(trackerId: Long): Long? = withContext(io) {
@@ -284,22 +281,11 @@ internal class TrackerHelperImpl @Inject constructor(
     }
 
     override suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker> = withContext(io) {
-        dao.getFeaturesForGroupSync(groupId)
-            .mapNotNull { feature ->
-                dao.getTrackerByFeatureId(feature.id)?.let { tracker ->
-                    Pair(tracker, feature)
-                }
-            }
-            .map { Tracker.fromEntities(it.first, it.second) }
+        dao.getTrackersForGroupSync(groupId).map { Tracker.fromTrackerWithFeature(it) }
     }
 
-
     override suspend fun getTrackerByFeatureId(featureId: Long): Tracker? = withContext(io) {
-        dao.getTrackerByFeatureId(featureId)?.let { tracker ->
-            dao.getFeatureById(tracker.featureId)?.let { feature ->
-                Tracker.fromEntities(tracker, feature)
-            }
-        }
+        dao.getTrackerByFeatureId(featureId)?.let { Tracker.fromTrackerWithFeature(it) }
     }
 
     override fun hasAtLeastOneTracker(): Flow<Boolean> {
@@ -321,10 +307,7 @@ internal class TrackerHelperImpl @Inject constructor(
     }
 
     override suspend fun getAllTrackersSync(): List<Tracker> = withContext(io) {
-        dao.getAllTrackersSync().map {
-            val feature = dao.getFeatureById(it.featureId) ?: return@map null
-            Tracker.fromEntities(it, feature)
-        }.filterNotNull()
+        dao.getAllTrackersSync().map { Tracker.fromTrackerWithFeature(it) }
     }
 
     override suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker> =
