@@ -278,7 +278,7 @@ internal interface TrackAndGraphDatabaseDao {
     fun getAllActiveTimerTrackers(): List<DisplayTracker>
 
     @Query("$getDisplayTrackersQuery WHERE trackers_table.feature_id=:featureId LIMIT 1")
-    fun getDisplayTrackerByIdSync(featureId: Long): DisplayTracker?
+    fun getDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker?
 
     @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :id")
     fun getNumberOfDataPointsForFeature(id: Long): Int
