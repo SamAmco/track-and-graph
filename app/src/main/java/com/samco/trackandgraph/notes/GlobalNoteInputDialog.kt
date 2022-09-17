@@ -29,12 +29,16 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.GlobalNoteInputDialogBinding
 import com.samco.trackandgraph.util.bindingForViewLifecycle
+import com.samco.trackandgraph.util.focusAndShowKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -70,6 +74,7 @@ class GlobalNoteInputDialog : DialogFragment() {
             }
             binding.cancelButton.setOnClickListener { dismiss() }
             binding.addButton.setOnClickListener { viewModel.onAddClicked() }
+            binding.noteInputText.focusAndShowKeyboard()
 
             dialog?.setCanceledOnTouchOutside(true)
 
@@ -162,11 +167,10 @@ enum class GlobalNoteInputState { INITIALIZING, WAITING, DONE }
 
 @HiltViewModel
 class GlobalNoteInputViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor
+    private val dataInteractor: DataInteractor,
+    @MainDispatcher private val ui: CoroutineDispatcher,
+    @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
-    private var updateJob = Job()
-    private val ioScope = CoroutineScope(Dispatchers.IO + updateJob)
-
     var oldNote: GlobalNote? = null
     var timestamp: OffsetDateTime = OffsetDateTime.now()
     var noteText: String = ""
@@ -180,7 +184,7 @@ class GlobalNoteInputViewModel @Inject constructor(
         if (initialized) return
         initialized = true
 
-        ioScope.launch {
+        viewModelScope.launch(io) {
             if (timestampStr != null) {
                 val noteTimestamp = odtFromString(timestampStr)
                 val note = dataInteractor.getGlobalNoteByTimeSync(noteTimestamp)
@@ -190,13 +194,13 @@ class GlobalNoteInputViewModel @Inject constructor(
                     oldNote = note
                 }
             }
-            withContext(Dispatchers.Main) {
+            withContext(ui) {
                 _state.value = GlobalNoteInputState.WAITING
             }
         }
     }
 
-    fun onAddClicked() = ioScope.launch {
+    fun onAddClicked() = viewModelScope.launch(io) {
         oldNote?.let { dataInteractor.deleteGlobalNote(it) }
         if (noteText.isNotEmpty()) dataInteractor.insertGlobalNote(
             GlobalNote(
@@ -204,12 +208,7 @@ class GlobalNoteInputViewModel @Inject constructor(
                 noteText
             )
         )
-        withContext(Dispatchers.Main) { _state.value = GlobalNoteInputState.DONE }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        updateJob.cancel()
+        withContext(ui) { _state.value = GlobalNoteInputState.DONE }
     }
 }
 
