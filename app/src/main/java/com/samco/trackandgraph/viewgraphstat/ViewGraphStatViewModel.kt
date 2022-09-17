@@ -111,7 +111,11 @@ class ViewGraphStatViewModelImpl @Inject constructor(
                 dataInteractor.getDataSampleForFeatureId(feature.featureId).dataSampleProperties
             )
         }
-        featureDataProvider.value = FeatureDataProvider(dataSourceData, allGroups)
+        FeatureDataProvider(dataSourceData, allGroups).let {
+            withContext(ui) {
+                featureDataProvider.value = it
+            }
+        }
     }
 
     private suspend fun emitGraphData(graphStatId: Long) {
