@@ -173,11 +173,11 @@ class GroupViewModel @Inject constructor(
             tracker.discreteValues[tracker.defaultValue.toInt()].label
         } else ""
         val newDataPoint = DataPoint(
-            OffsetDateTime.now(),
-            tracker.id,
-            tracker.defaultValue,
-            label,
-            ""
+            timestamp = OffsetDateTime.now(),
+            featureId = tracker.featureId,
+            value = tracker.defaultValue,
+            label = label,
+            note = ""
         )
         dataInteractor.insertDataPoint(newDataPoint)
     }
