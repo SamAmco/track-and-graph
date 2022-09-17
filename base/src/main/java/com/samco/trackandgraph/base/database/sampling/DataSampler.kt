@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.base.database.sampling
 
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
+import com.samco.trackandgraph.base.database.dto.DataType
 import javax.inject.Inject
 
 interface DataSampler {
@@ -35,7 +36,7 @@ internal class DataSamplerImpl @Inject constructor(
             val cursorSequence = DataPointSequence(dao, featureId)
             DataSample.fromSequence(
                 cursorSequence,
-                DataSampleProperties(),
+                DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION),
                 cursorSequence::getRawDataPoints
             )
         } ?: DataSample.fromSequence(emptySequence())
