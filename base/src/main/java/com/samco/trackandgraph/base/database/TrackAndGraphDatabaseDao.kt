@@ -23,36 +23,53 @@ import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayTracker
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
 import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
 import kotlinx.coroutines.flow.Flow
 import org.threeten.bp.OffsetDateTime
 
+private const val getTrackersQuery = """
+    SELECT 
+        features_table.name as name,
+        features_table.group_id as group_id,
+        features_table.display_index as display_index,
+        features_table.feature_description as feature_description,
+        trackers_table.id as id,
+        trackers_table.feature_id as feature_id,
+        trackers_table.type as type,
+        trackers_table.discrete_values as discrete_values,
+        trackers_table.has_default_value as has_default_value,
+        trackers_table.default_value as default_value
+    FROM trackers_table
+    LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
+            """
+
 private const val getDisplayTrackersQuery =
-    """SELECT 
-         features_table.name as name,
-         features_table.group_id as group_id,
-         features_table.display_index as display_index,
-         features_table.feature_description as feature_description,
-         trackers_table.id as id,
-         trackers_table.feature_id as feature_id,
-         trackers_table.type as type,
-         trackers_table.discrete_values as discrete_values,
-         trackers_table.has_default_value as has_default_value,
-         trackers_table.default_value as default_value,
-         num_data_points as num_data_points,
-         last_timestamp as last_timestamp,
-         start_instant as start_instant
-       FROM (
+    """ SELECT
+        features_table.name as name,
+        features_table.group_id as group_id,
+        features_table.display_index as display_index,
+        features_table.feature_description as feature_description,
+        trackers_table.id as id,
+        trackers_table.feature_id as feature_id,
+        trackers_table.type as type,
+        trackers_table.discrete_values as discrete_values,
+        trackers_table.has_default_value as has_default_value,
+        trackers_table.default_value as default_value,
+        num_data_points as num_data_points,
+        last_timestamp as last_timestamp,
+        start_instant as start_instant
+        FROM (
             trackers_table
             LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
             LEFT JOIN (
-                SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp 
+                SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp
                 FROM data_points_table GROUP BY feature_id
-            ) as feature_data 
-            ON feature_data.id = trackers_table.feature_id
+            ) as feature_data
+                ON feature_data.id = trackers_table.feature_id
             LEFT JOIN (
                 SELECT * FROM feature_timers_table
             ) as timer_data
-            ON timer_data.feature_id = trackers_table.feature_id 
+            ON timer_data.feature_id = trackers_table.feature_id
         )
     """
 
@@ -111,6 +128,25 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT features_table.* FROM features_table WHERE group_id = :groupId ORDER BY features_table.display_index ASC")
     fun getFeaturesForGroupSync(groupId: Long): List<Feature>
+
+    @Query(
+        """
+SELECT
+features_table.name as name,
+features_table.group_id as group_id,
+features_table.display_index as display_index,
+features_table.feature_description as feature_description,
+trackers_table.id as id,
+trackers_table.feature_id as feature_id,
+trackers_table.type as type,
+trackers_table.discrete_values as discrete_values,
+trackers_table.has_default_value as has_default_value,
+trackers_table.default_value as default_value
+FROM trackers_table
+LEFT JOIN features_table ON features_table.id = trackers_table.feature_id
+WHERE features_table.group_id = :groupId ORDER BY features_table.display_index ASC"""
+    )
+    fun getTrackersForGroupSync(groupId: Long): List<TrackerWithFeature>
 
     @Query("SELECT * FROM features_table WHERE id = :featureId LIMIT 1")
     fun getFeatureById(featureId: Long): Feature?
@@ -184,18 +220,18 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query(
         """
-            SELECT * FROM (
-                SELECT dp.timestamp as timestamp, t.id as tracker_id, dp.feature_id as feature_id, f.name as feature_name, g.id as group_id, dp.note as note
-                FROM data_points_table as dp 
-                LEFT JOIN features_table as f ON dp.feature_id = f.id
-                LEFT JOIN trackers_table as t ON dp.feature_id = t.feature_id
-                LEFT JOIN groups_table as g ON f.group_id = g.id
-                WHERE dp.note IS NOT NULL AND dp.note != ""
-            ) UNION SELECT * FROM (
-                SELECT n.timestamp as timestamp, NULL as tracker_id, NULL as feature_id, NULL as feature_name, NULL as group_id, n.note as note
-                FROM notes_table as n
-            ) ORDER BY timestamp DESC
-        """
+SELECT * FROM (
+SELECT dp.timestamp as timestamp, t.id as tracker_id, dp.feature_id as feature_id, f.name as feature_name, g.id as group_id, dp.note as note
+FROM data_points_table as dp
+LEFT JOIN features_table as f ON dp.feature_id = f.id
+LEFT JOIN trackers_table as t ON dp.feature_id = t.feature_id
+LEFT JOIN groups_table as g ON f.group_id = g.id
+WHERE dp.note IS NOT NULL AND dp.note != ""
+) UNION SELECT * FROM (
+SELECT n.timestamp as timestamp, NULL as tracker_id, NULL as feature_id, NULL as feature_name, NULL as group_id, n.note as note
+FROM notes_table as n
+) ORDER BY timestamp DESC
+"""
     )
     fun getAllDisplayNotes(): Flow<List<DisplayNote>>
 
@@ -295,11 +331,11 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM functions_table")
     fun getAllFunctionsSync(): List<FunctionEntity>
 
-    @Query("SELECT * FROM trackers_table")
-    fun getAllTrackersSync(): List<Tracker>
+    @Query(getTrackersQuery)
+    fun getAllTrackersSync(): List<TrackerWithFeature>
 
-    @Query("SELECT * FROM trackers_table WHERE id = :trackerId LIMIT 1")
-    fun getTrackerById(trackerId: Long): Tracker?
+    @Query("$getTrackersQuery WHERE trackers_table.id = :trackerId LIMIT 1")
+    fun getTrackerById(trackerId: Long): TrackerWithFeature?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTracker(tracker: Tracker): Long
@@ -307,8 +343,8 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateTracker(tracker: Tracker)
 
-    @Query("SELECT * FROM trackers_table WHERE feature_id = :featureId LIMIT 1")
-    fun getTrackerByFeatureId(featureId: Long): Tracker?
+    @Query("$getTrackersQuery WHERE feature_id = :featureId LIMIT 1")
+    fun getTrackerByFeatureId(featureId: Long): TrackerWithFeature?
 
     @Query("SELECT COUNT(*) FROM trackers_table")
     fun numTrackers(): Flow<Int>
