@@ -55,16 +55,16 @@ data class Tracker(
     }
 
     internal fun toEntity() = com.samco.trackandgraph.base.database.entity.Tracker(
-        featureId,
-        featureId,
-        dataType,
-        discreteValues,
-        hasDefaultValue,
-        defaultValue
+        id = id,
+        featureId = featureId,
+        dataType = dataType,
+        discreteValues = discreteValues,
+        hasDefaultValue = hasDefaultValue,
+        defaultValue = defaultValue
     )
 
     internal fun toFeatureEntity() = Feature(
-        id = 0L,//Auto incremented
+        id = featureId,
         name = name,
         groupId = groupId,
         displayIndex = displayIndex,
