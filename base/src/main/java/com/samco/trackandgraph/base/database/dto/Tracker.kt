@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
 
 data class Tracker(
@@ -31,7 +30,7 @@ data class Tracker(
     val discreteValues: List<DiscreteValue>,
     val hasDefaultValue: Boolean,
     val defaultValue: Double,
-) : com.samco.trackandgraph.base.database.dto.Feature {
+) : Feature {
     fun getDefaultLabel(): String =
         if (dataType == DataType.DISCRETE)
             discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
@@ -42,7 +41,7 @@ data class Tracker(
             id = twf.id,
             name = twf.name,
             groupId = twf.groupId,
-            featureId = twf.id,
+            featureId = twf.featureId,
             displayIndex = twf.displayIndex,
             description = twf.description,
             dataType = twf.dataType,
@@ -61,7 +60,7 @@ data class Tracker(
         defaultValue = defaultValue
     )
 
-    internal fun toFeatureEntity() = Feature(
+    internal fun toFeatureEntity() = com.samco.trackandgraph.base.database.entity.Feature(
         id = featureId,
         name = name,
         groupId = groupId,
