@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.addtracker.DURATION_SECONDS_KEY
+import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.util.hideKeyboard
@@ -65,7 +66,7 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
     private fun showDialog(featureId: Long, duration: Long) {
         val dialog = TrackWidgetDataPointInputDialog()
         val args = Bundle()
-        args.putLongArray(TRACKER_ID_KEY, longArrayOf(featureId))
+        args.putLongArray(TRACKER_LIST_KEY, longArrayOf(featureId))
         args.putLong(DURATION_SECONDS_KEY, duration)
         dialog.arguments = args
         supportFragmentManager.let { dialog.show(it, "input_data_points_dialog") }

@@ -500,6 +500,7 @@ internal class DataInteractorImpl @Inject constructor(
         return trackerHelper.playTimerForTracker(trackerId)?.also {
             serviceManager.startTimerNotificationService()
             serviceManager.requestWidgetUpdatesForFeatureId(it)
+            dataUpdateEvents.emit(Unit)
         }
     }
 
@@ -507,6 +508,7 @@ internal class DataInteractorImpl @Inject constructor(
         trackerHelper.getTrackerById(trackerId)?.let { tracker ->
             trackerHelper.stopTimerForTracker(trackerId).also {
                 serviceManager.requestWidgetUpdatesForFeatureId(tracker.featureId)
+                dataUpdateEvents.emit(Unit)
             }
         }
 
