@@ -71,13 +71,11 @@ internal class CSVReadWriterImpl @Inject constructor(
         outStream: OutputStream,
         features: Map<Feature, DataSample>
     ) {
-        var throwable: Throwable? = null
         withContext(io) {
             outStream.writer().use { writer ->
-                throwable = writeFeaturesToCSVImpl(features, writer).exceptionOrNull()
+                writeFeaturesToCSVImpl(features, writer).getOrThrow()
             }
         }
-        throwable?.let { throw it }
     }
 
     private suspend fun writeFeaturesToCSVImpl(
@@ -127,11 +125,9 @@ internal class CSVReadWriterImpl @Inject constructor(
     }
 
     override suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long) {
-        var throwable: Throwable? = null
         inputStream.reader().use {
-            throwable = readFeaturesFromCSVImpl(trackGroupId, it).exceptionOrNull()
+            readFeaturesFromCSVImpl(trackGroupId, it).getOrThrow()
         }
-        throwable?.let { throw it }
     }
 
     private suspend fun readFeaturesFromCSVImpl(
