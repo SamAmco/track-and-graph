@@ -17,12 +17,8 @@
 
 package com.samco.trackandgraph.util
 
-import android.app.Activity
 import android.content.Context
-import android.os.Build
-import android.os.IBinder
-import android.os.VibrationEffect
-import android.os.Vibrator
+import android.os.*
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewTreeObserver
@@ -119,9 +115,18 @@ fun Window.hideKeyboard(windowToken: IBinder? = null, flags: Int = 0) {
     imm.hideSoftInputFromWindow(windowToken ?: decorView.windowToken, flags)
 }
 
+@Suppress("DEPRECATION")
 fun Context.performTrackVibrate() {
-    val vibrator = getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-    } else vibrator.vibrate(100)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibratorManager =
+            getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        val vibrator = vibratorManager.defaultVibrator
+        vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        val vibrator = getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
+        vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
+    } else {
+        val vibrator = getSystemService(AppCompatActivity.VIBRATOR_SERVICE) as Vibrator
+        vibrator.vibrate(100)
+    }
 }
