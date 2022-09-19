@@ -123,7 +123,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
                 R.id.add_group -> onAddGroupClicked()
                 R.id.export_button -> onExportClicked()
                 R.id.import_button -> onImportClicked()
-                R.id.add_function -> onAddFunctionClicked()
+                //R.id.add_function -> onAddFunctionClicked()
                 else -> return false
             }
             return true
