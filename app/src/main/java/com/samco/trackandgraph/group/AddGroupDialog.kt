@@ -62,13 +62,17 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
 
         val dialog = initDialog(groupId != null)
         viewModel.initViewModel(groupId, parentGroupId)
-        observeViewModel()
         editText.focusAndShowKeyboard()
         return dialog
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        observeViewModel()
+    }
+
     private fun observeViewModel() {
-        viewModel.state.observe(this) { state ->
+        viewModel.state.observe(viewLifecycleOwner) { state ->
             when (state) {
                 AddGroupDialogViewModel.AddGroupDialogViewModelState.READY -> onViewModelReady()
                 AddGroupDialogViewModel.AddGroupDialogViewModelState.DONE -> dismiss()
@@ -79,7 +83,7 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
     }
 
     private fun onViewModelReady() {
-        viewModel.groupName.observe(this) { name ->
+        viewModel.groupName.observe(viewLifecycleOwner) { name ->
             alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = name.isNotEmpty()
             if (editText.text.toString() != name) {
                 editText.setText(name)
@@ -87,7 +91,7 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
             }
         }
 
-        viewModel.colorIndex.observe(this) { index ->
+        viewModel.colorIndex.observe(viewLifecycleOwner) { index ->
             if (colorSpinner.selectedItemPosition != index) colorSpinner.setSelection(index)
         }
     }
