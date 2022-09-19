@@ -33,20 +33,8 @@ data class DiscreteValue(
         fun fromString(value: String): DiscreteValue {
             if (!value.contains(':')) throw Exception("value did not contain a colon")
             val label = value.substring(value.indexOf(':') + 1).trim()
-            val index = value.substring(0, value.indexOf(':')).trim().toInt()
+            val index = value.substring(0, value.indexOf(':')).trim().toDouble().toInt()
             return DiscreteValue(index, label)
         }
-
-        fun fromDataPoint(dataPoint: DataPoint) =
-            DiscreteValue(
-                dataPoint.value.toInt(),
-                dataPoint.label
-            )
-
-        fun fromIDataPoint(dataPoint: IDataPoint) =
-            DiscreteValue(
-                dataPoint.value.toInt(),
-                dataPoint.label
-            )
     }
 }

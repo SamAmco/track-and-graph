@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.base.model
 
 import android.util.Log
-import androidx.room.withTransaction
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DataType
@@ -51,7 +50,6 @@ import com.samco.trackandgraph.base.database.entity.DataPoint as DataPointEntity
 // have any label or no label. The concept of a discrete value will be removed and this class will need
 // to be updated accordingly.
 internal class CSVReadWriterImpl @Inject constructor(
-    private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
     private val trackerHelper: TrackerHelper,
     @IODispatcher private val io: CoroutineDispatcher
@@ -76,9 +74,7 @@ internal class CSVReadWriterImpl @Inject constructor(
         var throwable: Throwable? = null
         withContext(io) {
             outStream.writer().use { writer ->
-                database.withTransaction {
-                    throwable = writeFeaturesToCSVImpl(features, writer).exceptionOrNull()
-                }
+                throwable = writeFeaturesToCSVImpl(features, writer).exceptionOrNull()
             }
         }
         throwable?.let { throw it }
@@ -132,12 +128,8 @@ internal class CSVReadWriterImpl @Inject constructor(
 
     override suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long) {
         var throwable: Throwable? = null
-        withContext(io) {
-            database.withTransaction {
-                inputStream.reader().use {
-                    throwable = readFeaturesFromCSVImpl(trackGroupId, it).exceptionOrNull()
-                }
-            }
+        inputStream.reader().use {
+            throwable = readFeaturesFromCSVImpl(trackGroupId, it).exceptionOrNull()
         }
         throwable?.let { throw it }
     }
@@ -420,7 +412,7 @@ internal class CSVReadWriterImpl @Inject constructor(
             1.0
         )
         val trackerId = trackerHelper.insertTracker(newTracker)
-        return newTracker.copy(featureId = trackerId)
+        return trackerHelper.getTrackerById(trackerId)!!
     }
 
     private fun tryGetDiscreteValueFromString(string: String, lineNumber: Int): DiscreteValue {
