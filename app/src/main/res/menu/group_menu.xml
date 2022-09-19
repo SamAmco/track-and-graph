@@ -47,10 +47,12 @@
         android:icon="@drawable/add_icon"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
+<!--
     <item
         android:id="@+id/add_function"
         android:title="@string/function"
         android:icon="@drawable/add_icon"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="never" />
+-->
 </menu>
