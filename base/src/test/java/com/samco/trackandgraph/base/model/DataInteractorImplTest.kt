@@ -21,6 +21,7 @@ import com.nhaarman.mockitokotlin2.*
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.service.ServiceManager
 import kotlinx.coroutines.*
@@ -108,9 +109,13 @@ class DataInteractorImplTest {
 
         whenever(trackerHelper.insertTracker(any())).thenReturn(0L)
         whenever(dao.getTrackerById(any())).thenReturn(
-            com.samco.trackandgraph.base.database.entity.Tracker(
+            TrackerWithFeature(
                 id = 0L,
+                name = "name",
+                groupId = 0L,
                 featureId = 0L,
+                displayIndex = 0,
+                description = "",
                 dataType = DataType.CONTINUOUS,
                 discreteValues = emptyList(),
                 hasDefaultValue = false,
