@@ -492,8 +492,11 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long) =
         withContext(io) {
-            csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
-            dataUpdateEvents.emit(Unit)
+            try {
+                csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
+            } finally {
+                dataUpdateEvents.emit(Unit)
+            }
         }
 
     override suspend fun playTimerForTracker(trackerId: Long): Long? {
