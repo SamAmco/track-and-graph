@@ -94,11 +94,11 @@ class MoveToDialogFragment : DialogFragment() {
     }
 
     private fun listenToViewModel() {
-        viewModel.availableGroups.observe(this) {
+        viewModel.availableGroups.observe(viewLifecycleOwner) {
             inflateGroupItems(it)
         }
 
-        viewModel.state.observe(this) {
+        viewModel.state.observe(viewLifecycleOwner) {
             if (it == MoveToDialogState.MOVED) dismiss()
         }
     }
