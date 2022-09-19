@@ -59,6 +59,8 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        //Using experimental kotlin co-routines api's
+        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
 }
 
