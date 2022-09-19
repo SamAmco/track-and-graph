@@ -22,15 +22,17 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.base.service.TrackWidgetProvider
 import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
-import com.samco.trackandgraph.displaytrackgroup.FEATURE_LIST_KEY
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
@@ -56,31 +58,29 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
                 return
             }
 
-            viewModel.setFeatureId(featureId)
+            viewModel.initFromFeatureId(featureId)
             observeFeature()
         } ?: finish()
     }
 
-    private fun observeFeature() = viewModel.feature.observe(this) { feature ->
-        if (feature == null) finish()
-        else when (feature.hasDefaultValue) {
+    private fun observeFeature() = viewModel.tracker.observe(this) { tracker ->
+        if (tracker == null) finish()
+        else when (tracker.hasDefaultValue) {
             true -> {
                 viewModel.addDefaultDataPoint()
                 performTrackVibrate()
                 finish()
             }
-            else -> showDialog(feature.id)
+            else -> showDialog(tracker.id)
         }
     }
 
-    private fun showDialog(featureId: Long) {
-        val dialog = TrackWidgetInputDataPointDialog()
+    private fun showDialog(trackerId: Long) {
+        val dialog = TrackWidgetDataPointInputDialog()
         val args = Bundle()
-        args.putLongArray(FEATURE_LIST_KEY, longArrayOf(featureId))
+        args.putLongArray(TRACKER_LIST_KEY, longArrayOf(trackerId))
         dialog.arguments = args
-        supportFragmentManager.let {
-            dialog.show(it, "input_data_points_dialog")
-        }
+        dialog.show(supportFragmentManager, "input_data_points_dialog")
     }
 
     override fun onDestroy() {
@@ -92,26 +92,32 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
 @HiltViewModel
 class TrackWidgetInputDataPointViewModel @Inject constructor(
     private var dataInteractor: DataInteractor,
-    @IODispatcher private val io: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
-    lateinit var feature: LiveData<Feature?> private set
+
+    private val _tracker = MutableLiveData<Tracker?>()
+    val tracker: LiveData<Tracker?> get() = _tracker
 
     private var initialized = false
 
-    fun setFeatureId(featureId: Long) {
+    fun initFromFeatureId(featureId: Long) {
         if (initialized) return
         initialized = true
-        feature = dataInteractor.tryGetFeatureById(featureId)
+        viewModelScope.launch(io) {
+            val tracker = dataInteractor.getTrackerByFeatureId(featureId)
+            withContext(ui) { _tracker.value = tracker }
+        }
     }
 
-    fun addDefaultDataPoint() = feature.value?.let {
+    fun addDefaultDataPoint() = tracker.value?.let {
         viewModelScope.launch(io) {
             val newDataPoint = DataPoint(
-                OffsetDateTime.now(),
-                it.id,
-                it.defaultValue,
-                it.getDefaultLabel(),
-                ""
+                timestamp = OffsetDateTime.now(),
+                featureId = it.featureId,
+                value = it.defaultValue,
+                label = it.getDefaultLabel(),
+                note = ""
             )
             dataInteractor.insertDataPoint(newDataPoint)
         }

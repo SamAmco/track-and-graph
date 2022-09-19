@@ -18,13 +18,13 @@
 package com.samco.trackandgraph.base.model
 
 import android.util.Log
-import androidx.room.withTransaction
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.entity.*
+import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -41,12 +41,17 @@ import java.io.InputStreamReader
 import java.io.OutputStream
 import java.io.OutputStreamWriter
 import javax.inject.Inject
+import com.samco.trackandgraph.base.database.entity.DataPoint as DataPointEntity
 
-import com.samco.trackandgraph.base.database.dto.Feature as FeatureDto
-
+//TODO right now the import feature of this implementation assumes that trackers may only have one
+// data type and that that data type is either continuous, discrete or duration.
+// In future I would like to blur the lines between continuous and discrete such that a tracker
+// will require a numeric value (to be interpreted as either a number or a duration) but may optionally
+// have any label or no label. The concept of a discrete value will be removed and this class will need
+// to be updated accordingly.
 internal class CSVReadWriterImpl @Inject constructor(
-    private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
+    private val trackerHelper: TrackerHelper,
     @IODispatcher private val io: CoroutineDispatcher
 ) : CSVReadWriter {
     private enum class RequiredHeaders {
@@ -64,21 +69,17 @@ internal class CSVReadWriterImpl @Inject constructor(
 
     override suspend fun writeFeaturesToCSV(
         outStream: OutputStream,
-        features: Map<FeatureDto, DataSample>
+        features: Map<Feature, DataSample>
     ) {
-        var throwable: Throwable? = null
         withContext(io) {
             outStream.writer().use { writer ->
-                database.withTransaction {
-                    throwable = writeFeaturesToCSVImpl(features, writer).exceptionOrNull()
-                }
+                writeFeaturesToCSVImpl(features, writer).getOrThrow()
             }
         }
-        throwable?.let { throw it }
     }
 
     private suspend fun writeFeaturesToCSVImpl(
-        features: Map<FeatureDto, DataSample>,
+        features: Map<Feature, DataSample>,
         writer: OutputStreamWriter
     ) = runCatching {
         val csvWriter = CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(Headers::class.java))
@@ -87,88 +88,46 @@ internal class CSVReadWriterImpl @Inject constructor(
             val dataPoints = kvp.value.toList()
             val notes = kvp.value.getRawDataPoints().associate { it.timestamp to it.note }
 
-            when (feature.featureType) {
-                DataType.DISCRETE -> writeDiscreteDataPointsToCSV(
-                    csvWriter,
-                    dataPoints,
-                    notes,
-                    feature.name
-                )
-                DataType.CONTINUOUS -> writeContinuousDataPointsToCSV(
-                    csvWriter,
-                    dataPoints,
-                    notes,
-                    feature.name
-                )
-                DataType.DURATION -> writeDurationDataPointsToCSV(
-                    csvWriter,
-                    dataPoints,
-                    notes,
-                    feature.name
-                )
-            }
+            writeDataPointsToCSV(
+                csvWriter,
+                dataPoints,
+                notes,
+                feature.name,
+                kvp.value.dataSampleProperties.isDuration
+            )
         }
         writer.flush()
     }
 
-    private suspend fun writeDurationDataPointsToCSV(
+    private suspend fun writeDataPointsToCSV(
         csvPrinter: CSVPrinter,
         dataPoints: List<IDataPoint>,
         notes: Map<OffsetDateTime, String>,
-        featureName: String
+        featureName: String,
+        isDuration: Boolean
     ) = dataPoints.forEach { dp ->
-        csvPrinter.printRecord(
-            featureName,
-            dp.timestamp.toString(),
+        val dataPointString = if (isDuration) {
             dp.value.toLong().let { seconds ->
                 val absSecs = kotlin.math.abs(seconds)
                 String.format("%d:%02d:%02d", seconds / 3600, (absSecs % 3600) / 60, (absSecs % 60))
-            },
-            notes[dp.timestamp] ?: ""
-        )
-        yield()
-    }
-
-    private suspend fun writeContinuousDataPointsToCSV(
-        csvPrinter: CSVPrinter,
-        dataPoints: List<IDataPoint>,
-        notes: Map<OffsetDateTime, String>,
-        featureName: String
-    ) = dataPoints.forEach { dp ->
+            }
+        } else {
+            if (dp.label.isNotBlank()) "${dp.value}:${dp.label}"
+            else dp.value.toString()
+        }
         csvPrinter.printRecord(
             featureName,
             dp.timestamp.toString(),
-            dp.value.toString(),
-            notes[dp.timestamp] ?: ""
-        )
-        yield()
-    }
-
-    private suspend fun writeDiscreteDataPointsToCSV(
-        csvPrinter: CSVPrinter,
-        dataPoints: List<IDataPoint>,
-        notes: Map<OffsetDateTime, String>,
-        featureName: String
-    ) = dataPoints.forEach { dp ->
-        csvPrinter.printRecord(
-            featureName,
-            dp.timestamp.toString(),
-            "${dp.value.toInt()}:${dp.label}",
+            dataPointString,
             notes[dp.timestamp] ?: ""
         )
         yield()
     }
 
     override suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long) {
-        var throwable: Throwable? = null
-        withContext(io) {
-            database.withTransaction {
-                inputStream.reader().use {
-                    throwable = readFeaturesFromCSVImpl(trackGroupId, it).exceptionOrNull()
-                }
-            }
+        inputStream.reader().use {
+            readFeaturesFromCSVImpl(trackGroupId, it).getOrThrow()
         }
-        throwable?.let { throw it }
     }
 
     private suspend fun readFeaturesFromCSVImpl(
@@ -193,25 +152,25 @@ internal class CSVReadWriterImpl @Inject constructor(
         records: Iterable<CSVRecord>,
         trackGroupId: Long
     ) {
-        val existingFeatures = dao.getFeaturesForGroupSync(trackGroupId).toMutableList()
-        val existingFeaturesByName = existingFeatures.associateBy { it.name }.toMutableMap()
-        val newDataPoints = mutableListOf<DataPoint>()
+        val existingTrackers = trackerHelper.getTrackersForGroupSync(trackGroupId).toMutableList()
+        val existingTrackersByName = existingTrackers.associateBy { it.name }.toMutableMap()
+        val newDataPoints = mutableListOf<DataPointEntity>()
 
         records.forEachIndexed { recordNumber, record ->
-            val lineNumber = recordNumber + 2 //one for index by zero and one for headers
+            val lineNumber = recordNumber + 2 //add one for index by zero and one for headers
             val rec = getValidRecordData(record, lineNumber)
-            if (existingFeaturesByName.containsKey(rec.featureName)) {
+            if (existingTrackersByName.containsKey(rec.trackerName)) {
                 addDataPointToExistingFeature(
-                    existingFeatures,
-                    existingFeaturesByName,
+                    existingTrackers,
+                    existingTrackersByName,
                     newDataPoints,
                     rec,
                     lineNumber
                 )
             } else {
                 addDataPointToNewFeature(
-                    existingFeatures,
-                    existingFeaturesByName,
+                    existingTrackers,
+                    existingTrackersByName,
                     newDataPoints,
                     trackGroupId,
                     rec,
@@ -227,22 +186,22 @@ internal class CSVReadWriterImpl @Inject constructor(
         if (newDataPoints.isNotEmpty()) dao.insertDataPoints(newDataPoints)
     }
 
-    private fun addDataPointToNewFeature(
-        existingFeatures: MutableList<Feature>,
-        existingFeaturesByName: MutableMap<String, Feature>,
-        points: MutableList<DataPoint>,
+    private suspend fun addDataPointToNewFeature(
+        existingTrackers: MutableList<Tracker>,
+        existingTrackersByName: MutableMap<String, Tracker>,
+        points: MutableList<DataPointEntity>,
         trackGroupId: Long,
         rec: RecordData,
         lineNumber: Int
     ) {
-        val newFeature = createNewFeature(rec, trackGroupId, lineNumber)
-        insertFeature(existingFeatures, existingFeaturesByName, newFeature)
-        when (newFeature.featureType) {
+        val newTracker = createNewTracker(rec, trackGroupId, lineNumber)
+        insertTracker(existingTrackers, existingTrackersByName, newTracker)
+        when (newTracker.dataType) {
             DataType.DISCRETE -> addDiscreteDataPoint(
                 points,
                 rec.value,
                 rec.timestamp,
-                newFeature,
+                newTracker,
                 rec.note,
                 lineNumber
             )
@@ -250,120 +209,126 @@ internal class CSVReadWriterImpl @Inject constructor(
                 points,
                 rec.value.toDoubleOrNull(),
                 rec.timestamp,
-                newFeature.id,
+                newTracker.featureId,
                 rec.note
             )
             DataType.DURATION -> addDurationDataPoint(
                 points,
                 rec.value,
                 rec.timestamp,
-                newFeature.id,
+                newTracker.featureId,
                 rec.note
             )
         }
     }
 
-    private fun addDataPointToExistingFeature(
-        existingFeatures: MutableList<Feature>,
-        existingFeaturesByName: MutableMap<String, Feature>,
-        points: MutableList<DataPoint>,
+    private suspend fun addDataPointToExistingFeature(
+        existingTrackers: MutableList<Tracker>,
+        existingTrackersByName: MutableMap<String, Tracker>,
+        points: MutableList<DataPointEntity>,
         rec: RecordData,
         lineNumber: Int
     ) {
-        val feature = existingFeaturesByName[rec.featureName]!!
-        when (getFeatureTypeForValue(rec.value)) {
+        val tracker = existingTrackersByName[rec.trackerName]!!
+        when (getDataType(rec.value)) {
             DataType.DISCRETE -> {
-                validateFeatureType(feature, DataType.DISCRETE, lineNumber)
+                validateDataType(tracker, DataType.DISCRETE, lineNumber)
                 val discreteValue =
                     addDiscreteDataPoint(
                         points,
                         rec.value,
                         rec.timestamp,
-                        feature,
+                        tracker,
                         rec.note,
                         lineNumber
                     )
-                if (!feature.discreteValues.contains(discreteValue)) {
+                if (!tracker.discreteValues.contains(discreteValue)) {
                     addDiscreteValueToFeature(
-                        existingFeatures,
-                        existingFeaturesByName,
-                        feature,
+                        existingTrackers,
+                        existingTrackersByName,
+                        tracker,
                         discreteValue,
                         lineNumber
                     )
                 }
             }
             DataType.CONTINUOUS -> {
-                validateFeatureType(feature, DataType.CONTINUOUS, lineNumber)
+                validateDataType(tracker, DataType.CONTINUOUS, lineNumber)
                 addContinuousDataPoint(
                     points,
                     rec.value.toDoubleOrNull(),
                     rec.timestamp,
-                    feature.id,
+                    tracker.featureId,
                     rec.note
                 )
             }
             DataType.DURATION -> {
-                validateFeatureType(feature, DataType.DURATION, lineNumber)
+                validateDataType(tracker, DataType.DURATION, lineNumber)
                 addDurationDataPoint(
                     points,
                     rec.value,
                     rec.timestamp,
-                    feature.id,
+                    tracker.featureId,
                     rec.note
                 )
             }
         }
     }
 
-    private fun insertFeature(
-        existingFeatures: MutableList<Feature>,
-        existingFeaturesByName: MutableMap<String, Feature>,
-        feature: Feature
+    private fun validateDataType(tracker: Tracker, expectedType: DataType, lineNumber: Int) {
+        if (tracker.dataType != expectedType)
+            throw ImportFeaturesException.InconsistentDataType(lineNumber)
+    }
+
+
+    private fun insertTracker(
+        existingTrackers: MutableList<Tracker>,
+        existingTrackersByName: MutableMap<String, Tracker>,
+        tracker: Tracker
     ) {
-        existingFeatures.add(feature)
-        existingFeaturesByName[feature.name] = feature
+        existingTrackers.add(tracker)
+        existingTrackersByName[tracker.name] = tracker
     }
 
     private fun validateNotDiscreteValueConflict(
         discreteValue: DiscreteValue,
-        feature: Feature,
+        tracker: Tracker,
         lineNumber: Int
     ) {
-        if (feature.discreteValues.any { dv -> dv.index == discreteValue.index }) {
+        if (tracker.discreteValues.any { dv -> dv.index == discreteValue.index }) {
             throw ImportFeaturesException.DiscreteValueConflict(lineNumber)
         }
     }
 
-    private fun addDiscreteValueToFeature(
-        existingFeatures: MutableList<Feature>,
-        existingFeaturesByName: MutableMap<String, Feature>,
-        feature: Feature,
+    private suspend fun addDiscreteValueToFeature(
+        existingTrackers: MutableList<Tracker>,
+        existingTrackersByName: MutableMap<String, Tracker>,
+        tracker: Tracker,
         discreteValue: DiscreteValue,
         lineNumber: Int
     ) {
-        validateNotDiscreteValueConflict(discreteValue, feature, lineNumber)
-        existingFeatures.remove(feature)
-        existingFeaturesByName.remove(feature.name)
-        val newFeature =
-            tryAddDiscreteValueToFeature(feature, discreteValue, lineNumber)
-        existingFeatures.add(newFeature)
-        existingFeaturesByName[newFeature.name] = newFeature
+        validateNotDiscreteValueConflict(discreteValue, tracker, lineNumber)
+        existingTrackers.remove(tracker)
+        existingTrackersByName.remove(tracker.name)
+        val newTracker =
+            tryAddDiscreteValueToTracker(tracker, discreteValue, lineNumber)
+        existingTrackers.add(newTracker)
+        existingTrackersByName[newTracker.name] = newTracker
     }
 
     private fun addDiscreteDataPoint(
-        points: MutableList<DataPoint>,
+        points: MutableList<DataPointEntity>,
         value: String,
         timestamp: OffsetDateTime,
-        feature: Feature,
+        tracker: Tracker,
         note: String,
         lineNumber: Int
     ): DiscreteValue {
         val discreteValue = tryGetDiscreteValueFromString(value, lineNumber)
         points.add(
-            DataPoint(
+            DataPointEntity(
                 timestamp,
-                feature.id,
+                tracker.featureId,
                 discreteValue.index.toDouble(),
                 discreteValue.label,
                 note
@@ -373,14 +338,14 @@ internal class CSVReadWriterImpl @Inject constructor(
     }
 
     private fun addContinuousDataPoint(
-        points: MutableList<DataPoint>,
+        points: MutableList<DataPointEntity>,
         value: Double?,
         timestamp: OffsetDateTime,
         featureId: Long,
         note: String
     ) {
         points.add(
-            DataPoint(
+            DataPointEntity(
                 timestamp,
                 featureId,
                 value ?: 1.0,
@@ -391,7 +356,7 @@ internal class CSVReadWriterImpl @Inject constructor(
     }
 
     private fun addDurationDataPoint(
-        points: MutableList<DataPoint>,
+        points: MutableList<DataPointEntity>,
         value: String,
         timestamp: OffsetDateTime,
         featureId: Long,
@@ -408,7 +373,7 @@ internal class CSVReadWriterImpl @Inject constructor(
             .seconds
             .toDouble()
         points.add(
-            DataPoint(
+            DataPointEntity(
                 timestamp,
                 featureId,
                 totalSeconds,
@@ -418,26 +383,32 @@ internal class CSVReadWriterImpl @Inject constructor(
         )
     }
 
-    private fun createNewFeature(
+    private suspend fun createNewTracker(
         rec: RecordData,
         trackGroupId: Long,
         lineNumber: Int
-    ): Feature {
-        val featureType = getFeatureTypeForValue(rec.value)
-        val discreteValues =
-            if (featureType == DataType.DISCRETE) listOf(
-                tryGetDiscreteValueFromString(
-                    rec.value,
-                    lineNumber
-                )
+    ): Tracker {
+        val dataType = getDataType(rec.value)
+        val discreteValues = if (dataType == DataType.DISCRETE) listOf(
+            tryGetDiscreteValueFromString(
+                rec.value,
+                lineNumber
             )
-            else listOf()
-        val newFeature = Feature(
-            0, rec.featureName, trackGroupId, featureType,
-            discreteValues, 0, false, 1.0, ""
+        ) else listOf()
+        val newTracker = Tracker(
+            id = 0,
+            name = rec.trackerName,
+            groupId = trackGroupId,
+            featureId = 0L,
+            displayIndex = 0,
+            description = "",
+            dataType = dataType,
+            discreteValues = discreteValues,
+            hasDefaultValue = false,
+            1.0
         )
-        val featureId = dao.insertFeature(newFeature)
-        return newFeature.copy(id = featureId)
+        val trackerId = trackerHelper.insertTracker(newTracker)
+        return trackerHelper.getTrackerById(trackerId)!!
     }
 
     private fun tryGetDiscreteValueFromString(string: String, lineNumber: Int): DiscreteValue {
@@ -448,27 +419,22 @@ internal class CSVReadWriterImpl @Inject constructor(
         }
     }
 
-    private fun tryAddDiscreteValueToFeature(
-        feature: Feature,
+    private suspend fun tryAddDiscreteValueToTracker(
+        tracker: Tracker,
         discreteValue: DiscreteValue,
         lineNumber: Int
-    ): Feature {
-        val newDiscreteValues = feature.discreteValues.toMutableList()
+    ): Tracker {
+        val newDiscreteValues = tracker.discreteValues.toMutableList()
         if (newDiscreteValues.map { dv -> dv.index }.contains(discreteValue.index))
             throw ImportFeaturesException.DiscreteValueIndexExists(lineNumber, discreteValue.index)
         if (newDiscreteValues.map { dv -> dv.label }.contains(discreteValue.label))
             throw ImportFeaturesException.DiscreteValueLabelExists(lineNumber, discreteValue.label)
         newDiscreteValues.add(discreteValue)
-        dao.updateFeature(feature.copy(discreteValues = newDiscreteValues))
-        return feature.copy(discreteValues = newDiscreteValues)
+        trackerHelper.updateTracker(tracker.copy(discreteValues = newDiscreteValues))
+        return tracker.copy(discreteValues = newDiscreteValues)
     }
 
-    private fun validateFeatureType(feature: Feature, expectedType: DataType, lineNumber: Int) {
-        if (feature.featureType != expectedType)
-            throw ImportFeaturesException.InconsistentDataType(lineNumber)
-    }
-
-    private fun getFeatureTypeForValue(value: String): DataType {
+    private fun getDataType(value: String): DataType {
         val durationRegex = Regex("\\d*:\\d{2}:\\d{2}")
         return when {
             value.matches(durationRegex) -> DataType.DURATION
@@ -478,7 +444,7 @@ internal class CSVReadWriterImpl @Inject constructor(
     }
 
     private data class RecordData(
-        val featureName: String,
+        val trackerName: String,
         val value: String,
         val timestamp: OffsetDateTime,
         val note: String

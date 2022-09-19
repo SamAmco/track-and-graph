@@ -47,7 +47,7 @@ abstract class GraphStatConfigView constructor(
 ) {
     protected lateinit var featureDataProvider: FeatureDataProvider
 
-    protected val allFeatureData: List<FeatureDataProvider.FeatureData> get() = featureDataProvider.featureData
+    protected val allFeatureData: Set<FeatureDataProvider.DataSourceData> get() = featureDataProvider.dataSourceData.keys
 
     private var configChangedListener: ((Any?, ValidationException?) -> Unit)? = null
     protected var onScrollListener: ((Int) -> Unit)? = null
@@ -55,8 +55,8 @@ abstract class GraphStatConfigView constructor(
 
     abstract fun initFromConfigData(configData: Any?)
 
-    internal fun initFromConfigData(configData: Any?, featurePathProvider: FeatureDataProvider) {
-        this.featureDataProvider = featurePathProvider
+    internal fun initFromConfigData(configData: Any?, featureDataProvider: FeatureDataProvider) {
+        this.featureDataProvider = featureDataProvider
         initFromConfigData(configData)
     }
 
@@ -89,13 +89,13 @@ abstract class GraphStatConfigView constructor(
             featureFilter: (Feature) -> Boolean,
             onItemSelected: (Feature) -> Unit
         ) {
-            val allFeatures = view.featureDataProvider.featuresSortedAlphabetically().filter(featureFilter)
+            val allFeatures = view.featureDataProvider.sortedAlphabetically().filter(featureFilter)
             val context = view.context
-            val itemNames = allFeatures.map { ft -> view.featureDataProvider.getPathForFeature(ft.id) }
+            val itemNames = allFeatures.map { ft -> view.featureDataProvider.getPathForFeature(ft.featureId) }
             val adapter =
                 ArrayAdapter(context, android.R.layout.simple_spinner_dropdown_item, itemNames)
             spinner.adapter = adapter
-            val selected = allFeatures.indexOfFirst { it.id == selectedId }
+            val selected = allFeatures.indexOfFirst { it.featureId == selectedId }
             if (selected >= 0) spinner.setSelection(selected)
             spinner.onItemSelectedListener =
                 object : AdapterView.OnItemSelectedListener {
@@ -189,7 +189,7 @@ abstract class GraphStatConfigView constructor(
             onItemSelected(suggestedDate)
             view.emitConfigChange()
             val picker = DatePickerDialog(
-                view.context, DatePickerDialog.OnDateSetListener { _, year, month, day ->
+                view.context, { _, year, month, day ->
                     val selectedDate =
                         ZonedDateTime.of(suggestedDate.toLocalDateTime(), ZoneId.systemDefault())
                             .withYear(year)

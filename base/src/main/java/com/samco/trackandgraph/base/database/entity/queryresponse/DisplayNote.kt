@@ -18,16 +18,14 @@
 package com.samco.trackandgraph.base.database.entity.queryresponse
 
 import androidx.room.ColumnInfo
-import com.samco.trackandgraph.base.database.dto.DisplayNote
-import com.samco.trackandgraph.base.database.dto.NoteType
 import org.threeten.bp.OffsetDateTime
 
 internal data class DisplayNote(
     @ColumnInfo(name = "timestamp")
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
-    @ColumnInfo(name = "note_type")
-    val noteType: NoteType,
+    @ColumnInfo(name = "tracker_id")
+    val trackerId: Long?,
 
     @ColumnInfo(name = "feature_id")
     val featureId: Long?,
@@ -41,12 +39,12 @@ internal data class DisplayNote(
     @ColumnInfo(name = "note")
     val note: String
 ) {
-    fun toDto() = DisplayNote(
-        timestamp,
-        noteType,
-        featureId,
-        featureName,
-        groupId,
-        note
+    fun toDto() = com.samco.trackandgraph.base.database.dto.DisplayNote(
+        timestamp = timestamp,
+        trackerId = trackerId,
+        featureId = featureId,
+        featureName = featureName,
+        groupId = groupId,
+        note = note
     )
 }

@@ -25,50 +25,49 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
-import com.samco.trackandgraph.databinding.ListItemFeatureBinding
-import kotlinx.coroutines.*
+import com.samco.trackandgraph.databinding.ListItemTrackerBinding
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 
-class FeatureViewHolder private constructor(
-    private val binding: ListItemFeatureBinding,
+class TrackerViewHolder private constructor(
+    private val binding: ListItemTrackerBinding,
 ) : GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
-    private var clickListener: FeatureClickListener? = null
-    private var feature: DisplayFeature? = null
+    private var clickListener: TrackerClickListener? = null
+    private var tracker: DisplayTracker? = null
     private var dropElevation = 0f
 
-    fun bind(feature: DisplayFeature, clickListener: FeatureClickListener) {
-        this.feature = feature
+    fun bind(tracker: DisplayTracker, clickListener: TrackerClickListener) {
+        this.tracker = tracker
         this.clickListener = clickListener
         this.dropElevation = binding.cardView.cardElevation
         setLastDateText()
         setNumEntriesText()
-        binding.trackGroupNameText.text = feature.name
+        binding.trackGroupNameText.text = tracker.name
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
-        binding.cardView.setOnClickListener { clickListener.onHistory(feature) }
-        initAddButton(feature, clickListener)
-        initTimerControls(feature, clickListener)
+        binding.cardView.setOnClickListener { clickListener.onHistory(tracker) }
+        initAddButton(tracker, clickListener)
+        initTimerControls(tracker, clickListener)
     }
 
-    private fun initTimerControls(feature: DisplayFeature, clickListener: FeatureClickListener) {
+    private fun initTimerControls(tracker: DisplayTracker, clickListener: TrackerClickListener) {
         binding.playStopButtons.visibility =
-            if (feature.featureType == DataType.DURATION) View.VISIBLE
+            if (tracker.dataType == DataType.DURATION) View.VISIBLE
             else View.GONE
         binding.playTimerButton.setOnClickListener {
-            clickListener.onPlayTimer(feature)
+            clickListener.onPlayTimer(tracker)
         }
         binding.stopTimerButton.setOnClickListener {
-            clickListener.onStopTimer(feature)
+            clickListener.onStopTimer(tracker)
         }
         binding.playTimerButton.visibility =
-            if (feature.timerStartInstant == null) View.VISIBLE else View.GONE
+            if (tracker.timerStartInstant == null) View.VISIBLE else View.GONE
         binding.stopTimerButton.visibility =
-            if (feature.timerStartInstant == null) View.GONE else View.VISIBLE
+            if (tracker.timerStartInstant == null) View.GONE else View.VISIBLE
 
-        if (feature.timerStartInstant != null) {
+        if (tracker.timerStartInstant != null) {
             updateTimerText()
             binding.timerText.visibility = View.VISIBLE
         } else {
@@ -83,19 +82,19 @@ class FeatureViewHolder private constructor(
     }
 
     private fun updateTimerText() {
-        feature?.timerStartInstant?.let {
+        tracker?.timerStartInstant?.let {
             val duration = Duration.between(it, Instant.now())
             binding.timerText.text = formatTimeDuration(duration.seconds)
         }
     }
 
-    private fun initAddButton(feature: DisplayFeature, clickListener: FeatureClickListener) {
-        binding.addButton.setOnClickListener { clickListener.onAdd(feature) }
+    private fun initAddButton(tracker: DisplayTracker, clickListener: TrackerClickListener) {
+        binding.addButton.setOnClickListener { clickListener.onAdd(tracker) }
         binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
         binding.quickAddButton.setOnLongClickListener {
-            clickListener.onAdd(feature, false).let { true }
+            clickListener.onAdd(tracker, false).let { true }
         }
-        if (feature.hasDefaultValue) {
+        if (tracker.hasDefaultValue) {
             binding.addButton.visibility = View.INVISIBLE
             binding.quickAddButton.visibility = View.VISIBLE
         } else {
@@ -105,7 +104,7 @@ class FeatureViewHolder private constructor(
     }
 
     private fun setLastDateText() {
-        val timestamp = feature?.timestamp
+        val timestamp = tracker?.timestamp
         binding.lastDateText.text = if (timestamp == null) {
             binding.lastDateText.context.getString(R.string.no_data)
         } else {
@@ -114,7 +113,7 @@ class FeatureViewHolder private constructor(
     }
 
     private fun setNumEntriesText() {
-        val numDataPoints = feature?.numDataPoints
+        val numDataPoints = tracker?.numDataPoints
         binding.numEntriesText.text = if (numDataPoints != null) {
             binding.numEntriesText.context.getString(R.string.data_points, numDataPoints)
         } else {
@@ -127,7 +126,7 @@ class FeatureViewHolder private constructor(
         ripple.setHotspot(ripple.bounds.right.toFloat(), ripple.bounds.bottom.toFloat())
         ripple.state = intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
         ripple.state = intArrayOf()
-        feature?.let { clickListener?.onAdd(it) }
+        tracker?.let { clickListener?.onAdd(it) }
     }
 
     override fun elevateCard() {
@@ -142,13 +141,13 @@ class FeatureViewHolder private constructor(
 
     private fun createContextMenu(view: View) {
         val popup = PopupMenu(view.context, view)
-        popup.menuInflater.inflate(R.menu.edit_feature_context_menu, popup.menu)
+        popup.menuInflater.inflate(R.menu.edit_tracker_context_menu, popup.menu)
         popup.setOnMenuItemClickListener(this)
         popup.show()
     }
 
     override fun onMenuItemClick(item: MenuItem?): Boolean {
-        feature?.let {
+        tracker?.let {
             when (item?.itemId) {
                 R.id.edit -> clickListener?.onEdit(it)
                 R.id.delete -> clickListener?.onDelete(it)
@@ -162,32 +161,32 @@ class FeatureViewHolder private constructor(
     }
 
     companion object {
-        fun from(parent: ViewGroup): FeatureViewHolder {
+        fun from(parent: ViewGroup): TrackerViewHolder {
             val layoutInflater = LayoutInflater.from(parent.context)
-            val binding = ListItemFeatureBinding.inflate(layoutInflater, parent, false)
-            return FeatureViewHolder(binding)
+            val binding = ListItemTrackerBinding.inflate(layoutInflater, parent, false)
+            return TrackerViewHolder(binding)
         }
     }
 }
 
-class FeatureClickListener(
-    private val onEditListener: (feature: DisplayFeature) -> Unit,
-    private val onDeleteListener: (feature: DisplayFeature) -> Unit,
-    private val onMoveToListener: (feature: DisplayFeature) -> Unit,
-    private val onDescriptionListener: (feature: DisplayFeature) -> Unit,
-    private val onAddListener: (feature: DisplayFeature, useDefault: Boolean) -> Unit,
-    private val onHistoryListener: (feature: DisplayFeature) -> Unit,
-    private val onPlayTimerListener: (feature: DisplayFeature) -> Unit,
-    private val onStopTimerListener: (feature: DisplayFeature) -> Unit,
+class TrackerClickListener(
+    private val onEditListener: (tracker: DisplayTracker) -> Unit,
+    private val onDeleteListener: (tracker: DisplayTracker) -> Unit,
+    private val onMoveToListener: (tracker: DisplayTracker) -> Unit,
+    private val onDescriptionListener: (tracker: DisplayTracker) -> Unit,
+    private val onAddListener: (tracker: DisplayTracker, useDefault: Boolean) -> Unit,
+    private val onHistoryListener: (tracker: DisplayTracker) -> Unit,
+    private val onPlayTimerListener: (tracker: DisplayTracker) -> Unit,
+    private val onStopTimerListener: (tracker: DisplayTracker) -> Unit,
 ) {
-    fun onEdit(feature: DisplayFeature) = onEditListener(feature)
-    fun onDelete(feature: DisplayFeature) = onDeleteListener(feature)
-    fun onMoveTo(feature: DisplayFeature) = onMoveToListener(feature)
-    fun onDescription(feature: DisplayFeature) = onDescriptionListener(feature)
-    fun onAdd(feature: DisplayFeature, useDefault: Boolean = true) =
-        onAddListener(feature, useDefault)
+    fun onEdit(tracker: DisplayTracker) = onEditListener(tracker)
+    fun onDelete(tracker: DisplayTracker) = onDeleteListener(tracker)
+    fun onMoveTo(tracker: DisplayTracker) = onMoveToListener(tracker)
+    fun onDescription(tracker: DisplayTracker) = onDescriptionListener(tracker)
+    fun onAdd(tracker: DisplayTracker, useDefault: Boolean = true) =
+        onAddListener(tracker, useDefault)
 
-    fun onHistory(feature: DisplayFeature) = onHistoryListener(feature)
-    fun onPlayTimer(feature: DisplayFeature) = onPlayTimerListener(feature)
-    fun onStopTimer(feature: DisplayFeature) = onStopTimerListener(feature)
+    fun onHistory(tracker: DisplayTracker) = onHistoryListener(tracker)
+    fun onPlayTimer(tracker: DisplayTracker) = onPlayTimerListener(tracker)
+    fun onStopTimer(tracker: DisplayTracker) = onStopTimerListener(tracker)
 }

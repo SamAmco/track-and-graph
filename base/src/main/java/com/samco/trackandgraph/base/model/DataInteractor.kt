@@ -17,13 +17,12 @@
 
 package com.samco.trackandgraph.base.model
 
-import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.database.sampling.DataSampler
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
@@ -32,7 +31,7 @@ import java.io.OutputStream
 
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
-interface DataInteractor : FeatureUpdater {
+interface DataInteractor : TrackerHelper, DataSampler {
     @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
     fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
 
@@ -54,43 +53,23 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getAllGroupsSync(): List<Group>
 
-    fun getAllFeatures(): LiveData<List<Feature>>
-
-    suspend fun getAllFeaturesSync(): List<Feature>
-
     suspend fun updateReminders(reminders: List<Reminder>)
 
     suspend fun getGroupById(id: Long): Group
 
     suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>)
 
-    suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature>
-
     suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature>
 
-    suspend fun getFeatureById(featureId: Long): Feature
-
-    suspend fun tryGetFeatureByIdSync(featureId: Long): Feature?
-
-    suspend fun tryGetDisplayFeatureByIdSync(featureId: Long): DisplayFeature?
-
-    fun tryGetFeatureById(featureId: Long): LiveData<Feature?>
-
-    suspend fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature>
-
-    suspend fun insertFeature(feature: Feature): Long
-
-    suspend fun updateFeature(feature: Feature)
+    suspend fun getFeatureById(featureId: Long): Feature?
 
     suspend fun deleteDataPoint(dataPoint: DataPoint)
-
-    suspend fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double)
 
     suspend fun deleteGraphOrStat(id: Long)
 
     suspend fun deleteGraphOrStat(graphOrStat: GraphOrStat)
 
-    suspend fun deleteFeature(id: Long)
+    suspend fun deleteFeature(featureId: Long)
 
     suspend fun insertDataPoint(dataPoint: DataPoint): Long
 
@@ -98,24 +77,11 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun updateDataPoints(dataPoint: List<DataPoint>)
 
-    suspend fun getDataSampleForFeatureId(featureId: Long): DataSample
-
     /**
      * Emits a unit every time currently displayed data may have changed.
      * For example if you create/update/remove a data point.
      */
     fun getDataUpdateEvents(): SharedFlow<Unit>
-
-    //TODO get rid of this and only return DataSample for a feature
-    suspend fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor
-
-    //TODO get rid of this and only return DataSample for a feature
-    fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>>
-
-    suspend fun getDataPointByTimestampAndFeatureSync(
-        featureId: Long,
-        timestamp: OffsetDateTime
-    ): DataPoint
 
     suspend fun getGraphStatById(graphStatId: Long): GraphOrStat
 
@@ -133,9 +99,9 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun getAllGraphStatsSync(): List<GraphOrStat>
 
-    fun getAllDisplayNotes(): LiveData<List<DisplayNote>>
+    fun getAllDisplayNotes(): Flow<List<DisplayNote>>
 
-    suspend fun removeNote(timestamp: OffsetDateTime, featureId: Long)
+    suspend fun removeNote(timestamp: OffsetDateTime, trackerId: Long)
 
     suspend fun deleteGlobalNote(note: GlobalNote)
 
@@ -197,9 +163,11 @@ interface DataInteractor : FeatureUpdater {
 
     suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long)
 
-    suspend fun playTimerForFeature(featureId: Long)
+    suspend fun getFunctionById(functionId: Long): FunctionDto?
 
-    suspend fun stopTimerForFeature(featureId: Long): Duration?
+    suspend fun updateFunction(function: FunctionDto)
 
-    suspend fun getAllActiveTimerFeatures(): List<DisplayFeature>
+    suspend fun insertFunction(function: FunctionDto)
+
+    suspend fun getAllFeaturesSync(): List<Feature>
 }

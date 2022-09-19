@@ -17,13 +17,14 @@
 
 package com.samco.trackandgraph.base.model
 
-import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.*
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
+import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.service.ServiceManager
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.test.*
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -38,40 +39,43 @@ class DataInteractorImplTest {
 
     private val database: TrackAndGraphDatabase = mock()
     private val dao: TrackAndGraphDatabaseDao = mock()
-    private val featureUpdater: FeatureUpdater = mock()
+    private val trackerHelper: TrackerHelper = mock()
     private val csvReadWriter: CSVReadWriter = mock()
     private val alarmInteractor: AlarmInteractor = mock()
     private val serviceManager: ServiceManager = mock()
+    private val dataSampler: DataSampler = mock()
 
     @Before
     fun before() {
         Dispatchers.setMain(testDispatcher)
 
         uut = DataInteractorImpl(
-            database,
-            dao,
-            testDispatcher,
-            featureUpdater,
-            csvReadWriter,
-            alarmInteractor,
-            serviceManager
+            database = database,
+            dao = dao,
+            io = testDispatcher,
+            trackerHelper = trackerHelper,
+            csvReadWriter = csvReadWriter,
+            alarmInteractor = alarmInteractor,
+            serviceManager = serviceManager,
+            dataSampler = dataSampler
         )
     }
 
     @Test
-    fun `Modifying the data tracked should cause a data update event`() = runTest {
+    fun `Modifying the data should cause a data update event`() = runTest {
 
         //PREPARE
-        val testFeature = Feature(
+        val testTracker = Tracker(
             id = 0L,
+            featureId = 0L,
             name = "none",
             groupId = 0L,
-            featureType = DataType.CONTINUOUS,
+            dataType = DataType.CONTINUOUS,
             discreteValues = emptyList(),
             displayIndex = 0,
             hasDefaultValue = false,
             defaultValue = 0.0,
-            description = "none"
+            description = "none",
         )
 
         val testDataPoint = DataPoint(
@@ -87,12 +91,37 @@ class DataInteractorImplTest {
             note = "hi hi"
         )
 
+        val testFunction = FunctionDto(
+            id = 0L,
+            name = "name",
+            featureId = 0L,
+            dataSources = emptyList(),
+            script = "",
+            groupId = 0L,
+            displayIndex = 0,
+            description = "",
+        )
+
         var count = 0
         val collectJob = launch(testDispatcher) {
-            uut.getDataUpdateEvents()
-                .take(12)
-                .collect { count++ }
+            uut.getDataUpdateEvents().collect { count++ }
         }
+
+        whenever(trackerHelper.insertTracker(any())).thenReturn(0L)
+        whenever(dao.getTrackerById(any())).thenReturn(
+            TrackerWithFeature(
+                id = 0L,
+                name = "name",
+                groupId = 0L,
+                featureId = 0L,
+                displayIndex = 0,
+                description = "",
+                dataType = DataType.CONTINUOUS,
+                discreteValues = emptyList(),
+                hasDefaultValue = false,
+                defaultValue = 1.0,
+            )
+        )
 
         //EXECUTE
 
@@ -100,20 +129,23 @@ class DataInteractorImplTest {
         yield()
 
         uut.deleteGroup(0L)
-        uut.insertFeature(testFeature)
-        uut.updateFeature(testFeature)
+        uut.insertTracker(testTracker)
+        uut.updateTracker(testTracker)
         uut.deleteFeature(0L)
         uut.deleteDataPoint(testDataPoint)
-        uut.deleteAllDataPointsForDiscreteValue(0L, 0.0)
         uut.insertDataPoint(testDataPoint)
         uut.insertDataPoints(listOf(testDataPoint))
         uut.updateDataPoints(listOf(testDataPoint))
         uut.removeNote(OffsetDateTime.MAX, 0L)
         uut.deleteGlobalNote(testGlobalNote)
         uut.insertGlobalNote(testGlobalNote)
+        uut.insertFunction(testFunction)
+        uut.updateFunction(testFunction)
 
         //VERIFY
-        assertEquals(12, count)
+        assertEquals(13, count)
         collectJob.cancel()
+        verify(trackerHelper, times(1)).insertTracker(eq(testTracker))
+        verify(trackerHelper, times(1)).updateTracker(eq(testTracker))
     }
 }

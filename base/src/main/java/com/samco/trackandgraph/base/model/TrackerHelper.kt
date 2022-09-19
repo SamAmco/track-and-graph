@@ -17,9 +17,10 @@
 
 package com.samco.trackandgraph.base.model
 
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.*
+import kotlinx.coroutines.flow.Flow
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
 /**
  * An interface for updating features. Do not use this interface directly, it is implemented by
@@ -29,19 +30,53 @@ import com.samco.trackandgraph.base.database.dto.Feature
  * a feature as well as the feature its self. It will perform all changes inside a transaction and
  * throw an exception if anything goes wrong.
  */
-interface FeatureUpdater {
+interface TrackerHelper {
 
     enum class DurationNumericConversionMode { HOURS, MINUTES, SECONDS }
 
-    suspend fun updateFeature(
-        oldFeature: Feature,
+    suspend fun updateTracker(
+        oldTracker: Tracker,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>,
         durationNumericConversionMode: DurationNumericConversionMode? = null,
         newName: String? = null,
-        newFeatureType: DataType? = null,
+        newType: DataType? = null,
         newDiscreteValues: List<DiscreteValue>? = null,
         hasDefaultValue: Boolean? = null,
         defaultValue: Double? = null,
         featureDescription: String? = null
     )
+
+    suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker>
+
+    suspend fun getTrackerById(trackerId: Long): Tracker?
+
+    suspend fun insertTracker(tracker: Tracker): Long
+
+    suspend fun updateTracker(tracker: Tracker)
+
+    suspend fun getAllTrackersSync(): List<Tracker>
+
+    suspend fun getDisplayTrackersForGroupSync(groupId: Long): List<DisplayTracker>
+
+    suspend fun tryGetDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker?
+
+    suspend fun getDataPointByTimestampAndTrackerSync(
+        trackerId: Long,
+        timestamp: OffsetDateTime
+    ): DataPoint?
+
+    /**
+     * Returns the feature id of the started timer tracker
+     */
+    suspend fun playTimerForTracker(trackerId: Long): Long?
+
+    suspend fun stopTimerForTracker(trackerId: Long): Duration?
+
+    suspend fun getAllActiveTimerTrackers(): List<DisplayTracker>
+
+    suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker>
+
+    suspend fun getTrackerByFeatureId(featureId: Long): Tracker?
+
+    fun hasAtLeastOneTracker(): Flow<Boolean>
 }

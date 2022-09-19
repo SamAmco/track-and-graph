@@ -20,20 +20,32 @@ package com.samco.trackandgraph.ui
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Group
 
-
 open class FeaturePathProvider(
-    val features: List<Feature>,
-    groups: List<Group>
-) : GroupPathProvider(groups) {
-    private val featuresById = features.map { it.id to it }.toMap()
+    private val featureGroupMap: Map<Feature, Group>,
+) : GroupPathProvider(featureGroupMap.values) {
 
-    fun featuresSortedAlphabetically() = features.sortedBy { getPathForFeature(it.id) }
+    constructor(features: List<Feature>, groups: List<Group>) : this(
+        features.mapNotNull { feature ->
+            val group = groups.firstOrNull { it.id == feature.groupId }
+                ?: return@mapNotNull null
+            feature to group
+        }.toMap()
+    )
 
-    fun getPathForFeature(id: Long): String {
-        val feature = featuresById[id] ?: return ""
-        val groupPath = getPathForGroup(feature.groupId)
+    val features get() = featureGroupMap.keys
+
+    fun sortedAlphabetically() = featureGroupMap.keys.sortedBy { getPathForFeature(it.featureId) }
+
+    fun sortedPaths() = featureGroupMap.keys
+        .map { it to getPathForFeature(it.featureId) }
+        .sortedBy { it.second }
+
+    fun getPathForFeature(featureId: Long): String {
+        val dataSource = featureGroupMap.keys.firstOrNull { it.featureId == featureId } ?: return ""
+        val group = featureGroupMap[dataSource] ?: return ""
+        val groupPath = getPathForGroup(group.id)
         var path = groupPath
         if (groupPath.lastOrNull() != '/') path += '/'
-        return path + feature.name
+        return path + dataSource.name
     }
 }

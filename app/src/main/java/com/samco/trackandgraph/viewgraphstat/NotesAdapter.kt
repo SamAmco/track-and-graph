@@ -23,16 +23,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.graphstatinput.configviews.FeatureDataProvider
 
 class NotesAdapter(
-    private val featurePathProvider: FeaturePathProvider,
-    private val featureTypes: Map<Long, DataType>,
+    private val featureDataProvider: FeatureDataProvider,
     private val weekDayNames: List<String>,
     private val clickListener: NoteClickListener
 ) : ListAdapter<GraphNote, NotesAdapter.ViewHolder>(
@@ -42,28 +39,24 @@ class NotesAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder.from(
             parent,
-            featurePathProvider,
             weekDayNames,
-            featureTypes,
             clickListener
         )
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(getItem(position))
+        holder.bind(getItem(position), featureDataProvider)
     }
 
     class ViewHolder private constructor(
         private val binding: ListItemNoteBinding,
-        private val featurePathProvider: FeaturePathProvider,
         private val weekDayNames: List<String>,
-        private val featureTypes: Map<Long, DataType>,
         private val clickListener: NoteClickListener
     ) : RecyclerView.ViewHolder(binding.root) {
 
         var note: GraphNote? = null
 
-        fun bind(note: GraphNote) {
+        fun bind(note: GraphNote, featureDataProvider: FeatureDataProvider) {
             this.note = note
             binding.timestampText.text =
                 formatDayWeekDayMonthYearHourMinuteOneLine(
@@ -71,28 +64,30 @@ class NotesAdapter(
                     weekDayNames,
                     note.timestamp
                 )
-            when (note.noteType) {
-                NoteType.DATA_POINT -> initFromDataPointNote()
-                NoteType.GLOBAL_NOTE -> initFromGlobalNote()
+            when {
+                note.isDataPoint() -> initFromDataPointNote(featureDataProvider)
+                else -> initFromGlobalNote()
             }
         }
 
         private fun initFromGlobalNote() {
             val globalNote = note!!.globalNote!!
             binding.valueText.visibility = View.GONE
-            binding.featureNameText.visibility = View.GONE
+            binding.trackerNameText.visibility = View.GONE
             binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
             binding.noteText.visibility = View.VISIBLE
             binding.noteText.text = globalNote.note
         }
 
-        private fun initFromDataPointNote() {
+        private fun initFromDataPointNote(featureDataProvider: FeatureDataProvider) {
             val dataPoint = note!!.dataPoint!!
             binding.valueText.visibility = View.VISIBLE
-            val featureType = featureTypes.getOrElse(dataPoint.featureId) { DataType.CONTINUOUS }
-            binding.valueText.text = note!!.dataPoint!!.getDisplayValue(featureType)
-            binding.featureNameText.visibility = View.VISIBLE
-            binding.featureNameText.text = featurePathProvider.getPathForFeature(dataPoint.featureId)
+            val isDuration = featureDataProvider.getDataSampleProperties(dataPoint.featureId)
+                ?.isDuration ?: false
+            binding.valueText.text = note!!.dataPoint!!.getDisplayValue(isDuration)
+            binding.trackerNameText.visibility = View.VISIBLE
+            binding.trackerNameText.text =
+                featureDataProvider.getPathForFeature(dataPoint.featureId)
             binding.cardView.setOnClickListener { clickListener.viewClicked(note!!) }
             binding.noteText.visibility = View.VISIBLE
             binding.noteText.text = dataPoint.note
@@ -101,18 +96,14 @@ class NotesAdapter(
         companion object {
             fun from(
                 parent: ViewGroup,
-                featurePathProvider: FeaturePathProvider,
                 weekDayNames: List<String>,
-                featureTypes: Map<Long, DataType>,
                 clickListener: NoteClickListener
             ): ViewHolder {
                 val layoutInflater = LayoutInflater.from(parent.context)
                 val binding = ListItemNoteBinding.inflate(layoutInflater, parent, false)
                 return ViewHolder(
                     binding,
-                    featurePathProvider,
                     weekDayNames,
-                    featureTypes,
                     clickListener
                 )
             }
@@ -123,8 +114,8 @@ class NotesAdapter(
 class NoteDiffCallback : DiffUtil.ItemCallback<GraphNote>() {
     override fun areItemsTheSame(oldItem: GraphNote, newItem: GraphNote) =
         oldItem.timestamp == newItem.timestamp
-                && oldItem.noteType == newItem.noteType
                 && oldItem.dataPoint?.featureId == newItem.dataPoint?.featureId
+                && oldItem.globalNote?.timestamp == newItem.globalNote?.timestamp
 
     override fun areContentsTheSame(oldItem: GraphNote, newItem: GraphNote) =
         oldItem.dataPoint == newItem.dataPoint

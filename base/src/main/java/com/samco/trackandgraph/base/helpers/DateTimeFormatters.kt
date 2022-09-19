@@ -68,7 +68,7 @@ fun formatDayWeekDayMonthYearHourMinuteOneLine(
         weekDayPart(dateTime, weekDayNames) +
         formatHourMinute(dateTime)
 
-fun DataPoint.getDisplayValue(dataType: DataType): String {
+fun DataPoint.getDisplayValue(isDuration: Boolean): String {
     val time = this.timestamp
     val value = this.value
     val label = this.label
@@ -76,14 +76,14 @@ fun DataPoint.getDisplayValue(dataType: DataType): String {
         override val timestamp = time
         override val value = value
         override val label = label
-    }.getDisplayValue(dataType)
+    }.getDisplayValue(isDuration)
 }
 
-fun IDataPoint.getDisplayValue(dataType: DataType): String {
-    return when (dataType) {
-        DataType.DISCRETE -> doubleFormatter.format(this.value) + " : ${this.label}"
-        DataType.CONTINUOUS -> doubleFormatter.format(this.value)
-        DataType.DURATION -> formatTimeDuration(this.value.toLong())
+fun IDataPoint.getDisplayValue(isDuration: Boolean): String {
+    return when {
+        isDuration -> formatTimeDuration(this.value.toLong())
+        this.label.isNotEmpty() -> doubleFormatter.format(this.value) + " : ${this.label}"
+        else -> doubleFormatter.format(this.value)
     }
 }
 

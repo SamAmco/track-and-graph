@@ -41,23 +41,23 @@ class PendingIntentProviderImpl @Inject constructor(
             .let { PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_IMMUTABLE) }
     }
 
-    override fun getDurationInputActivityIntent(featureId: Long, startInstant: String): Intent {
+    override fun getDurationInputActivityIntent(trackerId: Long, startInstant: String): Intent {
         return Intent(context, AddDataPointFromTimerActivity::class.java)
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            .putExtra(AddDataPointFromTimerActivity.FEATURE_ID_KEY, featureId)
+            .putExtra(AddDataPointFromTimerActivity.TRACKER_ID_KEY, trackerId)
             .putExtra(AddDataPointFromTimerActivity.START_TIME_KEY, startInstant)
     }
 
 
     override fun getDurationInputActivityPendingIntent(
-        featureId: Long,
+        trackerId: Long,
         startInstant: String
     ): PendingIntent {
-        return getDurationInputActivityIntent(featureId, startInstant).let {
+        return getDurationInputActivityIntent(trackerId, startInstant).let {
             PendingIntent.getActivity(
                 context,
                 //A key unique to this request to allow updating notification
-                startInstant.hashCode() + featureId.toInt(),
+                startInstant.hashCode() + trackerId.toInt(),
                 it,
                 PendingIntent.FLAG_IMMUTABLE
             )
@@ -81,7 +81,9 @@ class PendingIntentProviderImpl @Inject constructor(
     override fun getTrackWidgetDisableForFeatureByIdIntent(featureId: Long): Intent {
         return Intent(
             AppWidgetManager.ACTION_APPWIDGET_UPDATE,
-            null, context, TrackWidgetProvider::class.java
+            null,
+            context,
+            TrackWidgetProvider::class.java
         ).apply { putExtra(DELETE_FEATURE_ID, featureId) }
     }
 

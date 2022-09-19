@@ -21,9 +21,11 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -33,7 +35,7 @@ import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
-import com.samco.trackandgraph.displaytrackgroup.*
+import com.samco.trackandgraph.addtracker.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.*
@@ -81,7 +83,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
 
         initializeGridLayout()
         adapter = GroupAdapter(
-            createFeatureClickListener(),
+            createTrackerClickListener(),
             createGraphStatClickListener(),
             createGroupClickListener(),
             gsiProvider
@@ -95,16 +97,48 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         binding.queueAddAllButton.setOnClickListener { onQueueAddAllClicked() }
         registerForContextMenu(binding.itemList)
 
-        setHasOptionsMenu(true)
-
         listenToViewModel()
         launchUpdateChildrenLoop()
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(
+            GroupMenuProvider(),
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
+    }
+
+    private inner class GroupMenuProvider : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.group_menu, menu)
+        }
+
+        override fun onMenuItemSelected(item: MenuItem): Boolean {
+            when (item.itemId) {
+                R.id.add_tracker -> onAddTrackerClicked()
+                R.id.add_graph_stat -> onAddGraphStatClicked()
+                R.id.add_group -> onAddGroupClicked()
+                R.id.export_button -> onExportClicked()
+                R.id.import_button -> onImportClicked()
+                //R.id.add_function -> onAddFunctionClicked()
+                else -> return false
+            }
+            return true
+        }
+    }
+
+    private fun onAddFunctionClicked() {
+        navController?.navigate(
+            GroupFragmentDirections.actionAddFunction(args.groupId)
+        )
+    }
+
     /**
      * Calls an update function on all children of the recycler view once a second. This is
-     * because graphs/statistics and features can have timers in the view holder that need to
+     * because graphs/statistics and trackers can have timers in the view holder that need to
      * be updated every second and it could be too costly to emit an entire new set of data to
      * the adapter every second for diffing.
      */
@@ -232,77 +266,75 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         )
     }
 
-    private fun createFeatureClickListener() = FeatureClickListener(
-        this::onFeatureEditClicked,
-        this::onFeatureDeleteClicked,
-        this::onFeatureMoveToClicked,
-        this::onFeatureDescriptionClicked,
-        this::onFeatureAddClicked,
-        this::onFeatureHistoryClicked,
+    private fun createTrackerClickListener() = TrackerClickListener(
+        this::onTrackerEditClicked,
+        this::onTrackerDeleteClicked,
+        this::onTrackerMoveClicked,
+        this::onTrackerDescriptionClicked,
+        this::onTrackerAddClicked,
+        this::onTrackerHistoryClicked,
         viewModel::playTimer,
         this::onStopTimerClicked
     )
 
-    private fun onStopTimerClicked(feature: DisplayFeature) {
+    private fun onStopTimerClicked(tracker: DisplayTracker) {
         //Due to a bug with the GridLayoutManager when you stop a timer and the timer text disappears
         // the views heights are not properly re-calculated and we need to call notifyDataSetChanged
         // to get the view heights right again
         forceNextNotifyDataSetChanged = true
-        viewModel.stopTimer(feature)
+        viewModel.stopTimer(tracker)
     }
 
-    private fun onFeatureHistoryClicked(feature: DisplayFeature) {
+    private fun onTrackerHistoryClicked(tracker: DisplayTracker) {
         navController?.navigate(
-            GroupFragmentDirections.actionFeatureHistory(feature.id, feature.name)
+            GroupFragmentDirections.actionFeatureHistory(tracker.featureId, tracker.name)
         )
     }
 
-    private fun onFeatureAddClicked(feature: DisplayFeature, useDefault: Boolean = true) {
+    private fun onTrackerAddClicked(tracker: DisplayTracker, useDefault: Boolean = true) {
         /**
          * @param useDefault: if false the default value will be ignored and the user will be queried for the value
          */
-        if (feature.hasDefaultValue && useDefault) {
+        if (tracker.hasDefaultValue && useDefault) {
             requireContext().performTrackVibrate()
-            viewModel.addDefaultFeatureValue(feature)
+            viewModel.addDefaultTrackerValue(tracker)
         } else {
             val argBundle = Bundle()
-            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(feature.id))
+            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(tracker.id))
             showAddDataPoint(argBundle)
         }
     }
 
-    private fun onFeatureDescriptionClicked(feature: DisplayFeature) {
-        showFeatureDescriptionDialog(requireContext(), feature.name, feature.description)
+    private fun onTrackerDescriptionClicked(tracker: DisplayTracker) {
+        showFeatureDescriptionDialog(requireContext(), tracker.name, tracker.description)
     }
 
-    private fun onFeatureMoveToClicked(feature: DisplayFeature) {
+    private fun onTrackerMoveClicked(tracker: DisplayTracker) {
         val dialog = MoveToDialogFragment()
         val args = Bundle()
         args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_TRACK)
-        args.putLong(MOVE_DIALOG_GROUP_KEY, feature.id)
+        args.putLong(MOVE_DIALOG_GROUP_KEY, tracker.id)
         dialog.arguments = args
         childFragmentManager.let { dialog.show(it, "move_dialog") }
     }
 
-    private fun onFeatureEditClicked(feature: DisplayFeature) {
-        val featureNames = viewModel.features.map { f -> f.name }.toTypedArray()
+    private fun onTrackerEditClicked(tracker: DisplayTracker) {
         navController?.navigate(
-            GroupFragmentDirections
-                .actionAddFeature(args.groupId, featureNames, feature.id)
+            GroupFragmentDirections.actionAddTracker(args.groupId, tracker.id)
         )
     }
 
     private fun onQueueAddAllClicked() {
-        viewModel.features.let { feats ->
-            if (feats.isEmpty()) return
+        viewModel.trackers.let { trackers ->
+            if (trackers.isEmpty()) return
             val argBundle = Bundle()
-            argBundle.putLongArray(FEATURE_LIST_KEY, feats.map { f -> f.id }.toLongArray())
+            argBundle.putLongArray(TRACKER_LIST_KEY, trackers.map { it.id }.toLongArray())
             showAddDataPoint(argBundle)
         }
     }
 
     private fun showAddDataPoint(argBundle: Bundle) {
-        val dialog = InputDataPointDialog()
+        val dialog = DataPointInputDialog()
         dialog.arguments = argBundle
         childFragmentManager.let { dialog.show(it, "input_data_points_dialog") }
     }
@@ -326,7 +358,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun listenToViewModel() {
-        viewModel.hasFeatures.observe(viewLifecycleOwner) {}
+        viewModel.hasTrackers.observe(viewLifecycleOwner) {}
         viewModel.groupChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it, forceNextNotifyDataSetChanged)
             if (forceNextNotifyDataSetChanged) forceNextNotifyDataSetChanged = false
@@ -338,7 +370,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
             if (it == null) return@observe
             val argBundle = Bundle()
-            argBundle.putLongArray(FEATURE_LIST_KEY, longArrayOf(it.featureId))
+            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(it.trackerId))
             argBundle.putLong(DURATION_SECONDS_KEY, it.duration.seconds)
             showAddDataPoint(argBundle)
             viewModel.onConsumedShowDurationInputDialog()
@@ -355,7 +387,7 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun updateShowQueueTrackButton() {
-        if (viewModel.features.isNotEmpty()) {
+        if (viewModel.trackers.isNotEmpty()) {
             binding.queueAddAllButton.show()
             binding.itemList.removeOnScrollListener(queueAddAllButtonShowHideListener)
             binding.itemList.addOnScrollListener(queueAddAllButtonShowHideListener)
@@ -379,22 +411,6 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.add_tracker -> onAddTrackerClicked()
-            R.id.add_graph_stat -> onAddGraphStatClicked()
-            R.id.add_group -> onAddGroupClicked()
-            R.id.export_button -> onExportClicked()
-            R.id.import_button -> onImportClicked()
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.group_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
     private fun onExportClicked() {
         val dialog = ExportFeaturesDialog()
         val argBundle = Bundle()
@@ -414,16 +430,13 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     }
 
     private fun onAddTrackerClicked() {
-        val featureNames = viewModel.features.map { f -> f.name }.toTypedArray()
-        navController?.navigate(
-            GroupFragmentDirections.actionAddFeature(args.groupId, featureNames)
-        )
+        navController?.navigate(GroupFragmentDirections.actionAddTracker(args.groupId))
     }
 
     private fun onAddGraphStatClicked() {
-        if (viewModel.hasFeatures.value != true) {
+        if (viewModel.hasTrackers.value != true) {
             AlertDialog.Builder(requireContext())
-                .setMessage(R.string.no_features_graph_stats_hint)
+                .setMessage(R.string.no_trackers_graph_stats_hint)
                 .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                 .show()
         } else {
@@ -441,11 +454,11 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         dialog.show(childFragmentManager, "add_group_dialog")
     }
 
-    private fun onFeatureDeleteClicked(feature: DisplayFeature) {
+    private fun onTrackerDeleteClicked(tracker: DisplayTracker) {
         val dialog = YesCancelDialogFragment()
         val args = Bundle()
         args.putString("title", getString(R.string.ru_sure_del_feature))
-        args.putString("id", feature.id.toString())
+        args.putString("id", tracker.featureId.toString())
         dialog.arguments = args
         childFragmentManager.let { dialog.show(it, "ru_sure_del_feature_fragment") }
     }

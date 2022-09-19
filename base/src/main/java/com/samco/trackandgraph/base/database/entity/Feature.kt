@@ -20,9 +20,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.FeatureDtoImpl
 
 @Entity(
     tableName = "features_table",
@@ -44,34 +43,18 @@ internal data class Feature(
     @ColumnInfo(name = "group_id", index = true)
     val groupId: Long,
 
-    @ColumnInfo(name = "type")
-    val featureType: DataType,
-
-    @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<DiscreteValue>,
-
     @ColumnInfo(name = "display_index")
     val displayIndex: Int,
-
-    @ColumnInfo(name = "has_default_value")
-    val hasDefaultValue: Boolean,
-
-    @ColumnInfo(name = "default_value")
-    val defaultValue: Double,
 
     @ColumnInfo(name = "feature_description")
     val description: String
 ) {
-    fun toDto() = Feature(
-        id,
-        name,
-        groupId,
-        featureType,
-        discreteValues,
-        displayIndex,
-        hasDefaultValue,
-        defaultValue,
-        description
+    fun toDto(): Feature = FeatureDtoImpl(
+        featureId = this@Feature.id,
+        name = this@Feature.name,
+        groupId = this@Feature.groupId,
+        displayIndex = this@Feature.displayIndex,
+        description = this@Feature.description
     )
 }
 
