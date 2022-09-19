@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.base.model
 
-import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.room.withTransaction
@@ -25,30 +24,32 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.database.entity.FeatureTimer
-import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.ServiceManager
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.map
 import org.threeten.bp.Duration
-import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Inject
 
+//TODO check that interface delegation overriding is working correctly, we need to do things like
+// emit dataUpdateEvent after calling trackerHelper
 internal class DataInteractorImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher,
-    private val featureUpdater: FeatureUpdater,
+    private val trackerHelper: TrackerHelper,
     private val csvReadWriter: CSVReadWriter,
     private val alarmInteractor: AlarmInteractor,
-    private val serviceManager: ServiceManager
-) : DataInteractor {
+    private val serviceManager: ServiceManager,
+    private val dataSampler: DataSampler
+) : DataInteractor, TrackerHelper by trackerHelper, DataSampler by dataSampler {
 
     private val dataUpdateEvents = MutableSharedFlow<Unit>()
 
@@ -107,85 +108,56 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllRemindersSync().map { it.toDto() }
     }
 
-    override fun getAllFeatures(): LiveData<List<Feature>> {
-        return Transformations.map(dao.getAllFeatures()) { features -> features.map { it.toDto() } }
-    }
-
-    override suspend fun getAllFeaturesSync(): List<Feature> = withContext(io) {
-        dao.getAllFeaturesSync().map { it.toDto() }
-    }
-
-    override suspend fun getDisplayFeaturesForGroupSync(groupId: Long): List<DisplayFeature> =
-        withContext(io) {
-            dao.getDisplayFeaturesForGroupSync(groupId).map { it.toDto() }
-        }
-
     override suspend fun getFeaturesForGroupSync(groupId: Long): List<Feature> = withContext(io) {
         dao.getFeaturesForGroupSync(groupId).map { it.toDto() }
     }
 
-    override suspend fun getFeatureById(featureId: Long): Feature = withContext(io) {
-        dao.getFeatureById(featureId).toDto()
+    override suspend fun getFeatureById(featureId: Long): Feature? = withContext(io) {
+        dao.getFeatureById(featureId)?.toDto()
     }
 
-    override suspend fun tryGetFeatureByIdSync(featureId: Long): Feature? = withContext(io) {
-        dao.tryGetFeatureByIdSync(featureId)?.toDto()
+    override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
+        val id = trackerHelper.insertTracker(tracker)
+        dataUpdateEvents.emit(Unit)
+        return@withContext id
     }
 
-    override suspend fun tryGetDisplayFeatureByIdSync(
-        featureId: Long
-    ): DisplayFeature? = withContext(io) {
-        dao.getDisplayFeatureByIdSync(featureId)?.toDto()
+    override suspend fun updateTracker(tracker: Tracker) = withContext(io) {
+        trackerHelper.updateTracker(tracker)
+        dataUpdateEvents.emit(Unit)
+        serviceManager.requestWidgetUpdatesForFeatureId(featureId = tracker.featureId)
     }
 
-    override fun tryGetFeatureById(featureId: Long): LiveData<Feature?> {
-        return Transformations.map(dao.tryGetFeatureById(featureId)) { it?.toDto() }
-    }
-
-    override suspend fun getFeaturesByIdsSync(featureIds: List<Long>): List<Feature> =
-        withContext(io) {
-            dao.getFeaturesByIdsSync(featureIds).map { it.toDto() }
-        }
-
-    override suspend fun insertFeature(feature: Feature): Long = withContext(io) {
-        dao.insertFeature(feature.toEntity()).also { dataUpdateEvents.emit(Unit) }
-    }
-
-    override suspend fun updateFeature(feature: Feature) = withContext(io) {
-        dao.updateFeature(feature.toEntity()).also { dataUpdateEvents.emit(Unit) }
-        serviceManager.requestWidgetUpdatesForFeatureId(featureId = feature.id)
-    }
-
-    override suspend fun updateFeature(
-        oldFeature: Feature,
+    override suspend fun updateTracker(
+        oldTracker: Tracker,
         discreteValueMap: Map<DiscreteValue, DiscreteValue>,
-        durationNumericConversionMode: FeatureUpdater.DurationNumericConversionMode?,
+        durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode?,
         newName: String?,
-        newFeatureType: DataType?,
+        newType: DataType?,
         newDiscreteValues: List<DiscreteValue>?,
         hasDefaultValue: Boolean?,
         defaultValue: Double?,
         featureDescription: String?
     ) = withContext(io) {
-        featureUpdater.updateFeature(
-            oldFeature,
+        trackerHelper.updateTracker(
+            oldTracker,
             discreteValueMap,
             durationNumericConversionMode,
             newName,
-            newFeatureType,
+            newType,
             newDiscreteValues,
             hasDefaultValue,
             defaultValue,
             featureDescription
         ).also {
-            serviceManager.requestWidgetUpdatesForFeatureId(featureId = oldFeature.id)
+            serviceManager.requestWidgetUpdatesForFeatureId(featureId = oldTracker.featureId)
             dataUpdateEvents.emit(Unit)
         }
     }
 
-    override suspend fun deleteFeature(id: Long) = withContext(io) {
-        dao.deleteFeature(id)
-        serviceManager.requestWidgetsDisabledForFeatureId(featureId = id)
+    override suspend fun deleteFeature(featureId: Long) = withContext(io) {
+        dao.deleteFeature(featureId)
+        serviceManager.requestWidgetsDisabledForFeatureId(featureId = featureId)
         dataUpdateEvents.emit(Unit)
     }
 
@@ -202,12 +174,6 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun deleteDataPoint(dataPoint: DataPoint) = withContext(io) {
         dao.deleteDataPoint(dataPoint.toEntity()).also { dataUpdateEvents.emit(Unit) }
     }
-
-    override suspend fun deleteAllDataPointsForDiscreteValue(featureId: Long, index: Double) =
-        withContext(io) {
-            dao.deleteAllDataPointsForDiscreteValue(featureId, index)
-                .also { dataUpdateEvents.emit(Unit) }
-        }
 
     override suspend fun deleteGraphOrStat(id: Long) = withContext(io) {
         dao.deleteGraphOrStat(id).also { dataUpdateEvents.emit(Unit) }
@@ -229,30 +195,7 @@ internal class DataInteractorImpl @Inject constructor(
         dao.updateDataPoints(dataPoint.map { it.toEntity() }).also { dataUpdateEvents.emit(Unit) }
     }
 
-    //TODO probably can do better than this
-    override suspend fun getDataSampleForFeatureId(featureId: Long): DataSample = withContext(io) {
-        val dataSampler = DataSampler(dao)
-        val dataSource = DataSource.FeatureDataSource(featureId)
-        dataSampler.getDataSampleForSource(dataSource)
-    }
-
     override fun getDataUpdateEvents(): SharedFlow<Unit> = dataUpdateEvents
-
-    override suspend fun getDataPointsCursorForFeatureSync(featureId: Long): Cursor =
-        withContext(io) {
-            dao.getDataPointsCursorForFeatureSync(featureId)
-        }
-
-    override fun getDataPointsForFeature(featureId: Long): LiveData<List<DataPoint>> {
-        return Transformations.map(dao.getDataPointsForFeature(featureId)) { dataPoints -> dataPoints.map { it.toDto() } }
-    }
-
-    override suspend fun getDataPointByTimestampAndFeatureSync(
-        featureId: Long,
-        timestamp: OffsetDateTime
-    ): DataPoint = withContext(io) {
-        dao.getDataPointByTimestampAndFeatureSync(featureId, timestamp).toDto()
-    }
 
     override suspend fun getGraphStatById(graphStatId: Long): GraphOrStat = withContext(io) {
         dao.getGraphStatById(graphStatId).toDto()
@@ -290,12 +233,18 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllGraphStatsSync().map { it.toDto() }
     }
 
-    override fun getAllDisplayNotes(): LiveData<List<DisplayNote>> {
-        return Transformations.map(dao.getAllDisplayNotes()) { notes -> notes.map { it.toDto() } }
+    override fun getAllDisplayNotes(): Flow<List<DisplayNote>> {
+        return dao.getAllDisplayNotes().map { notes ->
+            notes.map { it.toDto() }
+        }
     }
 
-    override suspend fun removeNote(timestamp: OffsetDateTime, featureId: Long) = withContext(io) {
-        dao.removeNote(timestamp, featureId).also { dataUpdateEvents.emit(Unit) }
+    override suspend fun removeNote(timestamp: OffsetDateTime, trackerId: Long) {
+        withContext(io) {
+            dao.getTrackerById(trackerId)?.featureId?.let {
+                dao.removeNote(timestamp, it).also { dataUpdateEvents.emit(Unit) }
+            }
+        }
     }
 
     override suspend fun deleteGlobalNote(note: GlobalNote) = withContext(io) {
@@ -490,14 +439,14 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateGroupChildOrder(groupId: Long, children: List<GroupChild>) =
         performAtomicUpdate {
-            //Update features
-            dao.getFeaturesForGroupSync(groupId).let { features ->
+            //Update trackers
+            dao.getTrackersForGroupSync(groupId).let { features ->
                 val updates = features.map { feature ->
                     val newDisplayIndex = children.indexOfFirst {
-                        it.type == GroupChildType.FEATURE && it.id == feature.id
+                        it.type == GroupChildType.TRACKER && it.id == feature.id
                     }
                     feature.copy(displayIndex = newDisplayIndex)
-                }
+                }.map { it.toFeatureEntity() }
                 dao.updateFeatures(updates)
             }
 
@@ -535,34 +484,56 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun writeFeaturesToCSV(outStream: OutputStream, featureIds: List<Long>) =
         withContext(io) {
-            val featureMap =
-                featureIds.associate { getFeatureById(it) to getDataSampleForFeatureId(it) }
+            val featureMap = featureIds
+                .mapNotNull { getFeatureById(it) }
+                .associateWith { getDataSampleForFeatureId(it.featureId) }
             csvReadWriter.writeFeaturesToCSV(outStream, featureMap)
         }
 
     override suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long) =
         withContext(io) {
-            csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
-            dataUpdateEvents.emit(Unit)
+            try {
+                csvReadWriter.readFeaturesFromCSV(inputStream, trackGroupId)
+            } finally {
+                dataUpdateEvents.emit(Unit)
+            }
         }
 
-    override suspend fun playTimerForFeature(featureId: Long) = performAtomicUpdate {
-        dao.deleteFeatureTimer(featureId)
-        dao.insertFeatureTimer(FeatureTimer(0L, featureId, Instant.now()))
-    }.also {
-        serviceManager.startTimerNotificationService()
-        serviceManager.requestWidgetUpdatesForFeatureId(featureId)
+    override suspend fun playTimerForTracker(trackerId: Long): Long? {
+        return trackerHelper.playTimerForTracker(trackerId)?.also {
+            serviceManager.startTimerNotificationService()
+            serviceManager.requestWidgetUpdatesForFeatureId(it)
+            dataUpdateEvents.emit(Unit)
+        }
     }
 
-    override suspend fun stopTimerForFeature(featureId: Long): Duration? = performAtomicUpdate {
-        val timer = dao.getFeatureTimer(featureId)
-        dao.deleteFeatureTimer(featureId)
-        timer?.let { Duration.between(it.startInstant, Instant.now()) }
-    }.also {
-        serviceManager.requestWidgetUpdatesForFeatureId(featureId)
+    override suspend fun stopTimerForTracker(trackerId: Long): Duration? =
+        trackerHelper.getTrackerById(trackerId)?.let { tracker ->
+            trackerHelper.stopTimerForTracker(trackerId).also {
+                serviceManager.requestWidgetUpdatesForFeatureId(tracker.featureId)
+                dataUpdateEvents.emit(Unit)
+            }
+        }
+
+    override suspend fun getFunctionById(functionId: Long): FunctionDto? = withContext(io) {
+        dao.getFunctionById(functionId)?.let { functionEntity ->
+            dao.getFeatureById(functionEntity.featureId)?.let { feature ->
+                FunctionDto.fromEntities(functionEntity, feature)
+            }
+        }
     }
 
-    override suspend fun getAllActiveTimerFeatures(): List<DisplayFeature> = withContext(io) {
-        dao.getAllActiveTimerFeatures().map { it.toDto() }
+    override suspend fun updateFunction(function: FunctionDto) = withContext(io) {
+        dao.updateFunction(function.toEntity()).also {
+            dataUpdateEvents.emit(Unit)
+        }
+    }
+
+    override suspend fun insertFunction(function: FunctionDto) = withContext(io) {
+        dao.createFunction(function.toEntity()).also { dataUpdateEvents.emit(Unit) }
+    }
+
+    override suspend fun getAllFeaturesSync(): List<Feature> = withContext(io) {
+        dao.getAllFeaturesSync().map { it.toDto() }
     }
 }

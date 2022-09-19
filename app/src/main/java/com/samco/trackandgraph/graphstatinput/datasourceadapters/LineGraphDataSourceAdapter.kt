@@ -44,7 +44,7 @@ class LineGraphDataSourceAdapter @Inject constructor(
         //If the feature was deleted then it should have been deleted via a cascade rule in the db
         // so the any statement should not strictly be necessary.
         return lineGraph.features.isEmpty() || lineGraph.features.any {
-            dataInteractor.tryGetFeatureByIdSync(it.featureId) == null
+            dataInteractor.getFeatureById(it.featureId) == null
         }
     }
 

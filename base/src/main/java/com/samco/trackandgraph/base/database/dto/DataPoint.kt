@@ -19,6 +19,11 @@ package com.samco.trackandgraph.base.database.dto
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import org.threeten.bp.OffsetDateTime
 
+/**
+ * Represents a data point for a feature specifically. You can insert data points into the database.
+ * For a more generic form of data iteration (that supports data from functions as well) see
+ * DataSample.
+ */
 data class DataPoint(
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
     val featureId: Long,

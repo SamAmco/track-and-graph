@@ -20,13 +20,13 @@ package com.samco.trackandgraph.ui
 import com.samco.trackandgraph.base.database.dto.Group
 
 open class GroupPathProvider(
-    val groups: List<Group>
+    val groups: Collection<Group>
 ) {
     private val separator = "/"
 
     private val groupsById = groups.map { it.id to it }.toMap()
 
-    protected val groupPaths = groups.map { group ->
+    private val groupPaths = groups.map { group ->
         group.id to run {
             if (group.parentGroupId == null) return@run separator
             var path = ""

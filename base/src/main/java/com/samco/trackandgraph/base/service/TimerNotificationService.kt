@@ -25,7 +25,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.CATEGORY_STOPWATCH
 import androidx.core.content.ContextCompat
 import com.samco.trackandgraph.base.R
-import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
@@ -79,14 +79,14 @@ class TimerNotificationService : Service() {
             this.updateJobs?.forEach { it.cancel() }
         }
 
-        private fun createUpdateJob(feature: DisplayFeature, isPrimary: Boolean): Job? {
-            val instant = feature.timerStartInstant ?: return null
-            val builder = buildNotification(feature.id, feature.name, instant)
+        private fun createUpdateJob(tracker: DisplayTracker, isPrimary: Boolean): Job? {
+            val instant = tracker.timerStartInstant ?: return null
+            val builder = buildNotification(tracker.id, tracker.name, instant)
             return jobScope.launch {
                 while (true) {
                     val durationSecs = Duration.between(instant, Instant.now()).seconds
                     builder.setContentText(formatTimeDuration(durationSecs))
-                    val id = feature.id.toInt()
+                    val id = tracker.id.toInt()
                     val notification = builder.build()
                     if (isPrimary) startForeground(id, notification)
                     else notificationManager.notify(id, notification)
@@ -95,7 +95,7 @@ class TimerNotificationService : Service() {
             }
         }
 
-        fun setNotifications(features: List<DisplayFeature>) =
+        fun setNotifications(features: List<DisplayTracker>) =
             synchronized(this@TimerNotificationService) {
                 clearOldNotifications()
 
@@ -139,7 +139,7 @@ class TimerNotificationService : Service() {
                 .debounce(200)
                 .collect {
                     val newFeatures = withContext(io) {
-                        dataInteractor.getAllActiveTimerFeatures()
+                        dataInteractor.getAllActiveTimerTrackers()
                             .filter { it.timerStartInstant != null }
                     }
                     if (newFeatures.isEmpty()) {
@@ -161,13 +161,13 @@ class TimerNotificationService : Service() {
     }
 
     private fun buildNotification(
-        id: Long,
+        trackerId: Long,
         name: String,
         startTimeInstant: Instant
     ): NotificationCompat.Builder {
         val durationSecs = Duration.between(startTimeInstant, Instant.now()).seconds
         val pendingIntent = pendingIntentProvider
-            .getDurationInputActivityPendingIntent(id, startTimeInstant.toString())
+            .getDurationInputActivityPendingIntent(trackerId, startTimeInstant.toString())
 
         val stopAction = NotificationCompat.Action(
             R.drawable.ic_stop_timer,

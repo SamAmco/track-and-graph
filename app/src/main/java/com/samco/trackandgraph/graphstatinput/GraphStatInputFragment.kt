@@ -35,11 +35,9 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.databinding.FragmentGraphStatInputBinding
-import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -296,15 +294,14 @@ class GraphStatInputViewModel @Inject constructor(
         viewModelScope.launch(io) {
             val allFeatures = dataInteractor.getAllFeaturesSync()
             val allGroups = dataInteractor.getAllGroupsSync()
-            //TODO Need to get an actual data sample and iterate to get actual labels and properties
-            val featureData = allFeatures.map { feat ->
-                FeatureDataProvider.FeatureData(
-                    feat,
-                    feat.discreteValues.map { it.label }.toSet(),
-                    DataSampleProperties(null, feat.featureType == DataType.DURATION)
+            val dataSourceData = allFeatures.map { feature ->
+                FeatureDataProvider.DataSourceData(
+                    feature,
+                    dataInteractor.getLabelsForFeatureId(feature.featureId),
+                    dataInteractor.getDataSampleForFeatureId(feature.featureId).dataSampleProperties
                 )
             }
-            featureDataProvider = FeatureDataProvider(featureData, allGroups)
+            featureDataProvider = FeatureDataProvider(dataSourceData, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
             else moveToWaiting()
         }

@@ -24,17 +24,15 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.samco.trackandgraph.base.database.dto.DisplayFeature
+import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.database.dto.GroupChild
 import com.samco.trackandgraph.base.database.dto.GroupChildType
-import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import kotlinx.coroutines.CoroutineDispatcher
 
 class GroupAdapter(
-    private val featureClickListener: FeatureClickListener,
+    private val trackerClickListener: TrackerClickListener,
     private val graphStatClickListener: GraphStatClickListener,
     private val groupClickListener: GroupClickListener,
     private val gsiProvider: GraphStatInteractorProvider,
@@ -45,7 +43,7 @@ class GroupAdapter(
         return when (viewType) {
             GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
                 .apply { setFullSpan(this) }
-            GroupChildType.FEATURE.ordinal -> FeatureViewHolder.from(parent)
+            GroupChildType.TRACKER.ordinal -> TrackerViewHolder.from(parent)
             else -> GroupViewHolder.from(parent).apply { setFullSpan(this) }
         }
     }
@@ -63,8 +61,8 @@ class GroupAdapter(
                 extractGraphViewData(item.obj),
                 graphStatClickListener
             )
-            GroupChildType.FEATURE -> (holder as FeatureViewHolder)
-                .bind(item.obj as DisplayFeature, featureClickListener)
+            GroupChildType.TRACKER -> (holder as TrackerViewHolder)
+                .bind(item.obj as DisplayTracker, trackerClickListener)
             GroupChildType.GROUP -> (holder as GroupViewHolder)
                 .bind(item.obj as Group, groupClickListener)
         }
@@ -105,7 +103,7 @@ class GroupAdapter(
     fun getSpanModeForItem(position: Int): SpanMode? {
         if (position < 0 || position > groupChildren.size) return null
         return when (groupChildren[position].type) {
-            GroupChildType.FEATURE -> SpanMode.NumSpans(1)
+            GroupChildType.TRACKER -> SpanMode.NumSpans(1)
             GroupChildType.GROUP -> SpanMode.NumSpans(2)
             GroupChildType.GRAPH -> SpanMode.FullWidth
         }
@@ -140,9 +138,9 @@ private class ListDiffCallback(
                 val newObj = (new.obj as Group).copy(displayIndex = 0)
                 oldObj == newObj
             }
-            GroupChildType.FEATURE -> {
-                val oldObj = (old.obj as DisplayFeature).copy(displayIndex = 0)
-                val newObj = (new.obj as DisplayFeature).copy(displayIndex = 0)
+            GroupChildType.TRACKER -> {
+                val oldObj = (old.obj as DisplayTracker).copy(displayIndex = 0)
+                val newObj = (new.obj as DisplayTracker).copy(displayIndex = 0)
                 oldObj == newObj
             }
             GroupChildType.GRAPH -> {

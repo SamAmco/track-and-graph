@@ -1,155 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:fillViewport="true">
-
-    <LinearLayout
+<layout>
+    <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/input_spacing_large">
-
-            <TextView
-                android:id="@+id/titleText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:textAppearance="@style/TextAppearance.Headline4"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:text="Some header" />
-
-            <ImageView
-                android:id="@+id/titleUnderline"
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_gravity="center"
-                app:layout_constraintLeft_toLeftOf="@id/titleText"
-                app:layout_constraintRight_toRightOf="@id/titleText"
-                app:layout_constraintTop_toBottomOf="@id/titleText"
-                app:srcCompat="?attr/colorPrimary"
-                tools:ignore="ContentDescription" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/input_spacing_large"
             android:gravity="center"
-            android:orientation="horizontal">
+            android:orientation="vertical">
 
-            <Button
-                android:id="@+id/dateButton"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:background="?attr/colorControlHighlight"
-                android:textColor="?attr/colorOnSurface"
-                tools:text="02/03/2017" />
-
-            <Button
-                android:id="@+id/timeButton"
-                android:layout_width="wrap_content"
-                android:layout_height="35dp"
-                android:layout_marginStart="30dp"
-                android:background="?attr/colorControlHighlight"
-                android:textColor="?attr/colorOnSurface"
-                tools:text="08:22" />
-
-        </LinearLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/addNoteButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="@dimen/input_spacing_large"
-            android:clickable="true"
-            android:focusable="true">
-
-            <TextView
-                android:id="@+id/addNoteText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/add_a_note"
-                android:textAppearance="@style/TextAppearance.Body"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="4dp"
-                app:layout_constraintBottom_toBottomOf="@id/addNoteText"
-                app:layout_constraintLeft_toRightOf="@id/addNoteText"
-                app:layout_constraintTop_toTopOf="@id/addNoteText"
-                app:srcCompat="@drawable/edit_icon"
-                app:tint="?android:attr/textColorSecondary" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <EditText
-            android:id="@+id/noteInputText"
-            style="@style/Style.ExpansiveTextInputStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/input_spacing_large"
-            android:focusableInTouchMode="true"
-            android:hint="@string/note_input_hint"
-            android:inputType="textMultiLine|textCapSentences"
-            android:importantForAutofill="no"
-            android:visibility="gone" />
-
-        <FrameLayout
-            android:id="@+id/inputLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dialog_input_spacing">
-
-            <EditText
-                android:id="@+id/numberInput"
-                style="@style/Style.DataPointInputNumberStyle"
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:cursorVisible="true"
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:hint="1"
-                android:importantForAutofill="no"
-                tools:ignore="HardcodedText"
-                tools:text="33" />
+                android:layout_marginTop="@dimen/input_spacing_large">
 
-            <com.samco.trackandgraph.ui.DurationInputView
-                android:id="@+id/durationInput"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                />
-
-            <HorizontalScrollView
-                android:id="@+id/buttonsScrollView"
-                android:layout_width="wrap_content"
-                android:layout_height="45dp"
-                android:layout_gravity="center_horizontal"
-                android:scrollbars="none">
-
-                <LinearLayout
-                    android:id="@+id/buttonsLayout"
+                <TextView
+                    android:id="@+id/titleText"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal" />
-            </HorizontalScrollView>
-        </FrameLayout>
+                    android:textAppearance="@style/TextAppearance.Headline4"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Some header" />
 
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+                <ImageView
+                    android:id="@+id/titleUnderline"
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_gravity="center"
+                    app:layout_constraintLeft_toLeftOf="@id/titleText"
+                    app:layout_constraintRight_toRightOf="@id/titleText"
+                    app:layout_constraintTop_toBottomOf="@id/titleText"
+                    app:srcCompat="?attr/colorPrimary"
+                    tools:ignore="ContentDescription" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/input_spacing_large"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/dateButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:background="?attr/colorControlHighlight"
+                    android:textColor="?attr/colorOnSurface"
+                    tools:text="02/03/2017" />
+
+                <Button
+                    android:id="@+id/timeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="35dp"
+                    android:layout_marginStart="30dp"
+                    android:background="?attr/colorControlHighlight"
+                    android:textColor="?attr/colorOnSurface"
+                    tools:text="08:22" />
+
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/addNoteButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="@dimen/input_spacing_large"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/addNoteText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/add_a_note"
+                    android:textAppearance="@style/TextAppearance.Body"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_marginStart="4dp"
+                    app:layout_constraintBottom_toBottomOf="@id/addNoteText"
+                    app:layout_constraintLeft_toRightOf="@id/addNoteText"
+                    app:layout_constraintTop_toTopOf="@id/addNoteText"
+                    app:srcCompat="@drawable/edit_icon"
+                    app:tint="?android:attr/textColorSecondary" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <EditText
+                android:id="@+id/noteInputText"
+                style="@style/Style.ExpansiveTextInputStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/input_spacing_large"
+                android:focusableInTouchMode="true"
+                android:hint="@string/note_input_hint"
+                android:importantForAutofill="no"
+                android:inputType="textMultiLine|textCapSentences"
+                android:visibility="gone" />
+
+            <FrameLayout
+                android:id="@+id/inputLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/dialog_input_spacing">
+
+                <EditText
+                    android:id="@+id/numberInput"
+                    style="@style/Style.DataPointInputNumberStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:cursorVisible="true"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
+                    android:hint="1"
+                    android:importantForAutofill="no"
+                    tools:ignore="HardcodedText"
+                    tools:text="33" />
+
+                <com.samco.trackandgraph.ui.DurationInputView
+                    android:id="@+id/durationInput"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal" />
+
+                <HorizontalScrollView
+                    android:id="@+id/buttonsScrollView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center_horizontal"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:id="@+id/buttonsLayout"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="horizontal" />
+                </HorizontalScrollView>
+            </FrameLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</layout>

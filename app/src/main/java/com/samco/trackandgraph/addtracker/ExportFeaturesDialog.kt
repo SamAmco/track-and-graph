@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.displaytrackgroup
+package com.samco.trackandgraph.addtracker
 
 import android.app.Dialog
 import android.content.ContentResolver
@@ -261,7 +261,7 @@ class ExportFeaturesViewModel @Inject constructor(
     private suspend fun doExport(uri: Uri) = runCatching {
         withContext(io) {
             contentResolver.openOutputStream(uri)?.let { outStream ->
-                val featureIds = selectedFeatures.map { it.id }
+                val featureIds = selectedFeatures.map { it.featureId }
                 dataInteractor.writeFeaturesToCSV(outStream, featureIds)
             }
         }

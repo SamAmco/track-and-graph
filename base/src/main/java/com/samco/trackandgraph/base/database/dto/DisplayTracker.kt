@@ -20,11 +20,12 @@ package com.samco.trackandgraph.base.database.dto
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 
-data class DisplayFeature(
+data class DisplayTracker(
     var id: Long,
+    var featureId: Long,
     val name: String,
     val groupId: Long,
-    val featureType: DataType = DataType.CONTINUOUS,
+    val dataType: DataType = DataType.CONTINUOUS,
     val discreteValues: List<DiscreteValue>,
     val hasDefaultValue: Boolean,
     val defaultValue: Double,
@@ -33,16 +34,4 @@ data class DisplayFeature(
     val displayIndex: Int,
     val description: String,
     val timerStartInstant: Instant?
-) {
-    fun asFeature() = Feature(
-        id,
-        name,
-        groupId,
-        featureType,
-        discreteValues,
-        displayIndex,
-        hasDefaultValue,
-        defaultValue,
-        description
-    )
-}
+)

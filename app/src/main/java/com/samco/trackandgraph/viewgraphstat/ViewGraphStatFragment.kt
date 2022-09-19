@@ -31,39 +31,25 @@ import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.GlobalNote
-import com.samco.trackandgraph.base.database.dto.NoteType
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatView
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.ui.FeaturePathProvider
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
-    private val viewModel by viewModels<ViewGraphStatViewModel>()
+    private val viewModel: ViewGraphStatViewModel by viewModels<ViewGraphStatViewModelImpl>()
     private lateinit var graphStatView: GraphStatView
     private var binding: FragmentViewGraphStatBinding by bindingForViewLifecycle()
     private lateinit var adapter: NotesAdapter
@@ -88,12 +74,30 @@ class ViewGraphStatFragment : Fragment() {
         binding = FragmentViewGraphStatBinding.inflate(inflater, container, false)
         graphStatView = binding.graphStatView
 
-        viewModel.setGraphStatId(args.graphStatId)
+        viewModel.initFromGraphStatId(args.graphStatId)
 
         setViewInitialState()
-        listenToState()
+        observeGraphStatViewData()
+        listenToShowingNotes()
+        listenToFeaturePathProvider()
+        observeNoteMarker()
         listenToBinding()
         return binding.root
+    }
+
+    private fun listenToFeaturePathProvider() {
+        viewModel.featureDataProvider.observe(viewLifecycleOwner) { featureDataProvider ->
+            adapter = NotesAdapter(
+                featureDataProvider,
+                getWeekDayNames(requireContext()),
+                NoteClickListener(this::onViewNoteClicked)
+            )
+            binding.notesRecyclerView.adapter = adapter
+            binding.notesRecyclerView.layoutManager = LinearLayoutManager(
+                context, RecyclerView.VERTICAL, false
+            )
+            viewModel.notes.observe(viewLifecycleOwner) { onNewNotesList(it) }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -106,29 +110,29 @@ class ViewGraphStatFragment : Fragment() {
 
     private fun setViewInitialState() {
         graphStatView.addLineGraphPanAndZoom()
+        graphStatView.initLoading()
         binding.showNotesButton.visibility = View.GONE
     }
 
     private fun onViewNoteClicked(note: GraphNote) {
         viewModel.noteClicked(note)
-        when (note.noteType) {
-            NoteType.GLOBAL_NOTE -> showNoteDialog(
+        when {
+            note.isGlobalNote() -> showNoteDialog(
                 layoutInflater,
                 requireContext(),
                 note.globalNote!!
             )
-            NoteType.DATA_POINT -> {
+            note.isDataPoint() -> {
                 val dataPoint = note.dataPoint!!
-                val featureDisplayName =
-                    viewModel.featurePathProvider.getPathForFeature(dataPoint.featureId)
-                val featureType =
-                    viewModel.featureTypes?.getOrElse(dataPoint.featureId) { DataType.CONTINUOUS }
-                        ?: DataType.CONTINUOUS
+                val dataProvider = viewModel.featureDataProvider.value
+                val featureDisplayName = dataProvider?.getPathForFeature(dataPoint.featureId) ?: ""
+                val isDuration = dataProvider?.getDataSampleProperties(dataPoint.featureId)
+                    ?.isDuration ?: false
                 showDataPointDescriptionDialog(
                     requireContext(),
                     layoutInflater,
                     dataPoint,
-                    featureType,
+                    isDuration,
                     featureDisplayName
                 )
             }
@@ -146,8 +150,7 @@ class ViewGraphStatFragment : Fragment() {
         }
     }
 
-    private fun listenToState() {
-        viewModel.state.observe(viewLifecycleOwner) { state -> onViewModelStateChanged(state) }
+    private fun listenToShowingNotes() {
         viewModel.showingNotes.observe(viewLifecycleOwner) { b -> onShowingNotesChanged(b) }
     }
 
@@ -162,33 +165,6 @@ class ViewGraphStatFragment : Fragment() {
         if (notes.isEmpty()) return
         binding.showNotesButton.visibility = View.VISIBLE
         adapter.submitList(notes)
-    }
-
-    private fun onViewModelStateChanged(state: ViewGraphStatViewModelState) {
-        when (state) {
-            ViewGraphStatViewModelState.INITIALIZING -> graphStatView.initLoading()
-            ViewGraphStatViewModelState.WAITING -> {
-                observeGraphStatViewData()
-                initNotesAdapterFromViewModel()
-                observeNoteMarker()
-            }
-        }
-    }
-
-    private fun initNotesAdapterFromViewModel() {
-        val featurePathProvider = viewModel.featurePathProvider
-        val featureTypes = viewModel.featureTypes ?: emptyMap()
-        adapter = NotesAdapter(
-            featurePathProvider,
-            featureTypes,
-            getWeekDayNames(requireContext()),
-            NoteClickListener(this::onViewNoteClicked)
-        )
-        binding.notesRecyclerView.adapter = adapter
-        binding.notesRecyclerView.layoutManager = LinearLayoutManager(
-            context, RecyclerView.VERTICAL, false
-        )
-        viewModel.notes.observe(viewLifecycleOwner) { onNewNotesList(it) }
     }
 
     private fun onShowingNotesChanged(showNotes: Boolean) {
@@ -250,98 +226,3 @@ class ViewGraphStatFragment : Fragment() {
     }
 }
 
-enum class ViewGraphStatViewModelState { INITIALIZING, WAITING }
-
-@HiltViewModel
-class ViewGraphStatViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor,
-    private val gsiProvider: GraphStatInteractorProvider,
-    @MainDispatcher private val ui: CoroutineDispatcher,
-    @IODispatcher private val io: CoroutineDispatcher
-) : ViewModel() {
-    var featurePathProvider: FeaturePathProvider = FeaturePathProvider(emptyList(), emptyList())
-        private set
-    var featureTypes: Map<Long, DataType>? = null
-        private set
-
-    val state: LiveData<ViewGraphStatViewModelState>
-        get() = _state
-    private val _state = MutableLiveData(ViewGraphStatViewModelState.INITIALIZING)
-
-    val graphStatViewData: LiveData<IGraphStatViewData>
-        get() = _graphStatViewData
-    private val _graphStatViewData = MutableLiveData<IGraphStatViewData>()
-
-    val showingNotes: LiveData<Boolean>
-        get() = _showingNotes
-    private val _showingNotes = MutableLiveData(false)
-
-    private val globalNotes = MutableStateFlow<List<GlobalNote>>(emptyList())
-    private val dataPoints = MutableStateFlow<List<DataPoint>>(emptyList())
-
-    val notes: LiveData<List<GraphNote>> =
-        combine(dataPoints, globalNotes) { dataPoints, globalNotes ->
-            val filteredGlobalNotes = globalNotes
-                .filter { g ->
-                    val afterOldest =
-                        dataPoints.lastOrNull()?.let { g.timestamp >= it.timestamp } ?: false
-                    val beforeNewest =
-                        dataPoints.firstOrNull()?.let { g.timestamp <= it.timestamp } ?: false
-                    afterOldest && beforeNewest
-                }
-                .map { GraphNote(it) }
-            dataPoints
-                .filter { dp -> dp.note.isNotEmpty() }
-                .distinct()
-                .map { GraphNote(it) }
-                .union(filteredGlobalNotes)
-                .sortedByDescending { it.timestamp }
-        }.asLiveData(viewModelScope.coroutineContext)
-
-    val markedNote: LiveData<GraphNote?>
-        get() = _markedNote
-    private val _markedNote = MutableLiveData<GraphNote?>(null)
-
-    private var initialized = false
-
-    fun setGraphStatId(graphStatId: Long) {
-        if (initialized) return
-        initialized = true
-
-        viewModelScope.launch(io) {
-            initFromGraphStatId(graphStatId)
-            getAllFeatureAttributes()
-            getAllGlobalNotes()
-            withContext(ui) { _state.value = ViewGraphStatViewModelState.WAITING }
-        }
-    }
-
-    private suspend fun getAllGlobalNotes() = withContext(io) {
-        globalNotes.emit(dataInteractor.getAllGlobalNotesSync())
-    }
-
-    private suspend fun getAllFeatureAttributes() {
-        val allFeatures = dataInteractor.getAllFeaturesSync()
-        val allGroups = dataInteractor.getAllGroupsSync()
-        featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
-        featureTypes = allFeatures.associate { it.id to it.featureType }
-    }
-
-    private suspend fun initFromGraphStatId(graphStatId: Long) {
-        val graphStat = dataInteractor.getGraphStatById(graphStatId)
-        val viewData = gsiProvider
-            .getDataFactory(graphStat.type)
-            .getViewData(graphStat) {
-                viewModelScope.launch(io) { dataPoints.emit(it) }
-            }
-        withContext(ui) { _graphStatViewData.value = viewData }
-    }
-
-    fun showHideNotesClicked() {
-        _showingNotes.value = _showingNotes.value?.not()
-    }
-
-    fun noteClicked(note: GraphNote) {
-        _markedNote.value = note
-    }
-}

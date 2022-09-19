@@ -15,27 +15,34 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.base.database.entity.queryresponse
+package com.samco.trackandgraph.base.database.entity
 
 import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DiscreteValue
-import com.samco.trackandgraph.base.database.dto.DisplayFeature
-import org.threeten.bp.Instant
-import org.threeten.bp.OffsetDateTime
 
-internal data class DisplayFeature(
-    @ColumnInfo(name = "id")
-    var id: Long,
+@Entity(
+    tableName = "trackers_table",
+    foreignKeys = [ForeignKey(
+        entity = Feature::class,
+        parentColumns = arrayOf("id"),
+        childColumns = arrayOf("feature_id"),
+        onDelete = ForeignKey.CASCADE
+    )]
+)
+internal data class Tracker(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id", index = true)
+    val id: Long,
 
-    @ColumnInfo(name = "name")
-    val name: String,
-
-    @ColumnInfo(name = "group_id")
-    val groupId: Long,
+    @ColumnInfo(name = "feature_id", index = true)
+    val featureId: Long,
 
     @ColumnInfo(name = "type")
-    val featureType: DataType = DataType.CONTINUOUS,
+    val dataType: DataType,
 
     @ColumnInfo(name = "discrete_values")
     val discreteValues: List<DiscreteValue>,
@@ -45,34 +52,4 @@ internal data class DisplayFeature(
 
     @ColumnInfo(name = "default_value")
     val defaultValue: Double,
-
-    @ColumnInfo(name = "last_timestamp")
-    val timestamp: OffsetDateTime?,
-
-    @ColumnInfo(name = "num_data_points")
-    val numDataPoints: Long?,
-
-    @ColumnInfo(name = "display_index")
-    val displayIndex: Int,
-
-    @ColumnInfo(name = "feature_description")
-    val description: String,
-
-    @ColumnInfo(name = "start_instant")
-    val timerStartInstant: Instant?
-) {
-    fun toDto() = DisplayFeature(
-        id,
-        name,
-        groupId,
-        featureType,
-        discreteValues,
-        hasDefaultValue,
-        defaultValue,
-        timestamp,
-        numDataPoints,
-        displayIndex,
-        description,
-        timerStartInstant
-    )
-}
+)

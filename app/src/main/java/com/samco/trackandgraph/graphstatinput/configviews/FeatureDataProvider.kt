@@ -23,13 +23,25 @@ import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.ui.FeaturePathProvider
 
 class FeatureDataProvider(
-    val featureData: List<FeatureData>,
-    groups: List<Group>
-) : FeaturePathProvider(featureData.map { it.feature }, groups) {
+    val dataSourceData: Map<DataSourceData, Group>
+) : FeaturePathProvider(dataSourceData.map { it.key.feature to it.value }.toMap()) {
 
-    fun featureDataAlphabetical() = featureData.sortedBy { getPathForFeature(it.feature.id) }
+    constructor(dataSourceData: List<DataSourceData>, groups: List<Group>) : this(
+        dataSourceData.mapNotNull { dataSource ->
+            val group = groups.firstOrNull { it.id == dataSource.feature.groupId }
+                ?: return@mapNotNull null
+            dataSource to group
+        }.toMap()
+    )
 
-    data class FeatureData(
+    fun dataSourceDataAlphabetically() =
+        dataSourceData.keys.sortedBy { getPathForFeature(it.feature.featureId) }
+
+    fun getDataSampleProperties(featureId: Long) = dataSourceData.keys.firstOrNull {
+        it.feature.featureId == featureId
+    }?.dataProperties
+
+    data class DataSourceData(
         val feature: Feature,
         val labels: Set<String>,
         val dataProperties: DataSampleProperties

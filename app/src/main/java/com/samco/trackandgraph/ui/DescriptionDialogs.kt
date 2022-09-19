@@ -68,13 +68,14 @@ fun showNoteDialog(inflater: LayoutInflater, context: Context, note: GlobalNote)
         .show()
 }
 
-fun showNoteDialog(inflater: LayoutInflater, context: Context, note: DisplayNote) {
-    val featureDispalayName = when (note.noteType) {
-        NoteType.DATA_POINT -> "${note.groupId} -> ${note.featureName}"
-        NoteType.GLOBAL_NOTE -> ""
-    }
+fun showNoteDialog(
+    inflater: LayoutInflater,
+    context: Context,
+    note: DisplayNote,
+    featurePath: String?
+) {
     val headerView =
-        getNoteDialogHeader(inflater, context, note.timestamp, null, featureDispalayName)
+        getNoteDialogHeader(inflater, context, note.timestamp, null, featurePath)
     AlertDialog.Builder(context)
         .setCustomTitle(headerView)
         .setView(getBodyTextView(context, note.note))
@@ -83,8 +84,11 @@ fun showNoteDialog(inflater: LayoutInflater, context: Context, note: DisplayNote
 }
 
 fun getNoteDialogHeader(
-    inflater: LayoutInflater, context: Context, timestamp: OffsetDateTime,
-    displayValue: String?, featureDispalayName: String?
+    inflater: LayoutInflater,
+    context: Context,
+    timestamp: OffsetDateTime,
+    displayValue: String?,
+    featureDisplayName: String?
 ): View {
     val headerView = ShowNoteDialogHeaderBinding.inflate(inflater)
     headerView.dateTimeText.text =
@@ -92,20 +96,23 @@ fun getNoteDialogHeader(
     headerView.valueText.visibility = if (displayValue.isNullOrEmpty()) View.GONE else View.VISIBLE
     displayValue?.let { headerView.valueText.text = it }
     headerView.featureDisplayNameText.visibility =
-        if (featureDispalayName.isNullOrEmpty()) View.GONE else View.VISIBLE
-    featureDispalayName?.let { headerView.featureDisplayNameText.text = it }
+        if (featureDisplayName.isNullOrEmpty()) View.GONE else View.VISIBLE
+    featureDisplayName?.let { headerView.featureDisplayNameText.text = it }
     return headerView.root
 }
 
 fun showDataPointDescriptionDialog(
-    context: Context, inflater: LayoutInflater, dataPoint: DataPoint,
-    dataType: DataType, featureDispalayName: String? = null
+    context: Context,
+    inflater: LayoutInflater,
+    dataPoint: DataPoint,
+    isDuration: Boolean,
+    featureDispalayName: String? = null
 ) {
     showDataPointDescriptionDialog(
         context,
         inflater,
         dataPoint.timestamp,
-        dataPoint.getDisplayValue(dataType),
+        dataPoint.getDisplayValue(isDuration),
         dataPoint.note,
         featureDispalayName
     )
