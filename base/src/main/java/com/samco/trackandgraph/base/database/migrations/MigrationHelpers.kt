@@ -17,8 +17,11 @@
 
 package com.samco.trackandgraph.base.database.migrations
 
+import androidx.room.TypeConverter
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import java.lang.Exception
 
 internal data class NTuple2<T1, T2>(val t1: T1, val t2: T2) {
@@ -98,9 +101,37 @@ internal class MigrationMoshiHelper private constructor() {
         }
     }
 
+    fun stringToListOfDiscreteValues(moshi: Moshi, value: String): List<DiscreteValue> {
+        if (value.isBlank()) return emptyList()
+        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
+        return fromJson(moshi.adapter(listType), value) { emptyList() }
+    }
+
+    fun listOfDiscreteValuesToString(moshi: Moshi, values: List<DiscreteValue>): String {
+        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
+        return toJson(moshi.adapter(listType), values)
+    }
+
+    @JsonClass(generateAdapter = true)
+    data class DiscreteValue(
+        val index: Int,
+        val label: String
+    ) {
+
+        //Ideally we wouldn't need fromString and toString here but they are still used by CSVReadWriter.
+        override fun toString() = "$index:$label"
+
+        companion object {
+            fun fromString(value: String): DiscreteValue {
+                if (!value.contains(':')) throw Exception("value did not contain a colon")
+                val label = value.substring(value.indexOf(':') + 1).trim()
+                val index = value.substring(0, value.indexOf(':')).trim().toDouble().toInt()
+                return DiscreteValue(index, label)
+            }
+        }
+    }
+
     companion object {
         internal fun getMigrationMoshiHelper() = MigrationMoshiHelper()
     }
 }
-
-

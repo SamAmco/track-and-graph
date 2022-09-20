@@ -66,7 +66,7 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         FeatureTimer::class,
         FunctionEntity::class
     ],
-    version = 48
+    version = 49
 )
 @TypeConverters(Converters::class)
 internal abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -162,19 +162,6 @@ internal class Converters {
     @TypeConverter
     fun listOfStringsToString(values: List<String>): String {
         val listType = Types.newParameterizedType(List::class.java, String::class.java)
-        return toJson(moshi.adapter(listType), values)
-    }
-
-    @TypeConverter
-    fun stringToListOfDiscreteValues(value: String): List<DiscreteValue> {
-        if (value.isBlank()) return emptyList()
-        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
-        return fromJson(moshi.adapter(listType), value) { emptyList() }
-    }
-
-    @TypeConverter
-    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String {
-        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
         return toJson(moshi.adapter(listType), values)
     }
 

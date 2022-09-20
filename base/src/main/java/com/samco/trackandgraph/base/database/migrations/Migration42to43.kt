@@ -21,7 +21,6 @@ package com.samco.trackandgraph.base.database.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.samco.trackandgraph.base.database.dto.CheckedDays
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.squareup.moshi.Types
 
 
@@ -67,14 +66,18 @@ val MIGRATION_42_43 = object : Migration(42, 43) {
             val discreteValues = try {
                 discreteValuesString
                     .split("||")
-                    .map { DiscreteValue.fromString(it) }
+                    .map { MigrationMoshiHelper.DiscreteValue.fromString(it) }
             } catch (e: Exception) {
                 deletes.add(id)
                 continue
             }
-            val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
+            val listType = Types.newParameterizedType(
+                List::class.java,
+                MigrationMoshiHelper.DiscreteValue::class.java
+            )
             val jsonString =
-                helper.moshi.adapter<List<DiscreteValue>>(listType).toJson(discreteValues) ?: ""
+                helper.moshi.adapter<List<MigrationMoshiHelper.DiscreteValue>>(listType)
+                    .toJson(discreteValues) ?: ""
             updates.add(listOf(jsonString, id))
         }
         if (deletes.size > 0) deletes.forEach {

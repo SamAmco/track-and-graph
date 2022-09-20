@@ -36,13 +36,12 @@ interface TrackerHelper {
 
     suspend fun updateTracker(
         oldTracker: Tracker,
-        discreteValueMap: Map<DiscreteValue, DiscreteValue>,
         durationNumericConversionMode: DurationNumericConversionMode? = null,
         newName: String? = null,
         newType: DataType? = null,
-        newDiscreteValues: List<DiscreteValue>? = null,
         hasDefaultValue: Boolean? = null,
         defaultValue: Double? = null,
+        defaultLabel: String?,
         featureDescription: String? = null
     )
 

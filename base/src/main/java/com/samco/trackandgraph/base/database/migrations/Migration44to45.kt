@@ -20,7 +20,6 @@ package com.samco.trackandgraph.base.database.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.squareup.moshi.Types
 
 
@@ -37,9 +36,12 @@ val MIGRATION_44_45 = object : Migration(44, 45) {
         database.execSQL("DROP TABLE IF EXISTS `average_time_between_stat_table2`")
     }
 
-    private fun getDiscreteValues(value: String): List<DiscreteValue> {
+    private fun getDiscreteValues(value: String): List<MigrationMoshiHelper.DiscreteValue> {
         if (value.isBlank()) return emptyList()
-        val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
+        val listType = Types.newParameterizedType(
+            List::class.java,
+            MigrationMoshiHelper.DiscreteValue::class.java
+        )
         return helper.fromJson(helper.moshi.adapter(listType), value) { emptyList() }
     }
 

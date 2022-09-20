@@ -27,14 +27,10 @@ data class Tracker(
     override val displayIndex: Int,
     override val description: String,
     val dataType: DataType,
-    val discreteValues: List<DiscreteValue>,
     val hasDefaultValue: Boolean,
     val defaultValue: Double,
+    val defaultLabel: String
 ) : Feature {
-    fun getDefaultLabel(): String =
-        if (dataType == DataType.DISCRETE)
-            discreteValues.first { dv -> dv.index == defaultValue.toInt() }.label
-        else ""
 
     companion object {
         internal fun fromTrackerWithFeature(twf: TrackerWithFeature) = Tracker(
@@ -45,9 +41,9 @@ data class Tracker(
             displayIndex = twf.displayIndex,
             description = twf.description,
             dataType = twf.dataType,
-            discreteValues = twf.discreteValues,
             hasDefaultValue = twf.hasDefaultValue,
             defaultValue = twf.defaultValue,
+            defaultLabel = twf.defaultLabel
         )
     }
 
@@ -55,9 +51,9 @@ data class Tracker(
         id = id,
         featureId = featureId,
         dataType = dataType,
-        discreteValues = discreteValues,
         hasDefaultValue = hasDefaultValue,
-        defaultValue = defaultValue
+        defaultValue = defaultValue,
+        defaultLabel = defaultLabel
     )
 
     internal fun toFeatureEntity() = com.samco.trackandgraph.base.database.entity.Feature(

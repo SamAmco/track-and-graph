@@ -41,81 +41,49 @@ internal class TrackerHelperImpl @Inject constructor(
 ) : TrackerHelper {
     override suspend fun updateTracker(
         oldTracker: Tracker,
-        discreteValueMap: Map<DiscreteValue, DiscreteValue>,
         durationNumericConversionMode: DurationNumericConversionMode?,
         newName: String?,
         newType: DataType?,
-        newDiscreteValues: List<DiscreteValue>?,
         hasDefaultValue: Boolean?,
         defaultValue: Double?,
+        defaultLabel: String?,
         featureDescription: String?
     ) = withContext(io) {
         database.withTransaction {
-            updateFeatureImpl(
+            val newDataType = newType ?: oldTracker.dataType
+
+            updateAllExistingDataPointsForTransformation(
                 oldTracker,
-                discreteValueMap,
-                durationNumericConversionMode,
-                newName,
-                newType,
-                newDiscreteValues,
-                hasDefaultValue,
-                defaultValue,
-                featureDescription
+                newDataType,
+                durationNumericConversionMode
             )
+
+            val newFeature = com.samco.trackandgraph.base.database.entity.Feature(
+                id = oldTracker.featureId,
+                name = newName ?: oldTracker.name,
+                groupId = oldTracker.groupId,
+                displayIndex = oldTracker.displayIndex,
+                description = featureDescription ?: oldTracker.description
+            )
+            val newTracker = com.samco.trackandgraph.base.database.entity.Tracker(
+                id = oldTracker.id,
+                featureId = oldTracker.featureId,
+                dataType = newDataType,
+                hasDefaultValue = hasDefaultValue ?: oldTracker.hasDefaultValue,
+                defaultValue = defaultValue ?: oldTracker.defaultValue,
+                defaultLabel = defaultLabel ?: oldTracker.defaultLabel
+            )
+            dao.updateFeature(newFeature)
+            dao.updateTracker(newTracker)
         }
-    }
-
-    private fun updateFeatureImpl(
-        oldTracker: Tracker,
-        discreteValueMap: Map<DiscreteValue, DiscreteValue>,
-        durationNumericConversionMode: DurationNumericConversionMode?,
-        newName: String?,
-        newDataType: DataType?,
-        newDiscreteValues: List<DiscreteValue>?,
-        hasDefaultValue: Boolean?,
-        defaultValue: Double?,
-        featureDescription: String?
-    ) {
-        val newType = newDataType ?: oldTracker.dataType
-
-        updateAllExistingDataPointsForTransformation(
-            oldTracker,
-            newType,
-            discreteValueMap,
-            durationNumericConversionMode
-        )
-
-        val newFeature = com.samco.trackandgraph.base.database.entity.Feature(
-            id = oldTracker.featureId,
-            name = newName ?: oldTracker.name,
-            groupId = oldTracker.groupId,
-            displayIndex = oldTracker.displayIndex,
-            description = featureDescription ?: oldTracker.description
-        )
-        val newTracker = com.samco.trackandgraph.base.database.entity.Tracker(
-            id = oldTracker.id,
-            featureId = oldTracker.featureId,
-            dataType = newType,
-            discreteValues = newDiscreteValues ?: oldTracker.discreteValues,
-            hasDefaultValue = hasDefaultValue ?: oldTracker.hasDefaultValue,
-            defaultValue = defaultValue ?: oldTracker.defaultValue
-        )
-        dao.updateFeature(newFeature)
-        dao.updateTracker(newTracker)
     }
 
     private fun updateAllExistingDataPointsForTransformation(
         oldTracker: Tracker,
         newType: DataType,
-        discreteValueMap: Map<DiscreteValue, DiscreteValue>,
         durationNumericConversionMode: DurationNumericConversionMode?
     ) {
         when (oldTracker.dataType) {
-            DataType.DISCRETE -> when (newType) {
-                DataType.CONTINUOUS -> stripDataPointsToValue(oldTracker)
-                DataType.DISCRETE -> updateDiscreteValueDataPoints(oldTracker, discreteValueMap)
-                else -> {}
-            }
             DataType.CONTINUOUS -> when (newType) {
                 DataType.DURATION -> {
                     if (durationNumericConversionMode == null) noConversionModeError()
@@ -189,65 +157,7 @@ internal class TrackerHelperImpl @Inject constructor(
         dao.updateDataPoints(newDataPoints)
     }
 
-    //TODO this would probably be faster in SQL
-    private fun stripDataPointsToValue(oldTracker: Tracker) {
-        val oldDataPoints = getAllDataPoints(oldTracker.featureId)
-        val newDataPoints = oldDataPoints.map {
-            DataPointEntity(
-                it.timestamp,
-                it.featureId,
-                it.value,
-                "",
-                it.note
-            )
-        }
-        dao.updateDataPoints(newDataPoints)
-    }
-
     private fun getAllDataPoints(featureId: Long) = dao.getDataPointsForFeatureSync(featureId)
-
-    private fun updateDiscreteValueDataPoints(
-        oldTracker: Tracker,
-        discreteValueMap: Map<DiscreteValue, DiscreteValue>
-    ) {
-        //Remove any discrete values that have no mapping
-        oldTracker.discreteValues
-            .filter { dv -> !discreteValueMap.keys.contains(dv) }
-            .forEach { i ->
-                removeExistingDataPointsForDiscreteValue(
-                    oldTracker.featureId,
-                    i.index
-                )
-            }
-
-        //Update existing data points to their new discrete values
-        if (discreteValueMap.any { it.key != it.value }) {
-            updateExistingDataPointsForDiscreteValue(oldTracker.featureId, discreteValueMap)
-        }
-    }
-
-    //TODO this would probably be faster in SQL
-    private fun updateExistingDataPointsForDiscreteValue(
-        featureId: Long,
-        discreteValueMap: Map<DiscreteValue, DiscreteValue>
-    ) {
-        val oldValues = getAllDataPoints(featureId)
-        val newValues = oldValues.map { v ->
-            val newDisc = discreteValueMap[DiscreteValue(v.value.toInt(), v.label)]!!
-            DataPointEntity(
-                v.timestamp,
-                v.featureId,
-                newDisc.index.toDouble(),
-                newDisc.label,
-                v.note
-            )
-        }
-        dao.updateDataPoints(newValues)
-    }
-
-    private fun removeExistingDataPointsForDiscreteValue(featureId: Long, index: Int) {
-        dao.deleteAllDataPointsForDiscreteValue(featureId, index.toDouble())
-    }
 
     override suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker> =
         withContext(io) { trackerIds.mapNotNull { getTrackerById(it) } }
