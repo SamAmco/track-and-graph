@@ -24,7 +24,7 @@ import javax.inject.Inject
 interface DataSampler {
     fun getDataSampleForFeatureId(featureId: Long): DataSample
 
-    suspend fun getLabelsForFeatureId(featureId: Long): Set<String>
+    suspend fun getLabelsForFeatureId(featureId: Long): List<String>
 }
 
 internal class DataSamplerImpl @Inject constructor(
@@ -43,10 +43,11 @@ internal class DataSamplerImpl @Inject constructor(
         //TODO if there is a function for the feature ID we need to return a data sample for the function
     }
 
-    override suspend fun getLabelsForFeatureId(featureId: Long): Set<String> {
+    override suspend fun getLabelsForFeatureId(featureId: Long): List<String> {
         val tracker = dao.getTrackerByFeatureId(featureId)
-        return tracker?.discreteValues?.map { it.label }?.toSet()
-            ?: emptySet()
+        return tracker?.let {
+            dao.getLabelsForTracker(tracker.id)
+        } ?: emptyList()
         //TODO implement collecting labels for a function data source
     }
 }

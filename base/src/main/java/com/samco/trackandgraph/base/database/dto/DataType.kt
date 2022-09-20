@@ -17,4 +17,4 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-enum class DataType { DISCRETE, CONTINUOUS, DURATION }
+enum class DataType { CONTINUOUS, DURATION }

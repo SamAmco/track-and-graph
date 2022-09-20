@@ -1,9 +1,7 @@
 package com.samco.trackandgraph.base.database.entity.queryresponse
 
 import androidx.room.ColumnInfo
-import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.entity.Feature
 
 internal data class TrackerWithFeature(
@@ -28,14 +26,14 @@ internal data class TrackerWithFeature(
     @ColumnInfo(name = "type")
     val dataType: DataType,
 
-    @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<DiscreteValue>,
-
     @ColumnInfo(name = "has_default_value")
     val hasDefaultValue: Boolean,
 
     @ColumnInfo(name = "default_value")
     val defaultValue: Double,
+
+    @ColumnInfo(name = "default_label")
+    val defaultLabel: String,
 ) {
     fun toFeatureEntity() = Feature(
         id = featureId,

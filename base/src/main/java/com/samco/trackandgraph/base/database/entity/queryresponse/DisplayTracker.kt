@@ -19,7 +19,6 @@ package com.samco.trackandgraph.base.database.entity.queryresponse
 
 import androidx.room.ColumnInfo
 import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
@@ -40,14 +39,14 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "type")
     val featureType: DataType = DataType.CONTINUOUS,
 
-    @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<DiscreteValue>,
-
     @ColumnInfo(name = "has_default_value")
     val hasDefaultValue: Boolean,
 
     @ColumnInfo(name = "default_value")
     val defaultValue: Double,
+
+    @ColumnInfo(name = "default_label")
+    val defaultLabel: String,
 
     @ColumnInfo(name = "last_timestamp")
     val timestamp: OffsetDateTime?,
@@ -70,9 +69,9 @@ internal data class DisplayTracker(
         name = name,
         groupId = groupId,
         dataType = featureType,
-        discreteValues = discreteValues,
         hasDefaultValue = hasDefaultValue,
         defaultValue = defaultValue,
+        defaultLabel = defaultLabel,
         timestamp = timestamp,
         numDataPoints = numDataPoints,
         displayIndex = displayIndex,

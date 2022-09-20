@@ -36,9 +36,9 @@ private const val getTrackersQuery = """
         trackers_table.id as id,
         trackers_table.feature_id as feature_id,
         trackers_table.type as type,
-        trackers_table.discrete_values as discrete_values,
         trackers_table.has_default_value as has_default_value,
-        trackers_table.default_value as default_value
+        trackers_table.default_value as default_value,
+        trackers_table.default_label as default_label
     FROM trackers_table
     LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
             """
@@ -52,9 +52,9 @@ private const val getDisplayTrackersQuery =
         trackers_table.id as id,
         trackers_table.feature_id as feature_id,
         trackers_table.type as type,
-        trackers_table.discrete_values as discrete_values,
         trackers_table.has_default_value as has_default_value,
         trackers_table.default_value as default_value,
+        trackers_table.default_label as default_label,
         num_data_points as num_data_points,
         last_timestamp as last_timestamp,
         start_instant as start_instant
@@ -131,20 +131,21 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query(
         """
-SELECT
-features_table.name as name,
-features_table.group_id as group_id,
-features_table.display_index as display_index,
-features_table.feature_description as feature_description,
-trackers_table.id as id,
-trackers_table.feature_id as feature_id,
-trackers_table.type as type,
-trackers_table.discrete_values as discrete_values,
-trackers_table.has_default_value as has_default_value,
-trackers_table.default_value as default_value
-FROM trackers_table
-LEFT JOIN features_table ON features_table.id = trackers_table.feature_id
-WHERE features_table.group_id = :groupId ORDER BY features_table.display_index ASC"""
+            SELECT
+                features_table.name as name,
+                features_table.group_id as group_id,
+                features_table.display_index as display_index,
+                features_table.feature_description as feature_description,
+                trackers_table.id as id,
+                trackers_table.feature_id as feature_id,
+                trackers_table.type as type,
+                trackers_table.has_default_value as has_default_value,
+                trackers_table.default_value as default_value,
+                trackers_table.default_label as default_label
+            FROM trackers_table
+            LEFT JOIN features_table ON features_table.id = trackers_table.feature_id
+            WHERE features_table.group_id = :groupId ORDER BY features_table.display_index ASC
+        """
     )
     fun getTrackersForGroupSync(groupId: Long): List<TrackerWithFeature>
 
@@ -348,4 +349,17 @@ FROM notes_table as n
 
     @Query("SELECT COUNT(*) FROM trackers_table")
     fun numTrackers(): Flow<Int>
+
+    @Query(
+        """
+            SELECT DISTINCT data_points_table.label 
+            FROM data_points_table 
+            WHERE data_points_table.feature_id = (
+                SELECT trackers_table.feature_id 
+                FROM trackers_table 
+                WHERE trackers_table.id = :trackerId
+            )
+        """
+    )
+    fun getLabelsForTracker(trackerId: Long): List<String>
 }

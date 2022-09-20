@@ -37,6 +37,7 @@ internal data class FeatureTimer(
     @ColumnInfo(name = "id", index = true)
     val id: Long,
 
+    //TODO should add index = true here but not sure if that requires a migration
     @ColumnInfo(name = "feature_id")
     val featureId: Long,
 

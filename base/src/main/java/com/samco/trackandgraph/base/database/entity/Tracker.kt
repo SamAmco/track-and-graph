@@ -22,7 +22,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.DataType
-import com.samco.trackandgraph.base.database.dto.DiscreteValue
 
 @Entity(
     tableName = "trackers_table",
@@ -44,12 +43,12 @@ internal data class Tracker(
     @ColumnInfo(name = "type")
     val dataType: DataType,
 
-    @ColumnInfo(name = "discrete_values")
-    val discreteValues: List<DiscreteValue>,
-
     @ColumnInfo(name = "has_default_value")
     val hasDefaultValue: Boolean,
 
     @ColumnInfo(name = "default_value")
     val defaultValue: Double,
+
+    @ColumnInfo(name = "default_label")
+    val defaultLabel: String
 )

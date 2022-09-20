@@ -130,25 +130,23 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun updateTracker(
         oldTracker: Tracker,
-        discreteValueMap: Map<DiscreteValue, DiscreteValue>,
         durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode?,
         newName: String?,
         newType: DataType?,
-        newDiscreteValues: List<DiscreteValue>?,
         hasDefaultValue: Boolean?,
         defaultValue: Double?,
+        defaultLabel: String?,
         featureDescription: String?
     ) = withContext(io) {
         trackerHelper.updateTracker(
-            oldTracker,
-            discreteValueMap,
-            durationNumericConversionMode,
-            newName,
-            newType,
-            newDiscreteValues,
-            hasDefaultValue,
-            defaultValue,
-            featureDescription
+            oldTracker = oldTracker,
+            durationNumericConversionMode = durationNumericConversionMode,
+            newName = newName,
+            newType = newType,
+            hasDefaultValue = hasDefaultValue,
+            defaultValue = defaultValue,
+            defaultLabel = defaultLabel,
+            featureDescription = featureDescription
         ).also {
             serviceManager.requestWidgetUpdatesForFeatureId(featureId = oldTracker.featureId)
             dataUpdateEvents.emit(Unit)
