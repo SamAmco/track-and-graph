@@ -302,7 +302,7 @@ internal class CSVReadWriterImpl @Inject constructor(
         val value: Double
         var label = ""
         var isDuration = false
-        val durationRegex = Regex("^\\d*:\\d{2}:\\d{2}")
+        val durationRegex = Regex("^-?\\d*:-?\\d{2}:-?\\d{2}")
 
         when {
             colons == 0 -> {
@@ -314,7 +314,9 @@ internal class CSVReadWriterImpl @Inject constructor(
             }
             colons > 2 && valueString.contains(durationRegex) -> {
                 value = parseDuration(valueString)
-                label = valueString.split(":").drop(3).joinToString { ":" }
+                val matchResult = durationRegex.find(valueString)
+                if (valueString.length > matchResult!!.range.last + 2)
+                    label = valueString.substring(matchResult.range.last + 2)
                 isDuration = true
             }
             else -> {
