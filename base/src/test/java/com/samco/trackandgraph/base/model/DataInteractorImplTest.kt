@@ -71,11 +71,11 @@ class DataInteractorImplTest {
             name = "none",
             groupId = 0L,
             dataType = DataType.CONTINUOUS,
-            discreteValues = emptyList(),
             displayIndex = 0,
             hasDefaultValue = false,
             defaultValue = 0.0,
             description = "none",
+            defaultLabel = ""
         )
 
         val testDataPoint = DataPoint(
@@ -117,9 +117,9 @@ class DataInteractorImplTest {
                 displayIndex = 0,
                 description = "",
                 dataType = DataType.CONTINUOUS,
-                discreteValues = emptyList(),
                 hasDefaultValue = false,
                 defaultValue = 1.0,
+                defaultLabel = ""
             )
         )
 
