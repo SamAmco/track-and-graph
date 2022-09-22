@@ -1,6 +1,6 @@
 # Track & Graph
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-11-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 An android app for tracking personal data and creating custom graphs
 
@@ -54,21 +54,24 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <table>
-  <tr>
-    <td align="center"><a href="https://github.com/pizzapim"><img src="https://avatars3.githubusercontent.com/u/23135512?v=4?s=100" width="100px;" alt=""/><br /><sub><b>pizzapim</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=pizzapim" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/Poussinou"><img src="https://avatars2.githubusercontent.com/u/19646549?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Poussinou</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=Poussinou" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://github.com/xerus2000"><img src="https://avatars3.githubusercontent.com/u/13354331?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Janek</b></sub></a><br /><a href="#ideas-xerus2000" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Axerus2000" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://android.izzysoft.de/"><img src="https://avatars3.githubusercontent.com/u/6781438?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Izzy</b></sub></a><br /><a href="#infra-IzzySoft" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
-    <td align="center"><a href="https://github.com/hhpmmd"><img src="https://avatars0.githubusercontent.com/u/77058867?v=4?s=100" width="100px;" alt=""/><br /><sub><b>hhpmmd</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=hhpmmd" title="Code">💻</a> <a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Ahhpmmd" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/Kozonak"><img src="https://avatars.githubusercontent.com/u/3283978?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kozonak</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3AKozonak" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/tifriis208"><img src="https://avatars.githubusercontent.com/u/40381365?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tifriis</b></sub></a><br /><a href="#translation-tifriis208" title="Translation">🌍</a></td>
-  </tr>
-  <tr>
-    <td align="center"><a href="http://sguinetti.gitlab.io"><img src="https://avatars.githubusercontent.com/u/5572928?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Diego</b></sub></a><br /><a href="#translation-sguinetti" title="Translation">🌍</a></td>
-    <td align="center"><a href="https://github.com/stheid"><img src="https://avatars.githubusercontent.com/u/2736207?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stefan Heid</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=stheid" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/Pada0"><img src="https://avatars.githubusercontent.com/u/73777780?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pada0</b></sub></a><br /><a href="#translation-Pada0" title="Translation">🌍</a></td>
-    <td align="center"><a href="https://github.com/yuhuitech"><img src="https://avatars.githubusercontent.com/u/25502419?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yuhui Su</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=yuhuitech" title="Code">💻</a></td>
-  </tr>
+  <tbody>
+    <tr>
+      <td align="center"><a href="https://github.com/pizzapim"><img src="https://avatars3.githubusercontent.com/u/23135512?v=4?s=100" width="100px;" alt=""/><br /><sub><b>pizzapim</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=pizzapim" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/Poussinou"><img src="https://avatars2.githubusercontent.com/u/19646549?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Poussinou</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=Poussinou" title="Documentation">📖</a></td>
+      <td align="center"><a href="https://github.com/xerus2000"><img src="https://avatars3.githubusercontent.com/u/13354331?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Janek</b></sub></a><br /><a href="#ideas-xerus2000" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Axerus2000" title="Bug reports">🐛</a></td>
+      <td align="center"><a href="https://android.izzysoft.de/"><img src="https://avatars3.githubusercontent.com/u/6781438?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Izzy</b></sub></a><br /><a href="#infra-IzzySoft" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+      <td align="center"><a href="https://github.com/hhpmmd"><img src="https://avatars0.githubusercontent.com/u/77058867?v=4?s=100" width="100px;" alt=""/><br /><sub><b>hhpmmd</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=hhpmmd" title="Code">💻</a> <a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Ahhpmmd" title="Bug reports">🐛</a></td>
+      <td align="center"><a href="https://github.com/Kozonak"><img src="https://avatars.githubusercontent.com/u/3283978?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Kozonak</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3AKozonak" title="Bug reports">🐛</a></td>
+      <td align="center"><a href="https://github.com/tifriis208"><img src="https://avatars.githubusercontent.com/u/40381365?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Tifriis</b></sub></a><br /><a href="#translation-tifriis208" title="Translation">🌍</a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="http://sguinetti.gitlab.io"><img src="https://avatars.githubusercontent.com/u/5572928?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Diego</b></sub></a><br /><a href="#translation-sguinetti" title="Translation">🌍</a></td>
+      <td align="center"><a href="https://github.com/stheid"><img src="https://avatars.githubusercontent.com/u/2736207?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Stefan Heid</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=stheid" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/Pada0"><img src="https://avatars.githubusercontent.com/u/73777780?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Pada0</b></sub></a><br /><a href="#translation-Pada0" title="Translation">🌍</a></td>
+      <td align="center"><a href="https://github.com/yuhuitech"><img src="https://avatars.githubusercontent.com/u/25502419?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yuhui Su</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/commits?author=yuhuitech" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/steel-steven-87"><img src="https://avatars.githubusercontent.com/u/89798696?v=4?s=100" width="100px;" alt=""/><br /><sub><b>steel-steven-87</b></sub></a><br /><a href="https://github.com/SamAmco/track-and-graph/issues?q=author%3Asteel-steven-87" title="Bug reports">🐛</a></td>
+    </tr>
+  </tbody>
 </table>
 
 <!-- markdownlint-restore -->
