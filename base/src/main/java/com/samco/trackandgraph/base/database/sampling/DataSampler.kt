@@ -33,7 +33,7 @@ internal class DataSamplerImpl @Inject constructor(
     override fun getDataSampleForFeatureId(featureId: Long): DataSample {
         val tracker = dao.getTrackerByFeatureId(featureId)
         return tracker?.let {
-            val cursorSequence = DataPointSequence(dao, featureId)
+            val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
             DataSample.fromSequence(
                 cursorSequence,
                 DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION),
