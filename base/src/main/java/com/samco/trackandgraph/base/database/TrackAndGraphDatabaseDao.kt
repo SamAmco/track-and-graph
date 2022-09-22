@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.base.database
 
+import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
@@ -187,11 +188,11 @@ WHERE features_table.group_id = :groupId ORDER BY features_table.display_index A
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT :size OFFSET :startIndex")
-    fun getDataPointsForFeatureSync(featureId: Long, startIndex: Int, size: Int): List<DataPoint>
-
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp = :timestamp")
     fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
+
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
+    fun getDataPointsCursor(featureId: Long): Cursor
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE id = :graphStatId LIMIT 1")
     fun getGraphStatById(graphStatId: Long): GraphOrStat
@@ -315,9 +316,6 @@ FROM notes_table as n
 
     @Query("$getDisplayTrackersQuery WHERE trackers_table.feature_id=:featureId LIMIT 1")
     fun getDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker?
-
-    @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :id")
-    fun getNumberOfDataPointsForFeature(id: Long): Int
 
     @Query("SELECT * FROM functions_table WHERE id = :functionId LIMIT 1")
     fun getFunctionById(functionId: Long): FunctionEntity?
