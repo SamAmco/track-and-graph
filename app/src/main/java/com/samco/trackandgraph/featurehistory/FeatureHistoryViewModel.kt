@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,11 @@ class FeatureHistoryViewModel @Inject constructor(
 ) : ViewModel() {
     private val featureIdFlow = MutableSharedFlow<Long>(replay = 1, extraBufferCapacity = 1)
 
+    private data class RawData(
+        val dataSampleProperties: DataSampleProperties,
+        val dataPoints: List<DataPoint>
+    )
+
     private val dataSample =
         combine(
             featureIdFlow,
@@ -25,7 +31,9 @@ class FeatureHistoryViewModel @Inject constructor(
             .map {
                 val dataSample = dataInteractor.getDataSampleForFeatureId(it)
                 dataSample.iterator().apply { while (hasNext()) next() }
-                dataSample
+                val answer = RawData(dataSample.dataSampleProperties, dataSample.getRawDataPoints())
+                dataSample.dispose()
+                return@map answer
             }
             .flowOn(io)
 
@@ -34,7 +42,7 @@ class FeatureHistoryViewModel @Inject constructor(
     }.asLiveData(viewModelScope.coroutineContext)
 
     val dataPoints: LiveData<List<DataPoint>> = dataSample.map {
-        it.getRawDataPoints()
+        it.dataPoints
     }.asLiveData(viewModelScope.coroutineContext)
 
     val feature: LiveData<Feature?> = featureIdFlow.map {
