@@ -99,15 +99,14 @@ internal class CSVReadWriterImpl @Inject constructor(
         featureName: String,
         isDuration: Boolean
     ) = dataPoints.forEach { dp ->
-        val dataPointString = if (isDuration) {
+        var dataPointString = if (isDuration) {
             dp.value.toLong().let { seconds ->
-                val absSecs = kotlin.math.abs(seconds)
-                String.format("%d:%02d:%02d", seconds / 3600, (absSecs % 3600) / 60, (absSecs % 60))
+                String.format("%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, (seconds % 60))
             }
-        } else {
-            if (dp.label.isNotBlank()) "${dp.value}:${dp.label}"
-            else dp.value.toString()
-        }
+        } else dp.value.toString()
+
+        if (dp.label.isNotBlank()) dataPointString = "${dataPointString}:${dp.label}"
+
         csvPrinter.printRecord(
             featureName,
             dp.timestamp.toString(),

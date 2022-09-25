@@ -22,6 +22,7 @@ import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.odtFromString
 import java.lang.Exception
 
+//TODO I think we need a dispose function here to release the cursor when we're done with it
 internal class DataPointCursorSequence(
     private val cursor: Cursor
 ) : Sequence<IDataPoint> {
