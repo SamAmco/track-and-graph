@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.base.database.migrations
 
-import androidx.room.TypeConverter
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -101,13 +100,13 @@ internal class MigrationMoshiHelper private constructor() {
         }
     }
 
-    fun stringToListOfDiscreteValues(moshi: Moshi, value: String): List<DiscreteValue> {
+    fun stringToListOfDiscreteValues(value: String): List<DiscreteValue> {
         if (value.isBlank()) return emptyList()
         val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
         return fromJson(moshi.adapter(listType), value) { emptyList() }
     }
 
-    fun listOfDiscreteValuesToString(moshi: Moshi, values: List<DiscreteValue>): String {
+    fun listOfDiscreteValuesToString(values: List<DiscreteValue>): String {
         val listType = Types.newParameterizedType(List::class.java, DiscreteValue::class.java)
         return toJson(moshi.adapter(listType), values)
     }
