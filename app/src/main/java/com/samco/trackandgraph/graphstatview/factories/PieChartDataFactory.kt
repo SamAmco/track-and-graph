@@ -96,6 +96,7 @@ class PieChartDataFactory @Inject constructor(
             .filter { it.label.isNotEmpty() }
             .toList()
         onDataSampled(dataSample.getRawDataPoints())
+        dataSample.dispose()
         return dataPoints.ifEmpty { null }
     }
 

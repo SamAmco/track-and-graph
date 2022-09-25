@@ -99,6 +99,7 @@ class TimeHistogramDataFactory @Inject constructor(
             config.sumByCount
         )
         onDataSampled(dataSample.getRawDataPoints())
+        sample.dispose()
         return barValues
     }
 }

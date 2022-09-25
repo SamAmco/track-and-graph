@@ -40,11 +40,13 @@ abstract class DataSample(
          */
         fun fromSequence(
             data: Sequence<IDataPoint>,
-            dataSampleProperties: DataSampleProperties = DataSampleProperties()
+            dataSampleProperties: DataSampleProperties = DataSampleProperties(),
+            onDispose: () -> Unit = {}
         ): DataSample {
             return object : DataSample(dataSampleProperties) {
                 override fun getRawDataPoints() = emptyList<DataPoint>()
                 override fun iterator(): Iterator<IDataPoint> = data.iterator()
+                override fun dispose() = onDispose()
             }
         }
 
@@ -55,14 +57,23 @@ abstract class DataSample(
         fun fromSequence(
             data: Sequence<IDataPoint>,
             dataSampleProperties: DataSampleProperties = DataSampleProperties(),
-            getRawDataPoints: () -> List<DataPoint>
+            getRawDataPoints: () -> List<DataPoint>,
+            onDispose: () -> Unit = {}
         ): DataSample {
             return object : DataSample(dataSampleProperties) {
                 override fun getRawDataPoints() = getRawDataPoints()
                 override fun iterator(): Iterator<IDataPoint> = data.iterator()
+                override fun dispose() = onDispose()
             }
         }
     }
+
+    /**
+     * Clean up any resources held onto by this data sample. For example a SQLite Cursor.
+     * Attempting to use a DataSample after its dispose function has been called is un-defined
+     * behaviour.
+     */
+    abstract fun dispose()
 
     /**
      * Get a list of all the raw data points that have been used so far to generate this
