@@ -21,25 +21,36 @@ import android.database.Cursor
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.odtFromString
 import java.lang.Exception
+import java.util.*
 
 internal class DataPointCursorSequence(
     private val cursor: Cursor
 ) : Sequence<IDataPoint> {
-    private val visited = mutableListOf<com.samco.trackandgraph.base.database.dto.DataPoint>()
+    private val visited =
+        Collections.synchronizedList(mutableListOf<com.samco.trackandgraph.base.database.dto.DataPoint>())
+
+    private val count = cursor.count
+
+    private val lock = Any()
+
     fun getRawDataPoints(): List<com.samco.trackandgraph.base.database.dto.DataPoint> = visited
+
+    fun dispose() = synchronized(lock) { cursor.close() }
 
     override fun iterator(): Iterator<IDataPoint> = object : Iterator<IDataPoint> {
         private var position = 0
 
-        override fun hasNext(): Boolean = position < cursor.count
+        override fun hasNext(): Boolean = synchronized(lock) { position < count }
 
-        override fun next(): IDataPoint {
-            val dataPoint = if (position >= cursor.position) {
-                cursor.moveToNext()
-                val rawDataPoint = getCursorDataPoint()
-                visited.add(rawDataPoint)
-                rawDataPoint
-            } else visited[position]
+        override fun next(): IDataPoint = synchronized(lock) {
+            val dataPoint =
+                if (position in visited.indices) visited[position]
+                else {
+                    cursor.moveToNext()
+                    val rawDataPoint = getCursorDataPoint()
+                    visited.add(rawDataPoint)
+                    rawDataPoint
+                }
             position++
             return object : IDataPoint() {
                 override val timestamp = dataPoint.timestamp

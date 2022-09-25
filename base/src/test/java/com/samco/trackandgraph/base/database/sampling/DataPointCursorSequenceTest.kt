@@ -3,10 +3,9 @@ package com.samco.trackandgraph.base.database.sampling
 import android.database.Cursor
 import com.nhaarman.mockitokotlin2.*
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.base.database.entity.DataPoint
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Test
-import org.threeten.bp.OffsetDateTime
 
 class DataPointCursorSequenceTest {
     @Test
@@ -14,7 +13,7 @@ class DataPointCursorSequenceTest {
         //PREPARE
         val dao = mock<TrackAndGraphDatabaseDao>()
         val featureId = 0L
-        val backingData = IntRange(0, 3).toList()
+        val backingData = (0..3).toList()
         val cursor = mock<Cursor>()
         var cursorPosition = 0
         var value = 0
@@ -35,13 +34,15 @@ class DataPointCursorSequenceTest {
         val sequence = DataPointCursorSequence(cursor)
 
         //EXECUTE
-        val output1 = sequence.iterator().asSequence().toList()
+        val iterator1 = sequence.iterator()
+        val output1 = iterator1.asSequence().toList()
         val output2 = sequence.iterator().asSequence().toList()
 
         //VERIFY
         assertEquals(backingData, output1.map { it.value.toInt() })
         assertEquals(backingData, output2.map { it.value.toInt() })
         verify(cursor, times(backingData.size)).getDouble(eq(2))
-
+        assertEquals(backingData.size, cursorPosition)
+        assertFalse(iterator1.hasNext())
     }
 }

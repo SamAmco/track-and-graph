@@ -26,6 +26,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.functions.*
@@ -43,7 +44,8 @@ import kotlin.math.abs
 
 class LineGraphDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
-    @IODispatcher ioDispatcher: CoroutineDispatcher
+    @IODispatcher ioDispatcher: CoroutineDispatcher,
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(dataInteractor, ioDispatcher) {
 
     override suspend fun createViewData(
@@ -107,7 +109,7 @@ class LineGraphDataFactory @Inject constructor(
         endTime: OffsetDateTime,
         onDataSampled: (List<DataPoint>) -> Unit
     ): Map<LineGraphFeature, FastXYSeries?> = coroutineScope {
-        withContext(Dispatchers.Default) {
+        withContext(defaultDispatcher) {
             //Create all the data samples in parallel (this shouldn't actually take long but why not)
             val dataSamples = lineGraph.features.map { lgf ->
                 async { Pair(lgf, tryGetPlottingData(lineGraph, lgf)) }
@@ -126,8 +128,11 @@ class LineGraphDataFactory @Inject constructor(
                     pair.first to series
                 }
             }.awaitAll().toMap()
-            val rawDataPoints = dataSamples.map { it.second.getRawDataPoints() }.flatten()
-            withContext(Dispatchers.Main) { onDataSampled(rawDataPoints) }
+            dataSamples.map { it.second }.forEach {
+                val rawDataPoints = it.getRawDataPoints()
+                onDataSampled(rawDataPoints)
+                it.dispose()
+            }
             return@withContext features
         }
     }
@@ -138,7 +143,7 @@ class LineGraphDataFactory @Inject constructor(
     ): DataSample {
         val movingAvDuration = movingAverageDurations[lineGraphFeature.averagingMode]
         val plottingPeriod = plottingModePeriods[lineGraphFeature.plottingMode]
-        val rawDataSample = withContext(Dispatchers.IO) {
+        val rawDataSample = withContext(ioDispatcher) {
             dataInteractor.getDataSampleForFeatureId(lineGraphFeature.featureId)
         }
         val clippingCalculator = DataClippingFunction(config.endDate, config.duration)
