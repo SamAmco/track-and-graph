@@ -16,15 +16,11 @@
 */
 package com.samco.trackandgraph.addtracker
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.view.children
-import androidx.core.view.forEachIndexed
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -37,11 +33,9 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.model.TrackerHelper.DurationNumericConversionMode
 import com.samco.trackandgraph.databinding.AddTrackerFragmentBinding
-import com.samco.trackandgraph.databinding.FeatureDiscreteValueListItemBinding
 import com.samco.trackandgraph.ui.YesCancelDialogFragment
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlin.math.absoluteValue
 
 
 //TODO this whole fragment/view model is a mess. There is way too much logic in the fragment
@@ -54,7 +48,6 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     private var navController: NavController? = null
 
     private val trackerTypeList = listOf(
-        DataType.DISCRETE,
         DataType.CONTINUOUS,
         DataType.DURATION
     )
@@ -119,12 +112,8 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     }
 
     private fun setInitialViewState() {
-        binding.discreteValuesTextView.visibility = View.INVISIBLE
-        binding.discreteValues.visibility = View.INVISIBLE
-        binding.addDiscreteValueButton.visibility = View.INVISIBLE
         binding.defaultNumericalInput.visibility = View.INVISIBLE
         binding.defaultDurationInput.visibility = View.INVISIBLE
-        binding.defaultDiscreteScrollView.visibility = View.INVISIBLE
         binding.durationNumericConversionModeSpinner.visibility = View.INVISIBLE
         binding.durationToNumericModeHeader.visibility = View.INVISIBLE
         binding.numericToDurationModeHeader.visibility = View.INVISIBLE
@@ -136,7 +125,7 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         observeFeatureType()
     }
 
-    private fun getOnFeatureSelectedListener(): AdapterView.OnItemSelectedListener {
+    private fun getOnDataTypeSelectedListener(): AdapterView.OnItemSelectedListener {
         return object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {}
 
@@ -147,12 +136,9 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     }
 
     private fun initViewFromViewModel() {
-        viewModel.discreteValues.forEach { v -> inflateDiscreteValue(v) }
-        if (viewModel.updateMode) initSpinnerInUpdateMode()
-
         binding.trackerDescription.setText(viewModel.trackerDescription)
         binding.trackerTypeSpinner.setSelection(trackerTypeList.indexOf(viewModel.dataType.value!!))
-        binding.trackerTypeSpinner.onItemSelectedListener = getOnFeatureSelectedListener()
+        binding.trackerTypeSpinner.onItemSelectedListener = getOnDataTypeSelectedListener()
 
         binding.trackerNameText.setText(viewModel.trackerName)
         binding.trackerNameText.setSelection(binding.trackerNameText.text.length)
@@ -164,7 +150,6 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         binding.trackerDescription.addTextChangedListener {
             viewModel.trackerDescription = binding.trackerDescription.text.toString()
         }
-        binding.addDiscreteValueButton.setOnClickListener { onAddDiscreteValue() }
         binding.addBar.addButton.setOnClickListener { onAddOrUpdateClicked() }
         binding.hasDefaultValueCheckbox.setOnCheckedChangeListener { _, checked ->
             viewModel.trackerHasDefaultValue.value = checked
@@ -196,7 +181,7 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
 
     private fun observeFeatureType() {
         viewModel.dataType.observe(viewLifecycleOwner) {
-            onTrackerDataTypeChanged(it)
+            onTrackerDataTypeChanged()
         }
     }
 
@@ -209,68 +194,21 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
     private fun updateDefaultValuesViewFromViewModel(checked: Boolean) {
         if (checked) {
             when (viewModel.dataType.value) {
-                DataType.DISCRETE -> {
-                    if (currentDefaultValueIsInvalidDiscreteValue()) {
-                        viewModel.trackerDefaultValue.value = 0.0
-                    }
-                    updateCurrentlySelectedDefaultDiscreteValue()
-                    binding.defaultDiscreteScrollView.visibility = View.VISIBLE
-                    binding.defaultNumericalInput.visibility = View.GONE
-                    binding.defaultDurationInput.visibility = View.GONE
-                }
                 DataType.CONTINUOUS -> {
                     binding.defaultNumericalInput.setText(viewModel.trackerDefaultValue.value!!.toString())
-                    binding.defaultDiscreteScrollView.visibility = View.GONE
                     binding.defaultNumericalInput.visibility = View.VISIBLE
                     binding.defaultDurationInput.visibility = View.GONE
                 }
                 DataType.DURATION -> {
                     binding.defaultDurationInput.setTimeInSeconds(viewModel.trackerDefaultValue.value!!.toLong())
-                    binding.defaultDiscreteScrollView.visibility = View.GONE
                     binding.defaultNumericalInput.visibility = View.GONE
                     binding.defaultDurationInput.visibility = View.VISIBLE
                 }
                 null -> {}
             }
         } else {
-            binding.defaultDiscreteScrollView.visibility = View.GONE
             binding.defaultNumericalInput.visibility = View.GONE
             binding.defaultDurationInput.visibility = View.GONE
-        }
-    }
-
-    private fun currentDefaultValueIsInvalidDiscreteValue(): Boolean {
-        val currentDefaultValue = viewModel.trackerDefaultValue.value!!
-        return currentDefaultValue > viewModel.discreteValues.size - 1
-                || currentDefaultValue < 0
-                || (currentDefaultValue - currentDefaultValue.toInt().toDouble()).absoluteValue > 0
-    }
-
-    private fun initSpinnerInUpdateMode() {
-        val itemList = resources.getStringArray(R.array.tracker_types)
-            .map { s -> s as CharSequence }.toTypedArray()
-        binding.trackerTypeSpinner.adapter = object : ArrayAdapter<CharSequence>(
-            requireContext(),
-            android.R.layout.simple_spinner_dropdown_item, itemList
-        ) {
-            override fun isEnabled(position: Int): Boolean {
-                return viewModel.isFeatureTypeEnabled(trackerTypeList[position])
-            }
-
-            override fun getDropDownView(
-                position: Int,
-                convertView: View?,
-                parent: ViewGroup
-            ): View {
-                val view = super.getDropDownView(position, convertView, parent)
-                val textView = view as TextView
-                val enabled = viewModel.isFeatureTypeEnabled(trackerTypeList[position])
-                val color =
-                    if (enabled) view.context.getColorFromAttr(android.R.attr.textColorPrimary)
-                    else view.context.getColorFromAttr(android.R.attr.textColorHint)
-                textView.setTextColor(color)
-                return view
-            }
         }
     }
 
@@ -283,94 +221,9 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         }
     }
 
-    private fun inflateDiscreteValue(label: AddTrackerViewModel.MutableLabel) {
-        inflateDiscreteValueInputCard(label)
-        inflateDiscreteValueDefaultButton(label)
-        reIndexDiscreteValueViews()
-        validateForm()
-    }
-
-    private fun updateCurrentlySelectedDefaultDiscreteValue() {
-        val selected = viewModel.trackerDefaultValue.value!!.toInt()
-        binding.defaultDiscreteButtonsLayout.children.forEachIndexed { i, view ->
-            (view as CheckBox).isChecked = i == selected
-        }
-    }
-
-    private fun inflateDiscreteValueDefaultButton(label: AddTrackerViewModel.MutableLabel) {
-        val layout = binding.defaultDiscreteButtonsLayout
-        val item =
-            layoutInflater.inflate(R.layout.discrete_value_input_button, layout, false) as CheckBox
-        item.text = label.label
-        val index = viewModel.discreteValues.indexOf(label)
-        item.isChecked =
-            viewModel.trackerHasDefaultValue.value!! && index == viewModel.trackerDefaultValue.value?.toInt()
-        item.setOnClickListener {
-            viewModel.trackerDefaultValue.value = viewModel.discreteValues.indexOf(label).toDouble()
-            updateCurrentlySelectedDefaultDiscreteValue()
-        }
-        layout.addView(item, index)
-    }
-
-    private fun updateDefaultValueButtonsText() {
-        binding.defaultDiscreteButtonsLayout.children.forEachIndexed { i, view ->
-            (view as CheckBox).text = viewModel.discreteValues[i].label
-        }
-    }
-
-    private fun inflateDiscreteValueInputCard(label: AddTrackerViewModel.MutableLabel) {
-        val item = FeatureDiscreteValueListItemBinding.inflate(
-            layoutInflater,
-            binding.discreteValues,
-            false
-        )
-        val inputText = item.discreteValueNameText
-        inputText.addTextChangedListener {
-            label.label = it.toString().trim()
-            updateDefaultValueButtonsText()
-            validateForm()
-        }
-        inputText.setText(label.label)
-        item.deleteButton.setOnClickListener {
-            onDeleteDiscreteValue(item)
-            validateForm()
-        }
-        item.upButton.setOnClickListener {
-            onUpClickedDiscreteValue(item)
-            validateForm()
-        }
-        item.downButton.setOnClickListener {
-            onDownClickedDiscreteValue(item)
-            validateForm()
-        }
-        binding.discreteValues.addView(item.root)
-        binding.scrollView.post {
-            binding.scrollView.fullScroll(View.FOCUS_DOWN)
-            inputText.requestFocus()
-        }
-    }
-
-    private fun onAddDiscreteValue() {
-        val label = AddTrackerViewModel.MutableLabel()
-        viewModel.discreteValues.add(label)
-        inflateDiscreteValue(label)
-    }
-
+    //TODO move this to the view model
     private fun validateForm() {
         var errorSet = false
-        val discreteValueStrings = viewModel.discreteValues
-        if (viewModel.dataType.value!! == DataType.DISCRETE) {
-            if (discreteValueStrings.isEmpty() || discreteValueStrings.size < 2) {
-                setErrorText(getString(R.string.discrete_tracker_needs_at_least_two_values))
-                errorSet = true
-            }
-            for (s in discreteValueStrings) {
-                if (s.label.isEmpty()) {
-                    setErrorText(getString(R.string.discrete_value_must_have_name))
-                    errorSet = true
-                }
-            }
-        }
         binding.trackerNameText.text.let {
             if (it.isEmpty()) {
                 setErrorText(getString(R.string.tracker_name_cannot_be_null))
@@ -392,60 +245,6 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         binding.addBar.errorText.text = text
     }
 
-    private fun onDownClickedDiscreteValue(item: FeatureDiscreteValueListItemBinding) {
-        val currIndex = binding.discreteValues.indexOfChild(item.root)
-        if (currIndex == binding.discreteValues.childCount - 1) return
-        viewModel.discreteValues.add(currIndex + 1, viewModel.discreteValues.removeAt(currIndex))
-        binding.discreteValues.removeView(item.root)
-        binding.discreteValues.addView(item.root, currIndex + 1)
-        val defaultButtonView = binding.defaultDiscreteButtonsLayout.getChildAt(currIndex)
-        binding.defaultDiscreteButtonsLayout.removeViewAt(currIndex)
-        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex + 1)
-        if (currIndex == viewModel.trackerDefaultValue.value!!.toInt())
-            viewModel.trackerDefaultValue.value = viewModel.trackerDefaultValue.value!! + 1
-        reIndexDiscreteValueViews()
-    }
-
-    private fun onUpClickedDiscreteValue(item: FeatureDiscreteValueListItemBinding) {
-        val currIndex = binding.discreteValues.indexOfChild(item.root)
-        if (currIndex == 0) return
-        viewModel.discreteValues.add(currIndex - 1, viewModel.discreteValues.removeAt(currIndex))
-        binding.discreteValues.removeView(item.root)
-        binding.discreteValues.addView(item.root, currIndex - 1)
-        val defaultButtonView = binding.defaultDiscreteButtonsLayout.getChildAt(currIndex)
-        binding.defaultDiscreteButtonsLayout.removeViewAt(currIndex)
-        binding.defaultDiscreteButtonsLayout.addView(defaultButtonView, currIndex - 1)
-        if (currIndex == viewModel.trackerDefaultValue.value!!.toInt())
-            viewModel.trackerDefaultValue.value = viewModel.trackerDefaultValue.value!! - 1
-        reIndexDiscreteValueViews()
-    }
-
-    private fun onDeleteDiscreteValue(item: FeatureDiscreteValueListItemBinding) {
-        if (viewModel.updateMode && !viewModel.haveWarnedAboutDeletingDiscreteValues) {
-            AlertDialog.Builder(context)
-                .setTitle(R.string.warning)
-                .setMessage(R.string.on_tracker_delete_discrete_value_warning)
-                .setPositiveButton(R.string.ok, null)
-                .show()
-            viewModel.haveWarnedAboutDeletingDiscreteValues = true
-        }
-        val currIndex = binding.discreteValues.indexOfChild(item.root)
-        viewModel.discreteValues.removeAt(currIndex)
-        binding.discreteValues.removeView(item.root)
-        binding.addDiscreteValueButton.isEnabled = true
-        binding.defaultDiscreteButtonsLayout.removeViewAt(currIndex)
-        if (currIndex == viewModel.trackerDefaultValue.value!!.toInt())
-            viewModel.trackerDefaultValue.value = 0.0
-        reIndexDiscreteValueViews()
-    }
-
-    @SuppressLint("SetTextI18n")
-    private fun reIndexDiscreteValueViews() {
-        binding.discreteValues.forEachIndexed { i, v ->
-            v.findViewById<TextView>(R.id.indexText).text = "$i : "
-        }
-    }
-
     private fun updateDurationNumericConversionUI() {
         val durationToNumeric = viewModel.updateMode
                 && viewModel.existingTracker?.dataType == DataType.DURATION
@@ -461,41 +260,10 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
             if (durationToNumeric || numericToDuration) View.VISIBLE else View.GONE
     }
 
-    private fun onTrackerDataTypeChanged(dataType: DataType) {
-        showOnTrackerTypeUpdatedMessage(dataType)
+    private fun onTrackerDataTypeChanged() {
         updateDurationNumericConversionUI()
         updateDefaultValuesViewFromViewModel(viewModel.trackerHasDefaultValue.value!!)
-        val vis = if (dataType == DataType.DISCRETE) View.VISIBLE else View.GONE
-        binding.discreteValuesTextView.visibility = vis
-        binding.discreteValues.visibility = vis
-        binding.addDiscreteValueButton.visibility = vis
         validateForm()
-    }
-
-    private fun showOnTrackerTypeUpdatedMessage(newType: DataType) {
-        val oldType = viewModel.existingTracker?.dataType
-        if (viewModel.updateMode && oldType != null && oldType != newType) {
-            val message = getOnDataTypeChangedMessage(oldType, newType)
-
-            message?.let {
-                AlertDialog.Builder(context)
-                    .setTitle(R.string.warning)
-                    .setMessage(it)
-                    .setPositiveButton(R.string.ok, null)
-                    .show()
-            }
-        }
-    }
-
-    private fun getOnDataTypeChangedMessage(oldType: DataType, newType: DataType): String? {
-        return when (oldType) {
-            DataType.DISCRETE -> when (newType) {
-                DataType.DISCRETE -> null
-                DataType.CONTINUOUS -> getString(R.string.on_tracker_type_change_numerical_warning)
-                else -> null
-            }
-            else -> null
-        }
     }
 
     override fun onDialogYes(dialog: YesCancelDialogFragment, id: String?) {

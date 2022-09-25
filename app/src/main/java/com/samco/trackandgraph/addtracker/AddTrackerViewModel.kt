@@ -26,16 +26,13 @@ class AddTrackerViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
 
-    class MutableLabel(var label: String = "", val updateIndex: Int = -1)
-
     var trackerName = ""
     var trackerDescription = ""
-    val dataType = MutableLiveData(DataType.DISCRETE)
+    val dataType = MutableLiveData(DataType.CONTINUOUS)
     val durationNumericConversionMode =
         MutableLiveData(TrackerHelper.DurationNumericConversionMode.HOURS)
     val trackerHasDefaultValue = MutableLiveData(false)
     val trackerDefaultValue = MutableLiveData(1.0)
-    val discreteValues = mutableListOf<MutableLabel>()
     lateinit var disallowedNames: List<String>
         private set
 
@@ -44,7 +41,6 @@ class AddTrackerViewModel @Inject constructor(
 
     var updateMode: Boolean = false
         private set
-    var haveWarnedAboutDeletingDiscreteValues = false
     private var groupId: Long = -1
     var existingTracker: Tracker? = null
         private set
@@ -59,16 +55,12 @@ class AddTrackerViewModel @Inject constructor(
             if (existingTrackerId > -1) {
                 updateMode = true
                 existingTracker = dataInteractor.getTrackerById(existingTrackerId)
-                val existingDiscreteValues = existingTracker!!.discreteValues
-                    .sortedBy { f -> f.index }
-                    .map { f -> MutableLabel(f.label, f.index) }
                 withContext(ui) {
                     trackerName = existingTracker!!.name
                     trackerDescription = existingTracker!!.description
                     dataType.value = existingTracker!!.dataType
                     trackerHasDefaultValue.value = existingTracker!!.hasDefaultValue
                     trackerDefaultValue.value = existingTracker!!.defaultValue
-                    discreteValues.addAll(existingDiscreteValues)
                 }
             }
             disallowedNames = dataInteractor
@@ -80,24 +72,6 @@ class AddTrackerViewModel @Inject constructor(
                 _state.value = AddTrackerState.SET_FOCUS
                 _state.value = AddTrackerState.WAITING
             }
-        }
-    }
-
-    fun isFeatureTypeEnabled(type: DataType): Boolean {
-        if (!updateMode) return true
-        // disc -> cont Y
-        // disc -> dur N
-        // cont -> disc N
-        // cont -> dur Y
-        // dur -> disc N
-        // dur -> cont Y
-        return when (type) {
-            DataType.DISCRETE -> existingTracker!!.dataType == DataType.DISCRETE
-            DataType.CONTINUOUS -> existingTracker!!.dataType == DataType.DURATION
-                    || existingTracker!!.dataType == DataType.DISCRETE
-                    || existingTracker!!.dataType == DataType.CONTINUOUS
-            DataType.DURATION -> existingTracker!!.dataType == DataType.CONTINUOUS
-                    || existingTracker!!.dataType == DataType.DURATION
         }
     }
 
@@ -115,40 +89,19 @@ class AddTrackerViewModel @Inject constructor(
     }
 
     private suspend fun updateTracker() {
-        val existingDiscreteValues = existingTracker!!.discreteValues
-
-        val newDiscVals = discreteValues.associateWith { mutableLabel ->
-            val index = if (discreteValues.size == 1) 1 else discreteValues.indexOf(mutableLabel)
-            DiscreteValue(index, mutableLabel.label)
-        }
-
-        val discValMap = existingDiscreteValues
-            .filter { dv -> discreteValues.map { it.updateIndex }.contains(dv.index) }
-            .associateWith {
-                newDiscVals.getOrElse(discreteValues.first { new -> new.updateIndex == it.index }) {
-                    throw Exception("Could not find discrete value update")
-                }
-            }
-
         dataInteractor.updateTracker(
             oldTracker = existingTracker!!,
-            discreteValueMap = discValMap,
             durationNumericConversionMode = durationNumericConversionMode.value,
             newName = trackerName,
             newType = dataType.value,
-            newDiscreteValues = newDiscVals.values.toList(),
             hasDefaultValue = trackerHasDefaultValue.value,
             defaultValue = trackerDefaultValue.value,
-            featureDescription = trackerDescription
+            featureDescription = trackerDescription,
+            defaultLabel = ""//TODO implement default label
         )
     }
 
     private suspend fun addTracker() {
-        val discVals = discreteValues.mapIndexed { i, s ->
-            val index = if (discreteValues.size == 1) 1 else i
-            DiscreteValue(index, s.label)
-        }
-
         val tracker = Tracker(
             id = 0L,
             name = trackerName,
@@ -157,9 +110,9 @@ class AddTrackerViewModel @Inject constructor(
             displayIndex = 0,
             description = trackerDescription,
             dataType = dataType.value!!,
-            discreteValues = discVals,
             hasDefaultValue = trackerHasDefaultValue.value!!,
-            defaultValue = trackerDefaultValue.value!!
+            defaultValue = trackerDefaultValue.value!!,
+            defaultLabel = ""//TODO implement default label
         )
         dataInteractor.insertTracker(tracker)
     }

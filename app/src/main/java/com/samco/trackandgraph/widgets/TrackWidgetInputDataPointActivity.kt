@@ -116,7 +116,7 @@ class TrackWidgetInputDataPointViewModel @Inject constructor(
                 timestamp = OffsetDateTime.now(),
                 featureId = it.featureId,
                 value = it.defaultValue,
-                label = it.getDefaultLabel(),
+                label = it.defaultLabel,
                 note = ""
             )
             dataInteractor.insertDataPoint(newDataPoint)

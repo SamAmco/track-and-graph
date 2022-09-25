@@ -169,14 +169,11 @@ class GroupViewModel @Inject constructor(
     }
 
     fun addDefaultTrackerValue(tracker: DisplayTracker) = viewModelScope.launch(io) {
-        val label = if (tracker.dataType == DataType.DISCRETE) {
-            tracker.discreteValues[tracker.defaultValue.toInt()].label
-        } else ""
         val newDataPoint = DataPoint(
             timestamp = OffsetDateTime.now(),
             featureId = tracker.featureId,
             value = tracker.defaultValue,
-            label = label,
+            label = tracker.defaultLabel,
             note = ""
         )
         dataInteractor.insertDataPoint(newDataPoint)

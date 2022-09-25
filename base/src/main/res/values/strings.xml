@@ -101,7 +101,6 @@
         <item>Number of seconds</item>
     </string-array>
     <string-array name="tracker_types">
-        <item>Multiple choice</item>
         <item>Numerical</item>
         <item>Time duration</item>
     </string-array>
