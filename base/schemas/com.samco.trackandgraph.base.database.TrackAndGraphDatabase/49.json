@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 49,
-    "identityHash": "0a2ea7593974bee0f7a886a078c7311b",
+    "identityHash": "834e54bdbcd1cc7d32e939b3307182b2",
     "entities": [
       {
         "tableName": "features_table",
@@ -1155,6 +1155,15 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_feature_timers_table_id` ON `${TABLE_NAME}` (`id`)"
           },
           {
+            "name": "index_feature_timers_table_feature_id",
+            "unique": false,
+            "columnNames": [
+              "feature_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_feature_timers_table_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
+          },
+          {
             "name": "index_feature_timers_table_start_instant",
             "unique": false,
             "columnNames": [
@@ -1251,7 +1260,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0a2ea7593974bee0f7a886a078c7311b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '834e54bdbcd1cc7d32e939b3307182b2')"
     ]
   }
 }

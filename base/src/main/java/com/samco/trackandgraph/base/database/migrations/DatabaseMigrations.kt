@@ -17,11 +17,6 @@
 
 package com.samco.trackandgraph.base.database.migrations
 
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
-import java.lang.Exception
-
-
 val allMigrations = arrayOf(
     MIGRATION_29_30,
     MIGRATION_30_31,
@@ -42,4 +37,5 @@ val allMigrations = arrayOf(
     MIGRATION_45_46,
     MIGRATION_46_47,
     MIGRATION_47_48,
+    MIGRATION_48_49
 )
