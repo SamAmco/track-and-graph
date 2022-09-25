@@ -108,9 +108,10 @@ class ViewGraphStatViewModelImpl @Inject constructor(
             FeatureDataProvider.DataSourceData(
                 feature,
                 dataInteractor.getLabelsForFeatureId(feature.featureId),
-                dataInteractor.getDataSampleForFeatureId(feature.featureId).dataSampleProperties
+                dataInteractor.getDataSamplePropertiesForFeatureId(feature.featureId)
+                    ?: return@map null
             )
-        }
+        }.filterNotNull()
         FeatureDataProvider(dataSourceData, allGroups).let {
             withContext(ui) {
                 featureDataProvider.value = it

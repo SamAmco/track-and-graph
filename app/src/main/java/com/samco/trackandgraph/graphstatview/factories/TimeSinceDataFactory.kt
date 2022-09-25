@@ -97,6 +97,7 @@ class TimeSinceDataFactory @Inject constructor(
         val first = sample.firstOrNull()
 
         onDataSampled(sample.getRawDataPoints())
+        dataSample.dispose()
         return first
     }
 }
