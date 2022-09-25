@@ -200,13 +200,7 @@ open class DataPointInputDialog : DialogFragment(), ViewPager.OnPageChangeListen
 
     @SuppressLint("SetTextI18n")
     private fun setupViewFeature(tracker: Tracker, index: Int) {
-        if (tracker.dataType != DataType.DISCRETE) binding.addButton.visibility = View.VISIBLE
-        else binding.addButton.visibility = View.INVISIBLE
         binding.indexText.text = "${index + 1} / ${viewModel.trackers.value!!.size}"
-
-        //SHOW/HIDE KEYBOARD
-        if (tracker.dataType == DataType.DISCRETE)
-            activity?.window?.hideKeyboard(view?.windowToken, 0)
         requireActivity().currentFocus?.clearFocus()
     }
 
@@ -316,7 +310,7 @@ class InputDataPointDialogViewModel @Inject constructor(
                 else -> 0.0
             }
             val dataPointLabel = dataPointData?.label
-                ?: if (f.hasDefaultValue) f.getDefaultLabel() else ""
+                ?: if (f.hasDefaultValue) f.defaultLabel else ""
             val dataPointNote = dataPointData?.note ?: ""
             DataPointInputView.DataPointInputData(
                 f,

@@ -83,29 +83,6 @@
                     android:entries="@array/numeric_duration_conversion_modes"
                     android:spinnerMode="dropdown" />
 
-                <TextView
-                    android:id="@+id/discreteValuesTextView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/input_spacing_large"
-                    android:text="@string/discrete_values"
-                    android:textAppearance="@style/TextAppearance.Body" />
-
-                <LinearLayout
-                    android:id="@+id/discreteValues"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:orientation="vertical" />
-
-                <ImageButton
-                    android:id="@+id/addDiscreteValueButton"
-                    style="@style/Style.AddBarButton"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
-                    android:layout_marginBottom="@dimen/dialog_input_spacing"
-                    android:contentDescription="@string/add_multiple_choice_answer_button_content_description"
-                    app:srcCompat="@drawable/add_icon" />
-
                 <CheckBox
                     android:id="@+id/hasDefaultValueCheckbox"
                     android:layout_width="wrap_content"
@@ -129,19 +106,6 @@
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:hint="@string/default_value"
                     android:importantForAutofill="no" />
-
-                <HorizontalScrollView
-                    android:id="@+id/defaultDiscreteScrollView"
-                    style="@style/Style.DiscreteValueButtonsScrollViewStyle"
-                    android:layout_marginTop="@dimen/dialog_input_spacing">
-
-                    <LinearLayout
-                        android:id="@+id/defaultDiscreteButtonsLayout"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:gravity="center"
-                        android:orientation="horizontal" />
-                </HorizontalScrollView>
 
                 <com.samco.trackandgraph.ui.DurationInputView
                     android:id="@+id/defaultDurationInput"

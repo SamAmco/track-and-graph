@@ -25,9 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
-import androidx.core.view.children
 import androidx.core.widget.addTextChangedListener
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.helpers.doubleFormatter
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
@@ -54,7 +52,6 @@ class DataPointInputView : FrameLayout {
     }
 
     private lateinit var state: DataPointInputData
-    private lateinit var discreteValueCheckBoxes: MutableMap<DiscreteValue, CheckBox>
 
     private var clickListener: DataPointInputClickListener? = null
 
@@ -73,7 +70,6 @@ class DataPointInputView : FrameLayout {
 
         when (state.tracker.dataType) {
             DataType.CONTINUOUS -> initContinuous()
-            DataType.DISCRETE -> initDiscrete()
             DataType.DURATION -> initDuration()
         }
     }
@@ -117,19 +113,6 @@ class DataPointInputView : FrameLayout {
         }
     }
 
-    private fun initDiscrete() {
-        binding.buttonsScrollView.visibility = View.VISIBLE
-        binding.numberInput.visibility = View.GONE
-        binding.durationInput.visibility = View.GONE
-        createButtons()
-        if (state.label.isNotEmpty()) {
-            binding.buttonsLayout.children
-                .map { v -> v.findViewById<CheckBox>(R.id.checkbox) }
-                .first { cb -> cb.text == state.label }
-                .isChecked = true
-        }
-    }
-
     private fun initContinuous() {
         binding.buttonsScrollView.visibility = View.GONE
         binding.numberInput.visibility = View.VISIBLE
@@ -166,33 +149,6 @@ class DataPointInputView : FrameLayout {
 
     fun setOnClickListener(clickListener: DataPointInputClickListener) {
         this.clickListener = clickListener
-    }
-
-    private fun createButtons() {
-        discreteValueCheckBoxes = mutableMapOf()
-        val inflater = LayoutInflater.from(context)
-        for (discreteValue in state.tracker.discreteValues.sortedBy { f -> f.index }) {
-            val item = inflater.inflate(
-                R.layout.discrete_value_input_button,
-                binding.buttonsLayout,
-                false
-            ) as CheckBox
-            item.text = discreteValue.label
-            item.setOnClickListener { onDiscreteValueClicked(discreteValue) }
-            discreteValueCheckBoxes[discreteValue] = item
-            binding.buttonsLayout.addView(item)
-        }
-    }
-
-    private fun onDiscreteValueClicked(discreteValue: DiscreteValue) {
-        if (clickListener != null) {
-            state.value = discreteValue.index.toDouble()
-            state.label = discreteValue.label
-            state.timeFixed = true
-            discreteValueCheckBoxes.filter { kvp -> kvp.key != discreteValue }
-                .forEach { kvp -> kvp.value.isChecked = false }
-            clickListener!!.onClick(state.tracker)
-        }
     }
 
     fun updateDateTimes() = setSelectedDateTime(state.dateTime)
