@@ -15,10 +15,13 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-apply plugin: 'com.android.library'
-apply plugin: 'org.jetbrains.kotlin.android'
-apply plugin: 'kotlin-kapt'
-apply plugin: "dagger.hilt.android.plugin"
+
+plugins {
+    id 'org.jetbrains.kotlin.android'
+    id 'com.android.library'
+    id 'kotlin-kapt'
+    id "dagger.hilt.android.plugin"
+}
 
 android {
     compileSdk 32
@@ -48,8 +51,16 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
             minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debugMinify {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -62,6 +73,7 @@ android {
         //Using experimental kotlin co-routines api's
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
     }
+    namespace 'com.samco.trackandgraph.base'
 }
 
 dependencies {
