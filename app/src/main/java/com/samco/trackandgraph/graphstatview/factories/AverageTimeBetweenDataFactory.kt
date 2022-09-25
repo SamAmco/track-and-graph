@@ -91,6 +91,7 @@ class AverageTimeBetweenDataFactory @Inject constructor(
                 calculateAverageTimeBetween(dataPoints)
             }
             onDataSampled(dataSample.getRawDataPoints())
+            dataSample.dispose()
             object : IAverageTimeBetweenViewData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat

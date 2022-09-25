@@ -485,7 +485,11 @@ internal class DataInteractorImpl @Inject constructor(
             val featureMap = featureIds
                 .mapNotNull { getFeatureById(it) }
                 .associateWith { getDataSampleForFeatureId(it.featureId) }
-            csvReadWriter.writeFeaturesToCSV(outStream, featureMap)
+            try {
+                csvReadWriter.writeFeaturesToCSV(outStream, featureMap)
+            } finally {
+                featureMap.values.forEach { it.dispose() }
+            }
         }
 
     override suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long) =
