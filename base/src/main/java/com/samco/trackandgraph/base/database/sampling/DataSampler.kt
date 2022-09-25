@@ -24,6 +24,8 @@ import javax.inject.Inject
 interface DataSampler {
     fun getDataSampleForFeatureId(featureId: Long): DataSample
 
+    suspend fun getDataSamplePropertiesForFeatureId(featureId: Long): DataSampleProperties?
+
     suspend fun getLabelsForFeatureId(featureId: Long): Set<String>
 }
 
@@ -35,13 +37,19 @@ internal class DataSamplerImpl @Inject constructor(
         return tracker?.let {
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
             DataSample.fromSequence(
-                cursorSequence,
-                DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION),
-                cursorSequence::getRawDataPoints
+                data = cursorSequence,
+                dataSampleProperties = DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION),
+                getRawDataPoints = cursorSequence::getRawDataPoints,
+                onDispose = cursorSequence::dispose
             )
         } ?: DataSample.fromSequence(emptySequence())
         //TODO if there is a function for the feature ID we need to return a data sample for the function
     }
+
+    override suspend fun getDataSamplePropertiesForFeatureId(featureId: Long) =
+        dao.getTrackerByFeatureId(featureId)?.let {
+            DataSampleProperties(isDuration = it.dataType == DataType.DURATION)
+        }
 
     override suspend fun getLabelsForFeatureId(featureId: Long): Set<String> {
         val tracker = dao.getTrackerByFeatureId(featureId)

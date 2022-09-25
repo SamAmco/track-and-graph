@@ -298,9 +298,10 @@ class GraphStatInputViewModel @Inject constructor(
                 FeatureDataProvider.DataSourceData(
                     feature,
                     dataInteractor.getLabelsForFeatureId(feature.featureId),
-                    dataInteractor.getDataSampleForFeatureId(feature.featureId).dataSampleProperties
+                    dataInteractor.getDataSamplePropertiesForFeatureId(feature.featureId)
+                        ?: return@map null
                 )
-            }
+            }.filterNotNull()
             featureDataProvider = FeatureDataProvider(dataSourceData, allGroups)
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
             else moveToWaiting()
