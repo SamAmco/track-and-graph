@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of Track & Graph
   ~ 
   ~ Track & Graph is free software: you can redistribute it and/or modify
@@ -16,6 +15,7 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
+
     <style name="AppTheme" parent="AppThemeBase">
         <!--COLORS-->
         <item name="colorAccent">@color/faded_orange</item>
@@ -40,21 +40,28 @@
         <item name="android:windowBackground">@color/dark_charcoal</item>
     </style>
 
-    <style name="AppTheme.AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <style name="AppTheme.AlertDialogTheme" parent="Theme.Material3.DayNight.Dialog.Alert">
         <item name="android:background">?attr/colorSurface</item>
         <item name="colorAccent">@color/faded_orange</item>
         <item name="android:textColorPrimary">@color/blue_white_pastel</item>
         <item name="android:textColorPrimaryDisableOnly">@color/blue_white_pastel</item>
-        <item name="android:buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
-        <item name="android:buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
-        <item name="android:buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="colorPrimary">@color/blue_black</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
     </style>
+
     <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
+
     <style name="NeutralButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
+
     <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/faded_orange</item>
     </style>
