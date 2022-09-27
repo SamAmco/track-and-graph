@@ -21,6 +21,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -52,18 +53,26 @@ class AddTrackerFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogLi
         DataType.DURATION
     )
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.init(args.groupId, args.editFeatureId)
+        listenToViewModelState()
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         navController = container?.findNavController()
+/*
+        return ComposeView(requireContext()).apply {
+            setContent {
+
+            }
+        }
+*/
         binding = AddTrackerFragmentBinding.inflate(inflater, container, false)
-
-        viewModel.init(args.groupId, args.editFeatureId)
-
-        listenToViewModelState()
-
         return binding.root
     }
 

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~  This file is part of Track & Graph
   ~
   ~  Track & Graph is free software: you can redistribute it and/or modify
@@ -39,11 +38,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="16dp"
-            android:scaleType="fitXY"
-            app:srcCompat="@drawable/queue_add_box"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            />
+            app:srcCompat="@drawable/queue_add_box" />
 
         <TextView
             android:id="@+id/emptyGroupText"

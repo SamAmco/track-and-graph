@@ -24,7 +24,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
 
     compileOptions {
         sourceCompatibility 1.8
@@ -39,7 +39,7 @@ android {
     defaultConfig {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 23
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 200302
         versionName "2.3.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -89,16 +89,16 @@ dependencies {
 
     implementation project(":functions")
 
-    implementation "org.jetbrains.kotlin:kotlin-reflect:1.6.21"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.10"
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Dependency Injection
-    implementation "com.google.dagger:hilt-android:2.38.1"
-    kapt "com.google.dagger:hilt-compiler:2.38.1"
+    implementation "com.google.dagger:hilt-android:2.41"
+    kapt "com.google.dagger:hilt-compiler:2.41"
 
     //UI
-    implementation 'androidx.fragment:fragment-ktx:1.5.2'
+    implementation 'androidx.fragment:fragment-ktx:1.5.3'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
@@ -106,11 +106,12 @@ dependencies {
     implementation 'androidx.compose.ui:ui:1.2.1'
     implementation 'androidx.compose.ui:ui-tooling:1.2.1'
     implementation 'androidx.compose.foundation:foundation:1.2.1'
-    implementation 'androidx.activity:activity-compose:1.5.1'
+    implementation 'androidx.activity:activity-compose:1.6.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     implementation 'androidx.compose.runtime:runtime-livedata:1.2.1'
     // Material design stuff you might need at some point
-    //implementation 'androidx.compose.material:material:1.2.1'
+    implementation 'androidx.compose.material:material:1.2.1'
+    implementation "com.google.android.material:compose-theme-adapter-3:1.0.19"
     //implementation 'androidx.compose.material:material-icons-core:1.2.1'
     //implementation 'androidx.compose.material:material-icons-extended:1.2.1'
 
@@ -125,8 +126,8 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
 
     // Coroutines
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.3"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
 
     //Timber
