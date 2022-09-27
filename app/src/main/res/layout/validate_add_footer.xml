@@ -23,8 +23,10 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:text="Some error message that goes on for at least two lines" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/addButton"
+            style="@style/Style.ButtonStyle"
+            android:layout_marginEnd="@dimen/card_margin_small"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:enabled="false"

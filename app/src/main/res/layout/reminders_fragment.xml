@@ -30,7 +30,7 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/saveChangesButton"
             style="@style/Style.WideBottomButton"
             android:layout_width="match_parent"

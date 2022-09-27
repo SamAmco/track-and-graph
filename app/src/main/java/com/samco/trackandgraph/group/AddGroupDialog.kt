@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.group
 
-import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
@@ -27,11 +26,13 @@ import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.model.DataInteractor
@@ -106,7 +107,7 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
             )
             editText = view.findViewById(R.id.edit_name_input)
             editText.addTextChangedListener(this)
-            val builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
+            val builder = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
             val positiveButtonText = if (updateMode) R.string.update else R.string.add
             setupColorSpinner(view)
             builder.setView(view)

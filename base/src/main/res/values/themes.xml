@@ -22,6 +22,7 @@
         <item name="editTextStyle">@style/Style.EditTextStyle</item>
         <item name="cardViewStyle">@style/Style.CardViewStyle</item>
         <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:colorBackground">?attr/colorSurface</item>
@@ -69,17 +70,28 @@
         <item name="colorAccent">@color/orange</item>
         <item name="android:textColorPrimary">@color/blue_black</item>
         <item name="android:textColorPrimaryDisableOnly">@color/blue_black</item>
-        <item name="android:buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
-        <item name="android:buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
-        <item name="android:buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="colorPrimary">@color/blue_black</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+    </style>
+
+    <style name="ShapeAppearance.TnG.Corner.Small" parent="ShapeAppearance.Material3.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/card_corner_radius</item>
     </style>
 
     <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
+
     <style name="NeutralButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">@android:color/white</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
+
     <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/orange</item>
     </style>

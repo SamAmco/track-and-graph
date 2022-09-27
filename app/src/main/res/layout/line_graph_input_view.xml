@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
         <LinearLayout
             android:id="@+id/timeDurationLayout"
@@ -207,14 +208,19 @@
             android:layout_marginTop="@dimen/dialog_input_spacing"
             android:orientation="vertical" />
 
-        <ImageButton
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/addFeatureButton"
             style="@style/Style.AddBarButton"
-            app:srcCompat="@drawable/add_icon"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginStart="50dp"
             android:layout_marginTop="@dimen/dialog_input_spacing"
+            android:layout_marginEnd="50dp"
             android:layout_marginBottom="@dimen/dialog_input_spacing"
-            android:clickable="false"
-            android:contentDescription="@string/add_line_button_content_description" />
+            android:contentDescription="@string/add_line_button_content_description"
+            app:icon="@drawable/add_icon"
+            app:iconGravity="textEnd"
+            app:iconSize="22dp" />
 
     </LinearLayout>
 </layout>

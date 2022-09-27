@@ -48,7 +48,7 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/dateButton"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"
@@ -56,7 +56,7 @@
                     android:textColor="?attr/colorOnSurface"
                     tools:text="02/03/2017" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/timeButton"
                     android:layout_width="wrap_content"
                     android:layout_height="35dp"

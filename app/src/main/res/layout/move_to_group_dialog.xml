@@ -38,17 +38,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:alpha="0.4"
-                    app:tint="?attr/colorOnSurface"
-                    app:srcCompat="@drawable/left_to_right_gradient" />
+                    app:srcCompat="@drawable/left_to_right_gradient"
+                    app:tint="?attr/colorOnSurface" />
             </LinearLayout>
         </ScrollView>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/cancelButton"
+            style="@style/Style.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dialog_header_top_margin"
-            android:background="@null"
             android:text="@string/cancel"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"

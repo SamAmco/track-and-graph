@@ -45,8 +45,8 @@
                         android:id="@+id/timeText"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:background="?android:attr/selectableItemBackground"
                         android:layout_marginTop="@dimen/card_padding"
+                        android:background="?android:attr/selectableItemBackground"
                         android:clickable="true"
                         android:focusable="true"
                         android:paddingStart="@dimen/dialog_input_spacing"
@@ -66,8 +66,8 @@
                         android:paddingTop="@dimen/card_padding"
                         android:paddingEnd="@dimen/card_padding"
                         android:scaleType="fitCenter"
-                        app:tint="?attr/colorControlNormal"
                         app:srcCompat="@drawable/delete_icon"
+                        app:tint="?attr/colorControlNormal"
                         tools:ignore="RtlSymmetry" />
                 </LinearLayout>
 
@@ -85,8 +85,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
 
-                        <CheckBox
+                        <com.google.android.material.checkbox.MaterialCheckBox
                             android:id="@+id/monBox"
+                            style="@style/Style.CheckBoxStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -98,8 +99,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
 
-                        <CheckBox
+                        <com.google.android.material.checkbox.MaterialCheckBox
                             android:id="@+id/tueBox"
+                            style="@style/Style.CheckBoxStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -111,8 +113,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
 
-                        <CheckBox
+                        <com.google.android.material.checkbox.MaterialCheckBox
                             android:id="@+id/wedBox"
+                            style="@style/Style.CheckBoxStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -124,8 +127,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
 
-                        <CheckBox
+                        <com.google.android.material.checkbox.MaterialCheckBox
                             android:id="@+id/thuBox"
+                            style="@style/Style.CheckBoxStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -137,11 +141,13 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
 
-                        <CheckBox
+                        <com.google.android.material.checkbox.MaterialCheckBox
                             android:id="@+id/friBox"
+                            style="@style/Style.CheckBoxStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
+                            android:checked="true"
                             android:text="" />
                     </FrameLayout>
 
@@ -150,8 +156,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
 
-                        <CheckBox
+                        <com.google.android.material.checkbox.MaterialCheckBox
                             android:id="@+id/satBox"
+                            style="@style/Style.CheckBoxStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
@@ -163,8 +170,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1">
 
-                        <CheckBox
+                        <com.google.android.material.checkbox.MaterialCheckBox
                             android:id="@+id/sunBox"
+                            style="@style/Style.CheckBoxStyle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
