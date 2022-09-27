@@ -50,6 +50,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="30dp"
                 android:background="@color/ap_transparent"
+                android:padding="0dp"
                 android:text="@string/github_link_friendly"
                 android:textAllCaps="false"
                 android:textAppearance="@style/TextAppearance.Body"

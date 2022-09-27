@@ -16,7 +16,7 @@
   -->
 <resources>
 
-    <style name="AppThemeBase" parent="Theme.AppCompat.DayNight">
+    <style name="AppThemeBase" parent="Theme.Material3.DayNight">
         <item name="android:actionOverflowButtonStyle">@style/Style.OverflowButtonStyle</item>
         <item name="actionOverflowMenuStyle">@style/Style.OverflowMenuStyle</item>
         <item name="editTextStyle">@style/Style.EditTextStyle</item>
@@ -35,6 +35,7 @@
         <item name="colorPrimary">@color/light_blue</item>
         <item name="colorPrimaryDark">@color/dark_blue</item>
         <item name="colorSecondary">@color/orange</item>
+        <item name="colorPrimaryContainer">@color/orange</item>
         <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">@color/black</item>
         <item name="colorOnSecondary">@color/chalky_white</item>
@@ -63,10 +64,23 @@
         <item name="android:backgroundDimEnabled">false</item>
     </style>
 
-    <style name="AppTheme.AlertDialogTheme" parent="Theme.AppCompat.DayNight.Dialog.Alert">
+    <style name="AppTheme.AlertDialogTheme" parent="Theme.Material3.DayNight.Dialog.Alert">
         <item name="android:background">?attr/colorSurface</item>
         <item name="colorAccent">@color/orange</item>
         <item name="android:textColorPrimary">@color/blue_black</item>
         <item name="android:textColorPrimaryDisableOnly">@color/blue_black</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="NeutralButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+    <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/orange</item>
     </style>
 </resources>
