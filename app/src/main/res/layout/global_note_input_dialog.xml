@@ -30,7 +30,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/dateButton"
-                    style="@style/Style.DateTimePickerButton"
+                    style="@style/Style.GrayButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?attr/colorControlHighlight"
@@ -39,7 +39,7 @@
 
                 <Button
                     android:id="@+id/timeButton"
-                    style="@style/Style.DateTimePickerButton"
+                    style="@style/Style.GrayButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"

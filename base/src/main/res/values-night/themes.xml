@@ -23,6 +23,7 @@
         <item name="colorPrimaryDark">@color/faded_dark_blue</item>
         <item name="colorSecondary">@color/faded_orange</item>
         <item name="colorPrimaryContainer">@color/faded_orange</item>
+        <item name="selectorButtonColor">@color/dark_gray</item>
         <item name="colorSurface">@color/mid_charcoal</item>
         <item name="colorOnSurface">@color/light_gray</item>
         <item name="colorOnSecondary">@color/blue_white_pastel</item>
@@ -56,13 +57,16 @@
 
     <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
 
     <style name="NeutralButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/faded_orange</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
 </resources>

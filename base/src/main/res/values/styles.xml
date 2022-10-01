@@ -19,10 +19,12 @@
         <item name="buttonTint">@color/checkbox_color</item>
     </style>
 
-    <style name="Style.DateTimePickerButton" parent="Widget.Material3.Button.TonalButton">
-        <item name="backgroundTint">@color/mid_gray</item>
+    <style name="Style.GrayButton" parent="Widget.Material3.Button.TonalButton">
+        <item name="backgroundTint">?selectorButtonColor</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="shapeAppearance">@style/ShapeAppearance.TnG.Corner.Small</item>
+        <item name="android:ellipsize">start</item>
+        <item name="android:singleLine">true</item>
     </style>
 
     <style name="Style.TextButton" parent="Widget.Material3.Button.TextButton">

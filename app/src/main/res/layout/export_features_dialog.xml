@@ -17,24 +17,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/dialog_header_top_margin"
                 android:layout_marginHorizontal="@dimen/card_padding"
+                android:layout_marginTop="@dimen/dialog_header_top_margin"
                 android:text="@string/export_to"
                 android:textAppearance="@style/TextAppearance.Body" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/fileButton"
+                style="@style/Style.GrayButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/card_padding"
                 android:layout_marginTop="@dimen/dialog_header_top_margin"
                 android:layout_marginRight="@dimen/card_padding"
-                android:background="?attr/colorControlHighlight"
-                android:textAppearance="@style/TextAppearance.Body"
-                android:ellipsize="start"
-                android:padding="@dimen/card_padding"
-                android:singleLine="true"
-                android:textAllCaps="false"
                 tools:text="/home/sam/some-directory/some-file-20190703-162203" />
 
             <LinearLayout
