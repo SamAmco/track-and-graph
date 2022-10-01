@@ -31,6 +31,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.model.DataInteractor
@@ -78,7 +79,7 @@ class ExportFeaturesDialog : DialogFragment() {
             fileButton.text = getString(R.string.select_file)
             fileButton.setTextColor(fileButton.context.getColorFromAttr(R.attr.colorError))
 
-            val builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
+            val builder = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setView(view)
                 .setPositiveButton(R.string.exportButton) { _, _ -> run {} }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
@@ -91,9 +92,6 @@ class ExportFeaturesDialog : DialogFragment() {
 
     private fun setAlertDialogShowListeners() {
         positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setTextColor(positiveButton.context.getColorFromAttr(R.attr.colorSecondary))
-        alertDialog.getButton(android.app.AlertDialog.BUTTON_NEGATIVE)
-            .setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
         positiveButton.isEnabled = false
         viewModel.loadFeatures(groupId!!)
         listenToState()

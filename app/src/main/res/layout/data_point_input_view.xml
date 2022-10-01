@@ -50,19 +50,17 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/dateButton"
+                    style="@style/Style.GrayButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
-                    android:background="?attr/colorControlHighlight"
-                    android:textColor="?attr/colorOnSurface"
+                    android:layout_height="wrap_content"
                     tools:text="02/03/2017" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/timeButton"
+                    style="@style/Style.GrayButton"
                     android:layout_width="wrap_content"
-                    android:layout_height="35dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
-                    android:background="?attr/colorControlHighlight"
-                    android:textColor="?attr/colorOnSurface"
                     tools:text="08:22" />
 
             </LinearLayout>

@@ -24,7 +24,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 32
 
     compileOptions {
         sourceCompatibility 1.8
@@ -39,7 +39,7 @@ android {
     defaultConfig {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 23
-        targetSdkVersion 33
+        targetSdkVersion 32
         versionCode 200302
         versionName "2.3.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -102,16 +102,17 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.2.1'
 
-    //COMPOSE
-    implementation 'androidx.compose.ui:ui:1.2.1'
-    implementation 'androidx.compose.ui:ui-tooling:1.2.1'
-    implementation 'androidx.compose.foundation:foundation:1.2.1'
-    implementation 'androidx.activity:activity-compose:1.6.0'
+    //COMPOSE (this stuff is not at the latest version because it requires compiling
+    // against SDK 33 which has a bug where it is not recognising common xml attributes)
+    implementation 'androidx.compose.ui:ui:1.1.1'
+    implementation 'androidx.compose.ui:ui-tooling:1.1.1'
+    implementation 'androidx.compose.foundation:foundation:1.1.1'
+    implementation 'androidx.activity:activity-compose:1.5.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     implementation 'androidx.compose.runtime:runtime-livedata:1.2.1'
     // Material design stuff you might need at some point
-    implementation 'androidx.compose.material:material:1.2.1'
-    implementation "com.google.android.material:compose-theme-adapter-3:1.0.19"
+    implementation 'androidx.compose.material:material:1.1.1'
+    implementation "com.google.android.material:compose-theme-adapter-3:1.0.15"
     //implementation 'androidx.compose.material:material-icons-core:1.2.1'
     //implementation 'androidx.compose.material:material-icons-extended:1.2.1'
 

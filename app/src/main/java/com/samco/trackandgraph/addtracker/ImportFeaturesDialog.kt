@@ -30,6 +30,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.ImportFeaturesException
@@ -70,7 +71,7 @@ class ImportFeaturesDialog : DialogFragment() {
             fileButton.text = getString(R.string.select_file)
             fileButton.setTextColor(fileButton.context.getColorFromAttr(R.attr.colorError))
 
-            val builder = AlertDialog.Builder(it, R.style.AppTheme_AlertDialogTheme)
+            val builder = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
             builder.setView(view)
                 .setPositiveButton(R.string.importButton) { _, _ -> run {} }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
@@ -83,14 +84,12 @@ class ImportFeaturesDialog : DialogFragment() {
 
     private fun setAlertDialogShowListeners() {
         val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.setTextColor(positiveButton.context.getColorFromAttr(R.attr.colorSecondary))
         positiveButton.isEnabled = false
         positiveButton.setOnClickListener { onImportClicked() }
         listenToUri()
         listenToImportState()
         listenToException()
         val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        negativeButton.setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
         negativeButton.setOnClickListener { dismiss() }
         alertDialog.setOnCancelListener { run {} }
     }
@@ -104,6 +103,7 @@ class ImportFeaturesDialog : DialogFragment() {
                     fileButton,
                     alertDialog
                 )
+                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
             }
         })
     }

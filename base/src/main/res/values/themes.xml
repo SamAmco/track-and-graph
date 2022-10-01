@@ -33,6 +33,7 @@
     <style name="AppTheme" parent="AppThemeBase">
         <!--COLORS-->
         <item name="colorAccent">@color/orange</item>
+        <item name="selectorButtonColor">@color/light_gray</item>
         <item name="colorPrimary">@color/light_blue</item>
         <item name="colorPrimaryDark">@color/dark_blue</item>
         <item name="colorSecondary">@color/orange</item>
@@ -53,7 +54,6 @@
         <item name="android:textColorSecondary">@color/dark_gray</item>
         <item name="android:textColorHint">@color/mid_gray</item>
         <item name="android:windowBackground">@color/chalky_white</item>
-
     </style>
 
     <style name="TransparentTheme" parent="AppTheme">
@@ -86,13 +86,16 @@
 
     <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
 
     <style name="NeutralButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
 
     <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
         <item name="android:textColor">@color/orange</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
 </resources>
