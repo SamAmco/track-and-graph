@@ -95,7 +95,7 @@ class BackupAndRestoreFragment : Fragment() {
         viewModel.restoreResult.observe(viewLifecycleOwner, Observer {
             when (it) {
                 true -> restartApp()
-                false -> {
+                else -> {
                     val color =
                         binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.restoreFeedbackText.setTextColor(color)
@@ -115,7 +115,7 @@ class BackupAndRestoreFragment : Fragment() {
                     binding.backupFeedbackText.setTextColor(color)
                     binding.backupFeedbackText.text = getString(R.string.backup_successful)
                 }
-                false -> {
+                else -> {
                     val color =
                         binding.backupFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.backupFeedbackText.setTextColor(color)

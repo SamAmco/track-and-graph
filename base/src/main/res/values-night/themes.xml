@@ -19,16 +19,19 @@
     <style name="AppTheme" parent="AppThemeBase">
         <!--COLORS-->
         <item name="colorAccent">@color/faded_orange</item>
-        <item name="colorPrimary">@color/faded_light_blue</item>
-        <item name="colorPrimaryDark">@color/faded_dark_blue</item>
-        <item name="colorSecondary">@color/faded_orange</item>
+        <item name="colorPrimary">@color/faded_orange</item>
+        <item name="colorContainer">@color/mid_charcoal</item>
+        <item name="colorOutline">@color/dark_gray</item>
+        <item name="colorSurfaceVariant">@color/mid_charcoal</item>
+        <item name="colorPrimaryDark">@color/faded_dark_orange</item>
+        <item name="colorSecondary">@color/faded_light_blue</item>
         <item name="colorPrimaryContainer">@color/faded_orange</item>
         <item name="selectorButtonColor">@color/dark_gray</item>
         <item name="colorSurface">@color/mid_charcoal</item>
         <item name="colorOnSurface">@color/light_gray</item>
-        <item name="colorOnSecondary">@color/blue_white_pastel</item>
-        <item name="colorPrimaryVariant">@color/faded_dark_blue</item>
-        <item name="colorSecondaryVariant">@color/faded_dark_orange</item>
+        <item name="colorOnSecondary">@color/blue_black</item>
+        <item name="colorPrimaryVariant">@color/faded_dark_orange</item>
+        <item name="colorSecondaryVariant">@color/faded_dark_blue</item>
         <item name="errorTextColor">@color/faded_dark_orange</item>
         <item name="colorOnError">@color/faded_green</item>
         <item name="colorControlNormal">@color/blue_white_pastel</item>

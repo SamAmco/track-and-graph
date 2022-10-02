@@ -24,7 +24,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
 
     compileOptions {
         sourceCompatibility 1.8
@@ -34,12 +34,13 @@ android {
         jvmTarget = "1.8"
         //Using experimental kotlin co-routines api's
         freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs += '-opt-in=androidx.compose.material3.ExperimentalMaterial3Api'
     }
 
     defaultConfig {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 23
-        targetSdkVersion 32
+        targetSdkVersion 33
         versionCode 200302
         versionName "2.3.2"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -78,7 +79,7 @@ android {
     // you might need to look into this:
     //https://developer.android.com/jetpack/androidx/releases/compose-kotlin
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0-beta01"
+        kotlinCompilerExtensionVersion = "1.2.0"
     }
 
     namespace 'com.samco.trackandgraph'
@@ -94,8 +95,8 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Dependency Injection
-    implementation "com.google.dagger:hilt-android:2.41"
-    kapt "com.google.dagger:hilt-compiler:2.41"
+    implementation "com.google.dagger:hilt-android:2.43"
+    kapt "com.google.dagger:hilt-compiler:2.43"
 
     //UI
     implementation 'androidx.fragment:fragment-ktx:1.5.3'
@@ -104,16 +105,15 @@ dependencies {
 
     //COMPOSE (this stuff is not at the latest version because it requires compiling
     // against SDK 33 which has a bug where it is not recognising common xml attributes)
-    implementation 'androidx.compose.ui:ui:1.1.1'
-    implementation 'androidx.compose.ui:ui-tooling:1.1.1'
-    implementation 'androidx.compose.foundation:foundation:1.1.1'
-    implementation 'androidx.activity:activity-compose:1.5.1'
+    implementation 'androidx.compose.ui:ui:1.2.1'
+    implementation 'androidx.compose.ui:ui-tooling:1.2.1'
+    implementation 'androidx.compose.foundation:foundation:1.2.1'
+    implementation 'androidx.activity:activity-compose:1.6.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     implementation 'androidx.compose.runtime:runtime-livedata:1.2.1'
     // Material design stuff you might need at some point
-    implementation 'androidx.compose.material:material:1.1.1'
-    implementation "com.google.android.material:compose-theme-adapter-3:1.0.15"
-    //implementation 'androidx.compose.material:material-icons-core:1.2.1'
+    implementation 'androidx.compose.material3:material3:1.0.0-beta03'
+    implementation "com.google.android.material:compose-theme-adapter-3:1.0.19"
     //implementation 'androidx.compose.material:material-icons-extended:1.2.1'
 
     // Android KTX
