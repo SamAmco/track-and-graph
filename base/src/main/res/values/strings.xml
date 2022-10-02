@@ -29,8 +29,8 @@
     <string name="update">Update</string>
     <string name="new_name">New name: </string>
     <string name="graph_or_stat_name">Graph name: </string>
-    <string name="tracker_name">What would you like to track?</string>
-    <string name="tracker_type">What type of data is this?</string>
+    <string name="tracker_name">Tracker name</string>
+    <string name="tracker_type">This is a time or duration</string>
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="select_file">Select File</string>
@@ -352,4 +352,6 @@
     <string name="name_your_function">Name your function: </string>
     <string name="write_your_function_here"># Write your function here</string>
     <string name="add_some_data_sources">Add some data sources</string>
+    <string name="value_colon">Value: </string>
+    <string name="label_colon">Label: </string>
 </resources>
