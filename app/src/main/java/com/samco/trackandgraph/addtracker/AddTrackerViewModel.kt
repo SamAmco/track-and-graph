@@ -8,6 +8,8 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.TrackerHelper
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
+import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface AddTrackerViewModel {
+interface AddTrackerViewModel : DurationInputViewModel {
     //Outputs
     val trackerName: LiveData<String>
     val trackerDescription: LiveData<String>
@@ -45,8 +47,8 @@ interface AddTrackerViewModel {
 class AddTrackerViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
-    @MainDispatcher private val ui: CoroutineDispatcher
-) : ViewModel(), AddTrackerViewModel {
+    @MainDispatcher private val ui: CoroutineDispatcher,
+) : ViewModel(), AddTrackerViewModel, DurationInputViewModel by DurationInputViewModelImpl() {
 
     private var disallowedNames: List<String>? = null
 
@@ -167,6 +169,11 @@ class AddTrackerViewModelImpl @Inject constructor(
         else -> DataType.CONTINUOUS
     }
 
+    private fun getDefaultValue() = when (isDuration.value) {
+        true -> getDurationAsDouble()
+        else -> defaultValue.value
+    }
+
     private suspend fun updateTracker(existingTracker: Tracker) {
         dataInteractor.updateTracker(
             oldTracker = existingTracker,
@@ -174,7 +181,7 @@ class AddTrackerViewModelImpl @Inject constructor(
             newName = trackerName.value,
             newType = getDataType(),
             hasDefaultValue = hasDefaultValue.value,
-            defaultValue = defaultValue.value,
+            defaultValue = getDefaultValue(),
             featureDescription = trackerDescription.value,
             defaultLabel = defaultLabel.value
         )
@@ -190,7 +197,7 @@ class AddTrackerViewModelImpl @Inject constructor(
             description = trackerDescription.value ?: "",
             dataType = getDataType(),
             hasDefaultValue = hasDefaultValue.value ?: false,
-            defaultValue = defaultValue.value ?: 1.0,
+            defaultValue = getDefaultValue() ?: 1.0,
             defaultLabel = defaultLabel.value ?: ""
         )
         dataInteractor.insertTracker(tracker)

@@ -1,10 +1,14 @@
 package com.samco.trackandgraph.ui.compose.theming
 
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import com.google.android.material.composethemeadapter3.createMdc3Theme
+
+
+fun ColorScheme.disabledAlpha() = 0.4f
 
 @Composable
 fun TnGComposeTheme(block: @Composable () -> Unit) {

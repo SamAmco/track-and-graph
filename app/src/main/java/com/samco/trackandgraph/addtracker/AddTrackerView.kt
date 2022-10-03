@@ -1,25 +1,28 @@
 package com.samco.trackandgraph.addtracker
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
+import androidx.compose.material3.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,6 +31,9 @@ import androidx.lifecycle.MutableLiveData
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.model.TrackerHelper
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
+import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
+import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
 
 @Composable
 @Preview(showBackground = true, device = Devices.PIXEL_3)
@@ -46,6 +52,9 @@ fun AddTrackerView() {
             override val durationNumericConversionMode =
                 MutableLiveData(TrackerHelper.DurationNumericConversionMode.HOURS)
             override val isUpdateMode = MutableLiveData(false)
+            override val hours = MutableLiveData("")
+            override val minutes = MutableLiveData("")
+            override val seconds = MutableLiveData("")
 
             override fun onTrackerNameChanged(name: String) {}
 
@@ -62,6 +71,14 @@ fun AddTrackerView() {
             override fun onDurationNumericConversionModeChanged(durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode) {}
 
             override fun onCreateClicked() {}
+
+            override fun setHours(value: String) { }
+
+            override fun setMinutes(value: String) { }
+
+            override fun setSeconds(value: String) { }
+
+            override fun getDurationAsDouble() = 0.0
         })
     }
 }
@@ -123,10 +140,7 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
 
             if (isDuration.value) {
                 LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                    DurationInput(
-                        seconds = defaultValue.value,
-                        onValueChange = { viewModel.onDefaultValueChanged(it) }
-                    )
+                    DurationInput(viewModel)
                 }
             } else {
                 LabeledRow(label = stringResource(id = R.string.value_colon)) {
@@ -157,52 +171,53 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun DurationInputPreview() = DurationInput(
-    seconds = 3663.0,
-    onValueChange = {}
+    DurationInputViewModelImpl()
 )
 
 @Composable
 fun DurationInput(
-    seconds: Double,
-    onValueChange: (Double) -> Unit
+    durationInputViewModel: DurationInputViewModel
 ) = Row(
     modifier = Modifier
-        .padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
+        .padding(
+            horizontal = dimensionResource(id = R.dimen.card_padding),
+            vertical = dimensionResource(id = R.dimen.card_padding)
+        ),
     verticalAlignment = Alignment.Bottom,
     horizontalArrangement = Arrangement.Center
 ) {
-    val hours = (seconds / (60 * 60)).toInt()
-    var remainder = seconds - (hours * 60 * 60)
-    val minutes = (remainder / 60).toInt()
-    remainder -= (minutes * 60)
-    val secondsRemainder = remainder.toInt()
-
+    val hours = durationInputViewModel.hours.observeAsState("")
+    val minutes = durationInputViewModel.minutes.observeAsState("")
+    val seconds = durationInputViewModel.seconds.observeAsState("")
     DurationInputComponent(
-        value = hours.toString(),
-        onValueChange = {
-            val int = it.asDurationComponent() ?: return@DurationInputComponent
-            onValueChange(
-                (int * 60 * 60) + (minutes * 60.0) + secondsRemainder
-            )
-        }, suffix = stringResource(id = R.string.hours_suffix)
+        value = hours.value,
+        onValueChange = { durationInputViewModel.setHours(it) },
+        suffix = stringResource(id = R.string.hours_suffix),
+        charLimit = 8
+    )
+    Text(
+        text = ":",
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
     )
     DurationInputComponent(
-        value = minutes.toString(),
-        onValueChange = {
-            val int = it.asDurationComponent() ?: return@DurationInputComponent
-            onValueChange(
-                (hours * 60 * 60) + (int * 60.0) + secondsRemainder
-            )
-        }, suffix = stringResource(id = R.string.minutes_suffix)
+        value = minutes.value,
+        onValueChange = { durationInputViewModel.setMinutes(it) },
+        suffix = stringResource(id = R.string.minutes_suffix),
+        charLimit = 3
+    )
+    Text(
+        text = ":",
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
     )
     DurationInputComponent(
-        value = secondsRemainder.toString(),
-        onValueChange = {
-            val int = it.asDurationComponent() ?: return@DurationInputComponent
-            onValueChange(
-                (hours * 60 * 60) + (minutes * 60.0) + int
-            )
-        }, suffix = stringResource(id = R.string.seconds_suffix)
+        value = seconds.value,
+        onValueChange = { durationInputViewModel.setSeconds(it) },
+        suffix = stringResource(id = R.string.seconds_suffix),
+        charLimit = 3
     )
 }
 
@@ -210,24 +225,70 @@ fun DurationInput(
 private fun DurationInputComponent(
     value: String,
     onValueChange: (String) -> Unit,
-    suffix: String
+    suffix: String,
+    charLimit: Int
 ) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        colors = TextFieldDefaults.textFieldColors(
-            containerColor = Color.Transparent
+    val colors = TextFieldDefaults.textFieldColors()
+    val interactionSource = remember { MutableInteractionSource() }
+    val textField = remember { mutableStateOf(TextFieldValue(value)) }
+
+    if (textField.value.text != value) {
+        textField.value = TextFieldValue(value, TextRange(value.length, value.length))
+    }
+
+    BasicTextField(
+        value = textField.value,
+        onValueChange = {
+            if (it.text != textField.value.text && it.text.length <= charLimit) {
+                textField.value = it
+                onValueChange.invoke(it.text)
+            }
+        },
+        textStyle = MaterialTheme.typography.labelSmall.copy(
+            textAlign = TextAlign.End
         ),
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        interactionSource = interactionSource,
+        decorationBox = {
+            if (textField.value.text == "") Text(
+                "0",
+                fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                textAlign = TextAlign.End,
+                color = MaterialTheme.typography.labelSmall.color.copy(
+                    alpha = MaterialTheme.colorScheme.disabledAlpha()
+                )
+            )
+            else it()
+        },
         singleLine = true,
         modifier = Modifier
-            .sizeIn(minWidth = 40.dp, maxWidth = 80.dp)
-            .wrapContentWidth(),
+            .width(IntrinsicSize.Min)
+            .widthIn(min = 40.dp, max = 80.dp)
+            .indicatorLine(
+                enabled = true,
+                isError = false,
+                interactionSource = interactionSource,
+                colors = colors
+            )
+            .onFocusChanged { focusState ->
+                val textLength = textField.value.text.length
+                if (focusState.isFocused) {
+                    textField.value = textField.value.copy(
+                        selection = TextRange(0, textLength)
+                    )
+                } else {
+                    textField.value = textField.value.copy(
+                        selection = TextRange(textLength, textLength)
+                    )
+                }
+            },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     )
-    Text(text = suffix)
+    Text(
+        text = suffix,
+        modifier = Modifier.padding(horizontal = 4.dp)
+    )
 }
-
-private fun String.asDurationComponent() = this.filter { it.isDigit() || it == '-' }.toIntOrNull()
 
 @Composable
 private fun LabeledRow(
@@ -237,8 +298,7 @@ private fun LabeledRow(
     modifier = Modifier
         .padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
     verticalAlignment = Alignment.CenterVertically
-)
-{
+) {
     Text(
         text = label,
         style = MaterialTheme.typography.labelSmall
@@ -276,32 +336,3 @@ private fun InputSpacingLarge() =
             .height(dimensionResource(id = R.dimen.input_spacing_large))
             .width(dimensionResource(id = R.dimen.input_spacing_large))
     )
-
-//TODO this should be moved out to a more generic place
-@Composable
-fun ExpandingTextField(
-    modifier: Modifier = Modifier,
-    value: String = "",
-    hint: String = "",
-    onValueChange: (String) -> Unit,
-) {
-    TextField(
-        value = value,
-        onValueChange = onValueChange,
-        singleLine = false,
-        colors = TextFieldDefaults.textFieldColors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-            disabledIndicatorColor = Color.Transparent
-        ),
-        label = {
-            Text(hint)
-        },
-        modifier = modifier
-            .border(
-                1.dp,
-                MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius))
-            )
-    )
-}
