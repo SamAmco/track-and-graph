@@ -5,21 +5,25 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.TextFieldDefaults.indicatorLine
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -45,7 +49,7 @@ fun AddTrackerView() {
             override val isDuration = MutableLiveData(false)
             override val isLoading = MutableLiveData(false)
             override val hasDefaultValue = MutableLiveData(true)
-            override val defaultValue = MutableLiveData(1.0)
+            override val defaultValue = MutableLiveData("1.0")
             override val defaultLabel = MutableLiveData("")
             override val createButtonEnabled = MutableLiveData(false)
             override val errorText: LiveData<Int?> = MutableLiveData(null)
@@ -64,7 +68,7 @@ fun AddTrackerView() {
 
             override fun onHasDefaultValueChanged(hasDefaultValue: Boolean) {}
 
-            override fun onDefaultValueChanged(defaultValue: Double) {}
+            override fun onDefaultValueChanged(defaultValue: String) {}
 
             override fun onDefaultLabelChanged(defaultLabel: String) {}
 
@@ -72,17 +76,18 @@ fun AddTrackerView() {
 
             override fun onCreateClicked() {}
 
-            override fun setHours(value: String) { }
+            override fun setHours(value: String) {}
 
-            override fun setMinutes(value: String) { }
+            override fun setMinutes(value: String) {}
 
-            override fun setSeconds(value: String) { }
+            override fun setSeconds(value: String) {}
 
             override fun getDurationAsDouble() = 0.0
         })
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddTrackerView(viewModel: AddTrackerViewModel) {
     Column(
@@ -93,79 +98,183 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
     ) {
         val trackerName = viewModel.trackerName.observeAsState("")
         val trackerDescription = viewModel.trackerDescription.observeAsState("")
+        val focusManager = LocalFocusManager.current
+        val focusRequester = FocusRequester()
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        val isDuration = viewModel.isDuration.observeAsState(false)
+        val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(true)
+        val defaultValue = viewModel.defaultValue.observeAsState("")
+        val defaultLabel = viewModel.defaultLabel.observeAsState("")
 
         InputSpacingSmall()
 
-        OutlinedTextField(
-            value = trackerName.value,
-            label = {
-                Text(text = stringResource(id = R.string.tracker_name))
-            },
-            onValueChange = { viewModel.onTrackerNameChanged(it) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        InputSpacingLarge()
-        OutlinedTextField(
-            value = trackerDescription.value,
-            label = {
-                Text(stringResource(id = R.string.add_a_longer_description_optional))
-            },
-            onValueChange = { viewModel.onTrackerDescriptionChanged(it) },
-            modifier = Modifier.fillMaxWidth()
-        )
+        NameInput(trackerName, viewModel, focusManager, focusRequester, keyboardController)
 
         InputSpacingLarge()
 
-        val isDuration = viewModel.isDuration.observeAsState(false)
-        RowCheckbox(
-            checked = isDuration.value,
-            onCheckedChange = { viewModel.onIsDurationCheckChanged(it) },
-            text = stringResource(id = R.string.tracker_type)
-        )
+        DescriptionInput(trackerDescription, focusManager, viewModel)
 
         InputSpacingLarge()
 
-        val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(true)
-        val defaultValue = viewModel.defaultValue.observeAsState(1.0)
-        val defaultLabel = viewModel.defaultLabel.observeAsState("")
+        DurationCheckbox(isDuration.value, viewModel)
 
-        RowCheckbox(
-            checked = hasDefaultValue.value,
-            onCheckedChange = { viewModel.onHasDefaultValueChanged(it) },
-            text = stringResource(id = R.string.use_default_value)
-        )
+        InputSpacingLarge()
+
+        DefaultValueCheckbox(hasDefaultValue.value, viewModel)
 
         if (hasDefaultValue.value) {
 
-            if (isDuration.value) {
-                LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                    DurationInput(viewModel)
-                }
-            } else {
-                LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                    OutlinedTextField(
-                        value = defaultValue.value.toString(),
-                        onValueChange = {
-                            val double = it.toDoubleOrNull() ?: return@OutlinedTextField
-                            viewModel.onDefaultValueChanged(double)
-                        },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        singleLine = true
-                    )
-                }
-            }
+            if (isDuration.value) DurationInputRow(viewModel)
+            else ValueInputRow(defaultValue.value, viewModel, focusManager)
 
             InputSpacingSmall()
-            LabeledRow(label = stringResource(id = R.string.label_colon)) {
-                OutlinedTextField(
-                    value = defaultLabel.value,
-                    onValueChange = { viewModel.onDefaultLabelChanged(it) },
-                    singleLine = true
-                )
-            }
+
+            LabelInputRow(defaultLabel.value, viewModel)
+        }
+
+        LaunchedEffect(true) {
+            focusRequester.requestFocus()
         }
     }
+}
+
+@Composable
+private fun LabelInputRow(
+    defaultLabel: String,
+    viewModel: AddTrackerViewModel
+) {
+    LabeledRow(label = stringResource(id = R.string.label_colon)) {
+        OutlinedTextField(
+            value = defaultLabel,
+            onValueChange = { viewModel.onDefaultLabelChanged(it) },
+            singleLine = true
+        )
+    }
+}
+
+@Composable
+private fun ValueInputRow(
+    defaultValue: String,
+    viewModel: AddTrackerViewModel,
+    focusManager: FocusManager
+) {
+    val textField = remember { mutableStateOf(TextFieldValue(defaultValue)) }
+
+    if (textField.value.text != defaultValue) {
+        textField.value = textField.value.copy(text = defaultValue)
+    }
+
+    LabeledRow(label = stringResource(id = R.string.value_colon)) {
+        OutlinedTextField(
+            value = textField.value,
+            onValueChange = {
+                textField.value = it
+                viewModel.onDefaultValueChanged(it.text)
+            },
+            keyboardActions = KeyboardActions(
+                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            ),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Decimal,
+                imeAction = ImeAction.Next
+            ),
+            singleLine = true,
+            modifier = Modifier
+                .onFocusChanged { focusState ->
+                    val textLength = textField.value.text.length
+                    if (focusState.isFocused) {
+                        textField.value = textField.value.copy(
+                            selection = TextRange(0, textLength)
+                        )
+                    } else {
+                        textField.value = textField.value.copy(
+                            selection = TextRange(textLength, textLength)
+                        )
+                    }
+                },
+        )
+    }
+}
+
+@Composable
+private fun DurationInputRow(viewModel: AddTrackerViewModel) {
+    LabeledRow(label = stringResource(id = R.string.value_colon)) {
+        DurationInput(viewModel)
+    }
+}
+
+@Composable
+private fun DefaultValueCheckbox(
+    hasDefaultValue: Boolean,
+    viewModel: AddTrackerViewModel
+) {
+    RowCheckbox(
+        checked = hasDefaultValue,
+        onCheckedChange = { viewModel.onHasDefaultValueChanged(it) },
+        text = stringResource(id = R.string.use_default_value)
+    )
+}
+
+@Composable
+private fun DurationCheckbox(
+    isDuration: Boolean,
+    viewModel: AddTrackerViewModel
+) {
+    RowCheckbox(
+        checked = isDuration,
+        onCheckedChange = { viewModel.onIsDurationCheckChanged(it) },
+        text = stringResource(id = R.string.tracker_type)
+    )
+}
+
+@Composable
+private fun DescriptionInput(
+    trackerDescription: State<String>,
+    focusManager: FocusManager,
+    viewModel: AddTrackerViewModel
+) {
+    OutlinedTextField(
+        value = trackerDescription.value,
+        label = {
+            Text(stringResource(id = R.string.add_a_longer_description_optional))
+        },
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        onValueChange = { viewModel.onTrackerDescriptionChanged(it) },
+        modifier = Modifier.fillMaxWidth()
+    )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun NameInput(
+    trackerName: State<String>,
+    viewModel: AddTrackerViewModel,
+    focusManager: FocusManager,
+    focusRequester: FocusRequester,
+    keyboardController: SoftwareKeyboardController?
+) {
+    OutlinedTextField(
+        value = trackerName.value,
+        label = {
+            Text(text = stringResource(id = R.string.tracker_name))
+        },
+        onValueChange = { viewModel.onTrackerNameChanged(it) },
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
+            .onFocusChanged {
+                if (it.hasFocus) keyboardController?.show()
+            }
+    )
 }
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)
@@ -228,6 +337,7 @@ private fun DurationInputComponent(
     suffix: String,
     charLimit: Int
 ) {
+    val focusManager = LocalFocusManager.current
     val colors = TextFieldDefaults.textFieldColors()
     val interactionSource = remember { MutableInteractionSource() }
     val textField = remember { mutableStateOf(TextFieldValue(value)) }
@@ -260,6 +370,9 @@ private fun DurationInputComponent(
             )
             else it()
         },
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager.moveFocus(FocusDirection.Right) }
+        ),
         singleLine = true,
         modifier = Modifier
             .width(IntrinsicSize.Min)
@@ -282,7 +395,10 @@ private fun DurationInputComponent(
                     )
                 }
             },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Next
+        ),
     )
     Text(
         text = suffix,

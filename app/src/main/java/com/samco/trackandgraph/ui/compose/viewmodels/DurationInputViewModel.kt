@@ -19,21 +19,18 @@ class DurationInputViewModelImpl : DurationInputViewModel {
     override val minutes = MutableLiveData("")
     override val seconds = MutableLiveData("")
 
-    private fun String.validated() =
-        this.take(1).filter { it.isDigit() || it == '-' } + this.drop(1).filter { it.isDigit() }
-
-    private fun LiveData<String>.getDouble() = ((hours.value ?: "").toDoubleOrNull() ?: 0.0)
+    private fun LiveData<String>.getDouble() = ((this.value ?: "").toDoubleOrNull() ?: 0.0)
 
     override fun setHours(value: String) {
-        hours.value = value.validated()
+        hours.value = value.asValidatedInt()
     }
 
     override fun setMinutes(value: String) {
-        minutes.value = value.validated()
+        minutes.value = value.asValidatedInt()
     }
 
     override fun setSeconds(value: String) {
-        seconds.value = value.validated()
+        seconds.value = value.asValidatedInt()
     }
 
     override fun getDurationAsDouble(): Double {

@@ -10,6 +10,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
+import com.samco.trackandgraph.ui.compose.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +26,7 @@ interface AddTrackerViewModel : DurationInputViewModel {
     val isDuration: LiveData<Boolean>
     val isLoading: LiveData<Boolean>
     val hasDefaultValue: LiveData<Boolean>
-    val defaultValue: LiveData<Double>
+    val defaultValue: LiveData<String>
     val defaultLabel: LiveData<String>
     val createButtonEnabled: LiveData<Boolean>
     val errorText: LiveData<Int?>
@@ -37,7 +38,7 @@ interface AddTrackerViewModel : DurationInputViewModel {
     fun onTrackerDescriptionChanged(description: String)
     fun onIsDurationCheckChanged(isDuration: Boolean)
     fun onHasDefaultValueChanged(hasDefaultValue: Boolean)
-    fun onDefaultValueChanged(defaultValue: Double)
+    fun onDefaultValueChanged(defaultValue: String)
     fun onDefaultLabelChanged(defaultLabel: String)
     fun onDurationNumericConversionModeChanged(durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode)
     fun onCreateClicked()
@@ -64,7 +65,7 @@ class AddTrackerViewModelImpl @Inject constructor(
     override val isDuration = MutableLiveData(false)
     override val isLoading = MutableLiveData(false)
     override val hasDefaultValue = MutableLiveData(false)
-    override val defaultValue = MutableLiveData(1.0)
+    override val defaultValue = MutableLiveData("1.0")
     override val defaultLabel = MutableLiveData("")
 
     private val validationErrorFlow = trackerNameFlow.map {
@@ -119,7 +120,7 @@ class AddTrackerViewModelImpl @Inject constructor(
         trackerDescription.value = tracker.description
         isDuration.value = tracker.dataType == DataType.DURATION
         hasDefaultValue.value = tracker.hasDefaultValue
-        defaultValue.value = tracker.defaultValue
+        defaultValue.value = tracker.defaultValue.toString()
         defaultLabel.value = tracker.defaultLabel
     }
 
@@ -141,8 +142,8 @@ class AddTrackerViewModelImpl @Inject constructor(
         this.hasDefaultValue.value = hasDefaultValue
     }
 
-    override fun onDefaultValueChanged(defaultValue: Double) {
-        this.defaultValue.value = defaultValue
+    override fun onDefaultValueChanged(defaultValue: String) {
+        this.defaultValue.value = defaultValue.asValidatedDouble()
     }
 
     override fun onDefaultLabelChanged(defaultLabel: String) {
@@ -171,7 +172,7 @@ class AddTrackerViewModelImpl @Inject constructor(
 
     private fun getDefaultValue() = when (isDuration.value) {
         true -> getDurationAsDouble()
-        else -> defaultValue.value
+        else -> defaultValue.value?.toDoubleOrNull()
     }
 
     private suspend fun updateTracker(existingTracker: Tracker) {
