@@ -14,6 +14,7 @@ import com.samco.trackandgraph.ui.compose.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -31,7 +32,7 @@ interface AddTrackerViewModel : DurationInputViewModel {
     val createButtonEnabled: LiveData<Boolean>
     val errorText: LiveData<Int?>
     val durationNumericConversionMode: LiveData<TrackerHelper.DurationNumericConversionMode>
-    val isUpdateMode: LiveData<Boolean>
+    val shouldShowDurationConversionModeSpinner: LiveData<Boolean>
 
     //Inputs
     fun onTrackerNameChanged(name: String)
@@ -58,15 +59,19 @@ class AddTrackerViewModelImpl @Inject constructor(
         object NameAlreadyExists : ValidationError
     }
 
+    private val isUpdateMode = MutableStateFlow(false)
+    private val isDurationModeFlow = MutableStateFlow(false)
+
     private val trackerNameFlow = MutableStateFlow("")
     override val trackerName: LiveData<String> =
         trackerNameFlow.asLiveData(viewModelScope.coroutineContext)
     override val trackerDescription = MutableLiveData("")
-    override val isDuration = MutableLiveData(false)
     override val isLoading = MutableLiveData(false)
     override val hasDefaultValue = MutableLiveData(false)
     override val defaultValue = MutableLiveData("1.0")
     override val defaultLabel = MutableLiveData("")
+    override val isDuration = isDurationModeFlow
+        .asLiveData(viewModelScope.coroutineContext)
 
     private val validationErrorFlow = trackerNameFlow.map {
         when {
@@ -89,7 +94,9 @@ class AddTrackerViewModelImpl @Inject constructor(
         .asLiveData(viewModelScope.coroutineContext)
     override val durationNumericConversionMode =
         MutableLiveData(TrackerHelper.DurationNumericConversionMode.HOURS)
-    override val isUpdateMode = MutableLiveData(false)
+    override val shouldShowDurationConversionModeSpinner: LiveData<Boolean> =
+        combine(isUpdateMode, isDurationModeFlow) { a, b -> a && b }
+            .asLiveData(viewModelScope.coroutineContext)
     val complete = MutableLiveData(false)
 
     private var groupId: Long = -1
@@ -118,7 +125,7 @@ class AddTrackerViewModelImpl @Inject constructor(
     private suspend fun initFromTracker(tracker: Tracker) = withContext(ui) {
         trackerNameFlow.value = tracker.name
         trackerDescription.value = tracker.description
-        isDuration.value = tracker.dataType == DataType.DURATION
+        isDurationModeFlow.value = tracker.dataType == DataType.DURATION
         hasDefaultValue.value = tracker.hasDefaultValue
         defaultValue.value = tracker.defaultValue.toString()
         defaultLabel.value = tracker.defaultLabel
@@ -135,7 +142,7 @@ class AddTrackerViewModelImpl @Inject constructor(
     }
 
     override fun onIsDurationCheckChanged(isDuration: Boolean) {
-        this.isDuration.value = isDuration
+        this.isDurationModeFlow.value = isDuration
     }
 
     override fun onHasDefaultValueChanged(hasDefaultValue: Boolean) {

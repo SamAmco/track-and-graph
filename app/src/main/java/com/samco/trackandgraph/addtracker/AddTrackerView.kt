@@ -1,5 +1,6 @@
 package com.samco.trackandgraph.addtracker
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -55,7 +56,8 @@ fun AddTrackerView() {
             override val errorText: LiveData<Int?> = MutableLiveData(null)
             override val durationNumericConversionMode =
                 MutableLiveData(TrackerHelper.DurationNumericConversionMode.HOURS)
-            override val isUpdateMode = MutableLiveData(false)
+            override val shouldShowDurationConversionModeSpinner: LiveData<Boolean> =
+                MutableLiveData(false)
             override val hours = MutableLiveData("")
             override val minutes = MutableLiveData("")
             override val seconds = MutableLiveData("")
@@ -119,6 +121,52 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
 
         DurationCheckbox(isDuration.value, viewModel)
 
+        val shouldShowConversionSpinner =
+            viewModel.shouldShowDurationConversionModeSpinner.observeAsState(false)
+        val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
+
+        if (shouldShowConversionSpinner.value) {
+            InputSpacingSmall()
+
+            val strings = mapOf(
+                TrackerHelper.DurationNumericConversionMode.HOURS to stringResource(id = R.string.hours),
+                TrackerHelper.DurationNumericConversionMode.MINUTES to stringResource(id = R.string.minutes),
+                TrackerHelper.DurationNumericConversionMode.SECONDS to stringResource(id = R.string.seconds)
+            )
+
+            //TODO add the leading label xyz represents...
+            //TODO extract this to a common enum text map spinner
+            Spinner(
+                items = strings.keys.toList(),
+                selectedItem = durationConversionMode.value
+                    ?: TrackerHelper.DurationNumericConversionMode.HOURS,
+                onItemSelected = {
+                    viewModel.onDurationNumericConversionModeChanged(it)
+                },
+                selectedItemFactory = { modifier, item, expanded ->
+                    Row(
+                        modifier = modifier
+                            .padding(dimensionResource(id = R.dimen.card_padding)),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = strings[item] ?: "",
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                            fontWeight = MaterialTheme.typography.labelSmall.fontWeight,
+                        )
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+                    }
+                },
+                dropdownItemFactory = { item, _ ->
+                    Text(
+                        text = strings[item] ?: "",
+                        fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                        fontWeight = MaterialTheme.typography.labelSmall.fontWeight
+                    )
+                }
+            )
+        }
+
         InputSpacingLarge()
 
         DefaultValueCheckbox(hasDefaultValue.value, viewModel)
@@ -135,6 +183,46 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
 
         LaunchedEffect(true) {
             focusRequester.requestFocus()
+        }
+    }
+}
+
+@Composable
+fun <T> Spinner(
+    modifier: Modifier = Modifier,
+    dropDownModifier: Modifier = Modifier,
+    items: List<T>,
+    selectedItem: T,
+    onItemSelected: (T) -> Unit,
+    selectedItemFactory: @Composable (Modifier, T, Boolean) -> Unit,
+    dropdownItemFactory: @Composable (T, Int) -> Unit,
+) {
+    var expanded: Boolean by remember { mutableStateOf(false) }
+
+    Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
+        selectedItemFactory(
+            Modifier.clickable { expanded = true },
+            selectedItem,
+            expanded
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = dropDownModifier
+                .background(color = MaterialTheme.colorScheme.surface)
+        ) {
+            items.forEachIndexed { index, element ->
+                DropdownMenuItem(
+                    text = {
+                        dropdownItemFactory(element, index)
+                    },
+                    onClick = {
+                        onItemSelected(items[index])
+                        expanded = false
+                    }
+                )
+            }
         }
     }
 }
