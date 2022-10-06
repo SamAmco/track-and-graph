@@ -48,8 +48,6 @@
     </style>
 
     <style name="Style.ButtonStyle" parent="Widget.Material3.Button.TonalButton">
-        <item name="backgroundTint">?colorSecondary</item>
-        <item name="android:textColor">?colorOnSecondary</item>
         <item name="shapeAppearance">@style/ShapeAppearance.TnG.Corner.Small</item>
     </style>
 

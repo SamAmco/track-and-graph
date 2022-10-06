@@ -52,6 +52,8 @@
         <item name="colorSurfaceVariant">@color/white</item>
         <item name="colorOutline">@color/light_gray</item>
         <item name="selectorButtonColor">@color/light_gray</item>
+        <item name="colorSecondaryContainer">@color/orange</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
         <item name="colorPrimary">@color/orange</item>
         <item name="colorPrimaryDark">@color/dark_orange</item>
         <item name="colorSecondary">@color/light_blue</item>
