@@ -33,6 +33,7 @@ interface AddTrackerViewModel : DurationInputViewModel {
     val errorText: LiveData<Int?>
     val durationNumericConversionMode: LiveData<TrackerHelper.DurationNumericConversionMode>
     val shouldShowDurationConversionModeSpinner: LiveData<Boolean>
+    val isUpdateMode: LiveData<Boolean>
 
     //Inputs
     fun onTrackerNameChanged(name: String)
@@ -59,7 +60,7 @@ class AddTrackerViewModelImpl @Inject constructor(
         object NameAlreadyExists : ValidationError
     }
 
-    private val isUpdateMode = MutableStateFlow(false)
+    private val isUpdateModeFlow = MutableStateFlow(false)
     private val isDurationModeFlow = MutableStateFlow(false)
 
     private val trackerNameFlow = MutableStateFlow("")
@@ -72,6 +73,8 @@ class AddTrackerViewModelImpl @Inject constructor(
     override val defaultLabel = MutableLiveData("")
     override val isDuration = isDurationModeFlow
         .asLiveData(viewModelScope.coroutineContext)
+    override val isUpdateMode: LiveData<Boolean> =
+        isUpdateModeFlow.asLiveData(viewModelScope.coroutineContext)
 
     private val validationErrorFlow = trackerNameFlow.map {
         when {
@@ -95,8 +98,11 @@ class AddTrackerViewModelImpl @Inject constructor(
     override val durationNumericConversionMode =
         MutableLiveData(TrackerHelper.DurationNumericConversionMode.HOURS)
     override val shouldShowDurationConversionModeSpinner: LiveData<Boolean> =
-        combine(isUpdateMode, isDurationModeFlow) { a, b -> a && b }
-            .asLiveData(viewModelScope.coroutineContext)
+        combine(isUpdateModeFlow, isDurationModeFlow) { a, b ->
+            //If we're in update mode and we've changed to or from duration we need to show
+            // a conversion mode spinner
+            a && (existingTracker?.dataType == DataType.DURATION) != b
+        } .asLiveData(viewModelScope.coroutineContext)
     val complete = MutableLiveData(false)
 
     private var groupId: Long = -1
@@ -112,7 +118,6 @@ class AddTrackerViewModelImpl @Inject constructor(
             withContext(ui) { isLoading.value = true }
             dataInteractor.getTrackerById(existingTrackerId)?.let {
                 initFromTracker(it)
-                withContext(ui) { isUpdateMode.value = true }
             }
             disallowedNames = dataInteractor
                 .getFeaturesForGroupSync(groupId)
@@ -123,12 +128,14 @@ class AddTrackerViewModelImpl @Inject constructor(
     }
 
     private suspend fun initFromTracker(tracker: Tracker) = withContext(ui) {
+        existingTracker = tracker
         trackerNameFlow.value = tracker.name
         trackerDescription.value = tracker.description
         isDurationModeFlow.value = tracker.dataType == DataType.DURATION
         hasDefaultValue.value = tracker.hasDefaultValue
         defaultValue.value = tracker.defaultValue.toString()
         defaultLabel.value = tracker.defaultLabel
+        isUpdateModeFlow.value = true
     }
 
     override fun onTrackerNameChanged(name: String) {

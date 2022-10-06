@@ -56,8 +56,8 @@ fun AddTrackerView() {
             override val errorText: LiveData<Int?> = MutableLiveData(null)
             override val durationNumericConversionMode =
                 MutableLiveData(TrackerHelper.DurationNumericConversionMode.HOURS)
-            override val shouldShowDurationConversionModeSpinner: LiveData<Boolean> =
-                MutableLiveData(false)
+            override val shouldShowDurationConversionModeSpinner = MutableLiveData(true)
+            override val isUpdateMode = MutableLiveData(true)
             override val hours = MutableLiveData("")
             override val minutes = MutableLiveData("")
             override val seconds = MutableLiveData("")
@@ -92,99 +92,177 @@ fun AddTrackerView() {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AddTrackerView(viewModel: AddTrackerViewModel) {
-    Column(
-        modifier = Modifier
-            .padding(dimensionResource(id = R.dimen.card_padding))
-            .width(IntrinsicSize.Max)
-            .verticalScroll(state = rememberScrollState())
-    ) {
-        val trackerName = viewModel.trackerName.observeAsState("")
-        val trackerDescription = viewModel.trackerDescription.observeAsState("")
-        val focusManager = LocalFocusManager.current
-        val focusRequester = FocusRequester()
-        val keyboardController = LocalSoftwareKeyboardController.current
 
-        val isDuration = viewModel.isDuration.observeAsState(false)
-        val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(true)
-        val defaultValue = viewModel.defaultValue.observeAsState("")
-        val defaultLabel = viewModel.defaultLabel.observeAsState("")
+    val focusRequester = FocusRequester()
+    val isUpdateMode by viewModel.isUpdateMode.observeAsState(false)
 
-        InputSpacingSmall()
+    Column(Modifier.fillMaxSize()) {
 
-        NameInput(trackerName, viewModel, focusManager, focusRequester, keyboardController)
+        Column(
+            modifier = Modifier
+                .padding(dimensionResource(id = R.dimen.card_padding))
+                .fillMaxWidth()
+                .weight(1f)
+                .fillMaxHeight()
+                .verticalScroll(state = rememberScrollState())
+        ) {
+            val trackerName = viewModel.trackerName.observeAsState("")
+            val trackerDescription = viewModel.trackerDescription.observeAsState("")
+            val focusManager = LocalFocusManager.current
+            val keyboardController = LocalSoftwareKeyboardController.current
 
-        InputSpacingLarge()
+            val isDuration = viewModel.isDuration.observeAsState(false)
+            val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(true)
+            val defaultValue = viewModel.defaultValue.observeAsState("")
+            val defaultLabel = viewModel.defaultLabel.observeAsState("")
 
-        DescriptionInput(trackerDescription, focusManager, viewModel)
-
-        InputSpacingLarge()
-
-        DurationCheckbox(isDuration.value, viewModel)
-
-        val shouldShowConversionSpinner =
-            viewModel.shouldShowDurationConversionModeSpinner.observeAsState(false)
-        val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
-
-        if (shouldShowConversionSpinner.value) {
             InputSpacingSmall()
 
-            val strings = mapOf(
-                TrackerHelper.DurationNumericConversionMode.HOURS to stringResource(id = R.string.hours),
-                TrackerHelper.DurationNumericConversionMode.MINUTES to stringResource(id = R.string.minutes),
-                TrackerHelper.DurationNumericConversionMode.SECONDS to stringResource(id = R.string.seconds)
+            NameInput(
+                trackerName.value,
+                viewModel,
+                focusManager,
+                focusRequester,
+                keyboardController
             )
 
-            //TODO add the leading label xyz represents...
-            //TODO extract this to a common enum text map spinner
-            Spinner(
-                items = strings.keys.toList(),
-                selectedItem = durationConversionMode.value
-                    ?: TrackerHelper.DurationNumericConversionMode.HOURS,
-                onItemSelected = {
-                    viewModel.onDurationNumericConversionModeChanged(it)
-                },
-                selectedItemFactory = { modifier, item, expanded ->
-                    Row(
-                        modifier = modifier
-                            .padding(dimensionResource(id = R.dimen.card_padding)),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = strings[item] ?: "",
-                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
-                            fontWeight = MaterialTheme.typography.labelSmall.fontWeight,
-                        )
-                        ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-                    }
-                },
-                dropdownItemFactory = { item, _ ->
-                    Text(
-                        text = strings[item] ?: "",
-                        fontSize = MaterialTheme.typography.labelSmall.fontSize,
-                        fontWeight = MaterialTheme.typography.labelSmall.fontWeight
-                    )
+            InputSpacingLarge()
+
+            DescriptionInput(trackerDescription.value, focusManager, viewModel)
+
+            InputSpacingLarge()
+
+            DurationCheckbox(isDuration.value, viewModel)
+
+            val shouldShowConversionSpinner =
+                viewModel.shouldShowDurationConversionModeSpinner.observeAsState(true)
+            val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
+
+            if (shouldShowConversionSpinner.value) {
+                InputSpacingSmall()
+                DurationConversionModeInput(
+                    isDuration.value,
+                    durationConversionMode.value,
+                    viewModel
+                )
+            }
+
+            InputSpacingLarge()
+
+            DefaultValueCheckbox(hasDefaultValue.value, viewModel)
+
+            if (hasDefaultValue.value) {
+
+                if (isDuration.value) DurationInputRow(viewModel)
+                else ValueInputRow(defaultValue.value, viewModel, focusManager)
+
+                InputSpacingSmall()
+
+                LabelInputRow(defaultLabel.value, viewModel)
+            }
+        }
+
+        Surface(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                val errorText by viewModel.errorText.observeAsState()
+
+                Text(
+                    text = errorText?.let { stringResource(id = it) } ?: "",
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+                    fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                )
+
+                Button(
+                    onClick = viewModel::onCreateClicked,
+                    shape = MaterialTheme.shapes.small,
+                    enabled = errorText == null,
+                    modifier = Modifier.padding(end = dimensionResource(id = R.dimen.card_margin_small))
+                ) {
+                    val buttonText =
+                        if (isUpdateMode) stringResource(id = R.string.update)
+                        else stringResource(id = R.string.create)
+                    Text(buttonText)
                 }
-            )
-        }
-
-        InputSpacingLarge()
-
-        DefaultValueCheckbox(hasDefaultValue.value, viewModel)
-
-        if (hasDefaultValue.value) {
-
-            if (isDuration.value) DurationInputRow(viewModel)
-            else ValueInputRow(defaultValue.value, viewModel, focusManager)
-
-            InputSpacingSmall()
-
-            LabelInputRow(defaultLabel.value, viewModel)
-        }
-
-        LaunchedEffect(true) {
-            focusRequester.requestFocus()
+            }
         }
     }
+
+    LaunchedEffect(true) { focusRequester.requestFocus() }
+}
+
+@Composable
+private fun DurationConversionModeInput(
+    isDuration: Boolean,
+    durationConversionMode: TrackerHelper.DurationNumericConversionMode?,
+    viewModel: AddTrackerViewModel
+) {
+    val strings = mapOf(
+        TrackerHelper.DurationNumericConversionMode.HOURS to stringResource(id = R.string.hours),
+        TrackerHelper.DurationNumericConversionMode.MINUTES to stringResource(id = R.string.minutes),
+        TrackerHelper.DurationNumericConversionMode.SECONDS to stringResource(id = R.string.seconds)
+    )
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        val name =
+            if (isDuration) stringResource(id = R.string.numeric_to_duration_mode_header)
+            else stringResource(id = R.string.duration_to_numeric_mode_header)
+        Text(
+            text = name,
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = dimensionResource(id = R.dimen.card_padding))
+        )
+        TextMapSpinner(
+            strings = strings,
+            selectedItem = durationConversionMode
+                ?: TrackerHelper.DurationNumericConversionMode.HOURS,
+            onItemSelected = viewModel::onDurationNumericConversionModeChanged
+        )
+    }
+}
+
+@Composable
+fun <T> TextMapSpinner(
+    strings: Map<T, String>,
+    selectedItem: T,
+    onItemSelected: (T) -> Unit
+) {
+    Spinner(
+        items = strings.keys.toList(),
+        selectedItem = selectedItem,
+        onItemSelected = onItemSelected,
+        selectedItemFactory = { modifier, item, expanded ->
+            Row(
+                modifier = modifier
+                    .padding(dimensionResource(id = R.dimen.card_padding)),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = strings[item] ?: "",
+                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                    fontWeight = MaterialTheme.typography.labelSmall.fontWeight,
+                )
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
+            }
+        },
+        dropdownItemFactory = { item, _ ->
+            Text(
+                text = strings[item] ?: "",
+                fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                fontWeight = MaterialTheme.typography.labelSmall.fontWeight
+            )
+        }
+    )
 }
 
 @Composable
@@ -316,54 +394,85 @@ private fun DurationCheckbox(
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DescriptionInput(
-    trackerDescription: State<String>,
+    trackerDescription: String,
     focusManager: FocusManager,
     viewModel: AddTrackerViewModel
+) = FullWidthTextField(
+    value = trackerDescription,
+    onValueChange = viewModel::onTrackerDescriptionChanged,
+    label = stringResource(id = R.string.add_a_longer_description_optional),
+    focusManager = focusManager
+)
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+private fun FullWidthTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    focusManager: FocusManager? = null,
+    focusRequester: FocusRequester? = null,
+    keyboardController: SoftwareKeyboardController? = null
 ) {
+    val textField = remember {
+        mutableStateOf(
+            TextFieldValue(
+                value,
+                TextRange(value.length, value.length)
+            )
+        )
+    }
+
+    if (textField.value.text != value) {
+        textField.value = TextFieldValue(
+            value,
+            TextRange(value.length, value.length)
+        )
+    }
+
     OutlinedTextField(
-        value = trackerDescription.value,
-        label = {
-            Text(stringResource(id = R.string.add_a_longer_description_optional))
+        value = textField.value,
+        label = { Text(text = label) },
+        onValueChange = {
+            textField.value = it
+            onValueChange(it.text)
         },
         keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) }
+            onNext = { focusManager?.moveFocus(FocusDirection.Down) }
         ),
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        onValueChange = { viewModel.onTrackerDescriptionChanged(it) },
-        modifier = Modifier.fillMaxWidth()
+        singleLine = true,
+        modifier = Modifier
+            .fillMaxWidth()
+            .onFocusChanged {
+                if (it.hasFocus) keyboardController?.show()
+            }
+            .let {
+                if (focusRequester != null) it.focusRequester(focusRequester)
+                else it
+            }
     )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun NameInput(
-    trackerName: State<String>,
+    trackerName: String,
     viewModel: AddTrackerViewModel,
     focusManager: FocusManager,
     focusRequester: FocusRequester,
     keyboardController: SoftwareKeyboardController?
-) {
-    OutlinedTextField(
-        value = trackerName.value,
-        label = {
-            Text(text = stringResource(id = R.string.tracker_name))
-        },
-        onValueChange = { viewModel.onTrackerNameChanged(it) },
-        keyboardActions = KeyboardActions(
-            onNext = { focusManager.moveFocus(FocusDirection.Down) }
-        ),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .focusRequester(focusRequester)
-            .onFocusChanged {
-                if (it.hasFocus) keyboardController?.show()
-            }
-    )
-}
+) = FullWidthTextField(
+    value = trackerName,
+    onValueChange = viewModel::onTrackerNameChanged,
+    label = stringResource(id = R.string.tracker_name),
+    focusManager = focusManager,
+    focusRequester = focusRequester,
+    keyboardController = keyboardController
+)
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
@@ -443,7 +552,8 @@ private fun DurationInputComponent(
             }
         },
         textStyle = MaterialTheme.typography.labelSmall.copy(
-            textAlign = TextAlign.End
+            textAlign = TextAlign.End,
+            color = MaterialTheme.colorScheme.onSurface
         ),
         cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
         interactionSource = interactionSource,
@@ -452,7 +562,7 @@ private fun DurationInputComponent(
                 "0",
                 fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 textAlign = TextAlign.End,
-                color = MaterialTheme.typography.labelSmall.color.copy(
+                color = MaterialTheme.colorScheme.onSurface.copy(
                     alpha = MaterialTheme.colorScheme.disabledAlpha()
                 )
             )
