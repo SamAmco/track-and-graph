@@ -22,4 +22,9 @@
         android:icon="@drawable/about_icon"
         app:iconTint="?attr/colorControlNormal"
         app:showAsAction="ifRoom" />
+    <item android:id="@+id/updateButton"
+        android:title="@string/update"
+        android:icon="@drawable/edit_icon"
+        app:iconTint="?attr/colorControlNormal"
+        app:showAsAction="ifRoom" />
 </menu>

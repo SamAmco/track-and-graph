@@ -45,7 +45,8 @@ class FragmentFeatureHistory : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         viewModel.initViewModel(args.featureId)
-        initMenuProvider()
+        viewModel.isTracker.observe(viewLifecycleOwner) { initMenuProvider(it) }
+
         return ComposeView(requireContext()).apply {
             setContent {
                 TnGComposeTheme {
@@ -70,22 +71,26 @@ class FragmentFeatureHistory : Fragment() {
         }
     }
 
-    private fun initMenuProvider() {
+    private fun initMenuProvider(isTracker: Boolean) {
         requireActivity().addMenuProvider(
-            FeatureHistoryMenuProvider(),
+            FeatureHistoryMenuProvider(isTracker),
             viewLifecycleOwner,
             Lifecycle.State.RESUMED
         )
     }
 
-    private inner class FeatureHistoryMenuProvider : MenuProvider {
+    private inner class FeatureHistoryMenuProvider(
+        private val isTracker: Boolean
+    ) : MenuProvider {
         override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
             menuInflater.inflate(R.menu.feature_history_menu, menu)
+            if (!isTracker) menu.removeItem(R.id.updateButton)
         }
 
         override fun onMenuItemSelected(item: MenuItem): Boolean {
             when (item.itemId) {
                 R.id.infoButton -> viewModel.onShowFeatureInfo()
+                R.id.updateButton -> viewModel.showUpdateAllDialog()
                 else -> return false
             }
             return true
