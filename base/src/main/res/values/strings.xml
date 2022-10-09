@@ -354,4 +354,5 @@
     <string name="add_some_data_sources">Add some data sources</string>
     <string name="value_colon">Value: </string>
     <string name="label_colon">Label: </string>
+    <string name="continue_word">Continue</string>
 </resources>

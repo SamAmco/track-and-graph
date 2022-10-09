@@ -34,6 +34,7 @@ interface AddTrackerViewModel : DurationInputViewModel {
     val durationNumericConversionMode: LiveData<TrackerHelper.DurationNumericConversionMode>
     val shouldShowDurationConversionModeSpinner: LiveData<Boolean>
     val isUpdateMode: LiveData<Boolean>
+    val showUpdateWarningAlertDialog: LiveData<Boolean>
 
     //Inputs
     fun onTrackerNameChanged(name: String)
@@ -43,7 +44,9 @@ interface AddTrackerViewModel : DurationInputViewModel {
     fun onDefaultValueChanged(defaultValue: String)
     fun onDefaultLabelChanged(defaultLabel: String)
     fun onDurationNumericConversionModeChanged(durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode)
-    fun onCreateClicked()
+    fun onConfirmUpdate()
+    fun onDismissUpdateWarningCancel()
+    fun onCreateUpdateClicked()
 }
 
 @HiltViewModel
@@ -75,6 +78,7 @@ class AddTrackerViewModelImpl @Inject constructor(
         .asLiveData(viewModelScope.coroutineContext)
     override val isUpdateMode: LiveData<Boolean> =
         isUpdateModeFlow.asLiveData(viewModelScope.coroutineContext)
+    override val showUpdateWarningAlertDialog = MutableLiveData(false)
 
     private val validationErrorFlow = trackerNameFlow.map {
         when {
@@ -102,7 +106,7 @@ class AddTrackerViewModelImpl @Inject constructor(
             //If we're in update mode and we've changed to or from duration we need to show
             // a conversion mode spinner
             a && (existingTracker?.dataType == DataType.DURATION) != b
-        } .asLiveData(viewModelScope.coroutineContext)
+        }.asLiveData(viewModelScope.coroutineContext)
     val complete = MutableLiveData(false)
 
     private var groupId: Long = -1
@@ -168,14 +172,31 @@ class AddTrackerViewModelImpl @Inject constructor(
         this.durationNumericConversionMode.value = durationNumericConversionMode
     }
 
-    override fun onCreateClicked() {
+    override fun onConfirmUpdate() {
+        showUpdateWarningAlertDialog.value = false
         viewModelScope.launch(io) {
             withContext(ui) { isLoading.value = true }
-            existingTracker?.let {
-                updateTracker(it)
-            } ?: addTracker()
+            //should not be null here but just in case lets fallback to add
+            existingTracker?.let { updateTracker(it) } ?: addTracker()
             withContext(ui) { isLoading.value = false }
             withContext(ui) { complete.value = true }
+        }
+    }
+
+    override fun onDismissUpdateWarningCancel() {
+        showUpdateWarningAlertDialog.value = false
+    }
+
+    override fun onCreateUpdateClicked() {
+        if (isUpdateModeFlow.value) {
+            showUpdateWarningAlertDialog.value = true
+        } else {
+            viewModelScope.launch(io) {
+                withContext(ui) { isLoading.value = true }
+                addTracker()
+                withContext(ui) { isLoading.value = false }
+                withContext(ui) { complete.value = true }
+            }
         }
     }
 
