@@ -27,6 +27,10 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
+import com.samco.trackandgraph.addtracker.DataPointInputDialog
+import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
+import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -47,6 +51,21 @@ class FragmentFeatureHistory : Fragment() {
                 TnGComposeTheme {
                     FeatureHistoryView(viewModel = viewModel)
                 }
+            }
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.showEditDataPointDialog.observe(viewLifecycleOwner) {
+            if (it != null) {
+                DataPointInputDialog().apply {
+                    arguments = Bundle().apply {
+                        putLongArray(TRACKER_LIST_KEY, longArrayOf(it.trackerId))
+                        putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(it.timestamp))
+                    }
+                }.show(childFragmentManager, "input_data_point_dialog")
+                viewModel.showEditDataPointDialogComplete()
             }
         }
     }
@@ -77,30 +96,5 @@ class FragmentFeatureHistory : Fragment() {
         super.onResume()
         (requireActivity() as MainActivity).setActionBarConfig(NavButtonStyle.UP, args.featureName)
     }
-/*
-
-    private fun onViewDataPointClicked(dataPoint: DataPoint) {
-        showDataPointDescriptionDialog(
-            requireContext(),
-            layoutInflater,
-            dataPoint,
-            viewModel.isDuration.value ?: false
-        )
-    }
-*/
-/*
-
-    private fun onEditDataPointClicked(dataPoint: DataPoint) {
-        viewModel.tracker.value?.let { tracker ->
-            val dialog = DataPointInputDialog()
-            val argBundle = Bundle()
-            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(tracker.id))
-            argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(dataPoint.timestamp))
-            dialog.arguments = argBundle
-            dialog.show(childFragmentManager, "input_data_point_dialog")
-        }
-    }
-
- */
 }
 
