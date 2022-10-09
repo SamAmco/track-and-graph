@@ -3,16 +3,27 @@ package com.samco.trackandgraph.featurehistory
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 interface FeatureHistoryNavigationViewModel {
     fun initViewModel(featureId: Long)
+
+    data class EditDataPointData(
+        val timestamp: OffsetDateTime,
+        val trackerId: Long
+    )
+
+    val showEditDataPointDialog: LiveData<EditDataPointData?>
+
+    fun showEditDataPointDialogComplete()
 }
 
 interface FeatureHistoryViewModel {
@@ -82,11 +93,17 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         .map { it != null }
         .asLiveData(viewModelScope.coroutineContext)
 
-    override val isTracker: LiveData<Boolean> = featureIdFlow
-        .map { dataInteractor.getTrackerByFeatureId(it) != null }
+    private val trackerFlow: Flow<Tracker?> = featureIdFlow
+        .map { dataInteractor.getTrackerByFeatureId(it) }
+        .shareIn(viewModelScope, SharingStarted.Eagerly)
+
+    override val isTracker: LiveData<Boolean> = trackerFlow
+        .map { it != null }
         .asLiveData(viewModelScope.coroutineContext)
 
     private var featureId: Long? = null
+
+    private val editDataPoint = MutableStateFlow<OffsetDateTime?>(null)
 
     override fun initViewModel(featureId: Long) {
         if (this.featureId != null) return
@@ -94,8 +111,24 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         viewModelScope.launch(io) { featureIdFlow.emit(featureId) }
     }
 
+    override val showEditDataPointDialog = combine(
+        trackerFlow.filterNotNull(),
+        editDataPoint
+    ) { tracker, timestamp ->
+        timestamp?.let {
+            FeatureHistoryNavigationViewModel.EditDataPointData(
+                it,
+                tracker.id
+            )
+        }
+    }.asLiveData(viewModelScope.coroutineContext)
+
+    override fun showEditDataPointDialogComplete() {
+        editDataPoint.value = null
+    }
+
     override fun onEditClicked(dataPoint: DataPoint) {
-        //TODO("Not yet implemented")
+        editDataPoint.value = dataPoint.timestamp
     }
 
     override fun onDeleteClicked(dataPoint: DataPoint) {
