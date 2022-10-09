@@ -148,7 +148,7 @@ private fun AddTrackerInputForm(
     val defaultValue = viewModel.defaultValue.observeAsState("")
     val defaultLabel = viewModel.defaultLabel.observeAsState("")
 
-    InputSpacingSmall()
+    SpacingSmall()
 
     NameInput(
         trackerName.value,
@@ -158,11 +158,11 @@ private fun AddTrackerInputForm(
         keyboardController
     )
 
-    InputSpacingLarge()
+    SpacingLarge()
 
     DescriptionInput(trackerDescription.value, viewModel)
 
-    InputSpacingLarge()
+    SpacingLarge()
 
     DurationCheckbox(isDuration.value, viewModel)
 
@@ -171,7 +171,7 @@ private fun AddTrackerInputForm(
     val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
 
     if (shouldShowConversionSpinner.value) {
-        InputSpacingSmall()
+        SpacingSmall()
         DurationConversionModeInput(
             isDuration.value,
             durationConversionMode.value,
@@ -179,7 +179,7 @@ private fun AddTrackerInputForm(
         )
     }
 
-    InputSpacingLarge()
+    SpacingLarge()
 
     DefaultValueCheckbox(hasDefaultValue.value, viewModel)
 
@@ -188,7 +188,7 @@ private fun AddTrackerInputForm(
         if (isDuration.value) DurationInputRow(viewModel)
         else ValueInputRow(defaultValue.value, viewModel, focusManager)
 
-        InputSpacingSmall()
+        SpacingSmall()
 
         LabelInputRow(defaultLabel.value, viewModel)
     }

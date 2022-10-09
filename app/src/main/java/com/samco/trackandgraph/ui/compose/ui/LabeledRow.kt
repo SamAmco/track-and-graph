@@ -23,7 +23,7 @@ fun LabeledRow(
         text = label,
         style = MaterialTheme.typography.labelSmall
     )
-    InputSpacingLarge()
+    SpacingLarge()
     input()
 }
 

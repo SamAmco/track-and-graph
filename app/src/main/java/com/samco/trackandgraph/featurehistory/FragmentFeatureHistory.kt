@@ -18,35 +18,21 @@ package com.samco.trackandgraph.featurehistory
 
 import android.os.Bundle
 import android.view.*
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
-import com.samco.trackandgraph.addtracker.DataPointInputDialog
-import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.stringFromOdt
-import com.samco.trackandgraph.base.helpers.getWeekDayNames
-import com.samco.trackandgraph.databinding.FragmentFeatureHistoryBinding
-import com.samco.trackandgraph.ui.YesCancelDialogFragment
-import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
-import com.samco.trackandgraph.ui.showFeatureDescriptionDialog
-import com.samco.trackandgraph.util.bindingForViewLifecycle
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
-
-    private var binding: FragmentFeatureHistoryBinding by bindingForViewLifecycle()
-    private val viewModel by viewModels<FeatureHistoryViewModel>()
-    private lateinit var adapter: DataPointAdapter
+class FragmentFeatureHistory : Fragment() {
+    private val viewModel by viewModels<FeatureHistoryViewModelImpl>()
     private val args: FragmentFeatureHistoryArgs by navArgs()
 
     override fun onCreateView(
@@ -54,18 +40,15 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentFeatureHistoryBinding.inflate(inflater, container, false)
-        initPreLoadViewState()
-        initAdapter()
-
         viewModel.initViewModel(args.featureId)
-
-        observeTrackerAndFeature()
-        observeIsDuration()
-        observeDataPoints()
-
         initMenuProvider()
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setContent {
+                TnGComposeTheme {
+                    FeatureHistoryView(viewModel = viewModel)
+                }
+            }
+        }
     }
 
     private fun initMenuProvider() {
@@ -83,57 +66,18 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
 
         override fun onMenuItemSelected(item: MenuItem): Boolean {
             when (item.itemId) {
-                R.id.infoButton -> showInfo()
+                R.id.infoButton -> viewModel.onShowFeatureInfo()
                 else -> return false
             }
             return true
         }
     }
 
-    private fun observeTrackerAndFeature() {
-        viewModel.tracker.observe(viewLifecycleOwner) {
-            adapter.submitIsTracker(it != null)
-        }
-        //Empty observer makes sure we get the feature because we will need it
-        // to be present when we click the info button
-        viewModel.feature.observe(viewLifecycleOwner) {}
-    }
-
-    private fun observeIsDuration() {
-        viewModel.isDuration.observe(viewLifecycleOwner) {
-            adapter.submitIsDuration(it)
-        }
-    }
-
-    private fun initAdapter() {
-        adapter = DataPointAdapter(
-            DataPointClickListener(
-                this::onEditDataPointClicked,
-                this::onDeleteDataPointClicked,
-                this::onViewDataPointClicked
-            ),
-            getWeekDayNames(requireContext())
-        )
-        binding.dataPointList.adapter = adapter
-        binding.dataPointList.layoutManager = LinearLayoutManager(
-            context, RecyclerView.VERTICAL, false
-        )
-    }
-
     override fun onResume() {
         super.onResume()
         (requireActivity() as MainActivity).setActionBarConfig(NavButtonStyle.UP, args.featureName)
     }
-
-    private fun showInfo() {
-        viewModel.feature.value?.let {
-            showFeatureDescriptionDialog(requireContext(), it.name, it.description)
-        }
-    }
-
-    private fun initPreLoadViewState() {
-        binding.noDataPointsHintText.visibility = View.GONE
-    }
+/*
 
     private fun onViewDataPointClicked(dataPoint: DataPoint) {
         showDataPointDescriptionDialog(
@@ -143,15 +87,8 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
             viewModel.isDuration.value ?: false
         )
     }
-
-    private fun observeDataPoints() {
-        viewModel.dataPoints.observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-            adapter.submitDataPoints(it)
-            binding.noDataPointsHintText.visibility =
-                if (it.isEmpty()) View.VISIBLE else View.GONE
-        }
-    }
+*/
+/*
 
     private fun onEditDataPointClicked(dataPoint: DataPoint) {
         viewModel.tracker.value?.let { tracker ->
@@ -170,11 +107,6 @@ class FragmentFeatureHistory : Fragment(), YesCancelDialogFragment.YesCancelDial
             .create("no id", getString(R.string.ru_sure_del_data_point))
         childFragmentManager.let { dialog.show(it, "ru_sure_del_data_point_fragment") }
     }
-
-    override fun onDialogYes(dialog: YesCancelDialogFragment, id: String?) {
-        when (dialog.title) {
-            getString(R.string.ru_sure_del_data_point) -> viewModel.deleteDataPoint()
-        }
-    }
+*/
 }
 
