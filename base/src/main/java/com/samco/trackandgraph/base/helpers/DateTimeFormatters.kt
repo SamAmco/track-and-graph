@@ -81,9 +81,12 @@ fun DataPoint.getDisplayValue(isDuration: Boolean): String {
 
 fun IDataPoint.getDisplayValue(isDuration: Boolean): String {
     return when {
-        isDuration -> formatTimeDuration(this.value.toLong())
-        this.label.isNotEmpty() -> doubleFormatter.format(this.value) + " : ${this.label}"
-        else -> doubleFormatter.format(this.value)
+        isDuration -> formatTimeDuration(value.toLong())
+        label.isNotEmpty() -> doubleFormatter.format(value)
+        else -> doubleFormatter.format(value)
+    }.let {
+        if (label.isNotEmpty()) it + " (${label})"
+        else it
     }
 }
 

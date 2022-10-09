@@ -3,7 +3,6 @@ package com.samco.trackandgraph.featurehistory
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -12,11 +11,31 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+interface FeatureHistoryNavigationViewModel {
+    fun initViewModel(featureId: Long)
+}
+
+interface FeatureHistoryViewModel {
+    val isDuration: LiveData<Boolean>
+    val isTracker: LiveData<Boolean>
+    val dataPoints: LiveData<List<DataPoint>>
+    val showFeatureInfo: LiveData<Feature?>
+    val showDataPointInfo: LiveData<DataPoint?>
+
+    fun deleteDataPoint()
+    fun onEditClicked(dataPoint: DataPoint)
+    fun onDeleteClicked(dataPoint: DataPoint)
+    fun onDataPointClicked(dataPoint: DataPoint)
+    fun onDismissDataPoint()
+    fun onShowFeatureInfo()
+    fun onHideFeatureInfo()
+}
+
 @HiltViewModel
-class FeatureHistoryViewModel @Inject constructor(
+class FeatureHistoryViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
-) : ViewModel() {
+) : ViewModel(), FeatureHistoryViewModel, FeatureHistoryNavigationViewModel {
     private val featureIdFlow = MutableSharedFlow<Long>(replay = 1, extraBufferCapacity = 1)
 
     private data class RawData(
@@ -37,34 +56,67 @@ class FeatureHistoryViewModel @Inject constructor(
             }
             .flowOn(io)
 
-    val isDuration: LiveData<Boolean> = dataSample.map {
+    override val isDuration: LiveData<Boolean> = dataSample.map {
         it.dataSampleProperties.isDuration
     }.asLiveData(viewModelScope.coroutineContext)
 
-    val dataPoints: LiveData<List<DataPoint>> = dataSample.map {
+    override val dataPoints: LiveData<List<DataPoint>> = dataSample.map {
         it.dataPoints
     }.asLiveData(viewModelScope.coroutineContext)
 
-    val feature: LiveData<Feature?> = featureIdFlow.map {
-        dataInteractor.getFeatureById(it)
+    private val showFeatureInfoFlow = MutableStateFlow(false)
+
+    override val showFeatureInfo: LiveData<Feature?> = combine(
+        showFeatureInfoFlow,
+        featureIdFlow.map { dataInteractor.getFeatureById(it) }) { show, feature ->
+        if (show) feature else null
     }.asLiveData(viewModelScope.coroutineContext)
 
-    val tracker: LiveData<Tracker?> = featureIdFlow
-        .map { dataInteractor.getTrackerByFeatureId(it) }
+    override val showDataPointInfo = MutableLiveData<DataPoint?>(null)
+
+    override val isTracker: LiveData<Boolean> = featureIdFlow
+        .map { dataInteractor.getTrackerByFeatureId(it) != null }
         .asLiveData(viewModelScope.coroutineContext)
 
-    var currentActionDataPoint: DataPoint? = null
+    private var currentActionDataPoint: DataPoint? = null
 
     private var featureId: Long? = null
 
-    fun initViewModel(featureId: Long) {
+    override fun initViewModel(featureId: Long) {
         if (this.featureId != null) return
         this.featureId = featureId
         viewModelScope.launch(io) { featureIdFlow.emit(featureId) }
     }
 
-    fun deleteDataPoint() = currentActionDataPoint?.let {
-        viewModelScope.launch(io) { dataInteractor.deleteDataPoint(it) }
+    override fun deleteDataPoint() {
+        currentActionDataPoint?.let {
+            viewModelScope.launch(io) { dataInteractor.deleteDataPoint(it) }
+        }
     }
 
+    override fun onEditClicked(dataPoint: DataPoint) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDeleteClicked(dataPoint: DataPoint) {
+        //TODO("Not yet implemented")
+    }
+
+    override fun onDataPointClicked(dataPoint: DataPoint) {
+        showFeatureInfoFlow.value = false
+        showDataPointInfo.value = dataPoint
+    }
+
+    override fun onDismissDataPoint() {
+        showDataPointInfo.value = null
+    }
+
+    override fun onShowFeatureInfo() {
+        showDataPointInfo.value = null
+        showFeatureInfoFlow.value = true
+    }
+
+    override fun onHideFeatureInfo() {
+        showFeatureInfoFlow.value = false
+    }
 }

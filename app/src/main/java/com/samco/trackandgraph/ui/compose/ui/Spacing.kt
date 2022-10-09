@@ -9,13 +9,14 @@ import androidx.compose.ui.res.dimensionResource
 import com.samco.trackandgraph.R
 
 @Composable
-fun InputSpacingSmall() = Spacer(
+fun SpacingSmall() = Spacer(
     modifier = Modifier
         .height(dimensionResource(id = R.dimen.dialog_input_spacing))
+        .width(dimensionResource(id = R.dimen.dialog_input_spacing))
 )
 
 @Composable
-fun InputSpacingLarge() = Spacer(
+fun SpacingLarge() = Spacer(
     modifier = Modifier
         .height(dimensionResource(id = R.dimen.input_spacing_large))
         .width(dimensionResource(id = R.dimen.input_spacing_large))

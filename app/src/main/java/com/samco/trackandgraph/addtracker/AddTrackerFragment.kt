@@ -30,6 +30,7 @@ import com.google.android.material.composethemeadapter3.Mdc3Theme
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -52,7 +53,7 @@ class AddTrackerFragment : Fragment() {
         navController = container?.findNavController()
         return ComposeView(requireContext()).apply {
             setContent {
-                Mdc3Theme {
+                TnGComposeTheme {
                     AddTrackerView(viewModel)
                 }
             }
@@ -78,22 +79,4 @@ class AddTrackerFragment : Fragment() {
         super.onStop()
         requireActivity().window.hideKeyboard(requireActivity().currentFocus?.windowToken)
     }
-
-/*
-    private fun onAddOrUpdateClicked() {
-        if (!viewModel.updateMode) viewModel.onAddOrUpdate()
-        else {
-            val dialog = YesCancelDialogFragment
-                .create("no id", getString(R.string.ru_sure_update_tracker))
-            childFragmentManager.let { dialog.show(it, "ru_sure_update_tracker_fragment") }
-        }
-    }
-
-
-    override fun onDialogYes(dialog: YesCancelDialogFragment, id: String?) {
-        when (dialog.title) {
-            getString(R.string.ru_sure_update_tracker) -> viewModel.onAddOrUpdate()
-        }
-    }
-*/
 }
