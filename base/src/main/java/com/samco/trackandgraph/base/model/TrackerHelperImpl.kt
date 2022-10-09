@@ -150,7 +150,7 @@ internal class TrackerHelperImpl @Inject constructor(
                 it.timestamp,
                 it.featureId,
                 newValue,
-                "",
+                it.label,
                 it.note
             )
         }
