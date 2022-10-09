@@ -1,11 +1,25 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.featurehistory
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -17,22 +31,14 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.lifecycle.MutableLiveData
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
-import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
-import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.*
 
+/*
 @Composable
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 fun FeatureHistoryViewPreview() {
@@ -47,6 +53,10 @@ fun FeatureHistoryViewPreview() {
             override fun deleteDataPoint() {}
             override fun onEditClicked(dataPoint: DataPoint) {}
             override fun onDeleteClicked(dataPoint: DataPoint) {}
+            override fun onDeleteConfirmed() { }
+
+            override fun onDeleteDismissed() { }
+
             override fun onDataPointClicked(dataPoint: DataPoint) {}
             override fun onDismissDataPoint() {}
 
@@ -55,26 +65,31 @@ fun FeatureHistoryViewPreview() {
         })
     }
 }
+*/
 
 @Composable
 fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
-    val dataPoints = viewModel.dataPoints.observeAsState(emptyList())
+    val dataPoints by viewModel.dataPoints.observeAsState(emptyList())
     val weekdayNames = getWeekDayNames(LocalContext.current)
     val isDuration by viewModel.isDuration.observeAsState(false)
     val isTracker by viewModel.isTracker.observeAsState(false)
     val featureInfo by viewModel.showFeatureInfo.observeAsState()
     val dataPointInfo by viewModel.showDataPointInfo.observeAsState()
 
-    LazyColumn(modifier = Modifier.padding(dimensionResource(id = R.dimen.card_margin_small))) {
-        items(dataPoints.value) {
-            DataPoint(
-                dataPoint = it,
-                viewModel = viewModel,
-                weekdayNames = weekdayNames,
-                isDuration = isDuration,
-                isTracker = isTracker
-            )
-            Spacer(modifier = Modifier.height(4.dp))
+    if (dataPoints.isEmpty()) {
+        EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
+    } else {
+        LazyColumn(modifier = Modifier.padding(dimensionResource(id = R.dimen.card_margin_small))) {
+            items(dataPoints) {
+                DataPoint(
+                    dataPoint = it,
+                    viewModel = viewModel,
+                    weekdayNames = weekdayNames,
+                    isDuration = isDuration,
+                    isTracker = isTracker
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
         }
     }
 
@@ -93,59 +108,12 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
             onDismissRequest = viewModel::onDismissDataPoint
         )
     }
-}
 
-@Composable
-fun DataPointInfoDialog(
-    dataPoint: DataPoint,
-    isDuration: Boolean,
-    weekdayNames: List<String>,
-    onDismissRequest: () -> Unit
-) = InfoDialog(onDismissRequest) {
-    Text(
-        formatDayWeekDayMonthYearHourMinuteOneLine(
-            LocalContext.current,
-            weekdayNames,
-            dataPoint.timestamp
-        ),
-        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-        fontWeight = MaterialTheme.typography.headlineSmall.fontWeight
-    )
-    SpacingSmall()
-    Text(dataPoint.getDisplayValue(isDuration))
-    Text(dataPoint.note)
-}
-
-@Composable
-fun FeatureInfoDialog(
-    feature: Feature,
-    onDismissRequest: () -> Unit
-) = InfoDialog(onDismissRequest) {
-    Text(
-        feature.name,
-        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-        fontWeight = MaterialTheme.typography.headlineSmall.fontWeight
-    )
-    SpacingSmall()
-    Text(feature.description)
-}
-
-@Composable
-fun InfoDialog(
-    onDismissRequest: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit
-) = Dialog(
-    onDismissRequest = onDismissRequest
-) {
-    Card(
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(state = rememberScrollState())
-                .padding(dimensionResource(id = R.dimen.card_padding)),
-            content = content
+    if (viewModel.showDeleteConfirmDialog.observeAsState(false).value) {
+        ConfirmCancelDialog(
+            body = R.string.ru_sure_del_data_point,
+            onDismissRequest = viewModel::onDeleteDismissed,
+            onConfirm = viewModel::onDeleteConfirmed
         )
     }
 }
@@ -195,26 +163,5 @@ private fun DataPoint(
                 )
             }
         }
-    }
-}
-
-@Composable
-fun DataPointValueAndDescription(
-    modifier: Modifier,
-    dataPoint: DataPoint,
-    isDuration: Boolean
-) = Column(modifier = modifier) {
-    Text(
-        text = dataPoint.getDisplayValue(isDuration),
-        fontSize = MaterialTheme.typography.labelLarge.fontSize,
-        fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
-    )
-    if (dataPoint.note.isNotEmpty()) {
-        SpacingSmall()
-        Text(
-            text = dataPoint.note,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
     }
 }
