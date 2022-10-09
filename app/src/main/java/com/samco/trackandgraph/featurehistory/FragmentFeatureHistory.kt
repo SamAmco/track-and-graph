@@ -101,12 +101,6 @@ class FragmentFeatureHistory : Fragment() {
         }
     }
 
-    private fun onDeleteDataPointClicked(dataPoint: DataPoint) {
-        viewModel.currentActionDataPoint = dataPoint
-        val dialog = YesCancelDialogFragment
-            .create("no id", getString(R.string.ru_sure_del_data_point))
-        childFragmentManager.let { dialog.show(it, "ru_sure_del_data_point_fragment") }
-    }
-*/
+ */
 }
 

@@ -21,10 +21,12 @@ interface FeatureHistoryViewModel {
     val dataPoints: LiveData<List<DataPoint>>
     val showFeatureInfo: LiveData<Feature?>
     val showDataPointInfo: LiveData<DataPoint?>
+    val showDeleteConfirmDialog: LiveData<Boolean>
 
-    fun deleteDataPoint()
     fun onEditClicked(dataPoint: DataPoint)
     fun onDeleteClicked(dataPoint: DataPoint)
+    fun onDeleteConfirmed()
+    fun onDeleteDismissed()
     fun onDataPointClicked(dataPoint: DataPoint)
     fun onDismissDataPoint()
     fun onShowFeatureInfo()
@@ -74,11 +76,15 @@ class FeatureHistoryViewModelImpl @Inject constructor(
 
     override val showDataPointInfo = MutableLiveData<DataPoint?>(null)
 
+    private val confirmDeleteDataPoint = MutableStateFlow<DataPoint?>(null)
+
+    override val showDeleteConfirmDialog = confirmDeleteDataPoint
+        .map { it != null }
+        .asLiveData(viewModelScope.coroutineContext)
+
     override val isTracker: LiveData<Boolean> = featureIdFlow
         .map { dataInteractor.getTrackerByFeatureId(it) != null }
         .asLiveData(viewModelScope.coroutineContext)
-
-    private var currentActionDataPoint: DataPoint? = null
 
     private var featureId: Long? = null
 
@@ -88,18 +94,25 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         viewModelScope.launch(io) { featureIdFlow.emit(featureId) }
     }
 
-    override fun deleteDataPoint() {
-        currentActionDataPoint?.let {
-            viewModelScope.launch(io) { dataInteractor.deleteDataPoint(it) }
-        }
-    }
-
     override fun onEditClicked(dataPoint: DataPoint) {
         //TODO("Not yet implemented")
     }
 
     override fun onDeleteClicked(dataPoint: DataPoint) {
-        //TODO("Not yet implemented")
+        confirmDeleteDataPoint.value = dataPoint
+    }
+
+    override fun onDeleteConfirmed() {
+        viewModelScope.launch(io) {
+            confirmDeleteDataPoint.value?.let {
+                dataInteractor.deleteDataPoint(it)
+            }
+            confirmDeleteDataPoint.value = null
+        }
+    }
+
+    override fun onDeleteDismissed() {
+        confirmDeleteDataPoint.value = null
     }
 
     override fun onDataPointClicked(dataPoint: DataPoint) {
