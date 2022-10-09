@@ -261,51 +261,12 @@ private fun ValueInputRow(
     viewModel: AddTrackerViewModel,
     focusManager: FocusManager
 ) {
-    val textField = remember(defaultValue) {
-        mutableStateOf(
-            TextFieldValue(
-                defaultValue,
-                TextRange(defaultValue.length, defaultValue.length)
-            )
-        )
-    }
 
     LabeledRow(label = stringResource(id = R.string.value_colon)) {
-        OutlinedTextField(
-            value = textField.value,
-            onValueChange = {
-                textField.value = it
-                viewModel.onDefaultValueChanged(it.text)
-            },
-            keyboardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
-            ),
-            placeholder = {
-                Text(
-                    "1.0",
-                    color = MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = MaterialTheme.colorScheme.disabledAlpha()
-                    )
-                )
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Decimal,
-                imeAction = ImeAction.Next
-            ),
-            singleLine = true,
-            modifier = Modifier
-                .onFocusChanged { focusState ->
-                    val textLength = textField.value.text.length
-                    if (focusState.isFocused) {
-                        textField.value = textField.value.copy(
-                            selection = TextRange(0, textLength)
-                        )
-                    } else {
-                        textField.value = textField.value.copy(
-                            selection = TextRange(textLength, textLength)
-                        )
-                    }
-                },
+        ValueInputTextField(
+            defaultValue,
+            viewModel::onDefaultValueChanged,
+            focusManager
         )
     }
 }

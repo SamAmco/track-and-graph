@@ -24,15 +24,17 @@ interface FeatureHistoryNavigationViewModel {
     val showEditDataPointDialog: LiveData<EditDataPointData?>
 
     fun showEditDataPointDialogComplete()
+
+    fun showUpdateAllDialog()
 }
 
-interface FeatureHistoryViewModel {
-    val isDuration: LiveData<Boolean>
+interface FeatureHistoryViewModel : UpdateDialogViewModel {
     val isTracker: LiveData<Boolean>
     val dataPoints: LiveData<List<DataPoint>>
     val showFeatureInfo: LiveData<Feature?>
     val showDataPointInfo: LiveData<DataPoint?>
     val showDeleteConfirmDialog: LiveData<Boolean>
+    val showUpdateDialog: LiveData<Boolean>
 
     fun onEditClicked(dataPoint: DataPoint)
     fun onDeleteClicked(dataPoint: DataPoint)
@@ -48,7 +50,9 @@ interface FeatureHistoryViewModel {
 class FeatureHistoryViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
-) : ViewModel(), FeatureHistoryViewModel, FeatureHistoryNavigationViewModel {
+) : UpdateDialogViewModelImpl(),
+    FeatureHistoryViewModel,
+    FeatureHistoryNavigationViewModel {
     private val featureIdFlow = MutableSharedFlow<Long>(replay = 1, extraBufferCapacity = 1)
 
     private data class RawData(
@@ -92,6 +96,8 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     override val showDeleteConfirmDialog = confirmDeleteDataPoint
         .map { it != null }
         .asLiveData(viewModelScope.coroutineContext)
+
+    override val showUpdateDialog = MutableLiveData(false)
 
     private val trackerFlow: Flow<Tracker?> = featureIdFlow
         .map { dataInteractor.getTrackerByFeatureId(it) }
@@ -164,5 +170,20 @@ class FeatureHistoryViewModelImpl @Inject constructor(
 
     override fun onHideFeatureInfo() {
         showFeatureInfoFlow.value = false
+    }
+
+    override fun showUpdateAllDialog() {
+        showUpdateDialog.value = true
+    }
+
+    override fun onConfirmUpdateWarning() {
+        showUpdateWarning.value = false
+        //TODO perform update
+        showUpdateDialog.value = false
+    }
+
+    override fun onCancelUpdate() {
+        showUpdateDialog.value = false
+        showUpdateWarning.value = false
     }
 }

@@ -37,26 +37,6 @@ import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 
-@Composable
-fun InfoDialog(
-    onDismissRequest: () -> Unit,
-    content: @Composable ColumnScope.() -> Unit
-) = Dialog(
-    onDismissRequest = onDismissRequest
-) {
-    Card(
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .verticalScroll(state = rememberScrollState())
-                .padding(dimensionResource(id = R.dimen.card_padding)),
-            content = content
-        )
-    }
-}
-
 
 @Composable
 fun DataPointInfoDialog(
@@ -64,7 +44,7 @@ fun DataPointInfoDialog(
     isDuration: Boolean,
     weekdayNames: List<String>,
     onDismissRequest: () -> Unit
-) = InfoDialog(onDismissRequest) {
+) = CustomDialog(onDismissRequest) {
     Text(
         formatDayWeekDayMonthYearHourMinuteOneLine(
             LocalContext.current,
@@ -104,7 +84,7 @@ fun DataPointValueAndDescription(
 fun FeatureInfoDialog(
     feature: Feature,
     onDismissRequest: () -> Unit
-) = InfoDialog(onDismissRequest) {
+) = CustomDialog(onDismissRequest) {
     Text(
         feature.name,
         fontSize = MaterialTheme.typography.headlineSmall.fontSize,

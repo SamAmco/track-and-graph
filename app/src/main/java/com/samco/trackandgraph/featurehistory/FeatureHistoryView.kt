@@ -16,6 +16,8 @@
  */
 package com.samco.trackandgraph.featurehistory
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -36,7 +39,9 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
+import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.ui.*
+import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 /*
 @Composable
@@ -116,6 +121,126 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
             onConfirm = viewModel::onDeleteConfirmed
         )
     }
+
+    if (viewModel.showUpdateDialog.observeAsState(false).value) {
+        UpdateDialog(viewModel = viewModel)
+    }
+}
+
+@Composable
+private fun UpdateDialog(
+    viewModel: UpdateDialogViewModel
+) = SlimConfirmCancelDialog(
+    onDismissRequest = viewModel::onCancelUpdate,
+    onConfirm = viewModel::onUpdateClicked,
+    continueText = R.string.update
+) {
+    val isDuration by viewModel.isDuration.observeAsState(false)
+
+    Text(
+        "Update all data points: ",
+        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
+        fontWeight = MaterialTheme.typography.headlineSmall.fontWeight,
+    )
+    SpacingLarge()
+
+    Text(
+        "Where: ",
+        fontSize = MaterialTheme.typography.labelLarge.fontSize,
+        fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
+    )
+    SpacingSmall()
+    CheckboxLabelRow(
+        checked = viewModel.whereValueEnabled.observeAsState(false).value,
+        onCheckedChanged = viewModel::setWhereValueEnabled,
+        label = "Value"
+    ) {
+        if (isDuration) {
+            DurationInput(durationInputViewModel = viewModel.whereDurationViewModel)
+        } else {
+            ValueInputTextField(
+                value = viewModel.whereValue.observeAsState("").value,
+                onDefaultValueChanged = viewModel::setWhereValue
+            )
+        }
+    }
+    SpacingSmall()
+    CheckboxLabelRow(
+        checked = viewModel.whereLabelEnabled.observeAsState(false).value,
+        onCheckedChanged = viewModel::setWhereLabelEnabled,
+        label = "Label"
+    ) {
+        OutlinedTextField(
+            value = viewModel.whereLabel.observeAsState("").value,
+            onValueChange = viewModel::setWhereLabel,
+            singleLine = true
+        )
+    }
+
+    SpacingLarge()
+
+    Text(
+        "To: ",
+        fontSize = MaterialTheme.typography.labelLarge.fontSize,
+        fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
+    )
+
+    SpacingSmall()
+    CheckboxLabelRow(
+        checked = viewModel.toValueEnabled.observeAsState(false).value,
+        onCheckedChanged = viewModel::setToValueEnabled,
+        label = "Value"
+    ) {
+        if (isDuration) {
+            DurationInput(durationInputViewModel = viewModel.toDurationViewModel)
+        } else {
+            ValueInputTextField(
+                value = viewModel.toValue.observeAsState("").value,
+                onDefaultValueChanged = viewModel::setToValue
+            )
+        }
+    }
+    SpacingSmall()
+    CheckboxLabelRow(
+        checked = viewModel.toLabelEnabled.observeAsState(false).value,
+        onCheckedChanged = viewModel::setToLabelEnabled,
+        label = "Label"
+    ) {
+        OutlinedTextField(
+            value = viewModel.toLabel.observeAsState("").value,
+            onValueChange = viewModel::setToLabel,
+            singleLine = true
+        )
+    }
+}
+
+@Composable
+fun CheckboxLabelRow(
+    checked: Boolean,
+    onCheckedChanged: (Boolean) -> Unit,
+    label: String,
+    input: @Composable (modifier: Modifier) -> Unit
+) = Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+    modifier = Modifier
+        .alpha(if (checked) 1.0f else MaterialTheme.colorScheme.disabledAlpha())
+        .fillMaxWidth()
+        .border(
+            BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface),
+            shape = MaterialTheme.shapes.small
+        )
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .clickable { onCheckedChanged(!checked) }
+            .fillMaxWidth()
+    ) {
+        Checkbox(checked, onCheckedChanged)
+        SpacingLarge()
+        Text(text = label)
+    }
+    if (checked) input(Modifier.fillMaxWidth())
 }
 
 @Composable
