@@ -19,16 +19,18 @@ package com.samco.trackandgraph.featurehistory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -41,7 +43,7 @@ import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayT
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.ui.*
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import kotlinx.coroutines.delay
 
 /*
 @Composable
@@ -133,92 +135,140 @@ private fun UpdateDialog(
 ) = SlimConfirmCancelDialog(
     onDismissRequest = viewModel::onCancelUpdate,
     onConfirm = viewModel::onUpdateClicked,
-    continueText = R.string.update
+    continueText = R.string.update,
+    continueEnabled = viewModel.updateButtonEnabled.observeAsState(false).value
 ) {
-    val isDuration by viewModel.isDuration.observeAsState(false)
 
     Text(
-        "Update all data points: ",
+        stringResource(R.string.update_all_data_points),
         fontSize = MaterialTheme.typography.headlineSmall.fontSize,
         fontWeight = MaterialTheme.typography.headlineSmall.fontWeight,
     )
     SpacingLarge()
 
     Text(
-        "Where: ",
+        stringResource(R.string.where_colon),
         fontSize = MaterialTheme.typography.labelLarge.fontSize,
         fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
     )
     SpacingSmall()
-    CheckboxLabelRow(
-        checked = viewModel.whereValueEnabled.observeAsState(false).value,
-        onCheckedChanged = viewModel::setWhereValueEnabled,
-        label = "Value"
-    ) {
-        if (isDuration) {
-            DurationInput(durationInputViewModel = viewModel.whereDurationViewModel)
-        } else {
-            ValueInputTextField(
-                value = viewModel.whereValue.observeAsState("").value,
-                onDefaultValueChanged = viewModel::setWhereValue
-            )
-        }
-    }
+    WhereValueInput(viewModel)
     SpacingSmall()
-    CheckboxLabelRow(
-        checked = viewModel.whereLabelEnabled.observeAsState(false).value,
-        onCheckedChanged = viewModel::setWhereLabelEnabled,
-        label = "Label"
-    ) {
-        OutlinedTextField(
-            value = viewModel.whereLabel.observeAsState("").value,
-            onValueChange = viewModel::setWhereLabel,
-            singleLine = true
-        )
-    }
+    WhereLabelInput(viewModel)
 
     SpacingLarge()
 
     Text(
-        "To: ",
+        stringResource(R.string.to_colon),
         fontSize = MaterialTheme.typography.labelLarge.fontSize,
         fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
     )
 
     SpacingSmall()
+    ToValueInput(viewModel)
+    SpacingSmall()
+    ToLabelInput(viewModel)
+}
+
+@Composable
+private fun ToLabelInput(viewModel: UpdateDialogViewModel) {
+    val focusRequester = remember { FocusRequester() }
+
+    CheckboxLabelRow(
+        checked = viewModel.toLabelEnabled.observeAsState(false).value,
+        onCheckedChanged = viewModel::setToLabelEnabled,
+        label = stringResource(R.string.label_equals),
+        focusRequester = focusRequester
+    ) {
+        OutlinedTextField(
+            modifier = it,
+            value = viewModel.toLabel.observeAsState("").value,
+            onValueChange = viewModel::setToLabel,
+            singleLine = true,
+        )
+    }
+}
+
+@Composable
+private fun ToValueInput(viewModel: UpdateDialogViewModel) {
+    val focusRequester = remember { FocusRequester() }
+    val isDuration by viewModel.isDuration.observeAsState(false)
+
     CheckboxLabelRow(
         checked = viewModel.toValueEnabled.observeAsState(false).value,
         onCheckedChanged = viewModel::setToValueEnabled,
-        label = "Value"
+        label = stringResource(R.string.value_equals),
+        focusRequester = focusRequester
     ) {
         if (isDuration) {
-            DurationInput(durationInputViewModel = viewModel.toDurationViewModel)
+            DurationInput(
+                modifier = it,
+                viewModel = viewModel.toDurationViewModel
+            )
         } else {
             ValueInputTextField(
+                modifier = it,
                 value = viewModel.toValue.observeAsState("").value,
                 onDefaultValueChanged = viewModel::setToValue
             )
         }
     }
-    SpacingSmall()
+}
+
+@Composable
+private fun WhereLabelInput(viewModel: UpdateDialogViewModel) {
+    val focusRequester = remember { FocusRequester() }
+
     CheckboxLabelRow(
-        checked = viewModel.toLabelEnabled.observeAsState(false).value,
-        onCheckedChanged = viewModel::setToLabelEnabled,
-        label = "Label"
+        checked = viewModel.whereLabelEnabled.observeAsState(false).value,
+        onCheckedChanged = viewModel::setWhereLabelEnabled,
+        label = stringResource(R.string.label_equals),
+        focusRequester = focusRequester
     ) {
         OutlinedTextField(
-            value = viewModel.toLabel.observeAsState("").value,
-            onValueChange = viewModel::setToLabel,
+            modifier = it,
+            value = viewModel.whereLabel.observeAsState("").value,
+            onValueChange = viewModel::setWhereLabel,
             singleLine = true
         )
     }
 }
 
 @Composable
+private fun WhereValueInput(
+    viewModel: UpdateDialogViewModel
+) {
+    val focusRequester = remember { FocusRequester() }
+    val isDuration by viewModel.isDuration.observeAsState(false)
+
+    CheckboxLabelRow(
+        checked = viewModel.whereValueEnabled.observeAsState(false).value,
+        onCheckedChanged = viewModel::setWhereValueEnabled,
+        label = stringResource(R.string.value_equals),
+        focusRequester = focusRequester
+    ) {
+        if (isDuration) {
+            DurationInput(
+                modifier = it,
+                viewModel = viewModel.whereDurationViewModel,
+            )
+        } else {
+            ValueInputTextField(
+                modifier = it,
+                value = viewModel.whereValue.observeAsState("").value,
+                onDefaultValueChanged = viewModel::setWhereValue,
+            )
+        }
+    }
+}
+
+
+@Composable
 fun CheckboxLabelRow(
     checked: Boolean,
     onCheckedChanged: (Boolean) -> Unit,
     label: String,
+    focusRequester: FocusRequester,
     input: @Composable (modifier: Modifier) -> Unit
 ) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -229,6 +279,7 @@ fun CheckboxLabelRow(
             BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface),
             shape = MaterialTheme.shapes.small
         )
+        .padding(dimensionResource(id = R.dimen.card_margin_small))
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -236,11 +287,23 @@ fun CheckboxLabelRow(
             .clickable { onCheckedChanged(!checked) }
             .fillMaxWidth()
     ) {
-        Checkbox(checked, onCheckedChanged)
+        Checkbox(
+            checked = checked,
+            onCheckedChange = { onCheckedChanged(it) }
+        )
         SpacingLarge()
         Text(text = label)
     }
-    if (checked) input(Modifier.fillMaxWidth())
+    if (checked) {
+        input(
+            Modifier
+                .fillMaxWidth()
+                .focusRequester(focusRequester)
+        )
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
+    }
 }
 
 @Composable

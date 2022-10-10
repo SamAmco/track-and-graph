@@ -18,8 +18,6 @@ package com.samco.trackandgraph.addtracker
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -33,10 +31,6 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.LiveData
@@ -44,7 +38,6 @@ import androidx.lifecycle.MutableLiveData
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.model.TrackerHelper
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.ui.*
 
 @Composable
@@ -264,9 +257,9 @@ private fun ValueInputRow(
 
     LabeledRow(label = stringResource(id = R.string.value_colon)) {
         ValueInputTextField(
-            defaultValue,
-            viewModel::onDefaultValueChanged,
-            focusManager
+            value = defaultValue,
+            onDefaultValueChanged = viewModel::onDefaultValueChanged,
+            focusManager = focusManager
         )
     }
 }
@@ -274,7 +267,7 @@ private fun ValueInputRow(
 @Composable
 private fun DurationInputRow(viewModel: AddTrackerViewModel) {
     LabeledRow(label = stringResource(id = R.string.value_colon)) {
-        DurationInput(viewModel)
+        DurationInput(viewModel = viewModel)
     }
 }
 

@@ -59,6 +59,7 @@ fun SlimConfirmCancelDialog(
     onConfirm: () -> Unit,
     @StringRes continueText: Int = R.string.continue_word,
     @StringRes dismissText: Int = R.string.cancel,
+    continueEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
@@ -85,7 +86,8 @@ fun SlimConfirmCancelDialog(
             }
             TextButton(
                 onClick = onConfirm,
-                shape = MaterialTheme.shapes.small
+                shape = MaterialTheme.shapes.small,
+                enabled = continueEnabled
             ) {
                 Text(stringResource(id = continueText))
             }

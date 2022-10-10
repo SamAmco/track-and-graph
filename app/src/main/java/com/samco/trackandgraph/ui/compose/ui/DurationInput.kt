@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
@@ -54,14 +55,16 @@ import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
 fun DurationInputPreview() = DurationInput(
-    DurationInputViewModelImpl()
+    modifier = Modifier,
+    viewModel = DurationInputViewModelImpl()
 )
 
 @Composable
 fun DurationInput(
-    durationInputViewModel: DurationInputViewModel
+    modifier: Modifier = Modifier,
+    viewModel: DurationInputViewModel
 ) = Row(
-    modifier = Modifier
+    modifier = modifier
         .padding(
             horizontal = dimensionResource(id = R.dimen.card_padding),
             vertical = dimensionResource(id = R.dimen.card_padding)
@@ -69,12 +72,12 @@ fun DurationInput(
     verticalAlignment = Alignment.Bottom,
     horizontalArrangement = Arrangement.Center
 ) {
-    val hours = durationInputViewModel.hours.observeAsState("")
-    val minutes = durationInputViewModel.minutes.observeAsState("")
-    val seconds = durationInputViewModel.seconds.observeAsState("")
+    val hours = viewModel.hours.observeAsState("")
+    val minutes = viewModel.minutes.observeAsState("")
+    val seconds = viewModel.seconds.observeAsState("")
     DurationInputComponent(
         value = hours.value,
-        onValueChange = { durationInputViewModel.setHours(it) },
+        onValueChange = { viewModel.setHours(it) },
         suffix = stringResource(id = R.string.hours_suffix),
         charLimit = 8
     )
@@ -86,7 +89,7 @@ fun DurationInput(
     )
     DurationInputComponent(
         value = minutes.value,
-        onValueChange = { durationInputViewModel.setMinutes(it) },
+        onValueChange = { viewModel.setMinutes(it) },
         suffix = stringResource(id = R.string.minutes_suffix),
         charLimit = 3
     )
@@ -98,7 +101,7 @@ fun DurationInput(
     )
     DurationInputComponent(
         value = seconds.value,
-        onValueChange = { durationInputViewModel.setSeconds(it) },
+        onValueChange = { viewModel.setSeconds(it) },
         suffix = stringResource(id = R.string.seconds_suffix),
         charLimit = 3
     )
