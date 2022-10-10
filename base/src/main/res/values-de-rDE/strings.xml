@@ -225,7 +225,7 @@
     <string name="move_to">Weiter zu</string>
 
     <string name="feature_add_or_update_error_occurred">Es ist ein Fehler aufgetreten, Ihre Änderungen konnten nicht durchgeführt werden.</string>
-    <string name="ru_sure_update_tracker">Diese Aktualisierung kann die Daten, die Sie bereits verfolgt haben, irreversibel verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\n Möchten Sie fortfahren?</string>
+    <string name="ru_sure_update_data">Diese Aktualisierung kann die Daten, die Sie bereits verfolgt haben, irreversibel verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\n Möchten Sie fortfahren?</string>
     <string name="warning">Warnung</string>
     <string name="ok">OK</string>
     <string name="on_tracker_type_change_numerical_warning">Wenn Sie Ihren Eingabetyp auf numerisch ändern, verlieren Ihre vorhandenen verfolgten Daten ihre Beschriftungen.</string>

@@ -129,7 +129,7 @@ private fun UpdateWarningDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
 ) = ConfirmCancelDialog(
-    body = R.string.ru_sure_update_tracker,
+    body = R.string.ru_sure_update_data,
     onDismissRequest = onDismissRequest,
     onConfirm = onConfirm
 )

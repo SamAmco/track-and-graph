@@ -226,7 +226,7 @@
     <string name="move_to">Déplacer vers</string>
 
     <string name="feature_add_or_update_error_occurred">Une erreur est survenue, vos modifications n\'ont pas pu être effectuées.</string>
-    <string name="ru_sure_update_tracker">Cette mise à jour peut modifier de manière irréversible les données que vous avez déjà suivies. Il est fortement recommandé de sauvegarder les données existantes avant de continuer.</string>
+    <string name="ru_sure_update_data">Cette mise à jour peut modifier de manière irréversible les données que vous avez déjà suivies. Il est fortement recommandé de sauvegarder les données existantes avant de continuer.</string>
     <string name="warning">Avertissement</string>
     <string name="ok">OK</string>
     <string name="on_tracker_type_change_numerical_warning">Si vous mettez à jour votre type d\'entrée en numérique, vos données suivies existantes perdront leurs étiquettes.</string>
