@@ -19,6 +19,8 @@ package com.samco.trackandgraph.featurehistory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -125,7 +127,29 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     if (viewModel.showUpdateDialog.observeAsState(false).value) {
         UpdateDialog(viewModel = viewModel)
     }
+
+    if (viewModel.showUpdateWarning.observeAsState(false).value) {
+        UpdateWarningDialog(
+            viewModel::onCancelUpdateWarning,
+            viewModel::onConfirmUpdateWarning
+        )
+    }
+
+    if (viewModel.isUpdating.observeAsState(false).value) {
+        LoadingOverlay()
+    }
 }
+
+@Composable
+private fun UpdateWarningDialog(
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit
+) = ConfirmCancelDialog(
+    body = R.string.ru_sure_update_data,
+    onDismissRequest = onDismissRequest,
+    onConfirm = onConfirm
+)
+
 
 @Composable
 private fun UpdateDialog(

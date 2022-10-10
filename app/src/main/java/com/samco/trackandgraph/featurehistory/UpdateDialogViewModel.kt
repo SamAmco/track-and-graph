@@ -5,9 +5,9 @@ import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
 import com.samco.trackandgraph.ui.compose.viewmodels.asValidatedDouble
 import kotlinx.coroutines.flow.combine
-import javax.inject.Inject
 
 interface UpdateDialogViewModel {
+    val isUpdating: LiveData<Boolean>
 
     val isDuration: LiveData<Boolean>
 

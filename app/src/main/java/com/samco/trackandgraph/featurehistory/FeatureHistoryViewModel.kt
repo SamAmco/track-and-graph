@@ -7,6 +7,7 @@ import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -50,6 +51,7 @@ interface FeatureHistoryViewModel : UpdateDialogViewModel {
 class FeatureHistoryViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher
 ) : UpdateDialogViewModelImpl(),
     FeatureHistoryViewModel,
     FeatureHistoryNavigationViewModel {
@@ -172,14 +174,21 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         showFeatureInfoFlow.value = false
     }
 
+    override val isUpdating = MutableLiveData(false)
+
     override fun showUpdateAllDialog() {
         showUpdateDialog.value = true
     }
 
     override fun onConfirmUpdateWarning() {
         showUpdateWarning.value = false
-        //TODO perform update
         showUpdateDialog.value = false
+        viewModelScope.launch(io) {
+            withContext(ui) { isUpdating.value = true }
+            delay(3000)
+            //TODO perform update
+            withContext(ui) { isUpdating.value = false }
+        }
     }
 
     override fun onCancelUpdate() {
