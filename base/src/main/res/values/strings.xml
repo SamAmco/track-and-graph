@@ -352,7 +352,12 @@
     <string name="name_your_function">Name your function: </string>
     <string name="write_your_function_here"># Write your function here</string>
     <string name="add_some_data_sources">Add some data sources</string>
-    <string name="value_colon">Value: </string>
-    <string name="label_colon">Label: </string>
+    <string name="value_colon">Value:</string>
+    <string name="label_colon">Label:</string>
     <string name="continue_word">Continue</string>
+    <string name="update_all_data_points">Update all data points: </string>
+    <string name="where_colon">Where:</string>
+    <string name="to_colon">To:</string>
+    <string name="value_equals">Value =</string>
+    <string name="label_equals">Label =</string>
 </resources>

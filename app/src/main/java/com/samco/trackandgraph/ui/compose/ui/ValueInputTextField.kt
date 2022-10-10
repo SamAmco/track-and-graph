@@ -20,6 +20,7 @@ import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 
 @Composable
 fun ValueInputTextField(
+    modifier: Modifier = Modifier,
     value: String,
     onDefaultValueChanged: (String) -> Unit,
     focusManager: FocusManager? = null
@@ -54,7 +55,7 @@ fun ValueInputTextField(
             imeAction = ImeAction.Next
         ),
         singleLine = true,
-        modifier = Modifier
+        modifier = modifier
             .onFocusChanged { focusState ->
                 val textLength = textField.value.text.length
                 if (focusState.isFocused) {
