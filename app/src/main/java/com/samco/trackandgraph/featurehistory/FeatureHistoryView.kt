@@ -19,7 +19,6 @@ package com.samco.trackandgraph.featurehistory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -43,7 +42,6 @@ import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayT
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.ui.*
-import kotlinx.coroutines.delay
 
 /*
 @Composable
@@ -180,11 +178,10 @@ private fun ToLabelInput(viewModel: UpdateDialogViewModel) {
         label = stringResource(R.string.label_equals),
         focusRequester = focusRequester
     ) {
-        OutlinedTextField(
+        LabelInputTextField(
             modifier = it,
             value = viewModel.toLabel.observeAsState("").value,
-            onValueChange = viewModel::setToLabel,
-            singleLine = true,
+            onValueChanged = viewModel::setToLabel
         )
     }
 }
@@ -209,7 +206,7 @@ private fun ToValueInput(viewModel: UpdateDialogViewModel) {
             ValueInputTextField(
                 modifier = it,
                 value = viewModel.toValue.observeAsState("").value,
-                onDefaultValueChanged = viewModel::setToValue
+                onValueChanged = viewModel::setToValue
             )
         }
     }
@@ -225,11 +222,10 @@ private fun WhereLabelInput(viewModel: UpdateDialogViewModel) {
         label = stringResource(R.string.label_equals),
         focusRequester = focusRequester
     ) {
-        OutlinedTextField(
+        LabelInputTextField(
             modifier = it,
             value = viewModel.whereLabel.observeAsState("").value,
-            onValueChange = viewModel::setWhereLabel,
-            singleLine = true
+            onValueChanged = viewModel::setWhereLabel,
         )
     }
 }
@@ -256,7 +252,7 @@ private fun WhereValueInput(
             ValueInputTextField(
                 modifier = it,
                 value = viewModel.whereValue.observeAsState("").value,
-                onDefaultValueChanged = viewModel::setWhereValue,
+                onValueChanged = viewModel::setWhereValue,
             )
         }
     }

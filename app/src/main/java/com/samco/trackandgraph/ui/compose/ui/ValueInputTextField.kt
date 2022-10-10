@@ -18,11 +18,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 
+
 @Composable
-fun ValueInputTextField(
+fun LabelInputTextField(
     modifier: Modifier = Modifier,
     value: String,
-    onDefaultValueChanged: (String) -> Unit,
+    onValueChanged: (String) -> Unit,
     focusManager: FocusManager? = null
 ) {
     val textField = remember(value) {
@@ -37,7 +38,37 @@ fun ValueInputTextField(
         value = textField.value,
         onValueChange = {
             textField.value = it
-            onDefaultValueChanged(it.text)
+            onValueChanged(it.text)
+        },
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager?.moveFocus(FocusDirection.Down) }
+        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        singleLine = true,
+        modifier = modifier
+    )
+}
+
+@Composable
+fun ValueInputTextField(
+    modifier: Modifier = Modifier,
+    value: String,
+    onValueChanged: (String) -> Unit,
+    focusManager: FocusManager? = null
+) {
+    val textField = remember(value) {
+        mutableStateOf(
+            TextFieldValue(
+                value,
+                TextRange(value.length, value.length)
+            )
+        )
+    }
+    OutlinedTextField(
+        value = textField.value,
+        onValueChange = {
+            textField.value = it
+            onValueChanged(it.text)
         },
         keyboardActions = KeyboardActions(
             onNext = { focusManager?.moveFocus(FocusDirection.Down) }

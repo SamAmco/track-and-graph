@@ -240,10 +240,9 @@ private fun LabelInputRow(
     viewModel: AddTrackerViewModel
 ) {
     LabeledRow(label = stringResource(id = R.string.label_colon)) {
-        OutlinedTextField(
+        LabelInputTextField(
             value = defaultLabel,
-            onValueChange = { viewModel.onDefaultLabelChanged(it) },
-            singleLine = true
+            onValueChanged = viewModel::onDefaultLabelChanged,
         )
     }
 }
@@ -258,7 +257,7 @@ private fun ValueInputRow(
     LabeledRow(label = stringResource(id = R.string.value_colon)) {
         ValueInputTextField(
             value = defaultValue,
-            onDefaultValueChanged = viewModel::onDefaultValueChanged,
+            onValueChanged = viewModel::onDefaultValueChanged,
             focusManager = focusManager
         )
     }
