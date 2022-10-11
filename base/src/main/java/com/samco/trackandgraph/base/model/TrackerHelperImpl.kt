@@ -37,8 +37,42 @@ import com.samco.trackandgraph.base.database.entity.DataPoint as DataPointEntity
 internal class TrackerHelperImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
+    private val dataPointUpdateHelper: DataPointUpdateHelper,
     @IODispatcher private val io: CoroutineDispatcher
 ) : TrackerHelper {
+
+    //TODO TEST THIS
+    override suspend fun updateDataPoints(
+        trackerId: Long,
+        whereValue: Double?,
+        whereLabel: String?,
+        toValue: Double?,
+        toLabel: String?
+    ) = withContext(io) {
+        database.withTransaction {
+            val tracker by lazy { dao.getTrackerById(trackerId) }
+            dataPointUpdateHelper.performUpdate(
+                whereValue = whereValue,
+                whereLabel = whereLabel,
+                toValue = toValue,
+                toLabel = toLabel,
+                getNumDataPoints = {
+                    tracker?.let { dao.getDataPointCount(it.featureId) } ?: 0
+                },
+                getDataPoints = { limit, offset ->
+                    tracker?.let {
+                        dao.getDataPoints(
+                            featureId = it.featureId,
+                            limit = limit,
+                            offset = offset
+                        )
+                    } ?: emptyList()
+                },
+                performUpdate = { dao.updateDataPoints(it) }
+            )
+        }
+    }
+
     override suspend fun updateTracker(
         oldTracker: Tracker,
         durationNumericConversionMode: DurationNumericConversionMode?,

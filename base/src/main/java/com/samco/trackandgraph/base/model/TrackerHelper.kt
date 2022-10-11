@@ -34,6 +34,14 @@ interface TrackerHelper {
 
     enum class DurationNumericConversionMode { HOURS, MINUTES, SECONDS }
 
+    suspend fun updateDataPoints(
+        trackerId: Long,
+        whereValue: Double? = null,
+        whereLabel: String? = null,
+        toValue: Double? = null,
+        toLabel: String? = null
+    )
+
     suspend fun updateTracker(
         oldTracker: Tracker,
         durationNumericConversionMode: DurationNumericConversionMode? = null,

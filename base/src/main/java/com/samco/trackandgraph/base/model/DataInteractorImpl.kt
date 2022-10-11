@@ -153,6 +153,24 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
+    override suspend fun updateDataPoints(
+        trackerId: Long,
+        whereValue: Double?,
+        whereLabel: String?,
+        toValue: Double?,
+        toLabel: String?
+    ) = withContext(io) {
+        trackerHelper.updateDataPoints(
+            trackerId = trackerId,
+            whereValue = whereValue,
+            whereLabel = whereLabel,
+            toValue = toValue,
+            toLabel = toLabel
+        ).also {
+            dataUpdateEvents.emit(Unit)
+        }
+    }
+
     override suspend fun deleteFeature(featureId: Long) = withContext(io) {
         dao.deleteFeature(featureId)
         serviceManager.requestWidgetsDisabledForFeatureId(featureId = featureId)

@@ -101,9 +101,9 @@ class FeatureHistoryViewModelImpl @Inject constructor(
 
     override val showUpdateDialog = MutableLiveData(false)
 
-    private val trackerFlow: Flow<Tracker?> = featureIdFlow
+    private val trackerFlow: StateFlow<Tracker?> = featureIdFlow
         .map { dataInteractor.getTrackerByFeatureId(it) }
-        .shareIn(viewModelScope, SharingStarted.Eagerly)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     override val isTracker: LiveData<Boolean> = trackerFlow
         .map { it != null }
@@ -185,8 +185,15 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         showUpdateDialog.value = false
         viewModelScope.launch(io) {
             withContext(ui) { isUpdating.value = true }
-            delay(3000)
-            //TODO perform update
+            trackerFlow.value?.let {
+                dataInteractor.updateDataPoints(
+                    trackerId = it.id,
+                    whereValue = getWhereValueDouble(),
+                    whereLabel = getWhereLabelString(),
+                    toValue = getToValueDouble(),
+                    toLabel = getToLabelString()
+                )
+            }
             withContext(ui) { isUpdating.value = false }
         }
     }
