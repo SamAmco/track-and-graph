@@ -109,4 +109,26 @@ abstract class UpdateDialogViewModelImpl: ViewModel(), UpdateDialogViewModel {
     override fun onCancelUpdateWarning() {
         showUpdateWarning.value = false
     }
+
+    protected fun getToLabelString() = when {
+        toLabelEnabled.value != true -> null
+        else -> toLabel.value
+    }
+
+    protected fun getToValueDouble() = when {
+        toValueEnabled.value != true -> null
+        isDuration.value == true -> toDurationViewModel.getDurationAsDouble()
+        else -> toValue.value?.toDouble()
+    }
+
+    protected fun getWhereLabelString() = when {
+        whereLabelEnabled.value != true -> null
+        else -> whereLabel.value
+    }
+
+    protected fun getWhereValueDouble() = when {
+        whereValueEnabled.value != true -> null
+        isDuration.value == true -> whereDurationViewModel.getDurationAsDouble()
+        else -> whereValue.value?.toDouble()
+    }
 }

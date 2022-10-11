@@ -71,12 +71,14 @@ class FragmentFeatureHistory : Fragment() {
         }
     }
 
+    private var menuProvider: MenuProvider? = null
+
     private fun initMenuProvider(isTracker: Boolean) {
-        requireActivity().addMenuProvider(
-            FeatureHistoryMenuProvider(isTracker),
-            viewLifecycleOwner,
-            Lifecycle.State.RESUMED
-        )
+        menuProvider?.let { requireActivity().removeMenuProvider(it) }
+        FeatureHistoryMenuProvider(isTracker).let {
+            menuProvider = it
+            requireActivity().addMenuProvider(it, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        }
     }
 
     private inner class FeatureHistoryMenuProvider(
