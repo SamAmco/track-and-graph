@@ -68,4 +68,12 @@ class ModelModule {
 
     @Provides
     internal fun getDataSampler(impl: DataSamplerImpl): DataSampler = impl
+
+    @Provides
+    internal fun getDataPointUpdateHelper(impl: DataPointUpdateHelperImpl): DataPointUpdateHelper =
+        impl
+
+    @Provides
+    internal fun getDatabaseTransactionHelper(impl: DatabaseTransactionHelperImpl): DatabaseTransactionHelper =
+        impl
 }

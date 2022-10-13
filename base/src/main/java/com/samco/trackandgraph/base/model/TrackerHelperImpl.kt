@@ -17,8 +17,6 @@
 
 package com.samco.trackandgraph.base.model
 
-import androidx.room.withTransaction
-import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.TrackerHelper.DurationNumericConversionMode
@@ -31,31 +29,54 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 import javax.inject.Inject
 import com.samco.trackandgraph.base.database.entity.DataPoint as DataPointEntity
 
 internal class TrackerHelperImpl @Inject constructor(
-    private val database: TrackAndGraphDatabase,
+    private val transactionHelper: DatabaseTransactionHelper,
     private val dao: TrackAndGraphDatabaseDao,
     private val dataPointUpdateHelper: DataPointUpdateHelper,
     @IODispatcher private val io: CoroutineDispatcher
 ) : TrackerHelper {
 
-    //TODO TEST THIS
     override suspend fun updateDataPoints(
         trackerId: Long,
         whereValue: Double?,
         whereLabel: String?,
         toValue: Double?,
         toLabel: String?
-    ) = withContext(io) {
-        database.withTransaction {
-            val tracker by lazy { dao.getTrackerById(trackerId) }
+    ) {
+        withContext(io) {
+            transactionHelper.withTransaction {
+                runDataPointUpdate(
+                    trackerId = trackerId,
+                    whereValue = whereValue,
+                    whereLabel = whereLabel,
+                    toValue = toValue,
+                    toLabel = toLabel
+                ).let {
+                    if (it.isFailure) Timber.e(it.exceptionOrNull())
+                }
+            }
+        }
+    }
+
+    private fun runDataPointUpdate(
+        trackerId: Long,
+        whereValue: Double?,
+        whereLabel: String?,
+        toValue: Double?,
+        toLabel: String?
+    ): Result<Unit> {
+        val tracker by lazy { dao.getTrackerById(trackerId) }
+        return runCatching {
             dataPointUpdateHelper.performUpdate(
                 whereValue = whereValue,
                 whereLabel = whereLabel,
                 toValue = toValue,
                 toLabel = toLabel,
+                isDuration = { tracker?.dataType == DataType.DURATION },
                 getNumDataPoints = {
                     tracker?.let { dao.getDataPointCount(it.featureId) } ?: 0
                 },
@@ -83,7 +104,7 @@ internal class TrackerHelperImpl @Inject constructor(
         defaultLabel: String?,
         featureDescription: String?
     ) = withContext(io) {
-        database.withTransaction {
+        transactionHelper.withTransaction {
             val newDataType = newType ?: oldTracker.dataType
 
             updateAllExistingDataPointsForTransformation(
@@ -224,9 +245,10 @@ internal class TrackerHelperImpl @Inject constructor(
         dao.getAllActiveTimerTrackers().map { it.toDto() }
     }
 
-    override suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker> = withContext(io) {
-        dao.getTrackersForGroupSync(groupId).map { Tracker.fromTrackerWithFeature(it) }
-    }
+    override suspend fun getTrackersForGroupSync(groupId: Long): List<Tracker> =
+        withContext(io) {
+            dao.getTrackersForGroupSync(groupId).map { Tracker.fromTrackerWithFeature(it) }
+        }
 
     override suspend fun getTrackerByFeatureId(featureId: Long): Tracker? = withContext(io) {
         dao.getTrackerByFeatureId(featureId)?.let { Tracker.fromTrackerWithFeature(it) }
@@ -237,14 +259,14 @@ internal class TrackerHelperImpl @Inject constructor(
     }
 
     override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
-        return@withContext database.withTransaction {
+        return@withContext transactionHelper.withTransaction {
             val featureId = dao.insertFeature(tracker.toFeatureEntity())
             dao.insertTracker(tracker.toEntity().copy(featureId = featureId))
         }
     }
 
     override suspend fun updateTracker(tracker: Tracker) = withContext(io) {
-        database.withTransaction {
+        transactionHelper.withTransaction {
             dao.updateFeature(tracker.toFeatureEntity())
             dao.updateTracker(tracker.toEntity())
         }
