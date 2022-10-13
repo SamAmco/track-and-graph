@@ -14,6 +14,7 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
@@ -43,7 +44,10 @@ fun LabelInputTextField(
         keyboardActions = KeyboardActions(
             onNext = { focusManager?.moveFocus(FocusDirection.Down) }
         ),
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+        keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Sentences
+        ),
         singleLine = true,
         modifier = modifier
     )

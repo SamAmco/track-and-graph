@@ -31,6 +31,7 @@ import androidx.compose.ui.focus.*
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -59,8 +60,12 @@ fun FullWidthTextField(
         }) else KeyboardActions.Default
 
     val keyboardOptions =
-        if (singleLine) KeyboardOptions(imeAction = ImeAction.Next)
-        else KeyboardOptions.Default
+        if (singleLine) KeyboardOptions(
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Sentences
+        ) else KeyboardOptions.Default.copy(
+            capitalization = KeyboardCapitalization.Sentences
+        )
 
     OutlinedTextField(
         value = textField.value,
