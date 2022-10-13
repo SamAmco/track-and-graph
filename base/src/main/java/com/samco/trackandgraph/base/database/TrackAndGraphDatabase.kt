@@ -90,7 +90,7 @@ internal abstract class TrackAndGraphDatabase : RoomDatabase() {
             return Room.databaseBuilder(
                 context.applicationContext,
                 TrackAndGraphDatabase::class.java,
-                "trackandgraph_database"
+                "trackandgraph_database"//This name is also in backup_rules.xml
             )
                 .addMigrations(*allMigrations)
                 .fallbackToDestructiveMigration()
