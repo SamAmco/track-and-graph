@@ -22,8 +22,8 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.addtracker.DURATION_SECONDS_KEY
-import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
+import com.samco.trackandgraph.adddatapoint.DURATION_SECONDS_KEY
+import com.samco.trackandgraph.adddatapoint.TRACKER_LIST_KEY
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.util.hideKeyboard

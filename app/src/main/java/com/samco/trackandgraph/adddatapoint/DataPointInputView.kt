@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.addtracker
+package com.samco.trackandgraph.adddatapoint
 
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
@@ -26,7 +26,6 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import androidx.core.widget.addTextChangedListener
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.helpers.doubleFormatter
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear

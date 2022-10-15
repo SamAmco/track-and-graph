@@ -33,14 +33,15 @@ import androidx.recyclerview.widget.*
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.adddatapoint.DURATION_SECONDS_KEY
+import com.samco.trackandgraph.adddatapoint.DataPointInputDialog
+import com.samco.trackandgraph.adddatapoint.TRACKER_LIST_KEY
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.addtracker.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.*
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.ConfirmCancelDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
