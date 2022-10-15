@@ -35,7 +35,7 @@ const val DURATION_SECONDS_KEY = "DURATION_SECONDS_KEY"
 
 @AndroidEntryPoint
 open class DataPointInputDialog : DialogFragment() {
-    private val viewModel: AddDataPointsViewModel by viewModels<AddDataPointsViewModelImpl>()
+    private val viewModel: AddDataPointsNavigationViewModel by viewModels<AddDataPointsViewModelImpl>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +65,11 @@ open class DataPointInputDialog : DialogFragment() {
                 }
             }
         }
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.dismiss.observe(viewLifecycleOwner) { if (it) dismiss() }
     }
 
     override fun onResume() {

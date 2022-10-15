@@ -78,19 +78,15 @@ fun SlimConfirmCancelDialog(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            TextButton(
-                onClick = onDismissRequest,
-                shape = MaterialTheme.shapes.small
-            ) {
-                Text(stringResource(id = dismissText))
-            }
-            TextButton(
+            SmallTextButton(
+                stringRes = dismissText,
+                onClick = onDismissRequest
+            )
+            SmallTextButton(
+                stringRes = continueText,
                 onClick = onConfirm,
-                shape = MaterialTheme.shapes.small,
                 enabled = continueEnabled
-            ) {
-                Text(stringResource(id = continueText))
-            }
+            )
         }
     }
 }
@@ -114,20 +110,16 @@ fun ConfirmCancelDialog(
         )
     },
     confirmButton = {
-        TextButton(
-            onClick = onConfirm,
-            shape = MaterialTheme.shapes.small
-        ) {
-            Text(stringResource(id = continueText))
-        }
+        SmallTextButton(
+            stringRes = continueText,
+            onClick = onConfirm
+        )
     },
     dismissButton = {
-        TextButton(
-            onClick = onDismissRequest,
-            shape = MaterialTheme.shapes.small
-        ) {
-            Text(stringResource(id = dismissText))
-        }
+        SmallTextButton(
+            stringRes = dismissText,
+            onClick = onDismissRequest
+        )
     }
 )
 
