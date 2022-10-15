@@ -27,9 +27,9 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.addtracker.DATA_POINT_TIMESTAMP_KEY
-import com.samco.trackandgraph.addtracker.DataPointInputDialog
-import com.samco.trackandgraph.addtracker.TRACKER_LIST_KEY
+import com.samco.trackandgraph.adddatapoint.DATA_POINT_TIMESTAMP_KEY
+import com.samco.trackandgraph.adddatapoint.DataPointInputDialog
+import com.samco.trackandgraph.adddatapoint.TRACKER_LIST_KEY
 import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
