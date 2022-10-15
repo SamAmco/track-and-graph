@@ -112,8 +112,9 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     implementation 'androidx.compose.runtime:runtime-livedata:1.2.1'
     // Material design stuff you might need at some point
-    implementation 'androidx.compose.material3:material3:1.0.0-beta03'
-    implementation "com.google.android.material:compose-theme-adapter-3:1.0.19"
+    implementation 'androidx.compose.material3:material3:1.0.0-rc01'
+    implementation "com.google.android.material:compose-theme-adapter-3:1.0.20"
+    implementation 'com.google.accompanist:accompanist-pager:0.22.0-rc'
     //implementation 'androidx.compose.material:material-icons-extended:1.2.1'
 
     // Android KTX
