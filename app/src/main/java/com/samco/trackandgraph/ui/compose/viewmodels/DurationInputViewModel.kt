@@ -14,7 +14,7 @@ interface DurationInputViewModel {
     fun getDurationAsDouble(): Double
 }
 
-class DurationInputViewModelImpl : DurationInputViewModel {
+open class DurationInputViewModelImpl : DurationInputViewModel {
     override val hours = MutableLiveData("")
     override val minutes = MutableLiveData("")
     override val seconds = MutableLiveData("")
