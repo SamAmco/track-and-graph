@@ -14,6 +14,8 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
+@file:OptIn(ExperimentalPagerApi::class)
+
 package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.foundation.layout.*
@@ -21,14 +23,20 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
 fun AddDataPointsView(viewModel: AddDataPointsViewModel) =
@@ -74,11 +82,42 @@ private fun BottomButtons(viewModel: AddDataPointsViewModel) =
 
 @Composable
 private fun TrackerPager(viewModel: AddDataPointsViewModel) {
-/*
-    HorizontalPager(count = ) {
-        
+    val count by viewModel.dataPointPages.observeAsState(0)
+    val pagerState = rememberPagerState(initialPage = viewModel.currentPageIndex.value ?: 0)
+
+    HorizontalPager(
+        count = count,
+        state = pagerState
+    ) { page ->
+        viewModel.getViewModel(page).observeAsState().value?.let {
+            TrackerPage(viewModel = it)
+        }
     }
-*/
+
+    //Synchronise page between view model and view:
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect {
+            viewModel.updateCurrentPage(it)
+            println("samsam: updated page to: $it")
+        }
+    }
+
+    val currentPage by viewModel.currentPageIndex.observeAsState(0)
+
+    if (currentPage != pagerState.currentPage) {
+        println("samsam: $currentPage != ${pagerState.currentPage}")
+        LaunchedEffect(currentPage) {
+            pagerState.animateScrollToPage(currentPage)
+            println("samsam: animatedScrollTo $currentPage")
+        }
+    }
+}
+
+@Composable
+private fun TrackerPage(viewModel: AddDataPointViewModel) {
+    //TODO TrackerPage
+    Text(text = "Hey we're at page: ${viewModel.name.observeAsState().value}")
 }
 
 @Composable
