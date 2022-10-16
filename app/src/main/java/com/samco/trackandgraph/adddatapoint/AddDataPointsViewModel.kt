@@ -6,7 +6,6 @@ import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,8 +66,7 @@ interface AddDataPointsNavigationViewModel : AddDataPointsViewModel {
 @HiltViewModel
 class AddDataPointsViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
-    @IODispatcher private val io: CoroutineDispatcher,
-    @MainDispatcher private val ui: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel(), AddDataPointsNavigationViewModel {
 
     private data class Config(
@@ -172,27 +170,33 @@ class AddDataPointsViewModelImpl @Inject constructor(
             combine(indexFlow, viewModels) { index, viewModels -> viewModels.getOrNull(index) }
                 .take(1)
                 .filterNotNull()
-                .collect { viewModel ->
-
-                    val doubleValue = when (viewModel) {
-                        is AddDataPointViewModel.NumericalDataPointViewModel ->
-                            viewModel.value.value ?: 1.0
-                        is AddDataPointViewModel.DurationDataPointViewModel ->
-                            viewModel.getDurationAsDouble()
-                    }
-
-                    dataInteractor.insertDataPoint(
-                        DataPoint(
-                            timestamp = viewModel.timestamp.value ?: return@collect,
-                            featureId = viewModel.getTracker().featureId,
-                            value = doubleValue,
-                            label = viewModel.label.value ?: "",
-                            note = viewModel.note.value ?: ""
-                        )
-                    )
-                    incrementPageIndex()
-                }
+                .collect { insertDataPoint(it) }
         }
+    }
+
+    private suspend fun insertDataPoint(viewModel: AddDataPointViewModel) {
+        getDataPoint(viewModel)?.let {
+            dataInteractor.insertDataPoint(it)
+            incrementPageIndex()
+        }
+    }
+
+    private fun getDataPoint(viewModel: AddDataPointViewModel): DataPoint? {
+        val timestamp = viewModel.timestamp.value ?: return null
+        return DataPoint(
+            timestamp = timestamp,
+            featureId = viewModel.getTracker().featureId,
+            value = getDoubleValue(viewModel),
+            label = viewModel.label.value ?: "",
+            note = viewModel.note.value ?: ""
+        )
+    }
+
+    private fun getDoubleValue(viewModel: AddDataPointViewModel) = when (viewModel) {
+        is AddDataPointViewModel.NumericalDataPointViewModel ->
+            viewModel.value.value ?: 1.0
+        is AddDataPointViewModel.DurationDataPointViewModel ->
+            viewModel.getDurationAsDouble()
     }
 
     override fun updateCurrentPage(page: Int) {
@@ -222,24 +226,30 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
             val configs = trackerIds
                 .mapNotNull { dataInteractor.getTrackerById(it) }
-                .map { tracker ->
-                    val dataPoint = dataPointTimestamp?.let { timestamp ->
-                        dataInteractor.getDataPointByTimestampAndTrackerSync(
-                            tracker.id,
-                            timestamp
-                        )
-                    }
-                    Config(
-                        tracker,
-                        dataPointTimestamp,
-                        dataPoint?.label,
-                        customInitialValue ?: dataPoint?.value,
-                        dataPoint?.note
-                    )
-                }
+                .map { getConfig(it, dataPointTimestamp, customInitialValue) }
 
             if (configs.isEmpty()) dismiss.value = true
             else configFlow.emit(configs)
         }
+    }
+
+    private suspend fun getConfig(
+        tracker: Tracker,
+        dataPointTimestamp: OffsetDateTime?,
+        customInitialValue: Double?
+    ): Config {
+        val dataPoint = dataPointTimestamp?.let { timestamp ->
+            dataInteractor.getDataPointByTimestampAndTrackerSync(
+                tracker.id,
+                timestamp
+            )
+        }
+        return Config(
+            tracker,
+            dataPointTimestamp,
+            dataPoint?.label,
+            customInitialValue ?: dataPoint?.value,
+            dataPoint?.note
+        )
     }
 }
