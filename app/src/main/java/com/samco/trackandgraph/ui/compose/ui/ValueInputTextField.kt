@@ -2,9 +2,9 @@ package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -80,8 +80,8 @@ fun ValueInputTextField(
         placeholder = {
             Text(
                 "1.0",
-                color = MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = MaterialTheme.colorScheme.disabledAlpha()
+                color = MaterialTheme.colors.onSurface.copy(
+                    alpha = MaterialTheme.colors.disabledAlpha
                 )
             )
         },

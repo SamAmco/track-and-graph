@@ -19,10 +19,10 @@
 package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.Button
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -30,7 +30,6 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -156,8 +155,8 @@ fun DateButton(
 ) {
     Text(
         text = dateString,
-        fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
-        fontSize = MaterialTheme.typography.labelMedium.fontSize,
+        fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
+        fontSize = MaterialTheme.typography.subtitle1.fontSize,
     )
 }
 
@@ -167,13 +166,13 @@ private fun HintHeader(viewModel: AddDataPointsViewModel) =
         Text(
             modifier = Modifier.weight(1f),
             text = stringResource(id = R.string.add_data_point_hint),
-            fontSize = MaterialTheme.typography.bodySmall.fontSize,
-            fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
+            fontSize = MaterialTheme.typography.body1.fontSize,
+            fontWeight = MaterialTheme.typography.body1.fontWeight,
         )
         Text(
             text = viewModel.indexText.observeAsState("").value,
-            fontSize = MaterialTheme.typography.bodySmall.fontSize,
-            fontWeight = MaterialTheme.typography.bodySmall.fontWeight,
+            fontSize = MaterialTheme.typography.body1.fontSize,
+            fontWeight = MaterialTheme.typography.body1.fontWeight,
         )
     }
 

@@ -50,4 +50,5 @@
     <dimen name="subtitle_size">17sp</dimen>
     <dimen name="text_body_size">15sp</dimen>
     <dimen name="small_label_size">10sp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
 </resources>

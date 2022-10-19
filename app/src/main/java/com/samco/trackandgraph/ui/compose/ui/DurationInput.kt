@@ -14,6 +14,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,10 +23,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
-import androidx.compose.material3.TextFieldDefaults.indicatorLine
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
@@ -135,19 +137,19 @@ private fun DurationInputComponent(
                 onValueChange.invoke(it.text)
             }
         },
-        textStyle = MaterialTheme.typography.labelSmall.copy(
+        textStyle = MaterialTheme.typography.body2.copy(
             textAlign = TextAlign.End,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colors.onSurface
         ),
-        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        cursorBrush = SolidColor(MaterialTheme.colors.primary),
         interactionSource = interactionSource,
         decorationBox = {
             if (textField.value.text == "") Text(
                 "0",
-                fontSize = MaterialTheme.typography.labelSmall.fontSize,
+                fontSize = MaterialTheme.typography.body2.fontSize,
                 textAlign = TextAlign.End,
-                color = MaterialTheme.colorScheme.onSurface.copy(
-                    alpha = MaterialTheme.colorScheme.disabledAlpha()
+                color = MaterialTheme.colors.onSurface.copy(
+                    alpha = MaterialTheme.colors.disabledAlpha
                 )
             )
             else it()
