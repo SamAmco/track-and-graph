@@ -16,24 +16,24 @@
  */
 package com.samco.trackandgraph.ui.compose.theming
 
-import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.Colors
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import com.google.android.material.composethemeadapter3.createMdc3Theme
+import com.google.android.material.composethemeadapter.createMdcTheme
 
 
-fun ColorScheme.disabledAlpha() = 0.4f
+val Colors.disabledAlpha get() = 0.4f
 
 @Composable
 fun TnGComposeTheme(block: @Composable () -> Unit) {
-    val (colorScheme, typography, shapes) = createMdc3Theme(
+    val (colorScheme, typography, shapes) = createMdcTheme(
         context = LocalContext.current,
         layoutDirection = LocalLayoutDirection.current
     )
     MaterialTheme(
-        colorScheme = colorScheme ?: MaterialTheme.colorScheme,
+        colors = colorScheme ?: MaterialTheme.colors,
         typography = typography ?: MaterialTheme.typography,
         shapes = shapes ?: MaterialTheme.shapes,
         content = block

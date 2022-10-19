@@ -22,9 +22,9 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,8 +44,8 @@ fun LoadingOverlay() = Box(
                 indication = null
             ) { }
             .focusable(),
-        color = MaterialTheme.colorScheme.surface.copy(
-            alpha = MaterialTheme.colorScheme.disabledAlpha()
+        color = MaterialTheme.colors.surface.copy(
+            alpha = MaterialTheme.colors.disabledAlpha
         )
     ) {
         Box(contentAlignment = Alignment.Center) {

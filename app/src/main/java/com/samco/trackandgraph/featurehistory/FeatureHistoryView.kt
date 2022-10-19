@@ -19,12 +19,10 @@ package com.samco.trackandgraph.featurehistory
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -163,15 +161,15 @@ private fun UpdateDialog(
 
     Text(
         stringResource(R.string.update_all_data_points),
-        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-        fontWeight = MaterialTheme.typography.headlineSmall.fontWeight,
+        fontSize = MaterialTheme.typography.h4.fontSize,
+        fontWeight = MaterialTheme.typography.h4.fontWeight,
     )
     SpacingLarge()
 
     Text(
         stringResource(R.string.where_colon),
-        fontSize = MaterialTheme.typography.labelLarge.fontSize,
-        fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
+        fontSize = MaterialTheme.typography.subtitle1.fontSize,
+        fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
     )
     SpacingSmall()
     WhereValueInput(viewModel)
@@ -182,8 +180,8 @@ private fun UpdateDialog(
 
     Text(
         stringResource(R.string.to_colon),
-        fontSize = MaterialTheme.typography.labelLarge.fontSize,
-        fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
+        fontSize = MaterialTheme.typography.subtitle1.fontSize,
+        fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
     )
 
     SpacingSmall()
@@ -293,10 +291,10 @@ fun CheckboxLabelRow(
 ) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = Modifier
-        .alpha(if (checked) 1.0f else MaterialTheme.colorScheme.disabledAlpha())
+        .alpha(if (checked) 1.0f else MaterialTheme.colors.disabledAlpha)
         .fillMaxWidth()
         .border(
-            BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface),
+            BorderStroke(1.dp, MaterialTheme.colors.onSurface),
             shape = MaterialTheme.shapes.small
         )
         .padding(dimensionResource(id = R.dimen.card_margin_small))
@@ -333,8 +331,9 @@ private fun DataPoint(
     weekdayNames: List<String>,
     isDuration: Boolean,
     isTracker: Boolean
-) = ElevatedCard(
-    modifier = Modifier.clickable { viewModel.onDataPointClicked(dataPoint) }
+) = Card(
+    modifier = Modifier.clickable { viewModel.onDataPointClicked(dataPoint) },
+    elevation = dimensionResource(id = R.dimen.card_elevation)
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -360,14 +359,14 @@ private fun DataPoint(
                 Icon(
                     painter = painterResource(id = R.drawable.edit_icon),
                     contentDescription = stringResource(id = R.string.edit_data_point_button_content_description),
-                    tint = MaterialTheme.colorScheme.secondary
+                    tint = MaterialTheme.colors.secondary
                 )
             }
             IconButton(onClick = { viewModel.onDeleteClicked(dataPoint) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.delete_icon),
                     contentDescription = stringResource(id = R.string.delete_data_point_button_content_description),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colors.primary
                 )
             }
         }

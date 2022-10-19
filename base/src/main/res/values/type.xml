@@ -17,37 +17,37 @@
   -->
 
 <resources>
-    <style name="TextAppearance.Headline2" parent="TextAppearance.Material3.HeadlineLarge">
+    <style name="TextAppearance.Headline2" parent="TextAppearance.MaterialComponents.Headline2">
         <item name="android:textSize">@dimen/headline2_size</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Headline4" parent="TextAppearance.Material3.HeadlineMedium">
+    <style name="TextAppearance.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
         <item name="android:textSize">@dimen/headline4_size</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Headline5" parent="TextAppearance.Material3.HeadlineSmall">
+    <style name="TextAppearance.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
         <item name="android:textSize">@dimen/headline5_size</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Headline6" parent="TextAppearance.Material3.HeadlineSmall">
+    <style name="TextAppearance.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
         <item name="android:textSize">@dimen/headline6_size</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Subtitle1" parent="TextAppearance.Material3.TitleMedium">
+    <style name="TextAppearance.Subtitle1" parent="TextAppearance.MaterialComponents.Subtitle1">
         <item name="android:textSize">@dimen/subtitle_size</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-    <style name="TextAppearance.Subtitle2" parent="TextAppearance.Material3.TitleSmall">
+    <style name="TextAppearance.Subtitle2" parent="TextAppearance.MaterialComponents.Subtitle2">
         <item name="android:textSize">@dimen/subtitle_size</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>
 
-    <style name="TextAppearance.Body" parent="TextAppearance.Material3.BodyMedium">
+    <style name="TextAppearance.Body" parent="TextAppearance.MaterialComponents.Body1">
         <item name="android:textSize">@dimen/text_body_size</item>
         <item name="android:textColor">?android:attr/textColorSecondary</item>
     </style>

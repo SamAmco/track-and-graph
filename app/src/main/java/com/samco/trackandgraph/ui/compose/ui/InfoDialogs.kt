@@ -22,9 +22,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -51,8 +50,8 @@ fun DataPointInfoDialog(
             weekdayNames,
             dataPoint.timestamp
         ),
-        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-        fontWeight = MaterialTheme.typography.headlineSmall.fontWeight
+        fontSize = MaterialTheme.typography.h5.fontSize,
+        fontWeight = MaterialTheme.typography.h5.fontWeight
     )
     SpacingSmall()
     Text(dataPoint.getDisplayValue(isDuration))
@@ -67,8 +66,8 @@ fun DataPointValueAndDescription(
 ) = Column(modifier = modifier) {
     Text(
         text = dataPoint.getDisplayValue(isDuration),
-        fontSize = MaterialTheme.typography.labelLarge.fontSize,
-        fontWeight = MaterialTheme.typography.labelLarge.fontWeight,
+        fontSize = MaterialTheme.typography.subtitle1.fontSize,
+        fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
     )
     if (dataPoint.note.isNotEmpty()) {
         SpacingSmall()
@@ -87,8 +86,8 @@ fun FeatureInfoDialog(
 ) = CustomDialog(onDismissRequest) {
     Text(
         feature.name,
-        fontSize = MaterialTheme.typography.headlineSmall.fontSize,
-        fontWeight = MaterialTheme.typography.headlineSmall.fontWeight
+        fontSize = MaterialTheme.typography.h5.fontSize,
+        fontWeight = MaterialTheme.typography.h5.fontWeight
     )
     SpacingSmall()
     Text(feature.description)

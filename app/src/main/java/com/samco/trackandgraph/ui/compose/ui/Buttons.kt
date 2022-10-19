@@ -3,11 +3,10 @@ package com.samco.trackandgraph.ui.compose.ui
 import androidx.annotation.StringRes
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material3.*
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 
@@ -38,13 +37,10 @@ fun SelectorTextButton(
     onClick = onClick,
     shape = MaterialTheme.shapes.small,
     contentPadding = PaddingValues(8.dp),
-    colors = ButtonDefaults.buttonColors(
-        containerColor = MaterialTheme.colorScheme.
-    )
 ) {
     Text(
         text = text,
-        fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
-        fontSize = MaterialTheme.typography.labelMedium.fontSize,
+        fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
+        fontSize = MaterialTheme.typography.subtitle2.fontSize,
     )
 }
