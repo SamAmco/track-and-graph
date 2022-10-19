@@ -19,6 +19,7 @@
 package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,15 +28,20 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.VerticalAlignmentLine
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.TrackerNameHeadline
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
@@ -115,9 +121,44 @@ private fun TrackerPager(viewModel: AddDataPointsViewModel) {
 }
 
 @Composable
-private fun TrackerPage(viewModel: AddDataPointViewModel) {
-    //TODO TrackerPage
-    Text(text = "Hey we're at page: ${viewModel.name.observeAsState().value}")
+private fun TrackerPage(viewModel: AddDataPointViewModel) =
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        SpacingLarge()
+
+        TrackerNameHeadline(name = viewModel.name.observeAsState("").value)
+
+        SpacingSmall()
+
+        DateTimeButtonRow()
+
+
+        SpacingLarge()
+    }
+
+@Composable
+fun DateTimeButtonRow(
+    modifier: Modifier = Modifier
+) = Row(
+    horizontalArrangement = Arrangement.SpaceEvenly
+) {
+    DateButton(dateString = "18/10/22")
+    //TimeButton()
+}
+
+@Composable
+fun DateButton(
+    modifier: Modifier = Modifier,
+    dateString: String
+) = Button(
+    onClick = {},
+    shape = MaterialTheme.shapes.small,
+    contentPadding = PaddingValues(8.dp)
+) {
+    Text(
+        text = dateString,
+        fontWeight = MaterialTheme.typography.labelMedium.fontWeight,
+        fontSize = MaterialTheme.typography.labelMedium.fontSize,
+    )
 }
 
 @Composable
