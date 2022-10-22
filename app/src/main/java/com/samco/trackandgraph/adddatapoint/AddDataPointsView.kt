@@ -18,10 +18,13 @@
 
 package com.samco.trackandgraph.adddatapoint
 
+import android.app.Activity
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,25 +33,26 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.FragmentManager
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.ui.SmallTextButton
-import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
-import com.samco.trackandgraph.ui.compose.ui.TrackerNameHeadline
+import com.samco.trackandgraph.ui.compose.theming.tngColors
+import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 
 @Composable
-fun AddDataPointsView(viewModel: AddDataPointsViewModel) =
-    Card(
-        shape = MaterialTheme.shapes.small,
+fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(color = MaterialTheme.tngColors.surface)
             .padding(
                 start = dimensionResource(id = R.dimen.card_padding),
                 end = dimensionResource(id = R.dimen.card_padding),
@@ -56,18 +60,17 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) =
                 bottom = dimensionResource(id = R.dimen.card_padding)
             )
     ) {
-        Column {
-            HintHeader(viewModel)
+        HintHeader(viewModel)
 
-            SpacingLarge()
+        SpacingLarge()
 
-            TrackerPager(viewModel)
+        TrackerPager(viewModel)
 
-            SpacingLarge()
+        SpacingLarge()
 
-            BottomButtons(viewModel)
-        }
+        BottomButtons(viewModel)
     }
+}
 
 @Composable
 private fun BottomButtons(viewModel: AddDataPointsViewModel) =
@@ -104,17 +107,14 @@ private fun TrackerPager(viewModel: AddDataPointsViewModel) {
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect {
             viewModel.updateCurrentPage(it)
-            println("samsam: updated page to: $it")
         }
     }
 
     val currentPage by viewModel.currentPageIndex.observeAsState(0)
 
     if (currentPage != pagerState.currentPage) {
-        println("samsam: $currentPage != ${pagerState.currentPage}")
         LaunchedEffect(currentPage) {
             pagerState.animateScrollToPage(currentPage)
-            println("samsam: animatedScrollTo $currentPage")
         }
     }
 }
@@ -130,7 +130,6 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
         DateTimeButtonRow()
 
-
         SpacingLarge()
     }
 
@@ -140,24 +139,46 @@ fun DateTimeButtonRow(
 ) = Row(
     horizontalArrangement = Arrangement.SpaceEvenly
 ) {
-    DateButton(dateString = "18/10/22")
+    DateButton(
+        context = LocalContext.current,
+        dateString = "18/10/22",
+        onDateSelected = {
+            println("samsam: selected epoch $it")
+        }
+    )
     //TimeButton()
 }
 
 @Composable
 fun DateButton(
     modifier: Modifier = Modifier,
-    dateString: String
-) = Button(
-    onClick = {},
-    shape = MaterialTheme.shapes.small,
-    contentPadding = PaddingValues(8.dp)
-) {
-    Text(
-        text = dateString,
-        fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
-        fontSize = MaterialTheme.typography.subtitle1.fontSize,
-    )
+    context: Context,
+    dateString: String,
+    onDateSelected: (Long) -> Unit
+) = SelectorTextButton(
+    modifier = modifier,
+    text = dateString,
+    onClick = {
+        val picker = MaterialDatePicker.Builder.datePicker().build()
+        //TODO onDateSelected is missed on rotation.
+        // Think you need to pass a view model
+        picker.addOnPositiveButtonClickListener {
+            onDateSelected(it)
+        }
+        findFragmentManager(context)?.let {
+            picker.show(it, "MaterialDatePicker")
+        }
+    }
+)
+
+private fun findFragmentManager(context: Context): FragmentManager? {
+    var currentContext = context
+    while (currentContext !is FragmentActivity) {
+        if (currentContext is ContextWrapper) {
+            currentContext = currentContext.baseContext
+        } else break
+    }
+    return (currentContext as? FragmentActivity)?.supportFragmentManager
 }
 
 @Composable

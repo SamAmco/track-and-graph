@@ -16,26 +16,81 @@
  */
 package com.samco.trackandgraph.ui.compose.theming
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
+import androidx.compose.runtime.*
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import com.google.android.material.composethemeadapter.createMdcTheme
 
+private val lightGray = Color(0xFFE0E0E0)
+private val darkGray = Color(0xFF4C4C4C)
+
+data class TngColors(
+    val material: Colors,
+    val selectorButtonColor: Color
+) {
+    val primary get() = material.primary
+    val primaryVariant get() = material.primaryVariant
+    val secondary get() = material.secondary
+    val secondaryVariant get() = material.secondaryVariant
+    val background get() = material.background
+    val surface get() = material.surface
+    val error get() = material.error
+    val onPrimary get() = material.onPrimary
+    val onSecondary get() = material.onSecondary
+    val onBackground get() = material.onBackground
+    val onSurface get() = material.onSurface
+    val onError get() = material.onError
+    val isLight get() = material.isLight
+}
+
+
+private val LightColorPalette = TngColors(
+    material = lightColors(),
+    selectorButtonColor = lightGray
+)
+
+private val DarkColorPalette = TngColors(
+    material = darkColors(),
+    selectorButtonColor = darkGray
+)
 
 val Colors.disabledAlpha get() = 0.4f
 
+private val LocalColors = staticCompositionLocalOf { LightColorPalette }
+
+val MaterialTheme.tngColors: TngColors
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalColors.current
+
 @Composable
-fun TnGComposeTheme(block: @Composable () -> Unit) {
-    val (colorScheme, typography, shapes) = createMdcTheme(
+fun TnGComposeTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    block: @Composable () -> Unit
+) {
+    val (materialColors, typography, shapes) = createMdcTheme(
         context = LocalContext.current,
         layoutDirection = LocalLayoutDirection.current
     )
-    MaterialTheme(
-        colors = colorScheme ?: MaterialTheme.colors,
-        typography = typography ?: MaterialTheme.typography,
-        shapes = shapes ?: MaterialTheme.shapes,
-        content = block
-    )
+
+    val colors = if (darkTheme) {
+        DarkColorPalette.copy(material = materialColors ?: darkColors())
+    } else {
+        LightColorPalette.copy(material = materialColors ?: lightColors())
+    }
+
+    CompositionLocalProvider(LocalColors provides colors) {
+        MaterialTheme(
+            colors = colors.material,
+            typography = typography ?: MaterialTheme.typography,
+            shapes = shapes ?: MaterialTheme.shapes,
+            content = block
+        )
+    }
 }

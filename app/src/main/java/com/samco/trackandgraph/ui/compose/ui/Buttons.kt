@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun SmallTextButton(
@@ -31,12 +32,17 @@ fun SmallTextButton(
 
 @Composable
 fun SelectorTextButton(
+    modifier: Modifier,
     text: String,
     onClick: () -> Unit
 ) = Button(
+    modifier = modifier,
     onClick = onClick,
     shape = MaterialTheme.shapes.small,
     contentPadding = PaddingValues(8.dp),
+    colors = ButtonDefaults.buttonColors(
+        backgroundColor = MaterialTheme.tngColors.selectorButtonColor
+    )
 ) {
     Text(
         text = text,
