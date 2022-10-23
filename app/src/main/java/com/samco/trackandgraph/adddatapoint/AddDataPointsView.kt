@@ -127,6 +127,28 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
             onDateTimeSelected = viewModel::updateTimestamp
         )
 
+        SpacingSmall()
+
+        when (viewModel) {
+            is AddDataPointViewModel.NumericalDataPointViewModel -> {
+
+                val value by viewModel.value.observeAsState("")
+
+                LabeledRow(label = stringResource(id = R.string.value_colon)) {
+                    ValueInputTextField(
+                        value = value ?: "",
+                        onValueChanged = viewModel::setValue
+                    )
+                }
+            }
+            is AddDataPointViewModel.DurationDataPointViewModel -> {
+                LabeledRow(label = stringResource(id = R.string.value_colon)) {
+                    DurationInput(viewModel = viewModel)
+                }
+            }
+        }
+
+
         SpacingLarge()
     }
 
