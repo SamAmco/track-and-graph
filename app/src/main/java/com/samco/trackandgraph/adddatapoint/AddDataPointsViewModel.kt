@@ -8,6 +8,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
+import com.samco.trackandgraph.ui.compose.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
@@ -30,8 +31,8 @@ interface AddDataPointBaseViewModel {
 
 sealed interface AddDataPointViewModel : AddDataPointBaseViewModel {
     interface NumericalDataPointViewModel : AddDataPointViewModel {
-        val value: LiveData<Double?>
-        fun setValue(value: Double)
+        val value: LiveData<String?>
+        fun setValue(value: String)
     }
 
     interface DurationDataPointViewModel : AddDataPointViewModel, DurationInputViewModel
@@ -131,10 +132,10 @@ class AddDataPointsViewModelImpl @Inject constructor(
     private fun getNumericalViewModel(config: Config) =
         object : AddDataPointViewModel.NumericalDataPointViewModel,
             AddDataPointBaseViewModel by getBaseViewModel(config) {
-            override val value = MutableLiveData(config.value)
+            override val value = MutableLiveData(config.value?.toString())
 
-            override fun setValue(value: Double) {
-                this.value.value = value
+            override fun setValue(value: String) {
+                this.value.value = value.asValidatedDouble()
             }
         }
 
@@ -194,7 +195,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     private fun getDoubleValue(viewModel: AddDataPointViewModel) = when (viewModel) {
         is AddDataPointViewModel.NumericalDataPointViewModel ->
-            viewModel.value.value ?: 1.0
+            viewModel.value.value?.toDouble() ?: 1.0
         is AddDataPointViewModel.DurationDataPointViewModel ->
             viewModel.getDurationAsDouble()
     }
