@@ -18,34 +18,25 @@
 
 package com.samco.trackandgraph.adddatapoint
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
-import com.google.android.material.datepicker.MaterialDatePicker
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.flow.distinctUntilChanged
+import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
@@ -128,58 +119,16 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
         SpacingSmall()
 
-        DateTimeButtonRow()
+        val selectedDateTime by viewModel.timestamp.observeAsState(OffsetDateTime.now())
+
+        DateTimeButtonRow(
+            modifier = Modifier.fillMaxWidth(),
+            selectedDateTime = selectedDateTime,
+            onDateTimeSelected = viewModel::updateTimestamp
+        )
 
         SpacingLarge()
     }
-
-@Composable
-fun DateTimeButtonRow(
-    modifier: Modifier = Modifier
-) = Row(
-    horizontalArrangement = Arrangement.SpaceEvenly
-) {
-    DateButton(
-        context = LocalContext.current,
-        dateString = "18/10/22",
-        onDateSelected = {
-            println("samsam: selected epoch $it")
-        }
-    )
-    //TimeButton()
-}
-
-@Composable
-fun DateButton(
-    modifier: Modifier = Modifier,
-    context: Context,
-    dateString: String,
-    onDateSelected: (Long) -> Unit
-) = SelectorTextButton(
-    modifier = modifier,
-    text = dateString,
-    onClick = {
-        val picker = MaterialDatePicker.Builder.datePicker().build()
-        //TODO onDateSelected is missed on rotation.
-        // Think you need to pass a view model
-        picker.addOnPositiveButtonClickListener {
-            onDateSelected(it)
-        }
-        findFragmentManager(context)?.let {
-            picker.show(it, "MaterialDatePicker")
-        }
-    }
-)
-
-private fun findFragmentManager(context: Context): FragmentManager? {
-    var currentContext = context
-    while (currentContext !is FragmentActivity) {
-        if (currentContext is ContextWrapper) {
-            currentContext = currentContext.baseContext
-        } else break
-    }
-    return (currentContext as? FragmentActivity)?.supportFragmentManager
-}
 
 @Composable
 private fun HintHeader(viewModel: AddDataPointsViewModel) =
