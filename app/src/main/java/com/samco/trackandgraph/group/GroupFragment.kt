@@ -36,6 +36,8 @@ import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.permissions.NotificationsPermissionRequesterUseCase
+import com.samco.trackandgraph.permissions.NotificationsPermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
@@ -51,7 +53,9 @@ import javax.inject.Inject
  * args.groupName may be null or empty.
  */
 @AndroidEntryPoint
-class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListener {
+class GroupFragment : Fragment(),
+    YesCancelDialogFragment.YesCancelDialogListener,
+    NotificationsPermissionRequesterUseCase by NotificationsPermissionRequesterUseCaseImpl() {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
 
@@ -64,6 +68,10 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
     private val viewModel by viewModels<GroupViewModel>()
 
     private var forceNextNotifyDataSetChanged: Boolean = false
+
+    init {
+        initNotificationsPermissionRequester(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -239,9 +247,15 @@ class GroupFragment : Fragment(), YesCancelDialogFragment.YesCancelDialogListene
         this::onFeatureDescriptionClicked,
         this::onFeatureAddClicked,
         this::onFeatureHistoryClicked,
-        viewModel::playTimer,
+        this::onPlayTimerClicked,
         this::onStopTimerClicked
     )
+
+
+    private fun onPlayTimerClicked(tracker: DisplayFeature) {
+        viewModel.playTimer(tracker)
+        requestNotificationPermission(requireContext())
+    }
 
     private fun onStopTimerClicked(feature: DisplayFeature) {
         //Due to a bug with the GridLayoutManager when you stop a timer and the timer text disappears
