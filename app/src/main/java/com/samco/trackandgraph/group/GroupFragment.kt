@@ -36,8 +36,8 @@ import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.displaytrackgroup.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.permissions.NotificationsPermissionRequesterUseCase
-import com.samco.trackandgraph.permissions.NotificationsPermissionRequesterUseCaseImpl
+import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
+import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
@@ -55,7 +55,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class GroupFragment : Fragment(),
     YesCancelDialogFragment.YesCancelDialogListener,
-    NotificationsPermissionRequesterUseCase by NotificationsPermissionRequesterUseCaseImpl() {
+    PermissionRequesterUseCase by PermissionRequesterUseCaseImpl() {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
 
