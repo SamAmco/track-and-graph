@@ -35,8 +35,8 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
-import com.samco.trackandgraph.permissions.NotificationsPermissionRequesterUseCase
-import com.samco.trackandgraph.permissions.NotificationsPermissionRequesterUseCaseImpl
+import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
+import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,7 +49,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RemindersFragment : Fragment(),
-    NotificationsPermissionRequesterUseCase by NotificationsPermissionRequesterUseCaseImpl() {
+    PermissionRequesterUseCase by PermissionRequesterUseCaseImpl() {
     private var binding: RemindersFragmentBinding by bindingForViewLifecycle()
     private val viewModel by viewModels<RemindersViewModel>()
     private lateinit var adapter: ReminderListAdapter
@@ -176,7 +176,7 @@ class RemindersFragment : Fragment(),
         viewModel.currentReminders.value?.size?.let {
             binding.remindersList.smoothScrollToPosition(it)
         }
-        requestNotificationPermission(requireContext())
+        requestAlarmAndNotificationPermission(requireContext())
     }
 
     override fun onPause() {
