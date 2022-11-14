@@ -38,8 +38,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Inject
 
-//TODO check that interface delegation overriding is working correctly, we need to do things like
-// emit dataUpdateEvent after calling trackerHelper
 internal class DataInteractorImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val dao: TrackAndGraphDatabaseDao,
