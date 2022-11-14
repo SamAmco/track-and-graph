@@ -19,7 +19,6 @@ import org.junit.Before
 import org.junit.Test
 import org.threeten.bp.LocalTime
 
-//TODO Add bindings to module
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class RemindersHelperImplTest {
     private val reminderPref: ReminderPrefWrapper = mock()
@@ -39,6 +38,68 @@ internal class RemindersHelperImplTest {
     @Before
     fun before() {
         whenever(systemInfoProvider.buildVersionSdkInt).thenReturn(33)
+        whenever(reminderPref.hasMigratedLegacyReminders).thenReturn(true)
+    }
+
+    @Test
+    fun syncAlarmsClearsLegacyAlarms() = runTest(testScheduler) {
+        //PREPARE
+        var storedIntents: String? = "[]"
+
+        val cancels = mutableListOf<Pair<Int, String>>()
+
+        whenever(alarmManager.canScheduleExactAlarms()).thenReturn(false)
+        whenever(reminderPref.hasMigratedLegacyReminders).thenReturn(false)
+        whenever(dao.getAllRemindersSync()).thenReturn(
+            listOf(
+                Reminder(
+                    id = 223L,
+                    displayIndex = 0,
+                    alarmName = "alarm name1",
+                    time = LocalTime.of(0, 0),
+                    checkedDays = CheckedDays.none().copy(monday = true, tuesday = true)
+                ),
+                Reminder(
+                    id = 123L,
+                    displayIndex = 0,
+                    alarmName = "alarm name2",
+                    time = LocalTime.of(0, 0),
+                    checkedDays = CheckedDays.none().copy(monday = true, tuesday = true)
+                ),
+            )
+        )
+        whenever(alarmManager.cancelLegacyAlarm(any(), any())).thenAnswer {
+            cancels.add(
+                Pair(
+                    it.arguments[0] as Int,
+                    it.arguments[1] as String
+                )
+            )
+        }
+
+        whenever(reminderPref.getStoredIntents()).thenAnswer { storedIntents }
+        whenever(reminderPref.putStoredIntents(any())).thenAnswer {
+            storedIntents = it.arguments[0] as String
+            return@thenAnswer Unit
+        }
+
+        //EXECUTE
+        //Sync alarms should debounce excess calls
+        for (i in 1..100) uut.syncAlarms()
+        delay(205)
+
+        //VERIFY
+        assertEquals(14, cancels.size)
+        assertEquals(
+            listOf(2231, 2232, 2233, 2234, 2235, 2236, 2237),
+            cancels.take(7).map { it.first }
+        )
+        assertEquals(
+            listOf(1231, 1232, 1233, 1234, 1235, 1236, 1237),
+            cancels.drop(7).map { it.first }
+        )
+        assert(cancels.take(7).all { it.second == "alarm name1" })
+        assert(cancels.drop(7).all { it.second == "alarm name2" })
     }
 
     @Test
@@ -142,6 +203,7 @@ internal class RemindersHelperImplTest {
                 )
             )
         )
+        verify(alarmManager, never()).cancelLegacyAlarm(any(), any())
     }
 
     @Test

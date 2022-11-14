@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.samco.trackandgraph.base.service.AlarmReceiver
+import com.samco.trackandgraph.base.service.AlarmReceiver.Companion.ALARM_MESSAGE_KEY
 import com.squareup.moshi.JsonClass
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -19,6 +20,8 @@ internal data class StoredAlarmInfo(
 )
 
 internal interface AlarmManagerWrapper {
+    fun cancelLegacyAlarm(id: Int, alarmName: String)
+
     fun cancel(storedAlarmInfo: StoredAlarmInfo)
 
     @RequiresApi(Build.VERSION_CODES.S)
@@ -36,6 +39,17 @@ internal class AlarmManagerWrapperImpl @Inject constructor(
         get() {
             return context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         }
+
+    override fun cancelLegacyAlarm(id: Int, alarmName: String) {
+        alarmManager.cancel(
+            PendingIntent.getBroadcast(
+                context,
+                id,
+                Intent(context, AlarmReceiver::class.java).putExtra(ALARM_MESSAGE_KEY, alarmName),
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
+        )
+    }
 
     override fun cancel(storedAlarmInfo: StoredAlarmInfo) =
         alarmManager.cancel(createPendingIntent(storedAlarmInfo))

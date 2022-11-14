@@ -85,8 +85,23 @@ internal class RemindersHelperImpl @Inject constructor(
         onSyncRequest.emit(Unit)
     }
 
+    private fun clearLegacyReminders() {
+        if (reminderPref.hasMigratedLegacyReminders) return
+
+        val reminders = dao.getAllRemindersSync()
+        for (reminder in reminders) {
+            for (day in 1..7) {
+                val id = ((reminder.id * 10) + day).toInt()
+                alarmManager.cancelLegacyAlarm(id, reminder.alarmName)
+            }
+        }
+
+        reminderPref.hasMigratedLegacyReminders = true
+    }
+
     private suspend fun performSync() = syncMutex.withLock {
         withContext(io) {
+            clearLegacyReminders()
             clearAlarms()
             for (reminder in dao.getAllRemindersSync()) createAlarms(reminder)
         }
