@@ -17,21 +17,30 @@
 
 package com.samco.trackandgraph.base.model
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
-import android.app.PendingIntent
-import android.content.Context
-import android.content.Intent
+import android.util.Log
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.service.AlarmReceiver
-import com.samco.trackandgraph.base.service.AlarmReceiver.Companion.ALARM_MESSAGE_KEY
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.samco.trackandgraph.base.system.AlarmManagerWrapper
+import com.samco.trackandgraph.base.system.ReminderPrefWrapper
+import com.samco.trackandgraph.base.system.StoredAlarmInfo
+import com.samco.trackandgraph.base.system.SystemInfoProvider
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.threeten.bp.LocalTime
+import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.coroutines.CoroutineContext
 
 interface AlarmInteractor {
     suspend fun syncAlarms()
@@ -45,70 +54,143 @@ internal interface RemindersHelper : AlarmInteractor {
     fun deleteAlarms(reminder: Reminder)
 }
 
+@OptIn(FlowPreview::class)
 @Singleton
 internal class RemindersHelperImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val reminderPref: ReminderPrefWrapper,
+    private val alarmManager: AlarmManagerWrapper,
+    private val systemInfoProvider: SystemInfoProvider,
     private val dao: TrackAndGraphDatabaseDao,
     @IODispatcher private val io: CoroutineDispatcher
-) : RemindersHelper {
+) : RemindersHelper, CoroutineScope {
 
-    private val alarmManager: AlarmManager
-        get() {
-            return context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        }
+    override val coroutineContext: CoroutineContext = Job() + io
 
-    override suspend fun syncAlarms() = withContext(io) {
-        for (reminder in dao.getAllRemindersSync()) {
-            deleteAlarms(reminder)
-            createAlarms(reminder)
+    private val onSyncRequest = MutableSharedFlow<Unit>()
+
+    private val syncMutex = Mutex()
+    private val clearMutex = Mutex()
+
+    private val moshi = Moshi.Builder().build()
+    private val moshiStoredAlarmInfoListType = Types
+        .newParameterizedType(List::class.java, StoredAlarmInfo::class.java)
+
+    init {
+        launch {
+            onSyncRequest
+                .debounce(200)
+                .collect { performSync() }
         }
     }
 
-    override suspend fun clearAlarms() = withContext(io) {
-        dao.getAllRemindersSync()
-            .forEach { deleteAlarms(it) }
+    override suspend fun syncAlarms() {
+        onSyncRequest.emit(Unit)
     }
 
+    private fun clearLegacyReminders() {
+        if (reminderPref.hasMigratedLegacyReminders) return
+
+        val reminders = dao.getAllRemindersSync()
+        for (reminder in reminders) {
+            for (day in 1..7) {
+                val id = ((reminder.id * 10) + day).toInt()
+                alarmManager.cancelLegacyAlarm(id, reminder.alarmName)
+            }
+        }
+
+        reminderPref.hasMigratedLegacyReminders = true
+    }
+
+    private suspend fun performSync() = syncMutex.withLock {
+        withContext(io) {
+            clearLegacyReminders()
+            clearAlarms()
+            for (reminder in dao.getAllRemindersSync()) createAlarms(reminder)
+        }
+    }
+
+    override suspend fun clearAlarms() = clearMutex.withLock {
+        withContext(io) {
+            getPendingIntentsFromPrefs().forEach { alarmManager.cancel(it) }
+            updateStoredIntentsInPrefs(emptyList())
+        }
+    }
+
+    @SuppressLint("NewApi")
+    @Synchronized
     override fun createAlarms(reminder: Reminder) {
-        val allIntents = getAllAlarmIntents(reminder, true)
+        val allIntents = createAlarmPendingIntents(reminder)
         allIntents.forEach { kvp ->
             val calendar = getNextReminderTime(reminder.time, kvp.key)
-            alarmManager.setRepeating(
-                AlarmManager.RTC_WAKEUP,
-                calendar.timeInMillis,
-                AlarmManager.INTERVAL_DAY * 7L,
-                kvp.value
-            )
+            if (systemInfoProvider.buildVersionSdkInt < 31 || alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    kvp.value
+                )
+            } else {
+                alarmManager.set(
+                    AlarmManager.RTC_WAKEUP,
+                    calendar.timeInMillis,
+                    kvp.value
+                )
+            }
         }
     }
 
+    @Synchronized
     override fun deleteAlarms(reminder: Reminder) {
-        val allIntents = getAllAlarmIntents(reminder, false)
-        allIntents.forEach { kvp -> alarmManager.cancel(kvp.value) }
+        val allIntents = getPendingIntentsFromPrefs()
+        val intentsToRemove = allIntents
+            .filter { it.reminderId == reminder.id }
+        intentsToRemove.forEach {
+            alarmManager.cancel(it)
+        }
+        val intentsToKeep = allIntents
+            .filter { it.reminderId != reminder.id }
+        updateStoredIntentsInPrefs(intentsToKeep)
     }
 
-    private fun getAllAlarmIntents(
-        reminder: Reminder,
-        filterUnchecked: Boolean
-    ): Map<Int, PendingIntent> {
-        val days = reminder.checkedDays.toList()
-            .mapIndexed { i, checked -> i + 1 to checked }.toMap()
-        return days
-            .filter { kvp -> !filterUnchecked || kvp.value }
-            .map { day ->
-                day.key to Intent(context, AlarmReceiver::class.java)
-                    .putExtra(ALARM_MESSAGE_KEY, reminder.alarmName)
-                    .let { intent ->
-                        val id = ((reminder.id * 10) + day.key).toInt()
-                        PendingIntent.getBroadcast(
-                            context,
-                            id,
-                            intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                        )
-                    }
-            }.toMap()
+    private fun createAlarmPendingIntents(reminder: Reminder): Map<Int, StoredAlarmInfo> {
+        val intentMap = reminder.checkedDays.toList()
+            .mapIndexed { i, checked -> i + 1 to checked }
+            .filter { pair -> pair.second }
+            .map { it.first }
+            .associateWith {
+                StoredAlarmInfo(
+                    reminder.id,
+                    reminder.alarmName,
+                    //A large prime to minimise the possibility of key clashes
+                    ((System.nanoTime() - it) % 2_147_483_647L).toInt()
+                )
+            }
+        addStoredIntentsToPrefs(intentMap.values)
+        return intentMap.mapValues { it.value }
     }
+
+    private fun getPendingIntentsFromPrefs(): List<StoredAlarmInfo> {
+        val storedIntents = reminderPref.getStoredIntents()
+        return try {
+            storedIntents?.let {
+                moshi.adapter<List<StoredAlarmInfo>>(moshiStoredAlarmInfoListType)
+                    .fromJson(it)
+            } ?: emptyList()
+        } catch (t: Throwable) {
+            Timber.e("Could not parse stored intents string: $storedIntents")
+            emptyList()
+        }
+    }
+
+    private fun updateStoredIntentsInPrefs(intentsToStore: Collection<StoredAlarmInfo>) {
+        reminderPref.putStoredIntents(
+            moshi.adapter<List<StoredAlarmInfo>>(moshiStoredAlarmInfoListType)
+                .toJson(intentsToStore.toList())
+        )
+    }
+
+    @Synchronized
+    private fun addStoredIntentsToPrefs(intentsToStore: Collection<StoredAlarmInfo>) =
+        updateStoredIntentsInPrefs(getPendingIntentsFromPrefs().plus(intentsToStore))
 
     private fun getNextReminderTime(time: LocalTime, dayOfWeek: Int) =
         Calendar.getInstance().apply {
@@ -132,5 +214,7 @@ internal class RemindersHelperImpl @Inject constructor(
             add(Calendar.DAY_OF_MONTH, dayDiff)
             set(Calendar.HOUR_OF_DAY, time.hour)
             set(Calendar.MINUTE, time.minute)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
         }
 }

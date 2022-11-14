@@ -46,8 +46,23 @@ data class CheckedDays (
         }
 
         fun none() = CheckedDays(
-            monday = false, tuesday = false, wednesday = false,
-            thursday = false, friday = false, saturday = false, sunday = false
+            monday = false,
+            tuesday = false,
+            wednesday = false,
+            thursday = false,
+            friday = false,
+            saturday = false,
+            sunday = false
+        )
+
+        fun all() = CheckedDays(
+            monday = true,
+            tuesday = true,
+            wednesday = true,
+            thursday = true,
+            friday = true,
+            saturday = true,
+            sunday = true
         )
     }
 }

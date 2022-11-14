@@ -27,6 +27,11 @@ import com.samco.trackandgraph.base.model.DataInteractorImpl
 import com.samco.trackandgraph.base.model.TrackerHelperImpl
 import com.samco.trackandgraph.base.service.ServiceManager
 import com.samco.trackandgraph.base.service.ServiceManagerImpl
+import com.samco.trackandgraph.base.system.*
+import com.samco.trackandgraph.base.system.AlarmManagerWrapper
+import com.samco.trackandgraph.base.system.AlarmManagerWrapperImpl
+import com.samco.trackandgraph.base.system.ReminderPrefWrapper
+import com.samco.trackandgraph.base.system.ReminderPrefWrapperImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -61,7 +66,7 @@ class ModelModule {
     internal fun getRemindersHelper(impl: RemindersHelperImpl): RemindersHelper = impl
 
     @Provides
-    internal fun getAlarmInteractor(impl: RemindersHelperImpl): AlarmInteractor = impl
+    internal fun getAlarmInteractor(impl: RemindersHelper): AlarmInteractor = impl
 
     @Provides
     internal fun getServiceManager(impl: ServiceManagerImpl): ServiceManager = impl
@@ -76,4 +81,15 @@ class ModelModule {
     @Provides
     internal fun getDatabaseTransactionHelper(impl: DatabaseTransactionHelperImpl): DatabaseTransactionHelper =
         impl
+
+    @Singleton
+    @Provides
+    internal fun getReminderPref(impl: ReminderPrefWrapperImpl): ReminderPrefWrapper = impl
+
+    @Provides
+    @Singleton
+    internal fun alarmManager(impl: AlarmManagerWrapperImpl): AlarmManagerWrapper = impl
+
+    @Provides
+    fun systemInfoProvider(impl: SystemInfoProviderImpl): SystemInfoProvider = impl
 }
