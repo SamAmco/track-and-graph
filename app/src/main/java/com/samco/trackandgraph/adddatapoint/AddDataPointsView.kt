@@ -20,6 +20,7 @@ package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -27,6 +28,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -81,7 +83,11 @@ private fun BottomButtons(viewModel: AddDataPointsViewModel) {
         val addButtonRes =
             if (viewModel.updateMode.observeAsState(false).value) R.string.update
             else R.string.add
-        SmallTextButton(stringRes = addButtonRes, onClick = viewModel::onAddClicked)
+        SmallTextButton(stringRes = addButtonRes, onClick = {
+            focusManager.clearFocus()
+            viewModel.onAddClicked()
+        })
+
     }
 }
 
@@ -119,6 +125,9 @@ private fun TrackerPager(viewModel: AddDataPointsViewModel) {
 @Composable
 private fun TrackerPage(viewModel: AddDataPointViewModel) =
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
+
+        val focusManager = LocalFocusManager.current
+
         SpacingLarge()
 
         TrackerNameHeadline(name = viewModel.name.observeAsState("").value)
@@ -143,17 +152,32 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
                 LabeledRow(label = stringResource(id = R.string.value_colon)) {
                     ValueInputTextField(
                         value = value ?: "",
-                        onValueChanged = viewModel::setValue
+                        onValueChanged = viewModel::setValue,
+                        focusManager = focusManager
                     )
                 }
             }
             is AddDataPointViewModel.DurationDataPointViewModel -> {
                 LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                    DurationInput(viewModel = viewModel)
+                    DurationInput(
+                        viewModel = viewModel,
+                        focusManager = focusManager,
+                        nextFocusDirection = FocusDirection.Down
+                    )
                 }
             }
         }
 
+        SpacingSmall()
+
+        val label by viewModel.label.observeAsState("")
+
+        LabeledRow(label = stringResource(id = R.string.label_colon)) {
+            LabelInputTextField(
+                value = label,
+                onValueChanged = viewModel::updateLabel
+            )
+        }
 
         SpacingLarge()
     }
