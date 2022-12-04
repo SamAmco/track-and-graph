@@ -27,6 +27,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -64,20 +65,25 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
 }
 
 @Composable
-private fun BottomButtons(viewModel: AddDataPointsViewModel) =
+private fun BottomButtons(viewModel: AddDataPointsViewModel) {
+    val focusManager = LocalFocusManager.current
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         SmallTextButton(stringRes = R.string.cancel, onClick = viewModel::onCancelClicked)
         if (viewModel.skipButtonVisible.observeAsState(false).value) {
-            SmallTextButton(stringRes = R.string.skip, onClick = viewModel::onSkipClicked)
+            SmallTextButton(stringRes = R.string.skip, onClick = {
+                focusManager.clearFocus()
+                viewModel.onSkipClicked()
+            })
         }
         val addButtonRes =
             if (viewModel.updateMode.observeAsState(false).value) R.string.update
             else R.string.add
         SmallTextButton(stringRes = addButtonRes, onClick = viewModel::onAddClicked)
     }
+}
 
 @Composable
 private fun TrackerPager(viewModel: AddDataPointsViewModel) {
