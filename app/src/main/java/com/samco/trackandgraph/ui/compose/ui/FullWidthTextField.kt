@@ -71,7 +71,7 @@ fun FullWidthTextField(
         value = textField.value,
         label = { Text(text = label) },
         onValueChange = {
-            textField.value = it
+            if (textField.value != it) textField.value = it
             onValueChange(it.text)
         },
         keyboardActions = keyboardActions,

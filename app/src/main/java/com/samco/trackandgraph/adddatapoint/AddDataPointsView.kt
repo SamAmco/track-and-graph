@@ -14,28 +14,37 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-@file:OptIn(ExperimentalPagerApi::class)
+@file:OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class)
 
 package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -175,12 +184,34 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
         LabeledRow(label = stringResource(id = R.string.label_colon)) {
             LabelInputTextField(
                 value = label,
-                onValueChanged = viewModel::updateLabel
+                onValueChanged = viewModel::updateLabel,
+                focusManager = focusManager
             )
         }
+        
+        SpacingLarge()
+
+        NoteInput(viewModel)
 
         SpacingLarge()
     }
+
+@Composable
+private fun NoteInput(viewModel: AddDataPointViewModel) {
+    val note by viewModel.note.observeAsState("")
+    var showNoteBox by rememberSaveable { mutableStateOf(true) }
+
+    if (showNoteBox) {
+        FullWidthTextField(
+            value = note,
+            onValueChange = { viewModel.updateNote(it) },
+            label = stringResource(id = R.string.note_input_hint),
+            singleLine = false
+        )
+    } else {
+
+    }
+}
 
 @Composable
 private fun HintHeader(viewModel: AddDataPointsViewModel) =
