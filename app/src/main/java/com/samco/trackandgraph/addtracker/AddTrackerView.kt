@@ -89,6 +89,8 @@ fun AddTrackerView() {
 
             override fun setSeconds(value: String) {}
 
+            override fun setDurationFromDouble(value: Double) { }
+
             override fun getDurationAsDouble() = 0.0
         })
     }

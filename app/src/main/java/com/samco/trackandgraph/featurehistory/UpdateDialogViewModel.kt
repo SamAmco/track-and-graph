@@ -1,9 +1,9 @@
 package com.samco.trackandgraph.featurehistory
 
 import androidx.lifecycle.*
-import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
-import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
-import com.samco.trackandgraph.ui.compose.viewmodels.asValidatedDouble
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
+import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import kotlinx.coroutines.flow.combine
 
 interface UpdateDialogViewModel {

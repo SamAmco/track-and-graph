@@ -1,7 +1,8 @@
-package com.samco.trackandgraph.ui.compose.viewmodels
+package com.samco.trackandgraph.ui.viewmodels
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import org.threeten.bp.Duration
 
 interface DurationInputViewModel {
     val hours: LiveData<String>
@@ -11,6 +12,7 @@ interface DurationInputViewModel {
     fun setHours(value: String)
     fun setMinutes(value: String)
     fun setSeconds(value: String)
+    fun setDurationFromDouble(value: Double)
     fun getDurationAsDouble(): Double
 }
 
@@ -31,6 +33,16 @@ open class DurationInputViewModelImpl : DurationInputViewModel {
 
     override fun setSeconds(value: String) {
         seconds.value = value.asValidatedInt()
+    }
+
+    override fun setDurationFromDouble(value: Double) {
+        val duration = Duration.ofSeconds(value.toLong())
+        val numHours = duration.toHours()
+        val numMinutes = duration.minusHours(numHours).toMinutes()
+        val numSeconds = duration.minusHours(numHours).minusMinutes(numMinutes).seconds
+        hours.value = numHours.toString()
+        minutes.value = numMinutes.toString()
+        seconds.value = numSeconds.toString()
     }
 
     override fun getDurationAsDouble(): Double {
