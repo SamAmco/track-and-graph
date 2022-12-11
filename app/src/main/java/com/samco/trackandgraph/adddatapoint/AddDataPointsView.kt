@@ -49,7 +49,7 @@ import org.threeten.bp.OffsetDateTime
 fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
     Column(
         modifier = Modifier
-            .verticalScroll(rememberScrollState())
+            .heightIn(max = 400.dp)
             .fillMaxWidth()
             .background(color = MaterialTheme.tngColors.surface)
             .padding(
@@ -63,7 +63,7 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
 
         SpacingLarge()
 
-        TrackerPager(viewModel)
+        TrackerPager(Modifier.weight(1f, true), viewModel)
 
         BottomButtons(viewModel)
     }
@@ -95,11 +95,12 @@ private fun BottomButtons(viewModel: AddDataPointsViewModel) {
 }
 
 @Composable
-private fun TrackerPager(viewModel: AddDataPointsViewModel) {
+private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) {
     val count by viewModel.dataPointPages.observeAsState(0)
     val pagerState = rememberPagerState(initialPage = viewModel.currentPageIndex.value ?: 0)
 
     HorizontalPager(
+        modifier = modifier,
         count = count,
         state = pagerState
     ) { page ->
@@ -128,7 +129,9 @@ private fun TrackerPager(viewModel: AddDataPointsViewModel) {
 @Composable
 private fun TrackerPage(viewModel: AddDataPointViewModel) =
     Column(
-        modifier = Modifier.padding(horizontal = 2.dp),
+        modifier = Modifier
+            .padding(horizontal = 2.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -197,6 +200,7 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
 @Composable
 private fun SuggestedValues(viewModel: AddDataPointViewModel) {
+    val focusManager = LocalFocusManager.current
     val list by viewModel.suggestedValues.observeAsState(emptyList())
     val selectedItem by viewModel.selectedSuggestedValue.observeAsState()
     LazyRow(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dialog_input_spacing))) {
@@ -205,7 +209,10 @@ private fun SuggestedValues(viewModel: AddDataPointViewModel) {
             TextChip(
                 text = "${suggestedValue.valueStr} : ${suggestedValue.label}",
                 isSelected = suggestedValue == selectedItem,
-                onSelectionChanged = { viewModel.onSuggestedValueSelected(suggestedValue) }
+                onSelectionChanged = {
+                    focusManager.clearFocus()
+                    viewModel.onSuggestedValueSelected(suggestedValue)
+                }
             )
         })
     }
