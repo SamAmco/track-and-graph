@@ -1,5 +1,7 @@
 package com.samco.trackandgraph.ui.compose.viewmodels
 
+import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
+import com.samco.trackandgraph.ui.viewmodels.asValidatedInt
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 

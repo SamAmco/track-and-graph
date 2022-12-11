@@ -1,4 +1,4 @@
-package com.samco.trackandgraph.ui.compose.viewmodels
+package com.samco.trackandgraph.ui.viewmodels
 
 fun String.asValidatedInt() =
     this.take(1).filter { it.isDigit() || it == '-' } + this.drop(1).takeWhile { it.isDigit() }

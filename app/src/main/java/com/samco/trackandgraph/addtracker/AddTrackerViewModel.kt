@@ -8,9 +8,9 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.TrackerHelper
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
-import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
-import com.samco.trackandgraph.ui.compose.viewmodels.asValidatedDouble
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
+import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow

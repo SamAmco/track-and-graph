@@ -51,8 +51,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
-import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModel
-import com.samco.trackandgraph.ui.compose.viewmodels.DurationInputViewModelImpl
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
+import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)

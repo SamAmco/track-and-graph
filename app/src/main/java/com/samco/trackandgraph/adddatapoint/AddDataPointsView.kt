@@ -20,6 +20,7 @@ package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -63,8 +64,6 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
         SpacingLarge()
 
         TrackerPager(viewModel)
-
-        SpacingLarge()
 
         BottomButtons(viewModel)
     }
@@ -128,7 +127,10 @@ private fun TrackerPager(viewModel: AddDataPointsViewModel) {
 
 @Composable
 private fun TrackerPage(viewModel: AddDataPointViewModel) =
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = Modifier.padding(horizontal = 2.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
         val focusManager = LocalFocusManager.current
 
@@ -145,6 +147,10 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
             selectedDateTime = selectedDateTime,
             onDateTimeSelected = viewModel::updateTimestamp
         )
+
+        SpacingLarge()
+
+        SuggestedValues(viewModel)
 
         SpacingLarge()
 
@@ -188,6 +194,22 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
         NoteInput(viewModel)
     }
+
+@Composable
+private fun SuggestedValues(viewModel: AddDataPointViewModel) {
+    val list by viewModel.suggestedValues.observeAsState(emptyList())
+    val selectedItem by viewModel.selectedSuggestedValue.observeAsState()
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dialog_input_spacing))) {
+        items(count = list.size, itemContent = { index ->
+            val suggestedValue = list[index]
+            TextChip(
+                text = "${suggestedValue.valueStr} : ${suggestedValue.label}",
+                isSelected = suggestedValue == selectedItem,
+                onSelectionChanged = { viewModel.onSuggestedValueSelected(suggestedValue) }
+            )
+        })
+    }
+}
 
 @Composable
 private fun NoteInput(viewModel: AddDataPointViewModel) =
