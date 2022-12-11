@@ -113,7 +113,7 @@ dependencies {
     // Material design stuff you might need at some point
     implementation 'androidx.compose.material:material:1.4.0-alpha02'
     implementation "com.google.android.material:compose-theme-adapter:1.2.1"
-    implementation 'com.google.accompanist:accompanist-pager:0.22.0-rc'
+    implementation 'com.google.accompanist:accompanist-pager:0.28.0'
     //implementation 'androidx.compose.material:material-icons-extended:1.2.1'
 
     // Android KTX

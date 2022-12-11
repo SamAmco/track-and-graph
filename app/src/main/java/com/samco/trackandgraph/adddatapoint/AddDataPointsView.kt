@@ -34,6 +34,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -197,8 +198,9 @@ private fun NoteInput(viewModel: AddDataPointViewModel) =
         val note by viewModel.note.observeAsState("")
         var showNoteBox by rememberSaveable { mutableStateOf(false) }
 
-        if (showNoteBox) {
+        if (note.isNotEmpty() || showNoteBox) {
             FullWidthTextField(
+                modifier = Modifier.heightIn(max = 200.dp),
                 value = note,
                 onValueChange = { viewModel.updateNote(it) },
                 label = stringResource(id = R.string.note_input_hint),
