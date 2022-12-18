@@ -132,22 +132,22 @@ class AddDataPointsViewModelImpl @Inject constructor(
                     SuggestedValue(
                         1.0,
                         "1.0",
-                        "A"
+                        "A really long name"
                     ),
                     SuggestedValue(
                         2.0,
                         "2.0",
-                        "B"
+                        "B really long name"
                     ),
                     SuggestedValue(
                         3.0,
                         "3.0",
-                        "C"
+                        "C really long name"
                     ),
                     SuggestedValue(
                         4.0,
                         "4.0",
-                        "D"
+                        "D really long name"
                     )
                 )
             ).asLiveData(viewModelScope.coroutineContext)

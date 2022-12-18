@@ -20,9 +20,6 @@ package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -31,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -132,10 +130,8 @@ private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) 
 
 @Composable
 private fun TrackerPage(viewModel: AddDataPointViewModel) =
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 2.dp)
-            .verticalScroll(rememberScrollState()),
+    FadingScrollColumn(
+        modifier = Modifier.padding(horizontal = 2.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -207,7 +203,11 @@ private fun SuggestedValues(viewModel: AddDataPointViewModel) {
     val focusManager = LocalFocusManager.current
     val list by viewModel.suggestedValues.observeAsState(emptyList())
     val selectedItem by viewModel.selectedSuggestedValue.observeAsState()
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dialog_input_spacing))) {
+    FadingLazyRow(
+        size = with(LocalDensity.current) { 24.dp.toPx() },
+        contentPadding = PaddingValues(horizontal = 24.dp),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dialog_input_spacing))
+    ) {
         items(count = list.size, itemContent = { index ->
             val suggestedValue = list[index]
             TextChip(
