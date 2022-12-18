@@ -43,6 +43,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -118,10 +119,13 @@ private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) 
     }
 
     val currentPage by viewModel.currentPageIndex.observeAsState(0)
+    val scope = rememberCoroutineScope()
 
     if (currentPage != pagerState.currentPage) {
         LaunchedEffect(currentPage) {
-            pagerState.animateScrollToPage(currentPage)
+            scope.launch {
+                pagerState.animateScrollToPage(currentPage)
+            }
         }
     }
 }
