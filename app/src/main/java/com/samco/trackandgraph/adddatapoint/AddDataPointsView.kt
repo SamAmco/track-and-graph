@@ -153,9 +153,17 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
         SpacingLarge()
 
-        SuggestedValues(viewModel)
+        val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
+        val selectedSuggestedValue by viewModel.selectedSuggestedValue.observeAsState()
 
-        SpacingLarge()
+        if (suggestedValues.isNotEmpty()) {
+            SuggestedValues(
+                suggestedValues,
+                selectedSuggestedValue,
+                viewModel::onSuggestedValueSelected
+            )
+            SpacingLarge()
+        }
 
         when (viewModel) {
             is AddDataPointViewModel.NumericalDataPointViewModel -> {
@@ -199,10 +207,12 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
     }
 
 @Composable
-private fun SuggestedValues(viewModel: AddDataPointViewModel) {
+private fun SuggestedValues(
+    list: List<SuggestedValue>,
+    selectedItem: SuggestedValue?,
+    onSuggestedValueSelected: (SuggestedValue) -> Unit
+) {
     val focusManager = LocalFocusManager.current
-    val list by viewModel.suggestedValues.observeAsState(emptyList())
-    val selectedItem by viewModel.selectedSuggestedValue.observeAsState()
     FadingLazyRow(
         size = with(LocalDensity.current) { 24.dp.toPx() },
         contentPadding = PaddingValues(horizontal = 24.dp),
@@ -215,7 +225,7 @@ private fun SuggestedValues(viewModel: AddDataPointViewModel) {
                 isSelected = suggestedValue == selectedItem,
                 onSelectionChanged = {
                     focusManager.clearFocus()
-                    viewModel.onSuggestedValueSelected(suggestedValue)
+                    onSuggestedValueSelected(suggestedValue)
                 }
             )
         })
