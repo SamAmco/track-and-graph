@@ -34,9 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
@@ -67,7 +65,8 @@ fun DurationInput(
     modifier: Modifier = Modifier,
     viewModel: DurationInputViewModel,
     focusManager: FocusManager? = null,
-    nextFocusDirection: FocusDirection? = null
+    nextFocusDirection: FocusDirection? = null,
+    focusRequester: FocusRequester? = null
 ) = Row(
     modifier = modifier
         .padding(
@@ -86,7 +85,8 @@ fun DurationInput(
         onValueChange = { viewModel.setHours(it) },
         suffix = stringResource(id = R.string.hours_suffix),
         charLimit = 8,
-        focusManager
+        focusManager = focusManager,
+        focusRequester = focusRequester
     )
     Text(
         text = ":",
@@ -99,7 +99,7 @@ fun DurationInput(
         onValueChange = { viewModel.setMinutes(it) },
         suffix = stringResource(id = R.string.minutes_suffix),
         charLimit = 3,
-        focusManager
+        focusManager = focusManager
     )
     Text(
         text = ":",
@@ -112,7 +112,7 @@ fun DurationInput(
         onValueChange = { viewModel.setSeconds(it) },
         suffix = stringResource(id = R.string.seconds_suffix),
         charLimit = 3,
-        focusManager,
+        focusManager = focusManager,
         overrideFocusDirection = nextFocusDirection
     )
 }
@@ -125,7 +125,8 @@ private fun DurationInputComponent(
     suffix: String,
     charLimit: Int,
     focusManager: FocusManager,
-    overrideFocusDirection: FocusDirection? = null
+    overrideFocusDirection: FocusDirection? = null,
+    focusRequester: FocusRequester? = null
 ) {
     val colors = TextFieldDefaults.textFieldColors()
     val interactionSource = remember { MutableInteractionSource() }
@@ -191,6 +192,10 @@ private fun DurationInputComponent(
                         selection = TextRange(textLength, textLength)
                     )
                 }
+            }
+            .let {
+                if (focusRequester != null) it.focusRequester(focusRequester)
+                else it
             },
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,

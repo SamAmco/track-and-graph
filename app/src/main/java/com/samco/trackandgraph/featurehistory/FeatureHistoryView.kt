@@ -268,7 +268,7 @@ private fun WhereValueInput(
         if (isDuration) {
             DurationInput(
                 modifier = it,
-                viewModel = viewModel.whereDurationViewModel,
+                viewModel = viewModel.whereDurationViewModel
             )
         } else {
             ValueInputTextField(
