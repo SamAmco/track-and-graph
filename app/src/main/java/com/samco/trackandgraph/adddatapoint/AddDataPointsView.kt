@@ -172,7 +172,7 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
                 LabeledRow(label = stringResource(id = R.string.value_colon)) {
                     ValueInputTextField(
-                        value = value ?: "",
+                        value = value,
                         onValueChanged = viewModel::setValue,
                         focusManager = focusManager
                     )
@@ -208,20 +208,26 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
 @Composable
 private fun SuggestedValues(
-    list: List<SuggestedValue>,
-    selectedItem: SuggestedValue?,
-    onSuggestedValueSelected: (SuggestedValue) -> Unit
+    list: List<SuggestedValueViewData>,
+    selectedItem: SuggestedValueViewData?,
+    onSuggestedValueSelected: (SuggestedValueViewData) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     FadingLazyRow(
         size = with(LocalDensity.current) { 24.dp.toPx() },
         contentPadding = PaddingValues(horizontal = 24.dp),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.dialog_input_spacing))
+        horizontalArrangement = Arrangement.spacedBy(
+            dimensionResource(id = R.dimen.dialog_input_spacing),
+            Alignment.CenterHorizontally
+        )
     ) {
         items(count = list.size, itemContent = { index ->
             val suggestedValue = list[index]
+            val text =
+                if (suggestedValue.label.isBlank()) suggestedValue.valueStr
+                else "${suggestedValue.valueStr} : ${suggestedValue.label}"
             TextChip(
-                text = "${suggestedValue.valueStr} : ${suggestedValue.label}",
+                text = text,
                 isSelected = suggestedValue == selectedItem,
                 onSelectionChanged = {
                     focusManager.clearFocus()

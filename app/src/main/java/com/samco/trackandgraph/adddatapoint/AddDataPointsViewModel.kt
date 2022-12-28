@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.helpers.doubleFormatter
+import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
@@ -15,7 +17,7 @@ import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
-data class SuggestedValue(
+data class SuggestedValueViewData(
     val value: Double,
     val valueStr: String,
     val label: String
@@ -26,14 +28,14 @@ interface AddDataPointBaseViewModel {
     val timestamp: LiveData<OffsetDateTime>
     val label: LiveData<String>
     val note: LiveData<String>
-    val suggestedValues: LiveData<List<SuggestedValue>>
-    val selectedSuggestedValue: LiveData<SuggestedValue?>
+    val suggestedValues: LiveData<List<SuggestedValueViewData>>
+    val selectedSuggestedValue: LiveData<SuggestedValueViewData?>
 
     fun getTracker(): Tracker
     fun updateLabel(label: String)
     fun updateNote(note: String)
     fun updateTimestamp(timestamp: OffsetDateTime)
-    fun onSuggestedValueSelected(suggestedValue: SuggestedValue)
+    fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData)
 }
 
 sealed interface AddDataPointViewModel : AddDataPointBaseViewModel {
@@ -75,6 +77,7 @@ interface AddDataPointsNavigationViewModel : AddDataPointsViewModel {
 @HiltViewModel
 class AddDataPointsViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
+    private val suggestedValueHelper: SuggestedValueHelper,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel(), AddDataPointsNavigationViewModel {
 
@@ -109,7 +112,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     private fun getViewModel(config: Config): AddDataPointViewModel {
         return when (config.tracker.dataType) {
-            DataType.DURATION -> getDurationViewModel(config)
+            DataType.DURATION -> DataPointDurationViewModel(config)
             DataType.CONTINUOUS -> getNumericalViewModel(config)
         }
     }
@@ -123,34 +126,30 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override val timestamp = MutableLiveData(config.timestamp ?: now)
         override val label = MutableLiveData(config.label ?: "")
         override val note = MutableLiveData(config.note ?: "")
-        override val selectedSuggestedValue = MutableLiveData<SuggestedValue?>(null)
+        override val selectedSuggestedValue = MutableLiveData<SuggestedValueViewData?>(null)
 
-        //TODO get these from the actual database
-        override val suggestedValues: LiveData<List<SuggestedValue>> =
-            MutableStateFlow(
-                listOf(
-                    SuggestedValue(
-                        1.0,
-                        "1.0",
-                        "A really long name"
-                    ),
-                    SuggestedValue(
-                        2.0,
-                        "2.0",
-                        "B really long name"
-                    ),
-                    SuggestedValue(
-                        3.0,
-                        "3.0",
-                        "C really long name"
-                    ),
-                    SuggestedValue(
-                        4.0,
-                        "4.0",
-                        "D really long name"
-                    )
+        override val suggestedValues: LiveData<List<SuggestedValueViewData>> =
+            flow {
+                emit(
+                    suggestedValueHelper
+                        .getSuggestedValues(config.tracker)
+                        .map {
+                            SuggestedValueViewData(
+                                it.value,
+                                getValueString(it.value, config.tracker.dataType.isDuration()),
+                                it.label
+                            )
+                        }
                 )
-            ).asLiveData(viewModelScope.coroutineContext)
+            }
+                .flowOn(io)
+                .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+                .asLiveData(viewModelScope.coroutineContext)
+
+        private fun getValueString(value: Double, isDuration: Boolean): String {
+            return if (isDuration) formatTimeDuration(value.toLong())
+            else doubleFormatter.format(value)
+        }
 
         override fun getTracker() = config.tracker
 
@@ -167,7 +166,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
             this.timestamp.value = timestamp
         }
 
-        override fun onSuggestedValueSelected(suggestedValue: SuggestedValue) {
+        override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
             this.label.value = suggestedValue.label
             this.selectedSuggestedValue.value = suggestedValue
             onAddClicked()
@@ -189,34 +188,40 @@ class AddDataPointsViewModelImpl @Inject constructor(
                 this.selectedSuggestedValue.value = null
             }
 
-            override fun onSuggestedValueSelected(suggestedValue: SuggestedValue) {
+            override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
                 this.doubleValue.value = suggestedValue.value
                 super.onSuggestedValueSelected(suggestedValue)
             }
         }
 
-    private fun getDurationViewModel(config: Config) =
-        object : DurationInputViewModel by DurationInputViewModelImpl(),
-            AddDataPointBaseViewModelImpl(config),
-            AddDataPointViewModel.DurationDataPointViewModel {
+    private inner class DataPointDurationViewModel(
+        config: Config,
+        private val durationInputViewModel: DurationInputViewModel = DurationInputViewModelImpl()
+    ) :
+        DurationInputViewModel by durationInputViewModel,
+        AddDataPointBaseViewModelImpl(config),
+        AddDataPointViewModel.DurationDataPointViewModel {
 
-            override fun setHours(value: String) {
-                this.selectedSuggestedValue.value = null
-            }
-
-            override fun setMinutes(value: String) {
-                this.selectedSuggestedValue.value = null
-            }
-
-            override fun setSeconds(value: String) {
-                this.selectedSuggestedValue.value = null
-            }
-
-            override fun onSuggestedValueSelected(suggestedValue: SuggestedValue) {
-                this.setDurationFromDouble(suggestedValue.value)
-                super.onSuggestedValueSelected(suggestedValue)
-            }
+        override fun setHours(value: String) {
+            durationInputViewModel.setHours(value)
+            this.selectedSuggestedValue.value = null
         }
+
+        override fun setMinutes(value: String) {
+            durationInputViewModel.setMinutes(value)
+            this.selectedSuggestedValue.value = null
+        }
+
+        override fun setSeconds(value: String) {
+            durationInputViewModel.setSeconds(value)
+            this.selectedSuggestedValue.value = null
+        }
+
+        override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
+            this.setDurationFromDouble(suggestedValue.value)
+            super.onSuggestedValueSelected(suggestedValue)
+        }
+    }
 
     override val updateMode: LiveData<Boolean> = configFlow.map {
         it.size == 1 && it[0].timestamp != null
