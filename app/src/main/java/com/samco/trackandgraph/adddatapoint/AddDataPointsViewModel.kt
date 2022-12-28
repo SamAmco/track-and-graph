@@ -36,6 +36,7 @@ interface AddDataPointBaseViewModel {
     fun updateNote(note: String)
     fun updateTimestamp(timestamp: OffsetDateTime)
     fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData)
+    fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData)
 }
 
 sealed interface AddDataPointViewModel : AddDataPointBaseViewModel {
@@ -166,6 +167,10 @@ class AddDataPointsViewModelImpl @Inject constructor(
             this.timestamp.value = timestamp
         }
 
+        override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
+            this.label.value = suggestedValue.label
+        }
+
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
             this.label.value = suggestedValue.label
             this.selectedSuggestedValue.value = suggestedValue
@@ -177,20 +182,24 @@ class AddDataPointsViewModelImpl @Inject constructor(
         object : AddDataPointViewModel.NumericalDataPointViewModel,
             AddDataPointBaseViewModelImpl(config) {
 
-            private val doubleValue = MutableStateFlow(config.value ?: 1.0)
+            private val lastInput = MutableStateFlow(config.value?.toString() ?: "")
 
-            override val value = doubleValue
-                .map { it.toString() }
+            override val value = lastInput
                 .asLiveData(viewModelScope.coroutineContext)
 
             override fun setValue(value: String) {
-                this.doubleValue.value = value.toDoubleOrNull() ?: 1.0
+                this.lastInput.value = value
                 this.selectedSuggestedValue.value = null
             }
 
             override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
-                this.doubleValue.value = suggestedValue.value
+                this.lastInput.value = suggestedValue.value.toString()
                 super.onSuggestedValueSelected(suggestedValue)
+            }
+
+            override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
+                this.lastInput.value = suggestedValue.value.toString()
+                super.onSuggestedValueLongPress(suggestedValue)
             }
         }
 
@@ -220,6 +229,11 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
             this.setDurationFromDouble(suggestedValue.value)
             super.onSuggestedValueSelected(suggestedValue)
+        }
+
+        override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
+            this.setDurationFromDouble(suggestedValue.value)
+            super.onSuggestedValueLongPress(suggestedValue)
         }
     }
 
@@ -274,7 +288,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     private fun getDoubleValue(viewModel: AddDataPointViewModel) = when (viewModel) {
         is AddDataPointViewModel.NumericalDataPointViewModel ->
-            viewModel.value.value?.toDouble() ?: 1.0
+            viewModel.value.value?.toDoubleOrNull() ?: 1.0
         is AddDataPointViewModel.DurationDataPointViewModel ->
             viewModel.getDurationAsDouble()
     }

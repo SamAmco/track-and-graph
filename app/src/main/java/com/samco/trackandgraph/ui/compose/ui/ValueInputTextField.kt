@@ -9,9 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -58,7 +56,8 @@ fun ValueInputTextField(
     modifier: Modifier = Modifier,
     value: String,
     onValueChanged: (String) -> Unit,
-    focusManager: FocusManager? = null
+    focusManager: FocusManager? = null,
+    focusRequester: FocusRequester? = null
 ) {
     val textField = remember(value) {
         mutableStateOf(
@@ -97,11 +96,11 @@ fun ValueInputTextField(
                     textField.value = textField.value.copy(
                         selection = TextRange(0, textLength)
                     )
-                } else {
-                    textField.value = textField.value.copy(
-                        selection = TextRange(textLength, textLength)
-                    )
                 }
+            }
+            .let {
+                if (focusRequester != null) it.focusRequester(focusRequester)
+                else it
             },
     )
 }

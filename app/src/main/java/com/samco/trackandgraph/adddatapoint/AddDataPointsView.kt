@@ -28,6 +28,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
@@ -40,6 +41,7 @@ import com.google.accompanist.pager.rememberPagerState
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
@@ -97,6 +99,7 @@ private fun BottomButtons(viewModel: AddDataPointsViewModel) {
 private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) {
     val count by viewModel.dataPointPages.observeAsState(0)
     val pagerState = rememberPagerState(initialPage = viewModel.currentPageIndex.value ?: 0)
+    val focusManager = LocalFocusManager.current
 
     HorizontalPager(
         modifier = modifier,
@@ -112,6 +115,7 @@ private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) 
 
     LaunchedEffect(pagerState) {
         snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect {
+            focusManager.clearFocus()
             viewModel.updateCurrentPage(it)
         }
     }
@@ -136,6 +140,7 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
     ) {
 
         val focusManager = LocalFocusManager.current
+        val valueFocusRequester = remember { FocusRequester() }
 
         SpacingLarge()
 
@@ -156,11 +161,20 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
         val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
         val selectedSuggestedValue by viewModel.selectedSuggestedValue.observeAsState()
 
+        val focusScope = rememberCoroutineScope()
+
         if (suggestedValues.isNotEmpty()) {
             SuggestedValues(
                 suggestedValues,
                 selectedSuggestedValue,
-                viewModel::onSuggestedValueSelected
+                viewModel::onSuggestedValueSelected,
+                onSuggestedValueLongPress = {
+                    viewModel.onSuggestedValueLongPress(it)
+                    focusScope.launch {
+                        delay(100)
+                        valueFocusRequester.requestFocus()
+                    }
+                }
             )
             SpacingLarge()
         }
@@ -174,7 +188,8 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
                     ValueInputTextField(
                         value = value,
                         onValueChanged = viewModel::setValue,
-                        focusManager = focusManager
+                        focusManager = focusManager,
+                        focusRequester = valueFocusRequester
                     )
                 }
             }
@@ -183,7 +198,8 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
                     DurationInput(
                         viewModel = viewModel,
                         focusManager = focusManager,
-                        nextFocusDirection = FocusDirection.Down
+                        nextFocusDirection = FocusDirection.Down,
+                        focusRequester = valueFocusRequester
                     )
                 }
             }
@@ -210,7 +226,8 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 private fun SuggestedValues(
     list: List<SuggestedValueViewData>,
     selectedItem: SuggestedValueViewData?,
-    onSuggestedValueSelected: (SuggestedValueViewData) -> Unit
+    onSuggestedValueSelected: (SuggestedValueViewData) -> Unit,
+    onSuggestedValueLongPress: (SuggestedValueViewData) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     FadingLazyRow(
@@ -229,9 +246,12 @@ private fun SuggestedValues(
             TextChip(
                 text = text,
                 isSelected = suggestedValue == selectedItem,
-                onSelectionChanged = {
+                onClick = {
                     focusManager.clearFocus()
                     onSuggestedValueSelected(suggestedValue)
+                },
+                onLongPress = {
+                    onSuggestedValueLongPress(suggestedValue)
                 }
             )
         })

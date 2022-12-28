@@ -1,8 +1,11 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -15,24 +18,26 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
-@OptIn(ExperimentalMaterialApi::class)
 @Preview
 @Composable
 fun TextChip(
     modifier: Modifier = Modifier,
     text: String = "Chip",
     isSelected: Boolean = false,
-    onSelectionChanged: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongPress: () -> Unit = {}
 ) {
     Surface(
-        modifier = modifier,
+        modifier = modifier.combinedClickable(
+            onClick = onClick,
+            onLongClick = onLongPress
+        ),
         border = BorderStroke(
             1.4.dp,
             if (isSelected) SolidColor(MaterialTheme.tngColors.primary)
             else SolidColor(MaterialTheme.tngColors.secondary)
         ),
         shape = MaterialTheme.shapes.medium,
-        onClick = onSelectionChanged
     ) {
         Text(
             text = text,
