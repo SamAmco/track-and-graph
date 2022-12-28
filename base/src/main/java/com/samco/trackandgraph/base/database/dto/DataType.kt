@@ -17,4 +17,10 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-enum class DataType { CONTINUOUS, DURATION }
+enum class DataType {
+
+    CONTINUOUS,
+    DURATION;
+
+    fun isDuration() = this == DURATION
+}

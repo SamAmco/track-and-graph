@@ -294,5 +294,4 @@ internal class TrackerHelperImpl @Inject constructor(
             dao.getDataPointByTimestampAndFeatureSync(it, timestamp).toDto()
         }
     }
-
 }
