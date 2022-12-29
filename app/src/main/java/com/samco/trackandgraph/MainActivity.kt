@@ -68,6 +68,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var dataInteractor: DataInteractor
 
+    @Inject
+    lateinit var prefHelper: PrefHelper
+
     private val viewModel by viewModels<MainActivityViewModel>()
 
     val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
@@ -81,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         onDrawerHideKeyboard()
         initDrawerSpinners()
         viewModel.syncAlarms()
-        if (isFirstRun()) showTutorial()
+        if (prefHelper.isFirstRun()) showTutorial()
         else destroyTutorial()
     }
 
@@ -170,24 +173,16 @@ class MainActivity : AppCompatActivity() {
             android.R.layout.simple_spinner_dropdown_item,
             formatNames
         )
-        spinner.setSelection(getDateFormatValue())
+        spinner.setSelection(prefHelper.getDateFormatValue())
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
-                onDateFormatSelected(position)
+                prefHelper.setDateTimeFormatIndex(position)
             }
 
             override fun onNothingSelected(p0: AdapterView<*>?) {
             }
         }
     }
-
-    private fun onDateFormatSelected(index: Int) {
-        getPrefs(applicationContext).edit().putInt(DATE_FORMAT_SETTING_PREF_KEY, index).apply()
-    }
-
-    private fun getDateFormatValue() = getPrefs(applicationContext).getInt(
-        DATE_FORMAT_SETTING_PREF_KEY, DateFormatSetting.DMY.ordinal
-    )
 
     private fun setUpThemeSpinner() {
         val spinner = navView.menu.findItem(R.id.themeSpinner).actionView as AppCompatSpinner
@@ -223,12 +218,11 @@ class MainActivity : AppCompatActivity() {
             AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
         else AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
 
-    private fun getThemeValue() =
-        getPrefs(applicationContext).getInt(THEME_SETTING_PREF_KEY, getDefaultThemeValue())
+    private fun getThemeValue() = prefHelper.getThemeValue(getDefaultThemeValue())
 
     private fun setThemeValue(themeValue: Int) {
         AppCompatDelegate.setDefaultNightMode(themeValue)
-        getPrefs(applicationContext).edit().putInt(THEME_SETTING_PREF_KEY, themeValue).apply()
+        prefHelper.setThemeValue(themeValue)
     }
 
     private fun readThemeValue() {
@@ -258,7 +252,7 @@ class MainActivity : AppCompatActivity() {
     private fun destroyTutorial() {
         val tutorialLayout = findViewById<ViewGroup>(R.id.tutorialOverlay)
         tutorialLayout.removeAllViews()
-        getPrefs(applicationContext).edit().putBoolean(FIRST_RUN_PREF_KEY, false).apply()
+        prefHelper.setFirstRun(false)
     }
 
     private fun showTutorial() {
@@ -289,8 +283,6 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-
-    private fun isFirstRun() = getPrefs(applicationContext).getBoolean(FIRST_RUN_PREF_KEY, true)
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(drawerLayout) || super.onNavigateUp()
