@@ -4,6 +4,7 @@ import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.helpers.PrefHelper
 import com.samco.trackandgraph.base.helpers.doubleFormatter
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.model.DataInteractor
@@ -51,6 +52,7 @@ sealed interface AddDataPointViewModel : AddDataPointBaseViewModel {
 
 interface AddDataPointsViewModel {
 
+    val showTutorial: LiveData<Boolean>
     val updateMode: LiveData<Boolean>
     val indexText: LiveData<String>
     val skipButtonVisible: LiveData<Boolean>
@@ -58,6 +60,9 @@ interface AddDataPointsViewModel {
     val currentPageIndex: LiveData<Int>
 
     fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel>
+
+    fun onTutorialButtonPressed()
+    fun onSkipTutorialButtonPressed()
 
     fun onCancelClicked()
     fun onSkipClicked()
@@ -79,7 +84,8 @@ interface AddDataPointsNavigationViewModel : AddDataPointsViewModel {
 class AddDataPointsViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val suggestedValueHelper: SuggestedValueHelper,
-    @IODispatcher private val io: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher,
+    private val prefHelper: PrefHelper
 ) : ViewModel(), AddDataPointsNavigationViewModel {
 
     private data class Config(
@@ -93,6 +99,27 @@ class AddDataPointsViewModelImpl @Inject constructor(
     private val configFlow = MutableStateFlow<List<Config>>(emptyList())
     private val indexFlow = MutableStateFlow(0)
     override val dismiss = MutableLiveData(false)
+
+    private val tutorialButtonPresses = MutableSharedFlow<Unit>()
+    private val skipTutorialButtonPresses = MutableSharedFlow<Unit>()
+
+    //Show the tutorial if the user has no data or if they have pressed the tutorial button
+    override val showTutorial: LiveData<Boolean> = merge(
+        tutorialButtonPresses.map { true }
+            .onStart { emit(!prefHelper.getHideDataPointTutorial()) },
+        skipTutorialButtonPresses.map { false }
+    ).shareIn(viewModelScope, SharingStarted.Eagerly, 1)
+        .asLiveData(viewModelScope.coroutineContext)
+
+
+    override fun onTutorialButtonPressed() {
+        viewModelScope.launch { tutorialButtonPresses.emit(Unit) }
+    }
+
+    override fun onSkipTutorialButtonPressed() {
+        prefHelper.setHideDataPointTutorial(true)
+        viewModelScope.launch { skipTutorialButtonPresses.emit(Unit) }
+    }
 
     override val dataPointPages = configFlow
         .map { it.size }

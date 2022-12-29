@@ -21,6 +21,8 @@ import android.content.ContentResolver
 import android.content.Context
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelper
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelperImpl
+import com.samco.trackandgraph.base.helpers.PrefHelper
+import com.samco.trackandgraph.base.helpers.PrefHelperImpl
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
 import dagger.Module
@@ -41,4 +43,7 @@ class AppModule {
 
     @Provides
     fun getSuggestedValueHelper(impl: SuggestedValueHelperImpl): SuggestedValueHelper = impl
+
+    @Provides
+    fun getPrefHelper(impl: PrefHelperImpl): PrefHelper = impl
 }

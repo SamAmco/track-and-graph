@@ -29,12 +29,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -61,14 +61,33 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
                 bottom = dimensionResource(id = R.dimen.card_padding)
             )
     ) {
-        HintHeader(viewModel)
-
-        SpacingLarge()
-
-        TrackerPager(Modifier.weight(1f, true), viewModel)
-
-        BottomButtons(viewModel)
+        val showTutorial by viewModel.showTutorial.observeAsState(false)
+        if (showTutorial) AddDataPointsTutorial(viewModel)
+        else DataPointInputView(viewModel)
     }
+}
+
+@Composable
+private fun ColumnScope.AddDataPointsTutorial(viewModel: AddDataPointsViewModel) {
+    //Centered Text in the middle of the column and filling height
+    Text(
+        text = "Add Data Points Tutorial",
+        modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .fillMaxHeight(),
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun ColumnScope.DataPointInputView(viewModel: AddDataPointsViewModel) {
+    HintHeader(viewModel)
+
+    SpacingLarge()
+
+    TrackerPager(Modifier.weight(1f, true), viewModel)
+
+    BottomButtons(viewModel)
 }
 
 @Composable
