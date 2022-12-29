@@ -264,6 +264,9 @@ private fun NoteInput(viewModel: AddDataPointViewModel) =
         modifier = Modifier.width(IntrinsicSize.Max),
         horizontalArrangement = Arrangement.Center
     ) {
+        val focusRequester = remember { FocusRequester() }
+        val coroutineScope = rememberCoroutineScope()
+
         val note by viewModel.note.observeAsState("")
         var showNoteBox by rememberSaveable { mutableStateOf(false) }
 
@@ -272,12 +275,19 @@ private fun NoteInput(viewModel: AddDataPointViewModel) =
                 modifier = Modifier.heightIn(max = 200.dp),
                 value = note,
                 onValueChange = { viewModel.updateNote(it) },
+                focusRequester = focusRequester,
                 label = stringResource(id = R.string.note_input_hint),
                 singleLine = false
             )
         } else {
             TextButton(
-                onClick = { showNoteBox = true },
+                onClick = {
+                    showNoteBox = true
+                    coroutineScope.launch {
+                        delay(100)
+                        focusRequester.requestFocus()
+                    }
+                },
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.tngColors.onSurface
                 )
