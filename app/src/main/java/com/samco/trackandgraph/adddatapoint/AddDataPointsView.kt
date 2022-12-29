@@ -29,6 +29,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
@@ -136,7 +137,7 @@ private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) 
 private fun TrackerPage(viewModel: AddDataPointViewModel) =
     FadingScrollColumn(
         modifier = Modifier.padding(horizontal = 2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
         val focusManager = LocalFocusManager.current
@@ -260,9 +261,11 @@ private fun SuggestedValues(
 
 @Composable
 private fun NoteInput(viewModel: AddDataPointViewModel) =
-    Row(
-        modifier = Modifier.width(IntrinsicSize.Max),
-        horizontalArrangement = Arrangement.Center
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .width(IntrinsicSize.Max),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val focusRequester = remember { FocusRequester() }
         val coroutineScope = rememberCoroutineScope()
@@ -297,7 +300,6 @@ private fun NoteInput(viewModel: AddDataPointViewModel) =
                     contentDescription = stringResource(id = R.string.add_a_note)
                 )
                 Text(
-                    modifier = Modifier.weight(1f),
                     text = stringResource(id = R.string.add_a_note),
                     fontSize = MaterialTheme.typography.body1.fontSize,
                     fontWeight = MaterialTheme.typography.body1.fontWeight,
