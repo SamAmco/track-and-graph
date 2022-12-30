@@ -32,9 +32,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -62,22 +60,11 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
             )
     ) {
         val showTutorial by viewModel.showTutorial.observeAsState(false)
-        if (showTutorial) AddDataPointsTutorial(viewModel)
+        if (showTutorial) AddDataPointsTutorial(viewModel.tutorialViewModel)
         else DataPointInputView(viewModel)
     }
 }
 
-@Composable
-private fun ColumnScope.AddDataPointsTutorial(viewModel: AddDataPointsViewModel) {
-    //Centered Text in the middle of the column and filling height
-    Text(
-        text = "Add Data Points Tutorial",
-        modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .fillMaxHeight(),
-        textAlign = TextAlign.Center
-    )
-}
 
 @Composable
 private fun ColumnScope.DataPointInputView(viewModel: AddDataPointsViewModel) {
@@ -302,29 +289,15 @@ private fun NoteInput(viewModel: AddDataPointViewModel) =
                 singleLine = false
             )
         } else {
-            TextButton(
-                onClick = {
-                    showNoteBox = true
-                    coroutineScope.launch {
-                        delay(100)
-                        focusRequester.requestFocus()
-                    }
-                },
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.tngColors.onSurface
-                )
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.edit_icon),
-                    contentDescription = stringResource(id = R.string.add_a_note)
-                )
-                Text(
-                    text = stringResource(id = R.string.add_a_note),
-                    fontSize = MaterialTheme.typography.body1.fontSize,
-                    fontWeight = MaterialTheme.typography.body1.fontWeight,
-                )
+            AddANoteButton {
+                showNoteBox = true
+                coroutineScope.launch {
+                    delay(100)
+                    focusRequester.requestFocus()
+                }
             }
         }
+
     }
 
 @Composable

@@ -1,3 +1,19 @@
+/*
+* This file is part of Track & Graph
+*
+* Track & Graph is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Track & Graph is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+*/
 package com.samco.trackandgraph.adddatapoint
 
 import androidx.lifecycle.*
@@ -13,6 +29,7 @@ import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
@@ -58,11 +75,11 @@ interface AddDataPointsViewModel {
     val skipButtonVisible: LiveData<Boolean>
     val dataPointPages: LiveData<Int>
     val currentPageIndex: LiveData<Int>
+    val tutorialViewModel: AddDataPointTutorialViewModel
 
     fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel>
 
     fun onTutorialButtonPressed()
-    fun onSkipTutorialButtonPressed()
 
     fun onCancelClicked()
     fun onSkipClicked()
@@ -99,26 +116,30 @@ class AddDataPointsViewModelImpl @Inject constructor(
     private val configFlow = MutableStateFlow<List<Config>>(emptyList())
     private val indexFlow = MutableStateFlow(0)
     override val dismiss = MutableLiveData(false)
-
     private val tutorialButtonPresses = MutableSharedFlow<Unit>()
-    private val skipTutorialButtonPresses = MutableSharedFlow<Unit>()
+
+
+    override val tutorialViewModel = AddDataPointTutorialViewModelImpl()
 
     //Show the tutorial if the user has no data or if they have pressed the tutorial button
     override val showTutorial: LiveData<Boolean> = merge(
         tutorialButtonPresses.map { true }
             .onStart { emit(!prefHelper.getHideDataPointTutorial()) },
-        skipTutorialButtonPresses.map { false }
-    ).shareIn(viewModelScope, SharingStarted.Eagerly, 1)
+        tutorialViewModel.onTutorialComplete.map { false }
+    )
+        .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
         .asLiveData(viewModelScope.coroutineContext)
 
+    init {
+        viewModelScope.launch {
+            tutorialViewModel.onTutorialComplete.collect {
+                prefHelper.setHideDataPointTutorial(true)
+            }
+        }
+    }
 
     override fun onTutorialButtonPressed() {
         viewModelScope.launch { tutorialButtonPresses.emit(Unit) }
-    }
-
-    override fun onSkipTutorialButtonPressed() {
-        prefHelper.setHideDataPointTutorial(true)
-        viewModelScope.launch { skipTutorialButtonPresses.emit(Unit) }
     }
 
     override val dataPointPages = configFlow
@@ -137,6 +158,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         .map { it.getOrNull(pageIndex) }
         .filterNotNull()
         .asLiveData(viewModelScope.coroutineContext)
+
 
     private fun getViewModel(config: Config): AddDataPointViewModel {
         return when (config.tracker.dataType) {
@@ -372,5 +394,10 @@ class AddDataPointsViewModelImpl @Inject constructor(
             customInitialValue ?: dataPoint?.value,
             dataPoint?.note
         )
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        tutorialViewModel.cancel()
     }
 }
