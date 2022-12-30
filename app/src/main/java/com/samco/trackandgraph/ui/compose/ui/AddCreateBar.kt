@@ -55,17 +55,16 @@ fun AddCreateBar(
                 .fillMaxWidth()
         )
 
-        Button(
+        val buttonText =
+            if (isUpdateMode) stringResource(id = R.string.update)
+            else stringResource(id = R.string.create)
+
+        FilledButton(
+            text = buttonText,
             onClick = onCreateUpdateClicked,
-            shape = MaterialTheme.shapes.small,
             enabled = errorText == null,
             modifier = Modifier.padding(end = dimensionResource(id = R.dimen.card_margin_small))
-        ) {
-            val buttonText =
-                if (isUpdateMode) stringResource(id = R.string.update)
-                else stringResource(id = R.string.create)
-            Text(buttonText)
-        }
+        )
     }
 }
 

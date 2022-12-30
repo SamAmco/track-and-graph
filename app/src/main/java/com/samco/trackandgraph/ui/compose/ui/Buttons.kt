@@ -1,15 +1,88 @@
+/*
+* This file is part of Track & Graph
+*
+* Track & Graph is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Track & Graph is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+*/
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.tngColors
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+
+@Composable
+fun AddANoteButton(
+    onClick: () -> Unit
+) = TextButton(
+    onClick = onClick,
+    colors = ButtonDefaults.textButtonColors(
+        contentColor = MaterialTheme.tngColors.onSurface
+    )
+) {
+    Icon(
+        painter = painterResource(id = R.drawable.edit_icon),
+        contentDescription = stringResource(id = R.string.add_a_note)
+    )
+    Text(
+        text = stringResource(id = R.string.add_a_note),
+        fontSize = MaterialTheme.typography.body1.fontSize,
+        fontWeight = MaterialTheme.typography.body1.fontWeight,
+    )
+}
+
+@Composable
+fun FilledButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    enabled: Boolean = true
+) {
+    Button(
+        modifier = modifier,
+        onClick = onClick,
+        enabled = enabled,
+        shape = MaterialTheme.shapes.small,
+    ) {
+        Text(text = text)
+    }
+}
+
+@Composable
+fun WideButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    enabled: Boolean = true
+) = FilledButton(
+    text = text,
+    modifier = modifier.fillMaxWidth(),
+    onClick = onClick,
+    enabled = enabled
+)
+
 
 @Composable
 fun SmallTextButton(

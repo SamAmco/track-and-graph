@@ -360,4 +360,12 @@
     <string name="to_colon">To:</string>
     <string name="value_equals">Value =</string>
     <string name="label_equals">Label =</string>
+    <string name="adding_your_first_data_point">A quick tutorial on adding data points:</string>
+    <string name="next">Next</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Each data point has a timestamp and a value: </string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">It can also optionally have a label and a note: </string>
+    <string name="data_point_tutorial_page_2_description">The value is a number so you can see how your data is changing over time</string>
+    <string name="data_point_tutorial_page_2_hint">(Hint: If you don\'t care about the value just use the default value of 1)</string>
+    <string name="data_point_tutorial_page_3_description">Use labels if you want to group the data points</string>
+    <string name="data_point_tutorial_page_3_hint">(Hint: If you want to add more context or description use the note instead of the label field)</string>
 </resources>
