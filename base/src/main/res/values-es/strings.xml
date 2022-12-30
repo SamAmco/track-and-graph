@@ -41,7 +41,6 @@
     <string name="discrete_tracker_needs_at_least_two_values">Por favor, añade al menos dos respuestas de opción múltiple</string>
     <string name="data_points">%1$d trazado</string>
     <string name="no_data">Sin datos</string>
-    <string name="add_data_point_hint">Introducir un valor para:</string>
     <string name="skip">Saltar</string>
     <string name="exportButton">Exportar</string>
     <string name="importButton">Importar</string>
