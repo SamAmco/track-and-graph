@@ -41,7 +41,6 @@
     <string name="discrete_tracker_needs_at_least_two_values">Bitte fügen Sie mindestens zwei Multiple-Choice-Antworten hinzu</string>
     <string name="data_points">%1$d Getrackt</string>
     <string name="no_data">Keine Daten</string>
-    <string name="add_data_point_hint">Einen Wert eingeben für:</string>
     <string name="skip">Überspringen</string>
     <string name="exportButton">Exportieren</string>
     <string name="importButton">Importieren</string>

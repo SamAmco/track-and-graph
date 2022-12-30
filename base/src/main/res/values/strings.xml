@@ -49,7 +49,6 @@
     <string name="discrete_tracker_needs_at_least_two_values">Please add at least two multiple choice answers</string>
     <string name="data_points">%1$d Tracked</string>
     <string name="no_data">No Data</string>
-    <string name="add_data_point_hint">Enter a value for:</string>
     <string name="skip">Skip</string>
     <string name="exportButton">Export</string>
     <string name="importButton">Import</string>
@@ -368,4 +367,5 @@
     <string name="data_point_tutorial_page_2_hint">(Hint: If you don\'t care about the value just use the default value of 1)</string>
     <string name="data_point_tutorial_page_3_description">Use labels if you want to group the data points</string>
     <string name="data_point_tutorial_page_3_hint">(Hint: If you want to add more context or description use the note instead of the label field)</string>
+    <string name="help">Help</string>
 </resources>

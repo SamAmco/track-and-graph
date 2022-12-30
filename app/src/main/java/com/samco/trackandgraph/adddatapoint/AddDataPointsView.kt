@@ -32,6 +32,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -52,12 +53,7 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
             .heightIn(max = 400.dp)
             .fillMaxWidth()
             .background(color = MaterialTheme.tngColors.surface)
-            .padding(
-                start = dimensionResource(id = R.dimen.card_padding),
-                end = dimensionResource(id = R.dimen.card_padding),
-                top = dimensionResource(id = R.dimen.input_spacing_large),
-                bottom = dimensionResource(id = R.dimen.card_padding)
-            )
+            .padding(dimensionResource(id = R.dimen.card_padding))
     ) {
         val showTutorial by viewModel.showTutorial.observeAsState(false)
         if (showTutorial) AddDataPointsTutorial(viewModel.tutorialViewModel)
@@ -69,8 +65,6 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
 @Composable
 private fun ColumnScope.DataPointInputView(viewModel: AddDataPointsViewModel) {
     HintHeader(viewModel)
-
-    SpacingLarge()
 
     TrackerPager(Modifier.weight(1f, true), viewModel)
 
@@ -148,8 +142,6 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
         val focusManager = LocalFocusManager.current
         val valueFocusRequester = remember { FocusRequester() }
-
-        SpacingLarge()
 
         TrackerNameHeadline(name = viewModel.name.observeAsState("").value)
 
@@ -302,17 +294,23 @@ private fun NoteInput(viewModel: AddDataPointViewModel) =
 
 @Composable
 private fun HintHeader(viewModel: AddDataPointsViewModel) =
-    Row(modifier = Modifier.fillMaxWidth()) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = stringResource(id = R.string.add_data_point_hint),
-            fontSize = MaterialTheme.typography.body1.fontSize,
-            fontWeight = MaterialTheme.typography.body1.fontWeight,
-        )
-        Text(
             text = viewModel.indexText.observeAsState("").value,
             fontSize = MaterialTheme.typography.body1.fontSize,
             fontWeight = MaterialTheme.typography.body1.fontWeight,
         )
+        //Faq vecotor icon as a button
+        IconButton(onClick = { viewModel.onTutorialButtonPressed() }) {
+            Icon(
+                painter = painterResource(id = R.drawable.faq_icon),
+                contentDescription = stringResource(id = R.string.help),
+                tint = MaterialTheme.colors.onSurface
+            )
+        }
     }
 
