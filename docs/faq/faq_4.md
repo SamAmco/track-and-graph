@@ -16,7 +16,7 @@ Because our wheat values are multiple choice answers ranging from 0–2 and our 
 
 Next we click the FINISH button to complete the setup. Notice how our new graph appears as a card in our group:
 
-![faq_image_4_7](images/faq_image_4_7.jpg)
+![faq_image_4_7](images/faq_image_4_7.png)
 
 To explore the graph in more detail you can tap the card to open it in a full screen view and then pinch and drag the lines:
 
