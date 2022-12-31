@@ -1,6 +1,10 @@
 # How do notes work?
 
-Notes allow you to keep track of qualitative data alongside your quantitative data. There are two types of notes:\n\n• Global notes (added directly in the notes menu)\n\n• Data point notes (attached to specific data points)\n\nWhen adding a data point you may wish to track an important piece of information specific to that data set. For example:
+Notes allow you to keep track of qualitative data alongside your quantitative data. There are two types of notes:
+- Global notes (added directly in the notes menu)
+- Data point notes (attached to specific data points)
+
+When adding a data point you may wish to track an important piece of information specific to that data set. For example:
 
 ![faq_image_6_1](images/faq_image_6_1.jpg)
 

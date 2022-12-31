@@ -10,4 +10,4 @@ And then you tracked some data as follows:
 
 You could then visualise that data using either a line graph over time or using a pie chart as below:
 
-![faq_image_3_3](images/faq_image_3_3.jpg)
+![faq_image_3_3](images/faq_image_3_3.png)
