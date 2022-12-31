@@ -16,26 +16,23 @@
 */
 package com.samco.trackandgraph.faq
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
+import androidx.navigation.findNavController
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.databinding.Faq4Binding
 
-class FAQ4Fragment : Fragment() {
+class FAQRedirectFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return Faq4Binding.inflate(inflater, container, false).root
-    }
-
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(
-            NavButtonStyle.UP,
-            getString(R.string.faq_4)
-        )
+        val navController = container?.findNavController()
+        val url = getString(R.string.faq_page_link)
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(browserIntent)
+        navController?.popBackStack()
+        return super.onCreateView(inflater, container, savedInstanceState)
     }
 }
