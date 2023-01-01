@@ -36,9 +36,9 @@ import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 data class SuggestedValueViewData(
-    val value: Double,
-    val valueStr: String,
-    val label: String
+    val value: Double?,
+    val valueStr: String?,
+    val label: String?
 )
 
 interface AddDataPointBaseViewModel {
@@ -178,27 +178,25 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override val note = MutableLiveData(config.note ?: "")
         override val selectedSuggestedValue = MutableLiveData<SuggestedValueViewData?>(null)
 
-        override val suggestedValues: LiveData<List<SuggestedValueViewData>> =
-            flow {
-                emit(
-                    suggestedValueHelper
-                        .getSuggestedValues(config.tracker)
-                        .map {
-                            SuggestedValueViewData(
-                                it.value,
-                                getValueString(it.value, config.tracker.dataType.isDuration()),
-                                it.label
-                            )
-                        }
-                )
+        override val suggestedValues: LiveData<List<SuggestedValueViewData>> = suggestedValueHelper
+            .getSuggestedValues(config.tracker)
+            .map { list ->
+                list.map {
+                    SuggestedValueViewData(
+                        it.value,
+                        getValueString(it.value, config.tracker.dataType.isDuration()),
+                        it.label
+                    )
+                }
             }
-                .flowOn(io)
-                .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-                .asLiveData(viewModelScope.coroutineContext)
+            .flowOn(io)
+            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+            .asLiveData(viewModelScope.coroutineContext)
 
-        private fun getValueString(value: Double, isDuration: Boolean): String {
-            return if (isDuration) formatTimeDuration(value.toLong())
-            else doubleFormatter.format(value)
+        private fun getValueString(value: Double?, isDuration: Boolean): String? = when {
+            value == null -> null
+            isDuration -> formatTimeDuration(value.toLong())
+            else -> doubleFormatter.format(value)
         }
 
         override fun getTracker() = config.tracker
@@ -217,11 +215,11 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
 
         override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
-            this.label.value = suggestedValue.label
+            suggestedValue.label?.let { this.label.value = it }
         }
 
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
-            this.label.value = suggestedValue.label
+            suggestedValue.label?.let { this.label.value = it }
             this.selectedSuggestedValue.value = suggestedValue
             onAddClicked()
         }
@@ -242,12 +240,12 @@ class AddDataPointsViewModelImpl @Inject constructor(
             }
 
             override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
-                this.lastInput.value = suggestedValue.value.toString()
+                suggestedValue.value?.let { this.lastInput.value = it.toString() }
                 super.onSuggestedValueSelected(suggestedValue)
             }
 
             override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
-                this.lastInput.value = suggestedValue.value.toString()
+                suggestedValue.value?.let { this.lastInput.value = it.toString() }
                 super.onSuggestedValueLongPress(suggestedValue)
             }
         }
@@ -276,12 +274,12 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
 
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
-            this.setDurationFromDouble(suggestedValue.value)
+            suggestedValue.value?.let { this.setDurationFromDouble(it) }
             super.onSuggestedValueSelected(suggestedValue)
         }
 
         override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
-            this.setDurationFromDouble(suggestedValue.value)
+            suggestedValue.value?.let { this.setDurationFromDouble(it) }
             super.onSuggestedValueLongPress(suggestedValue)
         }
     }

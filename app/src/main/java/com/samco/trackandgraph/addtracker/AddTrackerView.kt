@@ -178,7 +178,7 @@ fun SuggestionType(viewModel: AddTrackerViewModel) {
         TrackerSuggestionType.LABEL_ONLY to stringResource(R.string.label_only)
     )
 
-    LabeledRow(label = stringResource(id = R.string.suggestion_order)) {
+    LabeledRow(label = stringResource(id = R.string.suggestion_type)) {
         TextMapSpinner(
             strings = suggestionTypeMap,
             selectedItem = selectedSuggestionType,
@@ -201,7 +201,7 @@ fun SuggestionOrder(viewModel: AddTrackerViewModel) {
         TrackerSuggestionOrder.OLDEST to stringResource(R.string.oldest)
     )
 
-    LabeledRow(label = stringResource(id = R.string.suggestion_type)) {
+    LabeledRow(label = stringResource(id = R.string.suggestion_order)) {
         TextMapSpinner(
             strings = suggestionOrderMap,
             selectedItem = selectedSuggestionOrder,

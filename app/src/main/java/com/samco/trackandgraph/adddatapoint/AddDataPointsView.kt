@@ -239,9 +239,13 @@ private fun SuggestedValues(
     ) {
         items(count = list.size, itemContent = { index ->
             val suggestedValue = list[index]
-            val text =
-                if (suggestedValue.label.isBlank()) suggestedValue.valueStr
+
+            //We should not be passed values with null for everything
+            val text: String =
+                if (suggestedValue.label.isNullOrBlank() && suggestedValue.valueStr != null) suggestedValue.valueStr
+                else if (suggestedValue.valueStr.isNullOrBlank() && suggestedValue.label != null) suggestedValue.label
                 else "${suggestedValue.valueStr} : ${suggestedValue.label}"
+
             TextChip(
                 text = text,
                 isSelected = suggestedValue == selectedItem,
