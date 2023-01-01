@@ -4,6 +4,8 @@ import androidx.lifecycle.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionOrder
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.TrackerHelper
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -35,6 +37,8 @@ interface AddTrackerViewModel : DurationInputViewModel {
     val shouldShowDurationConversionModeSpinner: LiveData<Boolean>
     val isUpdateMode: LiveData<Boolean>
     val showUpdateWarningAlertDialog: LiveData<Boolean>
+    val suggestionType: LiveData<TrackerSuggestionType>
+    val suggestionOrder: LiveData<TrackerSuggestionOrder>
 
     //Inputs
     fun onTrackerNameChanged(name: String)
@@ -47,8 +51,11 @@ interface AddTrackerViewModel : DurationInputViewModel {
     fun onConfirmUpdate()
     fun onDismissUpdateWarningCancel()
     fun onCreateUpdateClicked()
+    fun onSuggestionTypeChanged(suggestionType: TrackerSuggestionType)
+    fun onSuggestionOrderChanged(suggestionOrder: TrackerSuggestionOrder)
 }
 
+//TODO so much mutable state :/ ugly
 @HiltViewModel
 class AddTrackerViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
@@ -79,6 +86,9 @@ class AddTrackerViewModelImpl @Inject constructor(
     override val isUpdateMode: LiveData<Boolean> =
         isUpdateModeFlow.asLiveData(viewModelScope.coroutineContext)
     override val showUpdateWarningAlertDialog = MutableLiveData(false)
+
+    override val suggestionType = MutableLiveData(TrackerSuggestionType.VALUE_AND_LABEL)
+    override val suggestionOrder = MutableLiveData(TrackerSuggestionOrder.VALUE_ASCENDING)
 
     private val validationErrorFlow = trackerNameFlow.map {
         when {
@@ -139,6 +149,8 @@ class AddTrackerViewModelImpl @Inject constructor(
         hasDefaultValue.value = tracker.hasDefaultValue
         defaultValue.value = tracker.defaultValue.toString()
         defaultLabel.value = tracker.defaultLabel
+        suggestionType.value = tracker.suggestionType
+        suggestionOrder.value = tracker.suggestionOrder
         isUpdateModeFlow.value = true
     }
 
@@ -200,6 +212,14 @@ class AddTrackerViewModelImpl @Inject constructor(
         }
     }
 
+    override fun onSuggestionTypeChanged(suggestionType: TrackerSuggestionType) {
+        this.suggestionType.value = suggestionType
+    }
+
+    override fun onSuggestionOrderChanged(suggestionOrder: TrackerSuggestionOrder) {
+        this.suggestionOrder.value = suggestionOrder
+    }
+
     private fun getDataType() = when (isDuration.value) {
         true -> DataType.DURATION
         else -> DataType.CONTINUOUS
@@ -219,7 +239,9 @@ class AddTrackerViewModelImpl @Inject constructor(
             hasDefaultValue = hasDefaultValue.value,
             defaultValue = getDefaultValue(),
             featureDescription = trackerDescription.value,
-            defaultLabel = defaultLabel.value
+            defaultLabel = defaultLabel.value,
+            suggestionType = suggestionType.value,
+            suggestionOrder = suggestionOrder.value
         )
     }
 

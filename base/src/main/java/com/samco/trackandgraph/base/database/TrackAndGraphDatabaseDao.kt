@@ -39,7 +39,9 @@ private const val getTrackersQuery = """
         trackers_table.type as type,
         trackers_table.has_default_value as has_default_value,
         trackers_table.default_value as default_value,
-        trackers_table.default_label as default_label
+        trackers_table.default_label as default_label,
+        trackers_table.suggestion_type as suggestion_type,
+        trackers_table.suggestion_order as suggestion_order
     FROM trackers_table
     LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
             """
@@ -142,7 +144,9 @@ internal interface TrackAndGraphDatabaseDao {
                 trackers_table.type as type,
                 trackers_table.has_default_value as has_default_value,
                 trackers_table.default_value as default_value,
-                trackers_table.default_label as default_label
+                trackers_table.default_label as default_label,
+                trackers_table.suggestion_order as suggestion_order,
+                trackers_table.suggestion_type as suggestion_type
             FROM trackers_table
             LEFT JOIN features_table ON features_table.id = trackers_table.feature_id
             WHERE features_table.group_id = :groupId ORDER BY features_table.display_index ASC

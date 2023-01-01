@@ -18,16 +18,10 @@
 
 package com.samco.trackandgraph.ui.compose.ui
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.res.dimensionResource
-import com.samco.trackandgraph.R
 
 @Composable
 fun <T> TextMapSpinner(
@@ -40,18 +34,12 @@ fun <T> TextMapSpinner(
         selectedItem = selectedItem,
         onItemSelected = onItemSelected,
         selectedItemFactory = { modifier, item, expanded ->
-            Row(
-                modifier = modifier
-                    .padding(dimensionResource(id = R.dimen.card_padding)),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = strings[item] ?: "",
-                    fontSize = MaterialTheme.typography.subtitle2.fontSize,
-                    fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
-                )
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
-            }
+            Text(
+                modifier = modifier,
+                text = strings[item] ?: "",
+                fontSize = MaterialTheme.typography.subtitle2.fontSize,
+                fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
+            )
         },
         dropdownItemFactory = { item, _ ->
             Text(

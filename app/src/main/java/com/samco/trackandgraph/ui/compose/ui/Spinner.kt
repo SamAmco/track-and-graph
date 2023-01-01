@@ -14,18 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import com.samco.trackandgraph.R
 
 @Composable
 fun <T> Spinner(
@@ -40,11 +44,15 @@ fun <T> Spinner(
     var expanded: Boolean by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
-        selectedItemFactory(
-            Modifier.clickable { expanded = true },
-            selectedItem,
-            expanded
-        )
+        Row(
+            modifier = modifier
+                .padding(dimensionResource(id = R.dimen.card_padding))
+                .clickable { expanded = !expanded },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            selectedItemFactory(Modifier, selectedItem, expanded)
+            ExposedDropdownMenuDefaults.TrailingIcon(expanded) { expanded = !expanded }
+        }
 
         DropdownMenu(
             expanded = expanded,
