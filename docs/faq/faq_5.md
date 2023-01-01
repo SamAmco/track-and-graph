@@ -1,48 +1,23 @@
-# How are moving averages and plot totals calculated?
+# How do notes work?
 
-Moving averages:
+Notes allow you to keep track of qualitative data alongside your quantitative data. There are two types of notes:
+- Global notes (added directly in the notes menu)
+- Data point notes (attached to specific data points)
 
-Suppose we want to track something simply as a yes or no question, for example:
+When adding a data point you may wish to track an important piece of information specific to that data set. For example:
 
-![faq_image_5_1](images/faq_image_5_1.jpg)
+![faq_image_6_1](images/faq_image_6_1.jpg)
 
-If we were to track this data over time without using a moving average it might look like this:
+After adding this note you will notice it shows up in a list underneath any graph of that data set. If you tap the note it will open in a dialog window and a marker will be added to the graph.
 
-![faq_image_5_2](images/faq_image_5_2.jpg)
+![faq_image_6_2](images/faq_image_6_2.jpg)
 
-This output is very accurate but not very helpful. To make it easier to understand the data we could use a monthly moving average:
+However some pieces of information might be relevant to all your data. In this case you can add a global note by tapping the plus button in the global notes menu:
 
-![faq_image_5_3](images/faq_image_5_3.png)
+![faq_image_6_3](images/faq_image_6_3.jpg)
 
-Now instead of plotting each data point with the recorded Y value (0 or 1), each Y value is calculated as the mean of itself and all previous data points within the selected time range prior.
+You will notice this note now shows up underneath all graphs.
 
-Generally speaking the longer the selected averaging period the smoother the curve will appear. However note that moving averages are lagging indicators. The longer the averaging period, the further behind the real value the curve will lag.
+![faq_image_6_4](images/faq_image_6_4.jpg)
 
-Plot totals:
-
-Some things you may only want to track rarely. For example, you may want to track when you finish reading a book:
-
-![faq_image_5_4](images/faq_image_5_4.jpg)
-
-Suppose you tracked the following:
-
-![faq_image_5_5](images/faq_image_5_5.jpg)
-
-You may or may not then be surprised to find that your graph appears as follows:
-
-![faq_image_5_6](images/faq_image_5_6.png)
-
-The problem is that lines are drawn only from each plotted value to the next plotted value. Since all plotted values are interpreted as 1 you only see a straight line at the point 1 on the Y axis.
-
-We can fix this using plot totals. For example if we plot monthly totals we would see the following graph:
-
-![faq_image_5_7](images/faq_image_5_7.png)
-
-Notice a point is plotted at the end of each month representing the total of all tracked values in that month.
-
-You can use scale, offset, averaging and totals all at once. The order of precedence is as follows:
-
-- First your data is converted to totals
-- Then each point is converted to its moving average
-- Then your points are multiplied by the scale value
-- Finally the offset is added to each point
+You can edit or delete any note from the notes menu. Deleting a data point note from the notes menu will not delete the data point its self, just the attached note.
