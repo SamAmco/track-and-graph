@@ -134,7 +134,9 @@ internal class DataInteractorImpl @Inject constructor(
         hasDefaultValue: Boolean?,
         defaultValue: Double?,
         defaultLabel: String?,
-        featureDescription: String?
+        featureDescription: String?,
+        suggestionType: TrackerSuggestionType?,
+        suggestionOrder: TrackerSuggestionOrder?
     ) = withContext(io) {
         trackerHelper.updateTracker(
             oldTracker = oldTracker,
@@ -144,7 +146,9 @@ internal class DataInteractorImpl @Inject constructor(
             hasDefaultValue = hasDefaultValue,
             defaultValue = defaultValue,
             defaultLabel = defaultLabel,
-            featureDescription = featureDescription
+            featureDescription = featureDescription,
+            suggestionType = suggestionType,
+            suggestionOrder = suggestionOrder
         ).also {
             serviceManager.requestWidgetUpdatesForFeatureId(featureId = oldTracker.featureId)
             dataUpdateEvents.emit(Unit)

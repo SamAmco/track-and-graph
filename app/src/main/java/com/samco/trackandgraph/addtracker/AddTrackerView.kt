@@ -16,85 +16,37 @@
  */
 package com.samco.trackandgraph.addtracker
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.*
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionOrder
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.base.model.TrackerHelper
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.*
-
-@Composable
-@Preview(showBackground = true, device = Devices.PIXEL_3)
-fun AddTrackerView() {
-    TnGComposeTheme {
-        AddTrackerView(viewModel = object : AddTrackerViewModel {
-            override val trackerName = MutableLiveData("Tracker name")
-            override val trackerDescription = MutableLiveData("Tracker description")
-            override val isDuration = MutableLiveData(false)
-            override val isLoading = MutableLiveData(false)
-            override val hasDefaultValue = MutableLiveData(true)
-            override val defaultValue = MutableLiveData("1.0")
-            override val defaultLabel = MutableLiveData("")
-            override val createButtonEnabled = MutableLiveData(false)
-            override val errorText: LiveData<Int?> = MutableLiveData(null)
-            override val durationNumericConversionMode =
-                MutableLiveData(TrackerHelper.DurationNumericConversionMode.HOURS)
-            override val shouldShowDurationConversionModeSpinner = MutableLiveData(true)
-            override val isUpdateMode = MutableLiveData(true)
-            override val showUpdateWarningAlertDialog = MutableLiveData(false)
-            override val hours = MutableLiveData("")
-            override val minutes = MutableLiveData("")
-            override val seconds = MutableLiveData("")
-
-            override fun onTrackerNameChanged(name: String) {}
-
-            override fun onTrackerDescriptionChanged(description: String) {}
-
-            override fun onIsDurationCheckChanged(isDuration: Boolean) {}
-
-            override fun onHasDefaultValueChanged(hasDefaultValue: Boolean) {}
-
-            override fun onDefaultValueChanged(defaultValue: String) {}
-
-            override fun onDefaultLabelChanged(defaultLabel: String) {}
-
-            override fun onDurationNumericConversionModeChanged(durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode) {}
-
-            override fun onConfirmUpdate() {}
-
-            override fun onDismissUpdateWarningCancel() {}
-
-            override fun onCreateUpdateClicked() {}
-
-            override fun setHours(value: String) {}
-
-            override fun setMinutes(value: String) {}
-
-            override fun setSeconds(value: String) {}
-
-            override fun setDurationFromDouble(value: Double) { }
-
-            override fun getDurationAsDouble() = 0.0
-        })
-    }
-}
 
 @Composable
 fun AddTrackerView(viewModel: AddTrackerViewModel) {
@@ -155,9 +107,6 @@ private fun AddTrackerInputForm(
     val keyboardController = LocalSoftwareKeyboardController.current
 
     val isDuration = viewModel.isDuration.observeAsState(false)
-    val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(true)
-    val defaultValue = viewModel.defaultValue.observeAsState("")
-    val defaultLabel = viewModel.defaultLabel.observeAsState("")
 
     SpacingSmall()
 
@@ -192,6 +141,120 @@ private fun AddTrackerInputForm(
 
     SpacingLarge()
 
+    AdvancedOptions(viewModel)
+}
+
+@Composable
+private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
+
+    var advancedOptionsExpanded by rememberSaveable { mutableStateOf(false) }
+
+    AdvancedSectionHeader(advancedOptionsExpanded) {
+        advancedOptionsExpanded = !advancedOptionsExpanded
+    }
+
+    AnimatedVisibility(visible = advancedOptionsExpanded) {
+        Column {
+            SpacingSmall()
+
+            DefaultValueOptions(viewModel)
+
+            SpacingLarge()
+
+            SuggestionOrder(viewModel)
+
+            SuggestionType(viewModel)
+        }
+    }
+}
+
+@Composable
+fun SuggestionType(viewModel: AddTrackerViewModel) {
+    val selectedSuggestionType by viewModel.suggestionType.observeAsState(TrackerSuggestionType.VALUE_AND_LABEL)
+
+    val suggestionTypeMap = mapOf(
+        TrackerSuggestionType.VALUE_AND_LABEL to stringResource(R.string.value_and_label),
+        TrackerSuggestionType.VALUE_ONLY to stringResource(R.string.value_only),
+        TrackerSuggestionType.LABEL_ONLY to stringResource(R.string.label_only)
+    )
+
+    LabeledRow(label = stringResource(id = R.string.suggestion_order)) {
+        TextMapSpinner(
+            strings = suggestionTypeMap,
+            selectedItem = selectedSuggestionType,
+            onItemSelected = { viewModel.onSuggestionTypeChanged(it) }
+        )
+    }
+}
+
+@Composable
+fun SuggestionOrder(viewModel: AddTrackerViewModel) {
+
+    val selectedSuggestionOrder by viewModel.suggestionOrder.observeAsState(TrackerSuggestionOrder.VALUE_ASCENDING)
+
+    val suggestionOrderMap = mapOf(
+        TrackerSuggestionOrder.VALUE_ASCENDING to stringResource(R.string.value_ascending),
+        TrackerSuggestionOrder.VALUE_DESCENDING to stringResource(R.string.value_descending),
+        TrackerSuggestionOrder.LABEL_ASCENDING to stringResource(R.string.label_ascending),
+        TrackerSuggestionOrder.LABEL_DESCENDING to stringResource(R.string.label_descending),
+        TrackerSuggestionOrder.LATEST to stringResource(R.string.latest),
+        TrackerSuggestionOrder.OLDEST to stringResource(R.string.oldest)
+    )
+
+    LabeledRow(label = stringResource(id = R.string.suggestion_type)) {
+        TextMapSpinner(
+            strings = suggestionOrderMap,
+            selectedItem = selectedSuggestionOrder,
+            onItemSelected = { viewModel.onSuggestionOrderChanged(it) }
+        )
+    }
+}
+
+@Composable
+private fun AdvancedSectionHeader(
+    expanded: Boolean,
+    onClick: () -> Unit = {}
+) = Row(
+    modifier = Modifier.clickable(
+        onClick = onClick,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = null
+    ),
+    verticalAlignment = Alignment.CenterVertically
+) {
+    Divider()
+    SpacingSmall()
+    Text(
+        text = stringResource(id = R.string.advanced_options),
+        style = MaterialTheme.typography.subtitle1
+    )
+    Icon(
+        modifier = Modifier.rotate(if (expanded) 180f else 0f),
+        painter = painterResource(id = R.drawable.down_arrow),
+        contentDescription = null
+    )
+    SpacingSmall()
+    Divider()
+}
+
+@Composable
+private fun RowScope.Divider() {
+    Box(
+        modifier = Modifier
+            .weight(1f)
+            .height(1.dp)
+            .background(MaterialTheme.colors.onSurface.copy(alpha = 0.2f))
+    )
+}
+
+@Composable
+private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
+    val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(false)
+    val defaultValue = viewModel.defaultValue.observeAsState("")
+    val defaultLabel = viewModel.defaultLabel.observeAsState("")
+    val isDuration = viewModel.isDuration.observeAsState(false)
+
+    val focusManager = LocalFocusManager.current
     DefaultValueCheckbox(hasDefaultValue.value, viewModel)
 
     if (hasDefaultValue.value) {

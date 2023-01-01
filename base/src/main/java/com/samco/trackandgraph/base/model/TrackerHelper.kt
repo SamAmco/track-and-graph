@@ -50,7 +50,9 @@ interface TrackerHelper {
         hasDefaultValue: Boolean? = null,
         defaultValue: Double? = null,
         defaultLabel: String?,
-        featureDescription: String? = null
+        featureDescription: String? = null,
+        suggestionType: TrackerSuggestionType?,
+        suggestionOrder: TrackerSuggestionOrder?
     )
 
     suspend fun getTrackersByIdsSync(trackerIds: List<Long>): List<Tracker>

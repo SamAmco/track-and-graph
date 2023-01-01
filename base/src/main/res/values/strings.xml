@@ -370,4 +370,17 @@
     <string name="help">Help</string>
     <!--<string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/docs/faq/faq.md</string>-->
     <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/faq.md</string>
+    <string name="advanced_options">Advanced options</string>
+    <string name="suggestion_type">"Suggestion type: "</string>
+    <string name="suggestion_order">"Suggestion order: "</string>
+    <string name="value_and_label">Value and label</string>
+    <string name="value_only">Value only</string>
+    <string name="label_only">Label only</string>
+    <string name="value_ascending">Value ascending</string>
+    <string name="value_descending">Value descending</string>
+    <string name="label_ascending">Label ascending</string>
+    <string name="label_descending">Label descending</string>
+    <string name="latest">Latest</string>
+    <string name="oldest">Oldest</string>
+
 </resources>

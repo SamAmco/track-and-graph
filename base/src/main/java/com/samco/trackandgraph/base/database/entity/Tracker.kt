@@ -23,6 +23,21 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.DataType
 
+internal enum class TrackerSuggestionType {
+    VALUE_AND_LABEL,
+    VALUE_ONLY,
+    LABEL_ONLY
+}
+
+internal enum class TrackerSuggestionOrder {
+    VALUE_ASCENDING,
+    VALUE_DESCENDING,
+    LABEL_ASCENDING,
+    LABEL_DESCENDING,
+    LATEST,
+    OLDEST,
+}
+
 @Entity(
     tableName = "trackers_table",
     foreignKeys = [ForeignKey(
@@ -50,5 +65,11 @@ internal data class Tracker(
     val defaultValue: Double,
 
     @ColumnInfo(name = "default_label")
-    val defaultLabel: String
+    val defaultLabel: String,
+
+    @ColumnInfo(name = "suggestion_type")
+    val suggestionType: TrackerSuggestionType,
+
+    @ColumnInfo(name = "suggestion_order")
+    val suggestionOrder: TrackerSuggestionOrder
 )
