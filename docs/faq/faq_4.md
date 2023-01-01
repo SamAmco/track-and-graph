@@ -1,27 +1,48 @@
-# How do I start creating graphs?
+# How are moving averages and plot totals calculated?
 
-To begin creating graphs you will need to first have some data tracked. Then go to the group where you want to create your graph, tap + in the top right and then select Graph or Statistic.
+Moving averages:
 
-![faq_image_4_1](images/faq_image_4_1.jpg)
+Suppose we want to track something simply as a yes or no question, for example:
 
-Begin by entering a name for your new graph and then select a graph type. Here we will demonstrate the line graph since other graph types are relatively trivial to set up. One caveat to note however is that you can only create pie charts from multiple choice data.
+![faq_image_5_1](images/faq_image_5_1.jpg)
 
-![faq_image_4_5](images/faq_image_4_5.jpg)
+If we were to track this data over time without using a moving average it might look like this:
 
-The Dynamic range style will automatically calculate the min and max value for the Y axis. Now we will add some lines to our graph by using the + button at the bottom:
+![faq_image_5_2](images/faq_image_5_2.jpg)
 
-![faq_image_4_6](images/faq_image_4_6.jpg)
+This output is very accurate but not very helpful. To make it easier to understand the data we could use a monthly moving average:
 
-Because our wheat values are multiple choice answers ranging from 0–2 and our stomach pain values are numbers ranging from 1–8 we have multiplied our wheat values by 4 to make the ranges similar. We have used a three day moving average to smooth out anomalies and reduce noise in the output graph. We have also selected plot when tracked because this data was tracked relatively consistently. You can read more about how these settings affect line graphs in the FAQ: “How are moving averages and plot totals calculated?”
+![faq_image_5_3](images/faq_image_5_3.png)
 
-Next we click the FINISH button to complete the setup. Notice how our new graph appears as a card in our group:
+Now instead of plotting each data point with the recorded Y value (0 or 1), each Y value is calculated as the mean of itself and all previous data points within the selected time range prior.
 
-![faq_image_4_7](images/faq_image_4_7.png)
+Generally speaking the longer the selected averaging period the smoother the curve will appear. However note that moving averages are lagging indicators. The longer the averaging period, the further behind the real value the curve will lag.
 
-To explore the graph in more detail you can tap the card to open it in a full screen view and then pinch and drag the lines:
+Plot totals:
 
-![faq_image_4_8](images/faq_image_4_8.jpg)
+Some things you may only want to track rarely. For example, you may want to track when you finish reading a book:
 
-As we add more graphs and statistics to our group they appear as a list of cards. You can reorder them at any point by holding down and dragging a card to a new position.
+![faq_image_5_4](images/faq_image_5_4.jpg)
 
-![faq_image_4_9](images/faq_image_4_9.jpg)
+Suppose you tracked the following:
+
+![faq_image_5_5](images/faq_image_5_5.jpg)
+
+You may or may not then be surprised to find that your graph appears as follows:
+
+![faq_image_5_6](images/faq_image_5_6.png)
+
+The problem is that lines are drawn only from each plotted value to the next plotted value. Since all plotted values are interpreted as 1 you only see a straight line at the point 1 on the Y axis.
+
+We can fix this using plot totals. For example if we plot monthly totals we would see the following graph:
+
+![faq_image_5_7](images/faq_image_5_7.png)
+
+Notice a point is plotted at the end of each month representing the total of all tracked values in that month.
+
+You can use scale, offset, averaging and totals all at once. The order of precedence is as follows:
+
+- First your data is converted to totals
+- Then each point is converted to its moving average
+- Then your points are multiplied by the scale value
+- Finally the offset is added to each point

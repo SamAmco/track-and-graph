@@ -4,42 +4,47 @@ To begin tracking you will need to create a Tracker.
 
 ![faq_image_1_1](images/faq_image_1_1.jpg)
 
+As a minimum you will need to give your tracker a name. You can also optionally add a longer description. The description can later be seen via the context menu of the tracker.
 
-Type in the name of what you want to track and select an input style:
+### Gif of accessing the description
 
-![faq_image_1_4](images/faq_image_1_4.jpg)
+A Tracker holds a list of data points ordered by time. Each data point has the following information:
 
-There are three styles of input you can choose: 
+- A timestamp
+- A value 
+- An optional label
+- An optional note
 
-- Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.
-- Numerical will ask you to enter a number when tracking.
-- Time duration will ask you to enter an amount of time in hours, minutes and seconds when tracking. 
+The value is usually just a number, but it can also be a time or duration. If you check the box "This is a time or duration" you will be asked for values in hours, minutes and seconds and you will be able to start a timer using that tracker. Internally this information is still stored as a number (specifically the total number of seconds tracked).
 
-If you add a default value you will not be asked for a value every time you tap the + button and your default value will be used instead. You can long press the + button to provide a value manually.
+Labels and notes are both text inputs. Labels are useful for categorising data. For example if you wanted to track calories for breakfast, lunch, and dinner, you could track the calories in the value field and the word "breakfast", "lunch" or "dinner" in the label field. Use the note field to add more contextual information like "Today was my birthday so I ate lots of cake."
 
-To create multiple choice answers click the + button at the bottom.
+### Image of data input
 
-![faq_image_1_6](images/faq_image_1_6.png)
+Any previous values you have tracked will later appear as buttons on the tracker input dialog. If you press the button that value/label is tracked immediately. If you long press the button the tracker input is filled for you and you can edit it before adding that data point. This means you can create multiple choice style answers for your self.
 
+### Image of suggested values
 
-When you are happy with the setup click the FINISH button.
+Use groups to organise your trackers. You can move a tracker to a group using the trackers context menu:
 
-You should now see cards in your group. You can order them easily by holding down on the item you want to move and then dragging it to a new position.
+### Gif of moving a tracker
 
-![faq_image_1_7](images/faq_image_1_7.png)
+When you have multiple trackers in a group you can use the quick track button to quickly track them all at once:
 
+### Gif of quick tracking
 
-You can track things individually by using their + buttons or track everything in the group quickly by using the action button:
+You can also reorder items in a group by dragging them: 
 
-![faq_image_1_8](images/faq_image_1_8.png)
+### Gif of dragging a tracker to a new spot
 
+To view, edit and delete your data points tap on the center of a tracker:
 
-![faq_image_1_9](images/faq_image_1_9.jpg)
+### Gif of opening a trackers history
 
+You can edit all the data points for a tracker at once using the edit button in the top right. 
 
-![faq_image_1_10](images/faq_image_1_10.jpg)
+### WARNING: It is recommended that you back up your data before doing so as this will change all your data points at once and can not be undone.
 
+The "Where" section allows you to specify which data points you want to update. Any data points that match any of the input data will be updated. For example if you check value and input 56, then any data point that has a value of 56 will be updated. If you check label and input "Small" then any data point with the label "Small" will be updated (this is case sensitive so "Small" will not match "small"). If you check both value and label, then only data points with both the given value and the given label will be updated. 
 
-Don\'t worry if you make a mistake you can always see, review and edit your tracking history by simply tapping on the card.
-
-![faq_image_1_11](images/faq_image_1_11.jpg)
+### Gif of updating all
