@@ -219,6 +219,7 @@
             android:layout_marginBottom="@dimen/dialog_input_spacing"
             android:contentDescription="@string/add_line_button_content_description"
             app:icon="@drawable/add_icon"
+            app:iconTint="?colorOnSurface"
             app:iconGravity="textEnd"
             app:iconSize="22dp" />
 

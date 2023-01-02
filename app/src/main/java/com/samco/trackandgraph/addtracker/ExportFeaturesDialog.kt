@@ -171,8 +171,11 @@ class ExportFeaturesDialog : DialogFragment() {
 
     private fun createFeatureCheckboxes() {
         for (feature in viewModel.features) {
-            val item =
-                layoutInflater.inflate(R.layout.list_item_feature_checkbox, checkboxLayout, false)
+            val item = layoutInflater.inflate(
+                R.layout.list_item_feature_checkbox,
+                checkboxLayout,
+                false
+            )
             val checkBox = item.findViewById<CheckBox>(R.id.checkbox)
             checkBox.text = feature.name
             checkBox.isChecked = viewModel.selectedFeatures.contains(feature)

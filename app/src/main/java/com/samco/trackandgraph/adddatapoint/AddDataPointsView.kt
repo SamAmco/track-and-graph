@@ -78,12 +78,24 @@ private fun BottomButtons(viewModel: AddDataPointsViewModel) {
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        SmallTextButton(stringRes = R.string.cancel, onClick = viewModel::onCancelClicked)
+        SmallTextButton(
+            stringRes = R.string.cancel,
+            onClick = viewModel::onCancelClicked,
+            colors = ButtonDefaults.textButtonColors(
+                contentColor = MaterialTheme.tngColors.onSurface
+            )
+        )
         if (viewModel.skipButtonVisible.observeAsState(false).value) {
-            SmallTextButton(stringRes = R.string.skip, onClick = {
-                focusManager.clearFocus()
-                viewModel.onSkipClicked()
-            })
+            SmallTextButton(
+                stringRes = R.string.skip,
+                onClick = {
+                    focusManager.clearFocus()
+                    viewModel.onSkipClicked()
+                },
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.tngColors.onSurface
+                )
+            )
         }
         val addButtonRes =
             if (viewModel.updateMode.observeAsState(false).value) R.string.update

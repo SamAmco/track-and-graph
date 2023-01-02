@@ -119,7 +119,7 @@ fun DurationInput(
 
 
 @Composable
-private fun DurationInputComponent(
+private fun RowScope.DurationInputComponent(
     value: String,
     onValueChange: (String) -> Unit,
     suffix: String,
@@ -147,7 +147,7 @@ private fun DurationInputComponent(
                 onValueChange.invoke(it.text)
             }
         },
-        textStyle = MaterialTheme.typography.body2.copy(
+        textStyle = MaterialTheme.typography.h5.copy(
             textAlign = TextAlign.End,
             color = MaterialTheme.colors.onSurface
         ),
@@ -156,7 +156,7 @@ private fun DurationInputComponent(
         decorationBox = {
             if (textField.value.text == "") Text(
                 "0",
-                fontSize = MaterialTheme.typography.body2.fontSize,
+                fontSize = MaterialTheme.typography.h6.fontSize,
                 textAlign = TextAlign.End,
                 color = MaterialTheme.colors.onSurface.copy(
                     alpha = MaterialTheme.colors.disabledAlpha
@@ -196,15 +196,19 @@ private fun DurationInputComponent(
             .let {
                 if (focusRequester != null) it.focusRequester(focusRequester)
                 else it
-            },
+            }
+            .alignByBaseline(),
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Next
         ),
     )
+    //Align baseline to above text field
     Text(
         text = suffix,
-        modifier = Modifier.padding(horizontal = 4.dp)
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .alignByBaseline()
     )
 }
 

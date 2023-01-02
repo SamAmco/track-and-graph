@@ -119,6 +119,7 @@
             android:id="@+id/sumByCountCheckbox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            style="@style/Style.CheckBoxStyle"
             android:layout_marginTop="@dimen/input_spacing_large"
             android:checked="false"
             android:text="@string/sum_by_count_checkbox_label" />
