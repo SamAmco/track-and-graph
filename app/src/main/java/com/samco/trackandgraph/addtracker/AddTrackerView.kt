@@ -161,9 +161,9 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
 
             SpacingLarge()
 
-            SuggestionOrder(viewModel)
-
             SuggestionType(viewModel)
+
+            SuggestionOrder(viewModel)
         }
     }
 }
@@ -175,7 +175,8 @@ fun SuggestionType(viewModel: AddTrackerViewModel) {
     val suggestionTypeMap = mapOf(
         TrackerSuggestionType.VALUE_AND_LABEL to stringResource(R.string.value_and_label),
         TrackerSuggestionType.VALUE_ONLY to stringResource(R.string.value_only),
-        TrackerSuggestionType.LABEL_ONLY to stringResource(R.string.label_only)
+        TrackerSuggestionType.LABEL_ONLY to stringResource(R.string.label_only),
+        TrackerSuggestionType.NONE to stringResource(R.string.none)
     )
 
     LabeledRow(label = stringResource(id = R.string.suggestion_type)) {
@@ -190,23 +191,29 @@ fun SuggestionType(viewModel: AddTrackerViewModel) {
 @Composable
 fun SuggestionOrder(viewModel: AddTrackerViewModel) {
 
-    val selectedSuggestionOrder by viewModel.suggestionOrder.observeAsState(TrackerSuggestionOrder.VALUE_ASCENDING)
+    val selectedSuggestionType by viewModel.suggestionType.observeAsState(TrackerSuggestionType.VALUE_AND_LABEL)
 
-    val suggestionOrderMap = mapOf(
-        TrackerSuggestionOrder.VALUE_ASCENDING to stringResource(R.string.value_ascending),
-        TrackerSuggestionOrder.VALUE_DESCENDING to stringResource(R.string.value_descending),
-        TrackerSuggestionOrder.LABEL_ASCENDING to stringResource(R.string.label_ascending),
-        TrackerSuggestionOrder.LABEL_DESCENDING to stringResource(R.string.label_descending),
-        TrackerSuggestionOrder.LATEST to stringResource(R.string.latest),
-        TrackerSuggestionOrder.OLDEST to stringResource(R.string.oldest)
-    )
-
-    LabeledRow(label = stringResource(id = R.string.suggestion_order)) {
-        TextMapSpinner(
-            strings = suggestionOrderMap,
-            selectedItem = selectedSuggestionOrder,
-            onItemSelected = { viewModel.onSuggestionOrderChanged(it) }
+    if (selectedSuggestionType != TrackerSuggestionType.NONE) {
+        val selectedSuggestionOrder by viewModel.suggestionOrder.observeAsState(
+            TrackerSuggestionOrder.VALUE_ASCENDING
         )
+
+        val suggestionOrderMap = mapOf(
+            TrackerSuggestionOrder.VALUE_ASCENDING to stringResource(R.string.value_ascending),
+            TrackerSuggestionOrder.VALUE_DESCENDING to stringResource(R.string.value_descending),
+            TrackerSuggestionOrder.LABEL_ASCENDING to stringResource(R.string.label_ascending),
+            TrackerSuggestionOrder.LABEL_DESCENDING to stringResource(R.string.label_descending),
+            TrackerSuggestionOrder.LATEST to stringResource(R.string.latest),
+            TrackerSuggestionOrder.OLDEST to stringResource(R.string.oldest)
+        )
+
+        LabeledRow(label = stringResource(id = R.string.suggestion_order)) {
+            TextMapSpinner(
+                strings = suggestionOrderMap,
+                selectedItem = selectedSuggestionOrder,
+                onItemSelected = { viewModel.onSuggestionOrderChanged(it) }
+            )
+        }
     }
 }
 
