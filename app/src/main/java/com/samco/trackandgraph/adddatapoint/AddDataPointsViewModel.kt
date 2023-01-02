@@ -258,6 +258,10 @@ class AddDataPointsViewModelImpl @Inject constructor(
         AddDataPointBaseViewModelImpl(config),
         AddDataPointViewModel.DurationDataPointViewModel {
 
+        init {
+            durationInputViewModel.setDurationFromDouble(config.value ?: 0.0)
+        }
+
         override fun setHours(value: String) {
             durationInputViewModel.setHours(value)
             this.selectedSuggestedValue.value = null
