@@ -41,7 +41,9 @@
             android:layout_margin="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:srcCompat="@drawable/queue_add_box" />
+            app:backgroundTint="?colorPrimary"
+            app:srcCompat="@drawable/queue_add_box"
+            android:contentDescription="@string/track_all" />
 
         <TextView
             android:id="@+id/emptyGroupText"

@@ -141,7 +141,7 @@
                         android:contentDescription="@string/add_data_point_button_content_description"
                         android:scaleType="fitXY"
                         app:srcCompat="@drawable/add_box"
-                        app:tint="?attr/colorPrimary" />
+                        app:tint="?attr/colorSecondary" />
                 </FrameLayout>
 
                 <FrameLayout

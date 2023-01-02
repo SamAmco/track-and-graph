@@ -20,16 +20,14 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun CustomDialog(
@@ -77,11 +75,14 @@ fun SlimConfirmCancelDialog(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             SmallTextButton(
                 stringRes = dismissText,
-                onClick = onDismissRequest
+                onClick = onDismissRequest,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.tngColors.onSurface
+                )
             )
             SmallTextButton(
                 stringRes = continueText,

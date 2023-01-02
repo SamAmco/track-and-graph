@@ -26,28 +26,28 @@
                 android:orientation="vertical"
                 android:padding="@dimen/card_padding">
 
-                <TextView
-                    android:id="@+id/nameLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/input_spacing_large"
-                    android:text="@string/graph_or_stat_name"
-                    android:textAppearance="@style/TextAppearance.Body" />
-
-                <EditText
-                    android:id="@+id/graphStatNameInput"
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/graph_name_hint"
-                    android:importantForAutofill="no"
-                    android:inputType="textCapSentences"
-                    android:maxLines="2" />
+                    android:hint="@string/graph_or_stat_name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/graphStatNameInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:importantForAutofill="no"
+                        android:inputType="textCapSentences"
+                        android:maxLines="2">
+                    </com.google.android.material.textfield.TextInputEditText>
+
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <LinearLayout
                     android:id="@+id/graphStatTypeLayout"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/dialog_input_spacing"
+                    android:layout_marginTop="@dimen/input_spacing_large"
                     android:orientation="horizontal">
 
                     <TextView
@@ -84,9 +84,8 @@
             android:id="@+id/preview_overlay"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/btn_preivew"
-            >
+            app:layout_constraintTop_toTopOf="parent">
 
             <View
                 android:layout_width="match_parent"
@@ -96,9 +95,9 @@
 
             <ScrollView
                 android:id="@+id/preview_scroll_view"
-                android:paddingVertical="@dimen/dialog_header_top_margin"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:paddingVertical="@dimen/dialog_header_top_margin">
 
                 <com.samco.trackandgraph.graphstatview.GraphStatCardView
                     android:id="@+id/demoGraphStatCardView"

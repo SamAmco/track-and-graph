@@ -16,6 +16,7 @@
   -->
 
 <layout>
+
     <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -31,6 +32,7 @@
 
             <CheckBox
                 android:id="@+id/checkFilterByValue"
+                style="@style/Style.CheckBoxStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/filter_by_value" />
@@ -111,12 +113,14 @@
                     android:id="@+id/valueStatFromInput"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="?colorPrimary"
                     android:digits="0123456789.,-"
                     android:gravity="center"
                     android:hint="0"
                     android:importantForAutofill="no"
                     android:inputType="numberSigned|numberDecimal"
                     android:singleLine="true"
+                    app:backgroundTint="?colorPrimary"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintLeft_toRightOf="@id/valueStatFromLabel"
                     app:layout_constraintRight_toLeftOf="@id/valueStatToLabel"
@@ -140,12 +144,14 @@
                     android:id="@+id/valueStatToInput"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:backgroundTint="?colorPrimary"
                     android:digits="0123456789.,-"
                     android:gravity="center"
                     android:hint="0"
                     android:importantForAutofill="no"
                     android:inputType="numberSigned|numberDecimal"
                     android:singleLine="true"
+                    app:backgroundTint="?colorPrimary"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintLeft_toRightOf="@id/valueStatToLabel"
                     app:layout_constraintRight_toRightOf="parent"

@@ -17,6 +17,7 @@
 <resources>
     <style name="Style.CheckBoxStyle" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
         <item name="buttonTint">@color/checkbox_color</item>
+        <item name="android:minHeight">0dp</item>
     </style>
 
     <style name="Style.GrayButton" parent="Widget.MaterialComponents.Button">

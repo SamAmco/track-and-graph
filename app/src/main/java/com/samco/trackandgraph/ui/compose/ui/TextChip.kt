@@ -41,7 +41,7 @@ fun TextChip(
     ) {
         Text(
             text = text,
-            Modifier.padding(dimensionResource(id = R.dimen.half_card_padding)),
+            Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
             fontSize = MaterialTheme.typography.subtitle2.fontSize,
             fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
         )

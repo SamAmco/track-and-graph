@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
@@ -13,6 +14,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="0dp"
+            android:backgroundTint="?colorPrimary"
             android:digits="0123456789"
             android:focusable="true"
             android:focusableInTouchMode="true"
@@ -25,6 +27,7 @@
             android:nextFocusRight="@id/minutesInput"
             android:singleLine="true"
             android:textAlignment="textEnd"
+            app:backgroundTint="?colorPrimary"
             tools:ignore="HardcodedText,RtlSymmetry" />
 
         <TextView
@@ -50,6 +53,7 @@
             android:id="@+id/minutesInput"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="?colorPrimary"
             android:digits="0123456789"
             android:focusable="true"
             android:focusableInTouchMode="true"
@@ -62,6 +66,7 @@
             android:nextFocusRight="@id/secondsInput"
             android:singleLine="true"
             android:textAlignment="textEnd"
+            app:backgroundTint="?colorPrimary"
             tools:ignore="HardcodedText"
             tools:text="45" />
 
@@ -88,6 +93,7 @@
             android:id="@+id/secondsInput"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:backgroundTint="?colorPrimary"
             android:digits="0123456789"
             android:focusable="true"
             android:focusableInTouchMode="true"
@@ -99,6 +105,7 @@
             android:minWidth="40dp"
             android:singleLine="true"
             android:textAlignment="textEnd"
+            app:backgroundTint="?colorPrimary"
             tools:ignore="HardcodedText"
             tools:text="21" />
 

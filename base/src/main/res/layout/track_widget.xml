@@ -79,7 +79,7 @@
             android:layout_marginEnd="@dimen/card_margin_small"
             android:layout_marginBottom="@dimen/card_margin_small"
             android:src="@drawable/add_box"
-            android:tint="?attr/colorPrimary" />
+            android:tint="?attr/colorSecondary" />
 
         <ImageView
             android:id="@+id/track_widget_icon_warning"

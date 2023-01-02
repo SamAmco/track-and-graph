@@ -383,5 +383,6 @@
     <string name="label_descending">Label descending</string>
     <string name="latest">Latest</string>
     <string name="oldest">Oldest</string>
+    <string name="track_all">Track all</string>
 
 </resources>
