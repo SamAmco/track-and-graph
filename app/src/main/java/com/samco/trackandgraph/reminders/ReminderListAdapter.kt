@@ -156,6 +156,7 @@ internal class ReminderViewHolder private constructor(
         if (binding.reminderNameText.text.toString() != text) {
             reminder = reminder?.copy(alarmName = text)
             binding.reminderNameText.setText(text)
+            binding.reminderNameText.setSelection(text.length)
         }
     }
 

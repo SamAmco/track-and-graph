@@ -21,7 +21,9 @@ import android.app.Dialog
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.EditText
 import android.widget.Spinner
@@ -50,7 +52,9 @@ const val ADD_GROUP_DIALOG_PARENT_ID_KEY = "ADD_GROUP_DIALOG_PARENT_ID_KEY"
 
 @AndroidEntryPoint
 class AddGroupDialog : DialogFragment(), TextWatcher {
+
     private lateinit var alertDialog: AlertDialog
+    private lateinit var alertDialogView: View
     private lateinit var editText: EditText
     private lateinit var colorSpinner: Spinner
 
@@ -63,13 +67,47 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
 
         val dialog = initDialog(groupId != null)
         viewModel.initViewModel(groupId, parentGroupId)
-        editText.focusAndShowKeyboard()
         return dialog
+    }
+
+    private fun initDialog(updateMode: Boolean): Dialog {
+        return activity?.let {
+            alertDialogView = it.layoutInflater.inflate(R.layout.fragment_add_group_dialog, null)
+            val promptText = alertDialogView.findViewById<TextView>(R.id.prompt_text)
+            promptText.setText(
+                if (updateMode) R.string.edit_group
+                else R.string.add_group
+            )
+            editText = alertDialogView.findViewById(R.id.edit_name_input)
+            editText.addTextChangedListener(this)
+            val builder = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
+            val positiveButtonText = if (updateMode) R.string.update else R.string.add
+            setupColorSpinner(alertDialogView)
+            builder.setView(alertDialogView)
+                .setPositiveButton(positiveButtonText) { _, _ -> onPositiveClicked() }
+                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
+            alertDialog = builder.create()
+            alertDialog.setCanceledOnTouchOutside(true)
+            alertDialog.setOnShowListener {
+                val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
+                negativeButton.setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
+            }
+            alertDialog
+        } ?: throw IllegalStateException("Activity cannot be null")
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return alertDialogView
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         observeViewModel()
+        editText.post { editText.focusAndShowKeyboard() }
     }
 
     private fun observeViewModel() {
@@ -95,32 +133,6 @@ class AddGroupDialog : DialogFragment(), TextWatcher {
         viewModel.colorIndex.observe(viewLifecycleOwner) { index ->
             if (colorSpinner.selectedItemPosition != index) colorSpinner.setSelection(index)
         }
-    }
-
-    private fun initDialog(updateMode: Boolean): Dialog {
-        return activity?.let {
-            val view = it.layoutInflater.inflate(R.layout.fragment_add_group_dialog, null)
-            val promptText = view.findViewById<TextView>(R.id.prompt_text)
-            promptText.setText(
-                if (updateMode) R.string.edit_group
-                else R.string.add_group
-            )
-            editText = view.findViewById(R.id.edit_name_input)
-            editText.addTextChangedListener(this)
-            val builder = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
-            val positiveButtonText = if (updateMode) R.string.update else R.string.add
-            setupColorSpinner(view)
-            builder.setView(view)
-                .setPositiveButton(positiveButtonText) { _, _ -> onPositiveClicked() }
-                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
-            alertDialog = builder.create()
-            alertDialog.setCanceledOnTouchOutside(true)
-            alertDialog.setOnShowListener {
-                val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                negativeButton.setTextColor(requireContext().getColorFromAttr(R.attr.colorControlNormal))
-            }
-            alertDialog
-        } ?: throw IllegalStateException("Activity cannot be null")
     }
 
     private fun setupColorSpinner(view: View) {
