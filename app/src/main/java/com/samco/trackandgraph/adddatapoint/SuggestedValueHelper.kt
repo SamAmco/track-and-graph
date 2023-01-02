@@ -71,23 +71,28 @@ class SuggestedValueHelperImpl @Inject constructor(
             TrackerSuggestionType.VALUE_AND_LABEL -> this
             TrackerSuggestionType.VALUE_ONLY -> this.map { list -> list.map { it.copy(label = null) } }
             TrackerSuggestionType.LABEL_ONLY -> this.map { list -> list.map { it.copy(value = null) } }
+            TrackerSuggestionType.NONE -> this.map { emptyList() }
         }.map { list -> list.filter { it != emptySuggestion } }
 
-    private fun Flow<List<SuggestedValue>>.sort(tracker: Tracker) = when (tracker.suggestionOrder) {
-        TrackerSuggestionOrder.VALUE_ASCENDING -> this.map { values -> values.sortedBy { it.value } }
-        TrackerSuggestionOrder.VALUE_DESCENDING -> this.map { values -> values.sortedByDescending { it.value } }
-        TrackerSuggestionOrder.LABEL_ASCENDING -> this.map { values ->
-            values.sortedWith(
-                compareBy(stringComparatorWithEmpty) { it.label }
-            )
+    private fun Flow<List<SuggestedValue>>.sort(tracker: Tracker): Flow<List<SuggestedValue>> {
+        return if (tracker.suggestionType == TrackerSuggestionType.NONE) this.map { emptyList() }
+        else when (tracker.suggestionOrder) {
+            TrackerSuggestionOrder.VALUE_ASCENDING -> this.map { values -> values.sortedBy { it.value } }
+            TrackerSuggestionOrder.VALUE_DESCENDING -> this.map { values -> values.sortedByDescending { it.value } }
+            TrackerSuggestionOrder.LABEL_ASCENDING -> this.map { values ->
+                values.sortedWith(
+                    compareBy(stringComparatorWithEmpty) { it.label }
+                )
+            }
+            TrackerSuggestionOrder.LABEL_DESCENDING -> this.map { values ->
+                values.sortedWith(
+                    compareBy(stringComparatorReversedWithEmpty) { it.label }
+                )
+            }
+            TrackerSuggestionOrder.LATEST -> this
+            TrackerSuggestionOrder.OLDEST -> this.map { values -> values.reversed() }
         }
-        TrackerSuggestionOrder.LABEL_DESCENDING -> this.map { values ->
-            values.sortedWith(
-                compareBy(stringComparatorReversedWithEmpty) { it.label }
-            )
-        }
-        TrackerSuggestionOrder.LATEST -> this
-        TrackerSuggestionOrder.OLDEST -> this.map { values -> values.reversed() }
+
     }
 
     private val stringComparatorWithEmpty = Comparator<String?> { s1, s2 ->

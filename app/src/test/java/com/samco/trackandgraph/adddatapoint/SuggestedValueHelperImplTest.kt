@@ -21,8 +21,6 @@ import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.DataInteractor
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.*
 import org.junit.Assert.assertEquals
@@ -39,7 +37,6 @@ class SuggestedValueHelperImplTest {
     private val dataInteractor: DataInteractor = mock()
 
     private val dispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-    private val standardTestDispatcher = StandardTestDispatcher()
 
     private val testTracker = Tracker(
         id = 1,
@@ -506,10 +503,6 @@ class SuggestedValueHelperImplTest {
             val suggestedValuesLatestList = suggestedValuesLatest.toList()
             val suggestedValuesOldestList = suggestedValuesOldest.toList()
 
-            //val dataPoints = dpFromValuesAndLabels(
-            //    listOf(5.0, 3.0, 5.0, 4.0, 4.0, 1.0),
-            //    listOf("e", "b", "e", "c", "e", "")
-            //)
             //Assert value ascending
             assertEquals(
                 listOf(
@@ -584,18 +577,91 @@ class SuggestedValueHelperImplTest {
         }
 
     @Test
+    fun `test suggested value with none and different suggestion orders`() = runTest {
+        //Create a sequence of data points with values and labels
+        val dataPoints = dpFromValuesAndLabels(
+            listOf(5.0, 3.0, 5.0, 4.0, 4.0, 1.0),
+            listOf("e", "b", "e", "c", "e", "")
+        )
+
+        whenever(dataInteractor.getDataSampleForFeatureId(any()))
+            .thenReturn(DataSample.fromSequence(dataPoints))
+
+        val suggestedValuesValueAscending = uut.getSuggestedValues(
+            testTracker.copy(
+                suggestionType = TrackerSuggestionType.NONE,
+                suggestionOrder = TrackerSuggestionOrder.VALUE_ASCENDING
+            )
+        )
+
+        val suggestedValuesValueDescending = uut.getSuggestedValues(
+            testTracker.copy(
+                suggestionType = TrackerSuggestionType.NONE,
+                suggestionOrder = TrackerSuggestionOrder.VALUE_DESCENDING
+            )
+        )
+
+        val suggestedValuesLabelAscending = uut.getSuggestedValues(
+            testTracker.copy(
+                suggestionType = TrackerSuggestionType.NONE,
+                suggestionOrder = TrackerSuggestionOrder.LABEL_ASCENDING
+            )
+        )
+
+        val suggestedValuesLabelDescending = uut.getSuggestedValues(
+            testTracker.copy(
+                suggestionType = TrackerSuggestionType.NONE,
+                suggestionOrder = TrackerSuggestionOrder.LABEL_DESCENDING
+            )
+        )
+
+        val suggestedValuesLatest = uut.getSuggestedValues(
+            testTracker.copy(
+                suggestionType = TrackerSuggestionType.NONE,
+                suggestionOrder = TrackerSuggestionOrder.LATEST
+            )
+        )
+
+        val suggestedValuesOldest = uut.getSuggestedValues(
+            testTracker.copy(
+                suggestionType = TrackerSuggestionType.NONE,
+                suggestionOrder = TrackerSuggestionOrder.OLDEST
+            )
+        )
+
+        //Collect the whole suggested values flows
+        val suggestedValuesValueAscendingList = suggestedValuesValueAscending.toList()
+        val suggestedValuesValueDescendingList = suggestedValuesValueDescending.toList()
+        val suggestedValuesLabelAscendingList = suggestedValuesLabelAscending.toList()
+        val suggestedValuesLabelDescendingList = suggestedValuesLabelDescending.toList()
+        val suggestedValuesLatestList = suggestedValuesLatest.toList()
+        val suggestedValuesOldestList = suggestedValuesOldest.toList()
+
+        assertTrue(
+            listOf(
+                suggestedValuesLabelAscendingList,
+                suggestedValuesLabelDescendingList,
+                suggestedValuesLatestList,
+                suggestedValuesOldestList,
+                suggestedValuesValueAscendingList,
+                suggestedValuesValueDescendingList
+            ).all { it.last().isEmpty() }
+        )
+    }
+
+    @Test
     fun `We recieve at most max values`() = runTest {
-            //Create a list of > MAX_VALUES size
-            val values = List(SuggestedValueHelperImpl.MAX_VALUES + 100) { it.toDouble() }
-            val dataPoints = dpFromValues(values)
+        //Create a list of > MAX_VALUES size
+        val values = List(SuggestedValueHelperImpl.MAX_VALUES + 100) { it.toDouble() }
+        val dataPoints = dpFromValues(values)
 
-            whenever(dataInteractor.getDataSampleForFeatureId(any()))
-                .thenReturn(DataSample.fromSequence(dataPoints))
+        whenever(dataInteractor.getDataSampleForFeatureId(any()))
+            .thenReturn(DataSample.fromSequence(dataPoints))
 
-            val sizes = mutableListOf<Int>()
+        val sizes = mutableListOf<Int>()
 
-            uut.getSuggestedValues(testTracker).collect { sizes.add(it.size) }
+        uut.getSuggestedValues(testTracker).collect { sizes.add(it.size) }
 
-            assertTrue(sizes.last() == SuggestedValueHelperImpl.MAX_VALUES)
-        }
+        assertTrue(sizes.last() == SuggestedValueHelperImpl.MAX_VALUES)
+    }
 }

@@ -26,7 +26,8 @@ import com.samco.trackandgraph.base.database.dto.DataType
 internal enum class TrackerSuggestionType {
     VALUE_AND_LABEL,
     VALUE_ONLY,
-    LABEL_ONLY
+    LABEL_ONLY,
+    NONE;
 }
 
 internal enum class TrackerSuggestionOrder {

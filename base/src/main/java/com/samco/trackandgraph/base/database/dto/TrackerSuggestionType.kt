@@ -21,7 +21,8 @@ import com.samco.trackandgraph.base.database.entity.TrackerSuggestionType
 enum class TrackerSuggestionType {
     VALUE_AND_LABEL,
     VALUE_ONLY,
-    LABEL_ONLY;
+    LABEL_ONLY,
+    NONE;
 
     companion object {
 
@@ -30,6 +31,7 @@ enum class TrackerSuggestionType {
                 TrackerSuggestionType.VALUE_AND_LABEL -> VALUE_AND_LABEL
                 TrackerSuggestionType.VALUE_ONLY -> VALUE_ONLY
                 TrackerSuggestionType.LABEL_ONLY -> LABEL_ONLY
+                TrackerSuggestionType.NONE -> NONE
             }
     }
 
@@ -38,6 +40,7 @@ enum class TrackerSuggestionType {
             VALUE_AND_LABEL -> TrackerSuggestionType.VALUE_AND_LABEL
             VALUE_ONLY -> TrackerSuggestionType.VALUE_ONLY
             LABEL_ONLY -> TrackerSuggestionType.LABEL_ONLY
+            NONE -> TrackerSuggestionType.NONE
         }
     }
 }
