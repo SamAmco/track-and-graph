@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:theme="@style/AppTheme"
     android:background="@color/orange">
 
     <!--Colors are hardcoded here because these tutorial pages should look the same regardless of theme-->
@@ -18,7 +19,7 @@
         android:paddingBottom="30dp"
         android:text="@string/tutorial_text_3"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.Headline6"
+        android:textAppearance="@style/TextAppearance.Headline4"
         android:textColor="@color/blue_black"
         app:layout_constraintBottom_toTopOf="@id/image"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -44,17 +45,16 @@
         app:layout_constraintVertical_chainStyle="packed"
         tools:ignore="ContentDescription" />
 
-    <Button
+    <TextView
         android:id="@+id/closeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
         android:layout_marginEnd="30dp"
         android:layout_marginBottom="20dp"
-        android:background="@color/ap_transparent"
         android:text="@string/got_it"
-        android:textStyle="bold"
         android:textColor="@color/blue_black"
+        android:background="?selectableItemBackgroundBorderless"
+        android:textAppearance="@style/TextAppearance.Headline5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 

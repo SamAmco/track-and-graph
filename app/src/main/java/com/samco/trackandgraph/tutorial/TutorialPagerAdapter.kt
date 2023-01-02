@@ -20,7 +20,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.viewpager.widget.PagerAdapter
 import com.samco.trackandgraph.R
 
@@ -37,7 +36,7 @@ class TutorialPagerAdapter(
         }
         val inflater = LayoutInflater.from(context)
         val layout = inflater.inflate(resId, collection, false) as ViewGroup
-        val closeButton = layout.findViewById<Button?>(R.id.closeButton)
+        val closeButton = layout.findViewById<View>(R.id.closeButton)
         closeButton?.setOnClickListener { closeTutorialCallback() }
         collection.addView(layout)
         return layout

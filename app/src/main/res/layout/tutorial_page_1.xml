@@ -18,7 +18,7 @@
         android:paddingBottom="30dp"
         android:text="@string/tutorial_text_1"
         android:textAlignment="center"
-        android:textAppearance="@style/TextAppearance.Headline6"
+        android:textAppearance="@style/TextAppearance.Headline4"
         android:textColor="@color/blue_black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
