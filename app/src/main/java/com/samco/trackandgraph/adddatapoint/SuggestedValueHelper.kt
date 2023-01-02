@@ -23,6 +23,7 @@ import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -54,12 +55,13 @@ class SuggestedValueHelperImpl @Inject constructor(
     override fun getSuggestedValues(tracker: Tracker): Flow<List<SuggestedValue>> =
         getDataPoints(tracker)
             .take(MAX_VALUES)
-            .map { SuggestedValue(it.value, it.label) }
-            .buffer(20)
+            .map { SuggestedValue(it.value, it.label.ifEmpty { null }) }
             .scan(emptyList<SuggestedValue>()) { acc, value -> acc + value }
+            .buffer(1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
             .sort(tracker)
             .mapToSuggestionType(tracker)
             .map { it.distinct() }
+            .buffer(1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
             .flowOn(io)
 
     private val emptySuggestion = SuggestedValue(null, null)
@@ -74,9 +76,36 @@ class SuggestedValueHelperImpl @Inject constructor(
     private fun Flow<List<SuggestedValue>>.sort(tracker: Tracker) = when (tracker.suggestionOrder) {
         TrackerSuggestionOrder.VALUE_ASCENDING -> this.map { values -> values.sortedBy { it.value } }
         TrackerSuggestionOrder.VALUE_DESCENDING -> this.map { values -> values.sortedByDescending { it.value } }
-        TrackerSuggestionOrder.LABEL_ASCENDING -> this.map { values -> values.sortedBy { it.label } }
-        TrackerSuggestionOrder.LABEL_DESCENDING -> this.map { values -> values.sortedByDescending { it.label } }
+        TrackerSuggestionOrder.LABEL_ASCENDING -> this.map { values ->
+            values.sortedWith(
+                compareBy(stringComparatorWithEmpty) { it.label }
+            )
+        }
+        TrackerSuggestionOrder.LABEL_DESCENDING -> this.map { values ->
+            values.sortedWith(
+                compareBy(stringComparatorReversedWithEmpty) { it.label }
+            )
+        }
         TrackerSuggestionOrder.LATEST -> this
         TrackerSuggestionOrder.OLDEST -> this.map { values -> values.reversed() }
+    }
+
+    private val stringComparatorWithEmpty = Comparator<String?> { s1, s2 ->
+        return@Comparator checkEmptys(s1, s2) ?: s1!!.compareTo(s2!!)
+    }
+
+    private val stringComparatorReversedWithEmpty = Comparator<String?> { s1, s2 ->
+        return@Comparator checkEmptys(s1, s2) ?: s2!!.compareTo(s1!!)
+    }
+
+    //The common code from the above two functions is extracted into a separate function
+    private fun checkEmptys(s1: String?, s2: String?): Int? {
+        if (s1 == null && s2 == null) return 0
+        if (s1 == null) return 1
+        if (s2 == null) return -1
+        if (s1.isEmpty() && s2.isEmpty()) return 0
+        if (s1.isEmpty()) return 1
+        if (s2.isEmpty()) return -1
+        return null
     }
 }
