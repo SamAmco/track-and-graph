@@ -15,11 +15,11 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <style name="Style.CheckBoxStyle" parent="Widget.Material3.CompoundButton.CheckBox">
+    <style name="Style.CheckBoxStyle" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
         <item name="buttonTint">@color/checkbox_color</item>
     </style>
 
-    <style name="Style.GrayButton" parent="Widget.Material3.Button.TonalButton">
+    <style name="Style.GrayButton" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">?selectorButtonColor</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="shapeAppearance">@style/ShapeAppearance.TnG.Corner.Small</item>
@@ -27,33 +27,33 @@
         <item name="android:singleLine">true</item>
     </style>
 
-    <style name="Style.TextButton" parent="Widget.Material3.Button.TextButton">
+    <style name="Style.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
         <item name="shapeAppearance">@style/ShapeAppearance.TnG.Corner.Small</item>
     </style>
 
-    <style name="Style.FAB" parent="Widget.Material3.FloatingActionButton.Primary">
+    <style name="Style.FAB" parent="Widget.MaterialComponents.FloatingActionButton">
         <item name="shapeAppearance">@style/ShapeAppearance.TnG.FAB</item>
         <item name="tint">?colorControlNormal</item>
     </style>
 
-    <style name="ShapeAppearance.TnG.FAB" parent="ShapeAppearance.Material3.SmallComponent">
+    <style name="ShapeAppearance.TnG.FAB" parent="ShapeAppearance.MaterialComponents.SmallComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">1000dp</item>
     </style>
 
-    <style name="Style.AddBarButton" parent="Widget.Material3.Button.TonalButton">
+    <style name="Style.AddBarButton" parent="Widget.MaterialComponents.Button">
         <item name="backgroundTint">?colorControlHighlight</item>
         <item name="android:textColor">?android:attr/textColorPrimary</item>
         <item name="shapeAppearance">@style/ShapeAppearance.TnG.Corner.Small</item>
     </style>
 
-    <style name="Style.ButtonStyle" parent="Widget.Material3.Button.TonalButton">
+    <style name="Style.ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="shapeAppearance">@style/ShapeAppearance.TnG.Corner.Small</item>
     </style>
 
-    <style name="Style.WideBottomButton" parent="Widget.Material3.Button.ElevatedButton">
-        <item name="backgroundTint">?colorSecondary</item>
-        <item name="android:textColor">?colorOnSecondary</item>
+    <style name="Style.WideBottomButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">?colorPrimary</item>
+        <item name="android:textColor">?colorOnPrimary</item>
         <item name="shapeAppearance">@style/ShapeAppearance.TnG.Corner.Small</item>
         <item name="android:layout_marginBottom">20dp</item>
         <item name="android:minHeight">50dp</item>

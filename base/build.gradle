@@ -79,13 +79,13 @@ android {
 dependencies {
     api 'com.jakewharton.threetenabp:threetenabp:1.2.1'
 
-    api 'androidx.core:core-ktx:1.8.0'
+    api 'androidx.core:core-ktx:1.9.0'
     //Apparently we need material for the instrumented tests to build. idk why
-    api 'com.google.android.material:material:1.6.1'
+    api 'com.google.android.material:material:1.7.0'
 
     //Dependency Injection
-    implementation "com.google.dagger:hilt-android:2.41"
-    kapt "com.google.dagger:hilt-compiler:2.41"
+    implementation "com.google.dagger:hilt-android:2.43"
+    kapt "com.google.dagger:hilt-compiler:2.43"
 
     //Database
     kapt "androidx.room:room-compiler:2.4.3"

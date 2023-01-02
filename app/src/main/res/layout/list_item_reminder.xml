@@ -29,17 +29,26 @@
                     android:layout_marginStart="@dimen/card_padding"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/reminderNameText"
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/card_padding"
-                        android:layout_weight="1"
-                        android:hint="@string/default_reminder_name"
-                        android:imeOptions="actionDone"
-                        android:importantForAutofill="no"
-                        android:inputType="textCapSentences"
-                        android:maxLines="1" />
+                        android:layout_weight="1">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/reminderNameText"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:imeOptions="actionDone"
+                            android:importantForAutofill="no"
+                            android:inputType="textCapSentences"
+                            android:maxLines="1">
+
+                            <requestFocus />
+                        </com.google.android.material.textfield.TextInputEditText>
+
+                    </com.google.android.material.textfield.TextInputLayout>
 
                     <TextView
                         android:id="@+id/timeText"
