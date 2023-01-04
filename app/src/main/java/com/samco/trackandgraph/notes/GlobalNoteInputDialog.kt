@@ -17,86 +17,47 @@
 
 package com.samco.trackandgraph.notes
 
-import android.app.DatePickerDialog
-import android.app.TimePickerDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.base.database.dto.GlobalNote
-import com.samco.trackandgraph.base.database.odtFromString
-import com.samco.trackandgraph.base.helpers.formatDayMonthYear
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.databinding.GlobalNoteInputDialogBinding
-import com.samco.trackandgraph.util.bindingForViewLifecycle
-import com.samco.trackandgraph.util.focusAndShowKeyboard
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZonedDateTime
-import org.threeten.bp.format.DateTimeFormatter
-import javax.inject.Inject
 
 const val GLOBAL_NOTE_TIMESTAMP_KEY = "GLOBAL_NOTE_TIME_ID"
 
 @AndroidEntryPoint
 class GlobalNoteInputDialog : DialogFragment() {
-    private val viewModel by viewModels<GlobalNoteInputViewModel>()
-    private var binding: GlobalNoteInputDialogBinding by bindingForViewLifecycle()
+    private val viewModel: GlobalNoteInputViewModel by viewModels<GlobalNoteInputViewModelImpl>()
 
-    private val timeDisplayFormatter: DateTimeFormatter = DateTimeFormatter
-        .ofPattern("HH:mm")
-        .withZone(ZoneId.systemDefault())
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel.init(arguments?.getString(GLOBAL_NOTE_TIMESTAMP_KEY))
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return activity?.let {
-            val timestampStr = arguments?.getString(GLOBAL_NOTE_TIMESTAMP_KEY)
-            viewModel.init(timestampStr)
-            listenToViewModel()
-            binding = GlobalNoteInputDialogBinding.inflate(inflater, container, false)
-            binding.noteInputText.addTextChangedListener { editText ->
-                viewModel.noteText = editText.toString()
+    ): View {
+        dialog?.setCanceledOnTouchOutside(true)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                TnGComposeTheme {
+                    GlobalNoteInputDialogView(viewModel)
+                }
             }
-            binding.cancelButton.setOnClickListener { dismiss() }
-            binding.addButton.setOnClickListener { viewModel.onAddClicked() }
-            binding.noteInputText.focusAndShowKeyboard()
-
-            dialog?.setCanceledOnTouchOutside(true)
-
-            binding.root
         }
     }
 
-    private fun listenToViewModel() {
-        viewModel.state.observe(viewLifecycleOwner) {
-            when (it) {
-                GlobalNoteInputState.WAITING -> {
-                    initDateButton()
-                    initTimeButton()
-                    setSelectedDateTime(viewModel.timestamp)
-                    binding.noteInputText.requestFocus()
-                    binding.noteInputText.setText(viewModel.noteText)
-                    binding.noteInputText.setSelection(binding.noteInputText.text.length)
-                }
-                GlobalNoteInputState.DONE -> dismiss()
-                else -> run {}
-            }
-        }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        viewModel.dismiss.observe(viewLifecycleOwner) { dismiss() }
     }
 
     override fun onResume() {
@@ -107,108 +68,11 @@ class GlobalNoteInputDialog : DialogFragment() {
         )
     }
 
-    private fun setSelectedDateTime(dateTime: OffsetDateTime) {
-        viewModel.timestamp = dateTime
-        binding.dateButton.text = formatDayMonthYear(requireContext(), dateTime)
-        binding.timeButton.text = dateTime.format(timeDisplayFormatter)
-    }
-
-    private fun initDateButton() {
-        binding.dateButton.setOnClickListener {
-            val picker = DatePickerDialog(
-                requireContext(),
-                { _, year, month, day -> onSetDate(year, month, day) },
-                viewModel.timestamp.year,
-                viewModel.timestamp.monthValue - 1,
-                viewModel.timestamp.dayOfMonth
-            )
-            picker.show()
-        }
-    }
-
-    private fun onSetDate(year: Int, month: Int, day: Int) {
-        val oldDate = ZonedDateTime.of(
-            viewModel.timestamp.toLocalDateTime(),
-            ZoneId.systemDefault()
-        )
-        val newDate = oldDate
-            .withYear(year)
-            .withMonth(month + 1)
-            .withDayOfMonth(day)
-            .toOffsetDateTime()
-        setSelectedDateTime(newDate)
-    }
-
-    private fun initTimeButton() {
-        binding.timeButton.setOnClickListener {
-            val picker = TimePickerDialog(
-                requireContext(),
-                { _, hour, minute -> onSetTime(hour, minute) },
-                viewModel.timestamp.hour, viewModel.timestamp.minute, true
-            )
-            picker.show()
-        }
-    }
-
-    private fun onSetTime(hour: Int, minute: Int) {
-        val oldTime = ZonedDateTime.of(
-            viewModel.timestamp.toLocalDateTime(),
-            ZoneId.systemDefault()
-        )
-        val newTime = oldTime
-            .withHour(hour)
-            .withMinute(minute)
-            .toOffsetDateTime()
-        setSelectedDateTime(newTime)
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
+        requireActivity().currentFocus?.clearFocus()
+        requireActivity().window?.hideKeyboard()
     }
 }
 
-enum class GlobalNoteInputState { INITIALIZING, WAITING, DONE }
-
-@HiltViewModel
-class GlobalNoteInputViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor,
-    @MainDispatcher private val ui: CoroutineDispatcher,
-    @IODispatcher private val io: CoroutineDispatcher
-) : ViewModel() {
-    var oldNote: GlobalNote? = null
-    var timestamp: OffsetDateTime = OffsetDateTime.now()
-    var noteText: String = ""
-
-    private val _state = MutableLiveData(GlobalNoteInputState.INITIALIZING)
-    val state: LiveData<GlobalNoteInputState> = _state
-
-    private var initialized = false
-
-    fun init(timestampStr: String?) {
-        if (initialized) return
-        initialized = true
-
-        viewModelScope.launch(io) {
-            if (timestampStr != null) {
-                val noteTimestamp = odtFromString(timestampStr)
-                val note = dataInteractor.getGlobalNoteByTimeSync(noteTimestamp)
-                if (note != null) {
-                    timestamp = note.timestamp
-                    noteText = note.note
-                    oldNote = note
-                }
-            }
-            withContext(ui) {
-                _state.value = GlobalNoteInputState.WAITING
-            }
-        }
-    }
-
-    fun onAddClicked() = viewModelScope.launch(io) {
-        oldNote?.let { dataInteractor.deleteGlobalNote(it) }
-        if (noteText.isNotEmpty()) dataInteractor.insertGlobalNote(
-            GlobalNote(
-                timestamp,
-                noteText
-            )
-        )
-        withContext(ui) { _state.value = GlobalNoteInputState.DONE }
-    }
-}
 
