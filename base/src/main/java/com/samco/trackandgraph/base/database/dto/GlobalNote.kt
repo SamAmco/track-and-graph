@@ -22,7 +22,7 @@ import org.threeten.bp.OffsetDateTime
 
 data class GlobalNote(
     val timestamp: OffsetDateTime = OffsetDateTime.now(),
-    val note: String
+    val note: String = ""
 ) {
     internal fun toEntity() = GlobalNote(
         timestamp,
