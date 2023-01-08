@@ -101,8 +101,6 @@ private fun AddTrackerInputForm(
         .fillMaxHeight()
         .verticalScroll(state = rememberScrollState())
 ) {
-    val trackerName = viewModel.trackerName.observeAsState("")
-    val trackerDescription = viewModel.trackerDescription.observeAsState("")
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
@@ -111,7 +109,6 @@ private fun AddTrackerInputForm(
     SpacingSmall()
 
     NameInput(
-        trackerName.value,
         viewModel,
         focusManager,
         focusRequester,
@@ -120,7 +117,7 @@ private fun AddTrackerInputForm(
 
     SpacingLarge()
 
-    DescriptionInput(trackerDescription.value, viewModel)
+    DescriptionInput(viewModel)
 
     SpacingLarge()
 
@@ -374,10 +371,9 @@ private fun DurationCheckbox(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DescriptionInput(
-    trackerDescription: String,
     viewModel: AddTrackerViewModel
 ) = FullWidthTextField(
-    value = trackerDescription,
+    textFieldValue = viewModel.trackerDescription,
     onValueChange = viewModel::onTrackerDescriptionChanged,
     label = stringResource(id = R.string.add_a_longer_description_optional),
     singleLine = false
@@ -386,16 +382,16 @@ private fun DescriptionInput(
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun NameInput(
-    trackerName: String,
     viewModel: AddTrackerViewModel,
     focusManager: FocusManager,
     focusRequester: FocusRequester,
     keyboardController: SoftwareKeyboardController?
 ) = FullWidthTextField(
-    value = trackerName,
+    textFieldValue = viewModel.trackerName,
     onValueChange = viewModel::onTrackerNameChanged,
     label = stringResource(id = R.string.tracker_name),
     focusManager = focusManager,
     focusRequester = focusRequester,
     keyboardController = keyboardController
 )
+

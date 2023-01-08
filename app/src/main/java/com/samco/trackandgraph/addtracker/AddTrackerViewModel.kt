@@ -1,5 +1,8 @@
 package com.samco.trackandgraph.addtracker
 
+import androidx.compose.runtime.*
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
@@ -24,8 +27,8 @@ import javax.inject.Inject
 
 interface AddTrackerViewModel : DurationInputViewModel {
     //Outputs
-    val trackerName: LiveData<String>
-    val trackerDescription: LiveData<String>
+    val trackerName: TextFieldValue
+    val trackerDescription: TextFieldValue
     val isDuration: LiveData<Boolean>
     val isLoading: LiveData<Boolean>
     val hasDefaultValue: LiveData<Boolean>
@@ -41,8 +44,8 @@ interface AddTrackerViewModel : DurationInputViewModel {
     val suggestionOrder: LiveData<TrackerSuggestionOrder>
 
     //Inputs
-    fun onTrackerNameChanged(name: String)
-    fun onTrackerDescriptionChanged(description: String)
+    fun onTrackerNameChanged(name: TextFieldValue)
+    fun onTrackerDescriptionChanged(description: TextFieldValue)
     fun onIsDurationCheckChanged(isDuration: Boolean)
     fun onHasDefaultValueChanged(hasDefaultValue: Boolean)
     fun onDefaultValueChanged(defaultValue: String)
@@ -73,10 +76,8 @@ class AddTrackerViewModelImpl @Inject constructor(
     private val isUpdateModeFlow = MutableStateFlow(false)
     private val isDurationModeFlow = MutableStateFlow(false)
 
-    private val trackerNameFlow = MutableStateFlow("")
-    override val trackerName: LiveData<String> =
-        trackerNameFlow.asLiveData(viewModelScope.coroutineContext)
-    override val trackerDescription = MutableLiveData("")
+    override var trackerName by mutableStateOf(TextFieldValue(""))
+    override var trackerDescription by mutableStateOf(TextFieldValue(""))
     override val isLoading = MutableLiveData(false)
     override val hasDefaultValue = MutableLiveData(false)
     override val defaultValue = MutableLiveData("1.0")
@@ -90,13 +91,23 @@ class AddTrackerViewModelImpl @Inject constructor(
     override val suggestionType = MutableLiveData(TrackerSuggestionType.VALUE_AND_LABEL)
     override val suggestionOrder = MutableLiveData(TrackerSuggestionOrder.VALUE_ASCENDING)
 
-    private val validationErrorFlow = trackerNameFlow.map {
-        when {
-            it.isBlank() -> ValidationError.NoName
-            disallowedNames?.contains(it) == true -> ValidationError.NameAlreadyExists
-            else -> null
-        }
+    override fun onTrackerNameChanged(name: TextFieldValue) {
+        trackerName = name
     }
+
+    override fun onTrackerDescriptionChanged(description: TextFieldValue) {
+        trackerDescription = description
+    }
+
+    private val validationErrorFlow = snapshotFlow { trackerName }
+        .map {
+            when {
+                it.text.isBlank() -> ValidationError.NoName
+                disallowedNames?.contains(it.text) == true -> ValidationError.NameAlreadyExists
+                else -> null
+            }
+        }
+
     override val createButtonEnabled = validationErrorFlow
         .map { it == null }
         .asLiveData(viewModelScope.coroutineContext)
@@ -143,8 +154,8 @@ class AddTrackerViewModelImpl @Inject constructor(
 
     private suspend fun initFromTracker(tracker: Tracker) = withContext(ui) {
         existingTracker = tracker
-        trackerNameFlow.value = tracker.name
-        trackerDescription.value = tracker.description
+        trackerName = TextFieldValue(tracker.name, TextRange(tracker.name.length))
+        trackerDescription = TextFieldValue(tracker.description, TextRange(tracker.name.length))
         isDurationModeFlow.value = tracker.dataType == DataType.DURATION
         hasDefaultValue.value = tracker.hasDefaultValue
         defaultValue.value = tracker.defaultValue.toString()
@@ -152,16 +163,6 @@ class AddTrackerViewModelImpl @Inject constructor(
         suggestionType.value = tracker.suggestionType
         suggestionOrder.value = tracker.suggestionOrder
         isUpdateModeFlow.value = true
-    }
-
-    override fun onTrackerNameChanged(name: String) {
-        viewModelScope.launch(ui) {
-            trackerNameFlow.emit(name)
-        }
-    }
-
-    override fun onTrackerDescriptionChanged(description: String) {
-        trackerDescription.value = description
     }
 
     override fun onIsDurationCheckChanged(isDuration: Boolean) {
@@ -234,11 +235,11 @@ class AddTrackerViewModelImpl @Inject constructor(
         dataInteractor.updateTracker(
             oldTracker = existingTracker,
             durationNumericConversionMode = durationNumericConversionMode.value,
-            newName = trackerName.value,
+            newName = trackerName.text,
             newType = getDataType(),
             hasDefaultValue = hasDefaultValue.value,
             defaultValue = getDefaultValue(),
-            featureDescription = trackerDescription.value,
+            featureDescription = trackerDescription.text,
             defaultLabel = defaultLabel.value,
             suggestionType = suggestionType.value,
             suggestionOrder = suggestionOrder.value
@@ -248,11 +249,11 @@ class AddTrackerViewModelImpl @Inject constructor(
     private suspend fun addTracker() {
         val tracker = Tracker(
             id = 0L,
-            name = trackerName.value ?: "",
+            name = trackerName.text,
             groupId = groupId,
             featureId = 0L,
             displayIndex = 0,
-            description = trackerDescription.value ?: "",
+            description = trackerDescription.text,
             dataType = getDataType(),
             hasDefaultValue = hasDefaultValue.value ?: false,
             defaultValue = getDefaultValue() ?: 1.0,

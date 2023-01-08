@@ -71,7 +71,7 @@ fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
 
         SpacingSmall()
 
-        FullWidthTextField(
+        FullWidthTextFieldLegacy(
             modifier = Modifier.heightIn(max = 200.dp),
             value = noteText,
             onValueChange = { viewModel.updateNoteText(it) },

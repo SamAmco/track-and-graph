@@ -288,7 +288,7 @@ private fun NoteInput(viewModel: AddDataPointViewModel) =
         var showNoteBox by rememberSaveable { mutableStateOf(false) }
 
         if (note.isNotEmpty() || showNoteBox) {
-            FullWidthTextField(
+            FullWidthTextFieldLegacy(
                 modifier = Modifier.heightIn(max = 200.dp),
                 value = note,
                 onValueChange = { viewModel.updateNote(it) },
