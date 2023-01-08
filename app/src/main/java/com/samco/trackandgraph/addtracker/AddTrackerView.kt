@@ -161,6 +161,11 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
 
             SpacingLarge()
 
+            Text(
+                text = stringResource(id = R.string.suggestions),
+                style = MaterialTheme.typography.subtitle2
+            )
+
             SuggestionType(viewModel)
 
             SuggestionOrder(viewModel)
@@ -179,7 +184,7 @@ fun SuggestionType(viewModel: AddTrackerViewModel) {
         TrackerSuggestionType.NONE to stringResource(R.string.none)
     )
 
-    LabeledRow(label = stringResource(id = R.string.suggestion_type)) {
+    LabeledRow(label = stringResource(id = R.string.type_colon)) {
         TextMapSpinner(
             strings = suggestionTypeMap,
             selectedItem = selectedSuggestionType,
@@ -207,7 +212,7 @@ fun SuggestionOrder(viewModel: AddTrackerViewModel) {
             TrackerSuggestionOrder.OLDEST to stringResource(R.string.oldest)
         )
 
-        LabeledRow(label = stringResource(id = R.string.suggestion_order)) {
+        LabeledRow(label = stringResource(id = R.string.order_colon)) {
             TextMapSpinner(
                 strings = suggestionOrderMap,
                 selectedItem = selectedSuggestionOrder,

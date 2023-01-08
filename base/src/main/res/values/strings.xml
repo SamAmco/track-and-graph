@@ -185,55 +185,7 @@
     <string name="about">About</string>
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
-    <string name="faq_1">How do I start tracking something?</string>
-    <string name="faq_2">How do I import / export what I have tracked?</string>
-    <string name="faq_3">How does multiple choice data work?</string>
-    <string name="faq_4">How do I start creating graphs?</string>
-    <string name="faq_5">How are moving averages and plot totals calculated?</string>
-    <string name="faq_6">How do notes work?</string>
     <string name="faq">FAQ</string>
-    <string name="faq_text_1_1">To begin tracking you will need to create a Tracker.</string>
-    <string name="faq_text_1_4">Type in the name of what you want to track and select an input style:</string>
-    <string name="faq_text_1_5">There are three styles of input you can choose: \n\n• Multiple choice requires you to manually set up predefined answers that will be presented to you as buttons when tracking.\n\n• Numerical will ask you to enter a number when tracking.\n\n• Time duration will ask you to enter an amount of time in hours, minutes and seconds when tracking. \n\nIf you add a default value you will not be asked for a value every time you tap the + button and your default value will be used instead. You can long press the + button to provide a value manually.</string>
-    <string name="faq_text_1_6">To create multiple choice answers click the + button at the bottom.</string>
-    <string name="faq_text_1_8">When you are happy with the setup click the FINISH button.</string>
-    <string name="faq_text_1_9">You should now see cards in your group. You can order them easily by holding down on the item you want to move and then dragging it to a new position.</string>
-    <string name="faq_text_1_10">You can track things individually by using their + buttons or track everything in the group quickly by using the action button:</string>
-    <string name="faq_text_1_11">Don\'t worry if you make a mistake you can always see, review and edit your tracking history by simply tapping on the card.</string>
-    <string name="faq_text_2_1">To import/export only the tracked data in a group to a CSV use the menu buttons at the top:</string>
-    <string name="faq_text_2_2">Use this button to import a csv into this group.</string>
-    <string name="faq_text_2_3">Use this button to export this groups tracked data to a csv.</string>
-    <string name="faq_text_2_4">The Backup &amp; Restore option in the menu is slightly different. This will export and restore the entire database file containing all tracked data, graphs, reminders and notes. It is recommended that you backup your data regularly. The backup file is an un-encrypted Sqlite3 database file which can also be opened and modified using freely available software. However this is not recommended for non-technical users as you could break the integrity of the database.</string>
-    <string name="faq_text_3_1">Using the multiple choice input type is recommended wherever possible. If you ever want to draw a pie chart from your data you will need it to be in multiple choice form. You can also draw a line graph of your data over time if your predefined answers have a natural order. For example say you were to setup the following:</string>
-    <string name="faq_text_3_2">And then you tracked some data as follows:</string>
-    <string name="faq_text_3_3">You could then visualise that data using either a line graph over time or using a pie chart as below:</string>
-    <string name="faq_text_4_1">To begin creating graphs you will need to first have some data tracked. Then go to the group where you want to create your graph, tap + in the top right and then select Graph or Statistic.</string>
-    <string name="faq_text_4_5">Begin by entering a name for your new graph and then select a graph type. Here we will demonstrate the line graph since other graph types are relatively trivial to set up. One caveat to note however is that you can only create pie charts from multiple choice data.</string>
-    <string name="faq_text_4_6">The Dynamic range style will automatically calculate the min and max value for the Y axis. Now we will add some lines to our graph by using the + button at the bottom:</string>
-    <string name="faq_text_4_7">Because our wheat values are multiple choice answers ranging from 0–2 and our stomach pain values are numbers ranging from 1–8 we have multiplied our wheat values by 4 to make the ranges similar. We have used a three day moving average to smooth out anomalies and reduce noise in the output graph. We have also selected plot when tracked because this data was tracked relatively consistently. You can read more about how these settings affect line graphs in the FAQ: “How are moving averages and plot totals calculated?”</string>
-    <string name="faq_text_4_8">Next we click the FINISH button to complete the setup. Notice how our new graph appears as a card in our group:</string>
-    <string name="faq_text_4_9">To explore the graph in more detail you can tap the card to open it in a full screen view and then pinch and drag the lines:</string>
-    <string name="faq_text_4_10">As we add more graphs and statistics to our group they appear as a list of cards. You can reorder them at any point by holding down and dragging a card to a new position.</string>
-    <string name="faq_text_5_1">Moving averages:</string>
-    <string name="faq_text_5_2">Suppose we want to track something simply as a yes or no question, for example:</string>
-    <string name="faq_text_5_3">If we were to track this data over time without using a moving average it might look like this:</string>
-    <string name="faq_text_5_4">This output is very accurate but not very helpful. To make it easier to understand the data we could use a monthly moving average:</string>
-    <string name="faq_text_5_5">Now instead of plotting each data point with the recorded Y value (0 or 1), each Y value is calculated as the mean of itself and all previous data points within the selected time range prior.</string>
-    <string name="faq_text_5_6">Generally speaking the longer the selected averaging period the smoother the curve will appear. However note that moving averages are lagging indicators. The longer the averaging period, the further behind the real value the curve will lag.</string>
-    <string name="faq_text_5_7">Plot totals:</string>
-    <string name="faq_text_5_8">Some things you may only want to track rarely. For example, you may want to track when you finish reading a book:</string>
-    <string name="faq_text_5_9">Suppose you tracked the following:</string>
-    <string name="faq_text_5_10">You may or may not then be surprised to find that your graph appears as follows:</string>
-    <string name="faq_text_5_11">The problem is that lines are drawn only from each plotted value to the next plotted value. Since all plotted values are interpreted as 1 you only see a straight line at the point 1 on the Y axis.</string>
-    <string name="faq_text_5_12">We can fix this using plot totals. For example if we plot monthly totals we would see the following graph:</string>
-    <string name="faq_text_5_13">Notice a point is plotted at the end of each month representing the total of all tracked values in that month.</string>
-    <string name="faq_text_5_14">You can use scale, offset, averaging and totals all at once. The order of precedence is as follows:</string>
-    <string name="faq_text_5_15">• First your data is converted to totals\n\n• Then each point is converted to its moving average\n\n• Then your points are multiplied by the scale value\n\n• Finally the offset is added to each point</string>
-    <string name="faq_text_6_1">Notes allow you to keep track of qualitative data alongside your quantitative data. There are two types of notes:\n\n• Global notes (added directly in the notes menu)\n\n• Data point notes (attached to specific data points)\n\nWhen adding a data point you may wish to track an important piece of information specific to that data set. For example:</string>
-    <string name="faq_text_6_2">After adding this note you will notice it shows up in a list underneath any graph of that data set. If you tap the note it will open in a dialog window and a marker will be added to the graph.</string>
-    <string name="faq_text_6_3">However some pieces of information might be relevant to all your data. In this case you can add a global note by tapping the plus button in the global notes menu:</string>
-    <string name="faq_text_6_4">You will notice this note now shows up underneath all graphs.</string>
-    <string name="faq_text_6_5">You can edit or delete any note from the notes menu. Deleting a data point note from the notes menu will not delete the data point its self, just the attached note.</string>
     <string name="tutorial_text_1">Use trackers to track your data.</string>
     <string name="tutorial_text_2">Use graphs and statistics to visualise data.</string>
     <string name="tutorial_text_3">Use groups to organise your trackers, graphs and statistics.</string>
@@ -323,20 +275,6 @@
     <string name="number_of_bins">Number of bins:</string>
     <string name="sum_by_count_checkbox_label">Check here to count the number of data points tracked rather than the total of their values.</string>
     <string name="time_window_size">Time window size:</string>
-    <string name="faq_7">How do time histograms work?</string>
-    <string name="faq_text_7_1"><![CDATA[Histograms are useful for showing how data is distributed over a given domain. Time histograms in Track & Graph allow you to see how your data is distributed over various time periods.]]></string>
-    <string name="faq_text_7_2">For example imagine you had tracked 7 weeks worth of data on how much time you spent reading. You may wish to know on what days during the week do you typically spend the most time reading. Here you could use a time histogram with the following setup:</string>
-    <string name="faq_text_7_3">To generate the following histogram:</string>
-    <string name="faq_text_7_4">The histogram is calculated simply by taking every data point within the sample and adding its value to a \"bin\" based on which day of the week that value was tracked. So the day 1 bin represents the total of all data points tracked on Mondays divided by the total of all data points in the sample. Histograms are \"normalised\" meaning that the sum of all the heights of the bars (or the area under the graph) should add up to exactly 1. So for example if you only ever read on Fridays you would expect your histogram to only show one bar for Friday with height 1.</string>
-    <string name="faq_text_7_5">If you read on Saturday 50% of the time and on Friday 50% of the time you would expect your histogram to look like this:</string>
-    <string name="faq_text_7_6"><![CDATA[If the data you are tracking is multiple choice then Track & Graph will show you the distribution within each bar of the amount made up by each choice tracked like so:]]></string>
-    <string name="faq_text_7_7">By default the height of each bar is relative to the sum of all the data point values that fall in that time range. However if the value of each of your choices should be the same (i.e. the choices represent un-ordered discrete data) then your histogram will be incorrectly skewed like so:</string>
-    <string name="faq_text_7_8">(notice the index of Sparrow is 0 so it doesn\'t even show up on the histogram)</string>
-    <string name="faq_text_7_9">To fix this you can check the box marked: \"Check here to count the number of data points tracked rather than the total of their values.\"</string>
-    <string name="faq_text_7_10">This way each multiple choice answer will be regarded as having the same weight in the histogram like so:</string>
-    <string name="faq_text_7_11">One final note to bare in mind is that your data may be skewed by the fact that you have not tracked data for each histogram bin yet or have not tracked them all equally yet. So for example if you are drawing a yearly histogram but have only been tracking for 6 months then your histogram may look like this:</string>
-    <string name="faq_text_7_12">And a year later it may look like this:</string>
-    <string name="faq_text_7_13">Over time however this skew will tend to 0. Therefore the more data you have tracked the more accurate the histogram will be.</string>
     <string name="moshi" translatable="false">Moshi</string>
     <string name="hold_to_preview">Hold to preview</string>
     <string name="open">Open</string>
@@ -372,8 +310,8 @@
     <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/index.md</string>
     <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/faq_1.md</string>
     <string name="advanced_options">Advanced options</string>
-    <string name="suggestion_type">"Suggestion type: "</string>
-    <string name="suggestion_order">"Suggestion order: "</string>
+    <string name="type_colon">"Type: "</string>
+    <string name="order_colon">"Order: "</string>
     <string name="value_and_label">Value and label</string>
     <string name="value_only">Value only</string>
     <string name="label_only">Label only</string>
@@ -386,5 +324,6 @@
     <string name="oldest">Oldest</string>
     <string name="track_all">Track all</string>
     <string name="more_details">More details</string>
+    <string name="suggestions">Suggestions</string>
 
 </resources>

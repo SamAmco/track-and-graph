@@ -14,11 +14,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalMaterialApi::class)
 
 package com.samco.trackandgraph.ui.compose.ui
 
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -37,15 +35,15 @@ fun <T> TextMapSpinner(
             Text(
                 modifier = modifier,
                 text = strings[item] ?: "",
-                fontSize = MaterialTheme.typography.subtitle2.fontSize,
-                fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
+                fontSize = MaterialTheme.typography.body1.fontSize,
+                fontWeight = MaterialTheme.typography.body1.fontWeight,
             )
         },
         dropdownItemFactory = { item, _ ->
             Text(
                 text = strings[item] ?: "",
-                fontSize = MaterialTheme.typography.subtitle2.fontSize,
-                fontWeight = MaterialTheme.typography.subtitle2.fontWeight
+                fontSize = MaterialTheme.typography.body1.fontSize,
+                fontWeight = MaterialTheme.typography.body1.fontWeight
             )
         }
     )
