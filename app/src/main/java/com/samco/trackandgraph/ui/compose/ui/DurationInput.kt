@@ -91,8 +91,7 @@ fun DurationInput(
     Text(
         text = ":",
         textAlign = TextAlign.Center,
-        modifier = Modifier
-            .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
+        modifier = Modifier.alignByBaseline()
     )
     DurationInputComponent(
         value = minutes.value,
@@ -104,8 +103,7 @@ fun DurationInput(
     Text(
         text = ":",
         textAlign = TextAlign.Center,
-        modifier = Modifier
-            .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
+        modifier = Modifier.alignByBaseline()
     )
     DurationInputComponent(
         value = seconds.value,
@@ -174,7 +172,8 @@ private fun RowScope.DurationInputComponent(
         singleLine = true,
         modifier = Modifier
             .width(IntrinsicSize.Min)
-            .widthIn(min = 40.dp, max = 80.dp)
+            .padding(start = 4.dp)
+            .widthIn(min = 40.dp, max = 40.dp)
             .indicatorLine(
                 enabled = true,
                 isError = false,
