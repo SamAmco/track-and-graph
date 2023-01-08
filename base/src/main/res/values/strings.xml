@@ -369,7 +369,8 @@
     <string name="data_point_tutorial_page_3_hint">(Hint: If you want to add more context or description use the note instead of the label field)</string>
     <string name="help">Help</string>
     <!--<string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/docs/faq/faq.md</string>-->
-    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/faq.md</string>
+    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/index.md</string>
+    <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/faq_1.md</string>
     <string name="advanced_options">Advanced options</string>
     <string name="suggestion_type">"Suggestion type: "</string>
     <string name="suggestion_order">"Suggestion order: "</string>
@@ -384,5 +385,6 @@
     <string name="latest">Latest</string>
     <string name="oldest">Oldest</string>
     <string name="track_all">Track all</string>
+    <string name="more_details">More details</string>
 
 </resources>

@@ -18,6 +18,8 @@
 
 package com.samco.trackandgraph.adddatapoint
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -30,10 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -124,6 +128,27 @@ fun TutorialPage2() {
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
         text = stringResource(R.string.data_point_tutorial_page_3_hint),
+        textAlign = TextAlign.Center,
+        fontSize = MaterialTheme.typography.body2.fontSize,
+        fontWeight = MaterialTheme.typography.body2.fontWeight
+    )
+
+    val context = LocalContext.current
+    val url = stringResource(R.string.faq_page_link_1)
+    Text(
+        modifier = Modifier
+            .padding(
+                horizontal = dimensionResource(id = R.dimen.input_spacing_large),
+                vertical = dimensionResource(id = R.dimen.card_padding)
+            )
+            .fillMaxWidth()
+            .clickable {
+                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+                context.startActivity(browserIntent)
+            },
+        text = stringResource(R.string.more_details),
+        color = MaterialTheme.tngColors.secondary,
+        textDecoration = TextDecoration.Underline,
         textAlign = TextAlign.Center,
         fontSize = MaterialTheme.typography.body2.fontSize,
         fontWeight = MaterialTheme.typography.body2.fontWeight
