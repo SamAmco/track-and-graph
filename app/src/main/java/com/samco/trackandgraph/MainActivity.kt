@@ -191,7 +191,9 @@ class MainActivity : AppCompatActivity() {
             android.R.layout.simple_spinner_dropdown_item,
             getThemeNames()
         )
-        when (getThemeValue()) {
+        val currentTheme = getThemeValue()
+        updateStatusBarColor()
+        when (currentTheme) {
             AppCompatDelegate.MODE_NIGHT_NO -> spinner.setSelection(1)
             AppCompatDelegate.MODE_NIGHT_YES -> spinner.setSelection(2)
             else -> spinner.setSelection(0)
@@ -199,10 +201,15 @@ class MainActivity : AppCompatActivity() {
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
                 onThemeSelected(position)
+                updateStatusBarColor()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+    }
+
+    private fun updateStatusBarColor() {
+        window.statusBarColor = getColorFromAttr(R.attr.colorSecondaryVariant)
     }
 
     private fun onThemeSelected(position: Int) {
