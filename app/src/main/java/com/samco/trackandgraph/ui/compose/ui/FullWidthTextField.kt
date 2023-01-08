@@ -17,15 +17,12 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
@@ -34,14 +31,15 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.unit.dp
 
+
+//TODO remove this
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun FullWidthTextField(
-    modifier: Modifier = Modifier,
+fun FullWidthTextFieldLegacy(
     value: String,
     onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
     label: String,
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
@@ -77,6 +75,51 @@ fun FullWidthTextField(
             if (textField.value != it) textField.value = it
             onValueChange(it.text)
         },
+        keyboardActions = keyboardActions,
+        keyboardOptions = keyboardOptions,
+        singleLine = singleLine,
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .onFocusChanged {
+                if (it.hasFocus) keyboardController?.show()
+            }
+            .let {
+                if (focusRequester != null) it.focusRequester(focusRequester)
+                else it
+            }
+    )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun FullWidthTextField(
+    modifier: Modifier = Modifier,
+    textFieldValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    label: String,
+    focusManager: FocusManager? = null,
+    focusRequester: FocusRequester? = null,
+    keyboardController: SoftwareKeyboardController? = null,
+    singleLine: Boolean = true
+) {
+    val keyboardActions =
+        if (focusManager != null) KeyboardActions(onNext = {
+            focusManager.moveFocus(FocusDirection.Down)
+        }) else KeyboardActions.Default
+
+    val keyboardOptions =
+        if (singleLine) KeyboardOptions(
+            imeAction = ImeAction.Next,
+            capitalization = KeyboardCapitalization.Sentences
+        ) else KeyboardOptions.Default.copy(
+            capitalization = KeyboardCapitalization.Sentences
+        )
+
+    OutlinedTextField(
+        value = textFieldValue,
+        label = { Text(text = label) },
+        onValueChange = { onValueChange(it) },
         keyboardActions = keyboardActions,
         keyboardOptions = keyboardOptions,
         singleLine = singleLine,
