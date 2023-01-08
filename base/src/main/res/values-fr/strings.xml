@@ -168,55 +168,7 @@
     <string name="about">About</string>
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
-    <string name="faq_1">Comment puis-je commencer à suivre quelque chose ? </string>
-    <string name="faq_2">Comment importer / exporter ce que j\'ai suivi?</string>
-    <string name="faq_3">Comment fonctionnent les données à choix multiples?</string>
-    <string name="faq_4">Comment puis-je commencer à créer des graphiques?</string>
-    <string name="faq_5">Comment sont calculées les moyennes glissantes et les totaux?</string>
-    <string name="faq_6">Comment fonctionnent les notes?</string>
     <string name="faq">FAQ</string>
-    <string name="faq_text_1_1">Pour commencer le suivi, vous devrez créer un suivi.</string>
-    <string name="faq_text_1_4">Tapez le nom de ce que vous voulez suivre et sélectionnez un style d\'entrée : </string>
-    <string name="faq_text_1_5">Vous avez le choix entre trois styles de saisie : \n\n• Les choix multiples vous obligent à configurer manuellement des réponses prédéfinies qui vous seront présentées sous forme de boutons lors du suivi.\n\n• Numérique vous demandera de saisir un nombre lorsque suivi.\n\n• La durée vous demandera d\'entrer une durée en heures, minutes et secondes lors du suivi. \n\nSi vous ajoutez une valeur par défaut, aucune valeur ne vous sera demandée à chaque fois que vous appuyez sur le bouton + et votre valeur par défaut sera utilisée à la place. Vous pouvez appuyer longuement sur le bouton + pour fournir une valeur manuellement.</string>
-    <string name="faq_text_1_6">Pour créer des réponses à choix multiples, cliquez sur le bouton + en bas.</string>
-    <string name="faq_text_1_8">Quand vous êtes satisfait de la configuration, cliquez sur le bouton TERMINER.</string>
-    <string name="faq_text_1_9">Vous devriez maintenant voir des cartes dans votre groupe. Vous pouvez les commander facilement en maintenant enfoncé l\'élément que vous souhaitez déplacer, puis en le faisant glisser vers une nouvelle position.</string>
-    <string name="faq_text_1_10">Vous pouvez suivre les choses individuellement en utilisant leurs boutons + ou suivre tout dans le groupe rapidement en utilisant le bouton d\'action : </string>.
-    <string name="faq_text_1_11">Ne vous inquiétez pas si vous faites une erreur, vous pouvez toujours voir, revoir et modifier votre historique de suivi en tapant simplement sur la carte.</string>
-    <string name="faq_text_2_1">Pour importer/exporter uniquement les données suivies dans un groupe vers un fichier CSV, utilisez les boutons de menu en haut:</string>
-    <string name="faq_text_2_2">Utilisez ce bouton pour importer un csv dans ce groupe.</string>
-    <string name="faq_text_2_3">Utilisez ce bouton pour exporter les données suivies de ce groupe vers un fichier csv.</string>
-    <string name="faq_text_2_4">La sauvegarde &amp; L\'option de restauration dans le menu est légèrement différente. Cela exportera et restaurera l\'intégralité du fichier de base de données contenant toutes les données, graphiques, rappels et notes suivis. Il est recommandé de sauvegarder régulièrement vos données. Le fichier de sauvegarde est un fichier de base de données Sqlite3 non crypté qui peut également être ouvert et modifié à l\'aide d\'un logiciel disponible gratuitement. Cependant, cela n\'est pas recommandé pour les utilisateurs non techniques car vous pourriez briser l\'intégrité de la base de données.</string>
-    <string name="faq_text_3_1">Il est recommandé d\'utiliser le type de saisie à choix multiple chaque fois que cela est possible. Si jamais vous voulez dessiner un camembert à partir de vos données, vous aurez besoin qu\'elles soient sous forme de choix multiples. Vous pouvez également dessiner un graphique linéaire de vos données dans le temps si vos réponses prédéfinies ont un ordre naturel. Par exemple, disons que vous deviez configurer ce qui suit : </string>
-    <string name="faq_text_3_2">Et puis vous avez suivi certaines données comme suit: </string>
-    <string name="faq_text_3_3">Vous pourriez ensuite visualiser ces données à l\'aide d\'un graphique linéaire dans le temps ou à l\'aide d\'un graphique circulaire comme ci-dessous : </string>.
-    <string name="faq_text_4_1">Pour commencer à créer des graphiques, vous devez d\'abord suivre certaines données. Accédez ensuite au groupe dans lequel vous souhaitez créer votre graphique, appuyez sur + en haut à droite, puis sélectionnez Graphique ou Statistique.</string>
-    <string name="faq_text_4_5">Commencez par saisir un nom pour votre nouveau graphique, puis sélectionnez un type de graphique. Ici, nous ferons la démonstration du graphique linéaire puisque les autres types de graphiques sont relativement triviaux à configurer. Une mise en garde à noter cependant est que vous ne pouvez créer des graphiques circulaires qu\'à partir de données à choix multiples.</string>
-    <string name="faq_text_4_6">Le style plage dynamique calculera automatiquement les valeurs min et max pour l\'axe Y. Maintenant, nous allons ajouter quelques lignes à notre graphique en utilisant le bouton + en bas : </string>
-    <string name="faq_text_4_7">Parce que nos valeurs de blé sont des réponses à choix multiples allant de 0 à 2 et que nos valeurs de douleur à l\'estomac sont des nombres allant de 1 à 8, nous avons multiplié nos valeurs de blé par 4 pour rendre les plages similaires. Nous avons utilisé une moyenne mobile sur trois jours pour lisser les anomalies et réduire le bruit dans le graphique de sortie. Nous avons également sélectionné l\'option plot when tracked car ces données ont été suivies de manière relativement cohérente. Pour en savoir plus sur la façon dont ces paramètres affectent les graphiques linéaires, consultez la FAQ : "Comment sont calculées les moyennes mobiles et les totaux des tracés ?"</string>.
-    <string name="faq_text_4_8">Ensuite, nous cliquons sur le bouton FINISH pour terminer la configuration. Remarquez comment notre nouveau graphique apparaît sous forme de carte dans notre groupe:</string>
-    <string name="faq_text_4_9">Pour explorer le graphique plus en détail, vous pouvez toucher la carte pour l\'ouvrir en plein écran, puis pincer et faire glisser les lignes : </string>
-    <string name="faq_text_4_10">Au fur et à mesure que nous ajoutons plus de graphiques et de statistiques à notre groupe, ils apparaissent sous la forme d\'une liste de cartes. Vous pouvez les réorganiser à tout moment en maintenant enfoncée et en faisant glisser une carte vers une nouvelle position.</string>
-    <string name="faq_text_5_1">Déplacement des moyennes : </string>
-    <string name="faq_text_5_2">Supposons que nous voulions suivre quelque chose simplement sous forme de question oui ou non, par exemple : </string>
-    <string name="faq_text_5_3">Si nous devions suivre ces données dans le temps sans utiliser de moyenne mobile, cela pourrait ressembler à ceci : </string>
-    <string name="faq_text_5_4">Ce résultat est très précis mais pas très utile. Pour faciliter la compréhension des données, nous pourrions utiliser une moyenne mobile mensuelle : </string>
-    <string name="faq_text_5_5">Maintenant, au lieu de tracer chaque point de données avec la valeur Y enregistrée (0 ou 1), chaque valeur Y est calculée comme la moyenne d\'elle-même et de tous les points de données précédents dans la plage de temps sélectionnée avant.</string>
-    <string name="faq_text_5_6">Généralement, plus la période de calcul de la moyenne sélectionnée est longue, plus la courbe apparaît lisse. Notez toutefois que les moyennes mobiles sont des indicateurs retardés. Plus la période de moyennage est longue, plus la courbe sera en retard par rapport à la valeur réelle.</string>
-    <string name="faq_text_5_7">Total des tracés: </string>
-    <string name="faq_text_5_8">Certaines choses que vous pouvez ne vouloir suivre que rarement. Par exemple, vous pouvez vouloir suivre quand vous finissez de lire un livre : </string>.
-    <string name="faq_text_5_9">Supposons que vous suiviez les éléments suivants : </string>
-    <string name="faq_text_5_10">Vous pouvez alors être surpris ou non de constater que votre graphique apparaît comme suit : </string>
-    <string name="faq_text_5_11">Le problème est que les lignes sont tracées uniquement de chaque valeur tracée à la valeur tracée suivante. Comme toutes les valeurs tracées sont interprétées comme 1, vous ne voyez qu\'une ligne droite au point 1 sur l\'axe des Y.</string>
-    <string name="faq_text_5_12">Nous pouvons corriger cela en utilisant des totaux de tracé. Par exemple, si nous traçons les totaux mensuels, nous verrons le graphique suivant: </string>
-    <string name="faq_text_5_13">Notez qu\'un point est tracé à la fin de chaque mois représentant le total de toutes les valeurs suivies au cours de ce mois.</string>
-    <string name="faq_text_5_14">Vous pouvez utiliser l\'échelle, le décalage, la moyenne et les totaux en même temps. L\'ordre de préséance est le suivant : </string>
-    <string name="faq_text_5_15">- Vos données sont d\'abord converties en totaux\n\n- Puis chaque point est converti en sa moyenne mobile\n\n- Puis vos points sont multipliés par la valeur de l\'échelle\n\n- Enfin le décalage est ajouté à chaque point</string>.
-    <string name="faq_text_6_1">Les notes vous permettent de garder une trace des données qualitatives à côté de vos données quantitatives. Il existe deux types de notes :\n\n- Les notes globales (ajoutées directement dans le menu des notes)\n\n- Les notes de points de données (attachées à des points de données spécifiques)\n\nLorsque vous ajoutez un point de données, vous pouvez souhaiter suivre un élément d\'information important spécifique à cet ensemble de données. Par exemple : </string>
-    <string name="faq_text_6_2">Après avoir ajouté cette note, vous remarquerez qu\'elle s\'affiche dans une liste sous tout graphique de cet ensemble de données. Si vous appuyez sur la note, elle s\'ouvrira dans une fenêtre de dialogue et un marqueur sera ajouté au graphique.</string>
-    <string name="faq_text_6_3">Cependant, certains éléments d\'information peuvent être pertinents pour toutes vos données. Dans ce cas, vous pouvez ajouter une note globale en appuyant sur le bouton plus dans le menu des notes globales : </string>
-    <string name="faq_text_6_4">Vous remarquerez que cette note s\'affiche désormais sous tous les graphiques.</string>
-    <string name="faq_text_6_5">Vous pouvez modifier ou supprimer toute note à partir du menu des notes. La suppression d\'une note de point de données à partir du menu notes ne supprimera pas le point de données lui-même, mais seulement la note qui y est attachée.</string>
     <string name="tutorial_text_1">Utilisez des suivi pour suivre vos données.</string>
     <string name="tutorial_text_2">Utilisez des graphiques et des statistiques pour visualiser les données.</string>
     <string name="tutorial_text_3">Utilisez des groupes pour organiser vos suivie, graphiques et statistiques.</string>
@@ -303,20 +255,6 @@
     <string name="number_of_bins">Nombre de cases : </string>
     <string name="sum_by_count_checkbox_label">Cochez ici pour compter le nombre de points de données suivis plutôt que le total de leurs valeurs.</string>
     <string name="time_window_size">Taille de la fenêtre de temps : </string>
-    <string name="faq_7">Comment fonctionnent les histogrammes temporels ?</string>
-    <string name="faq_text_7_1"><![CDATA[Les histogrammes sont utiles pour montrer comment les données sont distribuées sur un domaine donné. Les histogrammes temporels dans Track & Graph vous permettent de voir comment vos données sont distribuées sur diverses périodes de temps.]]></string>
-    <string name="faq_text_7_2">Par exemple, imaginez que vous avez suivi 7 semaines de données sur le temps que vous avez passé à lire. Vous souhaitez peut-être savoir quels jours de la semaine vous passez généralement le plus de temps à lire. Ici, vous pourriez utiliser un histogramme temporel avec la configuration suivante : </string>.
-    <string name="faq_text_7_3">Pour générer l\'histogramme suivant : </string>
-    <string name="faq_text_7_4">L\'histogramme est calculé simplement en prenant chaque point de données au sein de l\'échantillon et en ajoutant sa valeur à une \"bin\" basée sur le jour de la semaine où cette valeur a été suivie. Ainsi, la case du jour 1 représente le total de tous les points de données suivis le lundi, divisé par le total de tous les points de données de l\'échantillon. Les histogrammes sont "normalisés", ce qui signifie que la somme de toutes les hauteurs des barres (ou de la zone sous le graphique) doit être égale à 1 exactement. Ainsi, par exemple, si vous ne lisez jamais que le vendredi, vous vous attendez à ce que votre histogramme ne présente qu\'une seule barre pour le vendredi avec une hauteur de 1. </string>
-    <string name="faq_text_7_5">Si vous lisez le samedi 50% du temps et le vendredi 50% du temps, vous vous attendriez à ce que votre histogramme ressemble à ceci: </string>
-    <string name="faq_text_7_6"><![CDATA[Si les données que vous suivez sont à choix multiples, alors Track & Graph vous montrera la distribution dans chaque barre de la quantité constituée par chaque choix suivi comme ceci :]]></string>.
-    <string name="faq_text_7_7">Par défaut, la hauteur de chaque barre est relative à la somme de toutes les valeurs des points de données qui tombent dans cette plage de temps. Cependant, si la valeur de chacun de vos choix doit être la même (c\'est-à-dire que les choix représentent des données discrètes non ordonnées), alors votre histogramme sera incorrectement incliné comme suit: </string>.
-    <string name="faq_text_7_8">(remarquez que l\'indice de Sparrow est 0 donc il n\'apparaît même pas sur l\'histogramme)</string>
-    <string name="faq_text_7_9">Pour corriger cela, vous pouvez cocher la case marquée : \"Cocher ici pour compter le nombre de points de données suivis plutôt que le total de leurs valeurs.\"</string>
-    <string name="faq_text_7_10">De cette façon, chaque réponse à choix multiple sera considérée comme ayant le même poids dans l\'histogramme, comme suit : </string>
-    <string name="faq_text_7_11">Une dernière remarque à garder à l\'esprit est que vos données peuvent être faussées par le fait que vous n\'avez pas encore suivi les données pour chaque case de l\'histogramme ou que vous ne les avez pas encore toutes suivies de manière égale. Ainsi, par exemple, si vous dessinez un histogramme annuel mais que vous ne suivez les données que depuis 6 mois, alors votre histogramme peut ressembler à ceci : </string>
-    <string name="faq_text_7_12">Et un an plus tard, il peut ressembler à ceci: </string>
-    <string name="faq_text_7_13">Au fil du temps cependant, ce biais tendra vers 0. Par conséquent, plus vous aurez suivi de données, plus l\'histogramme sera précis.</string>
     <string name="hold_to_preview">Maintenir pour visualiser l\'aperçu</string>
     <string name="hours_suffix">h</string>
     <string name="weeks">Semaines</string>
@@ -334,4 +272,47 @@
     <string name="save_changes">Sauvegarder les modifications</string>
     <string name="timer_notification_channel_name">Minuteries</string>
     <string name="stop">Arrêt</string>
+
+    <string name="function">Fonction (expérimental)</string>
+    <string name="add_function">Ajouter une fonction</string>
+    <string name="name_your_function">Nommez votre fonction :</string>
+    <string name="write_your_function_here"># Écrivez votre fonction ici</string>
+    <string name="add_some_data_sources">Ajouter des sources de données</string>
+    <string name="value_colon">Évaluer:</string>
+    <string name="label_colon">Étiquette:</string>
+    <string name="continue_word">Continuez</string>
+    <string name="update_all_data_points">Mettez à jour tous les points de données :</string>
+    <string name="where_colon">Où:</string>
+    <string name="to_colon">Pour:</string>
+    <string name="value_equals">Valeur =</string>
+    <string name="label_equals">Libellé =</string>
+    <string name="adding_your_first_data_point">Un tutoriel rapide sur l\'ajout de points de données :</string>
+    <string name="next">Suivant</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Chaque point de données a un horodatage et une valeur :</string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Il peut aussi éventuellement avoir une étiquette et une note :</string>
+    <string name="data_point_tutorial_page_2_description">La valeur est un nombre afin que vous puissiez voir comment vos données évoluent au fil du temps</string>
+    <string name="data_point_tutorial_page_2_hint">(Astuce : si vous ne vous souciez pas de la valeur, utilisez simplement la valeur par défaut de 1)</string>
+    <string name="data_point_tutorial_page_3_description">Utilisez des étiquettes si vous souhaitez regrouper les points de données</string>
+    <string name="data_point_tutorial_page_3_hint">(Astuce : si vous souhaitez ajouter plus de contexte ou de description, utilisez la note au lieu du champ d\'étiquette)</string>
+    <string name="help">Aider</string>
+    
+    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/index.md</string>
+    <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/faq_1.md</string>
+    <string name="advanced_options">Options avancées</string>
+    <string name="type_colon">\"Taper: \"</string>
+    <string name="order_colon">\"Ordre: \"</string>
+    <string name="value_and_label">Valeur et étiquette</string>
+    <string name="value_only">Valeur uniquement</string>
+    <string name="label_only">Étiquette uniquement</string>
+    <string name="none">Aucun</string>
+    <string name="value_ascending">Valeur croissante</string>
+    <string name="value_descending">Valeur décroissante</string>
+    <string name="label_ascending">Libellé croissant</string>
+    <string name="label_descending">Libellé décroissant</string>
+    <string name="latest">Dernier</string>
+    <string name="oldest">Le plus ancien</string>
+    <string name="track_all">Suivre tout</string>
+    <string name="more_details">Plus de détails</string>
+    <string name="suggestions">Suggestions</string>
+
 </resources>
