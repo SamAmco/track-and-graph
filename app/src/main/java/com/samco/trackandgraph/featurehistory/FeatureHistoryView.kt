@@ -43,35 +43,6 @@ import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.ui.*
 
-/*
-@Composable
-@Preview(showBackground = true, device = Devices.PIXEL_3)
-fun FeatureHistoryViewPreview() {
-    TnGComposeTheme {
-        FeatureHistoryView(viewModel = object : FeatureHistoryViewModel {
-            override val isDuration = MutableLiveData(false)
-            override val isTracker = MutableLiveData(false)
-            override val dataPoints = MutableLiveData(emptyList<DataPoint>())
-            override val showFeatureInfo = MutableLiveData<Feature?>(null)
-            override val showDataPointInfo = MutableLiveData<DataPoint?>(null)
-
-            override fun deleteDataPoint() {}
-            override fun onEditClicked(dataPoint: DataPoint) {}
-            override fun onDeleteClicked(dataPoint: DataPoint) {}
-            override fun onDeleteConfirmed() { }
-
-            override fun onDeleteDismissed() { }
-
-            override fun onDataPointClicked(dataPoint: DataPoint) {}
-            override fun onDismissDataPoint() {}
-
-            override fun onShowFeatureInfo() {}
-            override fun onHideFeatureInfo() {}
-        })
-    }
-}
-*/
-
 @Composable
 fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     val dataPoints by viewModel.dataPoints.observeAsState(emptyList())
@@ -202,8 +173,8 @@ private fun ToLabelInput(viewModel: UpdateDialogViewModel) {
     ) {
         LabelInputTextField(
             modifier = it,
-            value = viewModel.toLabel.observeAsState("").value,
-            onValueChanged = viewModel::setToLabel
+            textFieldValue = viewModel.toLabel,
+            onValueChange = viewModel::setToTextLabel
         )
     }
 }
@@ -227,8 +198,8 @@ private fun ToValueInput(viewModel: UpdateDialogViewModel) {
         } else {
             ValueInputTextField(
                 modifier = it,
-                value = viewModel.toValue.observeAsState("").value,
-                onValueChanged = viewModel::setToValue
+                textFieldValue = viewModel.toValue,
+                onValueChange = viewModel::setToTextValue
             )
         }
     }
@@ -246,8 +217,8 @@ private fun WhereLabelInput(viewModel: UpdateDialogViewModel) {
     ) {
         LabelInputTextField(
             modifier = it,
-            value = viewModel.whereLabel.observeAsState("").value,
-            onValueChanged = viewModel::setWhereLabel,
+            textFieldValue = viewModel.whereLabel,
+            onValueChange = viewModel::setWhereTextLabel,
         )
     }
 }
@@ -273,8 +244,8 @@ private fun WhereValueInput(
         } else {
             ValueInputTextField(
                 modifier = it,
-                value = viewModel.whereValue.observeAsState("").value,
-                onValueChanged = viewModel::setWhereValue,
+                textFieldValue = viewModel.whereValue,
+                onValueChange = viewModel::setWhereTextValue,
             )
         }
     }

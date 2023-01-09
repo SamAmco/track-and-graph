@@ -47,8 +47,7 @@ fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
             .background(color = MaterialTheme.tngColors.surface)
             .padding(dimensionResource(id = R.dimen.card_padding))
     ) {
-        val noteText by viewModel.note.map { it.note }.observeAsState("")
-        val selectedDateTime by viewModel.note.map { it.timestamp }.observeAsState(OffsetDateTime.now())
+        val selectedDateTime by viewModel.dateTime.observeAsState(OffsetDateTime.now())
 
         val focusRequester = FocusRequester()
 
@@ -71,9 +70,9 @@ fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
 
         SpacingSmall()
 
-        FullWidthTextFieldLegacy(
+        FullWidthTextField(
             modifier = Modifier.heightIn(max = 200.dp),
-            value = noteText,
+            textFieldValue = viewModel.note,
             onValueChange = { viewModel.updateNoteText(it) },
             focusRequester = focusRequester,
             label = stringResource(id = R.string.note_input_hint),

@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
@@ -238,8 +239,8 @@ private fun TutorialPage0() {
 
                 LabeledRow(label = stringResource(id = R.string.value_colon)) {
                     ValueInputTextField(
-                        value = "",
-                        onValueChanged = {}
+                        textFieldValue = TextFieldValue(""),
+                        onValueChange = {}
                     )
                 }
             }
@@ -274,8 +275,8 @@ private fun TutorialPage0() {
             ) {
                 LabeledRow(label = stringResource(id = R.string.label_colon)) {
                     LabelInputTextField(
-                        value = "",
-                        onValueChanged = {}
+                        textFieldValue = TextFieldValue(""),
+                        onValueChange = {}
                     )
                 }
 

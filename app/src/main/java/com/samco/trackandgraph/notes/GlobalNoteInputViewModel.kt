@@ -14,31 +14,39 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalCoroutinesApi::class)
 
 package com.samco.trackandgraph.notes
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 interface GlobalNoteInputViewModel {
-    val note: LiveData<GlobalNote>
+    val note: TextFieldValue
+    val dateTime: LiveData<OffsetDateTime>
     val dismiss: LiveData<Boolean>
     val updateMode: LiveData<Boolean>
     val addButtonEnabled: LiveData<Boolean>
 
     fun init(timestampStr: String?)
-    fun updateNoteText(text: String)
+    fun updateNoteText(text: TextFieldValue)
     fun updateTimeStamp(timeStamp: OffsetDateTime)
     fun onAddClicked()
     fun onCancelClicked()
@@ -47,55 +55,24 @@ interface GlobalNoteInputViewModel {
 @HiltViewModel
 class GlobalNoteInputViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
-    @IODispatcher private val io: CoroutineDispatcher
+    @IODispatcher private val io: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel(), GlobalNoteInputViewModel {
 
-    private val onInitFromTimestamp = MutableSharedFlow<OffsetDateTime>()
-    private val onUpdateText = MutableSharedFlow<String?>()
-    private val onUpdateTimeStamp = MutableSharedFlow<OffsetDateTime?>()
     private val onCancelClicked = MutableSharedFlow<Unit>()
-    private val onAddClicked = MutableSharedFlow<Unit>()
 
-    private val foundNote = onInitFromTimestamp
-        .map { dataInteractor.getGlobalNoteByTimeSync(it) }
-        .flowOn(io)
-        .filterNotNull()
-        .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
+    private var foundNote: GlobalNote? = null
 
-    private val noteFlow = foundNote
-        .onStart { emit(GlobalNote()) }
-        .combine(onUpdateText.onStart { emit(null) }) { note, text ->
-            text?.let { note.copy(note = it) } ?: note
-        }
-        .combine(onUpdateTimeStamp.onStart { emit(null) }) { note, timeStamp ->
-            timeStamp?.let { note.copy(timestamp = it) } ?: note
-        }
-        .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
+    override var note by mutableStateOf(TextFieldValue())
+    override val dateTime = MutableLiveData<OffsetDateTime>()
 
-    override val note = noteFlow.asLiveData(viewModelScope.coroutineContext)
+    override val updateMode = MutableLiveData(false)
 
-    private val updateModeFlow = foundNote
-        .map { true }
-        .onStart { emit(false) }
-        .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
-
-    override val updateMode = updateModeFlow.asLiveData(viewModelScope.coroutineContext)
-
-    override val addButtonEnabled = noteFlow
-        .map { it.note.isNotBlank() }
+    override val addButtonEnabled = snapshotFlow { note }
+        .map { it.text.isNotBlank() }
         .asLiveData(viewModelScope.coroutineContext)
 
-    private val addCompleteEvents = onAddClicked
-        .flatMapLatest { noteFlow }
-        .combine(updateModeFlow) { note, updateMode ->
-            if (updateMode) {
-                foundNote.firstOrNull()?.let {
-                    dataInteractor.deleteGlobalNote(it)
-                }
-            }
-            dataInteractor.insertGlobalNote(note)
-        }
-        .flowOn(io)
+    private val addCompleteEvents = MutableSharedFlow<Unit>()
 
     override val dismiss = merge(onCancelClicked, addCompleteEvents)
         .map { true }
@@ -107,25 +84,45 @@ class GlobalNoteInputViewModelImpl @Inject constructor(
         if (initialized) return
         initialized = true
 
-        viewModelScope.launch {
-            timestampStr?.let {
+        viewModelScope.launch(io) {
+            val globalNote = timestampStr?.let {
                 odtFromString(it)?.let { odt ->
-                    onInitFromTimestamp.emit(odt)
+                    dataInteractor.getGlobalNoteByTimeSync(odt)
                 }
+            }
+            withContext(ui) {
+                globalNote?.let { initFromGlobalNote(it) }
             }
         }
     }
 
-    override fun updateNoteText(text: String) {
-        viewModelScope.launch { onUpdateText.emit(text) }
+    private fun initFromGlobalNote(note: GlobalNote) {
+        foundNote = note
+        this.note = TextFieldValue(note.note, TextRange(note.note.length))
+        this.dateTime.value = note.timestamp
+        this.updateMode.value = true
+    }
+
+    override fun updateNoteText(text: TextFieldValue) {
+        note = text
     }
 
     override fun updateTimeStamp(timeStamp: OffsetDateTime) {
-        viewModelScope.launch { onUpdateTimeStamp.emit(timeStamp) }
+        dateTime.value = timeStamp
     }
 
     override fun onAddClicked() {
-        viewModelScope.launch { onAddClicked.emit(Unit) }
+        viewModelScope.launch(io) {
+            foundNote?.let { dataInteractor.deleteGlobalNote(it) }
+            dataInteractor.insertGlobalNote(
+                GlobalNote(
+                    note = note.text,
+                    timestamp = dateTime.value ?: OffsetDateTime.now()
+                )
+            )
+
+            withContext(ui) { addCompleteEvents.emit(Unit) }
+        }
     }
 
     override fun onCancelClicked() {

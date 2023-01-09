@@ -262,6 +262,10 @@ internal class TrackerHelperImpl @Inject constructor(
         return dao.numTrackers().map { it > 0 }.flowOn(io)
     }
 
+    override suspend fun hasAtLeastOneDataPoint() = withContext(io) {
+        return@withContext dao.hasAtLeastOneDataPoint()
+    }
+
     override suspend fun insertTracker(tracker: Tracker): Long = withContext(io) {
         return@withContext transactionHelper.withTransaction {
             val featureId = dao.insertFeature(tracker.toFeatureEntity())

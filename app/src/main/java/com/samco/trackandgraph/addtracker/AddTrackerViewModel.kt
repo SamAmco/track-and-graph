@@ -32,8 +32,8 @@ interface AddTrackerViewModel : DurationInputViewModel {
     val isDuration: LiveData<Boolean>
     val isLoading: LiveData<Boolean>
     val hasDefaultValue: LiveData<Boolean>
-    val defaultValue: LiveData<String>
-    val defaultLabel: LiveData<String>
+    val defaultValue: TextFieldValue
+    val defaultLabel: TextFieldValue
     val createButtonEnabled: LiveData<Boolean>
     val errorText: LiveData<Int?>
     val durationNumericConversionMode: LiveData<TrackerHelper.DurationNumericConversionMode>
@@ -48,8 +48,8 @@ interface AddTrackerViewModel : DurationInputViewModel {
     fun onTrackerDescriptionChanged(description: TextFieldValue)
     fun onIsDurationCheckChanged(isDuration: Boolean)
     fun onHasDefaultValueChanged(hasDefaultValue: Boolean)
-    fun onDefaultValueChanged(defaultValue: String)
-    fun onDefaultLabelChanged(defaultLabel: String)
+    fun onDefaultValueChanged(defaultValue: TextFieldValue)
+    fun onDefaultLabelChanged(defaultLabel: TextFieldValue)
     fun onDurationNumericConversionModeChanged(durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode)
     fun onConfirmUpdate()
     fun onDismissUpdateWarningCancel()
@@ -80,8 +80,8 @@ class AddTrackerViewModelImpl @Inject constructor(
     override var trackerDescription by mutableStateOf(TextFieldValue(""))
     override val isLoading = MutableLiveData(false)
     override val hasDefaultValue = MutableLiveData(false)
-    override val defaultValue = MutableLiveData("1.0")
-    override val defaultLabel = MutableLiveData("")
+    override var defaultValue by mutableStateOf(TextFieldValue("1.0", TextRange(0, 3)))
+    override var defaultLabel by mutableStateOf(TextFieldValue())
     override val isDuration = isDurationModeFlow
         .asLiveData(viewModelScope.coroutineContext)
     override val isUpdateMode: LiveData<Boolean> =
@@ -158,8 +158,10 @@ class AddTrackerViewModelImpl @Inject constructor(
         trackerDescription = TextFieldValue(tracker.description, TextRange(tracker.name.length))
         isDurationModeFlow.value = tracker.dataType == DataType.DURATION
         hasDefaultValue.value = tracker.hasDefaultValue
-        defaultValue.value = tracker.defaultValue.toString()
-        defaultLabel.value = tracker.defaultLabel
+
+        val defaultValueStr = tracker.defaultValue.toString()
+        defaultValue = TextFieldValue(defaultValueStr, TextRange(defaultValueStr.length))
+        defaultLabel = TextFieldValue(tracker.defaultLabel, TextRange(tracker.defaultLabel.length))
         suggestionType.value = tracker.suggestionType
         suggestionOrder.value = tracker.suggestionOrder
         isUpdateModeFlow.value = true
@@ -173,12 +175,12 @@ class AddTrackerViewModelImpl @Inject constructor(
         this.hasDefaultValue.value = hasDefaultValue
     }
 
-    override fun onDefaultValueChanged(defaultValue: String) {
-        this.defaultValue.value = defaultValue.asValidatedDouble()
+    override fun onDefaultValueChanged(defaultValue: TextFieldValue) {
+        this.defaultValue = defaultValue.copy(text = defaultValue.text.asValidatedDouble())
     }
 
-    override fun onDefaultLabelChanged(defaultLabel: String) {
-        this.defaultLabel.value = defaultLabel
+    override fun onDefaultLabelChanged(defaultLabel: TextFieldValue) {
+        this.defaultLabel = defaultLabel
     }
 
     override fun onDurationNumericConversionModeChanged(durationNumericConversionMode: TrackerHelper.DurationNumericConversionMode) {
@@ -228,7 +230,7 @@ class AddTrackerViewModelImpl @Inject constructor(
 
     private fun getDefaultValue() = when (isDuration.value) {
         true -> getDurationAsDouble()
-        else -> defaultValue.value?.toDoubleOrNull()
+        else -> defaultValue.text.toDoubleOrNull()
     }
 
     private suspend fun updateTracker(existingTracker: Tracker) {
@@ -238,9 +240,9 @@ class AddTrackerViewModelImpl @Inject constructor(
             newName = trackerName.text,
             newType = getDataType(),
             hasDefaultValue = hasDefaultValue.value,
-            defaultValue = getDefaultValue(),
+            defaultValue = getDefaultValue() ?: 1.0,
             featureDescription = trackerDescription.text,
-            defaultLabel = defaultLabel.value,
+            defaultLabel = defaultLabel.text,
             suggestionType = suggestionType.value,
             suggestionOrder = suggestionOrder.value
         )
@@ -257,7 +259,7 @@ class AddTrackerViewModelImpl @Inject constructor(
             dataType = getDataType(),
             hasDefaultValue = hasDefaultValue.value ?: false,
             defaultValue = getDefaultValue() ?: 1.0,
-            defaultLabel = defaultLabel.value ?: ""
+            defaultLabel = defaultLabel.text
         )
         dataInteractor.insertTracker(tracker)
     }

@@ -16,6 +16,11 @@
 */
 package com.samco.trackandgraph.adddatapoint
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
@@ -44,14 +49,14 @@ data class SuggestedValueViewData(
 interface AddDataPointBaseViewModel {
     val name: LiveData<String>
     val timestamp: LiveData<OffsetDateTime>
-    val label: LiveData<String>
-    val note: LiveData<String>
+    val label: TextFieldValue
+    val note: TextFieldValue
     val suggestedValues: LiveData<List<SuggestedValueViewData>>
     val selectedSuggestedValue: LiveData<SuggestedValueViewData?>
 
     fun getTracker(): Tracker
-    fun updateLabel(label: String)
-    fun updateNote(note: String)
+    fun updateLabel(label: TextFieldValue)
+    fun updateNote(note: TextFieldValue)
     fun updateTimestamp(timestamp: OffsetDateTime)
     fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData)
     fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData)
@@ -60,8 +65,8 @@ interface AddDataPointBaseViewModel {
 sealed interface AddDataPointViewModel : AddDataPointBaseViewModel {
 
     interface NumericalDataPointViewModel : AddDataPointViewModel {
-        val value: LiveData<String>
-        fun setValue(value: String)
+        val value: TextFieldValue
+        fun setValueText(value: TextFieldValue)
     }
 
     interface DurationDataPointViewModel : AddDataPointViewModel, DurationInputViewModel
@@ -123,8 +128,12 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     //Show the tutorial if the user has no data or if they have pressed the tutorial button
     override val showTutorial: LiveData<Boolean> = merge(
-        tutorialButtonPresses.map { true }
-            .onStart { emit(!prefHelper.getHideDataPointTutorial()) },
+        tutorialButtonPresses
+            .map { true }
+            .onStart {
+                val hasData = dataInteractor.hasAtLeastOneDataPoint()
+                emit(!hasData && !prefHelper.getHideDataPointTutorial())
+            },
         tutorialViewModel.onTutorialComplete.map { false }
     )
         .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
@@ -174,8 +183,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
     ) : AddDataPointBaseViewModel {
         override val name = MutableLiveData(config.tracker.name)
         override val timestamp = MutableLiveData(config.timestamp ?: now)
-        override val label = MutableLiveData(config.label ?: "")
-        override val note = MutableLiveData(config.note ?: "")
+        override var label by mutableStateOf(TextFieldValue(""))
+        override var note by mutableStateOf(TextFieldValue(""))
         override val selectedSuggestedValue = MutableLiveData<SuggestedValueViewData?>(null)
 
         override val suggestedValues: LiveData<List<SuggestedValueViewData>> = suggestedValueHelper
@@ -201,13 +210,13 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
         override fun getTracker() = config.tracker
 
-        override fun updateLabel(label: String) {
-            this.label.value = label
+        override fun updateLabel(label: TextFieldValue) {
+            this.label = label
             this.selectedSuggestedValue.value = null
         }
 
-        override fun updateNote(note: String) {
-            this.note.value = note
+        override fun updateNote(note: TextFieldValue) {
+            this.note = note
         }
 
         override fun updateTimestamp(timestamp: OffsetDateTime) {
@@ -215,13 +224,18 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
 
         override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
-            suggestedValue.label?.let { this.label.value = it }
+            this.selectedSuggestedValue.value = suggestedValue
+            setLabelFromSuggestedValue(suggestedValue)
         }
 
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
-            suggestedValue.label?.let { this.label.value = it }
             this.selectedSuggestedValue.value = suggestedValue
+            setLabelFromSuggestedValue(suggestedValue)
             onAddClicked()
+        }
+
+        private fun setLabelFromSuggestedValue(suggestedValue: SuggestedValueViewData) {
+            suggestedValue.label?.let { this.label = TextFieldValue(it, TextRange(it.length)) }
         }
     }
 
@@ -229,24 +243,33 @@ class AddDataPointsViewModelImpl @Inject constructor(
         object : AddDataPointViewModel.NumericalDataPointViewModel,
             AddDataPointBaseViewModelImpl(config) {
 
-            private val lastInput = MutableStateFlow(config.value?.toString() ?: "")
+            private val initialValue = config.value?.toString() ?: ""
+            override var value by mutableStateOf(
+                TextFieldValue(
+                    initialValue,
+                    TextRange(initialValue.length)
+                )
+            )
 
-            override val value = lastInput
-                .asLiveData(viewModelScope.coroutineContext)
-
-            override fun setValue(value: String) {
-                this.lastInput.value = value
+            override fun setValueText(value: TextFieldValue) {
+                this.value = value
                 this.selectedSuggestedValue.value = null
             }
 
             override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
-                suggestedValue.value?.let { this.lastInput.value = it.toString() }
+                setValueFromSuggestedValue(suggestedValue)
                 super.onSuggestedValueSelected(suggestedValue)
             }
 
             override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
-                suggestedValue.value?.let { this.lastInput.value = it.toString() }
+                setValueFromSuggestedValue(suggestedValue)
                 super.onSuggestedValueLongPress(suggestedValue)
+            }
+
+            private fun setValueFromSuggestedValue(suggestedValue: SuggestedValueViewData) {
+                suggestedValue.value?.let {
+                    this.value = TextFieldValue(it.toString(), TextRange(0, it.toString().length))
+                }
             }
         }
 
@@ -262,18 +285,18 @@ class AddDataPointsViewModelImpl @Inject constructor(
             durationInputViewModel.setDurationFromDouble(config.value ?: 0.0)
         }
 
-        override fun setHours(value: String) {
-            durationInputViewModel.setHours(value)
+        override fun setHoursText(value: TextFieldValue) {
+            durationInputViewModel.setHoursText(value)
             this.selectedSuggestedValue.value = null
         }
 
-        override fun setMinutes(value: String) {
-            durationInputViewModel.setMinutes(value)
+        override fun setMinutesText(value: TextFieldValue) {
+            durationInputViewModel.setMinutesText(value)
             this.selectedSuggestedValue.value = null
         }
 
-        override fun setSeconds(value: String) {
-            durationInputViewModel.setSeconds(value)
+        override fun setSecondsText(value: TextFieldValue) {
+            durationInputViewModel.setSecondsText(value)
             this.selectedSuggestedValue.value = null
         }
 
@@ -332,14 +355,14 @@ class AddDataPointsViewModelImpl @Inject constructor(
             timestamp = timestamp,
             featureId = viewModel.getTracker().featureId,
             value = getDoubleValue(viewModel),
-            label = viewModel.label.value ?: "",
-            note = viewModel.note.value ?: ""
+            label = viewModel.label.text,
+            note = viewModel.note.text
         )
     }
 
     private fun getDoubleValue(viewModel: AddDataPointViewModel) = when (viewModel) {
         is AddDataPointViewModel.NumericalDataPointViewModel ->
-            viewModel.value.value?.toDoubleOrNull() ?: 1.0
+            viewModel.value.text.toDoubleOrNull() ?: 1.0
         is AddDataPointViewModel.DurationDataPointViewModel ->
             viewModel.getDurationAsDouble()
     }

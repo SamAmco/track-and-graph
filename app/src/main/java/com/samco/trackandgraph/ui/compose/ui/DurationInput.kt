@@ -29,8 +29,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,7 +49,6 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
-
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
@@ -77,12 +74,9 @@ fun DurationInput(
     horizontalArrangement = Arrangement.Center
 ) {
     val focusManager = focusManager ?: LocalFocusManager.current
-    val hours = viewModel.hours.observeAsState("")
-    val minutes = viewModel.minutes.observeAsState("")
-    val seconds = viewModel.seconds.observeAsState("")
     DurationInputComponent(
-        value = hours.value,
-        onValueChange = { viewModel.setHours(it) },
+        textFieldValue = viewModel.hours,
+        onValueChange = { viewModel.setHoursText(it) },
         suffix = stringResource(id = R.string.hours_suffix),
         charLimit = 8,
         focusManager = focusManager,
@@ -94,8 +88,8 @@ fun DurationInput(
         modifier = Modifier.alignByBaseline()
     )
     DurationInputComponent(
-        value = minutes.value,
-        onValueChange = { viewModel.setMinutes(it) },
+        textFieldValue = viewModel.minutes,
+        onValueChange = { viewModel.setMinutesText(it) },
         suffix = stringResource(id = R.string.minutes_suffix),
         charLimit = 3,
         focusManager = focusManager
@@ -106,8 +100,8 @@ fun DurationInput(
         modifier = Modifier.alignByBaseline()
     )
     DurationInputComponent(
-        value = seconds.value,
-        onValueChange = { viewModel.setSeconds(it) },
+        textFieldValue = viewModel.seconds,
+        onValueChange = { viewModel.setSecondsText(it) },
         suffix = stringResource(id = R.string.seconds_suffix),
         charLimit = 3,
         focusManager = focusManager,
@@ -118,8 +112,8 @@ fun DurationInput(
 
 @Composable
 private fun RowScope.DurationInputComponent(
-    value: String,
-    onValueChange: (String) -> Unit,
+    textFieldValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     suffix: String,
     charLimit: Int,
     focusManager: FocusManager,
@@ -128,22 +122,11 @@ private fun RowScope.DurationInputComponent(
 ) {
     val colors = TextFieldDefaults.textFieldColors()
     val interactionSource = remember { MutableInteractionSource() }
-    val textField = remember(value) {
-        mutableStateOf(
-            TextFieldValue(
-                value,
-                TextRange(value.length, value.length)
-            )
-        )
-    }
 
     BasicTextField(
-        value = textField.value,
+        value = textFieldValue,
         onValueChange = {
-            if (it.text != textField.value.text && it.text.length <= charLimit) {
-                textField.value = it
-                onValueChange.invoke(it.text)
-            }
+            if (it.text.length <= charLimit) onValueChange(it)
         },
         textStyle = MaterialTheme.typography.h5.copy(
             textAlign = TextAlign.End,
@@ -152,7 +135,7 @@ private fun RowScope.DurationInputComponent(
         cursorBrush = SolidColor(MaterialTheme.colors.primary),
         interactionSource = interactionSource,
         decorationBox = {
-            if (textField.value.text == "") Text(
+            if (textFieldValue.text == "") Text(
                 "0",
                 fontSize = MaterialTheme.typography.h6.fontSize,
                 textAlign = TextAlign.End,
@@ -181,14 +164,18 @@ private fun RowScope.DurationInputComponent(
                 colors = colors
             )
             .onFocusChanged { focusState ->
-                val textLength = textField.value.text.length
+                val textLength = textFieldValue.text.length
                 if (focusState.isFocused) {
-                    textField.value = textField.value.copy(
-                        selection = TextRange(0, textLength)
+                    onValueChange(
+                        textFieldValue.copy(
+                            selection = TextRange(0, textLength)
+                        )
                     )
                 } else {
-                    textField.value = textField.value.copy(
-                        selection = TextRange(textLength, textLength)
+                    onValueChange(
+                        textFieldValue.copy(
+                            selection = TextRange(textLength, textLength)
+                        )
                     )
                 }
             }

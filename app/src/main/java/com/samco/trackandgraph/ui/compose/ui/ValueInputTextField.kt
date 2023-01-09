@@ -37,24 +37,13 @@ import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 @Composable
 fun LabelInputTextField(
     modifier: Modifier = Modifier,
-    value: String,
-    onValueChanged: (String) -> Unit,
+    textFieldValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     focusManager: FocusManager? = null
 ) {
-    val textField = remember(value) {
-        mutableStateOf(
-            TextFieldValue(
-                value,
-                TextRange(value.length, value.length)
-            )
-        )
-    }
     OutlinedTextField(
-        value = textField.value,
-        onValueChange = {
-            textField.value = it
-            onValueChanged(it.text)
-        },
+        value = textFieldValue,
+        onValueChange = { onValueChange(it) },
         keyboardActions = KeyboardActions(
             onNext = { focusManager?.moveFocus(FocusDirection.Down) }
         ),
@@ -70,25 +59,14 @@ fun LabelInputTextField(
 @Composable
 fun ValueInputTextField(
     modifier: Modifier = Modifier,
-    value: String,
-    onValueChanged: (String) -> Unit,
+    textFieldValue: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null
 ) {
-    val textField = remember(value) {
-        mutableStateOf(
-            TextFieldValue(
-                value,
-                TextRange(value.length, value.length)
-            )
-        )
-    }
     OutlinedTextField(
-        value = textField.value,
-        onValueChange = {
-            textField.value = it
-            onValueChanged(it.text)
-        },
+        value = textFieldValue,
+        onValueChange = { onValueChange(it) },
         keyboardActions = KeyboardActions(
             onNext = { focusManager?.moveFocus(FocusDirection.Down) }
         ),
@@ -107,10 +85,12 @@ fun ValueInputTextField(
         singleLine = true,
         modifier = modifier
             .onFocusChanged { focusState ->
-                val textLength = textField.value.text.length
+                val textLength = textFieldValue.text.length
                 if (focusState.isFocused) {
-                    textField.value = textField.value.copy(
-                        selection = TextRange(0, textLength)
+                    onValueChange(
+                        textFieldValue.copy(
+                            selection = TextRange(0, textLength)
+                        )
                     )
                 }
             }

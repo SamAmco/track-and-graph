@@ -1,38 +1,42 @@
 package com.samco.trackandgraph.ui.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import org.threeten.bp.Duration
 
 interface DurationInputViewModel {
-    val hours: LiveData<String>
-    val minutes: LiveData<String>
-    val seconds: LiveData<String>
+    val hours: TextFieldValue
+    val minutes: TextFieldValue
+    val seconds: TextFieldValue
 
-    fun setHours(value: String)
-    fun setMinutes(value: String)
-    fun setSeconds(value: String)
+    fun setHoursText(value: TextFieldValue)
+    fun setMinutesText(value: TextFieldValue)
+    fun setSecondsText(value: TextFieldValue)
+
     fun setDurationFromDouble(value: Double)
     fun getDurationAsDouble(): Double
 }
 
 open class DurationInputViewModelImpl : DurationInputViewModel {
-    override val hours = MutableLiveData("")
-    override val minutes = MutableLiveData("")
-    override val seconds = MutableLiveData("")
+    override var hours by mutableStateOf(TextFieldValue(""))
+    override var minutes by mutableStateOf(TextFieldValue(""))
+    override var seconds by mutableStateOf(TextFieldValue(""))
 
-    private fun LiveData<String>.getDouble() = ((this.value ?: "").toDoubleOrNull() ?: 0.0)
+    private fun TextFieldValue.getDouble() = ((this.text ?: "").toDoubleOrNull() ?: 0.0)
 
-    override fun setHours(value: String) {
-        hours.value = value.asValidatedInt()
+    override fun setHoursText(value: TextFieldValue) {
+        hours = value.copy(text = value.text.asValidatedInt())
     }
 
-    override fun setMinutes(value: String) {
-        minutes.value = value.asValidatedInt()
+    override fun setMinutesText(value: TextFieldValue) {
+        minutes = value.copy(text = value.text.asValidatedInt())
     }
 
-    override fun setSeconds(value: String) {
-        seconds.value = value.asValidatedInt()
+    override fun setSecondsText(value: TextFieldValue) {
+        seconds = value.copy(text = value.text.asValidatedDouble())
     }
 
     override fun setDurationFromDouble(value: Double) {
@@ -40,9 +44,14 @@ open class DurationInputViewModelImpl : DurationInputViewModel {
         val numHours = duration.toHours()
         val numMinutes = duration.minusHours(numHours).toMinutes()
         val numSeconds = duration.minusHours(numHours).minusMinutes(numMinutes).seconds
-        hours.value = numHours.toString()
-        minutes.value = numMinutes.toString()
-        seconds.value = numSeconds.toString()
+
+        val hrsString = numHours.toString()
+        val minString = numMinutes.toString()
+        val secString = numSeconds.toString()
+
+        hours = TextFieldValue(numHours.toString(), TextRange(hrsString.length))
+        minutes = TextFieldValue(numMinutes.toString(), TextRange(minString.length))
+        seconds = TextFieldValue(numSeconds.toString(), TextRange(secString.length))
     }
 
     override fun getDurationAsDouble(): Double {
