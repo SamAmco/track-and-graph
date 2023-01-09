@@ -1,5 +1,10 @@
 package com.samco.trackandgraph.featurehistory
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.*
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
@@ -13,20 +18,20 @@ interface UpdateDialogViewModel {
 
     val whereValueEnabled: LiveData<Boolean>
     val whereLabelEnabled: LiveData<Boolean>
-    val whereValue: LiveData<String>
+    val whereValue: TextFieldValue
     val whereDurationViewModel: DurationInputViewModel
-    val whereLabel: LiveData<String>
+    val whereLabel: TextFieldValue
 
     val toValueEnabled: LiveData<Boolean>
     val toLabelEnabled: LiveData<Boolean>
-    val toValue: LiveData<String>
+    val toValue: TextFieldValue
     val toDurationViewModel: DurationInputViewModel
-    val toLabel: LiveData<String>
+    val toLabel: TextFieldValue
 
-    fun setWhereValue(value: String)
-    fun setToValue(value: String)
-    fun setWhereLabel(label: String)
-    fun setToLabel(label: String)
+    fun setWhereTextValue(value: TextFieldValue)
+    fun setToTextValue(value: TextFieldValue)
+    fun setWhereTextLabel(label: TextFieldValue)
+    fun setToTextLabel(label: TextFieldValue)
     fun setWhereValueEnabled(enabled: Boolean)
     fun setWhereLabelEnabled(enabled: Boolean)
     fun setToValueEnabled(enabled: Boolean)
@@ -48,29 +53,28 @@ abstract class UpdateDialogViewModelImpl: ViewModel(), UpdateDialogViewModel {
     override val whereLabelEnabled = MutableLiveData(false)
     override val toValueEnabled = MutableLiveData(false)
     override val toLabelEnabled = MutableLiveData(false)
-    override val whereValue = MutableLiveData("1.0")
-    override val whereLabel = MutableLiveData("")
-    override val toValue = MutableLiveData("1.0")
-    override val toLabel = MutableLiveData("")
+    override var whereValue by mutableStateOf(TextFieldValue("1.0", TextRange(3)))
+    override var whereLabel by mutableStateOf(TextFieldValue("", TextRange(0)))
+    override var toValue by mutableStateOf(TextFieldValue("1.0", TextRange(3)))
+    override var toLabel by mutableStateOf(TextFieldValue("", TextRange(0)))
 
     override val whereDurationViewModel = DurationInputViewModelImpl()
     override val toDurationViewModel = DurationInputViewModelImpl()
 
-
-    override fun setWhereValue(value: String) {
-        whereValue.value = value.asValidatedDouble()
+    override fun setWhereTextValue(value: TextFieldValue) {
+        whereValue = value.copy(text = value.text.asValidatedDouble())
     }
 
-    override fun setToValue(value: String) {
-        toValue.value = value.asValidatedDouble()
+    override fun setToTextValue(value: TextFieldValue) {
+        toValue = value.copy(text = value.text.asValidatedDouble())
     }
 
-    override fun setWhereLabel(label: String) {
-        whereLabel.value = label
+    override fun setWhereTextLabel(label: TextFieldValue) {
+        whereLabel = label
     }
 
-    override fun setToLabel(label: String) {
-        toLabel.value = label
+    override fun setToTextLabel(label: TextFieldValue) {
+        toLabel = label
     }
 
     override fun setWhereValueEnabled(enabled: Boolean) {
@@ -112,23 +116,23 @@ abstract class UpdateDialogViewModelImpl: ViewModel(), UpdateDialogViewModel {
 
     protected fun getToLabelString() = when {
         toLabelEnabled.value != true -> null
-        else -> toLabel.value
+        else -> toLabel.text
     }
 
     protected fun getToValueDouble() = when {
         toValueEnabled.value != true -> null
         isDuration.value == true -> toDurationViewModel.getDurationAsDouble()
-        else -> toValue.value?.toDouble()
+        else -> toValue.text.toDoubleOrNull()
     }
 
     protected fun getWhereLabelString() = when {
         whereLabelEnabled.value != true -> null
-        else -> whereLabel.value
+        else -> whereLabel.text
     }
 
     protected fun getWhereValueDouble() = when {
         whereValueEnabled.value != true -> null
         isDuration.value == true -> whereDurationViewModel.getDurationAsDouble()
-        else -> whereValue.value?.toDouble()
+        else -> whereValue.text.toDoubleOrNull()
     }
 }

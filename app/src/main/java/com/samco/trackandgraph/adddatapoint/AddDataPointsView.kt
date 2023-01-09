@@ -193,12 +193,10 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
         when (viewModel) {
             is AddDataPointViewModel.NumericalDataPointViewModel -> {
 
-                val value by viewModel.value.observeAsState("")
-
                 LabeledRow(label = stringResource(id = R.string.value_colon)) {
                     ValueInputTextField(
-                        value = value,
-                        onValueChanged = viewModel::setValue,
+                        textFieldValue = viewModel.value,
+                        onValueChange = viewModel::setValueText,
                         focusManager = focusManager,
                         focusRequester = valueFocusRequester
                     )
@@ -218,12 +216,10 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
         SpacingSmall()
 
-        val label by viewModel.label.observeAsState("")
-
         LabeledRow(label = stringResource(id = R.string.label_colon)) {
             LabelInputTextField(
-                value = label,
-                onValueChanged = viewModel::updateLabel,
+                textFieldValue = viewModel.label,
+                onValueChange = viewModel::updateLabel,
                 focusManager = focusManager
             )
         }
@@ -284,13 +280,12 @@ private fun NoteInput(viewModel: AddDataPointViewModel) =
         val focusRequester = remember { FocusRequester() }
         val coroutineScope = rememberCoroutineScope()
 
-        val note by viewModel.note.observeAsState("")
         var showNoteBox by rememberSaveable { mutableStateOf(false) }
 
-        if (note.isNotEmpty() || showNoteBox) {
-            FullWidthTextFieldLegacy(
+        if (viewModel.note.text.isNotEmpty() || showNoteBox) {
+            FullWidthTextField(
                 modifier = Modifier.heightIn(max = 200.dp),
-                value = note,
+                textFieldValue = viewModel.note,
                 onValueChange = { viewModel.updateNote(it) },
                 focusRequester = focusRequester,
                 label = stringResource(id = R.string.note_input_hint),

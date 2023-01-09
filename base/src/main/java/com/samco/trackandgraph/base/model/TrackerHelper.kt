@@ -88,4 +88,6 @@ interface TrackerHelper {
     suspend fun getTrackerByFeatureId(featureId: Long): Tracker?
 
     fun hasAtLeastOneTracker(): Flow<Boolean>
+
+    suspend fun hasAtLeastOneDataPoint(): Boolean
 }

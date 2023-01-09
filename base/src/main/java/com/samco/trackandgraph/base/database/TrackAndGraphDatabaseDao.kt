@@ -370,4 +370,7 @@ FROM notes_table as n
         """
     )
     fun getLabelsForTracker(trackerId: Long): List<String>
+
+    @Query(" SELECT EXISTS ( SELECT 1 FROM data_points_table LIMIT 1 ) ")
+    fun hasAtLeastOneDataPoint(): Boolean
 }

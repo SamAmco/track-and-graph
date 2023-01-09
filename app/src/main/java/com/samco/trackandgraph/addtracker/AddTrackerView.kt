@@ -259,8 +259,6 @@ private fun RowScope.Divider() {
 @Composable
 private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
     val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(false)
-    val defaultValue = viewModel.defaultValue.observeAsState("")
-    val defaultLabel = viewModel.defaultLabel.observeAsState("")
     val isDuration = viewModel.isDuration.observeAsState(false)
 
     val focusManager = LocalFocusManager.current
@@ -269,11 +267,11 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
     if (hasDefaultValue.value) {
 
         if (isDuration.value) DurationInputRow(viewModel)
-        else ValueInputRow(defaultValue.value, viewModel, focusManager)
+        else ValueInputRow(viewModel, focusManager)
 
         SpacingSmall()
 
-        LabelInputRow(defaultLabel.value, viewModel)
+        LabelInputRow(viewModel)
     }
 }
 
@@ -309,29 +307,24 @@ private fun DurationConversionModeInput(
 }
 
 @Composable
-private fun LabelInputRow(
-    defaultLabel: String,
-    viewModel: AddTrackerViewModel
-) {
+private fun LabelInputRow(viewModel: AddTrackerViewModel) {
     LabeledRow(label = stringResource(id = R.string.label_colon)) {
         LabelInputTextField(
-            value = defaultLabel,
-            onValueChanged = viewModel::onDefaultLabelChanged,
+            textFieldValue = viewModel.defaultLabel,
+            onValueChange = viewModel::onDefaultLabelChanged
         )
     }
 }
 
 @Composable
 private fun ValueInputRow(
-    defaultValue: String,
     viewModel: AddTrackerViewModel,
     focusManager: FocusManager
 ) {
-
     LabeledRow(label = stringResource(id = R.string.value_colon)) {
         ValueInputTextField(
-            value = defaultValue,
-            onValueChanged = viewModel::onDefaultValueChanged,
+            textFieldValue = viewModel.defaultValue,
+            onValueChange = viewModel::onDefaultValueChanged,
             focusManager = focusManager
         )
     }
