@@ -23,6 +23,7 @@ import androidx.appcompat.app.AppCompatActivity
 
 const val THEME_SETTING_PREF_KEY = "theme_setting"
 const val DATE_FORMAT_SETTING_PREF_KEY = "date_format_setting"
+const val DISPLAY_DAYS_AGO_SETTING_PREF_KEY = "display_days_ago_setting"
 const val FIRST_RUN_PREF_KEY = "firstrun2"
 
 fun getPrefs(context: Context, mode: Int = AppCompatActivity.MODE_PRIVATE): SharedPreferences {

@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.group
 
 import android.graphics.drawable.RippleDrawable
+import android.icu.text.MessageFormat
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -26,11 +27,15 @@ import android.widget.PopupMenu
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
+import com.samco.trackandgraph.base.helpers.DISPLAY_DAYS_AGO_SETTING_PREF_KEY
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
+import com.samco.trackandgraph.base.helpers.getPrefs
 import com.samco.trackandgraph.databinding.ListItemTrackerBinding
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.ChronoUnit
 
 class TrackerViewHolder private constructor(
     private val binding: ListItemTrackerBinding,
@@ -105,8 +110,14 @@ class TrackerViewHolder private constructor(
 
     private fun setLastDateText() {
         val timestamp = tracker?.timestamp
+        val displayDaysAgo = getPrefs(binding.lastDateText.context).getBoolean(DISPLAY_DAYS_AGO_SETTING_PREF_KEY, false)
         binding.lastDateText.text = if (timestamp == null) {
             binding.lastDateText.context.getString(R.string.no_data)
+        } else if (displayDaysAgo) {
+            val message = binding.lastDateText.context.getString(R.string.days_ago)
+            val midnight = OffsetDateTime.now().truncatedTo(ChronoUnit.DAYS).plusDays(1)
+            val daysSinceLastUpdate = Duration.between(timestamp, midnight).toDays()
+            MessageFormat.format(message, daysSinceLastUpdate)
         } else {
             formatDayMonthYearHourMinute(binding.lastDateText.context, timestamp)
         }

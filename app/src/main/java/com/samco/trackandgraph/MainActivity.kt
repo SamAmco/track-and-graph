@@ -29,6 +29,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
@@ -39,6 +40,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.base.helpers.*
@@ -80,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         initializeAppBar()
         onDrawerHideKeyboard()
         initDrawerSpinners()
+        initDisplayDaysAgoCheckBox()
         viewModel.syncAlarms()
         if (isFirstRun()) showTutorial()
         else destroyTutorial()
@@ -183,6 +186,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun onDateFormatSelected(index: Int) {
         getPrefs(applicationContext).edit().putInt(DATE_FORMAT_SETTING_PREF_KEY, index).apply()
+        refreshTrackersView()
     }
 
     private fun getDateFormatValue() = getPrefs(applicationContext).getInt(
@@ -240,6 +244,20 @@ class MainActivity : AppCompatActivity() {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
             resources.getStringArray(R.array.theme_names_Q)
         else resources.getStringArray(R.array.theme_names_pre_Q)
+
+    private fun initDisplayDaysAgoCheckBox() {
+        val checkbox = navView.menu.findItem(R.id.displayDaysAgoCheckBox).actionView as AppCompatCheckBox
+        checkbox.isChecked = getPrefs(applicationContext).getBoolean(DISPLAY_DAYS_AGO_SETTING_PREF_KEY, false)
+        checkbox.setOnCheckedChangeListener { _ , isChecked ->
+            getPrefs(applicationContext).edit().putBoolean(DISPLAY_DAYS_AGO_SETTING_PREF_KEY, isChecked).apply()
+            refreshTrackersView()
+        }
+    }
+
+    private fun refreshTrackersView() {
+        val itemList = findViewById<RecyclerView>(R.id.item_list)
+        itemList.adapter?.notifyDataSetChanged()
+    }
 
     private fun onDrawerHideKeyboard() {
         drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {

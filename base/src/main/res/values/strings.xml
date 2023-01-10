@@ -295,6 +295,7 @@
     <string name="delete_reminder_content_description">Delete Reminder</string>
     <string name="theme_colon">Theme:</string>
     <string name="date_format_colon">Date format:</string>
+    <string name="display_days_ago_colon">Display days ago:</string>
     <string name="add_data_point_button_content_description">Add a data point button</string>
     <string name="tracked_data_menu_button_content_description">Tracked data menu button</string>
     <string name="tracked_data_history_button_content_description">Tracked data history button</string>
@@ -353,4 +354,5 @@
     <string name="name_your_function">Name your function: </string>
     <string name="write_your_function_here"># Write your function here</string>
     <string name="add_some_data_sources">Add some data sources</string>
+    <string name="days_ago">{0, plural, =0{Today}=1{Yesterday}other{# days ago}}</string>
 </resources>

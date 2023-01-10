@@ -59,6 +59,11 @@
             android:id="@+id/dateFormatSpinner"
             android:title="@string/date_format_colon"
             app:actionLayout="@layout/navigation_menu_spinner" />
+        <item
+            android:id="@+id/displayDaysAgoCheckBox"
+            android:title="@string/display_days_ago_colon"
+            app:actionViewClass="androidx.appcompat.widget.AppCompatCheckBox"
+            />
     </group>
 
 </menu>

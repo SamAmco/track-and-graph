@@ -335,4 +335,6 @@
     <string name="filter_by_value">filtrar por valor</string>
     <string name="timer_notification_channel_name">Temporizadores</string>
     <string name="stop">Deténgase</string>
+    <string name="display_days_ago_colon">Mostrar hace días:</string>
+    <string name="days_ago">{0, plural, =0{Hoy}=1{Ayer}other{Hace # días}}</string>
 </resources>

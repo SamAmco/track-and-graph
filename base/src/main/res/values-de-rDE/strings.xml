@@ -335,4 +335,6 @@
     <string name="save_changes">Änderungen speichern</string>
     <string name="timer_notification_channel_name">Timer</string>
     <string name="stop">Halt</string>
+    <string name="display_days_ago_colon">Vor Tagen anzeigen:</string>
+    <string name="days_ago">{0, plural, =0{Heute}=1{Gestern}other{Vor # Tagen}}</string>
 </resources>

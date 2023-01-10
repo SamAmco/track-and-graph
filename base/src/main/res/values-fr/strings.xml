@@ -336,4 +336,6 @@
     <string name="save_changes">Sauvegarder les modifications</string>
     <string name="timer_notification_channel_name">Minuteries</string>
     <string name="stop">Arrêt</string>
+    <string name="display_days_ago_colon">Afficher il y a jours:</string>
+    <string name="days_ago">{0, plural, =0{Aujourd\'hui}=1{Hier}other{Il y a # jours}}</string>
 </resources>
