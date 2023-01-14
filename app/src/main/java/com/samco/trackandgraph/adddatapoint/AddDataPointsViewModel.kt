@@ -54,6 +54,8 @@ interface AddDataPointBaseViewModel {
     val suggestedValues: LiveData<List<SuggestedValueViewData>>
     val selectedSuggestedValue: LiveData<SuggestedValueViewData?>
 
+    val oldDataPoint: DataPoint?
+
     fun getTracker(): Tracker
     fun updateLabel(label: TextFieldValue)
     fun updateNote(note: TextFieldValue)
@@ -115,14 +117,14 @@ class AddDataPointsViewModelImpl @Inject constructor(
         val timestamp: OffsetDateTime?,
         val label: String?,
         val value: Double?,
-        val note: String?
+        val note: String?,
+        val oldDataPoint: DataPoint?
     )
 
     private val configFlow = MutableStateFlow<List<Config>>(emptyList())
     private val indexFlow = MutableStateFlow(0)
     override val dismiss = MutableLiveData(false)
     private val tutorialButtonPresses = MutableSharedFlow<Unit>()
-
 
     override val tutorialViewModel = AddDataPointTutorialViewModelImpl()
 
@@ -168,7 +170,6 @@ class AddDataPointsViewModelImpl @Inject constructor(
         .filterNotNull()
         .asLiveData(viewModelScope.coroutineContext)
 
-
     private fun getViewModel(config: Config): AddDataPointViewModel {
         return when (config.tracker.dataType) {
             DataType.DURATION -> DataPointDurationViewModel(config)
@@ -181,10 +182,12 @@ class AddDataPointsViewModelImpl @Inject constructor(
     private abstract inner class AddDataPointBaseViewModelImpl(
         protected val config: Config
     ) : AddDataPointBaseViewModel {
+
+        override val oldDataPoint = config.oldDataPoint
         override val name = MutableLiveData(config.tracker.name)
         override val timestamp = MutableLiveData(config.timestamp ?: now)
-        override var label by mutableStateOf(TextFieldValue(""))
-        override var note by mutableStateOf(TextFieldValue(""))
+        override var label by mutableStateOf(TextFieldValue(config.label ?: ""))
+        override var note by mutableStateOf(TextFieldValue(config.note ?: ""))
         override val selectedSuggestedValue = MutableLiveData<SuggestedValueViewData?>(null)
 
         override val suggestedValues: LiveData<List<SuggestedValueViewData>> = suggestedValueHelper
@@ -343,8 +346,9 @@ class AddDataPointsViewModelImpl @Inject constructor(
     }
 
     private suspend fun insertDataPoint(viewModel: AddDataPointViewModel) {
-        getDataPoint(viewModel)?.let {
-            dataInteractor.insertDataPoint(it)
+        viewModel.oldDataPoint?.let { dataInteractor.deleteDataPoint(it) }
+        getDataPoint(viewModel)?.let { newDataPoint ->
+            dataInteractor.insertDataPoint(newDataPoint)
             incrementPageIndex()
         }
     }
@@ -391,7 +395,6 @@ class AddDataPointsViewModelImpl @Inject constructor(
         initialized = true
 
         viewModelScope.launch(io) {
-
             val configs = trackerIds
                 .mapNotNull { dataInteractor.getTrackerById(it) }
                 .map { getConfig(it, dataPointTimestamp, customInitialValue) }
@@ -413,11 +416,12 @@ class AddDataPointsViewModelImpl @Inject constructor(
             )
         }
         return Config(
-            tracker,
-            dataPointTimestamp,
-            dataPoint?.label,
-            customInitialValue ?: dataPoint?.value,
-            dataPoint?.note
+            tracker = tracker,
+            timestamp = dataPointTimestamp,
+            label = dataPoint?.label,
+            value = customInitialValue ?: dataPoint?.value,
+            note = dataPoint?.note,
+            oldDataPoint = dataPoint
         )
     }
 
