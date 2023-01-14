@@ -138,20 +138,27 @@ class NotesFragment : Fragment() {
         viewModel.deleteNote(note)
     }
 
-    private fun onEditNote(note: DisplayNote) {
-        note.trackerId?.let { trackerId ->
-            val dialog = DataPointInputDialog()
-            val argBundle = Bundle()
-            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(trackerId))
-            argBundle.putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
-            dialog.arguments = argBundle
-            childFragmentManager.let { dialog.show(it, "input_data_point_dialog") }
-        } ?: run {
-            val dialog = GlobalNoteInputDialog()
-            val argBundle = Bundle()
-            argBundle.putString(GLOBAL_NOTE_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
-            dialog.arguments = argBundle
-            childFragmentManager.let { dialog.show(it, "global_note_edit_dialog") }
+    private fun onEditNote(note: DisplayNote) =
+        note.trackerId?.let { showEditDataPointDialog(it, note) }
+            ?: showEditGlobalNoteDialog(note)
+
+    private fun showEditGlobalNoteDialog(note: DisplayNote) {
+        childFragmentManager.apply {
+            GlobalNoteInputDialog().apply {
+                arguments = Bundle().apply {
+                    putString(GLOBAL_NOTE_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
+                }
+            }.show(this, "global_note_edit_dialog")
         }
     }
+
+    private fun showEditDataPointDialog(trackerId: Long, note: DisplayNote) =
+        childFragmentManager.apply {
+            DataPointInputDialog().apply {
+                arguments = Bundle().apply {
+                    putLongArray(TRACKER_LIST_KEY, longArrayOf(trackerId))
+                    putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
+                }
+            }.show(this, "input_data_point_dialog")
+        }
 }
