@@ -57,6 +57,7 @@ android {
         }
         debugMinify {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             applicationIdSuffix = ".debug"
             resValue "string", "app_name", "Debug Track & Graph"
@@ -64,8 +65,10 @@ android {
         }
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             resValue "string", "app_name", "Track & Graph"
+            ndk.debugSymbolLevel = "SYMBOL_TABLE"
         }
     }
 

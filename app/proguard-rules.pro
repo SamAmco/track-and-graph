@@ -22,5 +22,5 @@
 
 -keep class com.androidplot.** { *; }
 -keepnames class androidx.navigation.fragment.NavHostFragment
--dontobfuscate
--dontshrink
+-keepattributes LineNumberTable,SourceFile
+-renamesourcefileattribute SourceFile
