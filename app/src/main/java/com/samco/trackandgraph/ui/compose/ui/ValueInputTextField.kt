@@ -24,6 +24,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
 import androidx.compose.ui.text.TextRange
@@ -32,6 +33,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -64,6 +67,8 @@ fun ValueInputTextField(
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null
 ) {
+    val focusUpdateScope = rememberCoroutineScope()
+
     OutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
@@ -85,13 +90,15 @@ fun ValueInputTextField(
         singleLine = true,
         modifier = modifier
             .onFocusChanged { focusState ->
-                val textLength = textFieldValue.text.length
                 if (focusState.isFocused) {
-                    onValueChange(
-                        textFieldValue.copy(
-                            selection = TextRange(0, textLength)
+                    focusUpdateScope.launch {
+                        delay(20)
+                        onValueChange(
+                            textFieldValue.copy(
+                                selection = TextRange(0, textFieldValue.text.length)
+                            )
                         )
-                    )
+                    }
                 }
             }
             .let {

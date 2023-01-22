@@ -30,6 +30,7 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
@@ -49,6 +50,8 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
@@ -61,7 +64,7 @@ fun DurationInputPreview() = DurationInput(
 fun DurationInput(
     modifier: Modifier = Modifier,
     viewModel: DurationInputViewModel,
-    focusManager: FocusManager? = null,
+    focusManager: FocusManager = LocalFocusManager.current,
     nextFocusDirection: FocusDirection? = null,
     focusRequester: FocusRequester? = null
 ) = Row(
@@ -73,7 +76,6 @@ fun DurationInput(
     verticalAlignment = Alignment.Bottom,
     horizontalArrangement = Arrangement.Center
 ) {
-    val focusManager = focusManager ?: LocalFocusManager.current
     DurationInputComponent(
         textFieldValue = viewModel.hours,
         onValueChange = { viewModel.setHoursText(it) },
@@ -122,6 +124,7 @@ private fun RowScope.DurationInputComponent(
 ) {
     val colors = TextFieldDefaults.textFieldColors()
     val interactionSource = remember { MutableInteractionSource() }
+    val focusUpdateScope = rememberCoroutineScope()
 
     BasicTextField(
         value = textFieldValue,
@@ -164,19 +167,15 @@ private fun RowScope.DurationInputComponent(
                 colors = colors
             )
             .onFocusChanged { focusState ->
-                val textLength = textFieldValue.text.length
                 if (focusState.isFocused) {
-                    onValueChange(
-                        textFieldValue.copy(
-                            selection = TextRange(0, textLength)
+                    focusUpdateScope.launch {
+                        delay(20)
+                        onValueChange(
+                            textFieldValue.copy(
+                                selection = TextRange(0, textFieldValue.text.length)
+                            )
                         )
-                    )
-                } else {
-                    onValueChange(
-                        textFieldValue.copy(
-                            selection = TextRange(textLength, textLength)
-                        )
-                    )
+                    }
                 }
             }
             .let {
