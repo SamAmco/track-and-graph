@@ -184,7 +184,7 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     private fun drawLegend() {
-        val labels = data!!.barValues!!.keys.toList()
+        val labels = data!!.barValues!!.map { it.label }
         if (labels.size > 1) {
             labels.forEachIndexed { i, l ->
                 val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
@@ -199,9 +199,9 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     private fun drawBars() {
         val outlineColor = context!!.getColorFromAttr(R.attr.colorOnSurface)
 
-        data!!.barValues!!.keys.forEachIndexed { i, key ->
-            val series = (data!!.barValues!![key] ?: error("")).toTypedArray()
-            val xySeries = SimpleXYSeries(SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, key, *series)
+        data!!.barValues!!.forEachIndexed { i, bv ->
+            val series = (data!!.barValues!![i]).values.toTypedArray()
+            val xySeries = SimpleXYSeries(SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, bv.label, *series)
             val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
             val color = getColor(context!!, dataVisColorList[colorIndex])
             val seriesFormatter = BarFormatter(color, outlineColor)
