@@ -21,11 +21,9 @@
         <item name="actionOverflowMenuStyle">@style/Style.OverflowMenuStyle</item>
         <item name="editTextStyle">@style/Style.EditTextStyle</item>
         <item name="cardViewStyle">@style/Style.CardViewStyle</item>
-        <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:colorBackground">?attr/colorSurface</item>
         <item name="buttonStyle">@style/Style.ButtonStyle</item>
 
         <item name="textAppearanceHeadline2">@style/TextAppearance.Headline2</item>
@@ -40,7 +38,9 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="AppThemeBase">
         <!--COLORS-->
+        <item name="android:colorBackground">@color/chalky_white</item>
         <item name="colorAccent">@color/orange</item>
+        <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
         <item name="colorContainer">@color/white</item>
         <item name="colorSurfaceVariant">@color/white</item>
         <item name="colorOutline">@color/light_gray</item>
@@ -79,7 +79,7 @@
     </style>
 
     <style name="AppTheme.AlertDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
-        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:background">@color/white</item>
         <item name="colorAccent">@color/orange</item>
         <item name="android:textColorPrimary">@color/blue_black</item>
         <item name="android:textColorPrimaryDisableOnly">@color/blue_black</item>

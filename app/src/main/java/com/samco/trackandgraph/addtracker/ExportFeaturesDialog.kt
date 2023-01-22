@@ -79,11 +79,11 @@ class ExportFeaturesDialog : DialogFragment() {
             fileButton.text = getString(R.string.select_file)
             fileButton.setTextColor(fileButton.context.getColorFromAttr(R.attr.colorError))
 
-            val builder = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
-            builder.setView(view)
+            alertDialog = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
+                .setView(view)
                 .setPositiveButton(R.string.exportButton) { _, _ -> run {} }
                 .setNegativeButton(R.string.cancel) { _, _ -> run {} }
-            alertDialog = builder.create()
+                .create()
             alertDialog.setCanceledOnTouchOutside(true)
             alertDialog.setOnShowListener { setAlertDialogShowListeners() }
             alertDialog

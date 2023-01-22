@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -55,26 +56,27 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
     val errorText by viewModel.errorText.observeAsState()
     val openDialog by viewModel.showUpdateWarningAlertDialog.observeAsState(false)
 
-    Column(Modifier.fillMaxSize()) {
+    Surface(color = MaterialTheme.colors.background) {
+        Column(Modifier.fillMaxSize()) {
+            AddTrackerInputForm(
+                modifier = Modifier.weight(1f),
+                viewModel = viewModel,
+                focusRequester = focusRequester
+            )
 
-        AddTrackerInputForm(
-            modifier = Modifier.weight(1f),
-            viewModel = viewModel,
-            focusRequester = focusRequester
-        )
+            AddCreateBar(
+                errorText = errorText,
+                onCreateUpdateClicked = viewModel::onCreateUpdateClicked,
+                isUpdateMode = isUpdateMode
+            )
 
-        AddCreateBar(
-            errorText = errorText,
-            onCreateUpdateClicked = viewModel::onCreateUpdateClicked,
-            isUpdateMode = isUpdateMode
-        )
+            if (openDialog) UpdateWarningDialog(
+                onDismissRequest = viewModel::onDismissUpdateWarningCancel,
+                onConfirm = viewModel::onConfirmUpdate
+            )
 
-        if (openDialog) UpdateWarningDialog(
-            onDismissRequest = viewModel::onDismissUpdateWarningCancel,
-            onConfirm = viewModel::onConfirmUpdate
-        )
-
-        LaunchedEffect(true) { focusRequester.requestFocus() }
+            LaunchedEffect(true) { focusRequester.requestFocus() }
+        }
     }
 }
 
