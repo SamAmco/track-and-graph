@@ -51,7 +51,7 @@
     <string name="add_a_graph_or_stat">Ajouter un Graphique ou une Statistique</string>
     <string name="graph_type_label">Type de Graphique : </string>
     <string name="maximum_sample_duration">Taille de l\'échantillon : </string>
-    <string name="select_a_discrete_feature">Sélectionnez un ensemble de données à choix multiple : </string>
+    <string name="select_a_discrete_feature">Sélectionnez un ensemble de données avec des libellés : </string>
     <string name="no_discrete_features_pie_chart">Impossible de créer un camembert car il n\'y a pas donnée suivie à choix multiples.</string>
     <string name="select_a_feature">Sélectionnez un ensemble de données : </string>
     <string name="offset">Décalage : </string>
@@ -296,8 +296,6 @@
     <string name="data_point_tutorial_page_3_hint">(Astuce : si vous souhaitez ajouter plus de contexte ou de description, utilisez la note au lieu du champ d\'étiquette)</string>
     <string name="help">Aider</string>
     
-    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/index.md</string>
-    <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/faq_1.md</string>
     <string name="advanced_options">Options avancées</string>
     <string name="type_colon">\"Taper: \"</string>
     <string name="order_colon">\"Ordre: \"</string>

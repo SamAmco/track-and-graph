@@ -59,7 +59,7 @@
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
     <string name="graph_type_label">Graph type:</string>
     <string name="maximum_sample_duration">Sample size:</string>
-    <string name="select_a_discrete_feature">Select a multiple choice data set: </string>
+    <string name="select_a_discrete_feature">Select a data set with labels: </string>
     <string name="no_discrete_features_pie_chart">You can not currently create a pie chart because you are not tracking anything multiple choice.</string>
     <string name="select_a_feature">Select a data set:</string>
     <string name="offset">Offset:</string>

@@ -295,8 +295,6 @@
     <string name="data_point_tutorial_page_3_hint">(Sugerencia: si desea agregar más contexto o descripción, use la nota en lugar del campo de etiqueta)</string>
     <string name="help">Ayudar</string>
     
-    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/index.md</string>
-    <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/faq_1.md</string>
     <string name="advanced_options">Opciones avanzadas</string>
     <string name="type_colon">\"Escribe: \"</string>
     <string name="order_colon">\"Ordenar: \"</string>

@@ -51,7 +51,7 @@
     <string name="add_a_graph_or_stat">Ein Diagramm oder eine Statistik hinzufügen</string>
     <string name="graph_type_label">Diagrammtyp:</string>
     <string name="maximum_sample_duration">Größe des Samples:</string>
-    <string name="select_a_discrete_feature">Wählen Sie einen Multiple-Choice-Datensatz aus: </string>
+    <string name="select_a_discrete_feature">Wählen Sie einen Datensatz mit Labels aus: </string>
     <string name="no_discrete_features_pie_chart">Sie können derzeit kein Tortendiagramm erstellen, da Sie nichts mit Multiple-Choice tracken..</string>
     <string name="select_a_feature">Wählen Sie einen Datensatz:</string>
     <string name="offset">Offset:</string>
@@ -295,8 +295,6 @@
     <string name="data_point_tutorial_page_3_hint">(Hinweis: Wenn Sie mehr Kontext oder Beschreibung hinzufügen möchten, verwenden Sie die Notiz anstelle des Beschriftungsfelds)</string>
     <string name="help">Hilfe</string>
     
-    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/index.md</string>
-    <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/tree/feature/data_transformation/docs/faq/faq_1.md</string>
     <string name="advanced_options">Erweiterte Optionen</string>
     <string name="type_colon">\"Art: \"</string>
     <string name="order_colon">\"Befehl: \"</string>
