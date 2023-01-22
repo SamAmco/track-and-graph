@@ -20,9 +20,11 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 import com.samco.trackandgraph.TimeHistogramWindowData
 
 interface ITimeHistogramViewData : IGraphStatViewData {
+    data class BarValue(val label: String, val values: List<Double>)
+
     val window: TimeHistogramWindowData?
         get() = null
-    val barValues: Map<String, List<Double>>?
+    val barValues: List<BarValue>?
         get() = null
     val maxDisplayHeight: Double?
         get() = 0.0

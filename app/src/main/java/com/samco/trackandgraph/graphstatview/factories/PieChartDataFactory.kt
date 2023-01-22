@@ -105,5 +105,5 @@ class PieChartDataFactory @Inject constructor(
             .groupingBy { dp -> dp.label }
             .eachCount()
             .map { b -> Segment(b.key, b.value) }
-
+            .sortedBy { s -> s.title }
 }

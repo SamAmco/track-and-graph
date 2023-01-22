@@ -61,7 +61,7 @@ class TimeHistogramDataFactory @Inject constructor(
                 TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
             val barValues =
                 getBarValues(config, onDataSampled, timeHistogramDataHelper)
-            val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.values?.toList())
+            val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.map { it.values })
             val maxDisplayHeight = largestBin?.let {
                 min(
                     it.times(10.0).toInt().plus(1).div(10.0),
@@ -89,15 +89,14 @@ class TimeHistogramDataFactory @Inject constructor(
         config: TimeHistogram,
         onDataSampled: (List<DataPoint>) -> Unit,
         timeHistogramDataHelper: TimeHistogramDataHelper
-    ): Map<String, List<Double>>? {
+    ): List<ITimeHistogramViewData.BarValue>? {
         val sample = dataInteractor.getDataSampleForFeatureId(config.featureId)
         val dataSample = DataClippingFunction(config.endDate, config.duration)
             .mapSample(sample)
-        val barValues = timeHistogramDataHelper.getHistogramBinsForSample(
-            dataSample,
-            config.window,
-            config.sumByCount
-        )
+        val barValues = timeHistogramDataHelper
+            .getHistogramBinsForSample(dataSample, config.window, config.sumByCount)
+            ?.map { ITimeHistogramViewData.BarValue(it.key, it.value) }
+            ?.sortedBy { it.label }
         onDataSampled(dataSample.getRawDataPoints())
         sample.dispose()
         return barValues
