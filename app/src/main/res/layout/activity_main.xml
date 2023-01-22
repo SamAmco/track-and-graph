@@ -45,8 +45,8 @@
             android:fitsSystemWindows="true"
             android:paddingTop="50dp"
             app:headerLayout="@layout/nav_header"
-            app:itemTextColor="?attr/colorControlNormal"
             app:itemIconTint="?attr/colorControlNormal"
+            app:itemTextColor="?attr/colorControlNormal"
             app:menu="@menu/navigation_menu" />
 
     </androidx.drawerlayout.widget.DrawerLayout>
@@ -75,8 +75,8 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                app:tint="@color/ap_white"
                 app:srcCompat="@drawable/filled_circle"
+                app:tint="@color/ap_white"
                 tools:ignore="ContentDescription" />
 
             <ImageView
@@ -84,8 +84,8 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                app:tint="@color/ap_white"
                 app:srcCompat="@drawable/filled_circle"
+                app:tint="@color/ap_white"
                 tools:ignore="ContentDescription" />
 
             <ImageView
@@ -93,8 +93,8 @@
                 android:layout_width="15dp"
                 android:layout_height="15dp"
                 android:layout_margin="5dp"
-                app:tint="@color/ap_white"
                 app:srcCompat="@drawable/filled_circle"
+                app:tint="@color/ap_white"
                 tools:ignore="ContentDescription" />
         </LinearLayout>
     </FrameLayout>

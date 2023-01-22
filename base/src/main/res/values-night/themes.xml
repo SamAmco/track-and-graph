@@ -31,6 +31,7 @@
         <item name="selectorButtonColor">@color/dark_gray</item>
         <item name="colorSurface">@color/mid_charcoal</item>
         <item name="colorOnSurface">@color/light_gray</item>
+        <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
         <item name="colorOnSecondary">@color/blue_black</item>
         <item name="colorPrimaryVariant">@color/faded_dark_orange</item>
         <item name="colorSecondaryVariant">@color/faded_dark_blue</item>
@@ -44,10 +45,11 @@
         <item name="android:textColorSecondary">@color/light_gray</item>
         <item name="android:textColorHint">@color/mid_gray</item>
         <item name="android:windowBackground">@color/dark_charcoal</item>
+        <item name="android:colorBackground">@color/dark_charcoal</item>
     </style>
 
     <style name="AppTheme.AlertDialogTheme" parent="Theme.Material3.DayNight.Dialog.Alert">
-        <item name="android:background">?attr/colorSurface</item>
+        <item name="android:background">@color/mid_charcoal</item>
         <item name="colorAccent">@color/faded_orange</item>
         <item name="android:textColorPrimary">@color/blue_white_pastel</item>
         <item name="android:textColorPrimaryDisableOnly">@color/blue_white_pastel</item>
@@ -74,4 +76,5 @@
         <item name="android:textColor">@color/faded_orange</item>
         <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
     </style>
+
 </resources>
