@@ -186,6 +186,7 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     private fun drawLegend() {
         val labels = data!!.barValues!!.map { it.label }
         if (labels.size > 1) {
+            binding?.legendFlexboxLayout?.visibility = View.VISIBLE
             labels.forEachIndexed { i, l ->
                 val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
                 val color = getColor(context!!, dataVisColorList[colorIndex])
