@@ -49,7 +49,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
 
     fun setGraphHeight(height: Int) {
         binding.xyPlot.layoutParams.height = height
-        binding.pieChart.layoutParams.height = height.coerceAtMost(width)
+        binding.pieChart.layoutParams.height = height
         requestLayout()
         invalidate()
     }
