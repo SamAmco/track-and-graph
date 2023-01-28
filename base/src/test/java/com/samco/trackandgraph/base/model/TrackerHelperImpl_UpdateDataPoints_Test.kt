@@ -4,6 +4,8 @@ import com.nhaarman.mockitokotlin2.*
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.entity.DataPoint
+import com.samco.trackandgraph.base.database.entity.TrackerSuggestionOrder
+import com.samco.trackandgraph.base.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
@@ -289,7 +291,9 @@ class TrackerHelperImpl_UpdateDataPoints_Test {
                 dataType = if (isDuration) DataType.DURATION else DataType.CONTINUOUS,
                 hasDefaultValue = false,
                 defaultValue = 1.0,
-                defaultLabel = ""
+                defaultLabel = "",
+                suggestionType = TrackerSuggestionType.NONE,
+                suggestionOrder = TrackerSuggestionOrder.LATEST
             )
         )
         whenever(dao.getDataPointCount(any())).thenReturn(db.size)

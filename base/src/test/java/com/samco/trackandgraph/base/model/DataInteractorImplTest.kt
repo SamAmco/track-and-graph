@@ -21,6 +21,7 @@ import com.nhaarman.mockitokotlin2.*
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.service.ServiceManager
@@ -119,7 +120,9 @@ class DataInteractorImplTest {
                 dataType = DataType.CONTINUOUS,
                 hasDefaultValue = false,
                 defaultValue = 1.0,
-                defaultLabel = ""
+                defaultLabel = "",
+                suggestionType = TrackerSuggestionType.NONE,
+                suggestionOrder = com.samco.trackandgraph.base.database.entity.TrackerSuggestionOrder.VALUE_ASCENDING,
             )
         )
 
