@@ -45,16 +45,17 @@ class SuggestedValueHelperImpl @Inject constructor(
         const val MAX_VALUES = 1000
     }
 
-    private fun getDataPoints(tracker: Tracker): Flow<IDataPoint> = flow {
+    private fun getDataPoints(tracker: Tracker): Flow<IDataPoint> {
         val sample = dataInteractor.getDataSampleForFeatureId(tracker.featureId)
-        for (dp in sample) {
-            emit(dp)
-        }
+        return flow {
+            for (dp in sample) emit(dp)
+        }.onCompletion { sample.dispose() }
     }
 
     override fun getSuggestedValues(tracker: Tracker): Flow<List<SuggestedValue>> =
         getDataPoints(tracker)
             .take(MAX_VALUES)
+            .onCompletion { }
             .map { SuggestedValue(it.value, it.label.ifEmpty { null }) }
             .scan(emptyList<SuggestedValue>()) { acc, value -> acc + value }
             .buffer(1, onBufferOverflow = BufferOverflow.DROP_OLDEST)

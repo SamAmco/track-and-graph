@@ -31,7 +31,8 @@ class FilterValueFunction(
         return DataSample.fromSequence(
             dataSample.filter { it.value in fromValue..toValue },
             dataSample.dataSampleProperties,
-            dataSample::getRawDataPoints
+            dataSample::getRawDataPoints,
+            dataSample::dispose
         )
     }
 }

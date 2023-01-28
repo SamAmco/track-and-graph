@@ -36,10 +36,11 @@ internal class FixedBinAggregator(
 ) : DataAggregator {
 
     override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
-        return AggregatedDataSample.fromSequence(
-            getSequence(dataSample),
-            dataSample.dataSampleProperties.copy(regularity = binSize),
-            dataSample::getRawDataPoints
+        return AggregatedDataSample.fromDataSample(
+            data = getSequence(dataSample),
+            dataSample = dataSample,
+            dataSampleProperties = dataSample.dataSampleProperties.copy(regularity = binSize),
+            getRawDataPoints = dataSample::getRawDataPoints
         )
     }
 

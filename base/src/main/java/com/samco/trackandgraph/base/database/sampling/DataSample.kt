@@ -27,7 +27,8 @@ data class DataSampleProperties(
 )
 
 /**
- * A sequence of data points in order from newest to oldest
+ * A sequence of data points in order from newest to oldest. When you are done iterating the
+ * sample you must call [dispose] to release any resources being used.
  */
 abstract class DataSample(
     val dataSampleProperties: DataSampleProperties = DataSampleProperties()

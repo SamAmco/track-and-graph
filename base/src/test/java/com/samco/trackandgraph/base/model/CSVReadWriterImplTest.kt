@@ -410,9 +410,10 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
                 val dataSampleProperties =
                     DataSampleProperties(isDuration = feature.featureId == 3L)
                 feature to DataSample.fromSequence(
-                    tuple.value.asSequence(),
-                    dataSampleProperties
-                ) { tuple.value.map { it.toDto() } }
+                    data = tuple.value.asSequence(),
+                    dataSampleProperties = dataSampleProperties,
+                    getRawDataPoints = { tuple.value.map { it.toDto() } }
+                )
             }
             .toMap()
 
