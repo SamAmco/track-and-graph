@@ -80,7 +80,8 @@ class DataPaddingFunction : DataSampleFunction {
             DataSample.fromSequence(
                 getSequence(dataSample, regularity),
                 dataSample.dataSampleProperties,
-                dataSample::getRawDataPoints
+                dataSample::getRawDataPoints,
+                dataSample::dispose
             )
         } ?: throw InvalidRegularityException()
     }

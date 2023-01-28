@@ -31,10 +31,11 @@ import org.threeten.bp.Duration
  */
 internal class MovingAggregator(private val movingAggDuration: Duration) : DataAggregator {
     override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
-        return AggregatedDataSample.fromSequence(
-            getSequence(dataSample),
-            dataSample.dataSampleProperties,
-            dataSample::getRawDataPoints
+        return AggregatedDataSample.fromDataSample(
+            data = getSequence(dataSample),
+            dataSample = dataSample,
+            dataSampleProperties = dataSample.dataSampleProperties,
+            getRawDataPoints = dataSample::getRawDataPoints
         )
     }
 

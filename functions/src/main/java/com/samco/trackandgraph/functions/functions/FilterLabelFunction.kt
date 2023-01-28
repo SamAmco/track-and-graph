@@ -30,7 +30,8 @@ class FilterLabelFunction(
         return DataSample.fromSequence(
             dataSample.filter { it.label in labels },
             dataSample.dataSampleProperties,
-            dataSample::getRawDataPoints
+            dataSample::getRawDataPoints,
+            dataSample::dispose
         )
     }
 }

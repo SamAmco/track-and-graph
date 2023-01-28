@@ -664,4 +664,42 @@ class SuggestedValueHelperImplTest {
 
         assertTrue(sizes.last() == SuggestedValueHelperImpl.MAX_VALUES)
     }
+
+    @Test
+    fun `Disposes upstream once read when more than max values`() = runTest {
+        val values = List(SuggestedValueHelperImpl.MAX_VALUES + 100) { it.toDouble() }
+        val dataPoints = dpFromValues(values)
+
+        var disposeCalled = false
+
+        whenever(dataInteractor.getDataSampleForFeatureId(any())).thenReturn(
+            DataSample.fromSequence(
+                data = dataPoints,
+                onDispose = { disposeCalled = true }
+            )
+        )
+
+        uut.getSuggestedValues(testTracker).collect {}
+
+        assertTrue(disposeCalled)
+    }
+
+    @Test
+    fun `Disposes upstream once read when less than max values`() = runTest {
+        val values = List(SuggestedValueHelperImpl.MAX_VALUES / 2) { it.toDouble() }
+        val dataPoints = dpFromValues(values)
+
+        var disposeCalled = false
+
+        whenever(dataInteractor.getDataSampleForFeatureId(any())).thenReturn(
+            DataSample.fromSequence(
+                data = dataPoints,
+                onDispose = { disposeCalled = true }
+            )
+        )
+
+        uut.getSuggestedValues(testTracker).collect {}
+
+        assertTrue(disposeCalled)
+    }
 }

@@ -27,15 +27,17 @@ import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
  * Note that some follow-up functions drop data-points without parents. This is supposed to be intuitive :)
  */
 internal abstract class AggregatedDataSample(
+    private val dataSample: DataSample,
     private val dataSampleProperties: DataSampleProperties
 ) : Sequence<AggregatedDataPoint> {
     companion object {
-        fun fromSequence(
+        fun fromDataSample(
             data: Sequence<AggregatedDataPoint>,
+            dataSample: DataSample,
             dataSampleProperties: DataSampleProperties,
             getRawDataPoints: () -> List<DataPoint>
         ): AggregatedDataSample {
-            return object : AggregatedDataSample(dataSampleProperties) {
+            return object : AggregatedDataSample(dataSample, dataSampleProperties) {
                 override fun getRawDataPoints() = getRawDataPoints.invoke()
                 override fun iterator(): Iterator<AggregatedDataPoint> = data.iterator()
             }
@@ -45,17 +47,19 @@ internal abstract class AggregatedDataSample(
     abstract fun getRawDataPoints(): List<DataPoint>
 
     fun average() = DataSample.fromSequence(
-        this
+        data = this
             .filter { it.parents.isNotEmpty() }
             .map { it.toDataPoint(it.parents.map { par -> par.value }.average()) },
-        dataSampleProperties,
-        this::getRawDataPoints
+        dataSampleProperties = dataSampleProperties,
+        getRawDataPoints = this::getRawDataPoints,
+        onDispose = dataSample::dispose
     )
 
     fun sum() = DataSample.fromSequence(
-        this.map { it.toDataPoint(it.parents.sumOf { par -> par.value }) },
-        dataSampleProperties,
-        this::getRawDataPoints
+        data = this.map { it.toDataPoint(it.parents.sumOf { par -> par.value }) },
+        dataSampleProperties = dataSampleProperties,
+        getRawDataPoints = this::getRawDataPoints,
+        onDispose = dataSample::dispose
     )
 
 }

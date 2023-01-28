@@ -36,7 +36,8 @@ class DataClippingFunction(
         return DataSample.fromSequence(
             getSequence(dataSample),
             dataSample.dataSampleProperties,
-            dataSample::getRawDataPoints
+            dataSample::getRawDataPoints,
+            dataSample::dispose
         )
     }
 
