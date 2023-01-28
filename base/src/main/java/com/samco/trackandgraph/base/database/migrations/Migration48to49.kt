@@ -49,7 +49,7 @@ val MIGRATION_48_49 = object : Migration(48, 49) {
                     has_default_value,
                     default_value,
                     "" as default_label,
-                    case type when 0 then "NONE" when 1 then "VALUE_AND_LABEL" when 2 then "NONE" end as suggestion_type,
+                    case trackers_table_old.type when 0 then "VALUE_AND_LABEL" when 1 then "NONE" when 2 then "NONE" end as suggestion_type,
                     "VALUE_ASCENDING" as suggestion_order
                 FROM trackers_table_old
             """.trimIndent()
