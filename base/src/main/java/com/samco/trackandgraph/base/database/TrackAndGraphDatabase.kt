@@ -66,7 +66,7 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         FeatureTimer::class,
         FunctionEntity::class
     ],
-    version = 50
+    version = 49
 )
 @TypeConverters(Converters::class)
 internal abstract class TrackAndGraphDatabase : RoomDatabase() {

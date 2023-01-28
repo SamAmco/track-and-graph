@@ -48,7 +48,9 @@ val MIGRATION_48_49 = object : Migration(48, 49) {
                     case type when 0 then 0 when 1 then 0 when 2 then 1 end as type ,
                     has_default_value,
                     default_value,
-                    "" as default_label
+                    "" as default_label,
+                    case type when 0 then "NONE" when 1 then "VALUE_AND_LABEL" when 2 then "NONE" end as suggestion_type,
+                    "VALUE_ASCENDING" as suggestion_order
                 FROM trackers_table_old
             """.trimIndent()
         )
@@ -84,7 +86,10 @@ val MIGRATION_48_49 = object : Migration(48, 49) {
                     `has_default_value` INTEGER NOT NULL, 
                     `default_value` REAL NOT NULL, 
                     `default_label` TEXT NOT NULL, 
-                    FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )
+                    `suggestion_type` TEXT NOT NULL, 
+                    `suggestion_order` TEXT NOT NULL, 
+                    FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE 
+                )
             """.trimMargin()
         )
 

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 49,
-    "identityHash": "834e54bdbcd1cc7d32e939b3307182b2",
+    "identityHash": "3c3e725dcaa820a159e5b1cb838c5935",
     "entities": [
       {
         "tableName": "features_table",
@@ -81,7 +81,7 @@
       },
       {
         "tableName": "trackers_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `has_default_value` INTEGER NOT NULL, `default_value` REAL NOT NULL, `default_label` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `feature_id` INTEGER NOT NULL, `type` INTEGER NOT NULL, `has_default_value` INTEGER NOT NULL, `default_value` REAL NOT NULL, `default_label` TEXT NOT NULL, `suggestion_type` TEXT NOT NULL, `suggestion_order` TEXT NOT NULL, FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -116,6 +116,18 @@
           {
             "fieldPath": "defaultLabel",
             "columnName": "default_label",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "suggestionType",
+            "columnName": "suggestion_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "suggestionOrder",
+            "columnName": "suggestion_order",
             "affinity": "TEXT",
             "notNull": true
           }
@@ -1260,7 +1272,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '834e54bdbcd1cc7d32e939b3307182b2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3c3e725dcaa820a159e5b1cb838c5935')"
     ]
   }
 }
