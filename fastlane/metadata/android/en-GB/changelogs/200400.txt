@@ -1,0 +1,6 @@
+- New UX for adding trackers 
+- New update all tool for updating tracked data
+- Suggested values and suggestion ordering/types
+- Various UI changes
+
+
