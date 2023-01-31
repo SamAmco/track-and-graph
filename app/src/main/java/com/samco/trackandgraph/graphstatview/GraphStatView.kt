@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatview
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -80,7 +81,6 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         binding.xyPlot.graph.setMargins(0f, 20f, 0f, 0f)
 
         val colorOnSurface = context.getColorFromAttr(R.attr.colorOnSurface)
-        val colorSurface = context.getColorFromAttr(R.attr.colorSurface)
 
         binding.xyPlot.domainTitle.labelPaint.color = colorOnSurface
         binding.xyPlot.graph.domainGridLinePaint.color = colorOnSurface
@@ -92,7 +92,14 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         binding.xyPlot.graph.rangeOriginLinePaint.color = colorOnSurface
         binding.xyPlot.graph.rangeOriginLinePaint.strokeWidth = 1f
 
-        binding.xyPlot.graph.gridBackgroundPaint.color = colorSurface
+        //Setting the layer type enables transparent backgrounds, I don't know why
+        // I discovered it here: https://groups.google.com/g/androidplot/c/5QnJXD0uIIU
+        binding.xyPlot.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
+
+        binding.xyPlot.graph.gridBackgroundPaint.color = Color.TRANSPARENT
+        binding.xyPlot.backgroundPaint.color = Color.TRANSPARENT
+        binding.xyPlot.graph.backgroundPaint.color = Color.TRANSPARENT
+        binding.pieChart.backgroundPaint.color = Color.TRANSPARENT
     }
 
     fun addLineGraphPanAndZoom() {
