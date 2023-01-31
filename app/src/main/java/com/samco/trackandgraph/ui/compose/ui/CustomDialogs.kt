@@ -35,14 +35,12 @@ fun CustomDialog(
     onDismissRequest: () -> Unit,
     scrollContent: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
-) = Dialog(
-    onDismissRequest = onDismissRequest
-) {
+) = Dialog(onDismissRequest = onDismissRequest) {
     DialogTheme {
         Surface {
             Column(
                 modifier = Modifier
-                    .padding(dimensionResource(id = R.dimen.card_padding))
+                    .padding(dimensionResource(id = R.dimen.card_padding_large))
                     .apply {
                         if (scrollContent) verticalScroll(state = rememberScrollState())
                     },
@@ -75,7 +73,7 @@ fun SlimConfirmCancelDialog(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.End
         ) {
             SmallTextButton(
                 stringRes = dismissText,
