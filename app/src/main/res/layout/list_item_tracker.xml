@@ -20,6 +20,7 @@
             app:cardElevation="@dimen/card_elevation">
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/innerLayoutContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
@@ -134,7 +135,7 @@
                         app:srcCompat="@drawable/add_box"
                         app:tint="?attr/colorControlNormal" />
 
-                    <ImageButton
+                    <ImageView
                         android:id="@+id/quickAddButton"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

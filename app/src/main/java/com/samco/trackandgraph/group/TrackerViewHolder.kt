@@ -17,11 +17,8 @@
 
 package com.samco.trackandgraph.group
 
-import android.graphics.drawable.RippleDrawable
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.annotation.SuppressLint
+import android.view.*
 import android.widget.PopupMenu
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
@@ -47,8 +44,7 @@ class TrackerViewHolder private constructor(
         setNumEntriesText()
         binding.trackGroupNameText.text = tracker.name
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
-        binding.cardView.setOnClickListener { clickListener.onHistory(tracker) }
-        initAddButton(tracker, clickListener)
+        initClickEvents(tracker, clickListener)
         initTimerControls(tracker, clickListener)
     }
 
@@ -88,11 +84,39 @@ class TrackerViewHolder private constructor(
         }
     }
 
-    private fun initAddButton(tracker: DisplayTracker, clickListener: TrackerClickListener) {
-        binding.addButton.setOnClickListener { clickListener.onAdd(tracker) }
-        binding.quickAddButton.setOnClickListener { onQuickAddClicked() }
-        binding.quickAddButton.setOnLongClickListener {
-            clickListener.onAdd(tracker, false).let { true }
+    @SuppressLint("ClickableViewAccessibility")
+    private fun initClickEvents(tracker: DisplayTracker, clickListener: TrackerClickListener) {
+        var lastX = 0
+        var lastY = 0
+        val isInCorner = {
+            val width = binding.cardView.width
+            val height = binding.cardView.height
+            val ratio = 0.22f
+            val cornerSizeX = width * ratio
+            val cornerSizeY = height * ratio
+            lastX > width - cornerSizeX && lastY > height - cornerSizeY
+        }
+        binding.cardView.setOnLongClickListener {
+            if (isInCorner()) {
+                clickListener.onAdd(tracker, false)
+                return@setOnLongClickListener true
+            }
+            return@setOnLongClickListener false
+        }
+        binding.cardView.setOnClickListener {
+            if (isInCorner()) {
+                clickListener.onAdd(tracker)
+            } else {
+                clickListener.onHistory(tracker)
+            }
+        }
+        binding.innerLayoutContainer.setOnTouchListener { _, event ->
+            //ignore this listener but update lastX and lastY
+            if (event.action == MotionEvent.ACTION_DOWN || event.action == MotionEvent.ACTION_MOVE) {
+                lastX = event.x.toInt()
+                lastY = event.y.toInt()
+            }
+            return@setOnTouchListener false
         }
         if (tracker.hasDefaultValue) {
             binding.addButton.visibility = View.INVISIBLE
@@ -119,14 +143,6 @@ class TrackerViewHolder private constructor(
         } else {
             binding.numEntriesText.context.getString(R.string.no_data)
         }
-    }
-
-    private fun onQuickAddClicked() {
-        val ripple = binding.cardView.foreground as RippleDrawable
-        ripple.setHotspot(ripple.bounds.right.toFloat(), ripple.bounds.bottom.toFloat())
-        ripple.state = intArrayOf(android.R.attr.state_pressed, android.R.attr.state_enabled)
-        ripple.state = intArrayOf()
-        tracker?.let { clickListener?.onAdd(it) }
     }
 
     override fun elevateCard() {

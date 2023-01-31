@@ -66,8 +66,8 @@ fun DataPointValueAndDescription(
 ) = Column(modifier = modifier) {
     Text(
         text = dataPoint.getDisplayValue(isDuration),
-        fontSize = MaterialTheme.typography.subtitle1.fontSize,
-        fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
+        fontSize = MaterialTheme.typography.subtitle2.fontSize,
+        fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
     )
     if (dataPoint.note.isNotEmpty()) {
         SpacingSmall()
