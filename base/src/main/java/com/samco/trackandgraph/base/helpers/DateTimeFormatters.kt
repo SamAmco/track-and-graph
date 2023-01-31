@@ -85,7 +85,7 @@ fun IDataPoint.getDisplayValue(isDuration: Boolean): String {
         label.isNotEmpty() -> doubleFormatter.format(value)
         else -> doubleFormatter.format(value)
     }.let {
-        if (label.isNotEmpty()) it + " (${label})"
+        if (label.isNotEmpty()) "$it : $label"
         else it
     }
 }
