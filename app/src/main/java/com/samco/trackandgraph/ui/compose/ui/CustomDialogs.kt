@@ -100,30 +100,34 @@ fun ConfirmCancelDialog(
     @StringRes continueText: Int = R.string.continue_word,
     @StringRes dismissText: Int = R.string.cancel,
     content: @Composable ColumnScope.() -> Unit
-) = AlertDialog(
-    onDismissRequest = onDismissRequest,
-    shape = MaterialTheme.shapes.small,
-    text = {
-        Column(
-            modifier = Modifier
-                .verticalScroll(state = rememberScrollState())
-                .padding(dimensionResource(id = R.dimen.card_padding)),
-            content = content
-        )
-    },
-    confirmButton = {
-        SmallTextButton(
-            stringRes = continueText,
-            onClick = onConfirm
-        )
-    },
-    dismissButton = {
-        SmallTextButton(
-            stringRes = dismissText,
-            onClick = onDismissRequest
-        )
-    }
-)
+) = DialogTheme {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        shape = MaterialTheme.shapes.small,
+        text = {
+            Column(
+                modifier = Modifier
+                    .verticalScroll(state = rememberScrollState()),
+                content = content
+            )
+        },
+        confirmButton = {
+            SmallTextButton(
+                stringRes = continueText,
+                onClick = onConfirm
+            )
+        },
+        dismissButton = {
+            SmallTextButton(
+                stringRes = dismissText,
+                colors = ButtonDefaults.textButtonColors(
+                    contentColor = MaterialTheme.tngColors.onSurface
+                ),
+                onClick = onDismissRequest
+            )
+        }
+    )
+}
 
 @Composable
 fun ConfirmCancelDialog(
@@ -137,5 +141,11 @@ fun ConfirmCancelDialog(
     onConfirm = onConfirm,
     continueText = continueText,
     dismissText = dismissText,
-    content = { Text(text = stringResource(id = body)) }
+    content = {
+        Text(
+            text = stringResource(id = body),
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.tngColors.onSurface
+        )
+    }
 )
