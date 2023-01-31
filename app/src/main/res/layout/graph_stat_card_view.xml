@@ -2,15 +2,17 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <androidx.cardview.widget.CardView
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/demoCardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/card_margin_small"
         android:clickable="true"
+        android:elevation="@dimen/card_elevation"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        app:cardCornerRadius="@dimen/card_corner_radius">
+        app:cardCornerRadius="@dimen/card_corner_radius"
+        app:cardElevation="@dimen/card_elevation">
 
         <com.samco.trackandgraph.graphstatview.GraphStatView
             android:id="@+id/graphStatView"
@@ -27,7 +29,7 @@
             android:paddingTop="6dp"
             android:paddingEnd="6dp"
             android:paddingBottom="12dp"
-            app:tint="?attr/colorControlNormal"
-            app:srcCompat="@drawable/list_menu_icon" />
-    </androidx.cardview.widget.CardView>
+            app:srcCompat="@drawable/list_menu_icon"
+            app:tint="?attr/colorControlNormal" />
+    </com.google.android.material.card.MaterialCardView>
 </layout>

@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun LoadingOverlay() = Box(
@@ -44,8 +45,8 @@ fun LoadingOverlay() = Box(
                 indication = null
             ) { }
             .focusable(),
-        color = MaterialTheme.colors.surface.copy(
-            alpha = MaterialTheme.colors.disabledAlpha
+        color = MaterialTheme.tngColors.surface.copy(
+            alpha = MaterialTheme.tngColors.disabledAlpha
         )
     ) {
         Box(contentAlignment = Alignment.Center) {
