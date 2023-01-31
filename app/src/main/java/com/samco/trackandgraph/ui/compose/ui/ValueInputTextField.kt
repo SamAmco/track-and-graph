@@ -33,6 +33,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -78,8 +79,8 @@ fun ValueInputTextField(
         placeholder = {
             Text(
                 "1.0",
-                color = MaterialTheme.colors.onSurface.copy(
-                    alpha = MaterialTheme.colors.disabledAlpha
+                color = MaterialTheme.tngColors.onSurface.copy(
+                    alpha = MaterialTheme.tngColors.disabledAlpha
                 )
             )
         },

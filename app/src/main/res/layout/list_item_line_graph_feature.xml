@@ -10,10 +10,12 @@
         android:focusable="true"
         android:padding="@dimen/card_margin_small">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:cardCornerRadius="@dimen/card_corner_radius">
+            android:elevation="@dimen/card_elevation"
+            app:cardCornerRadius="@dimen/card_corner_radius"
+            app:cardElevation="@dimen/card_elevation">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -51,7 +53,7 @@
                         android:layout_height="wrap_content"
                         android:importantForAutofill="no"
                         android:inputType="textCapSentences"
-                        android:maxLines="1"/>
+                        android:maxLines="1" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -141,14 +143,14 @@
                     android:id="@+id/offsetInput"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:backgroundTint="?colorPrimary"
                     android:digits="0123456789.,-"
                     android:hint="0"
                     android:importantForAutofill="no"
-                    app:backgroundTint="?colorPrimary"
-                    android:backgroundTint="?colorPrimary"
                     android:inputType="numberSigned|numberDecimal"
                     android:singleLine="true"
                     android:textAlignment="center"
+                    app:backgroundTint="?colorPrimary"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintLeft_toRightOf="@id/offsetLabel"
                     app:layout_constraintRight_toLeftOf="@id/scaleLabel"
@@ -172,14 +174,14 @@
                     android:id="@+id/scaleInput"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:backgroundTint="?colorPrimary"
                     android:digits="0123456789.,-"
                     android:hint="1"
-                    app:backgroundTint="?colorPrimary"
-                    android:backgroundTint="?colorPrimary"
                     android:importantForAutofill="no"
                     android:inputType="numberSigned|numberDecimal"
                     android:singleLine="true"
                     android:textAlignment="center"
+                    app:backgroundTint="?colorPrimary"
                     app:layout_constraintHorizontal_weight="1"
                     app:layout_constraintLeft_toRightOf="@id/scaleLabel"
                     app:layout_constraintRight_toRightOf="parent"
@@ -187,6 +189,6 @@
                     tools:ignore="HardcodedText" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </FrameLayout>
 </layout>

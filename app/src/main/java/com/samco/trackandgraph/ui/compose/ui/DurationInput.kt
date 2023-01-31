@@ -48,6 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import kotlinx.coroutines.delay
@@ -133,17 +134,17 @@ private fun RowScope.DurationInputComponent(
         },
         textStyle = MaterialTheme.typography.h5.copy(
             textAlign = TextAlign.End,
-            color = MaterialTheme.colors.onSurface
+            color = MaterialTheme.tngColors.onSurface
         ),
-        cursorBrush = SolidColor(MaterialTheme.colors.primary),
+        cursorBrush = SolidColor(MaterialTheme.tngColors.primary),
         interactionSource = interactionSource,
         decorationBox = {
             if (textFieldValue.text == "") Text(
                 "0",
                 fontSize = MaterialTheme.typography.h6.fontSize,
                 textAlign = TextAlign.End,
-                color = MaterialTheme.colors.onSurface.copy(
-                    alpha = MaterialTheme.colors.disabledAlpha
+                color = MaterialTheme.tngColors.onSurface.copy(
+                    alpha = MaterialTheme.tngColors.disabledAlpha
                 )
             )
             else it()

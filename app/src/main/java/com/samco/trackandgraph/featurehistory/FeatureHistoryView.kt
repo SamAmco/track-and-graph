@@ -28,8 +28,10 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -41,6 +43,7 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 
 @Composable
@@ -262,10 +265,10 @@ fun CheckboxLabelRow(
 ) = Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = Modifier
-        .alpha(if (checked) 1.0f else MaterialTheme.colors.disabledAlpha)
+        .alpha(if (checked) 1.0f else MaterialTheme.tngColors.disabledAlpha)
         .fillMaxWidth()
         .border(
-            BorderStroke(1.dp, MaterialTheme.colors.onSurface),
+            BorderStroke(1.dp, MaterialTheme.tngColors.onSurface),
             shape = MaterialTheme.shapes.small
         )
         .padding(dimensionResource(id = R.dimen.card_margin_small))
@@ -303,7 +306,8 @@ private fun DataPoint(
     isDuration: Boolean,
     isTracker: Boolean
 ) = Card(
-    modifier = Modifier.clickable { viewModel.onDataPointClicked(dataPoint) },
+    modifier = Modifier
+        .clickable { viewModel.onDataPointClicked(dataPoint) },
     elevation = dimensionResource(id = R.dimen.card_elevation)
 ) {
     Row(
@@ -330,14 +334,14 @@ private fun DataPoint(
                 Icon(
                     painter = painterResource(id = R.drawable.edit_icon),
                     contentDescription = stringResource(id = R.string.edit_data_point_button_content_description),
-                    tint = MaterialTheme.colors.secondary
+                    tint = MaterialTheme.tngColors.secondary
                 )
             }
             IconButton(onClick = { viewModel.onDeleteClicked(dataPoint) }) {
                 Icon(
                     painter = painterResource(id = R.drawable.delete_icon),
                     contentDescription = stringResource(id = R.string.delete_data_point_button_content_description),
-                    tint = MaterialTheme.colors.primary
+                    tint = MaterialTheme.tngColors.primary
                 )
             }
         }

@@ -39,6 +39,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.delay
@@ -47,17 +48,19 @@ import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
 @Composable
-fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
-    Column(
-        modifier = Modifier
-            .heightIn(max = 400.dp)
-            .fillMaxWidth()
-            .background(color = MaterialTheme.tngColors.surface)
-            .padding(dimensionResource(id = R.dimen.card_padding))
-    ) {
-        val showTutorial by viewModel.showTutorial.observeAsState(false)
-        if (showTutorial) AddDataPointsTutorial(viewModel.tutorialViewModel)
-        else DataPointInputView(viewModel)
+fun AddDataPointsView(viewModel: AddDataPointsViewModel) = DialogTheme {
+    Surface {
+        Column(
+            modifier = Modifier
+                .heightIn(max = 400.dp)
+                .fillMaxWidth()
+                .background(color = MaterialTheme.tngColors.surface)
+                .padding(dimensionResource(id = R.dimen.card_padding))
+        ) {
+            val showTutorial by viewModel.showTutorial.observeAsState(false)
+            if (showTutorial) AddDataPointsTutorial(viewModel.tutorialViewModel)
+            else DataPointInputView(viewModel)
+        }
     }
 }
 

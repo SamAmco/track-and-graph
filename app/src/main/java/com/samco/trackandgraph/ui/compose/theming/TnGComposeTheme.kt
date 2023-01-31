@@ -25,10 +25,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import com.google.android.material.composethemeadapter.createMdcTheme
+import com.google.accompanist.themeadapter.material.createMdcTheme
 
 private val lightGray = Color(0xFFE0E0E0)
 private val darkGray = Color(0xFF4C4C4C)
+private val midCharcoal = Color(0xFF222222)
 
 data class TngColors(
     val material: Colors,
@@ -60,7 +61,7 @@ private val DarkColorPalette = TngColors(
     selectorButtonColor = darkGray
 )
 
-val Colors.disabledAlpha get() = 0.4f
+val TngColors.disabledAlpha get() = 0.4f
 
 private val LocalColors = staticCompositionLocalOf { LightColorPalette }
 
@@ -79,11 +80,7 @@ fun TnGComposeTheme(
         layoutDirection = LocalLayoutDirection.current
     )
 
-    val colors = if (darkTheme) {
-        DarkColorPalette.copy(material = materialColors ?: darkColors())
-    } else {
-        LightColorPalette.copy(material = materialColors ?: lightColors())
-    }
+    val colors = tngColors(darkTheme, materialColors)
 
     CompositionLocalProvider(LocalColors provides colors) {
         MaterialTheme(
@@ -93,4 +90,38 @@ fun TnGComposeTheme(
             content = block
         )
     }
+}
+
+@Composable
+fun DialogTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    block: @Composable () -> Unit
+) = TnGComposeTheme(darkTheme) {
+
+    val colors = MaterialTheme.tngColors
+        .copy(
+            material = MaterialTheme.tngColors.material.copy(
+                background = midCharcoal,
+                surface = midCharcoal,
+            )
+        )
+
+    CompositionLocalProvider(LocalColors provides colors) {
+        MaterialTheme(
+            colors = colors.material,
+            typography = MaterialTheme.typography,
+            shapes = MaterialTheme.shapes,
+            content = block
+        )
+    }
+}
+
+@Composable
+private fun tngColors(
+    darkTheme: Boolean,
+    materialColors: Colors?
+) = if (darkTheme) {
+    DarkColorPalette.copy(material = materialColors ?: darkColors())
+} else {
+    LightColorPalette.copy(material = materialColors ?: lightColors())
 }

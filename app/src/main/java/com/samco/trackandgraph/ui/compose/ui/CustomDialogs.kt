@@ -27,6 +27,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
@@ -37,18 +38,17 @@ fun CustomDialog(
 ) = Dialog(
     onDismissRequest = onDismissRequest
 ) {
-    Card(
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.card_padding))
-                .apply {
-                    if (scrollContent) verticalScroll(state = rememberScrollState())
-                },
-            content = content
-        )
+    DialogTheme {
+        Surface {
+            Column(
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.card_padding))
+                    .apply {
+                        if (scrollContent) verticalScroll(state = rememberScrollState())
+                    },
+                content = content
+            )
+        }
     }
 }
 
