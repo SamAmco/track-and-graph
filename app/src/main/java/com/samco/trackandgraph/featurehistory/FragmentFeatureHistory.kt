@@ -47,6 +47,8 @@ class FragmentFeatureHistory : Fragment() {
         viewModel.initViewModel(args.featureId)
         viewModel.isTracker.observe(viewLifecycleOwner) { initMenuProvider(it) }
 
+        observeViewModel()
+
         return ComposeView(requireContext()).apply {
             setContent {
                 TnGComposeTheme {
@@ -56,8 +58,7 @@ class FragmentFeatureHistory : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    private fun observeViewModel() {
         viewModel.showEditDataPointDialog.observe(viewLifecycleOwner) {
             if (it != null) {
                 DataPointInputDialog().apply {
