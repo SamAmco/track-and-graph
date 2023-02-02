@@ -25,7 +25,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import com.google.accompanist.themeadapter.material.createMdcTheme
+import com.google.android.material.composethemeadapter.createMdcTheme
 
 private val lightGray = Color(0xFFE0E0E0)
 private val darkGray = Color(0xFF4C4C4C)
