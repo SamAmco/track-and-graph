@@ -195,7 +195,6 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
 
         when (viewModel) {
             is AddDataPointViewModel.NumericalDataPointViewModel -> {
-
                 LabeledRow(label = stringResource(id = R.string.value_colon)) {
                     ValueInputTextField(
                         textFieldValue = viewModel.value,
@@ -215,6 +214,7 @@ private fun TrackerPage(viewModel: AddDataPointViewModel) =
                     )
                 }
             }
+            else -> {}
         }
 
         SpacingSmall()
