@@ -10,12 +10,14 @@
         android:clipToPadding="false"
         android:padding="5dp">
 
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:elevation="@dimen/card_elevation"
+            app:cardElevation="@dimen/card_elevation"
             app:cardCornerRadius="@dimen/card_corner_radius">
 
             <LinearLayout
@@ -262,6 +264,6 @@
 
                 </LinearLayout>
             </LinearLayout>
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
     </FrameLayout>
 </layout>

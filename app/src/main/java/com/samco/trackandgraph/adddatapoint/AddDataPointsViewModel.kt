@@ -223,7 +223,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
                 SuggestedValueViewData(
                     it.value,
                     getValueString(it.value, config.tracker.dataType.isDuration()),
-                    it.label
+                    it.label.let { label -> label.ifEmpty { null } }
                 )
             }
         )
