@@ -98,13 +98,17 @@ fun DialogTheme(
     block: @Composable () -> Unit
 ) = TnGComposeTheme(darkTheme) {
 
-    val colors = MaterialTheme.tngColors
-        .copy(
-            material = MaterialTheme.tngColors.material.copy(
-                background = midCharcoal,
-                surface = midCharcoal,
+    val colors = MaterialTheme.tngColors.let {
+        if (darkTheme) {
+            it.copy(
+                material = MaterialTheme.tngColors.material.copy(
+                    background = midCharcoal,
+                    surface = midCharcoal,
+                )
             )
-        )
+        } else it
+    }
+
 
     CompositionLocalProvider(LocalColors provides colors) {
         MaterialTheme(

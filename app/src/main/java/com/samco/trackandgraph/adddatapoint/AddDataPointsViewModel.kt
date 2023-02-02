@@ -46,7 +46,7 @@ data class SuggestedValueViewData(
     val label: String?
 )
 
-interface AddDataPointBaseViewModel {
+sealed interface AddDataPointViewModel {
     val name: LiveData<String>
     val timestamp: LiveData<OffsetDateTime>
     val label: TextFieldValue
@@ -62,9 +62,6 @@ interface AddDataPointBaseViewModel {
     fun updateTimestamp(timestamp: OffsetDateTime)
     fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData)
     fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData)
-}
-
-sealed interface AddDataPointViewModel : AddDataPointBaseViewModel {
 
     interface NumericalDataPointViewModel : AddDataPointViewModel {
         val value: TextFieldValue
@@ -111,6 +108,11 @@ class AddDataPointsViewModelImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     private val prefHelper: PrefHelper
 ) : ViewModel(), AddDataPointsNavigationViewModel {
+
+    private interface AddDataPointViewModelInner : AddDataPointViewModel {
+        var tracked: Boolean
+        fun getDouble(): Double
+    }
 
     private data class Config(
         val tracker: Tracker,
@@ -161,16 +163,16 @@ class AddDataPointsViewModelImpl @Inject constructor(
     override val currentPageIndex = indexFlow
         .asLiveData(viewModelScope.coroutineContext)
 
-    private val viewModels: SharedFlow<List<AddDataPointViewModel>> = configFlow
+    private val viewModels: SharedFlow<List<AddDataPointViewModelInner>> = configFlow
         .map { it.map { config -> getViewModel(config) } }
         .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
 
-    override fun getViewModel(pageIndex: Int) = viewModels
+    override fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel> = viewModels
         .map { it.getOrNull(pageIndex) }
         .filterNotNull()
         .asLiveData(viewModelScope.coroutineContext)
 
-    private fun getViewModel(config: Config): AddDataPointViewModel {
+    private fun getViewModel(config: Config): AddDataPointViewModelInner {
         return when (config.tracker.dataType) {
             DataType.DURATION -> DataPointDurationViewModel(config)
             DataType.CONTINUOUS -> getNumericalViewModel(config)
@@ -179,13 +181,23 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     private val now = OffsetDateTime.now()
 
+    private val lastSelectedTimestampGlobal = MutableSharedFlow<OffsetDateTime>()
+
     private abstract inner class AddDataPointBaseViewModelImpl(
         protected val config: Config
-    ) : AddDataPointBaseViewModel {
+    ) : AddDataPointViewModelInner {
 
+        override var tracked = false
         override val oldDataPoint = config.oldDataPoint
         override val name = MutableLiveData(config.tracker.name)
-        override val timestamp = MutableLiveData(config.timestamp ?: now)
+        private val onTimestampSelected = MutableSharedFlow<OffsetDateTime>()
+        override val timestamp = merge(
+            onTimestampSelected,
+            lastSelectedTimestampGlobal.takeWhile { !tracked }
+        )
+            .onStart { emit(config.timestamp ?: now) }
+            .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
+            .asLiveData(viewModelScope.coroutineContext)
         override var label by mutableStateOf(TextFieldValue(config.label ?: ""))
         override var note by mutableStateOf(TextFieldValue(config.note ?: ""))
         override val selectedSuggestedValue = MutableLiveData<SuggestedValueViewData?>(null)
@@ -223,7 +235,10 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
 
         override fun updateTimestamp(timestamp: OffsetDateTime) {
-            this.timestamp.value = timestamp
+            viewModelScope.launch {
+                lastSelectedTimestampGlobal.emit(timestamp)
+                onTimestampSelected.emit(timestamp)
+            }
         }
 
         override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
@@ -263,6 +278,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
                 setValueFromSuggestedValue(suggestedValue)
                 super.onSuggestedValueSelected(suggestedValue)
             }
+
+            override fun getDouble(): Double = value.text.toDoubleOrNull() ?: 1.0
 
             override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
                 setValueFromSuggestedValue(suggestedValue)
@@ -308,6 +325,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
             super.onSuggestedValueSelected(suggestedValue)
         }
 
+        override fun getDouble(): Double = getDurationAsDouble()
+
         override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
             suggestedValue.value?.let { this.setDurationFromDouble(it) }
             super.onSuggestedValueLongPress(suggestedValue)
@@ -345,30 +364,24 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
     }
 
-    private suspend fun insertDataPoint(viewModel: AddDataPointViewModel) {
+    private suspend fun insertDataPoint(viewModel: AddDataPointViewModelInner) {
         viewModel.oldDataPoint?.let { dataInteractor.deleteDataPoint(it) }
         getDataPoint(viewModel)?.let { newDataPoint ->
             dataInteractor.insertDataPoint(newDataPoint)
             incrementPageIndex()
         }
+        viewModel.tracked = true
     }
 
-    private fun getDataPoint(viewModel: AddDataPointViewModel): DataPoint? {
+    private fun getDataPoint(viewModel: AddDataPointViewModelInner): DataPoint? {
         val timestamp = viewModel.timestamp.value ?: return null
         return DataPoint(
             timestamp = timestamp,
             featureId = viewModel.getTracker().featureId,
-            value = getDoubleValue(viewModel),
+            value = viewModel.getDouble(),
             label = viewModel.label.text,
             note = viewModel.note.text
         )
-    }
-
-    private fun getDoubleValue(viewModel: AddDataPointViewModel) = when (viewModel) {
-        is AddDataPointViewModel.NumericalDataPointViewModel ->
-            viewModel.value.text.toDoubleOrNull() ?: 1.0
-        is AddDataPointViewModel.DurationDataPointViewModel ->
-            viewModel.getDurationAsDouble()
     }
 
     override fun updateCurrentPage(page: Int) {
