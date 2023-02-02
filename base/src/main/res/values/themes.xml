@@ -48,6 +48,7 @@
         <item name="colorSecondaryContainer">@color/orange</item>
         <item name="colorOnSecondaryContainer">@color/white</item>
         <item name="colorPrimary">@color/orange</item>
+        <item name="colorOnPrimary">@color/blue_black</item>
         <item name="colorPrimaryDark">@color/dark_orange</item>
         <item name="colorSecondary">@color/light_blue</item>
         <item name="colorPrimaryContainer">@color/orange</item>
