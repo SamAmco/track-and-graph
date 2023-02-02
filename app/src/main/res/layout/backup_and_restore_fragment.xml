@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
         <ScrollView
-            android:layout_gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
+                android:orientation="vertical"
                 android:paddingTop="@dimen/input_spacing_large"
-                android:paddingBottom="@dimen/input_spacing_large"
-                android:orientation="vertical">
+                android:paddingBottom="@dimen/input_spacing_large">
 
                 <TextView
                     style="@style/Style.EmptyPageHintTextStyle"
@@ -28,10 +28,10 @@
                     android:layout_marginEnd="@dimen/input_spacing_large"
                     android:layout_marginBottom="@dimen/dialog_input_spacing"
                     android:text="@string/backup_hint_text"
-                    android:textAppearance="@style/TextAppearance.Body"
-                    android:textAlignment="textStart" />
+                    android:textAlignment="textStart"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/backupButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -40,15 +40,15 @@
 
                 <TextView
                     android:id="@+id/backupFeedbackText"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/input_spacing_large"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginEnd="@dimen/input_spacing_large"
-                    style="@style/Style.EmptyPageHintTextStyle"
                     android:textStyle="bold"
-                    tools:textColor="?attr/errorTextColor"
-                    tools:text="Some error that goes on for a really long time and even longer" />
+                    tools:text="Some error that goes on for a really long time and even longer"
+                    tools:textColor="?attr/errorTextColor" />
 
                 <ImageView
                     android:layout_width="match_parent"
@@ -66,10 +66,10 @@
                     android:layout_marginEnd="@dimen/input_spacing_large"
                     android:layout_marginBottom="@dimen/dialog_input_spacing"
                     android:text="@string/restore_hint_text"
-                    android:textAppearance="@style/TextAppearance.Body"
-                    android:textAlignment="textStart" />
+                    android:textAlignment="textStart"
+                    android:textAppearance="@style/TextAppearance.Body" />
 
-                <Button
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/restoreButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -78,15 +78,15 @@
 
                 <TextView
                     android:id="@+id/restoreFeedbackText"
+                    style="@style/Style.EmptyPageHintTextStyle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/input_spacing_large"
                     android:layout_marginTop="@dimen/dialog_input_spacing"
                     android:layout_marginEnd="@dimen/input_spacing_large"
-                    style="@style/Style.EmptyPageHintTextStyle"
                     android:textStyle="bold"
-                    tools:textColor="?attr/errorTextColor"
-                    tools:text="Some error that goes on for a really long time and even longer" />
+                    tools:text="Some error that goes on for a really long time and even longer"
+                    tools:textColor="?attr/errorTextColor" />
 
             </LinearLayout>
         </ScrollView>
@@ -95,8 +95,8 @@
             android:id="@+id/progressOverlay"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?android:attr/windowBackground"
             android:alpha="0.3"
+            android:background="?android:attr/windowBackground"
             android:clickable="true"
             android:focusable="true"
             android:visibility="gone">
