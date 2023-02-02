@@ -190,6 +190,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override var tracked = false
         override val oldDataPoint = config.oldDataPoint
         override val name = MutableLiveData(config.tracker.name)
+
         private val onTimestampSelected = MutableSharedFlow<OffsetDateTime>()
         override val timestamp = merge(
             onTimestampSelected,
@@ -198,9 +199,9 @@ class AddDataPointsViewModelImpl @Inject constructor(
             .onStart { emit(config.timestamp ?: now) }
             .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
             .asLiveData(viewModelScope.coroutineContext)
+
         override var label by mutableStateOf(TextFieldValue(config.label ?: ""))
         override var note by mutableStateOf(TextFieldValue(config.note ?: ""))
-        override val selectedSuggestedValue = MutableLiveData<SuggestedValueViewData?>(null)
 
         override val suggestedValues: LiveData<List<SuggestedValueViewData>> = suggestedValueHelper
             .getSuggestedValues(config.tracker)
@@ -216,6 +217,16 @@ class AddDataPointsViewModelImpl @Inject constructor(
             .flowOn(io)
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
             .asLiveData(viewModelScope.coroutineContext)
+
+        override val selectedSuggestedValue = MutableLiveData(
+            config.oldDataPoint?.let {
+                SuggestedValueViewData(
+                    it.value,
+                    getValueString(it.value, config.tracker.dataType.isDuration()),
+                    it.label
+                )
+            }
+        )
 
         private fun getValueString(value: Double?, isDuration: Boolean): String? = when {
             value == null -> null
