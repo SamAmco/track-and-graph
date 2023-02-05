@@ -6,7 +6,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="@dimen/card_padding"
-        android:theme="@style/AppTheme.AlertDialogTheme">
+        android:theme="@style/AppTheme">
 
         <TextView
             android:id="@+id/trackerTypeLabel"
@@ -22,32 +22,5 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dialog_input_spacing"
             android:spinnerMode="dialog" />
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/dialog_input_spacing">
-
-            <Button
-                android:id="@+id/cancelButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|start"
-                android:layout_marginStart="16dp"
-                android:background="@null"
-                android:text="@string/cancel"
-                android:textStyle="bold" />
-
-            <Button
-                android:id="@+id/createButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:background="@null"
-                android:text="@string/create"
-                android:textColor="?attr/colorSecondary"
-                android:textStyle="bold" />
-
-        </FrameLayout>
     </LinearLayout>
 </layout>
