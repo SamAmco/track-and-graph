@@ -4,12 +4,11 @@ To import/export only the tracked data in a group to a CSV use the menu buttons 
 
 ![faq_image_2_1"](images/faq_image_2_1.png)
 
-
-TODO import_icon
+<img src="images/faq_2_2.png" width="10%">
 
 Use this button to import a csv into this group.
 
-TODO export_icon
+<img src="images/faq_2_3.png" width="10%">
 
 Use this button to export this groups tracked data to a csv.
 
