@@ -2,7 +2,7 @@
 
 To import/export only the tracked data in a group to a CSV use the menu buttons at the top:
 
-![faq_image_2_1"](images/faq_image_2_1.png)
+![faq_2_1"](images/faq_2_1.png)
 
 <img src="images/faq_2_2.png" width="10%">
 
