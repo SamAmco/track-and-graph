@@ -1,14 +1,18 @@
-1. Update the build.gradle version code and name
+1. Checkout a new release or hotfix branch if you haven't already
 
-2. Build an aab for the release (using Android Studio)
+2. Make sure the docs links in the strings.xml are pointing to the new branch
 
-3. Copy and paste a fastlane changelog file and add the changelog there e.g. 
+3. Update the build.gradle version code and name
+
+4. Build an aab for the release (using Android Studio)
+
+5. Copy and paste a fastlane changelog file and add the changelog there e.g. 
 
 	# cp fastlane/metadata/android/en-GB/changelogs/10403.txt fastlane/metadata/android/en-GB/changelogs/10404.txt
 
 also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.
 
-4. Use fastlane to upload the new aab to the play store e.g. for alpha:
+6. Use fastlane to upload the new aab to the play store e.g. for alpha:
 
 	# bundle exec fastlane supply --aab app/release/app-release.aab --track alpha
 
@@ -20,8 +24,10 @@ or for release:
 
 	# bundle exec fastlane supply --aab app/release/app-release.aab
 
-6. While this is uploading you can build an apk for the release (using Android Studio)
+7. While this is uploading you can build an apk for the release (using Android Studio)
 
-5. Commit everything and tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload) as F-droid uses these tags for its own releases
+8. Commit everything and merge the release/hotfix branch back into master
 
-7. On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
+9. Tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload) as F-droid uses these tags for its own releases
+
+10. On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
