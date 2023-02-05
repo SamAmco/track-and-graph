@@ -2,11 +2,15 @@
 
 To begin tracking you will need to create a Tracker.
 
-![faq_image_1_1](images/faq_image_1_1.jpg)
+<img src="images/faq_image_1_1.jpg" width="50%">
+
+---
 
 As a minimum you will need to give your tracker a name. You can also optionally add a longer description. The description can later be seen via the context menu of the tracker.
 
-### Gif of accessing the description
+<img src="images/faq_1_1.gif" width="50%">
+
+---
 
 A Tracker holds a list of data points ordered by time. Each data point has the following information:
 
@@ -19,27 +23,39 @@ The value is usually just a number, but it can also be a time or duration. If yo
 
 Labels and notes are both text inputs. Labels are useful for categorising data. For example if you wanted to track calories for breakfast, lunch, and dinner, you could track the calories in the value field and the word "breakfast", "lunch" or "dinner" in the label field. Use the note field to add more contextual information like "Today was my birthday so I ate lots of cake."
 
-### Image of data input
+<img src="images/faq_1_2.png" width="50%">
+
+---
 
 Any previous values you have tracked will later appear as buttons on the tracker input dialog. If you press the button that value/label is tracked immediately. If you long press the button the tracker input is filled for you and you can edit it before adding that data point. This means you can create multiple choice style answers for your self.
 
-### Image of suggested values
+<img src="images/faq_1_3.png" width="50%">
+
+---
 
 Use groups to organise your trackers. You can move a tracker to a group using the trackers context menu:
 
-### Gif of moving a tracker
+<img src="images/faq_1_2.gif" width="50%">
+
+---
 
 When you have multiple trackers in a group you can use the quick track button to quickly track them all at once:
 
-### Gif of quick tracking
+<img src="images/faq_1_3.gif" width="50%">
 
-You can also reorder items in a group by dragging them: 
+---
 
-### Gif of dragging a tracker to a new spot
+You can also reorder items in a group by holding down and dragging them: 
+
+<img src="images/faq_1_4.gif" width="50%">
+
+---
 
 To view, edit and delete your data points tap on the center of a tracker:
 
-### Gif of opening a trackers history
+<img src="images/faq_1_5.gif" width="50%">
+
+---
 
 You can edit all the data points for a tracker at once using the edit button in the top right. 
 
@@ -47,4 +63,4 @@ You can edit all the data points for a tracker at once using the edit button in 
 
 The "Where" section allows you to specify which data points you want to update. Any data points that match any of the input data will be updated. For example if you check value and input 56, then any data point that has a value of 56 will be updated. If you check label and input "Small" then any data point with the label "Small" will be updated (this is case sensitive so "Small" will not match "small"). If you check both value and label, then only data points with both the given value and the given label will be updated. 
 
-### Gif of updating all
+<img src="images/faq_1_6.gif" width="50%">
