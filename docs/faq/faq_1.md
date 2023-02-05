@@ -64,3 +64,17 @@ You can edit all the data points for a tracker at once using the edit button in 
 The "Where" section allows you to specify which data points you want to update. Any data points that match any of the input data will be updated. For example if you check value and input 56, then any data point that has a value of 56 will be updated. If you check label and input "Small" then any data point with the label "Small" will be updated (this is case sensitive so "Small" will not match "small"). If you check both value and label, then only data points with both the given value and the given label will be updated. 
 
 <img src="images/faq_1_6.gif" width="50%">
+
+---
+
+### Advanced tracker options
+
+When creating a tracker you can set a "default value" for that tracker. If you do this you will not be asked for a value when you tap the + button. Instead the default value will immediately be tracked at the current time. You can still track a custom value by long pressing the + button on the tracker.
+
+<img src="images/faq_1_7.gif" width="50%">
+
+If you want to change the behaviour of the suggested values you can do so using the suggestions type and order settings. When you tap a suggested value the value and label fields are filled out and the data point is tracked immediately. You can long press a suggested value to fill out the fields without tracking so that you can edit one or more of the fields before tracking. 
+
+By default previous tracked data points are used to create suggestions. Both the value and the label are used to create the suggestion and they are ordered ascending by value. If you change the suggestion type to labels only then tapping a suggestion will track a data point with that label and the default value of 1. If you change it to value only it will track a data point with that value and an empty label.
+
+<img src="images/faq_1_8.gif" width="50%">
