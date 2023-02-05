@@ -17,11 +17,10 @@
 
 package com.samco.trackandgraph.widgets
 
+import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
@@ -30,6 +29,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
@@ -54,38 +55,41 @@ class TrackWidgetConfigureDialog : DialogFragment() {
         fun onDismiss()
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            binding = TrackWidgetConfigureDialogBinding.inflate(inflater, container, false)
+            binding = TrackWidgetConfigureDialogBinding.inflate(it.layoutInflater, null, false)
             listener = activity as TrackWidgetConfigureDialogListener
 
-            binding.cancelButton.setOnClickListener {
-                dismiss()
-                listener.onDismiss()
-            }
-            observeAllFeatures()
-            observeOnCreateClicked()
+            val alertDialog = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
+                .setView(binding.root)
+                .setPositiveButton(R.string.create) { _, _ ->
+                    viewModel.onCreateClicked()
+                }
+                .setNegativeButton(R.string.cancel) { _, _ ->
+                    dismiss()
+                    listener.onDismiss()
+                }
+                .create()
 
-            dialog?.setCanceledOnTouchOutside(true)
-            binding.root
+            alertDialog.setCanceledOnTouchOutside(true)
+            alertDialog.setOnShowListener { setAlertDialogShowListeners() }
+            alertDialog
         } ?: throw IllegalStateException("Activity cannot be null")
     }
 
+    private fun setAlertDialogShowListeners() {
+        observeAllFeatures()
+        observeOnCreateClicked()
+    }
+
     private fun observeOnCreateClicked() {
-        binding.createButton.setOnClickListener {
-            viewModel.onCreateClicked()
-        }
-        viewModel.onCreateWidget.observe(viewLifecycleOwner) {
+        viewModel.onCreateWidget.observe(this) {
             listener.onCreateWidget(it)
         }
     }
 
     private fun observeAllFeatures() =
-        viewModel.featurePathProvider.observe(viewLifecycleOwner) { featurePathProvider ->
+        viewModel.featurePathProvider.observe(this) { featurePathProvider ->
             val sortedFeatures = featurePathProvider.sortedPaths()
             if (sortedFeatures.isEmpty()) listener.onNoFeatures()
             val itemNames = sortedFeatures.map { it.second }
