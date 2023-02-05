@@ -18,21 +18,15 @@ If you read on Saturday 50% of the time and on Friday 50% of the time you would 
 
 ![faq_image_7_4](images/faq_image_7_4.jpg)
 
-If the data you are tracking is multiple choice then Track & Graph will show you the distribution within each bar of the amount made up by each choice tracked like so:
+If the data you are tracking has labels then Track & Graph will show you the distribution within each bar of the amount made up by each choice tracked like so:
 
 ![faq_image_7_5](images/faq_image_7_5.jpg)
 
-By default the height of each bar is relative to the sum of all the data point values that fall in that time range. However if the value of each of your choices should be the same (i.e. the choices represent un-ordered discrete data) then your histogram will be incorrectly skewed like so:
-
-![faq_image_7_6](images/faq_image_7_6.jpg)
-
-(notice the index of Sparrow is 0 so it doesn\'t even show up on the histogram)
+By default the height of each bar is relative to the sum of all the data point values that fall in that time range. However if the weight of each of your data points should be the same regardless of its value then your histogram may be incorrectly skewed.
 
 To fix this you can check the box marked: \"Check here to count the number of data points tracked rather than the total of their values.\"
 
-This way each multiple choice answer will be regarded as having the same weight in the histogram like so:
-
-![faq_image_7_7](images/faq_image_7_7.jpg)
+This way each data point will be regarded as having the same weight in the histogram.
 
 One final note to bare in mind is that your data may be skewed by the fact that you have not tracked data for each histogram bin yet or have not tracked them all equally yet. So for example if you are drawing a yearly histogram but have only been tracking for 6 months then your histogram may look like this:
 
