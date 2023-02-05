@@ -2,7 +2,7 @@
 
 To begin tracking you will need to create a Tracker.
 
-<img src="images/faq_image_1_1.jpg" width="50%">
+<img src="images/faq_1_1.jpg" width="50%">
 
 ---
 
