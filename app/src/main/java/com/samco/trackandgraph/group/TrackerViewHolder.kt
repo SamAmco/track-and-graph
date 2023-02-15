@@ -89,12 +89,9 @@ class TrackerViewHolder private constructor(
         var lastX = 0
         var lastY = 0
         val isInCorner = {
-            val width = binding.cardView.width
-            val height = binding.cardView.height
-            val ratio = 0.22f
-            val cornerSizeX = width * ratio
-            val cornerSizeY = height * ratio
-            lastX > width - cornerSizeX && lastY > height - cornerSizeY
+            val rect = binding.addButtons
+            lastX > rect.x && lastX < (rect.x + rect.width) &&
+                    lastY > rect.y && lastY < (rect.y + rect.height)
         }
         binding.cardView.setOnLongClickListener {
             if (isInCorner()) {
