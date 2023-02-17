@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.graphstatproviders
 
 import android.content.Context
+import androidx.compose.runtime.Composable
 import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatinput.configviews.AverageTimeBetweenConfigView
@@ -31,7 +32,9 @@ import javax.inject.Inject
 
 interface GraphStatInteractorProvider {
     fun getDataFactory(type: GraphStatType): ViewDataFactory<*, *>
-    fun getConfigView(type: GraphStatType, context: Context): GraphStatConfigView
+    //TODO I think the composable function needs to take an interface containing a subset of the
+    // functions of GraphStatInputViewModel
+    fun getConfigView(type: GraphStatType, context: Context): GraphStatConfigView//@Composable () -> Unit
     fun getDataSourceAdapter(type: GraphStatType): GraphStatDataSourceAdapter<*>
     fun getDecorator(type: GraphStatType, listMode: Boolean): GraphStatViewDecorator<*>
 }
