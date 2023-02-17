@@ -103,13 +103,11 @@
         <item>Numerical</item>
         <item>Time duration</item>
     </string-array>
-    <string-array name="graph_types">
-        <item>Line Graph</item>
-        <item>Pie Chart</item>
-        <item>Average Time Between</item>
-        <item>Time Since</item>
-        <item>Time Histogram</item>
-    </string-array>
+    <string name="graph_type_line_graph">Line Graph</string>
+    <string name="graph_type_pie_chart">Pie Chart</string>
+    <string name="graph_type_average_time_between">Average Time Between</string>
+    <string name="graph_type_time_since">Time Since</string>
+    <string name="graph_type_time_histogram">Time Histogram</string>
     <string-array name="line_graph_feature_modes">
         <item>No Averaging</item>
         <item>Daily Moving Average</item>

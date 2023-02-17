@@ -90,13 +90,11 @@
         <item>Numérique</item>
         <item>Durée</item>
     </string-array>
-    <string-array name="graph_types">
-        <item>Graphique linéraire</item>
-        <item>Camenbert</item>
-        <item>Temps moyen entre</item>
-        <item>Temps depuis</item>
-        <item>Histogramme temporel</item>
-    </string-array>
+    <string name="graph_type_line_graph">Graphique linéraire</string>
+    <string name="graph_type_pie_chart">Camenbert</string>
+    <string name="graph_type_average_time_between">Temps moyen entre</string>
+    <string name="graph_type_time_since">Temps depuis</string>
+    <string name="graph_type_time_histogram">Histogramme temporel</string>
     <string-array name="line_graph_feature_modes">
         <item>Pas de calcul de la moyenne</item>
         <item>Moyenne glissante quotidienne</item>

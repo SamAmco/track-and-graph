@@ -90,13 +90,11 @@
         <item>Numérico</item>
         <item>Duración del tiempo</item>
     </string-array>
-    <string-array name="graph_types">
-        <item>Gráfico de líneas</item>
-        <item>Gráfico de pastel</item>
-        <item>Tiempo medio entre</item>
-        <item>Tiempo desde</item>
-        <item>Histograma de tiempo</item>
-    </string-array>
+    <string name="graph_type_line_graph">Gráfico de líneas</string>
+    <string name="graph_type_pie_chart">Gráfico de pastel</string>
+    <string name="graph_type_average_time_between">Tiempo medio entre</string>
+    <string name="graph_type_time_since">Tiempo desde</string>
+    <string name="graph_type_time_histogram">Histograma de tiempo</string>
     <string-array name="line_graph_feature_modes">
         <item>Sin promedio</item>
         <item>Media móvil diaria</item>
@@ -200,7 +198,7 @@
     <string name="track_widget_configure_no_data_error">Primero, realice un seguimiento de algunos datos.</string>
     <string name="track_widget_configure_no_data_selected_error">Debes seleccionar un grupo de datos válido para crear un widget de traza.</string>
     <string name="create">Crear</string>
-    <string name="use_default_value" >Establece un valor por defecto</string>
+    <string name="use_default_value">Establece un valor por defecto</string>
     <string name="default_value_description_hint">(Su valor predeterminado se utilizará automáticamente cuando añada un punto de datos, pero siempre puede volver atrás y cambiarlo.)</string>
     <string name="backup_and_restore">Respaldo y restauración</string>
     <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluyendo todos los datos trazados, los gráficos y los recordatorios. Deberías hacer una copia de seguridad de tus datos en un dispositivo externo o en un almacenamiento en la nube con regularidad en caso de que tu dispositivo se pierda o se rompa.</string>
@@ -294,7 +292,7 @@
     <string name="data_point_tutorial_page_3_description">Utilice etiquetas si desea agrupar los puntos de datos</string>
     <string name="data_point_tutorial_page_3_hint">(Sugerencia: si desea agregar más contexto o descripción, use la nota en lugar del campo de etiqueta)</string>
     <string name="help">Ayudar</string>
-    
+
     <string name="advanced_options">Opciones avanzadas</string>
     <string name="type_colon">\"Escribe: \"</string>
     <string name="order_colon">\"Ordenar: \"</string>

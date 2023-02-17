@@ -90,13 +90,11 @@
         <item>Numerisch</item>
         <item>Dauer</item>
     </string-array>
-    <string-array name="graph_types">
-        <item>Liniendiagramm</item>
-        <item>Tortendiagramm</item>
-        <item>Durchschnittszeit zwischen</item>
-        <item>Zeit seitdem</item>
-        <item>Histogramm Zeit</item>
-    </string-array>
+    <string name="graph_type_line_graph">Liniendiagramm</string>
+    <string name="graph_type_pie_chart">Tortendiagramm</string>
+    <string name="graph_type_average_time_between">Durchschnittszeit zwischen</string>
+    <string name="graph_type_time_since">Zeit seitdem</string>
+    <string name="graph_type_time_histogram">Histogramm Zeit</string>
     <string-array name="line_graph_feature_modes">
         <item>Keine Durchschnittsermittlung</item>
         <item>Dynamischer Tagesdurchschnitt</item>
