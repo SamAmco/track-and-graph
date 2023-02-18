@@ -27,23 +27,40 @@ import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphStatType
+import com.samco.trackandgraph.graphstatinput.configviews.GraphStatConfigViewModelBase
+import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigView
+import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigViewModel
 import com.samco.trackandgraph.ui.compose.ui.*
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
-internal fun GraphStatInputView(viewModel: GraphStatInputViewModel) {
+internal fun GraphStatInputView(
+    viewModelStoreOwner: ViewModelStoreOwner,
+    viewModel: GraphStatInputViewModel,
+    graphStatId: Long
+) {
     Surface(color = MaterialTheme.colors.background) {
         Box {
             val loading = viewModel.loading.observeAsState(true)
 
-            GraphStatInputViewForm(viewModel)
+            GraphStatInputViewForm(
+                viewModelStoreOwner = viewModelStoreOwner,
+                viewModel = viewModel,
+                graphStatId = graphStatId
+            )
 
             if (loading.value) LoadingOverlay()
 
@@ -53,7 +70,11 @@ internal fun GraphStatInputView(viewModel: GraphStatInputViewModel) {
 }
 
 @Composable
-private fun GraphStatInputViewForm(viewModel: GraphStatInputViewModel) = Column(
+private fun GraphStatInputViewForm(
+    viewModelStoreOwner: ViewModelStoreOwner,
+    viewModel: GraphStatInputViewModel,
+    graphStatId: Long
+) = Column(
     modifier = Modifier
         .padding(dimensionResource(id = R.dimen.card_padding))
         .verticalScroll(state = rememberScrollState())
@@ -78,6 +99,11 @@ private fun GraphStatInputViewForm(viewModel: GraphStatInputViewModel) = Column(
 
     Divider()
 
+    ConfigInputView(
+        viewModelStoreOwner = viewModelStoreOwner,
+        viewModel = viewModel,
+        graphStatId = graphStatId
+    )
 }
 
 @Composable
@@ -102,3 +128,35 @@ fun GraphStatTypeSelector(
         )
     }
 }
+
+@Composable
+fun ConfigInputView(
+    viewModelStoreOwner: ViewModelStoreOwner,
+    viewModel: GraphStatInputViewModel,
+    graphStatId: Long
+) {
+    val graphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
+
+    val lineGraphConfigViewModel = hiltViewModel<LineGraphConfigViewModel>(viewModelStoreOwner)
+    lineGraphConfigViewModel.initFromGraphStatId(graphStatId)
+
+    var currentViewModel: GraphStatConfigViewModelBase<*> = lineGraphConfigViewModel
+
+    when (graphType) {
+        GraphStatType.LINE_GRAPH -> {
+            currentViewModel = lineGraphConfigViewModel
+            LineGraphConfigView(viewModel = lineGraphConfigViewModel)
+        }
+        else -> {
+            //TODO add other config views
+        }
+    }
+
+    LaunchedEffect(currentViewModel) {
+        currentViewModel.getConfigFlow()
+            .collect { viewModel.updateConfigData(it) }
+        currentViewModel.getValidationFlow()
+            .collect { viewModel.onValidationException(it) }
+    }
+}
+

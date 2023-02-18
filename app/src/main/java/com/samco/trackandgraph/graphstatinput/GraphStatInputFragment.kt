@@ -69,7 +69,11 @@ class GraphStatInputFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 TnGComposeTheme {
-                    GraphStatInputView(viewModel)
+                    GraphStatInputView(
+                        viewModelStoreOwner = this@GraphStatInputFragment,
+                        viewModel = viewModel,
+                        graphStatId = args.graphStatId
+                    )
                 }
             }
         }

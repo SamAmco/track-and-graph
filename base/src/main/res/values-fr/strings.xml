@@ -50,7 +50,7 @@
     <string name="graphs_and_statistics"><![CDATA[Graphiques & Statistiques]]></string>
     <string name="add_a_graph_or_stat">Ajouter un Graphique ou une Statistique</string>
     <string name="graph_type_label">Type de Graphique : </string>
-    <string name="maximum_sample_duration">Taille de l\'échantillon : </string>
+    <string name="sample_size">Taille de l\'échantillon : </string>
     <string name="select_a_discrete_feature">Sélectionnez un ensemble de données avec des libellés : </string>
     <string name="no_discrete_features_pie_chart">Impossible de créer un camembert car il n\'y a pas donnée suivie à choix multiples.</string>
     <string name="select_a_feature">Sélectionnez un ensemble de données : </string>
@@ -113,15 +113,13 @@
         <item>Tracer le total mensuel</item>
         <item>Tracer le total annuel</item>
     </string-array>
-    <string-array name="graph_time_durations">
-        <item>Toutes les données</item>
-        <item>1 jour</item>
-        <item>1 semaine</item>
-        <item>1 mois</item>
-        <item>3 mois</item>
-        <item>6 mois</item>
-        <item>1 an</item>
-    </string-array>
+    <string name="graph_time_durations_all_data">Toutes les données</string>
+    <string name="graph_time_durations_a_day">1 jour</string>
+    <string name="graph_time_durations_a_week">1 semaine</string>
+    <string name="graph_time_durations_a_month">1 mois</string>
+    <string name="graph_time_durations_three_months">3 mois</string>
+    <string name="graph_time_durations_six_months">6 mois</string>
+    <string name="graph_time_durations_a_year">1 an</string>
     <string-array name="y_range_styles">
         <item>Dynamique</item>
         <item>Corrigées</item>

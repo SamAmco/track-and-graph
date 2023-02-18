@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatinput.configviews
+package com.samco.trackandgraph.graphstatinput
 
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Group
@@ -23,7 +23,7 @@ import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.ui.FeaturePathProvider
 
 class FeatureDataProvider(
-    val dataSourceData: Map<DataSourceData, Group>
+    private val dataSourceData: Map<DataSourceData, Group>
 ) : FeaturePathProvider(dataSourceData.map { it.key.feature to it.value }.toMap()) {
 
     constructor(dataSourceData: List<DataSourceData>, groups: List<Group>) : this(
