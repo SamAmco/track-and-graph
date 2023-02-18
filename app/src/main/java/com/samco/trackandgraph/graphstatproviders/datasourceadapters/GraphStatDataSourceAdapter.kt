@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatinput.datasourceadapters
+package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.model.DataInteractor

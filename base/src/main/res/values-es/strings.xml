@@ -50,7 +50,7 @@
     <string name="graphs_and_statistics"><![CDATA[Gráficas y estadísticas]]></string>
     <string name="add_a_graph_or_stat">Añadir un gráfico o estadística</string>
     <string name="graph_type_label">Tipo de gráfico:</string>
-    <string name="maximum_sample_duration">Tamaño de la muestra:</string>
+    <string name="sample_size">Tamaño de la muestra:</string>
     <string name="select_a_discrete_feature">Seleccione un conjunto de datos de elección múltiple: </string>
     <string name="no_discrete_features_pie_chart">Actualmente no puede crear un gráfico circular porque no está haciendo una traza de ninguna elección múltiple.</string>
     <string name="select_a_feature">Seleccione un conjunto de datos:</string>
@@ -113,15 +113,13 @@
         <item>Generar totales mensuales</item>
         <item>Generar los totales anuales</item>
     </string-array>
-    <string-array name="graph_time_durations">
-        <item>Todos los datos</item>
-        <item>Un día</item>
-        <item>Una semana</item>
-        <item>Un mes</item>
-        <item>Tres meses</item>
-        <item>Seis meses</item>
-        <item>Un año</item>
-    </string-array>
+    <string name="graph_time_durations_all_data">Todos los datos</string>
+    <string name="graph_time_durations_a_day">Un día</string>
+    <string name="graph_time_durations_a_week">Una semana</string>
+    <string name="graph_time_durations_a_month">Un mes</string>
+    <string name="graph_time_durations_three_months">Tres meses</string>
+    <string name="graph_time_durations_six_months">Seis meses</string>
+    <string name="graph_time_durations_a_year">Un año</string>
     <string-array name="y_range_styles">
         <item>Dinámico</item>
         <item>Fijo</item>

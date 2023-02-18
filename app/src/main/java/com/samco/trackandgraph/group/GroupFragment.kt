@@ -142,9 +142,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onAddFunctionClicked() {
-        navController?.navigate(
-            GroupFragmentDirections.actionAddFunction(args.groupId)
-        )
+        navController?.navigate(GroupFragmentDirections.actionAddFunction(args.groupId))
     }
 
     /**

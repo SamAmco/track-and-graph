@@ -58,7 +58,7 @@
     <string name="graphs_and_statistics"><![CDATA[Graphs & Statistics]]></string>
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
     <string name="graph_type_label">Graph type:</string>
-    <string name="maximum_sample_duration">Sample size:</string>
+    <string name="sample_size">Sample size:</string>
     <string name="select_a_discrete_feature">Select a data set with labels: </string>
     <string name="no_discrete_features_pie_chart">You can not currently create a pie chart because you are not tracking anything multiple choice.</string>
     <string name="select_a_feature">Select a data set:</string>
@@ -126,15 +126,13 @@
         <item>Plot Monthly Totals</item>
         <item>Plot Yearly Totals</item>
     </string-array>
-    <string-array name="graph_time_durations">
-        <item>All Data</item>
-        <item>A Day</item>
-        <item>A Week</item>
-        <item>A Month</item>
-        <item>Three Months</item>
-        <item>Six Months</item>
-        <item>A Year</item>
-    </string-array>
+    <string name="graph_time_durations_all_data">All Data</string>
+    <string name="graph_time_durations_a_day">A Day</string>
+    <string name="graph_time_durations_a_week">A Week</string>
+    <string name="graph_time_durations_a_month">A Month</string>
+    <string name="graph_time_durations_three_months">Three Months</string>
+    <string name="graph_time_durations_six_months">Six Months</string>
+    <string name="graph_time_durations_a_year">A Year</string>
     <string-array name="y_range_styles">
         <item>Dynamic</item>
         <item>Fixed</item>
