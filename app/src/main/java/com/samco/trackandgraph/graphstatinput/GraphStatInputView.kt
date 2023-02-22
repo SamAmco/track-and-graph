@@ -30,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
@@ -43,8 +42,6 @@ import com.samco.trackandgraph.graphstatinput.configviews.GraphStatConfigViewMod
 import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigViewModel
 import com.samco.trackandgraph.ui.compose.ui.*
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 internal fun GraphStatInputView(
@@ -82,7 +79,7 @@ private fun GraphStatInputViewForm(
 
     FullWidthTextField(
         textFieldValue = viewModel.graphName,
-        onValueChange = { viewModel.setGraphName(it.text) },
+        onValueChange = { viewModel.setGraphStatName(it) },
         label = stringResource(id = R.string.graph_or_stat_name)
     )
 
@@ -154,9 +151,7 @@ fun ConfigInputView(
 
     LaunchedEffect(currentViewModel) {
         currentViewModel.getConfigFlow()
-            .collect { viewModel.updateConfigData(it) }
-        currentViewModel.getValidationFlow()
-            .collect { viewModel.onValidationException(it) }
+            .collect { viewModel.onConfigEvent(it) }
     }
 }
 

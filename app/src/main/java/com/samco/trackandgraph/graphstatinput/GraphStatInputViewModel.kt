@@ -5,10 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.GraphStatType
@@ -20,21 +17,23 @@ import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
 import java.lang.Exception
 import javax.inject.Inject
 
-class ValidationException(val errorMessageId: Int) : Exception()
+sealed interface GraphStatConfigEvent {
+    data class ValidationException(val errorMessageId: Int) : Exception(), GraphStatConfigEvent
+    object Loading : GraphStatConfigEvent
 
-sealed interface ConfigData<T> {
-    val config: T
+    sealed interface ConfigData<T> : GraphStatConfigEvent {
+        val config: T
 
-    class LineGraphConfigData(
-        override val config: LineGraphWithFeatures
-    ) : ConfigData<LineGraphWithFeatures>
+        data class LineGraphConfigData(
+            override val config: LineGraphWithFeatures
+        ) : ConfigData<LineGraphWithFeatures>
+    }
 }
 
 interface GraphStatInputViewModel {
@@ -42,18 +41,16 @@ interface GraphStatInputViewModel {
     val graphStatType: LiveData<GraphStatType>
     val updateMode: LiveData<Boolean>
     val loading: LiveData<Boolean>
-    val validationException: LiveData<ValidationException?>
+    val validationException: LiveData<GraphStatConfigEvent.ValidationException?>
     val demoViewData: LiveData<IGraphStatViewData?>
     val complete: LiveData<Boolean>
 
     fun initViewModel(graphStatGroupId: Long, graphStatId: Long)
-    fun setGraphName(name: String)
+    fun setGraphStatName(name: TextFieldValue)
     fun setGraphType(type: GraphStatType)
 
-    fun updateConfigData(configData: ConfigData<*>)
+    fun onConfigEvent(configData: GraphStatConfigEvent?)
     fun createGraphOrStat()
-
-    fun onValidationException(exception: ValidationException?)
 }
 
 @HiltViewModel
@@ -65,27 +62,33 @@ class GraphStatInputViewModelImpl @Inject constructor(
     @DefaultDispatcher private val worker: CoroutineDispatcher
 ) : ViewModel(), GraphStatInputViewModel {
 
+    private val thisIsLoading = MutableStateFlow(false)
+    private val configIsLoading = MutableStateFlow(false)
+
     override var graphName by mutableStateOf(TextFieldValue(""))
     override val graphStatType = MutableLiveData(GraphStatType.LINE_GRAPH)
     override val updateMode = MutableLiveData(false)
-    override val loading = MutableLiveData(false)
-    override val validationException = MutableLiveData<ValidationException?>(null)
+    override val loading = combine(thisIsLoading, configIsLoading) { a, b -> a || b }
+        .asLiveData(viewModelScope.coroutineContext)
+    override val validationException =
+        MutableLiveData<GraphStatConfigEvent.ValidationException?>(null)
     override val demoViewData = MutableLiveData<IGraphStatViewData?>(null)
     override val complete = MutableLiveData(false)
 
-    private var configData: ConfigData<*>? = null
+    private var updateJob: Job? = null
+    private var configData: GraphStatConfigEvent.ConfigData<*>? = null
     private var graphStatGroupId: Long = -1L
     private var graphStatId: Long? = null
     private var graphStatDisplayIndex: Int? = null
-    private var subConfigException: ValidationException? = null
+    private var subConfigException: GraphStatConfigEvent.ValidationException? = null
 
     override fun initViewModel(graphStatGroupId: Long, graphStatId: Long) {
         if (this.graphStatGroupId != -1L) return
         this.graphStatGroupId = graphStatGroupId
-        loading.value = true
         viewModelScope.launch(io) {
+            thisIsLoading.value = true
             if (graphStatId != -1L) initFromExistingGraphStat(graphStatId)
-            else withContext(ui) { loading.value = false }
+            thisIsLoading.value = false
         }
     }
 
@@ -96,7 +99,6 @@ class GraphStatInputViewModelImpl @Inject constructor(
 
         withContext(ui) {
             if (graphStat == null) {
-                loading.value = false
                 return@withContext
             }
 
@@ -105,15 +107,16 @@ class GraphStatInputViewModelImpl @Inject constructor(
             this@GraphStatInputViewModelImpl.graphStatId = graphStat.id
             this@GraphStatInputViewModelImpl.graphStatDisplayIndex = graphStat.displayIndex
             this@GraphStatInputViewModelImpl.updateMode.value = true
-            loading.value = false
         }
     }
 
     private fun String.asTfv() = TextFieldValue(this, TextRange(this.length))
 
-    override fun setGraphName(name: String) {
-        this.graphName = name.asTfv()
-        updateDemoData()
+    override fun setGraphStatName(name: TextFieldValue) {
+        if (this.graphName != name) {
+            this.graphName = name
+            updateDemoData()
+        }
     }
 
     override fun setGraphType(type: GraphStatType) {
@@ -121,15 +124,25 @@ class GraphStatInputViewModelImpl @Inject constructor(
         updateDemoData()
     }
 
-    override fun updateConfigData(configData: ConfigData<*>) {
+    override fun onConfigEvent(configData: GraphStatConfigEvent?) {
+        configIsLoading.value = false
+        when (configData) {
+            is GraphStatConfigEvent.ValidationException -> onValidationException(configData)
+            is GraphStatConfigEvent.Loading -> configIsLoading.value = true
+            is GraphStatConfigEvent.ConfigData<*> -> updateConfigData(configData)
+            null -> {}
+        }
+    }
+
+    private fun updateConfigData(configData: GraphStatConfigEvent.ConfigData<*>) {
         this.configData = configData
         updateDemoData()
     }
 
     override fun createGraphOrStat() {
-        if (loading.value == true) return
+        if (thisIsLoading.value) return
         configData?.config?.let {
-            loading.value = true
+            thisIsLoading.value = true
             viewModelScope.launch(io) {
                 gsiProvider
                     .getDataSourceAdapter(graphStatType.value!!)
@@ -139,36 +152,38 @@ class GraphStatInputViewModelImpl @Inject constructor(
         }
     }
 
-    override fun onValidationException(exception: ValidationException?) {
+    private fun onValidationException(exception: GraphStatConfigEvent.ValidationException?) {
         this.subConfigException = exception
         validateConfiguration()
     }
 
     private fun updateDemoData() {
-        worker.cancelChildren()
         validateConfiguration()
         if (validationException.value == null) updateDemoViewData()
         else demoViewData.value = null
     }
 
-    private fun updateDemoViewData() = viewModelScope.launch(worker) {
-        configData?.config?.let {
-            val graphOrStat = constructGraphOrStat()
+    private fun updateDemoViewData() {
+        updateJob?.cancel()
+        updateJob = viewModelScope.launch(worker) {
+            configData?.config?.let {
+                val graphOrStat = constructGraphOrStat()
 
-            withContext(ui) { demoViewData.value = IGraphStatViewData.loading(graphOrStat) }
+                withContext(ui) { demoViewData.value = IGraphStatViewData.loading(graphOrStat) }
 
-            val demoData = gsiProvider
-                .getDataFactory(graphOrStat.type)
-                .getViewData(graphOrStat, it)
+                val demoData = gsiProvider
+                    .getDataFactory(graphOrStat.type)
+                    .getViewData(graphOrStat, it)
 
-            withContext(ui) { demoViewData.value = demoData }
+                withContext(ui) { demoViewData.value = demoData }
+            }
         }
     }
 
     private fun validateConfiguration() {
         val configException = when {
-            graphName.text.isEmpty() -> ValidationException(R.string.graph_stat_validation_no_name)
-            graphStatType.value == null -> ValidationException(R.string.graph_stat_validation_unknown)
+            graphName.text.isEmpty() -> GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_name)
+            graphStatType.value == null -> GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_unknown)
             else -> null
         }
         validationException.value = configException ?: subConfigException

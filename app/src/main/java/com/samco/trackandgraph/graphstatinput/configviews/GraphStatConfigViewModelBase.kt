@@ -19,39 +19,33 @@ package com.samco.trackandgraph.graphstatinput.configviews
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.graphstatinput.ConfigData
-import com.samco.trackandgraph.graphstatinput.FeatureDataProvider
-import com.samco.trackandgraph.graphstatinput.ValidationException
+import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-abstract class GraphStatConfigViewModelBase<T : ConfigData<*>>(
+abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<*>>(
     @IODispatcher private val io: CoroutineDispatcher,
+    @DefaultDispatcher private val default: CoroutineDispatcher,
     private val gsiProvider: GraphStatInteractorProvider,
-    private val dataInteractor: DataInteractor
+    protected val dataInteractor: DataInteractor
 ) : ViewModel() {
 
-    private val configFlow = MutableSharedFlow<T?>()
-    private val validationFlow = MutableStateFlow<ValidationException?>(null)
+    private var configFlow = MutableSharedFlow<GraphStatConfigEvent>()
+
+    private var updateJob: Job? = null
 
     private var graphStatId: Long? = null
-    protected var featureDataProvider: FeatureDataProvider? = null
-
-    protected val allFeatureIds by lazy {
-        featureDataProvider?.features?.map { it.featureId }?.toSet() ?: emptySet()
-    }
 
     fun initFromGraphStatId(graphStatId: Long) {
         if (this.graphStatId == graphStatId) return
         this.graphStatId = graphStatId
 
         viewModelScope.launch(io) {
-            loadFeatureData()
             loadGraphStat(graphStatId)
         }
     }
@@ -64,32 +58,19 @@ abstract class GraphStatConfigViewModelBase<T : ConfigData<*>>(
             .let { pair -> pair?.second?.let { onDataLoaded(it) } }
     }
 
-    private suspend fun loadFeatureData() {
-        val allFeatures = dataInteractor.getAllFeaturesSync()
-        val allGroups = dataInteractor.getAllGroupsSync()
-        val dataSourceData = allFeatures.map { feature ->
-            FeatureDataProvider.DataSourceData(
-                feature,
-                //TODO this isn't going to fly when we implement functions. Iterating all labels
-                // of every feature could be too expensive. Need to grab these in a lazy way as needed.
-                dataInteractor.getLabelsForFeatureId(feature.featureId).toSet(),
-                dataInteractor.getDataSamplePropertiesForFeatureId(feature.featureId)
-                    ?: return@map null
-            )
-        }.filterNotNull()
-        featureDataProvider = FeatureDataProvider(dataSourceData, allGroups)
+    protected open fun onUpdate() {
+        updateJob?.cancel()
+        updateJob = viewModelScope.launch(default) {
+            configFlow.emit(GraphStatConfigEvent.Loading)
+            configFlow.emit(validate() ?: getConfig())
+        }
     }
 
-    protected fun updateConfig(config: T) {
-        viewModelScope.launch { configFlow.emit(config) }
-    }
+    abstract fun getConfig(): T
 
-    protected fun updateValidationException(exception: ValidationException?) {
-        viewModelScope.launch { validationFlow.emit(exception) }
-    }
+    abstract suspend fun validate(): GraphStatConfigEvent.ValidationException?
 
-    fun getConfigFlow() = configFlow.filterNotNull()
-    fun getValidationFlow() = validationFlow
+    fun getConfigFlow(): Flow<GraphStatConfigEvent?> = configFlow
 
     abstract fun onDataLoaded(config: Any)
 }
