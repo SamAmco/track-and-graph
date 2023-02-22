@@ -16,22 +16,34 @@
  */
 package com.samco.trackandgraph.graphstatinput.configviews
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import com.samco.trackandgraph.R
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
-import org.threeten.bp.Duration
+import com.samco.trackandgraph.ui.compose.ui.showDateDialog
+import org.threeten.bp.OffsetDateTime
 
-enum class GraphStatDurations(val duration: Duration?) {
-    ALL_DATA(null),
-    A_DAY(Duration.ofDays(1)),
-    A_WEEK(Duration.ofDays(7)),
-    A_MONTH(Duration.ofDays(30)),
-    THREE_MONTHS(Duration.ofDays(90)),
-    SIX_MONTHS(Duration.ofDays(180)),
-    A_YEAR(Duration.ofDays(365)),
+enum class SampleEndingAtOption {
+    LATEST, CUSTOM
+}
+
+sealed interface SampleEndingAt {
+    val option: SampleEndingAtOption
+
+    object Latest : SampleEndingAt {
+        override val option = SampleEndingAtOption.LATEST
+    }
+
+    data class Custom(val dateTime: OffsetDateTime?) : SampleEndingAt {
+        override val option = SampleEndingAtOption.CUSTOM
+    }
 }
 
 @Composable
@@ -39,21 +51,35 @@ fun LineGraphConfigView(
     modifier: Modifier = Modifier,
     viewModel: LineGraphConfigViewModel
 ) {
-    LabeledRow(label = stringResource(id = R.string.sample_size)) {
+    GraphStatDurationSpinner(
+        modifier = modifier,
+        selectedDuration = viewModel.selectedDuration,
+        onDurationSelected = { viewModel.setDuration(it) }
+    )
+
+    //TODO extract this into a composable
+    LabeledRow(label = stringResource(id = R.string.ending_at_colon)) {
+        val strings = stringArrayResource(id = R.array.ending_at_values)
+
         val spinnerItems = mapOf(
-            GraphStatDurations.ALL_DATA to stringResource(id = R.string.graph_time_durations_all_data),
-            GraphStatDurations.A_DAY to stringResource(id = R.string.graph_time_durations_a_day),
-            GraphStatDurations.A_WEEK to stringResource(id = R.string.graph_time_durations_a_week),
-            GraphStatDurations.A_MONTH to stringResource(id = R.string.graph_time_durations_a_month),
-            GraphStatDurations.THREE_MONTHS to stringResource(id = R.string.graph_time_durations_three_months),
-            GraphStatDurations.SIX_MONTHS to stringResource(id = R.string.graph_time_durations_six_months),
-            GraphStatDurations.A_YEAR to stringResource(id = R.string.graph_time_durations_a_year)
+            SampleEndingAtOption.LATEST to strings[0],
+            SampleEndingAtOption.CUSTOM to strings[1]
         )
 
+        val context = LocalContext.current
+        //TODO the spinner item should say the date not custom
         TextMapSpinner(
+            modifier = Modifier.padding(0.dp),
             strings = spinnerItems,
-            selectedItem = viewModel.selectedDuration,
-            onItemSelected = { viewModel.setDuration(it) },
+            selectedItem = viewModel.sampleEndingAt.option,
+            onItemSelected = { option ->
+                when (option) {
+                    SampleEndingAtOption.LATEST -> viewModel.setSampleEnding(SampleEndingAt.Latest)
+                    SampleEndingAtOption.CUSTOM -> showDateDialog(context) {
+                        viewModel.setSampleEnding(SampleEndingAt.Custom(it))
+                    }
+                }
+            }
         )
     }
 }

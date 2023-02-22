@@ -94,7 +94,9 @@ private fun GraphStatInputViewForm(
         )
     }
 
+    SpacingSmall()
     Divider()
+    SpacingSmall()
 
     ConfigInputView(
         viewModelStoreOwner = viewModelStoreOwner,
