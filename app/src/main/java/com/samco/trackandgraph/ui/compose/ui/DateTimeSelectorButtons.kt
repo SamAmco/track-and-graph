@@ -122,29 +122,35 @@ fun DateButton(
     dateString: String,
     onDateSelected: (OffsetDateTime) -> Unit
 ) = Box {
-
-    val tag = "DatePicker"
-
     SelectorTextButton(
         modifier = modifier,
         text = dateString,
         onClick = {
-            val fragmentManager = findFragmentManager(context) ?: return@SelectorTextButton
-            val fragment = fragmentManager.findFragmentByTag(tag)
-            val existingPicker = fragment as? MaterialDatePicker<*>
-            val picker = existingPicker ?: MaterialDatePicker.Builder.datePicker().build()
-            picker.apply {
-                addOnPositiveButtonClickListener { obj ->
-                    val epochMillis = (obj as? Long) ?: return@addOnPositiveButtonClickListener
-                    val instant = Instant.ofEpochMilli(epochMillis)
-                    val dateTime = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault())
-                    onDateSelected(dateTime)
-                }
-                show(fragmentManager, tag)
-            }
+            showDateDialog(context, onDateSelected)
         }
     )
 }
+
+fun showDateDialog(
+    context: Context,
+    onDateSelected: (OffsetDateTime) -> Unit
+) {
+    val tag = "DatePicker"
+    val fragmentManager = findFragmentManager(context) ?: return
+    val fragment = fragmentManager.findFragmentByTag(tag)
+    val existingPicker = fragment as? MaterialDatePicker<*>
+    val picker = existingPicker ?: MaterialDatePicker.Builder.datePicker().build()
+    picker.apply {
+        addOnPositiveButtonClickListener { obj ->
+            val epochMillis = (obj as? Long) ?: return@addOnPositiveButtonClickListener
+            val instant = Instant.ofEpochMilli(epochMillis)
+            val dateTime = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault())
+            onDateSelected(dateTime)
+        }
+        show(fragmentManager, tag)
+    }
+}
+
 
 private fun findFragmentManager(context: Context): FragmentManager? {
     var currentContext = context

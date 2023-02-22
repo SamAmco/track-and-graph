@@ -20,14 +20,17 @@ package com.samco.trackandgraph.ui.compose.ui
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 
 @Composable
 fun <T> TextMapSpinner(
+    modifier: Modifier = Modifier,
     strings: Map<T, String>,
     selectedItem: T,
     onItemSelected: (T) -> Unit
 ) {
     Spinner(
+        modifier = modifier,
         items = strings.keys.toList(),
         selectedItem = selectedItem,
         onItemSelected = onItemSelected,

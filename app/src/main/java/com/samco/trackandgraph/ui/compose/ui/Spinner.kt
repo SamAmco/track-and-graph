@@ -46,7 +46,7 @@ fun <T> Spinner(
     Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
         Row(
             modifier = modifier
-                .padding(dimensionResource(id = R.dimen.card_padding))
+                .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
                 .clickable { expanded = !expanded },
             verticalAlignment = Alignment.CenterVertically
         ) {
