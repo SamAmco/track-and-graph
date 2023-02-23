@@ -16,27 +16,13 @@
  */
 package com.samco.trackandgraph.graphstatinput.configviews
 
+import androidx.compose.material.Divider
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
-import org.threeten.bp.OffsetDateTime
-
-enum class SampleEndingAtOption {
-    LATEST, CUSTOM
-}
-
-sealed interface SampleEndingAt {
-    val option: SampleEndingAtOption
-
-    object Latest : SampleEndingAt {
-        override val option = SampleEndingAtOption.LATEST
-    }
-
-    data class Custom(val dateTime: OffsetDateTime?) : SampleEndingAt {
-        override val option = SampleEndingAtOption.CUSTOM
-    }
-}
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
+import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 
 @Composable
 fun LineGraphConfigView(
@@ -44,14 +30,37 @@ fun LineGraphConfigView(
     viewModel: LineGraphConfigViewModel
 ) {
     GraphStatDurationSpinner(
-        modifier = modifier,
+        modifier = Modifier,
         selectedDuration = viewModel.selectedDuration,
-        onDurationSelected = { viewModel.setDuration(it) }
+        onDurationSelected = { viewModel.updateDuration(it) }
     )
 
     GraphStatEndingAtSpinner(
-        modifier,
-        viewModel.sampleEndingAt
-    ) { viewModel.setSampleEnding(it) }
+        modifier = Modifier,
+        sampleEndingAt = viewModel.sampleEndingAt
+    ) { viewModel.updateSampleEndingAt(it) }
+
+
+
+    GraphStatYRangeTypeSpinner(
+        modifier = Modifier,
+        yRangeType = viewModel.yRangeType,
+        onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
+    )
+
+    SpacingSmall()
+
+    Divider()
+
+    SpacingSmall()
+
+    LineGraphFeaturesInputView(viewModel)
+}
+
+@Composable
+private fun LineGraphFeaturesInputView(
+    viewModel: LineGraphConfigViewModel
+) {
+
 }
 

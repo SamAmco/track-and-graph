@@ -25,11 +25,26 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
-import com.samco.trackandgraph.graphstatinput.configviews.SampleEndingAt
-import com.samco.trackandgraph.graphstatinput.configviews.SampleEndingAtOption
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.Spinner
 import com.samco.trackandgraph.ui.compose.ui.showDateDialog
+import org.threeten.bp.OffsetDateTime
+
+enum class SampleEndingAtOption {
+    LATEST, CUSTOM
+}
+
+sealed interface SampleEndingAt {
+    val option: SampleEndingAtOption
+
+    object Latest : SampleEndingAt {
+        override val option = SampleEndingAtOption.LATEST
+    }
+
+    data class Custom(val dateTime: OffsetDateTime?) : SampleEndingAt {
+        override val option = SampleEndingAtOption.CUSTOM
+    }
+}
 
 @Composable
 fun GraphStatEndingAtSpinner(

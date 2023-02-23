@@ -29,6 +29,7 @@ import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent.ValidationException
+import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
 import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -57,6 +58,8 @@ class LineGraphConfigViewModel @Inject constructor(
     var selectedDuration by mutableStateOf(GraphStatDurations.ALL_DATA)
         private set
     var sampleEndingAt by mutableStateOf<SampleEndingAt>(SampleEndingAt.Latest)
+        private set
+    var yRangeType by mutableStateOf(YRangeType.DYNAMIC)
         private set
 
     private var lineGraph = LineGraphWithFeatures(
@@ -130,13 +133,18 @@ class LineGraphConfigViewModel @Inject constructor(
         return null
     }
 
-    fun setDuration(duration: GraphStatDurations) {
+    fun updateDuration(duration: GraphStatDurations) {
         selectedDuration = duration
         onUpdate()
     }
 
-    fun setSampleEnding(endingAt: SampleEndingAt) {
+    fun updateSampleEndingAt(endingAt: SampleEndingAt) {
         sampleEndingAt = endingAt
+        onUpdate()
+    }
+
+    fun updateYRangeType(type: YRangeType) {
+        yRangeType = type
         onUpdate()
     }
 
