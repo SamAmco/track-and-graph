@@ -153,10 +153,10 @@ class TimerNotificationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (updateJobIsRunning) return super.onStartCommand(intent, flags, startId)
 
+        createChannel()
         notificationUpdater.setNotifications(emptyList())
 
         updateJobIsRunning = true
-        createChannel()
         jobScope.launch {
             dataInteractor.getDataUpdateEvents()
                 .onStart { emit(Unit) }
