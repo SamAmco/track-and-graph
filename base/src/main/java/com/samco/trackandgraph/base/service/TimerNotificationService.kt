@@ -73,6 +73,7 @@ class TimerNotificationService : Service() {
     private inner class NotificationUpdater {
         private var notifications: List<Int>? = null
         private var updateJobs: List<Job>? = null
+        private var calledStartForeGround = false
 
         private fun clearOldNotifications() {
             this.notifications?.forEach { notificationManager.cancel(it) }
@@ -82,13 +83,16 @@ class TimerNotificationService : Service() {
         private fun createUpdateJob(tracker: DisplayTracker, isPrimary: Boolean): Job? {
             val instant = tracker.timerStartInstant ?: return null
             val builder = buildNotification(tracker.id, tracker.name, instant)
+            val id = tracker.id.toInt()
             return jobScope.launch {
                 while (true) {
                     val durationSecs = Duration.between(instant, Instant.now()).seconds
                     builder.setContentText(formatTimeDuration(durationSecs))
-                    val id = tracker.id.toInt()
                     val notification = builder.build()
-                    if (isPrimary) startForeground(id, notification)
+                    if (isPrimary) {
+                        startForeground(id, notification)
+                        calledStartForeGround = true
+                    }
                     else notificationManager.notify(id, notification)
                     delay(1000)
                 }
@@ -102,6 +106,24 @@ class TimerNotificationService : Service() {
                 notifications = features
                     .filter { it.timerStartInstant != null }
                     .map { it.id.toInt() }
+
+                //We have to call start foreground before stop foreground so we always
+                // call startForeground even if there are no notifications somehow like if
+                // the timer was deleted from the db between start timer being called and the
+                // service starting.
+                if (!calledStartForeGround && notifications?.isEmpty() != false) {
+                    notifications = listOf(123)
+                    startForeground(
+                        123, NotificationCompat
+                            .Builder(this@TimerNotificationService, CHANNEL_ID)
+                            .setSmallIcon(R.drawable.timer_notification_icon)
+                            .setOnlyAlertOnce(true)
+                            .setSilent(true)
+                            .setAutoCancel(true)
+                            .build()
+                    )
+                    calledStartForeGround = true
+                }
 
                 updateJobs = features
                     .sortedBy { it.timerStartInstant }
@@ -131,6 +153,8 @@ class TimerNotificationService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (updateJobIsRunning) return super.onStartCommand(intent, flags, startId)
 
+        notificationUpdater.setNotifications(emptyList())
+
         updateJobIsRunning = true
         createChannel()
         jobScope.launch {
@@ -144,7 +168,7 @@ class TimerNotificationService : Service() {
                     }
                     if (newFeatures.isEmpty()) {
                         notificationUpdater.setNotifications(emptyList())
-                        stopForeground(true)
+                        stopForeground()
                         stopSelf()
                     } else notificationUpdater.setNotifications(newFeatures)
                 }
@@ -153,6 +177,13 @@ class TimerNotificationService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    private fun stopForeground() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            stopForeground(STOP_FOREGROUND_REMOVE)
+        } else {
+            stopForeground(true)
+        }
+    }
 
     override fun onDestroy() {
         job.cancel()
