@@ -29,6 +29,8 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import java.lang.NumberFormatException
 
+fun getDoubleFromText(text: String): Double = getDoubleFromTextOrNull(text) ?: 0.0
+
 /**
  * Return a number given a string by attempting to parse it as a double
  *
@@ -40,7 +42,7 @@ import java.lang.NumberFormatException
  * This function will always return a number rather than throw an exception. If the number
  * couldn't be parsed then the returned value will default to 0
  */
-fun getDoubleFromText(text: String): Double {
+fun getDoubleFromTextOrNull(text: String): Double? {
     try {
         //first account for values like 1,345,100 or French: 1.345.100
         val commaCount = text.count { c -> c == ',' }
@@ -59,7 +61,7 @@ fun getDoubleFromText(text: String): Double {
         val after = dotsOnly.substring(lastDot)
         return "$before$after".toDouble()
     } catch (e: NumberFormatException) {
-        return 0.0
+        return null
     }
 }
 

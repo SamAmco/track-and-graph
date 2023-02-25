@@ -224,7 +224,8 @@ private fun TrackerPage(
 
     LaunchedEffect(currentPage) {
         delay(50)
-        if (currentPage && suggestedValues.isEmpty()) valueFocusRequester.requestFocus()
+        val hasSuggestedValues = suggestedValues.any { it.value != null }
+        if (currentPage && !hasSuggestedValues) valueFocusRequester.requestFocus()
     }
 
     SpacingSmall()
