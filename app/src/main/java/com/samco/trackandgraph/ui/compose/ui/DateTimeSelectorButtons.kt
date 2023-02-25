@@ -31,6 +31,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.base.helpers.formatHourMinute
 import org.threeten.bp.Instant
@@ -104,7 +105,9 @@ fun TimeButton(
             val fragmentManager = findFragmentManager(context) ?: return@SelectorTextButton
             val fragment = fragmentManager.findFragmentByTag(tag)
             val existingPicker = fragment as? MaterialTimePicker
-            val picker = existingPicker ?: MaterialTimePicker.Builder().build()
+            val picker = existingPicker ?: MaterialTimePicker.Builder()
+                .setTimeFormat(CLOCK_24H)
+                .build()
             picker.apply {
                 addOnPositiveButtonClickListener {
                     onTimeSelected(SelectedTime(this.hour, this.minute))
