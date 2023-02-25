@@ -123,7 +123,10 @@ private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) 
         state = pagerState
     ) { page ->
         viewModel.getViewModel(page).observeAsState().value?.let {
-            TrackerPage(viewModel = it)
+            TrackerPage(
+                viewModel = it,
+                currentPage = page == pagerState.currentPage
+            )
         }
     }
 
@@ -149,88 +152,95 @@ private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) 
 }
 
 @Composable
-private fun TrackerPage(viewModel: AddDataPointViewModel) =
-    FadingScrollColumn(
-        modifier = Modifier.padding(horizontal = 2.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
+private fun TrackerPage(
+    viewModel: AddDataPointViewModel,
+    currentPage: Boolean
+) = FadingScrollColumn(
+    modifier = Modifier.padding(horizontal = 2.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+) {
 
-        val focusManager = LocalFocusManager.current
-        val valueFocusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+    val valueFocusRequester = remember { FocusRequester() }
 
-        TrackerNameHeadline(name = viewModel.name.observeAsState("").value)
+    TrackerNameHeadline(name = viewModel.name.observeAsState("").value)
 
-        SpacingSmall()
+    SpacingSmall()
 
-        val selectedDateTime by viewModel.timestamp.observeAsState(OffsetDateTime.now())
+    val selectedDateTime by viewModel.timestamp.observeAsState(OffsetDateTime.now())
 
-        DateTimeButtonRow(
-            modifier = Modifier.fillMaxWidth(),
-            selectedDateTime = selectedDateTime,
-            onDateTimeSelected = viewModel::updateTimestamp
+    DateTimeButtonRow(
+        modifier = Modifier.fillMaxWidth(),
+        selectedDateTime = selectedDateTime,
+        onDateTimeSelected = viewModel::updateTimestamp
+    )
+
+    SpacingLarge()
+
+    val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
+    val selectedSuggestedValue by viewModel.selectedSuggestedValue.observeAsState()
+
+    val focusScope = rememberCoroutineScope()
+
+    if (suggestedValues.isNotEmpty()) {
+        SuggestedValues(
+            suggestedValues,
+            selectedSuggestedValue,
+            viewModel::onSuggestedValueSelected,
+            onSuggestedValueLongPress = {
+                viewModel.onSuggestedValueLongPress(it)
+                focusScope.launch {
+                    delay(100)
+                    valueFocusRequester.requestFocus()
+                }
+            }
         )
-
         SpacingLarge()
-
-        val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
-        val selectedSuggestedValue by viewModel.selectedSuggestedValue.observeAsState()
-
-        val focusScope = rememberCoroutineScope()
-
-        if (suggestedValues.isNotEmpty()) {
-            SuggestedValues(
-                suggestedValues,
-                selectedSuggestedValue,
-                viewModel::onSuggestedValueSelected,
-                onSuggestedValueLongPress = {
-                    viewModel.onSuggestedValueLongPress(it)
-                    focusScope.launch {
-                        delay(100)
-                        valueFocusRequester.requestFocus()
-                    }
-                }
-            )
-            SpacingLarge()
-        }
-
-        when (viewModel) {
-            is AddDataPointViewModel.NumericalDataPointViewModel -> {
-                LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                    ValueInputTextField(
-                        textFieldValue = viewModel.value,
-                        onValueChange = viewModel::setValueText,
-                        focusManager = focusManager,
-                        focusRequester = valueFocusRequester
-                    )
-                }
-            }
-            is AddDataPointViewModel.DurationDataPointViewModel -> {
-                LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                    DurationInput(
-                        viewModel = viewModel,
-                        focusManager = focusManager,
-                        nextFocusDirection = FocusDirection.Down,
-                        focusRequester = valueFocusRequester
-                    )
-                }
-            }
-            else -> {}
-        }
-
-        SpacingSmall()
-
-        LabeledRow(label = stringResource(id = R.string.label_colon)) {
-            LabelInputTextField(
-                textFieldValue = viewModel.label,
-                onValueChange = viewModel::updateLabel,
-                focusManager = focusManager
-            )
-        }
-
-        SpacingSmall()
-
-        NoteInput(viewModel)
     }
+
+    when (viewModel) {
+        is AddDataPointViewModel.NumericalDataPointViewModel -> {
+            LabeledRow(label = stringResource(id = R.string.value_colon)) {
+                ValueInputTextField(
+                    textFieldValue = viewModel.value,
+                    onValueChange = viewModel::setValueText,
+                    focusManager = focusManager,
+                    focusRequester = valueFocusRequester
+                )
+            }
+        }
+        is AddDataPointViewModel.DurationDataPointViewModel -> {
+            LabeledRow(label = stringResource(id = R.string.value_colon)) {
+                DurationInput(
+                    viewModel = viewModel,
+                    focusManager = focusManager,
+                    nextFocusDirection = FocusDirection.Down,
+                    focusRequester = valueFocusRequester
+                )
+            }
+        }
+        else -> {}
+    }
+
+    LaunchedEffect(currentPage) {
+        delay(50)
+        if (currentPage && suggestedValues.isEmpty()) valueFocusRequester.requestFocus()
+    }
+
+    SpacingSmall()
+
+    LabeledRow(label = stringResource(id = R.string.label_colon)) {
+        LabelInputTextField(
+            textFieldValue = viewModel.label,
+            onValueChange = viewModel::updateLabel,
+            focusManager = focusManager
+        )
+    }
+
+    SpacingSmall()
+
+    NoteInput(viewModel)
+}
 
 @Composable
 private fun SuggestedValues(
