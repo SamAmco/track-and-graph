@@ -1,0 +1,5 @@
+- Fix bug negative durations not shown properly
+- Auto focus value field if there are no suggested values
+- Revert to 24 hour time input format
+- Revert to previous parse double implementation for value
+- Fix bug crash app on double click timer button

@@ -82,8 +82,7 @@
 
     <fragment
         android:id="@+id/featureHistoryFragment"
-        android:name="com.samco.trackandgraph.featurehistory.FragmentFeatureHistory"
-        tools:layout="@layout/fragment_feature_history">
+        android:name="com.samco.trackandgraph.featurehistory.FragmentFeatureHistory">
         <argument
             android:name="featureId"
             app:argType="long" />
