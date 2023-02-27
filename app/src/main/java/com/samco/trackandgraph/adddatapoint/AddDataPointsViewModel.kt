@@ -32,6 +32,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
+import com.samco.trackandgraph.util.getDoubleFromTextOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.cancel
@@ -290,7 +291,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
                 super.onSuggestedValueSelected(suggestedValue)
             }
 
-            override fun getDouble(): Double = value.text.toDoubleOrNull() ?: 1.0
+            override fun getDouble(): Double = getDoubleFromTextOrNull(value.text) ?: 1.0
 
             override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
                 setValueFromSuggestedValue(suggestedValue)

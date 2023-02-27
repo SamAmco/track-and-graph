@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
+import com.samco.trackandgraph.util.getDoubleFromTextOrNull
 import org.threeten.bp.Duration
 
 interface DurationInputViewModel {
@@ -25,7 +26,7 @@ open class DurationInputViewModelImpl : DurationInputViewModel {
     override var minutes by mutableStateOf(TextFieldValue(""))
     override var seconds by mutableStateOf(TextFieldValue(""))
 
-    private fun TextFieldValue.getDouble() = ((this.text ?: "").toDoubleOrNull() ?: 0.0)
+    private fun TextFieldValue.getDouble() = getDoubleFromTextOrNull(this.text ?: "") ?: 0.0
 
     override fun setHoursText(value: TextFieldValue) {
         hours = value.copy(text = value.text.asValidatedInt())
