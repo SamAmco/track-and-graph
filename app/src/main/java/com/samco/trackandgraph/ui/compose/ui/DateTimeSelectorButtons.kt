@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
@@ -48,34 +47,23 @@ fun DateTimeButtonRow(
     horizontalArrangement = Arrangement.SpaceEvenly
 ) {
 
-    val context = LocalContext.current
-    val selected = remember(selectedDateTime) { selectedDateTime }
-    val dateString = remember(selectedDateTime) {
-        formatDayMonthYear(context, selected)
-    }
-    val timeString = remember(selectedDateTime) {
-        formatHourMinute(selected)
-    }
-
     DateButton(
         modifier = Modifier.widthIn(min = 104.dp),
-        context = context,
-        dateString = dateString,
+        dateTime = selectedDateTime,
         onDateSelected = { odt ->
             onDateTimeSelected(
                 odt
-                    .withHour(selected.hour)
-                    .withMinute(selected.minute)
+                    .withHour(selectedDateTime.hour)
+                    .withMinute(selectedDateTime.minute)
             )
         }
     )
     TimeButton(
         modifier = Modifier.widthIn(min = 104.dp),
-        context = context,
-        timeString = timeString,
+        dateTime = selectedDateTime,
         onTimeSelected = { time ->
             onDateTimeSelected(
-                selected
+                selectedDateTime
                     .withHour(time.hour)
                     .withMinute(time.minute)
             )
@@ -91,21 +79,23 @@ data class SelectedTime(
 @Composable
 fun TimeButton(
     modifier: Modifier = Modifier,
-    context: Context,
-    timeString: String,
+    dateTime: OffsetDateTime,
     onTimeSelected: (SelectedTime) -> Unit
 ) = Box {
 
     val tag = "TimePicker"
+    val context = LocalContext.current
 
     SelectorTextButton(
         modifier = modifier,
-        text = timeString,
+        text = formatHourMinute(dateTime),
         onClick = {
             val fragmentManager = findFragmentManager(context) ?: return@SelectorTextButton
             val fragment = fragmentManager.findFragmentByTag(tag)
             val existingPicker = fragment as? MaterialTimePicker
             val picker = existingPicker ?: MaterialTimePicker.Builder()
+                .setHour(dateTime.hour)
+                .setMinute(dateTime.minute)
                 .setTimeFormat(CLOCK_24H)
                 .build()
             picker.apply {
@@ -121,27 +111,30 @@ fun TimeButton(
 @Composable
 fun DateButton(
     modifier: Modifier = Modifier,
-    context: Context,
-    dateString: String,
+    dateTime: OffsetDateTime,
     onDateSelected: (OffsetDateTime) -> Unit
 ) = Box {
 
     val tag = "DatePicker"
+    val context = LocalContext.current
 
     SelectorTextButton(
         modifier = modifier,
-        text = dateString,
+        text = formatDayMonthYear(context, dateTime),
         onClick = {
             val fragmentManager = findFragmentManager(context) ?: return@SelectorTextButton
             val fragment = fragmentManager.findFragmentByTag(tag)
             val existingPicker = fragment as? MaterialDatePicker<*>
-            val picker = existingPicker ?: MaterialDatePicker.Builder.datePicker().build()
+            val picker = existingPicker ?: MaterialDatePicker.Builder
+                .datePicker()
+                .setSelection(dateTime.toInstant().toEpochMilli())
+                .build()
             picker.apply {
                 addOnPositiveButtonClickListener { obj ->
                     val epochMillis = (obj as? Long) ?: return@addOnPositiveButtonClickListener
                     val instant = Instant.ofEpochMilli(epochMillis)
-                    val dateTime = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault())
-                    onDateSelected(dateTime)
+                    val selected = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault())
+                    onDateSelected(selected)
                 }
                 show(fragmentManager, tag)
             }
