@@ -27,6 +27,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.*
@@ -142,9 +143,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onAddFunctionClicked() {
-        navController?.navigate(
-            GroupFragmentDirections.actionAddFunction(args.groupId)
-        )
+        navigate(GroupFragmentDirections.actionAddFunction(args.groupId))
     }
 
     /**
@@ -233,9 +232,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onGroupSelected(group: Group) {
-        navController?.navigate(
-            GroupFragmentDirections.actionSelectGroup(group.id, group.name)
-        )
+        navigate(GroupFragmentDirections.actionSelectGroup(group.id, group.name))
     }
 
     private fun createGraphStatClickListener() = GraphStatClickListener(
@@ -265,11 +262,11 @@ class GroupFragment : Fragment(),
     }
 
     private fun onGraphStatClicked(graphOrStat: IGraphStatViewData) {
-        navController?.navigate(GroupFragmentDirections.actionViewGraphStat(graphOrStat.graphOrStat.id))
+        navigate(GroupFragmentDirections.actionViewGraphStat(graphOrStat.graphOrStat.id))
     }
 
     private fun onEditGraphStat(graphOrStat: IGraphStatViewData) {
-        navController?.navigate(
+        navigate(
             GroupFragmentDirections.actionGraphStatInput(
                 graphStatId = graphOrStat.graphOrStat.id,
                 groupId = args.groupId
@@ -302,9 +299,14 @@ class GroupFragment : Fragment(),
     }
 
     private fun onTrackerHistoryClicked(tracker: DisplayTracker) {
-        navController?.navigate(
-            GroupFragmentDirections.actionFeatureHistory(tracker.featureId, tracker.name)
-        )
+        navigate(GroupFragmentDirections.actionFeatureHistory(tracker.featureId, tracker.name))
+    }
+
+    private fun navigate(direction: NavDirections) {
+        //This check fixes a bug where calling navigate twice quickly would cause the app to crash
+        // https://stackoverflow.com/a/53737537
+        if (navController?.currentDestination?.id?.equals(R.id.groupFragment) != true) return
+        navController?.navigate(direction)
     }
 
     private fun onTrackerAddClicked(tracker: DisplayTracker, useDefault: Boolean = true) {
@@ -335,9 +337,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onTrackerEditClicked(tracker: DisplayTracker) {
-        navController?.navigate(
-            GroupFragmentDirections.actionAddTracker(args.groupId, tracker.id)
-        )
+        navigate(GroupFragmentDirections.actionAddTracker(args.groupId, tracker.id))
     }
 
     private fun onQueueAddAllClicked() {
@@ -446,7 +446,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onAddTrackerClicked() {
-        navController?.navigate(GroupFragmentDirections.actionAddTracker(args.groupId))
+        navigate(GroupFragmentDirections.actionAddTracker(args.groupId))
     }
 
     private fun onAddGraphStatClicked() {
@@ -456,9 +456,7 @@ class GroupFragment : Fragment(),
                 .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
                 .show()
         } else {
-            navController?.navigate(
-                GroupFragmentDirections.actionGraphStatInput(groupId = args.groupId)
-            )
+            navigate(GroupFragmentDirections.actionGraphStatInput(groupId = args.groupId))
         }
     }
 
