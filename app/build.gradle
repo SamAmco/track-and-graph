@@ -59,8 +59,8 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            applicationIdSuffix = ".debug"
-            resValue "string", "app_name", "Debug Track & Graph"
+            applicationIdSuffix = ".debug.minify"
+            resValue "string", "app_name", "Debug Minify Track & Graph"
             signingConfig signingConfigs.debug
         }
         release {
