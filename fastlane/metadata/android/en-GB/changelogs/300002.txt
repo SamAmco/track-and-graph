@@ -1,0 +1,1 @@
+- Bugfix for wrong date selected in different time zones

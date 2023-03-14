@@ -66,10 +66,13 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         combine(
             featureIdFlow,
             dataInteractor.getDataUpdateEvents().onStart { emit(Unit) }) { id, _ -> id }
-            .map {
-                val dataSample = dataInteractor.getDataSampleForFeatureId(it)
-                dataSample.iterator().apply { while (hasNext()) next() }
-                val answer = RawData(dataSample.dataSampleProperties, dataSample.getRawDataPoints())
+            .map { featureId ->
+                val dataSample = dataInteractor.getDataSampleForFeatureId(featureId)
+                val answer = RawData(
+                    dataSample.dataSampleProperties,
+                    dataSample.getAllRawDataPoints()
+                        .sortedByDescending { it.timestamp.toEpochSecond() }
+                )
                 dataSample.dispose()
                 return@map answer
             }

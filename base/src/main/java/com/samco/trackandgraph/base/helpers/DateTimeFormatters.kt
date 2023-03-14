@@ -58,15 +58,15 @@ fun getWeekDayNames(context: Context) = listOf(
  * Should return the day of the week locally at the time the data point was tracked
  */
 private fun weekDayPart(dateTime: OffsetDateTime, weekDayNames: List<String>) =
-    " (${weekDayNames[dateTime.dayOfWeek.value - 1]}) "
+    "(${weekDayNames[dateTime.dayOfWeek.value - 1]})"
 
 fun formatDayWeekDayMonthYearHourMinuteOneLine(
     context: Context,
     weekDayNames: List<String>,
     dateTime: OffsetDateTime
-) = formatDayMonthYear(context, dateTime) +
-        weekDayPart(dateTime, weekDayNames) +
-        formatHourMinute(dateTime)
+) = formatDayMonthYear(context, weekDayNames, dateTime) +
+        "  " +
+        formatHourMinuteSecondAndOffset(dateTime)
 
 fun DataPoint.getDisplayValue(isDuration: Boolean): String {
     val time = this.timestamp
@@ -94,10 +94,37 @@ fun formatDayMonthYearHourMinuteWeekDayTwoLines(
     context: Context,
     weekDayNames: List<String>,
     dateTime: OffsetDateTime
-) = formatDayMonthYear(context, dateTime) + " " +
-        formatHourMinute(dateTime) +
+) = formatDayMonthYear(context, weekDayNames, dateTime) +
         "\n" +
-        weekDayPart(dateTime, weekDayNames)
+        formatHourMinuteSecondAndOffset(dateTime)
+
+fun formatHourMinuteSecondAndOffset(dateTime: OffsetDateTime): String {
+    val stringBuilder = StringBuilder()
+    stringBuilder.append(formatHourMinute(dateTime))
+
+    val offsetDiff = OffsetDateTime.now().offset.totalSeconds - dateTime.offset.totalSeconds
+    val offsetDiffHours = offsetDiff / 3600
+    if (offsetDiffHours != 0) {
+        stringBuilder.append(" (")
+        if (offsetDiffHours > 0) stringBuilder.append("+")
+        stringBuilder.append(offsetDiffHours)
+        stringBuilder.append(")")
+    }
+    return stringBuilder.toString()
+
+}
+
+fun formatDayMonthYear(
+    context: Context,
+    weekDayNames: List<String>,
+    dateTime: OffsetDateTime
+): String {
+    val stringBuilder = StringBuilder()
+    stringBuilder.append(formatDayMonthYear(context, dateTime))
+    stringBuilder.append(" ")
+    stringBuilder.append(weekDayPart(dateTime, weekDayNames))
+    return stringBuilder.toString()
+}
 
 fun formatHourMinute(temporal: Temporal) = formatDate("HH:mm", temporal)
 

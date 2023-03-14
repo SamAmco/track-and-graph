@@ -69,9 +69,9 @@ fun GraphStatEndingAtSpinner(
             onItemSelected = { option ->
                 when (option) {
                     SampleEndingAtOption.LATEST -> onSampleEndingAtChanged(SampleEndingAt.Latest)
-                    SampleEndingAtOption.CUSTOM -> showDateDialog(context) {
+                    SampleEndingAtOption.CUSTOM -> showDateDialog(context, {
                         onSampleEndingAtChanged(SampleEndingAt.Custom(it))
-                    }
+                    })
                 }
             },
             selectedItemFactory = { modifier, item, expanded ->
