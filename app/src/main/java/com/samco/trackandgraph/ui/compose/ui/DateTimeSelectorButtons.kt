@@ -36,6 +36,7 @@ import com.samco.trackandgraph.base.helpers.formatHourMinute
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
+import org.threeten.bp.ZoneOffset
 
 @Composable
 fun DateTimeButtonRow(
@@ -132,8 +133,9 @@ fun DateButton(
             picker.apply {
                 addOnPositiveButtonClickListener { obj ->
                     val epochMillis = (obj as? Long) ?: return@addOnPositiveButtonClickListener
-                    val instant = Instant.ofEpochMilli(epochMillis)
-                    val selected = OffsetDateTime.ofInstant(instant, ZoneId.systemDefault())
+                    //epochMillis is 00:00 of a date in UTC, we want to return the same date in the local timezone
+                    val utcDate = Instant.ofEpochMilli(epochMillis).atOffset(ZoneOffset.UTC)
+                    val selected = utcDate.withOffsetSameLocal(OffsetDateTime.now().offset)
                     onDateSelected(selected)
                 }
                 show(fragmentManager, tag)
