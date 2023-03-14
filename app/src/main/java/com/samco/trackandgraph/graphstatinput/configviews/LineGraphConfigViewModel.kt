@@ -21,9 +21,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.DurationPlottingMode
-import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
-import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -60,6 +58,8 @@ class LineGraphConfigViewModel @Inject constructor(
     var sampleEndingAt by mutableStateOf<SampleEndingAt>(SampleEndingAt.Latest)
         private set
     var yRangeType by mutableStateOf(YRangeType.DYNAMIC)
+        private set
+    var lineGraphFeatures by mutableStateOf(emptyList<LineGraphFeature>())
         private set
 
     private var lineGraph = LineGraphWithFeatures(
@@ -148,8 +148,41 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
+    //val id: Long,
+    //val lineGraphId: Long,
+    //val featureId: Long,
+    //val name: String,
+    //val colorIndex: Int,
+    //val averagingMode: LineGraphAveraginModes,
+    //val plottingMode: LineGraphPlottingModes,
+    //val pointStyle: LineGraphPointStyle,
+    //val offset: Double,
+    //val scale: Double,
+    //val durationPlottingMode: DurationPlottingMode
+    fun onAddLineGraphFeatureClicked() {
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
+//            add(
+//                LineGraphFeature(
+//                    featureId = 0L,
+//                    colorIndex = 0,
+//                    durationPlottingMode = DurationPlottingMode.DURATION_IF_POSSIBLE
+//                )
+//            )
+        }
+    }
+
     override fun onDataLoaded(config: Any) {
         if (config !is LineGraphWithFeatures) return
         lineGraph = config
+    }
+
+    fun removeLineGraphFeature(index: Int) {
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply { removeAt(index) }
+        onUpdate()
+    }
+
+    fun updateLineGraphFeature(index: Int, it: LineGraphFeature) {
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply { set(index, it) }
+        onUpdate()
     }
 }
