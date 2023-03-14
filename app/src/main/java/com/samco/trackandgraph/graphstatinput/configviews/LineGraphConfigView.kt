@@ -16,12 +16,18 @@
  */
 package com.samco.trackandgraph.graphstatinput.configviews
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.Divider
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.samco.trackandgraph.base.database.dto.LineGraphFeature
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
+import com.samco.trackandgraph.ui.compose.ui.AddBarButton
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 
 @Composable
@@ -60,7 +66,30 @@ fun LineGraphConfigView(
 @Composable
 private fun LineGraphFeaturesInputView(
     viewModel: LineGraphConfigViewModel
+) = Column(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalAlignment = Alignment.CenterHorizontally
 ) {
 
+    for (index in viewModel.lineGraphFeatures.indices) {
+        val lgf = viewModel.lineGraphFeatures[index]
+        LineGraphFeatureInputView(
+            lgf = lgf,
+            onRemove = { viewModel.removeLineGraphFeature(index) },
+            onUpdate = { viewModel.updateLineGraphFeature(index, it) }
+        )
+    }
+
+    AddBarButton(
+        onClick = { viewModel.onAddLineGraphFeatureClicked() },
+    )
 }
 
+@Composable
+private fun LineGraphFeatureInputView(
+    lgf : LineGraphFeature,
+    onRemove: () -> Unit,
+    onUpdate: (LineGraphFeature) -> Unit
+) {
+    Text(text = "Hi")
+}
