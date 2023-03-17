@@ -95,7 +95,7 @@
     <string name="graph_type_average_time_between">Durchschnittszeit zwischen</string>
     <string name="graph_type_time_since">Zeit seitdem</string>
     <string name="graph_type_time_histogram">Histogramm Zeit</string>
-    <string-array name="line_graph_feature_modes">
+    <string-array name="line_graph_averaging_mode_names">
         <item>Keine Durchschnittsermittlung</item>
         <item>Dynamischer Tagesdurchschnitt</item>
         <item>Dynamischer dreitägiger Durchschnitt</item>
@@ -105,7 +105,7 @@
         <item>Dynamischer halbjährlicher Durchschnitt</item>
         <item>Dynamischer jährlicher Durchschnitt</item>
     </string-array>
-    <string-array name="line_graph_generation_modes">
+    <string-array name="line_graph_plot_mode_names">
         <item>Gesamtanzahl wenn getrackt</item>
         <item>Gesamtanzahl stündlich</item>
         <item>Gesamtanzahl täglich</item>

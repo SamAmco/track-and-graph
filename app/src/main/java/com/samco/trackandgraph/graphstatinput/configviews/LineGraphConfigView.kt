@@ -14,21 +14,34 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package com.samco.trackandgraph.graphstatinput.configviews
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Divider
-import androidx.compose.material.Text
+import androidx.annotation.ColorRes
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.unit.dp
+import com.google.android.material.card.MaterialCardView
+import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
 import com.samco.trackandgraph.base.database.dto.LineGraphFeature
+import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
-import com.samco.trackandgraph.ui.compose.ui.AddBarButton
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.ColorSpinnerAdapter
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.*
+import com.samco.trackandgraph.ui.dataVisColorList
 
 @Composable
 fun LineGraphConfigView(
@@ -45,8 +58,6 @@ fun LineGraphConfigView(
         modifier = Modifier,
         sampleEndingAt = viewModel.sampleEndingAt
     ) { viewModel.updateSampleEndingAt(it) }
-
-
 
     GraphStatYRangeTypeSpinner(
         modifier = Modifier,
@@ -75,6 +86,8 @@ private fun LineGraphFeaturesInputView(
         val lgf = viewModel.lineGraphFeatures[index]
         LineGraphFeatureInputView(
             lgf = lgf,
+            //TODO implement feature path map
+            emptyMap(),
             onRemove = { viewModel.removeLineGraphFeature(index) },
             onUpdate = { viewModel.updateLineGraphFeature(index, it) }
         )
@@ -87,9 +100,132 @@ private fun LineGraphFeaturesInputView(
 
 @Composable
 private fun LineGraphFeatureInputView(
-    lgf : LineGraphFeature,
+    lgf: LineGraphFeature,
+    featureMap: Map<Long, String>,
     onRemove: () -> Unit,
     onUpdate: (LineGraphFeature) -> Unit
-) {
-    Text(text = "Hi")
+) = Card {
+    var text by remember { mutableStateOf(TextFieldValue(lgf.name)) }
+    Column(
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            //The name input
+            FullWidthTextField(
+                modifier = Modifier.weight(1f),
+                textFieldValue = text,
+                onValueChange = { text = it }
+            )
+            //bin button
+            IconButton(onClick = { onRemove() }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.delete_icon),
+                    contentDescription = stringResource(id = R.string.delete_line_button_content_description)
+                )
+            }
+        }
+        Row {
+            Column {
+                //The color input
+                ColorSpinner(
+                    selectedColor = lgf.colorIndex,
+                    onColorSelected = { onUpdate(lgf.copy(colorIndex = dataVisColorList.indexOf(it))) }
+                )
+                //The point style input
+                //TODO implement the point style spinner
+                ColorSpinner(
+                    selectedColor = lgf.colorIndex,
+                    onColorSelected = { onUpdate(lgf.copy(colorIndex = dataVisColorList.indexOf(it))) }
+                )
+            }
+            Column {
+                //The feature
+                TextMapSpinner(
+                    strings = featureMap,
+                    selectedItem = featureMap.keys.firstOrNull() ?: -1L,
+                    onItemSelected = { onUpdate(lgf.copy(featureId = it))}
+                )
+                //The averaging mode
+
+                val averagingModeNames = stringArrayResource(id = R.array.line_graph_averaging_mode_names)
+                    .mapIndexed { index, name -> index to name }
+                    .associate { (index, name) -> LineGraphAveraginModes.values()[index] to name }
+
+                TextMapSpinner(
+                    strings = averagingModeNames,
+                    selectedItem = lgf.averagingMode,
+                    onItemSelected = { onUpdate(lgf.copy(averagingMode = it)) }
+                )
+
+                //the plot mode
+                val plotModeNames = stringArrayResource(id = R.array.line_graph_plot_mode_names)
+                    .mapIndexed { index, name -> index to name }
+                    .associate { (index, name) -> LineGraphPlottingModes.values()[index] to name }
+
+                TextMapSpinner(
+                    strings = plotModeNames,
+                    selectedItem = lgf.plottingMode,
+                    onItemSelected = { onUpdate(lgf.copy(plottingMode = it)) }
+                )
+                Row {
+                    //Offset label
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(id = R.string.offset),
+                        style = MaterialTheme.typography.body1
+                    )
+
+                    //Offset input
+                    //TODO get this right
+                    TextField(
+                        modifier = Modifier.weight(1f),
+                        value = lgf.offset.toString(),
+                        onValueChange = { onUpdate(lgf.copy(offset = it.toDouble())) },
+                    )
+
+                    //Scale label
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = stringResource(id = R.string.scale),
+                        style = MaterialTheme.typography.body1
+                    )
+
+                    //Scale input
+                    //TODO get this right
+                    TextField(
+                        modifier = Modifier.weight(1f),
+                        value = lgf.scale.toString(),
+                        onValueChange = { onUpdate(lgf.copy(scale = it.toDouble())) },
+                    )
+                }
+            }
+        }
+    }
 }
+
+
+@Composable
+fun ColorSpinner(
+    modifier: Modifier = Modifier,
+    colors: List<Int> = dataVisColorList,
+    selectedColor: Int,
+    onColorSelected: (Int) -> Unit
+) = Spinner(
+    items = dataVisColorList.indices.toList(),
+    selectedItem = selectedColor,
+    onItemSelected = { onColorSelected(it) },
+    selectedItemFactory = { mod, index, _ -> ColorCircle(modifier = mod, color = colors[index]) },
+    dropdownItemFactory = { index, _ -> ColorCircle(color = colors[index]) }
+)
+
+@Composable
+fun ColorCircle(
+    modifier: Modifier = Modifier,
+    @ColorRes color: Int
+) = Card(
+    modifier = modifier.size(40.dp),
+    backgroundColor = colorResource(id = color),
+    shape = RoundedCornerShape(100),
+    elevation = 0.dp,
+    content = {}
+)

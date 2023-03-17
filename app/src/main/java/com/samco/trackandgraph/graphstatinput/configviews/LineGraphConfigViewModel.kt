@@ -30,6 +30,7 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent.ValidationExc
 import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
 import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -103,8 +104,12 @@ class LineGraphConfigViewModel @Inject constructor(
 */
 
     override fun onUpdate() {
+        //TODO fill out the rest of the properties
         lineGraph = lineGraph.copy(
-            duration = selectedDuration.duration
+            duration = selectedDuration.duration,
+            endDate = sampleEndingAt.asDateTime(),
+            yRangeType = yRangeType,
+            features = lineGraphFeatures
         )
         super.onUpdate()
     }
@@ -148,32 +153,33 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
-    //val id: Long,
-    //val lineGraphId: Long,
-    //val featureId: Long,
-    //val name: String,
-    //val colorIndex: Int,
-    //val averagingMode: LineGraphAveraginModes,
-    //val plottingMode: LineGraphPlottingModes,
-    //val pointStyle: LineGraphPointStyle,
-    //val offset: Double,
-    //val scale: Double,
-    //val durationPlottingMode: DurationPlottingMode
     fun onAddLineGraphFeatureClicked() {
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
-//            add(
-//                LineGraphFeature(
-//                    featureId = 0L,
-//                    colorIndex = 0,
-//                    durationPlottingMode = DurationPlottingMode.DURATION_IF_POSSIBLE
-//                )
-//            )
+            add(
+                LineGraphFeature(
+                    id = 0L,
+                    lineGraphId = -1L,
+                    featureId = -1L,
+                    name = "",
+                    colorIndex = (size * dataVisColorGenerator) % dataVisColorList.size,
+                    averagingMode = LineGraphAveraginModes.NO_AVERAGING,
+                    plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
+                    pointStyle = LineGraphPointStyle.NONE,
+                    offset = 0.toDouble(),
+                    scale = 1.toDouble(),
+                    durationPlottingMode = DurationPlottingMode.NONE,
+                )
+            )
         }
     }
 
     override fun onDataLoaded(config: Any) {
         if (config !is LineGraphWithFeatures) return
-        lineGraph = config
+        selectedDuration = GraphStatDurations.fromDuration(config.duration)
+        sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
+        yRangeType = config.yRangeType
+        lineGraphFeatures = config.features
+        onUpdate()
     }
 
     fun removeLineGraphFeature(index: Int) {
