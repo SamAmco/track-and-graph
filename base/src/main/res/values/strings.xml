@@ -108,7 +108,8 @@
     <string name="graph_type_average_time_between">Average Time Between</string>
     <string name="graph_type_time_since">Time Since</string>
     <string name="graph_type_time_histogram">Time Histogram</string>
-    <string-array name="line_graph_feature_modes">
+
+    <string-array name="line_graph_averaging_mode_names">
         <item>No Averaging</item>
         <item>Daily Moving Average</item>
         <item>Three Day Moving Average</item>
@@ -118,7 +119,7 @@
         <item>Six Month Moving Average</item>
         <item>Yearly Moving Average</item>
     </string-array>
-    <string-array name="line_graph_generation_modes">
+    <string-array name="line_graph_plot_mode_names">
         <item>Plot When Tracked</item>
         <item>Plot Hourly Totals</item>
         <item>Plot Daily Totals</item>

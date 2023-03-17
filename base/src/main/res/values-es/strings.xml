@@ -95,7 +95,7 @@
     <string name="graph_type_average_time_between">Tiempo medio entre</string>
     <string name="graph_type_time_since">Tiempo desde</string>
     <string name="graph_type_time_histogram">Histograma de tiempo</string>
-    <string-array name="line_graph_feature_modes">
+    <string-array name="line_graph_averaging_mode_names">
         <item>Sin promedio</item>
         <item>Media móvil diaria</item>
         <item>Media móvil de tres días</item>
@@ -105,7 +105,7 @@
         <item>Media móvil semestral</item>
         <item>Media móvil anual</item>
     </string-array>
-    <string-array name="line_graph_generation_modes">
+    <string-array name="line_graph_plot_mode_names">
         <item>Generar cuando se hace un registro</item>
         <item>Generar totales por hora</item>
         <item>Generar totales diarios</item>

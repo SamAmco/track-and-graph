@@ -95,7 +95,7 @@
     <string name="graph_type_average_time_between">Temps moyen entre</string>
     <string name="graph_type_time_since">Temps depuis</string>
     <string name="graph_type_time_histogram">Histogramme temporel</string>
-    <string-array name="line_graph_feature_modes">
+    <string-array name="line_graph_averaging_mode_names">
         <item>Pas de calcul de la moyenne</item>
         <item>Moyenne glissante quotidienne</item>
         <item>Moyenne glissante sur trois jours</item>
@@ -105,7 +105,7 @@
         <item>Moyenne glissante sur six mois</item>
         <item>Moyenne glissante annuelle</item>
     </string-array>
-    <string-array name="line_graph_generation_modes">
+    <string-array name="line_graph_plot_mode_names">
         <item>Tracer quand la données existe</item>
         <item>Tracer le total horaire</item>
         <item>Tracer le total journalier</item>

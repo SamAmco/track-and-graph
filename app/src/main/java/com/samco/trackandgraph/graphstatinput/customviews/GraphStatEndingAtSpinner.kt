@@ -37,12 +37,21 @@ enum class SampleEndingAtOption {
 sealed interface SampleEndingAt {
     val option: SampleEndingAtOption
 
+    companion object {
+        fun fromDateTime(dateTime: OffsetDateTime?) =
+            if (dateTime == null) Latest else Custom(dateTime)
+    }
+
+    fun asDateTime(): OffsetDateTime?
+
     object Latest : SampleEndingAt {
         override val option = SampleEndingAtOption.LATEST
+        override fun asDateTime() = null
     }
 
     data class Custom(val dateTime: OffsetDateTime?) : SampleEndingAt {
         override val option = SampleEndingAtOption.CUSTOM
+        override fun asDateTime() = dateTime
     }
 }
 
