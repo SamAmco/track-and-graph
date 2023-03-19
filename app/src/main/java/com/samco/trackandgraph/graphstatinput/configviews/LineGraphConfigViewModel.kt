@@ -76,9 +76,10 @@ class LineGraphConfigViewModel @Inject constructor(
 
     private val allFeatureIds: StateFlow<Set<Long>> by lazy {
         flow {
-            withContext(io) {
-                emit(dataInteractor.getAllFeaturesSync().map { it.featureId }.toSet())
+            val ids = withContext(io) {
+                dataInteractor.getAllFeaturesSync().map { it.featureId }.toSet()
             }
+            emit(ids)
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
     }
 
