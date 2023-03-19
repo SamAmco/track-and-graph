@@ -35,6 +35,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
 import com.samco.trackandgraph.base.database.dto.LineGraphFeature
 import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
@@ -134,12 +135,23 @@ private fun LineGraphFeatureInputView(
                     selectedColor = lgf.colorIndex,
                     onColorSelected = { onUpdate(lgf.copy(colorIndex = it)) }
                 )
-                //The point style input
-                //TODO implement the point style spinner
-                ColorSpinner(
-                    selectedColor = lgf.colorIndex,
-                    onColorSelected = { onUpdate(lgf.copy(colorIndex = it)) }
+
+                val pointStyleIcons = listOf(
+                    R.drawable.point_style_none_icon,
+                    R.drawable.point_style_circles_icon,
+                    R.drawable.point_style_circles_and_numbers_icon
                 )
+
+                CircleSpinner(
+                    numItems = pointStyleIcons.size,
+                    selectedIndex = LineGraphPointStyle.values().indexOf(lgf.pointStyle),
+                    onIndexSelected = { onUpdate(lgf.copy(pointStyle = LineGraphPointStyle.values()[it])) }
+                ) {
+                    Icon(
+                        painter = painterResource(id = pointStyleIcons[it]),
+                        contentDescription = null
+                    )
+                }
             }
             Column {
                 //The feature

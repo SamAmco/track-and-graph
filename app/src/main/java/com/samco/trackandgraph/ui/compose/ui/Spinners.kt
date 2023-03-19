@@ -27,6 +27,7 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
@@ -90,15 +91,35 @@ fun ColorSpinner(
     colors: List<Int> = dataVisColorList,
     selectedColor: Int,
     onColorSelected: (Int) -> Unit
+) = CircleSpinner(
+    modifier = modifier,
+    numItems = colors.size,
+    selectedIndex = selectedColor,
+    onIndexSelected = { onColorSelected(it) },
+    circleContent = { index -> ColorCircle(color = colors[index]) }
+)
+
+@Composable
+fun CircleSpinner(
+    modifier: Modifier = Modifier,
+    numItems: Int,
+    selectedIndex: Int,
+    onIndexSelected: (Int) -> Unit,
+    circleContent: @Composable (Int) -> Unit,
 ) = Spinner(
     modifier = modifier,
-    items = dataVisColorList.indices.toList(),
-    selectedItem = selectedColor,
-    onItemSelected = { onColorSelected(it) },
-    selectedItemFactory = { mod, index, _ -> ColorCircle(modifier = mod, color = colors[index]) },
+    items = (0 until numItems).toList(),
+    selectedItem = selectedIndex,
+    onItemSelected = { onIndexSelected(it) },
+    selectedItemFactory = { mod, index, _ ->
+        Circle(
+            modifier = mod,
+            content = { circleContent(index) }
+        )
+    },
     dropdownItemFactory = { index, _ ->
         SpacingExtraSmall()
-        ColorCircle(color = colors[index])
+        Circle(content = { circleContent(index) })
         SpacingExtraSmall()
     },
     enableTrailingIcon = false,
@@ -109,10 +130,20 @@ fun ColorSpinner(
 fun ColorCircle(
     modifier: Modifier = Modifier,
     @ColorRes color: Int
+) = Circle(
+    modifier = modifier,
+    backgroundColor = colorResource(id = color)
+) {}
+
+@Composable
+fun Circle(
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colors.surface,
+    content: @Composable () -> Unit
 ) = Card(
-    modifier = modifier.size(60.dp),
-    backgroundColor = colorResource(id = color),
+    modifier = modifier.size(54.dp),
     shape = RoundedCornerShape(100),
+    backgroundColor = backgroundColor,
     elevation = 0.dp,
-    content = {}
+    content = content
 )
