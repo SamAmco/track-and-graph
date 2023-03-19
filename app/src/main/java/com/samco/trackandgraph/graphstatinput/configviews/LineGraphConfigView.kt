@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.android.material.card.MaterialCardView
 import com.samco.trackandgraph.R
@@ -186,32 +187,39 @@ private fun LineGraphFeatureInputView(
                 Row {
                     //Offset label
                     Text(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.alignByBaseline(),
                         text = stringResource(id = R.string.offset),
                         style = MaterialTheme.typography.body1
                     )
 
+                    var tfv1 by remember { mutableStateOf(TextFieldValue(lgf.offset.toString())) }
+                    var tfv2 by remember { mutableStateOf(TextFieldValue(lgf.scale.toString())) }
+
                     //Offset input
                     //TODO get this right
-                    TextField(
-                        modifier = Modifier.weight(1f),
-                        value = lgf.offset.toString(),
-                        onValueChange = { onUpdate(lgf.copy(offset = it.toDouble())) },
+                    MiniTextField(
+                        modifier = Modifier.weight(1f).alignByBaseline(),
+                        textAlign = TextAlign.Center,
+                        textFieldValue = tfv1,
+                        onValueChange = { tfv1 = it }
                     )
+
+                    SpacingSmall()
 
                     //Scale label
                     Text(
-                        modifier = Modifier.weight(1f),
+                        modifier = Modifier.alignByBaseline(),
                         text = stringResource(id = R.string.scale),
                         style = MaterialTheme.typography.body1
                     )
 
                     //Scale input
                     //TODO get this right
-                    TextField(
-                        modifier = Modifier.weight(1f),
-                        value = lgf.scale.toString(),
-                        onValueChange = { onUpdate(lgf.copy(scale = it.toDouble())) },
+                    MiniTextField(
+                        modifier = Modifier.weight(1f).alignByBaseline(),
+                        textAlign = TextAlign.Center,
+                        textFieldValue = tfv2,
+                        onValueChange = { tfv2 = it }
                     )
                 }
             }

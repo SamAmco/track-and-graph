@@ -123,72 +123,16 @@ private fun RowScope.DurationInputComponent(
     overrideFocusDirection: FocusDirection? = null,
     focusRequester: FocusRequester? = null
 ) {
-    val colors = TextFieldDefaults.textFieldColors()
-    val interactionSource = remember { MutableInteractionSource() }
-    val focusUpdateScope = rememberCoroutineScope()
-
-    BasicTextField(
-        value = textFieldValue,
-        onValueChange = {
-            if (it.text.length <= charLimit) onValueChange(it)
-        },
-        textStyle = MaterialTheme.typography.h5.copy(
-            textAlign = TextAlign.End,
-            color = MaterialTheme.tngColors.onSurface
-        ),
-        cursorBrush = SolidColor(MaterialTheme.tngColors.primary),
-        interactionSource = interactionSource,
-        decorationBox = {
-            if (textFieldValue.text == "") Text(
-                "0",
-                fontSize = MaterialTheme.typography.h6.fontSize,
-                textAlign = TextAlign.End,
-                color = MaterialTheme.tngColors.onSurface.copy(
-                    alpha = MaterialTheme.tngColors.disabledAlpha
-                )
-            )
-            else it()
-        },
-        keyboardActions = KeyboardActions(
-            onNext = {
-                focusManager.moveFocus(
-                    overrideFocusDirection ?: FocusDirection.Right
-                )
-            }
-        ),
-        singleLine = true,
-        modifier = Modifier
-            .width(IntrinsicSize.Min)
-            .padding(start = 4.dp)
-            .widthIn(min = 40.dp, max = 40.dp)
-            .indicatorLine(
-                enabled = true,
-                isError = false,
-                interactionSource = interactionSource,
-                colors = colors
-            )
-            .onFocusChanged { focusState ->
-                if (focusState.isFocused) {
-                    focusUpdateScope.launch {
-                        delay(20)
-                        onValueChange(
-                            textFieldValue.copy(
-                                selection = TextRange(0, textFieldValue.text.length)
-                            )
-                        )
-                    }
-                }
-            }
-            .let {
-                if (focusRequester != null) it.focusRequester(focusRequester)
-                else it
-            }
-            .alignByBaseline(),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number,
-            imeAction = ImeAction.Next
-        ),
+    MiniTextField(
+        modifier = Modifier.alignByBaseline(),
+        textFieldValue = textFieldValue,
+        onValueChange = onValueChange,
+        charLimit = charLimit,
+        focusManager = focusManager,
+        overrideFocusDirection = overrideFocusDirection,
+        focusRequester = focusRequester
     )
+
     //Align baseline to above text field
     Text(
         text = suffix,
