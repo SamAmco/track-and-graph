@@ -21,6 +21,7 @@
     <dimen name="card_padding_large">20dp</dimen>
     <dimen name="half_card_padding">5dp</dimen>
     <dimen name="card_corner_radius">4dp</dimen>
+    <dimen name="half_dialog_input_spacing">5dp</dimen>
     <dimen name="dialog_input_spacing">10dp</dimen>
     <dimen name="track_card_button_size">55dp</dimen>
     <dimen name="input_spacing_large">20dp</dimen>

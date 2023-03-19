@@ -25,6 +25,13 @@ import androidx.compose.ui.res.dimensionResource
 import com.samco.trackandgraph.R
 
 @Composable
+fun SpacingExtraSmall() = Spacer(
+    modifier = Modifier
+        .height(dimensionResource(id = R.dimen.half_dialog_input_spacing))
+        .width(dimensionResource(id = R.dimen.half_dialog_input_spacing))
+)
+
+@Composable
 fun SpacingSmall() = Spacer(
     modifier = Modifier
         .height(dimensionResource(id = R.dimen.dialog_input_spacing))

@@ -124,18 +124,21 @@ private fun LineGraphFeatureInputView(
                 )
             }
         }
-        Row {
-            Column {
+        Row(modifier = Modifier.height(IntrinsicSize.Max)) {
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
                 //The color input
                 ColorSpinner(
                     selectedColor = lgf.colorIndex,
-                    onColorSelected = { onUpdate(lgf.copy(colorIndex = dataVisColorList.indexOf(it))) }
+                    onColorSelected = { onUpdate(lgf.copy(colorIndex = it)) }
                 )
                 //The point style input
                 //TODO implement the point style spinner
                 ColorSpinner(
                     selectedColor = lgf.colorIndex,
-                    onColorSelected = { onUpdate(lgf.copy(colorIndex = dataVisColorList.indexOf(it))) }
+                    onColorSelected = { onUpdate(lgf.copy(colorIndex = it)) }
                 )
             }
             Column {
@@ -143,13 +146,14 @@ private fun LineGraphFeatureInputView(
                 TextMapSpinner(
                     strings = featureMap,
                     selectedItem = featureMap.keys.firstOrNull() ?: -1L,
-                    onItemSelected = { onUpdate(lgf.copy(featureId = it))}
+                    onItemSelected = { onUpdate(lgf.copy(featureId = it)) }
                 )
                 //The averaging mode
 
-                val averagingModeNames = stringArrayResource(id = R.array.line_graph_averaging_mode_names)
-                    .mapIndexed { index, name -> index to name }
-                    .associate { (index, name) -> LineGraphAveraginModes.values()[index] to name }
+                val averagingModeNames =
+                    stringArrayResource(id = R.array.line_graph_averaging_mode_names)
+                        .mapIndexed { index, name -> index to name }
+                        .associate { (index, name) -> LineGraphAveraginModes.values()[index] to name }
 
                 TextMapSpinner(
                     strings = averagingModeNames,
@@ -202,30 +206,3 @@ private fun LineGraphFeatureInputView(
         }
     }
 }
-
-
-@Composable
-fun ColorSpinner(
-    modifier: Modifier = Modifier,
-    colors: List<Int> = dataVisColorList,
-    selectedColor: Int,
-    onColorSelected: (Int) -> Unit
-) = Spinner(
-    items = dataVisColorList.indices.toList(),
-    selectedItem = selectedColor,
-    onItemSelected = { onColorSelected(it) },
-    selectedItemFactory = { mod, index, _ -> ColorCircle(modifier = mod, color = colors[index]) },
-    dropdownItemFactory = { index, _ -> ColorCircle(color = colors[index]) }
-)
-
-@Composable
-fun ColorCircle(
-    modifier: Modifier = Modifier,
-    @ColorRes color: Int
-) = Card(
-    modifier = modifier.size(40.dp),
-    backgroundColor = colorResource(id = color),
-    shape = RoundedCornerShape(100),
-    elevation = 0.dp,
-    content = {}
-)
