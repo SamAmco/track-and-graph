@@ -17,7 +17,7 @@
 
 package com.samco.trackandgraph
 
-import androidx.room.Room
+import androidx.room.*
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.platform.app.InstrumentationRegistry
@@ -191,11 +191,26 @@ class MigrationTest {
             listOf(3L, 0L, "graph4", 3, 3)
         )
         while (graphStatCursor.moveToNext()) {
-            assertEquals(expectedGraphStatValues[graphStatCursorCount][0], graphStatCursor.getLong(0))
-            assertEquals(expectedGraphStatValues[graphStatCursorCount][1], graphStatCursor.getLong(1))
-            assertEquals(expectedGraphStatValues[graphStatCursorCount][2], graphStatCursor.getString(2))
-            assertEquals(expectedGraphStatValues[graphStatCursorCount][3], graphStatCursor.getInt(3))
-            assertEquals(expectedGraphStatValues[graphStatCursorCount][4], graphStatCursor.getInt(4))
+            assertEquals(
+                expectedGraphStatValues[graphStatCursorCount][0],
+                graphStatCursor.getLong(0)
+            )
+            assertEquals(
+                expectedGraphStatValues[graphStatCursorCount][1],
+                graphStatCursor.getLong(1)
+            )
+            assertEquals(
+                expectedGraphStatValues[graphStatCursorCount][2],
+                graphStatCursor.getString(2)
+            )
+            assertEquals(
+                expectedGraphStatValues[graphStatCursorCount][3],
+                graphStatCursor.getInt(3)
+            )
+            assertEquals(
+                expectedGraphStatValues[graphStatCursorCount][4],
+                graphStatCursor.getInt(4)
+            )
             graphStatCursorCount++
         }
         assertEquals(4, graphStatCursorCount)
@@ -253,6 +268,49 @@ class MigrationTest {
         assertEquals(3, lineGraphFeatureCursor.getInt(10))
     }
 
+    @Test
+    fun testMigrateLineGraphFeatures_47_49() {
+        helper.createDatabase(TEST_DB, 47).apply {
+            query("pragma foreign_keys")
+            query("pragma foreign_keys=on")
+
+            execSQL(
+                """ INSERT OR REPLACE INTO 
+                    groups_table(id, name, display_index, parent_group_id, color_index) 
+                    VALUES(0, '', 0, NULL, 0)
+                    """.trimMargin()
+            )
+
+            //Insert one feature
+            execSQL(
+                "INSERT INTO features_table " +
+                        "(id, name, group_id, type, discrete_values, display_index, has_default_value, default_value, feature_description)" +
+                        " VALUES (0, 'name', 0, 0, '[]', 0, 0, 0.0, 'description')"
+            )
+            //Insert one data point
+            execSQL(
+                "INSERT INTO data_points_table " +
+                        "(timestamp, feature_id, value, label, note) " +
+                        "VALUES (0, 0, 0.0, 'label', 'note')"
+            )
+
+            //Insert a graphstat
+            execSQL(
+                "INSERT INTO graphs_and_stats_table2 " +
+                        "(id, group_id, name, graph_stat_type, display_index)" +
+                        " VALUES (0, 0, 'name', 0, 0)"
+            )
+
+            //Insert an average time between stat
+            execSQL(
+                "INSERT INTO average_time_between_stat_table4 " +
+                        "(id, graph_stat_id, feature_id, from_value, to_value, duration, labels, end_date, filter_by_range, filter_by_labels)" +
+                        " VALUES (0, 0, 0, 0.0, 0.0, 0, '[]', 0, 0, 0)"
+            )
+        }
+        helper.runMigrationsAndValidate(TEST_DB, 49, true, *allMigrations)
+    }
+
     private fun tryOpenDatabase() {
         // Open latest version of the database. Room will validate the schema
         // once all migrations execute.
@@ -261,8 +319,7 @@ class MigrationTest {
             TrackAndGraphDatabase::class.java,
             TEST_DB
         ).addMigrations(*allMigrations).build().apply {
-            openHelper.writableDatabase
-            close()
+            openHelper.writableDatabase.close()
         }
     }
 }
