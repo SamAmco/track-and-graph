@@ -36,7 +36,7 @@ fun <T> TextMapSpinner(
         onItemSelected = onItemSelected,
         selectedItemFactory = { modifier, item, expanded ->
             Text(
-                modifier = modifier,
+                modifier = modifier.weight(1f),
                 text = strings[item] ?: "",
                 fontSize = MaterialTheme.typography.body1.fontSize,
                 fontWeight = MaterialTheme.typography.body1.fontWeight,
