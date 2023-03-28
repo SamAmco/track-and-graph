@@ -21,16 +21,20 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.ui.FeaturePathProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<*>>(
-    @IODispatcher private val io: CoroutineDispatcher,
-    @DefaultDispatcher private val default: CoroutineDispatcher,
+    private val io: CoroutineDispatcher,
+    private val default: CoroutineDispatcher,
+    private val ui: CoroutineDispatcher,
     private val gsiProvider: GraphStatInteractorProvider,
     protected val dataInteractor: DataInteractor
 ) : ViewModel() {
@@ -41,12 +45,21 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
 
     private var graphStatId: Long? = null
 
+    protected val featurePathProvider: StateFlow<FeaturePathProvider> = flow {
+        val allFeatures = dataInteractor.getAllFeaturesSync()
+        val allGroups = dataInteractor.getAllGroupsSync()
+        emit(FeaturePathProvider(allFeatures, allGroups))
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, FeaturePathProvider(emptyList(), emptyList()))
+
     fun initFromGraphStatId(graphStatId: Long) {
         if (this.graphStatId == graphStatId) return
         this.graphStatId = graphStatId
 
         viewModelScope.launch(io) {
+            configFlow.emit(GraphStatConfigEvent.Loading)
             loadGraphStat(graphStatId)
+            featurePathProvider.first()
+            withContext(ui) { onUpdate() }
         }
     }
 

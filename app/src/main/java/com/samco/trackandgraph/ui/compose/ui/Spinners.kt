@@ -41,7 +41,7 @@ fun <T> Spinner(
     items: List<T>,
     selectedItem: T,
     onItemSelected: (T) -> Unit,
-    selectedItemFactory: @Composable (Modifier, T, Boolean) -> Unit,
+    selectedItemFactory: @Composable RowScope.(Modifier, T, Boolean) -> Unit,
     dropdownItemFactory: @Composable (T, Int) -> Unit,
     enableTrailingIcon: Boolean = true,
     dropdownContentAlignment: Alignment.Horizontal = Alignment.Start

@@ -19,12 +19,15 @@ package com.samco.trackandgraph.graphstatinput.configviews
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent.ValidationException
 import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
@@ -32,12 +35,11 @@ import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
+import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -45,14 +47,58 @@ import javax.inject.Inject
 class LineGraphConfigViewModel @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     @DefaultDispatcher private val default: CoroutineDispatcher,
+    @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LineGraphConfigData>(
     io,
     default,
+    ui,
     gsiProvider,
     dataInteractor
 ) {
+
+    inner class FeatureTextFields(
+        name: String,
+        offset: String = "0",
+        scale: String = "1"
+    ) {
+
+        var customName = false
+            private set
+
+        var name by mutableStateOf(TextFieldValue(""))
+            private set
+        var offset by mutableStateOf(TextFieldValue(""))
+            private set
+        var scale by mutableStateOf(TextFieldValue(""))
+            private set
+
+        init {
+            this.name = TextFieldValue(name)
+            this.offset = TextFieldValue(offset)
+            this.scale = TextFieldValue(scale)
+        }
+
+        fun updateName(name: TextFieldValue, ignoreCustomFlag: Boolean = false) {
+            if (!ignoreCustomFlag && name.text != this.name.text) customName = true
+            this.name = name
+            onUpdate()
+        }
+
+        fun updateOffset(offset: TextFieldValue) {
+            this.offset = offset.asValidatedDouble()
+            onUpdate()
+        }
+
+        fun updateScale(scale: TextFieldValue) {
+            this.scale = scale.asValidatedDouble()
+            onUpdate()
+        }
+    }
+
+    val featureNameMap: Map<Long, String>
+        get() = featurePathProvider.value.features.associate { it.featureId to it.name }
 
     var selectedDuration by mutableStateOf(GraphStatDurations.ALL_DATA)
         private set
@@ -62,6 +108,8 @@ class LineGraphConfigViewModel @Inject constructor(
         private set
     var lineGraphFeatures by mutableStateOf(emptyList<LineGraphFeature>())
         private set
+
+    private val featureTextFields = mutableListOf<FeatureTextFields>()
 
     private var lineGraph = LineGraphWithFeatures(
         id = 0L,
@@ -82,27 +130,6 @@ class LineGraphConfigViewModel @Inject constructor(
             emit(ids)
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
     }
-
-    //TODO remove this code when you can but you might need something like this to get the feature paths
-    // at some point
-/*
-    protected val allFeatureIds by lazy {
-        val allFeatures = dataInteractor.getAllFeaturesSync()
-        val allGroups = dataInteractor.getAllGroupsSync()
-        val dataSourceData = allFeatures.map { feature ->
-            FeatureDataProvider.DataSourceData(
-                feature,
-                //TODO this isn't going to fly when we implement functions. Iterating all labels
-                // of every feature could be too expensive. Need to grab these in a lazy way as needed.
-                dataInteractor.getLabelsForFeatureId(feature.featureId).toSet(),
-                dataInteractor.getDataSamplePropertiesForFeatureId(feature.featureId)
-                    ?: return@map null
-            )
-        }.filterNotNull()
-        val featureDataProvider = FeatureDataProvider(dataSourceData, allGroups)
-        featureDataProvider.features?.map { it.featureId }?.toSet() ?: emptySet()
-    }
-*/
 
     override fun onUpdate() {
         //TODO fill out the rest of the properties
@@ -154,14 +181,17 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
-    fun onAddLineGraphFeatureClicked() {
+    fun onAddLineGraphFeatureClicked() = viewModelScope.launch {
+        val firstFeature = featurePathProvider.first().features.firstOrNull()
+        val featureName = firstFeature?.name ?: ""
+        featureTextFields.add(FeatureTextFields(featureName))
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
             add(
                 LineGraphFeature(
                     id = 0L,
                     lineGraphId = -1L,
-                    featureId = -1L,
-                    name = "",
+                    featureId = firstFeature?.featureId ?: -1L,
+                    name = featureName,
                     colorIndex = (size * dataVisColorGenerator) % dataVisColorList.size,
                     averagingMode = LineGraphAveraginModes.NO_AVERAGING,
                     plottingMode = LineGraphPlottingModes.WHEN_TRACKED,
@@ -180,6 +210,15 @@ class LineGraphConfigViewModel @Inject constructor(
         sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
         yRangeType = config.yRangeType
         lineGraphFeatures = config.features
+        config.features.forEach {
+            featureTextFields.add(
+                FeatureTextFields(
+                    it.name,
+                    it.offset.toString(),
+                    it.scale.toString()
+                )
+            )
+        }
         onUpdate()
     }
 
@@ -188,8 +227,30 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
-    fun updateLineGraphFeature(index: Int, it: LineGraphFeature) {
-        lineGraphFeatures = lineGraphFeatures.toMutableList().apply { set(index, it) }
+    fun updateLineGraphFeature(index: Int, newLgf: LineGraphFeature) = viewModelScope.launch {
+        val newFeatureName = featureNameMap.getOrElse(newLgf.featureId) { "" }
+
+        lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
+            val textFields = featureTextFields[index]
+            if (!textFields.customName) textFields.updateName(
+                TextFieldValue(
+                    newFeatureName,
+                    TextRange(newFeatureName.length)
+                ),
+                ignoreCustomFlag = true
+            )
+            set(
+                index, newLgf.copy(
+                    name = textFields.name.text,
+                    offset = textFields.offset.text.toDoubleOrNull() ?: 0.toDouble(),
+                    scale = textFields.scale.text.toDoubleOrNull() ?: 1.toDouble()
+                )
+            )
+        }
         onUpdate()
+    }
+
+    fun getTextFieldsFor(index: Int): FeatureTextFields {
+        return featureTextFields[index]
     }
 }

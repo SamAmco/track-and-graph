@@ -1,5 +1,7 @@
 package com.samco.trackandgraph.ui.viewmodels
 
+import androidx.compose.ui.text.input.TextFieldValue
+
 fun String.asValidatedInt() =
     this.take(1).filter { it.isDigit() || it == '-' } + this.drop(1).takeWhile { it.isDigit() }
 
@@ -15,4 +17,8 @@ fun String.asValidatedDouble(): String {
     }
     return firstChar + remainingChars
 }
+
+fun TextFieldValue.asValidatedInt() = this.copy(text = this.text.asValidatedInt())
+
+fun TextFieldValue.asValidatedDouble() = this.copy(text = this.text.asValidatedDouble())
 

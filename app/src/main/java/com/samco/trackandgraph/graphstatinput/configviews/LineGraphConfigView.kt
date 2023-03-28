@@ -18,20 +18,15 @@
 
 package com.samco.trackandgraph.graphstatinput.configviews
 
-import androidx.annotation.ColorRes
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import com.google.android.material.card.MaterialCardView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
 import com.samco.trackandgraph.base.database.dto.LineGraphFeature
@@ -40,10 +35,7 @@ import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
-import com.samco.trackandgraph.ui.ColorSpinnerAdapter
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.*
-import com.samco.trackandgraph.ui.dataVisColorList
 
 @Composable
 fun LineGraphConfigView(
@@ -88,11 +80,12 @@ private fun LineGraphFeaturesInputView(
         val lgf = viewModel.lineGraphFeatures[index]
         LineGraphFeatureInputView(
             lgf = lgf,
-            //TODO implement feature path map
-            emptyMap(),
+            featureMap = viewModel.featureNameMap,
+            textFields = viewModel.getTextFieldsFor(index),
             onRemove = { viewModel.removeLineGraphFeature(index) },
             onUpdate = { viewModel.updateLineGraphFeature(index, it) }
         )
+        SpacingSmall()
     }
 
     AddBarButton(
@@ -104,21 +97,19 @@ private fun LineGraphFeaturesInputView(
 private fun LineGraphFeatureInputView(
     lgf: LineGraphFeature,
     featureMap: Map<Long, String>,
+    textFields: LineGraphConfigViewModel.FeatureTextFields,
     onRemove: () -> Unit,
     onUpdate: (LineGraphFeature) -> Unit
 ) = Card {
-    var text by remember { mutableStateOf(TextFieldValue(lgf.name)) }
     Column(
         modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            //The name input
             FullWidthTextField(
                 modifier = Modifier.weight(1f),
-                textFieldValue = text,
-                onValueChange = { text = it }
+                textFieldValue = textFields.name,
+                onValueChange = { textFields.updateName(it) }
             )
-            //bin button
             IconButton(onClick = { onRemove() }) {
                 Icon(
                     painter = painterResource(id = R.drawable.delete_icon),
@@ -126,12 +117,12 @@ private fun LineGraphFeatureInputView(
                 )
             }
         }
+        SpacingExtraSmall()
         Row(modifier = Modifier.height(IntrinsicSize.Max)) {
             Column(
                 modifier = Modifier.fillMaxHeight(),
                 verticalArrangement = Arrangement.SpaceEvenly
             ) {
-                //The color input
                 ColorSpinner(
                     selectedColor = lgf.colorIndex,
                     onColorSelected = { onUpdate(lgf.copy(colorIndex = it)) }
@@ -155,13 +146,11 @@ private fun LineGraphFeatureInputView(
                 }
             }
             Column {
-                //The feature
                 TextMapSpinner(
                     strings = featureMap,
-                    selectedItem = featureMap.keys.firstOrNull() ?: -1L,
+                    selectedItem = lgf.featureId,
                     onItemSelected = { onUpdate(lgf.copy(featureId = it)) }
                 )
-                //The averaging mode
 
                 val averagingModeNames =
                     stringArrayResource(id = R.array.line_graph_averaging_mode_names)
@@ -174,7 +163,6 @@ private fun LineGraphFeatureInputView(
                     onItemSelected = { onUpdate(lgf.copy(averagingMode = it)) }
                 )
 
-                //the plot mode
                 val plotModeNames = stringArrayResource(id = R.array.line_graph_plot_mode_names)
                     .mapIndexed { index, name -> index to name }
                     .associate { (index, name) -> LineGraphPlottingModes.values()[index] to name }
@@ -185,41 +173,36 @@ private fun LineGraphFeatureInputView(
                     onItemSelected = { onUpdate(lgf.copy(plottingMode = it)) }
                 )
                 Row {
-                    //Offset label
                     Text(
                         modifier = Modifier.alignByBaseline(),
                         text = stringResource(id = R.string.offset),
                         style = MaterialTheme.typography.body1
                     )
 
-                    var tfv1 by remember { mutableStateOf(TextFieldValue(lgf.offset.toString())) }
-                    var tfv2 by remember { mutableStateOf(TextFieldValue(lgf.scale.toString())) }
-
-                    //Offset input
-                    //TODO get this right
                     MiniTextField(
-                        modifier = Modifier.weight(1f).alignByBaseline(),
+                        modifier = Modifier
+                            .weight(1f)
+                            .alignByBaseline(),
                         textAlign = TextAlign.Center,
-                        textFieldValue = tfv1,
-                        onValueChange = { tfv1 = it }
+                        textFieldValue = textFields.offset,
+                        onValueChange = { textFields.updateOffset(it) }
                     )
 
                     SpacingSmall()
 
-                    //Scale label
                     Text(
                         modifier = Modifier.alignByBaseline(),
                         text = stringResource(id = R.string.scale),
                         style = MaterialTheme.typography.body1
                     )
 
-                    //Scale input
-                    //TODO get this right
                     MiniTextField(
-                        modifier = Modifier.weight(1f).alignByBaseline(),
+                        modifier = Modifier
+                            .weight(1f)
+                            .alignByBaseline(),
                         textAlign = TextAlign.Center,
-                        textFieldValue = tfv2,
-                        onValueChange = { tfv2 = it }
+                        textFieldValue = textFields.scale,
+                        onValueChange = { textFields.updateScale(it) }
                     )
                 }
             }
