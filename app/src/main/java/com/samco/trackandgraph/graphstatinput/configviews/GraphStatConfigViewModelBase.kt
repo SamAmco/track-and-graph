@@ -68,7 +68,11 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
         gsiProvider
             .getDataSourceAdapter(graphStat.type)
             .getConfigData(graphStatId)
-            .let { pair -> pair?.second?.let { onDataLoaded(it) } }
+            .let { pair ->
+                pair?.second?.let {
+                    withContext(ui) { onDataLoaded(it) }
+                }
+            }
     }
 
     protected open fun onUpdate() {

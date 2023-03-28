@@ -75,9 +75,9 @@ class LineGraphConfigViewModel @Inject constructor(
             private set
 
         init {
-            this.name = TextFieldValue(name)
-            this.offset = TextFieldValue(offset)
-            this.scale = TextFieldValue(scale)
+            this.name = TextFieldValue(name, TextRange(name.length))
+            this.offset = TextFieldValue(offset, TextRange(offset.length))
+            this.scale = TextFieldValue(scale, TextRange(scale.length))
         }
 
         fun updateName(name: TextFieldValue, ignoreCustomFlag: Boolean = false) {
