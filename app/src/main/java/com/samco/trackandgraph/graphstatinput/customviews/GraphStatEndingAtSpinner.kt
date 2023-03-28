@@ -93,7 +93,7 @@ fun GraphStatEndingAtSpinner(
                 }
 
                 Text(
-                    modifier = modifier,
+                    modifier = modifier.weight(1f),
                     text = text,
                     fontSize = MaterialTheme.typography.body1.fontSize,
                     fontWeight = MaterialTheme.typography.body1.fontWeight,
