@@ -53,26 +53,35 @@ internal fun GraphStatInputView(
         Box {
             val loading = viewModel.loading.observeAsState(true)
 
-            GraphStatInputViewForm(
-                viewModelStoreOwner = viewModelStoreOwner,
-                viewModel = viewModel,
-                graphStatId = graphStatId
-            )
+            Column {
+                GraphStatInputViewForm(
+                    modifier = Modifier.weight(1f),
+                    viewModelStoreOwner = viewModelStoreOwner,
+                    viewModel = viewModel,
+                    graphStatId = graphStatId
+                )
+                AddCreateBar(
+                    errorText = viewModel.validationException.observeAsState().value?.errorMessageId,
+                    onCreateUpdateClicked = viewModel::createGraphOrStat,
+                    isUpdateMode = viewModel.updateMode.observeAsState().value ?: false
+                )
+            }
 
             if (loading.value) LoadingOverlay()
 
-            //TODO add demo button and overlay
+            //TODO add demo button
         }
     }
 }
 
 @Composable
 private fun GraphStatInputViewForm(
+    modifier: Modifier = Modifier,
     viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
     graphStatId: Long
 ) = Column(
-    modifier = Modifier
+    modifier = modifier
         .padding(dimensionResource(id = R.dimen.card_padding))
         .verticalScroll(state = rememberScrollState())
 ) {
