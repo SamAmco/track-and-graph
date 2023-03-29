@@ -25,13 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.*
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
-import com.samco.trackandgraph.base.database.dto.LineGraphFeature
-import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
-import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
@@ -39,7 +35,6 @@ import com.samco.trackandgraph.ui.compose.ui.*
 
 @Composable
 fun LineGraphConfigView(
-    modifier: Modifier = Modifier,
     viewModel: LineGraphConfigViewModel
 ) {
     GraphStatDurationSpinner(
@@ -54,10 +49,13 @@ fun LineGraphConfigView(
     ) { viewModel.updateSampleEndingAt(it) }
 
     GraphStatYRangeTypeSpinner(
-        modifier = Modifier,
         yRangeType = viewModel.yRangeType,
         onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
     )
+
+    if (viewModel.yRangeType == YRangeType.FIXED) {
+        YRangeFromToInputs(viewModel)
+    }
 
     SpacingSmall()
 
@@ -66,6 +64,44 @@ fun LineGraphConfigView(
     SpacingSmall()
 
     LineGraphFeaturesInputView(viewModel)
+}
+
+@Composable
+private fun YRangeFromToInputs(viewModel: LineGraphConfigViewModel) = Row(
+    modifier = Modifier
+        .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
+        .fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceEvenly
+) {
+    Text(
+        modifier = Modifier.alignByBaseline(),
+        text = stringResource(id = R.string.from),
+        style = MaterialTheme.typography.subtitle2
+    )
+
+    MiniTextField(
+        modifier = Modifier
+            .weight(1f)
+            .alignByBaseline(),
+        textAlign = TextAlign.Center,
+        textFieldValue = viewModel.yRangeFrom,
+        onValueChange = { viewModel.updateYRangeFrom(it) }
+    )
+
+    Text(
+        modifier = Modifier.alignByBaseline(),
+        text = stringResource(id = R.string.to),
+        style = MaterialTheme.typography.subtitle2
+    )
+
+    MiniTextField(
+        modifier = Modifier
+            .weight(1f)
+            .alignByBaseline(),
+        textAlign = TextAlign.Center,
+        textFieldValue = viewModel.yRangeTo,
+        onValueChange = { viewModel.updateYRangeTo(it) }
+    )
 }
 
 @Composable
