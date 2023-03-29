@@ -135,6 +135,7 @@ class GraphStatInputViewModelImpl @Inject constructor(
     }
 
     private fun updateConfigData(configData: GraphStatConfigEvent.ConfigData<*>) {
+        subConfigException = null
         this.configData = configData
         updateDemoData()
     }

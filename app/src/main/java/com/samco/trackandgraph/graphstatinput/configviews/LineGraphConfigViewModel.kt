@@ -127,21 +127,18 @@ class LineGraphConfigViewModel @Inject constructor(
         endDate = null
     )
 
-    private val allFeatureIds: StateFlow<Set<Long>> by lazy {
-        flow {
-            val ids = withContext(io) {
-                dataInteractor.getAllFeaturesSync().map { it.featureId }.toSet()
-            }
-            emit(ids)
-        }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
-    }
-
     override fun onUpdate() {
         lineGraph = lineGraph.copy(
             duration = selectedDuration.duration,
             endDate = sampleEndingAt.asDateTime(),
             yRangeType = yRangeType,
-            features = lineGraphFeatures,
+            features = lineGraphFeatures.mapIndexed { index, f ->
+                f.copy(
+                    name = featureTextFields[index].name.text,
+                    offset = featureTextFields[index].offset.text.toDoubleOrNull() ?: 0.0,
+                    scale = featureTextFields[index].scale.text.toDoubleOrNull() ?: 1.0
+                )
+            },
             yFrom = yRangeFrom.text.toDoubleOrNull() ?: 0.0,
             yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0
         )
@@ -158,7 +155,7 @@ class LineGraphConfigViewModel @Inject constructor(
             if (f.colorIndex !in dataVisColorList.indices) {
                 return ValidationException(R.string.graph_stat_validation_unrecognised_color)
             }
-            if (!allFeatureIds.value.contains(f.featureId)) {
+            if (!featureNameMap.keys.contains(f.featureId)) {
                 return ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)
             }
         }
@@ -218,10 +215,12 @@ class LineGraphConfigViewModel @Inject constructor(
                 )
             )
         }
+        onUpdate()
     }
 
     override fun onDataLoaded(config: Any) {
         if (config !is LineGraphWithFeatures) return
+        lineGraph = config
         selectedDuration = GraphStatDurations.fromDuration(config.duration)
         sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
         yRangeType = config.yRangeType
