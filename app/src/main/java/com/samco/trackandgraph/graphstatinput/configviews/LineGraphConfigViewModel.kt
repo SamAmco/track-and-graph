@@ -106,8 +106,13 @@ class LineGraphConfigViewModel @Inject constructor(
         private set
     var yRangeType by mutableStateOf(YRangeType.DYNAMIC)
         private set
+    var yRangeFrom by mutableStateOf(TextFieldValue("0.0"))
+        private set
+    var yRangeTo by mutableStateOf(TextFieldValue("1.0"))
+        private set
     var lineGraphFeatures by mutableStateOf(emptyList<LineGraphFeature>())
         private set
+
 
     private val featureTextFields = mutableListOf<FeatureTextFields>()
 
@@ -132,12 +137,13 @@ class LineGraphConfigViewModel @Inject constructor(
     }
 
     override fun onUpdate() {
-        //TODO fill out the rest of the properties
         lineGraph = lineGraph.copy(
             duration = selectedDuration.duration,
             endDate = sampleEndingAt.asDateTime(),
             yRangeType = yRangeType,
-            features = lineGraphFeatures
+            features = lineGraphFeatures,
+            yFrom = yRangeFrom.text.toDoubleOrNull() ?: 0.0,
+            yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0
         )
         super.onUpdate()
     }
@@ -178,6 +184,16 @@ class LineGraphConfigViewModel @Inject constructor(
 
     fun updateYRangeType(type: YRangeType) {
         yRangeType = type
+        onUpdate()
+    }
+
+    fun updateYRangeFrom(from: TextFieldValue) {
+        yRangeFrom = from.asValidatedDouble()
+        onUpdate()
+    }
+
+    fun updateYRangeTo(to: TextFieldValue) {
+        yRangeTo = to.asValidatedDouble()
         onUpdate()
     }
 

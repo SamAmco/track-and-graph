@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.graphstatinput.customviews
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
@@ -27,7 +26,6 @@ import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
 fun GraphStatYRangeTypeSpinner(
-    modifier: Modifier = Modifier,
     yRangeType: YRangeType,
     onYRangeTypeSelected: (YRangeType) -> Unit
 ) {
