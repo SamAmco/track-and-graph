@@ -64,6 +64,8 @@ fun LineGraphConfigView(
     SpacingSmall()
 
     LineGraphFeaturesInputView(viewModel)
+
+    SpacingSmall()
 }
 
 @Composable
