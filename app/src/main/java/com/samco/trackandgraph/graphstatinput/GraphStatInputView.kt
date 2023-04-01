@@ -18,22 +18,23 @@
 
 package com.samco.trackandgraph.graphstatinput
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.*
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
@@ -41,6 +42,7 @@ import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatinput.configviews.GraphStatConfigViewModelBase
 import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigViewModel
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 
 @Composable
@@ -54,12 +56,38 @@ internal fun GraphStatInputView(
             val loading = viewModel.loading.observeAsState(true)
 
             Column {
-                GraphStatInputViewForm(
-                    modifier = Modifier.weight(1f),
-                    viewModelStoreOwner = viewModelStoreOwner,
-                    viewModel = viewModel,
-                    graphStatId = graphStatId
-                )
+                var demoYOffset by remember { mutableStateOf(0f) }
+                var demoVisible by remember { mutableStateOf(false) }
+
+                Box(modifier = Modifier.weight(1f)) {
+                    GraphStatInputViewForm(
+                        viewModelStoreOwner = viewModelStoreOwner,
+                        viewModel = viewModel,
+                        graphStatId = graphStatId
+                    )
+
+                    if (demoVisible) {
+                        //TODO swap this for an actual graph demo view
+                        Box(
+                            modifier = Modifier
+                                .offset(y = demoYOffset.dp)
+                                .background(Color.Red)
+                                .size(40.dp)
+                        )
+                    }
+                }
+
+                val demoViewData by viewModel.demoViewData.observeAsState()
+
+                if (demoViewData != null) {
+                    DemoButton(
+                        isPressed = {
+                            demoVisible = it
+                            if (!it) demoYOffset = 0f
+                        },
+                        onDragOffset = { demoYOffset -= it })
+                }
+
                 AddCreateBar(
                     errorText = viewModel.validationException.observeAsState().value?.errorMessageId,
                     onCreateUpdateClicked = viewModel::createGraphOrStat,
@@ -68,9 +96,52 @@ internal fun GraphStatInputView(
             }
 
             if (loading.value) LoadingOverlay()
-
-            //TODO add demo button
         }
+    }
+}
+
+@Composable
+private fun DemoButton(
+    isPressed: (Boolean) -> Unit,
+    onDragOffset: (Float) -> Unit
+) {
+    var buttonDown by remember { mutableStateOf(false) }
+
+    val background =
+        if (buttonDown) MaterialTheme.tngColors.selectorButtonColor
+        else MaterialTheme.tngColors.primary
+
+    Box(
+        Modifier
+            .background(background)
+            .fillMaxWidth()
+            .padding(vertical = dimensionResource(id = R.dimen.card_padding))
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    awaitFirstDown(requireUnconsumed = true)
+                    isPressed(true)
+                    buttonDown = true
+                    do {
+                        val event = awaitPointerEvent()
+                        event.changes.forEach {
+                            if (it.positionChange() != Offset.Zero) {
+                                onDragOffset(it.positionChange().y)
+                                it.consume()
+                            }
+                        }
+                    } while (event.changes.all { it.pressed })
+                    isPressed(false)
+                    buttonDown = false
+                }
+            }
+            .wrapContentHeight(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = stringResource(id = R.string.hold_to_preview).uppercase(),
+            style = MaterialTheme.typography.h6,
+            color = MaterialTheme.tngColors.onPrimary
+        )
     }
 }
 
@@ -82,7 +153,11 @@ private fun GraphStatInputViewForm(
     graphStatId: Long
 ) = Column(
     modifier = modifier
-        .padding(dimensionResource(id = R.dimen.card_padding))
+        .padding(
+            top = dimensionResource(id = R.dimen.card_padding),
+            start = dimensionResource(id = R.dimen.card_padding),
+            end = dimensionResource(id = R.dimen.card_padding)
+        )
         .verticalScroll(state = rememberScrollState())
 ) {
 
