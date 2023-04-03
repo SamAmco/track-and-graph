@@ -18,11 +18,10 @@
 
 package com.samco.trackandgraph.graphstatinput
 
-import androidx.compose.foundation.background
+import android.view.ViewGroup
+import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -30,11 +29,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
@@ -42,11 +41,16 @@ import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatinput.configviews.GraphStatConfigViewModelBase
 import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigView
 import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigViewModel
+import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.graphstatview.GraphStatCardView
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
+import java.lang.Float.min
 
 @Composable
 internal fun GraphStatInputView(
+    gsiProvider: GraphStatInteractorProvider,
     viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
     graphStatId: Long
@@ -54,6 +58,7 @@ internal fun GraphStatInputView(
     Surface(color = MaterialTheme.colors.background) {
         Box {
             val loading = viewModel.loading.observeAsState(true)
+            val demoViewData by viewModel.demoViewData.observeAsState()
 
             Column {
                 var demoYOffset by remember { mutableStateOf(0f) }
@@ -67,17 +72,9 @@ internal fun GraphStatInputView(
                     )
 
                     if (demoVisible) {
-                        //TODO swap this for an actual graph demo view
-                        Box(
-                            modifier = Modifier
-                                .offset(y = demoYOffset.dp)
-                                .background(Color.Red)
-                                .size(40.dp)
-                        )
+                        DemoOverlay(demoYOffset, demoViewData, gsiProvider)
                     }
                 }
-
-                val demoViewData by viewModel.demoViewData.observeAsState()
 
                 if (demoViewData != null) {
                     DemoButton(
@@ -99,6 +96,42 @@ internal fun GraphStatInputView(
         }
     }
 }
+
+@Composable
+private fun DemoOverlay(
+    demoYOffset: Float,
+    demoViewData: IGraphStatViewData?,
+    gsiProvider: GraphStatInteractorProvider
+) = AndroidView(
+    modifier = Modifier
+        .fillMaxWidth()
+        .offset(y = min(0f, -demoYOffset).dp)
+        .wrapContentHeight(align = Alignment.Top, unbounded = true),
+    factory = {
+        GraphStatCardView(it).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+    },
+    update = { cardView ->
+        demoViewData?.let {
+            cardView.graphStatView.initFromGraphStat(
+                it,
+                gsiProvider.getDecorator(it.graphOrStat.type, true)
+            )
+        } ?: cardView.graphStatView.initLoading()
+
+        cardView.apply {
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+    }
+)
+
 
 @Composable
 private fun DemoButton(

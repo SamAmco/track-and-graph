@@ -70,6 +70,7 @@ class GraphStatInputFragment : Fragment() {
             setContent {
                 TnGComposeTheme {
                     GraphStatInputView(
+                        gsiProvider,
                         viewModelStoreOwner = this@GraphStatInputFragment,
                         viewModel = viewModel,
                         graphStatId = args.graphStatId
