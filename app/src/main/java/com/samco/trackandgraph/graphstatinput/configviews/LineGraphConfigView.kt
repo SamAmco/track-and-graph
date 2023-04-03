@@ -18,6 +18,8 @@
 
 package com.samco.trackandgraph.graphstatinput.configviews
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -32,9 +34,12 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
 import com.samco.trackandgraph.ui.compose.ui.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun LineGraphConfigView(
+    scrollState: ScrollState,
     viewModel: LineGraphConfigViewModel
 ) {
     GraphStatDurationSpinner(
@@ -63,7 +68,7 @@ fun LineGraphConfigView(
 
     SpacingSmall()
 
-    LineGraphFeaturesInputView(viewModel)
+    LineGraphFeaturesInputView(scrollState, viewModel)
 
     SpacingSmall()
 }
@@ -108,9 +113,12 @@ private fun YRangeFromToInputs(viewModel: LineGraphConfigViewModel) = Row(
 
 @Composable
 private fun LineGraphFeaturesInputView(
+    scrollState: ScrollState,
     viewModel: LineGraphConfigViewModel
 ) = Column(
-    modifier = Modifier.fillMaxWidth(),
+    modifier = Modifier
+        .fillMaxWidth()
+        .animateContentSize(),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
 
@@ -126,8 +134,16 @@ private fun LineGraphFeaturesInputView(
         SpacingSmall()
     }
 
+    val coroutineScope = rememberCoroutineScope()
+
     AddBarButton(
-        onClick = { viewModel.onAddLineGraphFeatureClicked() },
+        onClick = {
+            viewModel.onAddLineGraphFeatureClicked()
+            coroutineScope.launch {
+                delay(200)
+                scrollState.animateScrollTo(scrollState.maxValue)
+            }
+        },
     )
 }
 
