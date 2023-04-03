@@ -14,6 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
+
 @file:OptIn(ExperimentalComposeUiApi::class)
 
 package com.samco.trackandgraph.graphstatinput
@@ -30,6 +31,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,6 +49,7 @@ import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
+import java.lang.Float.max
 import java.lang.Float.min
 
 @Composable
@@ -102,35 +106,47 @@ private fun DemoOverlay(
     demoYOffset: Float,
     demoViewData: IGraphStatViewData?,
     gsiProvider: GraphStatInteractorProvider
-) = AndroidView(
-    modifier = Modifier
-        .fillMaxWidth()
-        .offset(y = min(0f, -demoYOffset).dp)
-        .wrapContentHeight(align = Alignment.Top, unbounded = true),
-    factory = {
-        GraphStatCardView(it).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
-    },
-    update = { cardView ->
-        demoViewData?.let {
-            cardView.graphStatView.initFromGraphStat(
-                it,
-                gsiProvider.getDecorator(it.graphOrStat.type, true)
-            )
-        } ?: cardView.graphStatView.initLoading()
+) = Box(
+    Modifier
+        .background(MaterialTheme.tngColors.surface.copy(alpha = 0.8f))
+        .fillMaxSize()
+) {
+    var displayHeight by remember { mutableStateOf(0f) }
+    var demoHeight by remember { mutableStateOf(0f) }
+    Box(
+        Modifier
+            .fillMaxSize()
+            .onGloballyPositioned {
+                displayHeight = it.size.height.toFloat()
+            }
+    ) {
+        val invisiblePixels = max(0f, demoHeight - displayHeight)
+        val offsetRatio = max(0f, min(demoYOffset * 3f, displayHeight) / max(1f, displayHeight))
+        val offset = -offsetRatio * invisiblePixels
 
-        cardView.apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        }
+        AndroidView(
+            modifier = Modifier
+                .fillMaxWidth()
+                .offset(y = offset.dp)
+                .wrapContentHeight(align = Alignment.Top, unbounded = true)
+                .onSizeChanged { demoHeight = it.height.toFloat() },
+            factory = {
+                GraphStatCardView(it).apply {
+                    layoutParams = ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    )
+                }
+            },
+            update = { cardView ->
+                demoViewData?.let {
+                    val decorator = gsiProvider.getDecorator(it.graphOrStat.type, true)
+                    cardView.graphStatView.initFromGraphStat(it, decorator)
+                } ?: cardView.graphStatView.initLoading()
+            }
+        )
     }
-)
+}
 
 
 @Composable
