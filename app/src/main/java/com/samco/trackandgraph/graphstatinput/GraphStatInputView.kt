@@ -199,7 +199,8 @@ private fun GraphStatInputViewForm(
     modifier: Modifier = Modifier,
     viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
-    graphStatId: Long
+    graphStatId: Long,
+    scrollState: ScrollState = rememberScrollState()
 ) = Column(
     modifier = modifier
         .padding(
@@ -207,7 +208,7 @@ private fun GraphStatInputViewForm(
             start = dimensionResource(id = R.dimen.card_padding),
             end = dimensionResource(id = R.dimen.card_padding)
         )
-        .verticalScroll(state = rememberScrollState())
+        .verticalScroll(state = scrollState)
 ) {
 
     FullWidthTextField(
@@ -234,7 +235,8 @@ private fun GraphStatInputViewForm(
     ConfigInputView(
         viewModelStoreOwner = viewModelStoreOwner,
         viewModel = viewModel,
-        graphStatId = graphStatId
+        graphStatId = graphStatId,
+        scrollState = scrollState
     )
 }
 
@@ -265,7 +267,8 @@ fun GraphStatTypeSelector(
 fun ConfigInputView(
     viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
-    graphStatId: Long
+    graphStatId: Long,
+    scrollState: ScrollState
 ) {
     val graphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
 
@@ -277,7 +280,10 @@ fun ConfigInputView(
     when (graphType) {
         GraphStatType.LINE_GRAPH -> {
             currentViewModel = lineGraphConfigViewModel
-            LineGraphConfigView(viewModel = lineGraphConfigViewModel)
+            LineGraphConfigView(
+                scrollState = scrollState,
+                viewModel = lineGraphConfigViewModel
+            )
         }
         else -> {
             //TODO add other config views
