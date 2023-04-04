@@ -40,14 +40,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.GraphStatType
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
-import kotlinx.coroutines.flow.onEach
 import java.lang.Float.max
 import java.lang.Float.min
 
@@ -277,22 +276,40 @@ fun ConfigInputView(
     val pieChartConfigViewModel = hiltViewModel<PieChartConfigViewModel>(viewModelStoreOwner)
     pieChartConfigViewModel.initFromGraphStatId(graphStatId)
 
+    val averageTimeBetweenConfigViewModel =
+        hiltViewModel<AverageTimeBetweenConfigViewModel>(viewModelStoreOwner)
+    averageTimeBetweenConfigViewModel.initFromGraphStatId(graphStatId)
+
+    val timeSinceLastConfigViewModel =
+        hiltViewModel<TimeSinceLastConfigViewModel>(viewModelStoreOwner)
+    timeSinceLastConfigViewModel.initFromGraphStatId(graphStatId)
+
+    val timeHistogramConfigViewModel =
+        hiltViewModel<TimeHistogramConfigViewModel>(viewModelStoreOwner)
+    timeHistogramConfigViewModel.initFromGraphStatId(graphStatId)
+
     var currentViewModel: GraphStatConfigViewModelBase<*> = lineGraphConfigViewModel
 
     when (graphType) {
         GraphStatType.LINE_GRAPH -> {
             currentViewModel = lineGraphConfigViewModel
-            LineGraphConfigView(
-                scrollState = scrollState,
-                viewModel = lineGraphConfigViewModel
-            )
+            LineGraphConfigView(scrollState = scrollState, viewModel = lineGraphConfigViewModel)
         }
         GraphStatType.PIE_CHART -> {
             currentViewModel = pieChartConfigViewModel
             PieChartConfigView(viewModel = pieChartConfigViewModel)
         }
-        else -> {
-            //TODO add other config views
+        GraphStatType.AVERAGE_TIME_BETWEEN -> {
+            currentViewModel = averageTimeBetweenConfigViewModel
+            AverageTimeBetweenConfigView(viewModel = averageTimeBetweenConfigViewModel)
+        }
+        GraphStatType.TIME_SINCE -> {
+            currentViewModel = timeSinceLastConfigViewModel
+            TimeSinceLastConfigView(viewModel = timeSinceLastConfigViewModel)
+        }
+        GraphStatType.TIME_HISTOGRAM -> {
+            currentViewModel = timeHistogramConfigViewModel
+            TimeHistogramConfigView(viewModel = timeHistogramConfigViewModel)
         }
     }
 
@@ -301,4 +318,3 @@ fun ConfigInputView(
             .collect { viewModel.onConfigEvent(it) }
     }
 }
-

@@ -39,9 +39,15 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
 
     private var graphStatId: Long? = null
 
+    //This will be available after onDataLoaded is called
     protected lateinit var featurePathProvider: FeaturePathProvider
         private set
 
+    /**
+     * You must call this before using the view model even if the intention is to create a new graph
+     * or stat. This will load the config data from the database and set the [featurePathProvider].
+     * If creating a new graph or stat then you can pass in -1L as the graphStatId.
+     */
     fun initFromGraphStatId(graphStatId: Long) {
         if (this.graphStatId == graphStatId) return
         this.graphStatId = graphStatId
@@ -69,6 +75,10 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
         withContext(ui) { onDataLoaded(configData) }
     }
 
+    /**
+     * Call this to let [GraphStatInputViewModel] know when the demo data or validation exception
+     * may have changed and need updating
+     */
     protected open fun onUpdate() {
         updateJob?.cancel()
         updateJob = viewModelScope.launch(default) {
@@ -77,11 +87,24 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
         }
     }
 
+    /**
+     * Should return the current config data for the graph or stat
+     */
     abstract fun getConfig(): T
 
+    /**
+     * Should return a validation exception if the config is invalid or null if it is valid
+     */
     abstract suspend fun validate(): GraphStatConfigEvent.ValidationException?
 
+    /**
+     * A flow of events to be relayed to the [GraphStatInputViewModel]
+     */
     fun getConfigFlow(): Flow<GraphStatConfigEvent?> = configFlow
 
+    /**
+     * Called when the config data has been loaded from the database and [featurePathProvider] is
+     * available.
+     */
     abstract fun onDataLoaded(config: Any?)
 }
