@@ -40,7 +40,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -97,8 +96,7 @@ class LineGraphConfigViewModel @Inject constructor(
         }
     }
 
-    val featureNameMap: Map<Long, String>
-        get() = featurePathProvider.value.features.associate { it.featureId to it.name }
+    var featureNameMap: Map<Long, String> by mutableStateOf(emptyMap())
 
     var selectedDuration by mutableStateOf(GraphStatDurations.ALL_DATA)
         private set
@@ -195,7 +193,7 @@ class LineGraphConfigViewModel @Inject constructor(
     }
 
     fun onAddLineGraphFeatureClicked() = viewModelScope.launch {
-        val firstFeature = featurePathProvider.first().features.firstOrNull()
+        val firstFeature = featurePathProvider.features.firstOrNull()
         val featureName = firstFeature?.name ?: ""
         featureTextFields.add(FeatureTextFields(featureName))
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
@@ -218,7 +216,9 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
-    override fun onDataLoaded(config: Any) {
+    override fun onDataLoaded(config: Any?) {
+        featureNameMap = featurePathProvider.sortedFeatureMap()
+
         if (config !is LineGraphWithFeatures) return
         lineGraph = config
         selectedDuration = GraphStatDurations.fromDuration(config.duration)
@@ -234,7 +234,6 @@ class LineGraphConfigViewModel @Inject constructor(
                 )
             )
         }
-        onUpdate()
     }
 
     fun removeLineGraphFeature(index: Int) {
