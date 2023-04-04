@@ -41,14 +41,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphStatType
-import com.samco.trackandgraph.graphstatinput.configviews.GraphStatConfigViewModelBase
-import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigView
-import com.samco.trackandgraph.graphstatinput.configviews.LineGraphConfigViewModel
+import com.samco.trackandgraph.graphstatinput.configviews.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
+import kotlinx.coroutines.flow.onEach
 import java.lang.Float.max
 import java.lang.Float.min
 
@@ -275,6 +274,9 @@ fun ConfigInputView(
     val lineGraphConfigViewModel = hiltViewModel<LineGraphConfigViewModel>(viewModelStoreOwner)
     lineGraphConfigViewModel.initFromGraphStatId(graphStatId)
 
+    val pieChartConfigViewModel = hiltViewModel<PieChartConfigViewModel>(viewModelStoreOwner)
+    pieChartConfigViewModel.initFromGraphStatId(graphStatId)
+
     var currentViewModel: GraphStatConfigViewModelBase<*> = lineGraphConfigViewModel
 
     when (graphType) {
@@ -284,6 +286,10 @@ fun ConfigInputView(
                 scrollState = scrollState,
                 viewModel = lineGraphConfigViewModel
             )
+        }
+        GraphStatType.PIE_CHART -> {
+            currentViewModel = pieChartConfigViewModel
+            PieChartConfigView(viewModel = pieChartConfigViewModel)
         }
         else -> {
             //TODO add other config views

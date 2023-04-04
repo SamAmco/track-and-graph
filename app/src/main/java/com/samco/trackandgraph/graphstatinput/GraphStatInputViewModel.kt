@@ -10,6 +10,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -33,6 +34,10 @@ sealed interface GraphStatConfigEvent {
         data class LineGraphConfigData(
             override val config: LineGraphWithFeatures
         ) : ConfigData<LineGraphWithFeatures>
+
+        data class PieChartConfigData(
+            override val config: PieChart
+        ) : ConfigData<PieChart>
     }
 }
 

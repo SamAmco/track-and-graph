@@ -32,6 +32,8 @@ open class FeaturePathProvider(
         }.toMap()
     )
 
+    fun sortedFeatureMap() = sortedPaths().associate { it.first.featureId to it.second }
+
     val features get() = featureGroupMap.keys
 
     fun sortedAlphabetically() = featureGroupMap.keys.sortedBy { getPathForFeature(it.featureId) }

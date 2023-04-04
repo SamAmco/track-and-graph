@@ -19,17 +19,11 @@ package com.samco.trackandgraph.graphstatinput.configviews
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.DefaultDispatcher
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.ui.FeaturePathProvider
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<*>>(
     private val io: CoroutineDispatcher,
@@ -39,17 +33,14 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     protected val dataInteractor: DataInteractor
 ) : ViewModel() {
 
-    private var configFlow = MutableSharedFlow<GraphStatConfigEvent>()
+    private var configFlow = MutableStateFlow<GraphStatConfigEvent>(GraphStatConfigEvent.Loading)
 
     private var updateJob: Job? = null
 
     private var graphStatId: Long? = null
 
-    protected val featurePathProvider: StateFlow<FeaturePathProvider> = flow {
-        val allFeatures = dataInteractor.getAllFeaturesSync()
-        val allGroups = dataInteractor.getAllGroupsSync()
-        emit(FeaturePathProvider(allFeatures, allGroups))
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, FeaturePathProvider(emptyList(), emptyList()))
+    protected lateinit var featurePathProvider: FeaturePathProvider
+        private set
 
     fun initFromGraphStatId(graphStatId: Long) {
         if (this.graphStatId == graphStatId) return
@@ -57,22 +48,25 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
 
         viewModelScope.launch(io) {
             configFlow.emit(GraphStatConfigEvent.Loading)
+            loadFeaturePathProvider()
             loadGraphStat(graphStatId)
-            featurePathProvider.first()
             withContext(ui) { onUpdate() }
         }
     }
 
+    private suspend fun loadFeaturePathProvider() {
+        val allFeatures = dataInteractor.getAllFeaturesSync()
+        val allGroups = dataInteractor.getAllGroupsSync()
+        featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
+    }
+
     private suspend fun loadGraphStat(graphStatId: Long) {
         val graphStat = dataInteractor.tryGetGraphStatById(graphStatId) ?: return
-        gsiProvider
+        val configData = gsiProvider
             .getDataSourceAdapter(graphStat.type)
             .getConfigData(graphStatId)
-            .let { pair ->
-                pair?.second?.let {
-                    withContext(ui) { onDataLoaded(it) }
-                }
-            }
+            ?.second
+        withContext(ui) { onDataLoaded(configData) }
     }
 
     protected open fun onUpdate() {
@@ -89,5 +83,5 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
 
     fun getConfigFlow(): Flow<GraphStatConfigEvent?> = configFlow
 
-    abstract fun onDataLoaded(config: Any)
+    abstract fun onDataLoaded(config: Any?)
 }
