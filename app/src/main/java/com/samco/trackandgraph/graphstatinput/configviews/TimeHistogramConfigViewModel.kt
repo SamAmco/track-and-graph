@@ -16,14 +16,20 @@ class TimeHistogramConfigViewModel @Inject constructor(
     @DefaultDispatcher private val default: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
-    dataInteractor: DataInteractor
+    dataInteractor: DataInteractor,
+    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl()
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.TimeHistogramConfigData>(
     io,
     default,
     ui,
     gsiProvider,
     dataInteractor
-) {
+), TimeRangeConfigBehaviour by timeRangeConfigBehaviour {
+
+    init {
+        timeRangeConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
+    }
+
     override fun getConfig(): GraphStatConfigEvent.ConfigData.TimeHistogramConfigData {
         TODO("Not yet implemented")
     }
