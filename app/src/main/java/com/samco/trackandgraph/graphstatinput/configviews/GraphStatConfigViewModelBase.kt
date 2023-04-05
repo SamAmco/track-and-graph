@@ -67,11 +67,12 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     }
 
     private suspend fun loadGraphStat(graphStatId: Long) {
-        val graphStat = dataInteractor.tryGetGraphStatById(graphStatId) ?: return
-        val configData = gsiProvider
-            .getDataSourceAdapter(graphStat.type)
-            .getConfigData(graphStatId)
-            ?.second
+        val configData = dataInteractor.tryGetGraphStatById(graphStatId)?.let {
+            gsiProvider
+                .getDataSourceAdapter(it.type)
+                .getConfigData(graphStatId)
+                ?.second
+        }
         withContext(ui) { onDataLoaded(configData) }
     }
 

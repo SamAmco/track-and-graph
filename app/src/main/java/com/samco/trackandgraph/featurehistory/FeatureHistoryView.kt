@@ -16,8 +16,6 @@
  */
 package com.samco.trackandgraph.featurehistory
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,11 +25,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -42,7 +36,6 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
-import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 
@@ -168,7 +161,7 @@ private fun UpdateDialog(
 private fun ToLabelInput(viewModel: UpdateDialogViewModel) {
     val focusRequester = remember { FocusRequester() }
 
-    CheckboxLabelRow(
+    CheckboxLabeledExpandingSection(
         checked = viewModel.toLabelEnabled.observeAsState(false).value,
         onCheckedChanged = viewModel::setToLabelEnabled,
         label = stringResource(R.string.label_equals),
@@ -187,7 +180,7 @@ private fun ToValueInput(viewModel: UpdateDialogViewModel) {
     val focusRequester = remember { FocusRequester() }
     val isDuration by viewModel.isDuration.observeAsState(false)
 
-    CheckboxLabelRow(
+    CheckboxLabeledExpandingSection(
         checked = viewModel.toValueEnabled.observeAsState(false).value,
         onCheckedChanged = viewModel::setToValueEnabled,
         label = stringResource(R.string.value_equals),
@@ -212,7 +205,7 @@ private fun ToValueInput(viewModel: UpdateDialogViewModel) {
 private fun WhereLabelInput(viewModel: UpdateDialogViewModel) {
     val focusRequester = remember { FocusRequester() }
 
-    CheckboxLabelRow(
+    CheckboxLabeledExpandingSection(
         checked = viewModel.whereLabelEnabled.observeAsState(false).value,
         onCheckedChanged = viewModel::setWhereLabelEnabled,
         label = stringResource(R.string.label_equals),
@@ -233,7 +226,7 @@ private fun WhereValueInput(
     val focusRequester = remember { FocusRequester() }
     val isDuration by viewModel.isDuration.observeAsState(false)
 
-    CheckboxLabelRow(
+    CheckboxLabeledExpandingSection(
         checked = viewModel.whereValueEnabled.observeAsState(false).value,
         onCheckedChanged = viewModel::setWhereValueEnabled,
         label = stringResource(R.string.value_equals),
@@ -254,49 +247,6 @@ private fun WhereValueInput(
     }
 }
 
-
-@Composable
-fun CheckboxLabelRow(
-    checked: Boolean,
-    onCheckedChanged: (Boolean) -> Unit,
-    label: String,
-    focusRequester: FocusRequester,
-    input: @Composable (modifier: Modifier) -> Unit
-) = Column(
-    horizontalAlignment = Alignment.CenterHorizontally,
-    modifier = Modifier
-        .alpha(if (checked) 1.0f else MaterialTheme.tngColors.disabledAlpha)
-        .fillMaxWidth()
-        .border(
-            BorderStroke(1.dp, MaterialTheme.tngColors.onSurface),
-            shape = MaterialTheme.shapes.small
-        )
-        .padding(dimensionResource(id = R.dimen.card_margin_small))
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .clickable { onCheckedChanged(!checked) }
-            .fillMaxWidth()
-    ) {
-        Checkbox(
-            checked = checked,
-            onCheckedChange = { onCheckedChanged(it) }
-        )
-        SpacingLarge()
-        Text(text = label)
-    }
-    if (checked) {
-        input(
-            Modifier
-                .fillMaxWidth()
-                .focusRequester(focusRequester)
-        )
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
-        }
-    }
-}
 
 @Composable
 private fun DataPoint(

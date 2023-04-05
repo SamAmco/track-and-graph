@@ -3,21 +3,24 @@ package com.samco.trackandgraph.graphstatinput.configviews
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import kotlinx.coroutines.*
 import javax.inject.Inject
 
 interface FilterableFeatureConfigBehaviour {
     val availableLabels: List<String>
     val selectedLabels: List<String>
-    val fromValue: Double
-    val toValue: Double
+    val fromValue: TextFieldValue
+    val toValue: TextFieldValue
     val filterByLabel: Boolean
     val filterByRange: Boolean
     val loadingLabels: Boolean
 
-    fun updateFromValue(value: Double)
-    fun updateToValue(value: Double)
+    fun updateFromValue(value: TextFieldValue)
+    fun updateToValue(value: TextFieldValue)
     fun updateSelectedLabels(labels: List<String>)
     fun updateFilterByLabel(filter: Boolean)
     fun updateFilterByRange(filter: Boolean)
@@ -29,8 +32,8 @@ class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
     private var featureId: Long? = null
     override var availableLabels: List<String> by mutableStateOf(listOf())
     override var selectedLabels: List<String> by mutableStateOf(listOf())
-    override var fromValue: Double by mutableStateOf(0.0)
-    override var toValue: Double by mutableStateOf(1.0)
+    override var fromValue: TextFieldValue by mutableStateOf(TextFieldValue("0", TextRange(1)))
+    override var toValue: TextFieldValue by mutableStateOf(TextFieldValue("1", TextRange(1)))
     override var filterByLabel: Boolean by mutableStateOf(false)
     override var filterByRange: Boolean by mutableStateOf(false)
     override var loadingLabels: Boolean by mutableStateOf(false)
@@ -77,13 +80,13 @@ class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
         onUpdate()
     }
 
-    override fun updateFromValue(value: Double) {
-        fromValue = value
+    override fun updateFromValue(value: TextFieldValue) {
+        fromValue = value.asValidatedDouble()
         onUpdate()
     }
 
-    override fun updateToValue(value: Double) {
-        toValue = value
+    override fun updateToValue(value: TextFieldValue) {
+        toValue = value.asValidatedDouble()
         onUpdate()
     }
 

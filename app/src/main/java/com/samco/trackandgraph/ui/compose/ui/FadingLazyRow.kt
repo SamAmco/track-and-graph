@@ -18,15 +18,16 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun FadingLazyRow(
     modifier: Modifier = Modifier,
-    size: Float = 32f,
-    color: Color = MaterialTheme.tngColors.surface,
-    contentPadding: PaddingValues = PaddingValues(0.dp),
+    fadeSize: Float = with(LocalDensity.current) { 24.dp.toPx() },
+    fadeColor: Color = MaterialTheme.tngColors.surface,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 24.dp),
     state: LazyListState = rememberLazyListState(),
     reverseLayout: Boolean = false,
     horizontalArrangement: Arrangement.Horizontal =
@@ -36,8 +37,8 @@ fun FadingLazyRow(
     userScrollEnabled: Boolean = true,
     content: LazyListScope.() -> Unit
 ) {
-    val endColors = listOf(Color.Transparent, color)
-    val startColors = listOf(color, Color.Transparent)
+    val endColors = listOf(Color.Transparent, fadeColor)
+    val startColors = listOf(fadeColor, Color.Transparent)
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyRow(
@@ -47,18 +48,18 @@ fun FadingLazyRow(
                 .drawWithContent {
                     drawContent()
                     drawRect(
-                        Brush.horizontalGradient(startColors, 0f, size),
-                        size = Size(size, this.size.height),
+                        Brush.horizontalGradient(startColors, 0f, fadeSize),
+                        size = Size(fadeSize, this.size.height),
                         blendMode = BlendMode.Companion.SrcOver
                     )
                     drawRect(
                         brush = Brush.horizontalGradient(
                             endColors,
-                            this.size.width - size,
+                            this.size.width - fadeSize,
                             this.size.width
                         ),
-                        topLeft = Offset(this.size.width - size, 0f),
-                        size = Size(size, this.size.height),
+                        topLeft = Offset(this.size.width - fadeSize, 0f),
+                        size = Size(fadeSize, this.size.height),
                         blendMode = BlendMode.Companion.SrcOver
                     )
                 },

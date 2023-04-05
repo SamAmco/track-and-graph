@@ -86,7 +86,7 @@ class PieChartConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
-        singleFeatureConfigBehaviour.setFeatureMap(featurePathProvider.sortedFeatureMap())
+        singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
 
         if (config !is PieChart) return
         pieChart = config
