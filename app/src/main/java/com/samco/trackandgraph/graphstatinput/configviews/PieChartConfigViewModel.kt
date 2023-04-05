@@ -23,19 +23,19 @@ class PieChartConfigViewModel @Inject constructor(
     @DefaultDispatcher private val default: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
-    dataInteractor: DataInteractor
+    dataInteractor: DataInteractor,
+    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl()
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.PieChartConfigData>(
     io,
     default,
     ui,
     gsiProvider,
     dataInteractor
-) {
-    var selectedDuration by mutableStateOf(GraphStatDurations.ALL_DATA)
-        private set
+), TimeRangeConfigBehaviour by timeRangeConfigBehaviour {
 
-    var sampleEndingAt by mutableStateOf<SampleEndingAt>(SampleEndingAt.Latest)
-        private set
+    init {
+        timeRangeConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
+    }
 
     var featureId: Long? by mutableStateOf(null)
         private set
@@ -82,23 +82,13 @@ class PieChartConfigViewModel @Inject constructor(
 
         if (config !is PieChart) return
         pieChart = config
-        selectedDuration = GraphStatDurations.fromDuration(config.duration)
-        sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
+        timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
+        timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
         featureId = config.featureId
     }
 
     fun onFeatureSelected(featureId: Long) {
         this.featureId = featureId
-        this.onUpdate()
-    }
-
-    fun updateDuration(duration: GraphStatDurations) {
-        this.selectedDuration = duration
-        this.onUpdate()
-    }
-
-    fun updateSampleEndingAt(endingAt: SampleEndingAt) {
-        this.sampleEndingAt = endingAt
         this.onUpdate()
     }
 }

@@ -47,21 +47,25 @@ class LineGraphConfigViewModel @Inject constructor(
     @DefaultDispatcher private val default: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
-    dataInteractor: DataInteractor
+    dataInteractor: DataInteractor,
+    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl()
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LineGraphConfigData>(
     io,
     default,
     ui,
     gsiProvider,
     dataInteractor
-) {
+), TimeRangeConfigBehaviour by timeRangeConfigBehaviour {
+
+    init {
+        timeRangeConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
+    }
 
     inner class FeatureTextFields(
         name: String,
         offset: String = "0",
         scale: String = "1"
     ) {
-
         var customName = false
             private set
 
@@ -97,10 +101,6 @@ class LineGraphConfigViewModel @Inject constructor(
 
     var featureNameMap: Map<Long, String> by mutableStateOf(emptyMap())
 
-    var selectedDuration by mutableStateOf(GraphStatDurations.ALL_DATA)
-        private set
-    var sampleEndingAt by mutableStateOf<SampleEndingAt>(SampleEndingAt.Latest)
-        private set
     var yRangeType by mutableStateOf(YRangeType.DYNAMIC)
         private set
     var yRangeFrom by mutableStateOf(TextFieldValue("0.0"))
@@ -166,16 +166,6 @@ class LineGraphConfigViewModel @Inject constructor(
         return null
     }
 
-    fun updateDuration(duration: GraphStatDurations) {
-        selectedDuration = duration
-        onUpdate()
-    }
-
-    fun updateSampleEndingAt(endingAt: SampleEndingAt) {
-        sampleEndingAt = endingAt
-        onUpdate()
-    }
-
     fun updateYRangeType(type: YRangeType) {
         yRangeType = type
         onUpdate()
@@ -220,8 +210,8 @@ class LineGraphConfigViewModel @Inject constructor(
 
         if (config !is LineGraphWithFeatures) return
         lineGraph = config
-        selectedDuration = GraphStatDurations.fromDuration(config.duration)
-        sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
+        timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
+        timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
         yRangeType = config.yRangeType
         lineGraphFeatures = config.features
         config.features.forEach {
