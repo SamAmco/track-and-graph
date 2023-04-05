@@ -41,10 +41,10 @@ class TimeHistogramConfigViewModel @Inject constructor(
         singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(onUpdate = { onUpdate() })
     }
 
-    private var selectedWindow: TimeHistogramWindow by mutableStateOf(TimeHistogramWindow.DAY)
+    var selectedWindow: TimeHistogramWindow by mutableStateOf(TimeHistogramWindow.DAY)
         private set
 
-    private var sumByCount: Boolean by mutableStateOf(false)
+    var sumByCount: Boolean by mutableStateOf(false)
         private set
 
     private var timeHistogram = TimeHistogram(
@@ -78,7 +78,7 @@ class TimeHistogramConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
-        singleFeatureConfigBehaviour.setFeatureMap(featurePathProvider.sortedFeatureMap())
+        singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
 
         if (config !is TimeHistogram) return
         this.timeHistogram = config

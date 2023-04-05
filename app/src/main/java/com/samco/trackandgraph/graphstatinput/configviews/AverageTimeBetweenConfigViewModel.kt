@@ -27,6 +27,8 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
 import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
+import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -82,8 +84,8 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
     override fun updateConfig() {
         averageTimeBetweenStat = averageTimeBetweenStat.copy(
             featureId = featureId ?: -1L,
-            fromValue = fromValue,
-            toValue = toValue,
+            fromValue = fromValue.text.toDoubleOrNull() ?: 0.0,
+            toValue = toValue.text.toDoubleOrNull() ?: 1.0,
             duration = selectedDuration.duration,
             labels = selectedLabels,
             endDate = sampleEndingAt.asDateTime(),
@@ -105,7 +107,7 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
-        singleFeatureConfigBehaviour.setFeatureMap(featurePathProvider.sortedFeatureMap())
+        singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
 
         if (config !is AverageTimeBetweenStat) return
         this.averageTimeBetweenStat = config
@@ -113,8 +115,8 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
         timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
         filterableFeatureConfigBehaviour.filterByLabel = config.filterByLabels
         filterableFeatureConfigBehaviour.filterByRange = config.filterByRange
-        filterableFeatureConfigBehaviour.fromValue = config.fromValue
-        filterableFeatureConfigBehaviour.toValue = config.toValue
+        filterableFeatureConfigBehaviour.fromValue = config.fromValue.asTextFieldValue()
+        filterableFeatureConfigBehaviour.toValue = config.toValue.asTextFieldValue()
         filterableFeatureConfigBehaviour.selectedLabels = config.labels
         singleFeatureConfigBehaviour.featureId = config.featureId
         filterableFeatureConfigBehaviour.getAvailableLabels()

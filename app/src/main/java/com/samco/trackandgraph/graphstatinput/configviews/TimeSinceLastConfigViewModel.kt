@@ -25,6 +25,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -75,8 +76,8 @@ class TimeSinceLastConfigViewModel @Inject constructor(
     override fun updateConfig() {
         timeSinceLastStat = timeSinceLastStat.copy(
             featureId = singleFeatureConfigBehaviour.featureId ?: -1L,
-            fromValue = filterableFeatureConfigBehaviour.fromValue,
-            toValue = filterableFeatureConfigBehaviour.toValue,
+            fromValue = filterableFeatureConfigBehaviour.fromValue.text.toDoubleOrNull() ?: 0.0,
+            toValue = filterableFeatureConfigBehaviour.toValue.text.toDoubleOrNull() ?: 1.0,
             labels = filterableFeatureConfigBehaviour.selectedLabels,
             filterByRange = filterableFeatureConfigBehaviour.filterByRange,
             filterByLabels = filterableFeatureConfigBehaviour.filterByLabel
@@ -96,14 +97,14 @@ class TimeSinceLastConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
-        singleFeatureConfigBehaviour.setFeatureMap(featurePathProvider.sortedFeatureMap())
+        singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
 
         if (config !is TimeSinceLastStat) return
         this.timeSinceLastStat = config
         filterableFeatureConfigBehaviour.filterByLabel = config.filterByLabels
         filterableFeatureConfigBehaviour.filterByRange = config.filterByRange
-        filterableFeatureConfigBehaviour.fromValue = config.fromValue
-        filterableFeatureConfigBehaviour.toValue = config.toValue
+        filterableFeatureConfigBehaviour.fromValue = config.fromValue.asTextFieldValue()
+        filterableFeatureConfigBehaviour.toValue = config.toValue.asTextFieldValue()
         filterableFeatureConfigBehaviour.selectedLabels = config.labels
         singleFeatureConfigBehaviour.featureId = config.featureId
         filterableFeatureConfigBehaviour.getAvailableLabels()

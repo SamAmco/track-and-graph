@@ -21,9 +21,10 @@ class SingleFeatureConfigBehaviourImpl @Inject constructor() : SingleFeatureConf
 
     override fun updateFeatureId(id: Long) {
         featureId = id
+        onUpdate()
     }
 
-    fun setFeatureMap(map: Map<Long, String>) {
+    fun iniFeatureMap(map: Map<Long, String>) {
         featureMap = map
         if (featureId == null) featureId = map.keys.firstOrNull()
     }
