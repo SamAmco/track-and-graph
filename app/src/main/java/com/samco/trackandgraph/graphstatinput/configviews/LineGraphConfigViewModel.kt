@@ -124,7 +124,7 @@ class LineGraphConfigViewModel @Inject constructor(
         endDate = null
     )
 
-    override fun onUpdate() {
+    override fun updateConfig() {
         lineGraph = lineGraph.copy(
             duration = selectedDuration.duration,
             endDate = sampleEndingAt.asDateTime(),
@@ -139,7 +139,6 @@ class LineGraphConfigViewModel @Inject constructor(
             yFrom = yRangeFrom.text.toDoubleOrNull() ?: 0.0,
             yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0
         )
-        super.onUpdate()
     }
 
     override fun getConfig() = GraphStatConfigEvent.ConfigData.LineGraphConfigData(lineGraph)

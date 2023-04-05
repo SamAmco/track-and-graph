@@ -79,13 +79,19 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
      * Call this to let [GraphStatInputViewModel] know when the demo data or validation exception
      * may have changed and need updating
      */
-    protected open fun onUpdate() {
+    protected fun onUpdate() {
         updateJob?.cancel()
         updateJob = viewModelScope.launch(default) {
             configFlow.emit(GraphStatConfigEvent.Loading)
             configFlow.emit(validate() ?: getConfig())
         }
     }
+
+    /**
+     * Called when the implementation should update its stored config (as returned by [getConfig])
+     * with the latest data from the UI.
+     */
+    abstract fun updateConfig()
 
     /**
      * Should return the current config data for the graph or stat
