@@ -1,8 +1,21 @@
+/*
+* This file is part of Track & Graph
+*
+* Track & Graph is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Track & Graph is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+*/
 package com.samco.trackandgraph.graphstatinput.configviews
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.base.model.DataInteractor
@@ -24,24 +37,21 @@ class PieChartConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
-    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl()
+    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
+    private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl()
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.PieChartConfigData>(
     io,
     default,
     ui,
     gsiProvider,
     dataInteractor
-), TimeRangeConfigBehaviour by timeRangeConfigBehaviour {
+), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
+    SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour {
 
     init {
         timeRangeConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
+        singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(onUpdate = { onUpdate() })
     }
-
-    var featureId: Long? by mutableStateOf(null)
-        private set
-
-    var featureMap: Map<Long, String>? by mutableStateOf(null)
-        private set
 
     private var pieChart = PieChart(
         id = 0L,
@@ -51,13 +61,12 @@ class PieChartConfigViewModel @Inject constructor(
         endDate = null
     )
 
-    override fun onUpdate() {
+    override fun updateConfig() {
         pieChart = pieChart.copy(
             featureId = this.featureId ?: -1L,
             duration = selectedDuration.duration,
             endDate = sampleEndingAt.asDateTime()
         )
-        super.onUpdate()
     }
 
     override fun getConfig(): GraphStatConfigEvent.ConfigData.PieChartConfigData {
@@ -77,18 +86,12 @@ class PieChartConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
-        featureMap = featurePathProvider.sortedFeatureMap()
-        featureId = featureMap?.keys?.firstOrNull()
+        singleFeatureConfigBehaviour.setFeatureMap(featurePathProvider.sortedFeatureMap())
 
         if (config !is PieChart) return
         pieChart = config
         timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
         timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
-        featureId = config.featureId
-    }
-
-    fun onFeatureSelected(featureId: Long) {
-        this.featureId = featureId
-        this.onUpdate()
+        singleFeatureConfigBehaviour.featureId = config.featureId
     }
 }

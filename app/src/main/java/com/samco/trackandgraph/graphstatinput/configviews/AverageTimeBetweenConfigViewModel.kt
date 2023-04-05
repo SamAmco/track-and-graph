@@ -1,8 +1,21 @@
+/*
+* This file is part of Track & Graph
+*
+* Track & Graph is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Track & Graph is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+*/
 package com.samco.trackandgraph.graphstatinput.configviews
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
@@ -11,12 +24,11 @@ import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
+import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
+import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -26,47 +38,33 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
-    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl()
+    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
+    private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl = FilterableFeatureConfigBehaviourImpl(),
+    private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl(),
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.AverageTimeBetweenConfigData>(
     io,
     default,
     ui,
     gsiProvider,
     dataInteractor
-), TimeRangeConfigBehaviour by timeRangeConfigBehaviour {
+), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
+    FilterableFeatureConfigBehaviour by filterableFeatureConfigBehaviour,
+    SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour {
 
     init {
         timeRangeConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
+        filterableFeatureConfigBehaviour.initFilterableFeatureConfigBehaviour(
+            onUpdate = { onUpdate() },
+            io = io,
+            ui = ui,
+            coroutineScope = viewModelScope,
+            dataInteractor = dataInteractor
+        )
+        singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(
+            onUpdate = { onUpdate() },
+            featureChangeCallback = { filterableFeatureConfigBehaviour.onFeatureIdUpdated(it) },
+        )
     }
-
-    private var labelUpdateJob: Job? = null
-
-    var featureMap: Map<Long, String>? by mutableStateOf(null)
-        private set
-
-    var featureId: Long? by mutableStateOf(null)
-        private set
-
-    var availableLabels: List<String> by mutableStateOf(listOf())
-        private set
-
-    var selectedLabels: List<String> by mutableStateOf(listOf())
-        private set
-
-    var fromValue: Double by mutableStateOf(0.0)
-        private set
-
-    var toValue: Double by mutableStateOf(1.0)
-        private set
-
-    var filterByLabel: Boolean by mutableStateOf(false)
-        private set
-
-    var filterByRange: Boolean by mutableStateOf(false)
-        private set
-
-    var loadingLabels: Boolean by mutableStateOf(false)
-        private set
 
     private var averageTimeBetweenStat: AverageTimeBetweenStat = AverageTimeBetweenStat(
         id = 0,
@@ -81,7 +79,7 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
         filterByLabels = false
     )
 
-    override fun onUpdate() {
+    override fun updateConfig() {
         averageTimeBetweenStat = averageTimeBetweenStat.copy(
             featureId = featureId ?: -1L,
             fromValue = fromValue,
@@ -92,7 +90,6 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
             filterByRange = filterByRange,
             filterByLabels = filterByLabel
         )
-        super.onUpdate()
     }
 
     override fun getConfig(): GraphStatConfigEvent.ConfigData.AverageTimeBetweenConfigData {
@@ -108,63 +105,18 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
-        featureMap = featurePathProvider.sortedFeatureMap()
-        featureId = featureMap?.keys?.firstOrNull()
+        singleFeatureConfigBehaviour.setFeatureMap(featurePathProvider.sortedFeatureMap())
 
         if (config !is AverageTimeBetweenStat) return
         this.averageTimeBetweenStat = config
-        this.filterByLabel = config.filterByLabels
-        this.filterByRange = config.filterByRange
-        this.fromValue = config.fromValue
-        this.toValue = config.toValue
-        this.selectedLabels = config.labels
-        this.featureId = config.featureId
-        getAvailableLabels()
+        timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
+        timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
+        filterableFeatureConfigBehaviour.filterByLabel = config.filterByLabels
+        filterableFeatureConfigBehaviour.filterByRange = config.filterByRange
+        filterableFeatureConfigBehaviour.fromValue = config.fromValue
+        filterableFeatureConfigBehaviour.toValue = config.toValue
+        filterableFeatureConfigBehaviour.selectedLabels = config.labels
+        singleFeatureConfigBehaviour.featureId = config.featureId
+        filterableFeatureConfigBehaviour.getAvailableLabels()
     }
-
-    private fun getAvailableLabels() {
-        featureId?.let { fId ->
-            labelUpdateJob?.cancel()
-            labelUpdateJob = viewModelScope.launch(ui) {
-                loadingLabels = true
-                val labels = withContext(io) { dataInteractor.getLabelsForFeatureId(fId) }
-                availableLabels = labels
-                loadingLabels = false
-            }
-        }
-    }
-
-    fun updateFeatureId(id: Long) {
-        if (id == featureId) return
-        featureId = id
-        getAvailableLabels()
-        selectedLabels = emptyList()
-        onUpdate()
-    }
-
-    fun updateFromValue(value: Double) {
-        fromValue = value
-        onUpdate()
-    }
-
-    fun updateToValue(value: Double) {
-        toValue = value
-        onUpdate()
-    }
-
-    fun updateSelectedLabels(labels: List<String>) {
-        selectedLabels = labels
-        onUpdate()
-    }
-
-    fun updateFilterByLabel(filter: Boolean) {
-        filterByLabel = filter
-        onUpdate()
-    }
-
-    fun updateFilterByRange(filter: Boolean) {
-        filterByRange = filter
-        onUpdate()
-    }
-
 }
