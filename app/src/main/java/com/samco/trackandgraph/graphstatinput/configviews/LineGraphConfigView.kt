@@ -14,225 +14,252 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalComposeUiApi::class)
 
 package com.samco.trackandgraph.graphstatinput.configviews
 
-import android.content.Context
-import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import androidx.core.widget.addTextChangedListener
-import android.widget.AdapterView
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.*
+import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.helpers.doubleFormatter
-import com.samco.trackandgraph.databinding.LineGraphInputViewBinding
-import com.samco.trackandgraph.graphstatinput.ValidationException
-import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfig
-import com.samco.trackandgraph.graphstatinput.customviews.LineGraphFeatureConfigListItemView
-import com.samco.trackandgraph.maxGraphPeriodDurations
-import com.samco.trackandgraph.ui.dataVisColorGenerator
-import com.samco.trackandgraph.ui.dataVisColorList
-import com.samco.trackandgraph.util.getDoubleFromText
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
+import com.samco.trackandgraph.ui.compose.ui.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
-internal class LineGraphConfigView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : GraphStatConfigView(
-    context,
-    attrs,
-    defStyleAttr
+@Composable
+fun LineGraphConfigView(
+    scrollState: ScrollState,
+    viewModel: LineGraphConfigViewModel
 ) {
-    private val binding: LineGraphInputViewBinding = LineGraphInputViewBinding
-        .inflate(LayoutInflater.from(context), this, true)
-
-    private lateinit var configData: LineGraphWithFeatures
-
-    private val lgfConfigIndices = mutableListOf<LineGraphFeatureConfigListItemView>()
-
-    override fun initFromConfigData(configData: Any?) {
-        this.configData = configData as LineGraphWithFeatures? ?: createEmptyConfig()
-        initFromLineGraph()
-    }
-
-    private fun createEmptyConfig() = LineGraphWithFeatures(
-        0,
-        0,
-        emptyList(),
-        null,
-        YRangeType.DYNAMIC,
-        0.0,
-        1.0,
-        null
+    GraphStatDurationSpinner(
+        modifier = Modifier,
+        selectedDuration = viewModel.selectedDuration,
+        onDurationSelected = { viewModel.updateDuration(it) }
     )
 
-    private fun initFromLineGraph() {
-        binding.sampleDurationSpinner.setSelection(maxGraphPeriodDurations.indexOf(configData.duration))
-        listenToTimeDuration(this, binding.sampleDurationSpinner) {
-            configData = configData.copy(duration = it)
-        }
-        binding.endDateSpinner.setSelection(if (configData.endDate == null) 0 else 1)
-        listenToEndDate(this, binding.endDateSpinner, { configData.endDate }) {
-            configData = configData.copy(endDate = it)
-            updateEndDateText(this, binding.customEndDateText, it)
-        }
+    GraphStatEndingAtSpinner(
+        modifier = Modifier,
+        sampleEndingAt = viewModel.sampleEndingAt
+    ) { viewModel.updateSampleEndingAt(it) }
 
-        createLineGraphFeatureViews()
-        listenToAddLineGraphFeatureButton()
-        initYRangeFromTo()
-        listenToYRangeFixedFromTo()
-        initYRangeSpinner()
-        listenToYRangeTypeSpinner()
+    GraphStatYRangeTypeSpinner(
+        yRangeType = viewModel.yRangeType,
+        onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
+    )
+
+    if (viewModel.yRangeType == YRangeType.FIXED) {
+        YRangeFromToInputs(viewModel)
     }
 
-    private fun initYRangeSpinner() {
-        binding.yRangeStyleSpinner.setSelection(configData.yRangeType.ordinal)
-    }
+    SpacingSmall()
 
-    private fun listenToYRangeTypeSpinner() {
-        binding.yRangeStyleSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(p0: AdapterView<*>?) {}
-                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                    configData = configData.copy(yRangeType = YRangeType.values()[index])
-                    emitConfigChange()
-                    updateYRangeInputType()
-                }
-            }
-    }
+    Divider()
 
-    private fun initYRangeFromTo() {
-        binding.yRangeFrom.setText(doubleFormatter.format(configData.yFrom))
-        binding.yRangeFromDuration.setTimeInSeconds(configData.yFrom.toLong())
-        binding.yRangeTo.setText(doubleFormatter.format(configData.yTo))
-        binding.yRangeToDuration.setTimeInSeconds(configData.yTo.toLong())
-    }
+    SpacingSmall()
 
-    private fun listenToYRangeFixedFromTo() {
-        binding.yRangeFrom.addTextChangedListener { editText ->
-            configData = configData.copy(yFrom = getDoubleFromText(editText.toString()))
-            emitConfigChange()
-        }
-        binding.yRangeFromDuration.setDurationChangedListener {
-            configData = configData.copy(yFrom = it.toDouble())
-            emitConfigChange()
-        }
+    LineGraphFeaturesInputView(scrollState, viewModel)
 
-        binding.yRangeTo.addTextChangedListener { editText ->
-            configData = configData.copy(yTo = getDoubleFromText(editText.toString()))
-            emitConfigChange()
-        }
-        binding.yRangeToDuration.setDurationChangedListener {
-            configData = configData.copy(yTo = it.toDouble())
-            emitConfigChange()
-        }
+    SpacingSmall()
+}
 
-        val doneListener: () -> Unit = { onHideKeyboardListener?.invoke() }
-        binding.yRangeToDuration.setDoneListener(doneListener)
-        binding.yRangeFromDuration.setDoneListener(doneListener)
-    }
+@Composable
+private fun YRangeFromToInputs(viewModel: LineGraphConfigViewModel) = Row(
+    modifier = Modifier
+        .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
+        .fillMaxWidth(),
+    horizontalArrangement = Arrangement.SpaceEvenly
+) {
+    Text(
+        modifier = Modifier.alignByBaseline(),
+        text = stringResource(id = R.string.from),
+        style = MaterialTheme.typography.subtitle2
+    )
 
-    private fun listenToAddLineGraphFeatureButton() {
-        binding.addFeatureButton.isClickable = true
-        binding.addFeatureButton.setOnClickListener {
-            val nextIndex = binding.lineGraphFeaturesLayout.childCount
-            val nextColorIndex = (nextIndex * dataVisColorGenerator) % dataVisColorList.size
-            val newLgf = LineGraphFeature(
-                0, -1, -1, "", nextColorIndex,
-                LineGraphAveraginModes.NO_AVERAGING, LineGraphPlottingModes.WHEN_TRACKED,
-                LineGraphPointStyle.NONE, 0.toDouble(), 1.toDouble(), DurationPlottingMode.NONE
-            )
-            val newFeatures = configData.features.toMutableList()
-            newFeatures.add(newLgf)
-            configData = configData.copy(features = newFeatures)
-            inflateLineGraphFeatureView(nextIndex, newLgf)
-            emitConfigChange()
-        }
-    }
+    MiniTextField(
+        modifier = Modifier
+            .weight(1f)
+            .alignByBaseline(),
+        textAlign = TextAlign.Center,
+        textFieldValue = viewModel.yRangeFrom,
+        onValueChange = { viewModel.updateYRangeFrom(it) }
+    )
 
-    private fun createLineGraphFeatureViews() {
-        configData.features.forEachIndexed { i, lgf -> inflateLineGraphFeatureView(i, lgf) }
-    }
+    Text(
+        modifier = Modifier.alignByBaseline(),
+        text = stringResource(id = R.string.to),
+        style = MaterialTheme.typography.subtitle2
+    )
 
-    private fun inflateLineGraphFeatureView(index: Int, lineGraphFeature: LineGraphFeature) {
-        val featureConfig = LineGraphFeatureConfig.fromLineGraphFeature(lineGraphFeature)
-        val view = LineGraphFeatureConfigListItemView(context, featureDataProvider, featureConfig)
-        lgfConfigIndices.add(index, view)
-        view.setOnRemoveListener {
-            binding.lineGraphFeaturesLayout.removeView(view)
-            val viewIndex = lgfConfigIndices.indexOf(view)
-            val features = configData.features.toMutableList()
-            features.removeAt(viewIndex)
-            configData = configData.copy(features = features)
-            lgfConfigIndices.remove(view)
-            emitConfigChange()
-        }
-        view.setOnUpdateListener {
-            val newFeatures = configData.features.toMutableList()
-            val viewIndex = lgfConfigIndices.indexOf(view)
-            newFeatures.removeAt(viewIndex)
-            newFeatures.add(viewIndex, it)
-            configData = configData.copy(features = newFeatures)
-            updateYRangeInputType()
-            emitConfigChange()
-        }
-        val params = LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.WRAP_CONTENT
+    MiniTextField(
+        modifier = Modifier
+            .weight(1f)
+            .alignByBaseline(),
+        textAlign = TextAlign.Center,
+        textFieldValue = viewModel.yRangeTo,
+        onValueChange = { viewModel.updateYRangeTo(it) }
+    )
+}
+
+@Composable
+private fun LineGraphFeaturesInputView(
+    scrollState: ScrollState,
+    viewModel: LineGraphConfigViewModel
+) = Column(
+    modifier = Modifier
+        .fillMaxWidth()
+        .animateContentSize(),
+    horizontalAlignment = Alignment.CenterHorizontally
+) {
+
+    for (index in viewModel.lineGraphFeatures.indices) {
+        val lgf = viewModel.lineGraphFeatures[index]
+        LineGraphFeatureInputView(
+            lgf = lgf,
+            featureMap = viewModel.featureNameMap,
+            textFields = viewModel.getTextFieldsFor(index),
+            onRemove = { viewModel.removeLineGraphFeature(index) },
+            onUpdate = { viewModel.updateLineGraphFeature(index, it) }
         )
-        view.layoutParams = params
-        binding.lineGraphFeaturesLayout.addView(view, index)
-        //Using post delayed is a bit of a hack and doesn't guarantee it will work but it seems
-        // to work most of the time and I'm not sure what the better solution is right now.
-        binding.lineGraphFeaturesLayout.postDelayed({
-            onScrollListener?.invoke(View.FOCUS_DOWN)
-            view.requestFocus()
-        }, 100)
+        SpacingSmall()
     }
 
-    private fun updateYRangeInputType() {
-        when (configData.yRangeType) {
-            YRangeType.DYNAMIC -> {
-                binding.yRangeFromToLayout.visibility = View.GONE
-                binding.yRangeFromToDurationLayout.visibility = View.GONE
+    val coroutineScope = rememberCoroutineScope()
+
+    AddBarButton(
+        onClick = {
+            viewModel.onAddLineGraphFeatureClicked()
+            coroutineScope.launch {
+                delay(200)
+                scrollState.animateScrollTo(scrollState.maxValue)
             }
-            YRangeType.FIXED -> {
-                if (configData.features.any { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }) {
-                    binding.yRangeFromToDurationLayout.visibility = View.VISIBLE
-                    binding.yRangeFromToLayout.visibility = View.GONE
-                    binding.yRangeFromDuration.setTimeInSeconds(configData.yFrom.toLong())
-                    binding.yRangeToDuration.setTimeInSeconds(configData.yTo.toLong())
-                } else {
-                    binding.yRangeFromToDurationLayout.visibility = View.GONE
-                    binding.yRangeFromToLayout.visibility = View.VISIBLE
-                    binding.yRangeFrom.setText(configData.yFrom.toString())
-                    binding.yRangeTo.setText(configData.yTo.toString())
+        },
+    )
+}
+
+@Composable
+private fun LineGraphFeatureInputView(
+    lgf: LineGraphFeature,
+    featureMap: Map<Long, String>,
+    textFields: LineGraphConfigViewModel.FeatureTextFields,
+    onRemove: () -> Unit,
+    onUpdate: (LineGraphFeature) -> Unit
+) = Card {
+    Column(
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            FullWidthTextField(
+                modifier = Modifier.weight(1f),
+                textFieldValue = textFields.name,
+                onValueChange = { textFields.updateName(it) }
+            )
+            IconButton(onClick = { onRemove() }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.delete_icon),
+                    contentDescription = stringResource(id = R.string.delete_line_button_content_description)
+                )
+            }
+        }
+        SpacingExtraSmall()
+        Row(modifier = Modifier.height(IntrinsicSize.Max)) {
+            Column(
+                modifier = Modifier.fillMaxHeight(),
+                verticalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ColorSpinner(
+                    selectedColor = lgf.colorIndex,
+                    onColorSelected = { onUpdate(lgf.copy(colorIndex = it)) }
+                )
+
+                val pointStyleIcons = listOf(
+                    R.drawable.point_style_none_icon,
+                    R.drawable.point_style_circles_icon,
+                    R.drawable.point_style_circles_and_numbers_icon
+                )
+
+                CircleSpinner(
+                    numItems = pointStyleIcons.size,
+                    selectedIndex = LineGraphPointStyle.values().indexOf(lgf.pointStyle),
+                    onIndexSelected = { onUpdate(lgf.copy(pointStyle = LineGraphPointStyle.values()[it])) }
+                ) {
+                    Icon(
+                        painter = painterResource(id = pointStyleIcons[it]),
+                        contentDescription = null
+                    )
+                }
+            }
+            Column {
+                TextMapSpinner(
+                    strings = featureMap,
+                    selectedItem = lgf.featureId,
+                    onItemSelected = { onUpdate(lgf.copy(featureId = it)) }
+                )
+
+                val averagingModeNames =
+                    stringArrayResource(id = R.array.line_graph_averaging_mode_names)
+                        .mapIndexed { index, name -> index to name }
+                        .associate { (index, name) -> LineGraphAveraginModes.values()[index] to name }
+
+                TextMapSpinner(
+                    strings = averagingModeNames,
+                    selectedItem = lgf.averagingMode,
+                    onItemSelected = { onUpdate(lgf.copy(averagingMode = it)) }
+                )
+
+                val plotModeNames = stringArrayResource(id = R.array.line_graph_plot_mode_names)
+                    .mapIndexed { index, name -> index to name }
+                    .associate { (index, name) -> LineGraphPlottingModes.values()[index] to name }
+
+                TextMapSpinner(
+                    strings = plotModeNames,
+                    selectedItem = lgf.plottingMode,
+                    onItemSelected = { onUpdate(lgf.copy(plottingMode = it)) }
+                )
+                Row {
+                    Text(
+                        modifier = Modifier.alignByBaseline(),
+                        text = stringResource(id = R.string.offset),
+                        style = MaterialTheme.typography.body1
+                    )
+
+                    MiniTextField(
+                        modifier = Modifier
+                            .weight(1f)
+                            .alignByBaseline(),
+                        textAlign = TextAlign.Center,
+                        textFieldValue = textFields.offset,
+                        onValueChange = { textFields.updateOffset(it) }
+                    )
+
+                    SpacingSmall()
+
+                    Text(
+                        modifier = Modifier.alignByBaseline(),
+                        text = stringResource(id = R.string.scale),
+                        style = MaterialTheme.typography.body1
+                    )
+
+                    MiniTextField(
+                        modifier = Modifier
+                            .weight(1f)
+                            .alignByBaseline(),
+                        textAlign = TextAlign.Center,
+                        textFieldValue = textFields.scale,
+                        onValueChange = { textFields.updateScale(it) }
+                    )
                 }
             }
         }
-    }
-
-    override fun getConfigData(): Any = configData
-
-    override fun validateConfig(): ValidationException? {
-        if (configData.features.isEmpty())
-            return ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        val featureIds = allFeatureData.map { data -> data.feature.featureId }.toSet()
-        configData.features.forEach { f ->
-            if (f.colorIndex !in dataVisColorList.indices)
-                return ValidationException(R.string.graph_stat_validation_unrecognised_color)
-            if (!featureIds.contains(f.featureId))
-                return ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)
-        }
-        if (configData.features.any { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
-            && !configData.features.all { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }) {
-            return ValidationException(R.string.graph_stat_validation_mixed_time_value_line_graph_features)
-        }
-        if (configData.yRangeType == YRangeType.FIXED && configData.yFrom >= configData.yTo) {
-            return ValidationException(R.string.graph_stat_validation_bad_fixed_range)
-        }
-        return null
     }
 }

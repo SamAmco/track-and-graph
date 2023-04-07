@@ -115,34 +115,41 @@ fun DateButton(
     dateTime: OffsetDateTime,
     onDateSelected: (OffsetDateTime) -> Unit
 ) = Box {
-
-    val tag = "DatePicker"
     val context = LocalContext.current
-
     SelectorTextButton(
         modifier = modifier,
         text = formatDayMonthYear(context, dateTime),
         onClick = {
-            val fragmentManager = findFragmentManager(context) ?: return@SelectorTextButton
-            val fragment = fragmentManager.findFragmentByTag(tag)
-            val existingPicker = fragment as? MaterialDatePicker<*>
-            val picker = existingPicker ?: MaterialDatePicker.Builder
-                .datePicker()
-                .setSelection(dateTime.toInstant().toEpochMilli())
-                .build()
-            picker.apply {
-                addOnPositiveButtonClickListener { obj ->
-                    val epochMillis = (obj as? Long) ?: return@addOnPositiveButtonClickListener
-                    //epochMillis is 00:00 of a date in UTC, we want to return the same date in the local timezone
-                    val utcDate = Instant.ofEpochMilli(epochMillis).atOffset(ZoneOffset.UTC)
-                    val selected = utcDate.withOffsetSameLocal(OffsetDateTime.now().offset)
-                    onDateSelected(selected)
-                }
-                show(fragmentManager, tag)
-            }
+            showDateDialog(context, onDateSelected, dateTime)
         }
     )
 }
+
+fun showDateDialog(
+    context: Context,
+    onDateSelected: (OffsetDateTime) -> Unit,
+    dateTime: OffsetDateTime = OffsetDateTime.now()
+) {
+    val tag = "DatePicker"
+    val fragmentManager = findFragmentManager(context) ?: return
+    val fragment = fragmentManager.findFragmentByTag(tag)
+    val existingPicker = fragment as? MaterialDatePicker<*>
+    val picker = existingPicker ?: MaterialDatePicker.Builder
+        .datePicker()
+        .setSelection(dateTime.toInstant().toEpochMilli())
+        .build()
+    picker.apply {
+        addOnPositiveButtonClickListener { obj ->
+            val epochMillis = (obj as? Long) ?: return@addOnPositiveButtonClickListener
+            //epochMillis is 00:00 of a date in UTC, we want to return the same date in the local timezone
+            val utcDate = Instant.ofEpochMilli(epochMillis).atOffset(ZoneOffset.UTC)
+            val selected = utcDate.withOffsetSameLocal(OffsetDateTime.now().offset)
+            onDateSelected(selected)
+        }
+        show(fragmentManager, tag)
+    }
+}
+
 
 private fun findFragmentManager(context: Context): FragmentManager? {
     var currentContext = context

@@ -78,15 +78,6 @@ data class TimeHistogramWindowData(
     }
 }
 
-val maxGraphPeriodDurations = listOf(
-    null,
-    Duration.ofDays(1),
-    Duration.ofDays(7),
-    Duration.ofDays(31),
-    Duration.ofDays(93),
-    Duration.ofDays(183),
-    Duration.ofDays(365)
-)
 
 val movingAverageDurations = mapOf(
     LineGraphAveraginModes.NO_AVERAGING to null,

@@ -1,108 +1,108 @@
 /*
- *  This file is part of Track & Graph
- *
- *  Track & Graph is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Track & Graph is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
- */
-
+* This file is part of Track & Graph
+*
+* Track & Graph is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* Track & Graph is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+*/
 package com.samco.trackandgraph.graphstatinput.configviews
 
-import android.content.Context
-import android.util.AttributeSet
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.AdapterView
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringArrayResource
+import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.TimeHistogram
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
-import com.samco.trackandgraph.databinding.TimeHistogramInputViewBinding
-import com.samco.trackandgraph.graphstatinput.ValidationException
-import com.samco.trackandgraph.maxGraphPeriodDurations
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.ui.compose.ui.*
 
-class TimeHistogramConfigView @JvmOverloads constructor(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : GraphStatConfigView(
-    context,
-    attrs,
-    defStyleAttr
-) {
-    private val binding: TimeHistogramInputViewBinding = TimeHistogramInputViewBinding
-        .inflate(LayoutInflater.from(context), this, true)
+@Composable
+fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
 
-    private lateinit var configData: TimeHistogram
-
-    override fun initFromConfigData(configData: Any?) {
-        this.configData = configData as TimeHistogram? ?: createEmptyConfig()
-        initFromTimeHistogram()
-    }
-
-    private fun createEmptyConfig() = TimeHistogram(
-        0L,
-        0L,
-        allFeatureData.firstOrNull()?.feature?.featureId ?: -1,
-        null,
-        TimeHistogramWindow.DAY,
-        false,
-        null
+    GraphStatDurationSpinner(
+        modifier = Modifier,
+        selectedDuration = viewModel.selectedDuration,
+        onDurationSelected = { viewModel.updateDuration(it) }
     )
 
-    private fun initFromTimeHistogram() {
-        binding.sampleDurationSpinner.setSelection(maxGraphPeriodDurations.indexOf(configData.duration))
-        listenToTimeDuration(this, binding.sampleDurationSpinner) {
-            configData = configData.copy(duration = it)
-        }
-        binding.endDateSpinner.setSelection(if (configData.endDate == null) 0 else 1)
-        listenToEndDate(this, binding.endDateSpinner, { configData.endDate }) {
-            configData = configData.copy(endDate = it)
-            updateEndDateText(this, binding.customEndDateText, it)
-        }
-        listenToFeatureSpinner(this, binding.featureSpinner, configData.featureId) {
-            configData = configData.copy(featureId = it.featureId)
-        }
-        listenToTimeWindowSize()
-        listenToSumByDiscreteValueCheckbox()
+    GraphStatEndingAtSpinner(
+        modifier = Modifier,
+        sampleEndingAt = viewModel.sampleEndingAt
+    ) { viewModel.updateSampleEndingAt(it) }
+
+    SpacingSmall()
+
+    Divider()
+
+    SpacingLarge()
+
+    Text(
+        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
+        text = stringResource(id = R.string.select_a_feature),
+        style = MaterialTheme.typography.subtitle2
+    )
+
+    SpacingSmall()
+
+    val featureId = viewModel.featureId
+    val featureMap = viewModel.featureMap
+
+    if (featureId != null && featureMap != null) {
+        TextMapSpinner(
+            strings = featureMap,
+            selectedItem = featureId,
+            onItemSelected = { viewModel.updateFeatureId(it) }
+        )
     }
 
-    private fun listenToTimeWindowSize() {
-        val selection = TimeHistogramWindow.values().indexOfFirst { it == configData.window }
-        if (selection >= 0) binding.selectWindowSpinner.setSelection(selection)
-        binding.selectWindowSpinner.onItemSelectedListener =
-            object : AdapterView.OnItemSelectedListener {
-                override fun onNothingSelected(p0: AdapterView<*>?) {}
-                override fun onItemSelected(p0: AdapterView<*>?, p1: View?, index: Int, p3: Long) {
-                    configData = configData.copy(window = TimeHistogramWindow.values()[index])
-                    emitConfigChange()
-                }
-            }
+    SpacingSmall()
+
+    LabeledRow(
+        label = stringResource(id = R.string.time_window_size),
+        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
+    ) {
+        val stringArray = stringArrayResource(id = R.array.time_histogram_windows)
+        val timeWindows = mapOf(
+            TimeHistogramWindow.HOUR to stringArray[0],
+            TimeHistogramWindow.DAY to stringArray[1],
+            TimeHistogramWindow.WEEK to stringArray[2],
+            TimeHistogramWindow.MONTH to stringArray[3],
+            TimeHistogramWindow.THREE_MONTHS to stringArray[4],
+            TimeHistogramWindow.SIX_MONTHS to stringArray[5],
+            TimeHistogramWindow.YEAR to stringArray[6]
+        )
+
+        TextMapSpinner(
+            strings = timeWindows,
+            selectedItem = viewModel.selectedWindow,
+            onItemSelected = { viewModel.updateWindow(it) }
+        )
     }
 
-    private fun listenToSumByDiscreteValueCheckbox() {
-        binding.sumByCountCheckbox.isChecked = configData.sumByCount
-        binding.sumByCountCheckbox.setOnCheckedChangeListener { _, checked ->
-            configData = configData.copy(sumByCount = checked)
-            emitConfigChange()
-        }
-    }
+    SpacingSmall()
 
-    override fun validateConfig(): ValidationException? {
-        return if (allFeatureData.isEmpty()
-            || !allFeatureData.map { it.feature.featureId }.contains(configData.featureId)
-        ) {
-            ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        } else null
-    }
+    RowCheckbox(
+        checked = viewModel.sumByCount,
+        onCheckedChange = { viewModel.updateSumByCount(it) },
+        text = stringResource(id = R.string.sum_by_count_checkbox_label)
+    )
 
-    override fun getConfigData(): Any = configData
+    SpacingSmall()
 }

@@ -15,35 +15,40 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatinput.datasourceadapters
+package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.TimeHistogram
+import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
 import com.samco.trackandgraph.base.model.DataInteractor
 import javax.inject.Inject
 
-class TimeHistogramDataSourceAdapter @Inject constructor(
+class LineGraphDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
-) : GraphStatDataSourceAdapter<TimeHistogram>(dataInteractor) {
+) : GraphStatDataSourceAdapter<LineGraphWithFeatures>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
         graphOrStat: GraphOrStat,
-        config: TimeHistogram,
+        config: LineGraphWithFeatures,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateTimeHistogram(graphOrStat, config)
-        else dataInteractor.insertTimeHistogram(graphOrStat, config)
+        if (updateMode) dataInteractor.updateLineGraph(graphOrStat, config)
+        else dataInteractor.insertLineGraph(graphOrStat, config)
     }
 
-    override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, TimeHistogram>? {
-        val th = dataInteractor.getTimeHistogramByGraphStatId(graphOrStatId) ?: return null
-        return Pair(th.id, th)
+    override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, LineGraphWithFeatures>? {
+        val lineGraph = dataInteractor.getLineGraphByGraphStatId(graphOrStatId) ?: return null
+        return Pair(lineGraph.id, lineGraph)
     }
 
     override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
-        return dataInteractor.getTimeHistogramByGraphStatId(graphOrStat.id) == null
+        val lineGraph = dataInteractor.getLineGraphByGraphStatId(graphOrStat.id) ?: return true
+        //If the feature was deleted then it should have been deleted via a cascade rule in the db
+        // so the any statement should not strictly be necessary.
+        return lineGraph.features.isEmpty() || lineGraph.features.any {
+            dataInteractor.getFeatureById(it.featureId) == null
+        }
     }
 
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateTimeHistogram(graphOrStat)
+        dataInteractor.duplicateLineGraph(graphOrStat)
     }
 }

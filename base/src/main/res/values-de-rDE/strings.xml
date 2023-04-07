@@ -50,8 +50,9 @@
     <string name="graphs_and_statistics"><![CDATA[Diagramme & Statistiken]]></string>
     <string name="add_a_graph_or_stat">Ein Diagramm oder eine Statistik hinzufügen</string>
     <string name="graph_type_label">Diagrammtyp:</string>
-    <string name="maximum_sample_duration">Größe des Samples:</string>
+    <string name="sample_size">Größe des Samples:</string>
     <string name="select_a_discrete_feature">Wählen Sie einen Datensatz mit Labels aus: </string>
+    <string name="no_labels">Dieser Datensatz hat keine Labels</string>
     <string name="no_discrete_features_pie_chart">Sie können derzeit kein Tortendiagramm erstellen, da Sie nichts mit Multiple-Choice tracken..</string>
     <string name="select_a_feature">Wählen Sie einen Datensatz:</string>
     <string name="offset">Offset:</string>
@@ -90,14 +91,12 @@
         <item>Numerisch</item>
         <item>Dauer</item>
     </string-array>
-    <string-array name="graph_types">
-        <item>Liniendiagramm</item>
-        <item>Tortendiagramm</item>
-        <item>Durchschnittszeit zwischen</item>
-        <item>Zeit seitdem</item>
-        <item>Histogramm Zeit</item>
-    </string-array>
-    <string-array name="line_graph_feature_modes">
+    <string name="graph_type_line_graph">Liniendiagramm</string>
+    <string name="graph_type_pie_chart">Tortendiagramm</string>
+    <string name="graph_type_average_time_between">Durchschnittszeit zwischen</string>
+    <string name="graph_type_time_since">Zeit seitdem</string>
+    <string name="graph_type_time_histogram">Histogramm Zeit</string>
+    <string-array name="line_graph_averaging_mode_names">
         <item>Keine Durchschnittsermittlung</item>
         <item>Dynamischer Tagesdurchschnitt</item>
         <item>Dynamischer dreitägiger Durchschnitt</item>
@@ -107,7 +106,7 @@
         <item>Dynamischer halbjährlicher Durchschnitt</item>
         <item>Dynamischer jährlicher Durchschnitt</item>
     </string-array>
-    <string-array name="line_graph_generation_modes">
+    <string-array name="line_graph_plot_mode_names">
         <item>Gesamtanzahl wenn getrackt</item>
         <item>Gesamtanzahl stündlich</item>
         <item>Gesamtanzahl täglich</item>
@@ -115,15 +114,13 @@
         <item>Gesamtanzahl monatlich</item>
         <item>Gesamtanzahl jährlich</item>
     </string-array>
-    <string-array name="graph_time_durations">
-        <item>Alle Daten</item>
-        <item>Einen Tag</item>
-        <item>Eine Woche</item>
-        <item>Einen Monat</item>
-        <item>Drei Monate</item>
-        <item>Sechs Monate</item>
-        <item>Ein Jahr</item>
-    </string-array>
+    <string name="graph_time_durations_all_data">Alle Daten</string>
+    <string name="graph_time_durations_a_day">Einen Tag</string>
+    <string name="graph_time_durations_a_week">Eine Woche</string>
+    <string name="graph_time_durations_a_month">Einen Monat</string>
+    <string name="graph_time_durations_three_months">Drei Monate</string>
+    <string name="graph_time_durations_six_months">Sechs Monate</string>
+    <string name="graph_time_durations_a_year">Ein Jahr</string>
     <string-array name="y_range_styles">
         <item>Dynamisch</item>
         <item>Fixiert</item>

@@ -58,8 +58,9 @@
     <string name="graphs_and_statistics"><![CDATA[Graphs & Statistics]]></string>
     <string name="add_a_graph_or_stat">Add a Graph or Statistic</string>
     <string name="graph_type_label">Graph type:</string>
-    <string name="maximum_sample_duration">Sample size:</string>
+    <string name="sample_size">Sample size:</string>
     <string name="select_a_discrete_feature">Select a data set with labels: </string>
+    <string name="no_labels">This data set has no labels</string>
     <string name="no_discrete_features_pie_chart">You can not currently create a pie chart because you are not tracking anything multiple choice.</string>
     <string name="select_a_feature">Select a data set:</string>
     <string name="offset">Offset:</string>
@@ -103,14 +104,13 @@
         <item>Numerical</item>
         <item>Time duration</item>
     </string-array>
-    <string-array name="graph_types">
-        <item>Line Graph</item>
-        <item>Pie Chart</item>
-        <item>Average Time Between</item>
-        <item>Time Since</item>
-        <item>Time Histogram</item>
-    </string-array>
-    <string-array name="line_graph_feature_modes">
+    <string name="graph_type_line_graph">Line Graph</string>
+    <string name="graph_type_pie_chart">Pie Chart</string>
+    <string name="graph_type_average_time_between">Average Time Between</string>
+    <string name="graph_type_time_since">Time Since</string>
+    <string name="graph_type_time_histogram">Time Histogram</string>
+
+    <string-array name="line_graph_averaging_mode_names">
         <item>No Averaging</item>
         <item>Daily Moving Average</item>
         <item>Three Day Moving Average</item>
@@ -120,7 +120,7 @@
         <item>Six Month Moving Average</item>
         <item>Yearly Moving Average</item>
     </string-array>
-    <string-array name="line_graph_generation_modes">
+    <string-array name="line_graph_plot_mode_names">
         <item>Plot When Tracked</item>
         <item>Plot Hourly Totals</item>
         <item>Plot Daily Totals</item>
@@ -128,15 +128,13 @@
         <item>Plot Monthly Totals</item>
         <item>Plot Yearly Totals</item>
     </string-array>
-    <string-array name="graph_time_durations">
-        <item>All Data</item>
-        <item>A Day</item>
-        <item>A Week</item>
-        <item>A Month</item>
-        <item>Three Months</item>
-        <item>Six Months</item>
-        <item>A Year</item>
-    </string-array>
+    <string name="graph_time_durations_all_data">All Data</string>
+    <string name="graph_time_durations_a_day">A Day</string>
+    <string name="graph_time_durations_a_week">A Week</string>
+    <string name="graph_time_durations_a_month">A Month</string>
+    <string name="graph_time_durations_three_months">Three Months</string>
+    <string name="graph_time_durations_six_months">Six Months</string>
+    <string name="graph_time_durations_a_year">A Year</string>
     <string-array name="y_range_styles">
         <item>Dynamic</item>
         <item>Fixed</item>

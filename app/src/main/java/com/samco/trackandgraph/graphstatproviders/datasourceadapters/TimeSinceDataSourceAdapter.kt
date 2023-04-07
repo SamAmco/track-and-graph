@@ -15,36 +15,40 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.graphstatinput.datasourceadapters
+package com.samco.trackandgraph.graphstatproviders.datasourceadapters
 
-import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
 import com.samco.trackandgraph.base.model.DataInteractor
 import javax.inject.Inject
 
-class AverageTimeBetweenDataSourceAdapter @Inject constructor(
+
+class TimeSinceDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
-) : GraphStatDataSourceAdapter<AverageTimeBetweenStat>(dataInteractor) {
+) : GraphStatDataSourceAdapter<TimeSinceLastStat>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
         graphOrStat: GraphOrStat,
-        config: AverageTimeBetweenStat,
+        config: TimeSinceLastStat,
         updateMode: Boolean
     ) {
-        if (updateMode) dataInteractor.updateAverageTimeBetweenStat(graphOrStat, config)
-        else dataInteractor.insertAverageTimeBetweenStat(graphOrStat, config)
+        if (updateMode) dataInteractor.updateTimeSinceLastStat(graphOrStat, config)
+        else dataInteractor.insertTimeSinceLastStat(graphOrStat, config)
     }
 
-    override suspend fun getConfigDataFromDatabase(graphOrStatId: Long): Pair<Long, AverageTimeBetweenStat>? {
-        val ats =
-            dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStatId) ?: return null
-        return Pair(ats.id, ats)
+    override suspend fun getConfigDataFromDatabase(
+        graphOrStatId: Long
+    ): Pair<Long, TimeSinceLastStat>? {
+        val tss = dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStatId) ?: return null
+        return Pair(tss.id, tss)
     }
 
-    override suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean {
-        return dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStat.id) == null
+    override suspend fun shouldPreen(
+        graphOrStat: GraphOrStat
+    ): Boolean {
+        return dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStat.id) == null
     }
 
     override suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat) {
-        dataInteractor.duplicateAverageTimeBetweenStat(graphOrStat)
+        dataInteractor.duplicateTimeSinceLastStat(graphOrStat)
     }
 }
