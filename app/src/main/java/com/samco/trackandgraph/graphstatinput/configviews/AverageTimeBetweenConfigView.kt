@@ -79,4 +79,6 @@ fun AverageTimeBetweenConfigView(viewModel: AverageTimeBetweenConfigViewModel) {
     SpacingLarge()
 
     FilterByValueSection(viewModel)
+
+    SpacingSmall()
 }

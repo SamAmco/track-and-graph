@@ -65,7 +65,11 @@ class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
             labelUpdateJob?.cancel()
             labelUpdateJob = coroutineScope.launch(ui) {
                 loadingLabels = true
-                val labels = withContext(io) { dataInteractor.getLabelsForFeatureId(fId) }
+                val labels = withContext(io) {
+                    dataInteractor.getLabelsForFeatureId(fId)
+                        .filter { it.isNotEmpty() }
+                        .sorted()
+                }
                 availableLabels = labels
                 loadingLabels = false
             }

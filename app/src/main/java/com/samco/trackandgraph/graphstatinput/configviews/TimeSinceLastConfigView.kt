@@ -60,4 +60,6 @@ fun TimeSinceLastConfigView(viewModel: TimeSinceLastConfigViewModel) = Column {
     SpacingLarge()
 
     FilterByValueSection(viewModel)
+
+    SpacingSmall()
 }
