@@ -16,8 +16,10 @@
  */
 package com.samco.trackandgraph.graphstatinput.customviews
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
@@ -32,7 +34,12 @@ fun GraphStatDurationSpinner(
     selectedDuration: GraphStatDurations,
     onDurationSelected: (GraphStatDurations) -> Unit
 ) {
-    LabeledRow(label = label) {
+    LabeledRow(
+        label = label,
+        paddingValues = PaddingValues(
+            start = dimensionResource(id = R.dimen.card_padding)
+        )
+    ) {
         val spinnerItems = mapOf(
             GraphStatDurations.ALL_DATA to stringResource(id = R.string.graph_time_durations_all_data),
             GraphStatDurations.A_DAY to stringResource(id = R.string.graph_time_durations_a_day),

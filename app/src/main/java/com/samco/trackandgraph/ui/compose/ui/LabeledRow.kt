@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
@@ -29,11 +30,12 @@ import com.samco.trackandgraph.R
 
 @Composable
 fun LabeledRow(
+    modifier: Modifier = Modifier,
     label: String,
+    paddingValues: PaddingValues = PaddingValues(horizontal = dimensionResource(id = R.dimen.card_padding)),
     input: @Composable RowScope.() -> Unit
 ) = Row(
-    modifier = Modifier
-        .padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
+    modifier = Modifier.padding(paddingValues),
     verticalAlignment = Alignment.CenterVertically
 ) {
     Text(

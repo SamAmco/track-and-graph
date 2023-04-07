@@ -243,7 +243,12 @@ fun GraphStatTypeSelector(
     selectedItem: GraphStatType,
     setGraphType: (GraphStatType) -> Unit
 ) {
-    LabeledRow(label = stringResource(R.string.graph_type_label)) {
+    LabeledRow(
+        label = stringResource(R.string.graph_type_label),
+        paddingValues = PaddingValues(
+            start = dimensionResource(id = R.dimen.card_padding)
+        )
+    ) {
 
         val spinnerItems = mapOf(
             GraphStatType.LINE_GRAPH to stringResource(id = R.string.graph_type_line_graph),

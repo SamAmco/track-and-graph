@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatinput.configviews
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -26,12 +27,32 @@ import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByLabelSection
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByValueSection
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
 fun AverageTimeBetweenConfigView(viewModel: AverageTimeBetweenConfigViewModel) {
+
+    GraphStatDurationSpinner(
+        modifier = Modifier,
+        selectedDuration = viewModel.selectedDuration,
+        onDurationSelected = { viewModel.updateDuration(it) }
+    )
+
+    GraphStatEndingAtSpinner(
+        modifier = Modifier,
+        sampleEndingAt = viewModel.sampleEndingAt
+    ) { viewModel.updateSampleEndingAt(it) }
+
+    SpacingSmall()
+
+    Divider()
+
+    SpacingLarge()
+
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
         text = stringResource(id = R.string.select_a_feature),

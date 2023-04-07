@@ -83,9 +83,12 @@ class LineGraphConfigViewModel @Inject constructor(
         }
 
         fun updateName(name: TextFieldValue, ignoreCustomFlag: Boolean = false) {
-            if (!ignoreCustomFlag && name.text != this.name.text) customName = true
+            val triggerUpdate = !ignoreCustomFlag && name.text != this.name.text
             this.name = name
-            onUpdate()
+            if (triggerUpdate) {
+                customName = true
+                onUpdate()
+            }
         }
 
         fun updateOffset(offset: TextFieldValue) {
@@ -141,7 +144,9 @@ class LineGraphConfigViewModel @Inject constructor(
         )
     }
 
-    override fun getConfig() = GraphStatConfigEvent.ConfigData.LineGraphConfigData(lineGraph)
+    override fun getConfig(): GraphStatConfigEvent.ConfigData.LineGraphConfigData {
+        return GraphStatConfigEvent.ConfigData.LineGraphConfigData(lineGraph)
+    }
 
     override suspend fun validate(): ValidationException? {
         if (lineGraph.features.isEmpty()) {
@@ -212,6 +217,8 @@ class LineGraphConfigViewModel @Inject constructor(
         timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
         timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
         yRangeType = config.yRangeType
+        yRangeFrom = TextFieldValue(config.yFrom.toString())
+        yRangeTo = TextFieldValue(config.yTo.toString())
         lineGraphFeatures = config.features
         config.features.forEach {
             featureTextFields.add(
@@ -226,11 +233,13 @@ class LineGraphConfigViewModel @Inject constructor(
 
     fun removeLineGraphFeature(index: Int) {
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply { removeAt(index) }
+        featureTextFields.removeAt(index)
         onUpdate()
     }
 
     fun updateLineGraphFeature(index: Int, newLgf: LineGraphFeature) = viewModelScope.launch {
-        val newFeatureName = featureNameMap.getOrElse(newLgf.featureId) { "" }
+        val newFeatureName = featurePathProvider.features
+            .firstOrNull { it.featureId == newLgf.featureId }?.name ?: ""
 
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
             val textFields = featureTextFields[index]

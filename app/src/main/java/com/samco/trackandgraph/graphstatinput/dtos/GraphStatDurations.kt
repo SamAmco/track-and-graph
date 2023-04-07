@@ -6,7 +6,7 @@ enum class GraphStatDurations(val duration: Duration?) {
     ALL_DATA(null),
     A_DAY(Duration.ofDays(1)),
     A_WEEK(Duration.ofDays(7)),
-    A_MONTH(Duration.ofDays(30)),
+    A_MONTH(Duration.ofDays(31)),
     THREE_MONTHS(Duration.ofDays(90)),
     SIX_MONTHS(Duration.ofDays(180)),
     A_YEAR(Duration.ofDays(365));

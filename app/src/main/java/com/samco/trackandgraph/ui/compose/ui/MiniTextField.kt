@@ -58,8 +58,8 @@ fun MiniTextField(
     decorationBox = {
         if (textFieldValue.text == "") Text(
             "0",
-            fontSize = MaterialTheme.typography.h6.fontSize,
-            textAlign = TextAlign.End,
+            style = MaterialTheme.typography.h5,
+            textAlign = textAlign,
             color = MaterialTheme.tngColors.onSurface.copy(
                 alpha = MaterialTheme.tngColors.disabledAlpha
             )
