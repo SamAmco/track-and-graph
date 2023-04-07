@@ -31,6 +31,9 @@ import com.samco.trackandgraph.ui.compose.ui.*
 
 @Composable
 fun TimeSinceLastConfigView(viewModel: TimeSinceLastConfigViewModel) = Column {
+
+    SpacingSmall()
+
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
         text = stringResource(id = R.string.select_a_feature),

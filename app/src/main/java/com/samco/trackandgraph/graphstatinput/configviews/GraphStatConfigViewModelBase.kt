@@ -84,13 +84,14 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
         updateJob?.cancel()
         updateJob = viewModelScope.launch(default) {
             configFlow.emit(GraphStatConfigEvent.Loading)
+            updateConfig()
             configFlow.emit(validate() ?: getConfig())
         }
     }
 
     /**
-     * Called when the implementation should update its stored config (as returned by [getConfig])
-     * with the latest data from the UI.
+     * Should update the config data for the graph or stat. This will be validated when [validate]
+     * is called and returned when [getConfig] is called.
      */
     abstract fun updateConfig()
 

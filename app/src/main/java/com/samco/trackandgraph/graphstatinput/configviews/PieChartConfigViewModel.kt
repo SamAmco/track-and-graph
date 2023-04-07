@@ -73,13 +73,9 @@ class PieChartConfigViewModel @Inject constructor(
         return GraphStatConfigEvent.ConfigData.PieChartConfigData(pieChart)
     }
 
-    private suspend fun hasLabels(featureId: Long): Boolean {
-        return dataInteractor.getLabelsForFeatureId(featureId).isNotEmpty()
-    }
-
     override suspend fun validate(): GraphStatConfigEvent.ValidationException? {
         val id = pieChart.featureId
-        if (id == -1L || !hasLabels(id)) {
+        if (id == -1L) {
             return GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         }
         return null

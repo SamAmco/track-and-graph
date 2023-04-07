@@ -16,11 +16,13 @@
  */
 package com.samco.trackandgraph.graphstatinput.customviews
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
@@ -61,7 +63,12 @@ fun GraphStatEndingAtSpinner(
     sampleEndingAt: SampleEndingAt,
     onSampleEndingAtChanged: (SampleEndingAt) -> Unit
 ) {
-    LabeledRow(label = stringResource(id = R.string.ending_at_colon)) {
+    LabeledRow(
+        label = stringResource(id = R.string.ending_at_colon),
+        paddingValues = PaddingValues(
+            start = dimensionResource(id = R.dimen.card_padding)
+        )
+    ) {
         val strings = stringArrayResource(id = R.array.ending_at_values)
 
         val spinnerItems = mapOf(

@@ -28,7 +28,6 @@ import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
 import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
-import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject

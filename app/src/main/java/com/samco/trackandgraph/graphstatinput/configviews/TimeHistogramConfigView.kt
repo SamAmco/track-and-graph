@@ -17,25 +17,42 @@
 package com.samco.trackandgraph.graphstatinput.configviews
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
-import com.samco.trackandgraph.ui.compose.ui.CheckboxLabeledExpandingSection
-import com.samco.trackandgraph.ui.compose.ui.LabeledRow
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
-import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.ui.compose.ui.*
 
 @Composable
 fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
+
+    GraphStatDurationSpinner(
+        modifier = Modifier,
+        selectedDuration = viewModel.selectedDuration,
+        onDurationSelected = { viewModel.updateDuration(it) }
+    )
+
+    GraphStatEndingAtSpinner(
+        modifier = Modifier,
+        sampleEndingAt = viewModel.sampleEndingAt
+    ) { viewModel.updateSampleEndingAt(it) }
+
+    SpacingSmall()
+
+    Divider()
+
+    SpacingLarge()
+
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
         text = stringResource(id = R.string.select_a_feature),
@@ -55,7 +72,12 @@ fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
         )
     }
 
-    LabeledRow(label = stringResource(id = R.string.time_window_size)) {
+    SpacingSmall()
+
+    LabeledRow(
+        label = stringResource(id = R.string.time_window_size),
+        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
+    ) {
         val stringArray = stringArrayResource(id = R.array.time_histogram_windows)
         val timeWindows = mapOf(
             TimeHistogramWindow.HOUR to stringArray[0],
@@ -74,13 +96,11 @@ fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
         )
     }
 
-    val focusRequester = remember { FocusRequester() }
+    SpacingSmall()
 
-    CheckboxLabeledExpandingSection(
+    RowCheckbox(
         checked = viewModel.sumByCount,
-        onCheckedChanged = { viewModel.updateSumByCount(it) },
-        label = stringResource(id = R.string.sum_by_count_checkbox_label),
-        focusRequester = focusRequester,
-        input = {}
+        onCheckedChange = { viewModel.updateSumByCount(it) },
+        text = stringResource(id = R.string.sum_by_count_checkbox_label)
     )
 }
