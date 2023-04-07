@@ -60,6 +60,7 @@
     <string name="graph_type_label">Graph type:</string>
     <string name="sample_size">Sample size:</string>
     <string name="select_a_discrete_feature">Select a data set with labels: </string>
+    <string name="no_labels">This data set has no labels</string>
     <string name="no_discrete_features_pie_chart">You can not currently create a pie chart because you are not tracking anything multiple choice.</string>
     <string name="select_a_feature">Select a data set:</string>
     <string name="offset">Offset:</string>

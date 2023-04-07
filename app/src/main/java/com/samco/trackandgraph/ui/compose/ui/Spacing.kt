@@ -32,6 +32,13 @@ fun SpacingExtraSmall() = Spacer(
 )
 
 @Composable
+fun SpacingCard() = Spacer(
+    modifier = Modifier
+        .height(dimensionResource(id = R.dimen.card_padding))
+        .width(dimensionResource(id = R.dimen.card_padding))
+)
+
+@Composable
 fun SpacingSmall() = Spacer(
     modifier = Modifier
         .height(dimensionResource(id = R.dimen.dialog_input_spacing))

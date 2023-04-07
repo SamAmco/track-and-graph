@@ -134,8 +134,8 @@ class GraphStatInputViewModelImpl @Inject constructor(
     }
 
     override fun setGraphType(type: GraphStatType) {
+        configData = null
         this.graphStatType.value = type
-        updateDemoData()
     }
 
     override fun onConfigEvent(configData: GraphStatConfigEvent?) {

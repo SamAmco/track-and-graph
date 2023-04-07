@@ -103,4 +103,6 @@ fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
     )
+
+    SpacingSmall()
 }
