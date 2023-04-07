@@ -19,12 +19,11 @@ package com.samco.trackandgraph.viewgraphstat
 
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.graphstatinput.configviews.FeatureDataProvider
+import com.samco.trackandgraph.graphstatinput.FeatureDataProvider
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -39,6 +38,8 @@ import javax.inject.Inject
 interface ViewGraphStatViewModel {
     fun initFromGraphStatId(graphStatId: Long)
 
+    //TODO This won't work when we implement features. FeatureDataProvider
+    // iterates all data in every feature
     val featureDataProvider: LiveData<FeatureDataProvider>
     val graphStatViewData: LiveData<IGraphStatViewData>
     val showingNotes: LiveData<Boolean>

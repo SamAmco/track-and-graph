@@ -252,8 +252,6 @@ private fun SuggestedValues(
 ) {
     val focusManager = LocalFocusManager.current
     FadingLazyRow(
-        size = with(LocalDensity.current) { 24.dp.toPx() },
-        contentPadding = PaddingValues(horizontal = 24.dp),
         horizontalArrangement = Arrangement.spacedBy(
             dimensionResource(id = R.dimen.dialog_input_spacing),
             Alignment.CenterHorizontally

@@ -37,7 +37,7 @@ fun FullWidthTextField(
     modifier: Modifier = Modifier,
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    label: String,
+    label: String = "",
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
     keyboardController: SoftwareKeyboardController? = null,

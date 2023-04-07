@@ -50,8 +50,9 @@
     <string name="graphs_and_statistics"><![CDATA[Graphiques & Statistiques]]></string>
     <string name="add_a_graph_or_stat">Ajouter un Graphique ou une Statistique</string>
     <string name="graph_type_label">Type de Graphique : </string>
-    <string name="maximum_sample_duration">Taille de l\'échantillon : </string>
+    <string name="sample_size">Taille de l\'échantillon : </string>
     <string name="select_a_discrete_feature">Sélectionnez un ensemble de données avec des libellés : </string>
+    <string name="no_labels">Cet ensemble de données n\'a pas de libellés</string>
     <string name="no_discrete_features_pie_chart">Impossible de créer un camembert car il n\'y a pas donnée suivie à choix multiples.</string>
     <string name="select_a_feature">Sélectionnez un ensemble de données : </string>
     <string name="offset">Décalage : </string>
@@ -90,14 +91,12 @@
         <item>Numérique</item>
         <item>Durée</item>
     </string-array>
-    <string-array name="graph_types">
-        <item>Graphique linéraire</item>
-        <item>Camenbert</item>
-        <item>Temps moyen entre</item>
-        <item>Temps depuis</item>
-        <item>Histogramme temporel</item>
-    </string-array>
-    <string-array name="line_graph_feature_modes">
+    <string name="graph_type_line_graph">Graphique linéraire</string>
+    <string name="graph_type_pie_chart">Camenbert</string>
+    <string name="graph_type_average_time_between">Temps moyen entre</string>
+    <string name="graph_type_time_since">Temps depuis</string>
+    <string name="graph_type_time_histogram">Histogramme temporel</string>
+    <string-array name="line_graph_averaging_mode_names">
         <item>Pas de calcul de la moyenne</item>
         <item>Moyenne glissante quotidienne</item>
         <item>Moyenne glissante sur trois jours</item>
@@ -107,7 +106,7 @@
         <item>Moyenne glissante sur six mois</item>
         <item>Moyenne glissante annuelle</item>
     </string-array>
-    <string-array name="line_graph_generation_modes">
+    <string-array name="line_graph_plot_mode_names">
         <item>Tracer quand la données existe</item>
         <item>Tracer le total horaire</item>
         <item>Tracer le total journalier</item>
@@ -115,15 +114,13 @@
         <item>Tracer le total mensuel</item>
         <item>Tracer le total annuel</item>
     </string-array>
-    <string-array name="graph_time_durations">
-        <item>Toutes les données</item>
-        <item>1 jour</item>
-        <item>1 semaine</item>
-        <item>1 mois</item>
-        <item>3 mois</item>
-        <item>6 mois</item>
-        <item>1 an</item>
-    </string-array>
+    <string name="graph_time_durations_all_data">Toutes les données</string>
+    <string name="graph_time_durations_a_day">1 jour</string>
+    <string name="graph_time_durations_a_week">1 semaine</string>
+    <string name="graph_time_durations_a_month">1 mois</string>
+    <string name="graph_time_durations_three_months">3 mois</string>
+    <string name="graph_time_durations_six_months">6 mois</string>
+    <string name="graph_time_durations_a_year">1 an</string>
     <string-array name="y_range_styles">
         <item>Dynamique</item>
         <item>Corrigées</item>

@@ -50,8 +50,9 @@
     <string name="graphs_and_statistics"><![CDATA[Gráficas y estadísticas]]></string>
     <string name="add_a_graph_or_stat">Añadir un gráfico o estadística</string>
     <string name="graph_type_label">Tipo de gráfico:</string>
-    <string name="maximum_sample_duration">Tamaño de la muestra:</string>
+    <string name="sample_size">Tamaño de la muestra:</string>
     <string name="select_a_discrete_feature">Seleccione un conjunto de datos de elección múltiple: </string>
+    <string name="no_labels">Este conjunto de datos no tiene etiquetas</string>
     <string name="no_discrete_features_pie_chart">Actualmente no puede crear un gráfico circular porque no está haciendo una traza de ninguna elección múltiple.</string>
     <string name="select_a_feature">Seleccione un conjunto de datos:</string>
     <string name="offset">Desplazamiento:</string>
@@ -90,14 +91,12 @@
         <item>Numérico</item>
         <item>Duración del tiempo</item>
     </string-array>
-    <string-array name="graph_types">
-        <item>Gráfico de líneas</item>
-        <item>Gráfico de pastel</item>
-        <item>Tiempo medio entre</item>
-        <item>Tiempo desde</item>
-        <item>Histograma de tiempo</item>
-    </string-array>
-    <string-array name="line_graph_feature_modes">
+    <string name="graph_type_line_graph">Gráfico de líneas</string>
+    <string name="graph_type_pie_chart">Gráfico de pastel</string>
+    <string name="graph_type_average_time_between">Tiempo medio entre</string>
+    <string name="graph_type_time_since">Tiempo desde</string>
+    <string name="graph_type_time_histogram">Histograma de tiempo</string>
+    <string-array name="line_graph_averaging_mode_names">
         <item>Sin promedio</item>
         <item>Media móvil diaria</item>
         <item>Media móvil de tres días</item>
@@ -107,7 +106,7 @@
         <item>Media móvil semestral</item>
         <item>Media móvil anual</item>
     </string-array>
-    <string-array name="line_graph_generation_modes">
+    <string-array name="line_graph_plot_mode_names">
         <item>Generar cuando se hace un registro</item>
         <item>Generar totales por hora</item>
         <item>Generar totales diarios</item>
@@ -115,15 +114,13 @@
         <item>Generar totales mensuales</item>
         <item>Generar los totales anuales</item>
     </string-array>
-    <string-array name="graph_time_durations">
-        <item>Todos los datos</item>
-        <item>Un día</item>
-        <item>Una semana</item>
-        <item>Un mes</item>
-        <item>Tres meses</item>
-        <item>Seis meses</item>
-        <item>Un año</item>
-    </string-array>
+    <string name="graph_time_durations_all_data">Todos los datos</string>
+    <string name="graph_time_durations_a_day">Un día</string>
+    <string name="graph_time_durations_a_week">Una semana</string>
+    <string name="graph_time_durations_a_month">Un mes</string>
+    <string name="graph_time_durations_three_months">Tres meses</string>
+    <string name="graph_time_durations_six_months">Seis meses</string>
+    <string name="graph_time_durations_a_year">Un año</string>
     <string-array name="y_range_styles">
         <item>Dinámico</item>
         <item>Fijo</item>
@@ -200,7 +197,7 @@
     <string name="track_widget_configure_no_data_error">Primero, realice un seguimiento de algunos datos.</string>
     <string name="track_widget_configure_no_data_selected_error">Debes seleccionar un grupo de datos válido para crear un widget de traza.</string>
     <string name="create">Crear</string>
-    <string name="use_default_value" >Establece un valor por defecto</string>
+    <string name="use_default_value">Establece un valor por defecto</string>
     <string name="default_value_description_hint">(Su valor predeterminado se utilizará automáticamente cuando añada un punto de datos, pero siempre puede volver atrás y cambiarlo.)</string>
     <string name="backup_and_restore">Respaldo y restauración</string>
     <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluyendo todos los datos trazados, los gráficos y los recordatorios. Deberías hacer una copia de seguridad de tus datos en un dispositivo externo o en un almacenamiento en la nube con regularidad en caso de que tu dispositivo se pierda o se rompa.</string>
@@ -294,7 +291,7 @@
     <string name="data_point_tutorial_page_3_description">Utilice etiquetas si desea agrupar los puntos de datos</string>
     <string name="data_point_tutorial_page_3_hint">(Sugerencia: si desea agregar más contexto o descripción, use la nota en lugar del campo de etiqueta)</string>
     <string name="help">Ayudar</string>
-    
+
     <string name="advanced_options">Opciones avanzadas</string>
     <string name="type_colon">\"Escribe: \"</string>
     <string name="order_colon">\"Ordenar: \"</string>

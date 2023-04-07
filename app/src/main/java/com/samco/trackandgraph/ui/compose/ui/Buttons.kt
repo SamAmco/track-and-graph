@@ -20,6 +20,7 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -118,5 +119,20 @@ fun SelectorTextButton(
         text = text,
         fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
         fontSize = MaterialTheme.typography.subtitle2.fontSize,
+    )
+}
+
+@Composable
+fun AddBarButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) = Button(
+    modifier = modifier.widthIn(min = 160.dp),
+    onClick = onClick,
+    shape = MaterialTheme.shapes.small
+) {
+    Icon(
+        painter = painterResource(id = R.drawable.add_icon),
+        contentDescription = stringResource(id = R.string.add)
     )
 }

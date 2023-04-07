@@ -28,11 +28,9 @@
             android:layout_height="64dp"
             android:background="@null"
             android:dropDownWidth="@dimen/spinner_circle_item_size"
-            app:layout_constraintBottom_toTopOf="@id/pointStyleSpinner"
             app:layout_constraintHorizontal_weight="0.8"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/featureSpinner"
-            app:layout_constraintTop_toBottomOf="@id/lineGraphFeatureName"
+            app:layout_constraintRight_toLeftOf="@+id/edit_name_input"
             tools:background="@drawable/filled_circle" />
 
         <com.google.android.material.textfield.TextInputLayout
