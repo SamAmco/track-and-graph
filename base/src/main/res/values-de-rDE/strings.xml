@@ -22,7 +22,6 @@
     <string name="delete">Löschen</string>
     <string name="edit">Bearbeiten</string>
     <string name="update">Aktualisieren</string>
-    <string name="new_name">Neuer Name: </string>
     <string name="graph_or_stat_name">Diagramm Name: </string>
     <string name="tracker_name">Was möchten Sie tracken?</string>
     <string name="tracker_type">Dies ist eine Zeit oder Dauer</string>
@@ -35,11 +34,8 @@
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
     <string name="export_file_name_suffix">" Tippen Sie oben rechts auf + und wählen Sie Tracker aus, um zu beginnen."</string>
-    <string name="discrete_values">Fügen Sie unten einige Auswahlmöglichkeiten hinzu.</string>
     <string name="tracker_name_cannot_be_null">Bitte einen Namen angeben</string>
     <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
-    <string name="discrete_value_must_have_name">Bitte vergewissern Sie sich, dass alle Ihre Auswahlmöglichkeiten Namen haben</string>
-    <string name="discrete_tracker_needs_at_least_two_values">Bitte fügen Sie mindestens zwei Multiple-Choice-Antworten hinzu</string>
     <string name="data_points">%1$d Getrackt</string>
     <string name="no_data">Keine Daten</string>
     <string name="skip">Überspringen</string>
@@ -48,20 +44,16 @@
     <string name="export_to">Exportieren Sie nachverfolgte Daten in dieser Gruppe in CSV:</string>
     <string name="import_from">Nachverfolgte Daten aus CSV in diese Gruppe importieren:</string>
     <string name="import_warning">Achtung: Der Import ist irreversibel. Track &amp; Graph versucht, alle importierten Daten mit vorhandenen Daten in dieser Gruppe nach Namen zusammenzuführen.</string>
-    <string name="graphs_and_statistics"><![CDATA[Diagramme & Statistiken]]></string>
     <string name="add_a_graph_or_stat">Ein Diagramm oder eine Statistik hinzufügen</string>
     <string name="graph_type_label">Diagrammtyp:</string>
     <string name="sample_size">Größe des Samples:</string>
     <string name="select_a_discrete_feature">Wählen Sie einen Datensatz mit Labels aus: </string>
     <string name="no_labels">Dieser Datensatz hat keine Labels</string>
-    <string name="no_discrete_features_pie_chart">Sie können derzeit kein Tortendiagramm erstellen, da Sie nichts mit Multiple-Choice tracken..</string>
     <string name="select_a_feature">Wählen Sie einen Datensatz:</string>
     <string name="offset">Offset:</string>
     <string name="scale">Skalieren:</string>
     <string name="from">Von:</string>
     <string name="to">Zu:</string>
-    <string name="select_a_value_range">Wählen Sie einen Wertebereich:</string>
-    <string name="graph_name_hint">z.B. Übung: wöchentlicher beweglicher Durchschnitt</string>
     <string name="day">Tag</string>
 
     <string-array name="time_histogram_windows">
@@ -82,15 +74,6 @@
         <item>System Standard</item>
         <item>Hell</item>
         <item>Dunkel</item>
-    </string-array>
-    <string-array name="numeric_duration_conversion_modes">
-        <item>Anzahl Stunden</item>
-        <item>Anzahl Minuten</item>
-        <item>Anzahl Sekunden</item>
-    </string-array>
-    <string-array name="tracker_types">
-        <item>Numerisch</item>
-        <item>Dauer</item>
     </string-array>
     <string name="graph_type_line_graph">Liniendiagramm</string>
     <string name="graph_type_pie_chart">Tortendiagramm</string>
@@ -146,7 +129,6 @@
     <string name="graph_stat_validation_invalid_line_graph_feature">Ungültiger Liniendiagramm-Datensatz entdeckt</string>
     <string name="graph_stat_validation_bad_fixed_range">Bitte stellen Sie sicher, dass "Von" kleiner ist als "Bis".</string>
 
-    <string name="graph_stat_view_invalid_setup">Vervollständigen Sie die Konfiguration, um eine Vorschau zu sehen</string>
     <string name="graph_stat_view_not_found">Beim Auswerten dieses Diagramms ist ein Fehler aufgetreten.</string>
     <string name="graph_stat_view_not_enough_data_stat">Diese Statistik wird angezeigt, wenn genügend Daten erfasst wurden, um sie zu verarbeiten.</string>
     <string name="graph_stat_view_not_enough_data_graph">Dieses Diagramm wird angezeigt, wenn genügend Daten erfasst wurden, um sie zu verarbeiten.</string>
@@ -167,12 +149,8 @@
     <string name="move_to_colon">Verschieben nach:</string>
     <string name="move_to">Verschieben nach</string>
 
-    <string name="feature_add_or_update_error_occurred">Es ist ein Fehler aufgetreten, Ihre Änderungen konnten nicht durchgeführt werden.</string>
     <string name="ru_sure_update_data">Diese Aktualisierung kann die Daten, die Sie bereits verfolgt haben, irreversibel verändern. Es wird dringend empfohlen, ein Backup der vorhandenen Daten zu erstellen, bevor Sie fortfahren.\n\n Möchten Sie fortfahren?</string>
-    <string name="warning">Warnung</string>
     <string name="ok">OK</string>
-    <string name="on_tracker_type_change_numerical_warning">Wenn Sie Ihren Eingabetyp auf numerisch ändern, verlieren Ihre vorhandenen verfolgten Daten ihre Beschriftungen.</string>
-    <string name="on_tracker_delete_discrete_value_warning">Beim Löschen von Multiple-Choice-Antworten werden alle vorhandenen verfolgten Datenpunkte für diesen Wert gelöscht.</string>
 
     <string name="rate_the_app">Bewerten Sie uns</string>
     <string name="reminders">Erinnerungen</string>
@@ -193,7 +171,6 @@
     <string name="track_widget_configure_no_data_selected_error">Sie müssen einen gültigen Datensatz auswählen, um ein Tracking-Widget zu erstellen.</string>
     <string name="create">Erstellen</string>
     <string name="use_default_value">Einen Standardwert festlegen</string>
-    <string name="default_value_description_hint">(Ihr Standardwert wird automatisch verwendet, wenn Sie einen Datenpunkt hinzufügen, aber Sie können jederzeit zurückgehen und ihn ändern).</string>
     <string name="backup_and_restore">Sichern und Wiederherstellen</string>
     <string name="backup_hint_text">Die Sicherung sichert alle Ihre Anwendungsdaten einschließlich aller verfolgten Daten, Grafiken und Erinnerungen. Sie sollten Ihre Daten regelmäßig auf ein externes Gerät oder einen Cloud Speicher sichern, für den Fall, dass Ihr Gerät verloren geht oder kaputt geht.</string>
     <string name="restore_hint_text">WARNUNG: Das Wiederherstellen aus einer Sicherung löscht alle Daten und Einstellungen, die sich derzeit in der App befinden. Track &amp; Graph wird nach Abschluss der Wiederherstellung neu gestartet.</string>
@@ -225,7 +202,6 @@
     <string name="delete_line_button_content_description">Linie löschen Button</string>
     <string name="delete_data_point_button_content_description">Lösche Datenpunkt Button</string>
     <string name="edit_data_point_button_content_description">Datenpunkt bearbeiten Button</string>
-    <string name="add_line_button_content_description">Linie hinzufügen Button</string>
     <string name="add_multiple_choice_answer_button_content_description">Multiple Choice Antwort Button hinzufügen</string>
     <string name="duplicate">Kopie</string>
     <string name="no_notes_hint_text">Beim Tracking hinzugefügte Notizen werden hier angezeigt. Sie können auch globale Notizen mit der + Taste hinzufügen.</string>
@@ -239,13 +215,9 @@
     <string name="hours_suffix">h</string>
     <string name="minutes_suffix">m</string>
     <string name="seconds_suffix">s</string>
-    <string name="default_value">Standard Wert</string>
     <string name="numeric_to_duration_mode_header">Zuvor getrackte Werte darstellen:</string>
     <string name="duration_to_numeric_mode_header">In was sollen zuvor getrackte Werte konvertiert werden:</string>
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">Sie können die Zeitdauer nicht mit anderen Datentypen mischen. Beachten Sie die Darstellung von Stunden, Minuten oder Sekunden.</string>
-    <string name="time_duration">Zeitraum</string>
-    <string name="select_a_duration_range">Wählen Sie einen Zeitdauerbereich</string>
-    <string name="number_of_bins">Anzahl Boxen:</string>
     <string name="sum_by_count_checkbox_label">Klicken Sie hier, um die Anzahl der getrackten Datenpunkte zu zählen und nicht die Summe ihrer Werte.</string>
     <string name="time_window_size">Größe der Zeitfenster:</string>
     <string name="hold_to_preview">Vorschau</string>
@@ -263,7 +235,6 @@
     <string name="timer_notification_channel_name">Timer</string>
     <string name="stop">Halt</string>
 
-    <string name="function">Funktion (experimentell)</string>
     <string name="add_function">Fügen Sie eine Funktion hinzu</string>
     <string name="name_your_function">Benennen Sie Ihre Funktion:</string>
     <string name="write_your_function_here"># Schreiben Sie hier Ihre Funktion</string>

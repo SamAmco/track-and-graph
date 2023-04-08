@@ -92,21 +92,6 @@
         <item name="android:textAlignment">center</item>
     </style>
 
-    <style name="Style.DataPointInputNumberStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:gravity">center</item>
-        <item name="android:inputType">numberDecimal|numberSigned</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:digits">0123456789.,-</item>
-        <item name="android:hint">0</item>
-    </style>
-
-    <style name="Style.DiscreteValueButtonsScrollViewStyle" parent="">
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">80dp</item>
-        <item name="android:scrollbars">none</item>
-        <item name="android:layout_gravity">center_horizontal</item>
-    </style>
-
     <style name="Style.ExpansiveTextInputStyle" parent="Widget.AppCompat.EditText">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
@@ -114,17 +99,6 @@
         <item name="android:background">@drawable/expansive_text_box_background</item>
         <item name="backgroundTint">@null</item>
         <item name="android:inputType">textMultiLine|textAutoCorrect|textCapSentences</item>
-    </style>
-
-    <style name="Style.FAQMenuItem" parent="Widget.AppCompat.TextView">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:background">?android:attr/selectableItemBackground</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-        <item name="android:padding">20dp</item>
-        <item name="android:textAppearance">@style/TextAppearance.Subtitle2</item>
-        <item name="android:textStyle">bold</item>
     </style>
 
 </resources>
