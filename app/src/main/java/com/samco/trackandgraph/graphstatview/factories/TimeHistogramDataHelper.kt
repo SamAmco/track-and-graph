@@ -41,8 +41,7 @@ class TimeHistogramDataHelper(
             ?.getOrElse(0) { null }
             ?.size
             ?.downTo(1)
-            ?.map { index -> bins.sumByDouble { it[index - 1] } }
-            ?.maxOrNull()
+            ?.maxOfOrNull { index -> bins.sumOf { it[index - 1] } }
     }
 
     internal fun getHistogramBinsForSample(
@@ -58,19 +57,18 @@ class TimeHistogramDataHelper(
      * week it was tracked.
      *
      * A map is generated with a data structure similar to a Matrix whereby each value in the map is a list of the
-     * same length. The keys in the map are the integer values of the discrete values of the {@param feature}
-     * or just {0} if the feature is not Discrete. The length of the lists is the number of bins of the
-     * given {@param window}. The lists represent the sum of all values in each bin of the histogram
-     * normalised such that the sum of all values in all lists is 1.
+     * same length. The keys in the map are the labels of the [sample] or just empty string if the sample
+     * does not have labels. The length of the lists is the number of bins of the given [window].
+     * The lists represent the sum of all values in each bin of the histogram
+     * normalised such that the sum of all values in all lists is 100.
      *
-     * If {@param sumByCount} is false then the value of each data point is added to the total value of
+     * If [sumByCount] is false then the value of each data point is added to the total value of
      * the histogram bin it belongs in before normalisation. If sumByCount is true then the value of each
      * histogram bin before normalisation is the number of data points that fall in that bin.
      *
-     * {@param sample} - The data points to generate a histogram for
-     * {@param window} - The TimeHistogramWindowData specifying the domain and number of bins of the histogram
-     * {@param feature} - The Feature for which the histogram is being generated
-     * {@param sumByCount} - Whether this histogram represents the number of data points tracked or
+     * [sample] - The data points to generate a histogram for
+     * [window] - The TimeHistogramWindowData specifying the domain and number of bins of the histogram
+     * [sumByCount] - Whether this histogram represents the number of data points tracked or
      * the sum of their values
      */
     internal fun getHistogramBinsForSample(
@@ -107,7 +105,7 @@ class TimeHistogramDataHelper(
     ): Map<String, List<Double>> {
         val binTotalMaps = calculateBinTotals(sample, window, endTime, addFunction)
         val total = binTotalMaps.map { it.value.sum() }.sum()
-        return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { it / total } }.toMap()
+        return binTotalMaps.map { kvp -> kvp.key to kvp.value.map { (it / total) * 100.0 } }.toMap()
     }
 
     /**
