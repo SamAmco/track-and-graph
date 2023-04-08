@@ -16,6 +16,9 @@
 */
 package com.samco.trackandgraph.graphstatinput.configviews
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.base.model.DataInteractor
@@ -53,19 +56,24 @@ class PieChartConfigViewModel @Inject constructor(
         singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(onUpdate = { onUpdate() })
     }
 
+    var sumByCount: Boolean by mutableStateOf(false)
+        private set
+
     private var pieChart = PieChart(
         id = 0L,
         graphStatId = 0L,
         featureId = -1L,
         duration = null,
-        endDate = null
+        endDate = null,
+        sumByCount = false
     )
 
     override fun updateConfig() {
         pieChart = pieChart.copy(
             featureId = this.featureId ?: -1L,
             duration = selectedDuration.duration,
-            endDate = sampleEndingAt.asDateTime()
+            endDate = sampleEndingAt.asDateTime(),
+            sumByCount = sumByCount
         )
     }
 
@@ -89,5 +97,11 @@ class PieChartConfigViewModel @Inject constructor(
         timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
         timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
         singleFeatureConfigBehaviour.featureId = config.featureId
+        sumByCount = config.sumByCount
+    }
+
+    fun updateSumByCount(sumByCount: Boolean) {
+        this.sumByCount = sumByCount
+        onUpdate()
     }
 }

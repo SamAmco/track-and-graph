@@ -33,7 +33,6 @@
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
-    <string name="export_file_name_suffix">" Tippen Sie oben rechts auf + und wählen Sie Tracker aus, um zu beginnen."</string>
     <string name="tracker_name_cannot_be_null">Bitte einen Namen angeben</string>
     <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
     <string name="data_points">%1$d Getrackt</string>
@@ -203,6 +202,7 @@
     <string name="delete_data_point_button_content_description">Lösche Datenpunkt Button</string>
     <string name="edit_data_point_button_content_description">Datenpunkt bearbeiten Button</string>
     <string name="add_multiple_choice_answer_button_content_description">Multiple Choice Antwort Button hinzufügen</string>
+    <string name="ending_at_colon">Beispiel endet bei:</string>
     <string name="duplicate">Kopie</string>
     <string name="no_notes_hint_text">Beim Tracking hinzugefügte Notizen werden hier angezeigt. Sie können auch globale Notizen mit der + Taste hinzufügen.</string>
     <string name="add_a_global_note">Globale Notiz hinzufügen:</string>
@@ -273,4 +273,5 @@
     <string name="track_all">Alle verfolgen</string>
     <string name="more_details">Mehr Details</string>
     <string name="suggestions">Anregungen</string>
+    <string name="no_label">Kein Etikett</string>
 </resources>

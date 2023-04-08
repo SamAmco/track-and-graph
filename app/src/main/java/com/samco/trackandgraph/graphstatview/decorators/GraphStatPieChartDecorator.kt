@@ -81,11 +81,12 @@ class GraphStatPieChartDecorator(listMode: Boolean) :
             val index = (dataVisColorGenerator * i) % dataVisColorList.size
             val color = getColor(context!!, dataVisColorList[index])
             val percentage = "%.1f".format(s.value.toDouble())
-            var label = "${s.title} ($percentage%)"
+            val title = s.title.ifEmpty { context!!.getString(R.string.no_label) }
+            var label = "$title ($percentage%)"
 
             val segForm = SegmentFormatter(color)
             if (segments.size > dataVisColorList.size) {
-                label = "$i: ${s.title} ($percentage%)"
+                label = "$i: $title ($percentage%)"
                 s.title = i.toString()
                 segForm.labelPaint.textSize = context!!.resources.getDimension(R.dimen.small_label_size)
                 segForm.labelPaint.color = getColor(context!!, R.color.white)

@@ -63,7 +63,7 @@ class PieChartDataFactory @Inject constructor(
                     override val state = IGraphStatViewData.State.READY
                     override val graphOrStat = graphOrStat
                 }
-            val segments = getPieChartSegments(plottingData)
+            val segments = getPieChartSegments(plottingData, config.sumByCount)
             val total = segments.sumOf { s -> s.value.toDouble() }
             val percentages = segments.map {
                 Segment(it.title, (it.value.toDouble() / total) * 100f)
@@ -92,18 +92,23 @@ class PieChartDataFactory @Inject constructor(
         } ?: return null
         val dataSample = DataClippingFunction(pieChart.endDate, pieChart.duration)
             .mapSample(dataInteractor.getDataSampleForFeatureId(feature.featureId))
-        val dataPoints = dataSample
-            .filter { it.label.isNotEmpty() }
-            .toList()
+        val dataPoints = dataSample.toList()
         onDataSampled(dataSample.getRawDataPoints())
         dataSample.dispose()
         return dataPoints.ifEmpty { null }
     }
 
-    private fun getPieChartSegments(dataSample: List<IDataPoint>) =
+    private fun getPieChartSegments(dataSample: List<IDataPoint>, sumByCount: Boolean) =
         dataSample
             .groupingBy { dp -> dp.label }
-            .eachCount()
+            .aggregate<IDataPoint, String, Double> { _, accumulator, element, first ->
+                when {
+                    first && sumByCount -> 1.0
+                    first && !sumByCount -> element.value
+                    !first && sumByCount -> accumulator!! + 1.0
+                    else -> accumulator!! + element.value
+                }
+            }
             .map { b -> Segment(b.key, b.value) }
             .sortedBy { s -> s.title }
 }
