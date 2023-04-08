@@ -90,6 +90,7 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
             setUpBounds()
             drawBars()
             binding!!.xyPlot.redraw()
+            binding!!.xyPlot.graph.refreshLayout()
             binding!!.xyPlot.visibility = View.VISIBLE
             binding!!.progressBar.visibility = View.GONE
         } else {
@@ -121,8 +122,27 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     private fun setUpYAxis() {
-        val divisions = ((data!!.maxDisplayHeight ?: 0.0) * 10) + 1
+        val divisions = ((data!!.maxDisplayHeight ?: 0.0) / 10) + 1
         binding!!.xyPlot.setRangeStep(StepMode.SUBDIVIDE, max(2.0, divisions))
+        binding!!.xyPlot.graph.paddingLeft = context!!.resources.displayMetrics.scaledDensity * 8f
+        binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
+            object : Format() {
+                override fun format(
+                    obj: Any,
+                    toAppendTo: StringBuffer,
+                    pos: FieldPosition
+                ): StringBuffer {
+                    val percent = (obj as Number).toDouble()
+                    return toAppendTo.append(atMost1dp(percent) + "%")
+                }
+
+                override fun parseObject(source: String, pos: ParsePosition) = null
+            }
+    }
+
+    private fun atMost1dp(value: Double): String {
+        return if (value % 1 == 0.0) String.format("%.0f", value)
+        else String.format("%.1f", value)
     }
 
     private fun setUpXAxis() {
@@ -173,13 +193,13 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
             -1.0,
             data!!.window!!.numBins,
             0.0,
-            data!!.maxDisplayHeight ?: 1.0
+            data!!.maxDisplayHeight ?: 100.0
         )
         binding!!.xyPlot.outerLimits.set(
             -1.0,
             data!!.window!!.numBins,
             0.0,
-            data!!.maxDisplayHeight ?: 1.0
+            data!!.maxDisplayHeight ?: 100.0
         )
     }
 

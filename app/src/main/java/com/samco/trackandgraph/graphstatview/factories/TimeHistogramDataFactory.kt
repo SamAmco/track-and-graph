@@ -65,7 +65,7 @@ class TimeHistogramDataFactory @Inject constructor(
             val maxDisplayHeight = largestBin?.let {
                 min(
                     it.times(10.0).toInt().plus(1).div(10.0),
-                    1.0
+                    100.0
                 )
             }
 

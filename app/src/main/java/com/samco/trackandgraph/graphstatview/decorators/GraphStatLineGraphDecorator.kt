@@ -104,6 +104,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
             setUpLineGraphYAxis()
             setLineGraphBounds(listMode)
             binding!!.xyPlot.redraw()
+            binding!!.xyPlot.graph.refreshLayout()
             binding!!.xyPlot.visibility = View.VISIBLE
             binding!!.legendFlexboxLayout.visibility = View.VISIBLE
             binding!!.progressBar.visibility = View.GONE
@@ -142,8 +143,6 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         )
         binding!!.xyPlot.graph.paddingBottom =
             formattedTimestamp.length * (context!!.resources.displayMetrics.scaledDensity)
-
-        binding!!.xyPlot.graph.refreshLayout()
     }
 
     private fun setUpLineGraphYAxis() {
