@@ -25,15 +25,16 @@
     <string name="new_name">Nuevo nombre: </string>
     <string name="graph_or_stat_name">Nombre del gráfico: </string>
     <string name="tracker_name">¿Qué le gustaría rastrear?</string>
-    <string name="tracker_type">¿Qué tipo de datos son?</string>
+    <string name="tracker_type">Este es un tiempo o duración</string>
     <string name="yes">Sí</string>
     <string name="cancel">Cancelar</string>
     <string name="select_file">Seleccionar archivo</string>
-    <string name="empty_group_hint">¡Bienvenido a Track &amp; Graph!\n\n Toca aquí para crear tu primer grupo de trazas y empezar.</string>
+    <string name="empty_group_hint">Bienvenido a Track &amp; ¡Grafico!\n\nToque + en la parte superior derecha y seleccione Rastreador para comenzar. </string>
     <string name="no_trackers_graph_stats_hint">Cree un rastreador antes de crear cualquier gráfico.</string>
     <string name="ru_sure_del_group">¿Estás seguro de que quieres borrar este grupo y todo lo que contiene? Este proceso no es reversible.</string>
     <string name="ru_sure_del_feature">¿Estás seguro que quieres borrar estos datos de traza?</string>
     <string name="ru_sure_del_data_point">¿Está seguro de querer eliminar este punto de datos?</string>
+    <string name="export_file_name_suffix">" Toque + en la parte superior derecha y seleccione Rastreador para comenzar."</string>
     <string name="discrete_values">Añade algunas opciones a continuación.</string>
     <string name="tracker_name_cannot_be_null">Por favor, añade un nombre</string>
     <string name="tracker_with_that_name_exists">Ya estás registrando algo con ese nombre</string>
@@ -51,7 +52,7 @@
     <string name="add_a_graph_or_stat">Añadir un gráfico o estadística</string>
     <string name="graph_type_label">Tipo de gráfico:</string>
     <string name="sample_size">Tamaño de la muestra:</string>
-    <string name="select_a_discrete_feature">Seleccione un conjunto de datos de elección múltiple: </string>
+    <string name="select_a_discrete_feature">Seleccione un conjunto de datos con etiquetas:</string>
     <string name="no_labels">Este conjunto de datos no tiene etiquetas</string>
     <string name="no_discrete_features_pie_chart">Actualmente no puede crear un gráfico circular porque no está haciendo una traza de ninguna elección múltiple.</string>
     <string name="select_a_feature">Seleccione un conjunto de datos:</string>
@@ -136,12 +137,6 @@
     <string name="import_exception_inconsistent_record">Error de importación: Lq traza de la línea %1$s no es consistente con las cabeceras requeridas</string>
     <string name="import_exception_bad_timestamp">Error de importación: No se pudo interpretar la marca de tiempo para la traza en la línea: %1$s</string>
     <string name="import_exception_inconsistent_data_type">Error de importación: Se ha recibido un tipo de datos inconsistente en la línea: %1$s</string>
-    <string name="import_exception_bad_discrete_value">Fallo en la importación: Fallo en la lectura del valor de elección múltiple en la línea: %1$s</string>
-    <string name="import_exception_discrete_value_conflict">Error de importación: Conflicto de valores de elección múltiple en la línea: %1$s</string>
-    <string name="import_exception_discrete_value_index_exists">Error de importación: Fallo al leer el valor de elección múltiple en la línea: %1$s, el índice %2$s ya existe</string>
-    <string name="import_exception_discrete_value_label_exists">Error de importación: Ha fallado la lectura del valor de elección múltiple en la línea: %1$s, la etiqueta %2$s existe con un índice diferente</string>
-    <string name="import_exception_feature_name_too_long">Error de importación: nombre demasiado largo en la línea: %1$s</string>
-    <string name="import_exception_max_discrete_values_reached">Error de importación: El máximo de valores de opción múltiple para una característica es: %1$s</string>
 
     <string name="graph_stat_validation_unknown">Se ha producido un error desconocido</string>
     <string name="graph_stat_validation_no_name">Por favor, proporciona un nombre</string>
@@ -232,7 +227,6 @@
     <string name="edit_data_point_button_content_description">Botón para editar punto de datos</string>
     <string name="add_line_button_content_description">Botón de añadir línea</string>
     <string name="add_multiple_choice_answer_button_content_description">Añadir botón de respuesta de opción múltiple</string>
-    <string name="ending_at_colon">Muestra que termina en:</string>
     <string name="duplicate">Duplicar</string>
     <string name="no_notes_hint_text">Las notas añadidas durante la traza aparecerán aquí. También puedes añadir notas globales usando el botón +.</string>
     <string name="add_a_global_note">Añadir una nota global:</string>

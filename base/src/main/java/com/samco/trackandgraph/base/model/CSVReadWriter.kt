@@ -24,10 +24,6 @@ import java.io.OutputStream
 
 sealed class ImportFeaturesException : Exception() {
     class Unknown : ImportFeaturesException()
-    class DiscreteValueConflict(val lineNumber: Int) : ImportFeaturesException()
-    class BadDiscreteValue(val lineNumber: Int) : ImportFeaturesException()
-    class DiscreteValueIndexExists(val lineNumber: Int, val discreteValueIndex: Int) : ImportFeaturesException()
-    class DiscreteValueLabelExists(val lineNumber: Int, val label: String) : ImportFeaturesException()
     class InconsistentDataType(val lineNumber: Int) : ImportFeaturesException()
     class InconsistentRecord(val lineNumber: Int) : ImportFeaturesException()
     class BadTimestamp(val lineNumber: Int) : ImportFeaturesException()

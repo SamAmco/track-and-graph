@@ -25,15 +25,16 @@
     <string name="new_name">Neuer Name: </string>
     <string name="graph_or_stat_name">Diagramm Name: </string>
     <string name="tracker_name">Was möchten Sie tracken?</string>
-    <string name="tracker_type">Welche Art von Daten sind das?</string>
+    <string name="tracker_type">Dies ist eine Zeit oder Dauer</string>
     <string name="yes">Ja</string>
     <string name="cancel">Abbrechen</string>
     <string name="select_file">Datei wählen</string>
-    <string name="empty_group_hint">Willkommen bei Track &amp; Graph!\n\n Tippen Sie hier, um Ihre erste Track-Gruppe zu erstellen und loszulegen.</string>
+    <string name="empty_group_hint">Willkommen bei Track &amp; Graph!\n\nTippen Sie oben rechts auf + und wählen Sie Tracker aus, um zu beginnen.</string>
     <string name="no_trackers_graph_stats_hint">Bitte erstellen Sie einen beobachten, bevor Sie Grafiken erstellen.</string>
     <string name="ru_sure_del_group">Sind Sie sicher, dass Sie diese Gruppe und alles in ihr enthaltene löschen wollen? Sie können dies nicht mehr rückgängig machen.</string>
     <string name="ru_sure_del_feature">Sind Sie sicher, dass Sie diese getrackten Daten löschen möchten??</string>
     <string name="ru_sure_del_data_point">Sind Sie sicher, dass Sie diesen Datensatz löschen möchten??</string>
+    <string name="export_file_name_suffix">" Tippen Sie oben rechts auf + und wählen Sie Tracker aus, um zu beginnen."</string>
     <string name="discrete_values">Fügen Sie unten einige Auswahlmöglichkeiten hinzu.</string>
     <string name="tracker_name_cannot_be_null">Bitte einen Namen angeben</string>
     <string name="tracker_with_that_name_exists">Sie tracken bereits etwas mit diesem Namen</string>
@@ -136,12 +137,6 @@
     <string name="import_exception_inconsistent_record">Import fehlgeschlagen: Datensatz in Zeile %1$s stimmt nicht mit den erforderlichen Kopfzeilen überein: %1$s</string>
     <string name="import_exception_bad_timestamp">Import fehlgeschlagen: Konnte den Zeitstempel für Eintrag in Zeile nicht interpretieren: %1$s </string>
     <string name="import_exception_inconsistent_data_type">Import fehlgeschlagen: Inkonsistenter Datentyp in der Zeile enthalten: %1$s</string>
-    <string name="import_exception_bad_discrete_value">Import fehlgeschlagen: Lesen des Multiple-Choice-Wertes in der Zeile fehlgeschlagen: %1$s</string>
-    <string name="import_exception_discrete_value_conflict">Import fehlgeschlagen: Multiple-Choice-Wertekonflikt in der Zeile: %1$s</string>
-    <string name="import_exception_discrete_value_index_exists">Import fehlgeschlagen: Lesen des Multiple-Choice-Wertes in der Zeile fehlgeschlagen: %1$s, Index %2$s bereits vorhanden</string>
-    <string name="import_exception_discrete_value_label_exists">Import fehlgeschlagen: Lesen des Multiple-Choice-Wertes in der Zeile fehlgeschlagen: %1$s, das Label %2$s existiert mit einem anderen Index</string>
-    <string name="import_exception_feature_name_too_long">Import fehlgeschlagen: Name zu lang in der Zeile: %1$s</string>
-    <string name="import_exception_max_discrete_values_reached">Import fehlgeschlagen: Der maximale Multiple-Choice-Wert für ein Feature ist: %1$s</string>
 
     <string name="graph_stat_validation_unknown">Ein unbekannter Fehler ist aufgetreten</string>
     <string name="graph_stat_validation_no_name">Geben Sie bitte einen Namen an</string>
@@ -232,7 +227,6 @@
     <string name="edit_data_point_button_content_description">Datenpunkt bearbeiten Button</string>
     <string name="add_line_button_content_description">Linie hinzufügen Button</string>
     <string name="add_multiple_choice_answer_button_content_description">Multiple Choice Antwort Button hinzufügen</string>
-    <string name="ending_at_colon">Beispiel endet ab:</string>
     <string name="duplicate">Kopie</string>
     <string name="no_notes_hint_text">Beim Tracking hinzugefügte Notizen werden hier angezeigt. Sie können auch globale Notizen mit der + Taste hinzufügen.</string>
     <string name="add_a_global_note">Globale Notiz hinzufügen:</string>

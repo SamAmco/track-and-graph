@@ -141,24 +141,6 @@ class ImportFeaturesDialog : DialogFragment() {
     private fun getStringForImportException(exception: ImportFeaturesException) = when (exception) {
         is ImportFeaturesException.Unknown ->
             getString(R.string.import_exception_unknown)
-        is ImportFeaturesException.DiscreteValueConflict -> getString(
-            R.string.import_exception_discrete_value_conflict,
-            exception.lineNumber
-        )
-        is ImportFeaturesException.BadDiscreteValue -> getString(
-            R.string.import_exception_bad_discrete_value,
-            exception.lineNumber
-        )
-        is ImportFeaturesException.DiscreteValueIndexExists -> getString(
-            R.string.import_exception_discrete_value_index_exists,
-            exception.lineNumber,
-            exception.discreteValueIndex
-        )
-        is ImportFeaturesException.DiscreteValueLabelExists -> getString(
-            R.string.import_exception_discrete_value_label_exists,
-            exception.lineNumber,
-            exception.label
-        )
         is ImportFeaturesException.InconsistentDataType -> getString(
             R.string.import_exception_inconsistent_data_type,
             exception.lineNumber
