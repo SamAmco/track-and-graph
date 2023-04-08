@@ -164,8 +164,7 @@ fun formatMonthYear(context: Context, temporal: Temporal): String {
 
 fun formatTimeDuration(seconds: Long): String {
     val absSecs = kotlin.math.abs(seconds)
-    return StringBuilder().apply {
-        if (seconds < 0) append("-")
-        append(String.format("%d:%02d:%02d", seconds / 3600, (absSecs % 3600) / 60, (absSecs % 60)))
-    }.toString()
+    val timeStr = String.format("%d:%02d:%02d", seconds / 3600, (absSecs % 3600) / 60, (absSecs % 60))
+    if (seconds < 0 && !timeStr.startsWith("-")) return "-$timeStr"
+    return timeStr
 }
