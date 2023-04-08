@@ -259,7 +259,7 @@
     
     <string name="advanced_options">Erweiterte Optionen</string>
     <string name="type_colon">\"Art: \"</string>
-    <string name="order_colon">\"Befehl: \"</string>
+    <string name="order_colon">\"Reihenfolge: \"</string>
     <string name="value_and_label">Wert und Etikett</string>
     <string name="value_only">Nur Wert</string>
     <string name="label_only">Nur Etikett</string>
