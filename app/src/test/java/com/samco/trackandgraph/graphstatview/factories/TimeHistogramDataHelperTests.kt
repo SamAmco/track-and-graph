@@ -59,7 +59,8 @@ class TimeHistogramDataHelperTests {
         Assert.assertEquals(7, vals.size)
         val total = 3 + 3 + 2 + 2 + 2 + 2 + 2.0
         Assert.assertEquals(
-            listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total),
+            listOf(3 / total, 3 / total, 2 / total, 2 / total, 2 / total, 2 / total, 2 / total)
+                .map { it * 100 },
             vals
         )
     }
@@ -103,7 +104,7 @@ class TimeHistogramDataHelperTests {
         val expected1 =
             mutableListOf<Double>().apply { repeat(20) { addAll(listOf(0.0, 4.0, 0.0)) } }
         Assert.assertEquals(
-            expected1.map { it / total },
+            expected1.map { (it / total) * 100.0 },
             vals1
         )
 
@@ -112,7 +113,7 @@ class TimeHistogramDataHelperTests {
         val expected2 =
             mutableListOf<Double>().apply { repeat(20) { addAll(listOf(0.0, 0.0, 8.0)) } }
         Assert.assertEquals(
-            expected2.map { it / total },
+            expected2.map { (it / total) * 100.0 },
             vals2
         )
     }
@@ -142,7 +143,7 @@ class TimeHistogramDataHelperTests {
         //THEN
         answer!!
         Assert.assertEquals(2, answer.keys.size)
-        val av = 1.0 / 10.0
+        val av = 10.0
         Assert.assertEquals(
             listOf(av, 0.0, 0.0, 0.0, av, 0.0, av, 0.0, av, 0.0, av, 0.0),
             answer["0"] ?: error("Key 0 not found")
