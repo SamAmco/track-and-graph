@@ -287,5 +287,6 @@
     <string name="track_all">Track all</string>
     <string name="more_details">More details</string>
     <string name="suggestions">Suggestions</string>
+    <string name="no_label">No label</string>
 
 </resources>

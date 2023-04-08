@@ -54,13 +54,17 @@ internal data class PieChart(
     val duration: Duration?,
 
     @ColumnInfo(name = "end_date")
-    val endDate: OffsetDateTime?
+    val endDate: OffsetDateTime?,
+
+    @ColumnInfo(name = "sum_by_count")
+    val sumByCount: Boolean
 ) {
     fun toDto() = PieChart(
         id,
         graphStatId,
         featureId,
         duration,
-        endDate
+        endDate,
+        sumByCount
     )
 }
