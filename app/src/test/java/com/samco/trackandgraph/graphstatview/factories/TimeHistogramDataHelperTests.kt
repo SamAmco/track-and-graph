@@ -199,7 +199,7 @@ class TimeHistogramDataHelperTests {
         Assert.assertEquals(7, vals.size)
         val expected = listOf(2, 3, 3, 2, 2, 2, 2)
         val total = expected.sum().toDouble()
-        Assert.assertEquals(expected.map { it / total }, vals)
+        Assert.assertEquals(expected.map { (it / total) * 100.0 }, vals)
     }
 
     private fun makeDataSampleWithLables(dataPoints: List<Triple<Double, OffsetDateTime, String>>) =

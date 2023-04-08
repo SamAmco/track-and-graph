@@ -25,13 +25,15 @@ data class PieChart(
     val graphStatId: Long,
     val featureId: Long,
     val duration: Duration?,
-    val endDate: OffsetDateTime?
+    val endDate: OffsetDateTime?,
+    val sumByCount: Boolean
 ) {
     internal fun toEntity() = PieChart(
         id,
         graphStatId,
         featureId,
         duration,
-        endDate
+        endDate,
+        sumByCount
     )
 }

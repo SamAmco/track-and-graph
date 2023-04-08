@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
@@ -72,6 +73,14 @@ fun PieChartConfigView(
             onItemSelected = { viewModel.updateFeatureId(it) }
         )
     }
+
+    SpacingSmall()
+
+    RowCheckbox(
+        checked = viewModel.sumByCount,
+        onCheckedChange = { viewModel.updateSumByCount(it) },
+        text = stringResource(id = R.string.sum_by_count_checkbox_label)
+    )
 
     SpacingSmall()
 }
