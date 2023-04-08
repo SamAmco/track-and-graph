@@ -25,15 +25,16 @@
     <string name="new_name">Nouveau nom : </string>
     <string name="graph_or_stat_name">Nom du graphique : </string>
     <string name="tracker_name">Que voulez vous suivre ?</string>
-    <string name="tracker_type">De quel type de données s\'agit-il ?</string>
+    <string name="tracker_type">Il s\'agit d\'un temps ou d\'une durée</string>
     <string name="yes">Oui</string>
     <string name="cancel">Annuler</string>
     <string name="select_file">Sélectionner un fichier</string>
-    <string name="empty_group_hint">Bienvenue sur Track &amp; Graph!\n\n Appuyez ici pour créer vos premiers groupes de suivi et graphiques.</string>
+    <string name="empty_group_hint">Bienvenue sur Track &amp; Graphique!\n\nAppuyez sur + en haut à droite et sélectionnez Tracker pour commencer.</string>
     <string name="no_trackers_graph_stats_hint">Veuillez créer un suivi avant de créer des graphiques.</string>
     <string name="ru_sure_del_group">Êtes-vous sûr de vouloir supprimer ce groupe et tout ce qu\'il contient ? Vous ne pouvez pas faire marche arrière.</string>
     <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ces données ?</string>
     <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette donnée ?</string>
+    <string name="export_file_name_suffix">" Appuyez sur + en haut à droite et sélectionnez Tracker pour commencer."</string>
     <string name="discrete_values">Ajoutez quelques choix ci-dessous.</string>
     <string name="tracker_name_cannot_be_null">Veuillez ajouter un nom</string>
     <string name="tracker_with_that_name_exists">Vous suivez déjà quelque chose avec ce nom</string>
@@ -136,12 +137,6 @@
     <string name="import_exception_inconsistent_record">L\'importation a échoué : l\'enregistrement sur la ligne %1$s ne correspond pas aux en-têtes requis</string>
     <string name="import_exception_bad_timestamp">L\'importation a échoué : impossible d\'interpréter l\'horodatage pour l\'enregistrement sur la ligne : %1$s</string>
     <string name="import_exception_inconsistent_data_type">L\'importation a échoué : type de données incohérent sur la ligne : %1$s</string>
-    <string name="import_exception_bad_discrete_value">L\'importation a échoué : échec de la lecture de la valeur de choix multiple sur la ligne : %1$s</string>
-    <string name="import_exception_discrete_value_conflict">Échec de l\'importation : conflit de valeurs de choix multiples sur la ligne : %1$s</string>
-    <string name="import_exception_discrete_value_index_exists">L\'importation a échoué : échec de la lecture de la valeur de choix multiple sur la ligne : %1$s, l\'index %2$s existe déja</string>
-    <string name="import_exception_discrete_value_label_exists">L\'importation a échoué : échec de la lecture de la valeur de choix multiple sur la ligne : %1$s, le label %2$s existe avec un index différent</string>
-    <string name="import_exception_feature_name_too_long">Échec de l\'importation : nom trop long sur la ligne : %1$s</string>
-    <string name="import_exception_max_discrete_values_reached">L\'importation a échoué : le nombre maximal de valeurs à choix multiple pour une caractéristique est de : %1$s</string>
 
     <string name="graph_stat_validation_unknown">Une erreur inconnue s\'est produite</string>
     <string name="graph_stat_validation_no_name">Veuillez fournir un nom</string>
@@ -183,7 +178,7 @@
     <string name="rate_the_app">Notez l\'application</string>
     <string name="reminders">Notifications de rappel</string>
     <string name="no_reminders_hint">Touchez l\'icône + pour créer une nouvelle notification de rappel de suivi.</string>
-    <string name="mon">Mon</string>
+    <string name="mon">Lun</string>
     <string name="tue">Mar</string>
     <string name="wed">Mer</string>
     <string name="thu">Jeu</string>
@@ -203,8 +198,8 @@
     <string name="backup_and_restore">Sauvegarde et restauration</string>
     <string name="backup_hint_text">La sauvegarde permet d\'enregistrer toutes les données de votre appli, y compris toutes les données suivies, les graphiques et les rappels. Vous devriez sauvegarder régulièrement vos données sur un périphérique externe ou un stockage dans le cloud au cas où votre appareil serait perdu ou cassé.</string>
     <string name="restore_hint_text">ATTENTION : La restauration à partir d\'une sauvegarde effacera toutes les données et la configuration actuellement dans l\'app. Track &amp; Graph redémarrera une fois la restauration terminée.</string>
-    <string name="backup_data">Données de la sauvegarde</string>
-    <string name="restore_data">Restauration des données</string>
+    <string name="backup_data">Sauvegarder les données</string>
+    <string name="restore_data">Restaurer les données</string>
     <string name="backup_successful">Sauvegarde réussie !</string>
     <string name="backup_failed">Sauvegarde échouée. %1$s</string>
     <string name="backup_error_could_not_write_to_file">Impossible de trouver ou d\'écrire dans le fichier sélectionné.</string>
@@ -233,7 +228,6 @@
     <string name="edit_data_point_button_content_description">Bouton de modification de point de données</string>
     <string name="add_line_button_content_description">Bouton d\'ajout de ligne</string>
     <string name="add_multiple_choice_answer_button_content_description">Ajouter un bouton de réponse à choix multiple</string>
-    <string name="ending_at_colon">Échantillon se terminant à : </string>
     <string name="duplicate">Duplicate</string>
     <string name="no_notes_hint_text">Les notes ajoutées lors du suivi s\'afficheront ici. Vous pouvez également ajouter des notes globales en utilisant le bouton +.</string>
     <string name="add_a_global_note">Ajouter une note globale : </string>

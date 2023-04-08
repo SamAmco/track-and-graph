@@ -150,12 +150,6 @@
     <string name="import_exception_inconsistent_record">Import failed: Record on line %1$s is not consistent with required headers</string>
     <string name="import_exception_bad_timestamp">Import failed: Could not interpret the timestamp for record on line: %1$s</string>
     <string name="import_exception_inconsistent_data_type">Import failed: Received inconsistent data type on line: %1$s</string>
-    <string name="import_exception_bad_discrete_value">Import failed: Failed to read multiple choice value on line: %1$s</string>
-    <string name="import_exception_discrete_value_conflict">Import failed: multiple choice value conflict on line: %1$s</string>
-    <string name="import_exception_discrete_value_index_exists">Import failed: Failed to read multiple choice value on line: %1$s, index %2$s already exists</string>
-    <string name="import_exception_discrete_value_label_exists">Import failed: Failed to read multiple choice value on line: %1$s, label %2$s exists with a different index</string>
-    <string name="import_exception_feature_name_too_long">Import failed: name too long on line: %1$s</string>
-    <string name="import_exception_max_discrete_values_reached">Import failed: Max multiple choice values for a feature is: %1$s</string>
 
     <string name="graph_stat_validation_unknown">An unknown error occurred</string>
     <string name="graph_stat_validation_no_name">Please provide a name</string>
