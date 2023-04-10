@@ -114,6 +114,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "stfnw",
+      "name": "Stefan Walter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/28357058?v=4",
+      "profile": "https://github.com/stfnw",
+      "contributions": [
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -121,5 +130,6 @@
   "projectOwner": "SamAmco",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
