@@ -274,5 +274,5 @@
     <string name="more_details">Mehr Details</string>
     <string name="suggestions">Anmerkungen</string>
     <string name="no_label">Kein Label</string>
-    <string name="cancel_add_data_points_dialog_body">Möchten Sie wirklich schließen? Alle Notizen gehen verloren.</string>
+    <string name="confirm_cancel_notes_will_be_lost">Möchten Sie wirklich schließen? Alle Notizen gehen verloren.</string>
 </resources>

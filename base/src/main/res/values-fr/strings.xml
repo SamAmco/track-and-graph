@@ -276,6 +276,6 @@
     <string name="more_details">Plus de détails</string>
     <string name="suggestions">Suggestions</string>
     <string name="no_label">Sin etiqueta</string>
-    <string name="cancel_add_data_points_dialog_body">Voulez-vous vraiment fermer ? Toutes les notes seront perdues.</string>
+    <string name="confirm_cancel_notes_will_be_lost">Voulez-vous vraiment fermer ? Toutes les notes seront perdues.</string>
 
 </resources>
