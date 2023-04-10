@@ -1,0 +1,8 @@
+- Fix bug daylight savings not accounted for on line graphs
+- Disable close add note or input data point dialog on click outside and add confirm cancel dialog if you have notes
+- Fix translation errors
+- Fix bug suggestion type and order ignored on create tracker
+- Add checkbox for pie charts (sum by count)
+- Fix bug double negative on durations
+- Convert histograms to show percentage on the y axis
+
