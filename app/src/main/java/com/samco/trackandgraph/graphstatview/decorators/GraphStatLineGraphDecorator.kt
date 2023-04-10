@@ -53,10 +53,8 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     GraphStatViewDecorator<ILineGraphViewData>(listMode) {
     private val lineGraphHourMinuteSecondFormat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm:ss")
-        .withZone(ZoneId.systemDefault())
     private val lineGraphHoursDateFormat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm")
-        .withZone(ZoneId.systemDefault())
 
     private var binding: GraphStatViewBinding? = null
     private var context: Context? = null
@@ -136,11 +134,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
             (numDigits - 1) * (context!!.resources.displayMetrics.scaledDensity) * 3.5f
 
         //Set up X padding
-        val formattedTimestamp = getDateTimeFormattedForDuration(
-            binding!!.xyPlot.bounds.minX,
-            binding!!.xyPlot.bounds.maxX,
-            data!!.endTime
-        )
+        val formattedTimestamp = getDateTimeFormattedForDuration()
         binding!!.xyPlot.graph.paddingBottom =
             formattedTimestamp.length * (context!!.resources.displayMetrics.scaledDensity)
     }
@@ -179,12 +173,8 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
                 ): StringBuffer {
                     val millis = (obj as Number).toLong()
                     val duration = Duration.ofMillis(millis)
-                    val timeStamp = data!!.endTime.plus(duration)
-                    val formattedTimestamp = getDateTimeFormattedForDuration(
-                        binding!!.xyPlot.bounds.minX,
-                        binding!!.xyPlot.bounds.maxX,
-                        timeStamp
-                    )
+
+                    val formattedTimestamp = getDateTimeFormattedForDuration(duration)
                     return toAppendTo.append(formattedTimestamp)
                 }
 
@@ -192,17 +182,18 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
             }
     }
 
-    private fun getDateTimeFormattedForDuration(
-        minX: Number?,
-        maxX: Number?,
-        timestamp: OffsetDateTime
-    ): String {
+    private fun getDateTimeFormattedForDuration(duration: Duration = Duration.ZERO): String {
+        val timestamp = data!!.endTime
+            .atZoneSameInstant(ZoneId.systemDefault())
+            .plus(duration)
+        val minX = binding!!.xyPlot.bounds.minX
+        val maxX = binding!!.xyPlot.bounds.maxX
         if (minX == null || maxX == null) return formatDayMonth(context!!, timestamp)
-        val duration = Duration.ofMillis(abs(maxX.toLong() - minX.toLong()))
+        val durationRange = Duration.ofMillis(abs(maxX.toLong() - minX.toLong()))
         return when {
-            duration.toMinutes() < 5L -> lineGraphHourMinuteSecondFormat.format(timestamp)
-            duration.toDays() >= 304 -> formatMonthYear(context!!, timestamp)
-            duration.toDays() >= 1 -> formatDayMonth(context!!, timestamp)
+            durationRange.toMinutes() < 5L -> lineGraphHourMinuteSecondFormat.format(timestamp)
+            durationRange.toDays() >= 304 -> formatMonthYear(context!!, timestamp)
+            durationRange.toDays() >= 1 -> formatDayMonth(context!!, timestamp)
             else -> lineGraphHoursDateFormat.format(timestamp)
         }
     }
