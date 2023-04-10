@@ -259,7 +259,9 @@ class AddTrackerViewModelImpl @Inject constructor(
             dataType = getDataType(),
             hasDefaultValue = hasDefaultValue.value ?: false,
             defaultValue = getDefaultValue() ?: 1.0,
-            defaultLabel = defaultLabel.text
+            defaultLabel = defaultLabel.text,
+            suggestionType = suggestionType.value ?: TrackerSuggestionType.VALUE_AND_LABEL,
+            suggestionOrder = suggestionOrder.value ?: TrackerSuggestionOrder.VALUE_ASCENDING
         )
         dataInteractor.insertTracker(tracker)
     }
