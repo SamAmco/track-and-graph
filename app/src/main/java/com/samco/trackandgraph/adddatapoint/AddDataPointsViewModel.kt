@@ -81,12 +81,15 @@ interface AddDataPointsViewModel {
     val dataPointPages: LiveData<Int>
     val currentPageIndex: LiveData<Int>
     val tutorialViewModel: AddDataPointTutorialViewModel
+    val showCancelConfirmDialog: LiveData<Boolean>
 
     fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel>
 
     fun onTutorialButtonPressed()
 
     fun onCancelClicked()
+    fun onConfirmCancelConfirmed()
+    fun onConfirmCancelDismissed()
     fun onSkipClicked()
     fun onAddClicked()
     fun updateCurrentPage(page: Int)
@@ -131,6 +134,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     override val tutorialViewModel = AddDataPointTutorialViewModelImpl()
 
+    override val showCancelConfirmDialog = MutableLiveData(false)
+
     //Show the tutorial if the user has no data or if they have pressed the tutorial button
     override val showTutorial: LiveData<Boolean> = merge(
         tutorialButtonPresses
@@ -165,7 +170,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         .asLiveData(viewModelScope.coroutineContext)
 
     private val viewModels: SharedFlow<List<AddDataPointViewModelInner>> = configFlow
-        .map { it.map { config -> getViewModel(config) } }
+        .map { it.map { config -> createViewModel(config) } }
         .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
 
     override fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel> = viewModels
@@ -173,7 +178,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         .filterNotNull()
         .asLiveData(viewModelScope.coroutineContext)
 
-    private fun getViewModel(config: Config): AddDataPointViewModelInner {
+    private fun createViewModel(config: Config): AddDataPointViewModelInner {
         return when (config.tracker.dataType) {
             DataType.DURATION -> DataPointDurationViewModel(config)
             DataType.CONTINUOUS -> getNumericalViewModel(config)
@@ -362,18 +367,33 @@ class AddDataPointsViewModelImpl @Inject constructor(
     private var initialized = false
 
     override fun onCancelClicked() {
+        onCurrentViewModel {
+            if (it.note.text.isNotEmpty() && this.showCancelConfirmDialog.value == false)
+                this.showCancelConfirmDialog.value = true
+            else dismiss.value = true
+        }
+    }
+
+    override fun onConfirmCancelConfirmed() {
         dismiss.value = true
     }
 
-    override fun onSkipClicked() = incrementPageIndex()
+    override fun onConfirmCancelDismissed() {
+        showCancelConfirmDialog.value = false
+    }
 
-    override fun onAddClicked() {
+    private fun onCurrentViewModel(action: suspend (AddDataPointViewModelInner) -> Unit) =
         viewModelScope.launch {
             combine(indexFlow, viewModels) { index, viewModels -> viewModels.getOrNull(index) }
                 .take(1)
                 .filterNotNull()
-                .collect { insertDataPoint(it) }
+                .collect { action(it) }
         }
+
+    override fun onSkipClicked() = incrementPageIndex()
+
+    override fun onAddClicked() {
+        onCurrentViewModel { insertDataPoint(it) }
     }
 
     private suspend fun insertDataPoint(viewModel: AddDataPointViewModelInner) {

@@ -29,7 +29,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -60,6 +59,14 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = DialogTheme {
             val showTutorial by viewModel.showTutorial.observeAsState(false)
             if (showTutorial) AddDataPointsTutorial(viewModel.tutorialViewModel)
             else DataPointInputView(viewModel)
+        }
+
+        if (viewModel.showCancelConfirmDialog.observeAsState(false).value) {
+            ConfirmCancelDialog(
+                body = R.string.cancel_add_data_points_dialog_body,
+                onDismissRequest = viewModel::onConfirmCancelDismissed,
+                onConfirm = viewModel::onConfirmCancelConfirmed,
+            )
         }
     }
 }

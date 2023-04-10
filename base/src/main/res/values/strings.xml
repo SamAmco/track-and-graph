@@ -288,5 +288,6 @@
     <string name="more_details">More details</string>
     <string name="suggestions">Suggestions</string>
     <string name="no_label">No label</string>
+    <string name="cancel_add_data_points_dialog_body">Are you sure you want to close? All notes will be lost.</string>
 
 </resources>
