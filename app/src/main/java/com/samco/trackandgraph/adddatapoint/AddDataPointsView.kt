@@ -63,7 +63,7 @@ fun AddDataPointsView(viewModel: AddDataPointsViewModel) = DialogTheme {
 
         if (viewModel.showCancelConfirmDialog.observeAsState(false).value) {
             ConfirmCancelDialog(
-                body = R.string.cancel_add_data_points_dialog_body,
+                body = R.string.confirm_cancel_notes_will_be_lost,
                 onDismissRequest = viewModel::onConfirmCancelDismissed,
                 onConfirm = viewModel::onConfirmCancelConfirmed,
             )

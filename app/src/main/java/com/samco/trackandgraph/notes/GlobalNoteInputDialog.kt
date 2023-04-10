@@ -45,7 +45,7 @@ class GlobalNoteInputDialog : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        dialog?.setCanceledOnTouchOutside(true)
+        dialog?.setCanceledOnTouchOutside(false)
         return ComposeView(requireContext()).apply {
             setContent {
                 TnGComposeTheme {

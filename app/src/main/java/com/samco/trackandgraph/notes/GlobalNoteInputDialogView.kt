@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalComposeUiApi::class)
+@file:OptIn(ExperimentalComposeUiApi::class, ExperimentalComposeUiApi::class)
 
 package com.samco.trackandgraph.notes
 
@@ -44,6 +44,13 @@ fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
     Surface {
         DialogTheme {
             GlobalNoteDialogViewContent(viewModel)
+            if (viewModel.showConfirmCancelDialog.observeAsState(false).value) {
+                ConfirmCancelDialog(
+                    onDismissRequest = viewModel::onCancelDismissed,
+                    onConfirm = viewModel::onCancelConfirmed,
+                    body = R.string.confirm_cancel_notes_will_be_lost
+                )
+            }
         }
     }
 }

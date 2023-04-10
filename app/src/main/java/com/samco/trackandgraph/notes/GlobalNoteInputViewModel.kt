@@ -43,12 +43,15 @@ interface GlobalNoteInputViewModel {
     val dismiss: LiveData<Boolean>
     val updateMode: LiveData<Boolean>
     val addButtonEnabled: LiveData<Boolean>
+    val showConfirmCancelDialog: LiveData<Boolean>
 
     fun init(timestampStr: String?)
     fun updateNoteText(text: TextFieldValue)
     fun updateTimeStamp(timeStamp: OffsetDateTime)
     fun onAddClicked()
     fun onCancelClicked()
+    fun onCancelConfirmed()
+    fun onCancelDismissed()
 }
 
 @HiltViewModel
@@ -58,7 +61,7 @@ class GlobalNoteInputViewModelImpl @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel(), GlobalNoteInputViewModel {
 
-    private val onCancelClicked = MutableSharedFlow<Unit>()
+    private val onCancelConfirmedEvents = MutableSharedFlow<Unit>()
 
     private var foundNote: GlobalNote? = null
 
@@ -71,9 +74,11 @@ class GlobalNoteInputViewModelImpl @Inject constructor(
         .map { it.text.isNotBlank() }
         .asLiveData(viewModelScope.coroutineContext)
 
+    override val showConfirmCancelDialog = MutableLiveData<Boolean>(false)
+
     private val addCompleteEvents = MutableSharedFlow<Unit>()
 
-    override val dismiss = merge(onCancelClicked, addCompleteEvents)
+    override val dismiss = merge(onCancelConfirmedEvents, addCompleteEvents)
         .map { true }
         .asLiveData(viewModelScope.coroutineContext)
 
@@ -125,6 +130,15 @@ class GlobalNoteInputViewModelImpl @Inject constructor(
     }
 
     override fun onCancelClicked() {
-        viewModelScope.launch { onCancelClicked.emit(Unit) }
+        if (note.text.isNotBlank()) showConfirmCancelDialog.value = true
+        else viewModelScope.launch { onCancelConfirmedEvents.emit(Unit) }
+    }
+
+    override fun onCancelConfirmed() {
+        viewModelScope.launch { onCancelConfirmedEvents.emit(Unit) }
+    }
+
+    override fun onCancelDismissed() {
+        showConfirmCancelDialog.value = false
     }
 }
