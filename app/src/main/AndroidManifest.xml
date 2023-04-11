@@ -81,6 +81,9 @@
                 android:resource="@xml/track_widget_info" />
         </receiver>
 
+        <!--TODO you'll need to follow this guide when you traget android 14
+            https://developer.android.com/about/versions/14/changes/fgs-types-required
+        -->
         <service
             android:name=".base.service.TrackWidgetJobIntentService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
