@@ -56,7 +56,7 @@ internal class DataInteractorImpl @Inject constructor(
         return dao.doRawQuery(supportSQLiteQuery)
     }
 
-    override fun getDatabaseFilePath(): String {
+    override fun getDatabaseFilePath(): String? {
         return database.openHelper.readableDatabase.path
     }
 
