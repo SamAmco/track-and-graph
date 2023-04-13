@@ -81,7 +81,7 @@ android {
     // you might need to look into this:
     //https://developer.android.com/jetpack/androidx/releases/compose-kotlin
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.2.0"
+        kotlinCompilerExtensionVersion = "1.4.4"
     }
 
     namespace 'com.samco.trackandgraph'
@@ -97,35 +97,34 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 
     //Dependency Injection
-    implementation "com.google.dagger:hilt-android:2.43"
+    implementation "com.google.dagger:hilt-android:2.44"
+    kapt "com.google.dagger:hilt-compiler:2.44"
     implementation "androidx.hilt:hilt-navigation-compose:1.0.0"
-    kapt "com.google.dagger:hilt-compiler:2.43"
 
     //UI
-    implementation 'androidx.fragment:fragment-ktx:1.5.3'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
 
-    //COMPOSE (this stuff is not at the latest version because it requires compiling
-    // against SDK 33 which has a bug where it is not recognising common xml attributes)
-    implementation 'androidx.compose.ui:ui:1.3.1'
-    implementation 'androidx.compose.ui:ui-tooling:1.3.1'
-    implementation 'androidx.compose.foundation:foundation:1.3.1'
-    implementation 'androidx.activity:activity-compose:1.6.1'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
-    implementation 'androidx.compose.runtime:runtime-livedata:1.3.1'
+    implementation 'androidx.compose.ui:ui:1.4.1'
+    implementation 'androidx.compose.ui:ui-tooling:1.4.1'
+    implementation 'androidx.compose.foundation:foundation:1.4.1'
+    implementation 'androidx.activity:activity-compose:1.7.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+    implementation 'androidx.compose.runtime:runtime-livedata:1.4.1'
     // Material design stuff you might need at some point
-    implementation 'androidx.compose.material:material:1.4.0-alpha02'
+    implementation 'androidx.compose.material:material:1.5.0-alpha02'
     implementation "com.google.android.material:compose-theme-adapter:1.2.1"
     implementation 'com.google.accompanist:accompanist-pager:0.28.0'
     //implementation 'androidx.compose.material:material-icons-extended:1.2.1'
 
     // Android KTX
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.6.1"
+    implementation 'androidx.fragment:fragment-ktx:1.5.6'
 
     //Navigation
-    implementation "androidx.navigation:navigation-fragment-ktx:2.5.2"
-    implementation "androidx.navigation:navigation-ui-ktx:2.5.2"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.5.3"
+    implementation "androidx.navigation:navigation-ui-ktx:2.5.3"
 
     //Lifecycle extensions
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
@@ -133,7 +132,6 @@ dependencies {
     // Coroutines
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
-    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.5.1"
 
     //Date/Time
     testImplementation 'org.threeten:threetenbp:1.4.0'
