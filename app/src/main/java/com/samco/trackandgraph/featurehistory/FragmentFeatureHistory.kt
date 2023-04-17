@@ -23,14 +23,11 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.map
 import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.adddatapoint.DATA_POINT_TIMESTAMP_KEY
-import com.samco.trackandgraph.adddatapoint.DataPointInputDialog
-import com.samco.trackandgraph.adddatapoint.TRACKER_LIST_KEY
-import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -45,29 +42,13 @@ class FragmentFeatureHistory : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         viewModel.initViewModel(args.featureId)
-        viewModel.isTracker.observe(viewLifecycleOwner) { initMenuProvider(it) }
-
-        observeViewModel()
+        viewModel.tracker.map { it != null }.observe(viewLifecycleOwner) { initMenuProvider(it) }
 
         return ComposeView(requireContext()).apply {
             setContent {
                 TnGComposeTheme {
                     FeatureHistoryView(viewModel = viewModel)
                 }
-            }
-        }
-    }
-
-    private fun observeViewModel() {
-        viewModel.showEditDataPointDialog.observe(viewLifecycleOwner) {
-            if (it != null) {
-                DataPointInputDialog().apply {
-                    arguments = Bundle().apply {
-                        putLongArray(TRACKER_LIST_KEY, longArrayOf(it.trackerId))
-                        putString(DATA_POINT_TIMESTAMP_KEY, stringFromOdt(it.timestamp))
-                    }
-                }.show(childFragmentManager, "input_data_point_dialog")
-                viewModel.showEditDataPointDialogComplete()
             }
         }
     }

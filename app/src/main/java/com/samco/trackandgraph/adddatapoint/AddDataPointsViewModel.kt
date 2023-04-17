@@ -14,6 +14,8 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.runtime.getValue
@@ -35,6 +37,7 @@ import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import com.samco.trackandgraph.util.getDoubleFromTextOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -74,6 +77,7 @@ sealed interface AddDataPointViewModel {
 
 interface AddDataPointsViewModel {
 
+    val hidden: LiveData<Boolean>
     val showTutorial: LiveData<Boolean>
     val updateMode: LiveData<Boolean>
     val indexText: LiveData<String>
@@ -82,6 +86,7 @@ interface AddDataPointsViewModel {
     val currentPageIndex: LiveData<Int>
     val tutorialViewModel: AddDataPointTutorialViewModel
     val showCancelConfirmDialog: LiveData<Boolean>
+    val dismissEvents: Flow<Unit>
 
     fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel>
 
@@ -96,13 +101,20 @@ interface AddDataPointsViewModel {
 }
 
 interface AddDataPointsNavigationViewModel : AddDataPointsViewModel {
-    val dismiss: LiveData<Boolean>
 
-    fun initFromArgs(
-        trackerIds: List<Long>,
-        dataPointTimestamp: OffsetDateTime?,
-        customInitialValue: Double?
+    fun showAddDataPointDialog(
+        trackerId: Long,
+        dataPointTimestamp: OffsetDateTime? = null,
+        customInitialValue: Double? = null
     )
+
+    fun showAddDataPointsDialog(
+        trackerIds: List<Long>,
+        dataPointTimestamp: OffsetDateTime? = null,
+        customInitialValue: Double? = null
+    )
+
+    fun reset()
 }
 
 @HiltViewModel
@@ -129,7 +141,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     private val configFlow = MutableStateFlow<List<Config>>(emptyList())
     private val indexFlow = MutableStateFlow(0)
-    override val dismiss = MutableLiveData(false)
+    override val hidden = MutableLiveData(true)
+    override val dismissEvents = MutableSharedFlow<Unit>()
     private val tutorialButtonPresses = MutableSharedFlow<Unit>()
 
     override val tutorialViewModel = AddDataPointTutorialViewModelImpl()
@@ -370,13 +383,11 @@ class AddDataPointsViewModelImpl @Inject constructor(
         onCurrentViewModel {
             if (it.note.text.isNotEmpty() && this.showCancelConfirmDialog.value == false)
                 this.showCancelConfirmDialog.value = true
-            else dismiss.value = true
+            else dismiss()
         }
     }
 
-    override fun onConfirmCancelConfirmed() {
-        dismiss.value = true
-    }
+    override fun onConfirmCancelConfirmed() = dismiss()
 
     override fun onConfirmCancelDismissed() {
         showCancelConfirmDialog.value = false
@@ -421,7 +432,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
     }
 
     private fun incrementPageIndex() {
-        if (!setPageIndex(indexFlow.value + 1)) dismiss.value = true
+        if (!setPageIndex(indexFlow.value + 1)) dismiss()
     }
 
     private fun setPageIndex(index: Int): Boolean {
@@ -431,20 +442,27 @@ class AddDataPointsViewModelImpl @Inject constructor(
         } else false
     }
 
-    override fun initFromArgs(
+    override fun showAddDataPointDialog(
+        trackerId: Long,
+        dataPointTimestamp: OffsetDateTime?,
+        customInitialValue: Double?
+    ) = showAddDataPointsDialog(listOf(trackerId), dataPointTimestamp, customInitialValue)
+
+    override fun showAddDataPointsDialog(
         trackerIds: List<Long>,
         dataPointTimestamp: OffsetDateTime?,
         customInitialValue: Double?
     ) {
         if (initialized) return
         initialized = true
+        hidden.value = false
 
         viewModelScope.launch(io) {
             val configs = trackerIds
                 .mapNotNull { dataInteractor.getTrackerById(it) }
                 .map { getConfig(it, dataPointTimestamp, customInitialValue) }
 
-            if (configs.isEmpty()) dismiss.value = true
+            if (configs.isEmpty()) dismiss()
             else configFlow.emit(configs)
         }
     }
@@ -468,6 +486,19 @@ class AddDataPointsViewModelImpl @Inject constructor(
             note = dataPoint?.note,
             oldDataPoint = dataPoint
         )
+    }
+
+    private fun dismiss() {
+        hidden.value = true
+        viewModelScope.launch { dismissEvents.emit(Unit) }
+    }
+
+    override fun reset() {
+        showCancelConfirmDialog.value = false
+        indexFlow.value = 0
+        lastSelectedTimestampGlobal.resetReplayCache()
+        initialized = false
+        configFlow.value = emptyList()
     }
 
     override fun onCleared() {
