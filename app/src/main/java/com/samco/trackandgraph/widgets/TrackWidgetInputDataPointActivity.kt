@@ -21,11 +21,13 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.adddatapoint.TRACKER_LIST_KEY
+import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
+import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.model.DataInteractor
@@ -45,8 +47,18 @@ import javax.inject.Inject
 class TrackWidgetInputDataPointActivity : AppCompatActivity() {
     private val viewModel by viewModels<TrackWidgetInputDataPointViewModel>()
 
+    private val addDataPointDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
+
+    private val composeView = ComposeView(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        composeView.setContent {
+            AddDataPointsDialog(
+                viewModel = addDataPointDialogViewModel,
+                onDismissRequest = { finish() })
+        }
+        setContentView(composeView)
 
         val bundle = intent.extras
 
@@ -76,11 +88,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
     }
 
     private fun showDialog(trackerId: Long) {
-        val dialog = TrackWidgetDataPointInputDialog()
-        val args = Bundle()
-        args.putLongArray(TRACKER_LIST_KEY, longArrayOf(trackerId))
-        dialog.arguments = args
-        dialog.show(supportFragmentManager, "input_data_points_dialog")
+        addDataPointDialogViewModel.showAddDataPointDialog(trackerId)
     }
 
     override fun onDestroy() {

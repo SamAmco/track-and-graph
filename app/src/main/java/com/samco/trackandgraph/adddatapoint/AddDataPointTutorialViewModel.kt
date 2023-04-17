@@ -36,6 +36,7 @@ interface AddDataPointTutorialViewModel {
 
     fun onButtonClicked()
     fun onSwipeToPage(page: Int)
+    fun reset()
 }
 
 class AddDataPointTutorialViewModelImpl :
@@ -47,6 +48,7 @@ class AddDataPointTutorialViewModelImpl :
 
     private sealed class PageEvent {
         object NextPage : PageEvent()
+        object Reset : PageEvent()
         data class SwipeToPage(val page: Int) : PageEvent()
     }
 
@@ -57,6 +59,7 @@ class AddDataPointTutorialViewModelImpl :
             when (event) {
                 is PageEvent.NextPage -> currentPage + 1
                 is PageEvent.SwipeToPage -> event.page
+                is PageEvent.Reset -> 0
             }
         }
         .onStart { emit(0) }
@@ -82,5 +85,9 @@ class AddDataPointTutorialViewModelImpl :
 
     override fun onSwipeToPage(page: Int) {
         launch { pageEvent.emit(PageEvent.SwipeToPage(page)) }
+    }
+
+    override fun reset() {
+        launch { pageEvent.emit(PageEvent.Reset) }
     }
 }

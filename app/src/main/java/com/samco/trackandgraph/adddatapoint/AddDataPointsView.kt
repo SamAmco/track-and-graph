@@ -34,6 +34,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
@@ -43,34 +45,56 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
 @Composable
-fun AddDataPointsView(viewModel: AddDataPointsViewModel) = DialogTheme {
-    Surface {
-        Column(
-            modifier = Modifier
-                .heightIn(max = 400.dp)
-                .fillMaxWidth()
-                .background(color = MaterialTheme.tngColors.surface)
-                .padding(dimensionResource(id = R.dimen.card_padding))
-        ) {
-            val showTutorial by viewModel.showTutorial.observeAsState(false)
-            if (showTutorial) AddDataPointsTutorial(viewModel.tutorialViewModel)
-            else DataPointInputView(viewModel)
-        }
+fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () -> Unit = {}) {
+    val hidden by viewModel.hidden.observeAsState(true)
 
-        if (viewModel.showCancelConfirmDialog.observeAsState(false).value) {
-            ConfirmCancelDialog(
-                body = R.string.confirm_cancel_notes_will_be_lost,
-                onDismissRequest = viewModel::onConfirmCancelDismissed,
-                onConfirm = viewModel::onConfirmCancelConfirmed,
-            )
+    //Call onDismissRequest when the dialog is hidden after being shown
+    LaunchedEffect(true) {
+        viewModel.dismissEvents.collect {
+            println("DISMISSING")
+            onDismissRequest()
+        }
+    }
+
+    if (!hidden) {
+        DialogTheme {
+            Dialog(
+                onDismissRequest = onDismissRequest,
+                properties = DialogProperties(dismissOnClickOutside = false)
+            ) {
+                AddDataPointsView(viewModel)
+            }
         }
     }
 }
 
+@Composable
+private fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
+    Column(
+        modifier = Modifier
+            .heightIn(max = 400.dp)
+            .fillMaxWidth()
+            .background(color = MaterialTheme.tngColors.surface)
+            .padding(dimensionResource(id = R.dimen.card_padding))
+    ) {
+        val showTutorial by viewModel.showTutorial.observeAsState(false)
+        if (showTutorial) AddDataPointsTutorial(viewModel.tutorialViewModel)
+        else DataPointInputView(viewModel)
+    }
+
+    if (viewModel.showCancelConfirmDialog.observeAsState(false).value) {
+        ConfirmCancelDialog(
+            body = R.string.confirm_cancel_notes_will_be_lost,
+            onDismissRequest = viewModel::onConfirmCancelDismissed,
+            onConfirm = viewModel::onConfirmCancelConfirmed,
+        )
+    }
+}
 
 @Composable
 private fun ColumnScope.DataPointInputView(viewModel: AddDataPointsViewModel) {

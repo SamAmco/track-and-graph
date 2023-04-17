@@ -32,8 +32,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
+import com.samco.trackandgraph.adddatapoint.AddDataPointsNavigationViewModel
+import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -44,9 +49,10 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     val dataPoints by viewModel.dataPoints.observeAsState(emptyList())
     val weekdayNames = getWeekDayNames(LocalContext.current)
     val isDuration by viewModel.isDuration.observeAsState(false)
-    val isTracker by viewModel.isTracker.observeAsState(false)
+    val tracker by viewModel.tracker.observeAsState(null)
     val featureInfo by viewModel.showFeatureInfo.observeAsState()
     val dataPointInfo by viewModel.showDataPointInfo.observeAsState()
+    val dataPointDialogViewModel = hiltViewModel<AddDataPointsViewModelImpl>()
 
     if (dataPoints.isEmpty()) {
         EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
@@ -55,10 +61,11 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
             items(dataPoints) {
                 DataPoint(
                     dataPoint = it,
+                    addDataPointsViewModel = dataPointDialogViewModel,
                     viewModel = viewModel,
                     weekdayNames = weekdayNames,
                     isDuration = isDuration,
-                    isTracker = isTracker
+                    tracker = tracker
                 )
                 Spacer(modifier = Modifier.height(4.dp))
             }
@@ -102,6 +109,13 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
 
     if (viewModel.isUpdating.observeAsState(false).value) {
         LoadingOverlay()
+    }
+
+    if (!dataPointDialogViewModel.hidden.observeAsState(true).value) {
+        AddDataPointsDialog(
+            viewModel = dataPointDialogViewModel,
+            onDismissRequest = { dataPointDialogViewModel.reset() }
+        )
     }
 }
 
@@ -251,10 +265,11 @@ private fun WhereValueInput(
 @Composable
 private fun DataPoint(
     dataPoint: DataPoint,
+    addDataPointsViewModel: AddDataPointsNavigationViewModel,
     viewModel: FeatureHistoryViewModel,
     weekdayNames: List<String>,
     isDuration: Boolean,
-    isTracker: Boolean
+    tracker: Tracker?
 ) = Card(
     modifier = Modifier
         .clickable { viewModel.onDataPointClicked(dataPoint) },
@@ -279,8 +294,13 @@ private fun DataPoint(
             dataPoint = dataPoint,
             isDuration = isDuration
         )
-        if (isTracker) {
-            IconButton(onClick = { viewModel.onEditClicked(dataPoint) }) {
+        if (tracker != null) {
+            IconButton(onClick = {
+                addDataPointsViewModel.showAddDataPointDialog(
+                    trackerId = tracker.id,
+                    dataPointTimestamp = dataPoint.timestamp
+                )
+            }) {
                 Icon(
                     painter = painterResource(id = R.drawable.edit_icon),
                     contentDescription = stringResource(id = R.string.edit_data_point_button_content_description),

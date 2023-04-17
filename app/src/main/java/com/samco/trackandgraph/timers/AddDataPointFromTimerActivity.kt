@@ -20,14 +20,14 @@ package com.samco.trackandgraph.timers
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.adddatapoint.DURATION_SECONDS_KEY
-import com.samco.trackandgraph.adddatapoint.TRACKER_LIST_KEY
+import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
+import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.util.hideKeyboard
-import com.samco.trackandgraph.widgets.TrackWidgetDataPointInputDialog
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -46,8 +46,16 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<AddDataPointFromTimerViewModel>()
 
+    private val addDataPointsViewModel by viewModels<AddDataPointsViewModelImpl>()
+
+    private val composeView = ComposeView(this)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        composeView.setContent {
+            AddDataPointsDialog(viewModel = addDataPointsViewModel) { finish() }
+        }
+        setContentView(composeView)
 
         val bundle = intent.extras
         val trackerId = bundle?.getLong(TRACKER_ID_KEY)
@@ -63,13 +71,11 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
         }
     }
 
-    private fun showDialog(featureId: Long, duration: Long) {
-        val dialog = TrackWidgetDataPointInputDialog()
-        val args = Bundle()
-        args.putLongArray(TRACKER_LIST_KEY, longArrayOf(featureId))
-        args.putLong(DURATION_SECONDS_KEY, duration)
-        dialog.arguments = args
-        supportFragmentManager.let { dialog.show(it, "input_data_points_dialog") }
+    private fun showDialog(trackerId: Long, duration: Long) {
+        addDataPointsViewModel.showAddDataPointDialog(
+            trackerId,
+            customInitialValue = duration.toDouble()
+        )
     }
 
     override fun onDestroy() {
