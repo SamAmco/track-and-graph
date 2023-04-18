@@ -49,14 +49,14 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
 
     private val addDataPointDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
 
-    private val composeView = ComposeView(this)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        composeView.setContent {
-            AddDataPointsDialog(
-                viewModel = addDataPointDialogViewModel,
-                onDismissRequest = { finish() })
+        val composeView = ComposeView(this).apply {
+            setContent {
+                AddDataPointsDialog(
+                    viewModel = addDataPointDialogViewModel,
+                    onDismissRequest = { finish() })
+            }
         }
         setContentView(composeView)
 
