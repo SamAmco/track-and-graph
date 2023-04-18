@@ -54,7 +54,6 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
 
     val hidden by viewModel.hidden.observeAsState(true)
 
-    //Call onDismissRequest when the dialog is hidden after being shown
     LaunchedEffect(true) {
         viewModel.dismissEvents.collect { onDismissRequest() }
     }
@@ -63,9 +62,15 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
         DialogTheme {
             Dialog(
                 onDismissRequest = { onDismissRequest() },
-                properties = DialogProperties(dismissOnClickOutside = false)
+                properties = DialogProperties(
+                    usePlatformDefaultWidth = false,
+                    dismissOnClickOutside = false
+                )
             ) {
-                AddDataPointsView(viewModel)
+                AddDataPointsView(
+                    modifier = Modifier.fillMaxWidth(0.85f),
+                    viewModel = viewModel
+                )
                 BackHandler {
                     if (viewModel.showCancelConfirmDialog.value == true) {
                         viewModel.onConfirmCancelDismissed()
@@ -77,11 +82,13 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
 }
 
 @Composable
-private fun AddDataPointsView(viewModel: AddDataPointsViewModel) = Surface {
+private fun AddDataPointsView(
+    modifier: Modifier = Modifier,
+    viewModel: AddDataPointsViewModel
+) = Surface {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .heightIn(max = 400.dp)
-            .fillMaxWidth()
             .background(color = MaterialTheme.tngColors.surface)
             .padding(dimensionResource(id = R.dimen.card_padding))
     ) {
