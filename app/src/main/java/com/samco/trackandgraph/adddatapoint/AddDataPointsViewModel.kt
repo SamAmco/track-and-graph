@@ -157,7 +157,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
                 val hasData = dataInteractor.hasAtLeastOneDataPoint()
                 emit(!hasData && !prefHelper.getHideDataPointTutorial())
             },
-        tutorialViewModel.onTutorialComplete.map { false }
+        tutorialViewModel.onTutorialComplete.map { false },
+        dismissEvents.map { false }
     )
         .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
         .asLiveData(viewModelScope.coroutineContext)
@@ -498,6 +499,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         indexFlow.value = 0
         lastSelectedTimestampGlobal.resetReplayCache()
         initialized = false
+        tutorialViewModel.reset()
         configFlow.value = emptyList()
     }
 

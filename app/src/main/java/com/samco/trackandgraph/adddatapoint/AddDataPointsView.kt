@@ -18,6 +18,7 @@
 
 package com.samco.trackandgraph.adddatapoint
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -50,6 +51,7 @@ import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () -> Unit = {}) {
+
     val hidden by viewModel.hidden.observeAsState(true)
 
     //Call onDismissRequest when the dialog is hidden after being shown
@@ -60,10 +62,15 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
     if (!hidden) {
         DialogTheme {
             Dialog(
-                onDismissRequest = onDismissRequest,
+                onDismissRequest = { onDismissRequest() },
                 properties = DialogProperties(dismissOnClickOutside = false)
             ) {
                 AddDataPointsView(viewModel)
+                BackHandler {
+                    if (viewModel.showCancelConfirmDialog.value == true) {
+                        viewModel.onConfirmCancelDismissed()
+                    } else viewModel.onCancelClicked()
+                }
             }
         }
     }
