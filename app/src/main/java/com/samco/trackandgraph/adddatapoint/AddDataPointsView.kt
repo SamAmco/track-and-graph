@@ -45,7 +45,6 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
@@ -55,10 +54,7 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
 
     //Call onDismissRequest when the dialog is hidden after being shown
     LaunchedEffect(true) {
-        viewModel.dismissEvents.collect {
-            println("DISMISSING")
-            onDismissRequest()
-        }
+        viewModel.dismissEvents.collect { onDismissRequest() }
     }
 
     if (!hidden) {

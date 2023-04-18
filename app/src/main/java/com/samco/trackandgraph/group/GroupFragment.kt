@@ -89,10 +89,7 @@ class GroupFragment : Fragment(),
         binding.composeView.setContent {
             AddDataPointsDialog(
                 addDataPointsDialogViewModel,
-                onDismissRequest = {
-                    println("samsam: onDismissRequest")
-                    addDataPointsDialogViewModel.reset()
-                }
+                onDismissRequest = { addDataPointsDialogViewModel.reset() }
             )
         }
 

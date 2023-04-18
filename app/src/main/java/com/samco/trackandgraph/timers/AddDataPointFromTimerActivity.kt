@@ -48,12 +48,13 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
 
     private val addDataPointsViewModel by viewModels<AddDataPointsViewModelImpl>()
 
-    private val composeView = ComposeView(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        composeView.setContent {
-            AddDataPointsDialog(viewModel = addDataPointsViewModel) { finish() }
+        val composeView = ComposeView(this).apply {
+            setContent {
+                AddDataPointsDialog(viewModel = addDataPointsViewModel) { finish() }
+            }
         }
         setContentView(composeView)
 
