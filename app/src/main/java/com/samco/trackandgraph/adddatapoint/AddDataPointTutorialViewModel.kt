@@ -56,10 +56,12 @@ class AddDataPointTutorialViewModelImpl :
 
     private val currentPageFlow = pageEvent
         .scan(0) { currentPage, event ->
-            when (event) {
-                is PageEvent.NextPage -> currentPage + 1
-                is PageEvent.SwipeToPage -> event.page
-                is PageEvent.Reset -> 0
+            when {
+                event is PageEvent.NextPage && currentPage == 2 -> 0
+                event is PageEvent.NextPage -> currentPage + 1
+                event is PageEvent.SwipeToPage -> event.page
+                event is PageEvent.Reset -> 0
+                else -> currentPage
             }
         }
         .onStart { emit(0) }
