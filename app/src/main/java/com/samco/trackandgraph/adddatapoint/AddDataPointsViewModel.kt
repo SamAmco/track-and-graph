@@ -199,7 +199,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
     }
 
-    private val now = OffsetDateTime.now()
+    private val now get() = OffsetDateTime.now()
 
     private val lastSelectedTimestampGlobal = MutableSharedFlow<OffsetDateTime>()
 
