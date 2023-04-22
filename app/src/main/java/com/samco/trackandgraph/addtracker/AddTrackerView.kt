@@ -268,13 +268,17 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
     DefaultValueCheckbox(hasDefaultValue.value, viewModel)
 
     if (hasDefaultValue.value) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (isDuration.value) DurationInputRow(viewModel)
+            else ValueInputRow(viewModel, focusManager)
 
-        if (isDuration.value) DurationInputRow(viewModel)
-        else ValueInputRow(viewModel, focusManager)
+            SpacingSmall()
 
-        SpacingSmall()
-
-        LabelInputRow(viewModel)
+            LabelInputRow(viewModel)
+        }
     }
 }
 
