@@ -241,8 +241,8 @@
     <string name="name_your_function">Nommez votre fonction :</string>
     <string name="write_your_function_here"># Écrivez votre fonction ici</string>
     <string name="add_some_data_sources">Ajouter des sources de données</string>
-    <string name="value_colon">Évaluer:</string>
-    <string name="label_colon">Étiquette:</string>
+    <string name="value">Évaluer:</string>
+    <string name="label">Étiquette:</string>
     <string name="continue_word">Continuez</string>
     <string name="update_all_data_points">Mettez à jour tous les points de données :</string>
     <string name="where_colon">Où:</string>

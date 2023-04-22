@@ -239,8 +239,8 @@
     <string name="name_your_function">Benennen Sie Ihre Funktion:</string>
     <string name="write_your_function_here"># Schreiben Sie hier Ihre Funktion</string>
     <string name="add_some_data_sources">Fügen Sie einige Datenquellen hinzu</string>
-    <string name="value_colon">Wert:</string>
-    <string name="label_colon">Label:</string>
+    <string name="value">Wert:</string>
+    <string name="label">Label:</string>
     <string name="continue_word">Weitermachen</string>
     <string name="update_all_data_points">Alle Datenpunkte aktualisieren:</string>
     <string name="where_colon">Woher:</string>

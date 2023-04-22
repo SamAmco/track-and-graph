@@ -237,7 +237,7 @@ private fun TutorialPage0() {
 
                 SpacingSmall()
 
-                LabeledRow(label = stringResource(id = R.string.value_colon)) {
+                LabeledRow(label = stringResource(id = R.string.value)) {
                     ValueInputTextField(
                         textFieldValue = TextFieldValue(""),
                         onValueChange = {}
@@ -273,7 +273,7 @@ private fun TutorialPage0() {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                LabeledRow(label = stringResource(id = R.string.label_colon)) {
+                LabeledRow(label = stringResource(id = R.string.label)) {
                     LabelInputTextField(
                         textFieldValue = TextFieldValue(""),
                         onValueChange = {}
@@ -282,7 +282,7 @@ private fun TutorialPage0() {
 
                 SpacingSmall()
 
-                AddANoteButton {}
+                AddChipButton(stringResource(id = R.string.add_a_note)) {}
             }
 
             //An overlay that fills the parent with a semi transparent background that consumes all click events

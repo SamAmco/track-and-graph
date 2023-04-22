@@ -33,7 +33,7 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 @Composable
 fun FadingScrollColumn(
     modifier: Modifier = Modifier,
-    size: Dp = 32.dp,
+    fadeSize: Dp = 32.dp,
     color: Color = MaterialTheme.tngColors.surface,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
@@ -57,7 +57,7 @@ fun FadingScrollColumn(
                 Modifier
                     .align(Alignment.TopCenter)
                     .fillMaxWidth()
-                    .height(size)
+                    .height(fadeSize)
                     .background(brush = Brush.verticalGradient(topColors))
             )
         }
@@ -67,7 +67,7 @@ fun FadingScrollColumn(
                 Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
-                    .height(size)
+                    .height(fadeSize)
                     .background(brush = Brush.verticalGradient(bottomColors))
             )
         }

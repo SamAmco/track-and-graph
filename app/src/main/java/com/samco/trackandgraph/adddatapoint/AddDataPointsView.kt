@@ -216,7 +216,7 @@ private fun TrackerPage(
         onDateTimeSelected = viewModel::updateTimestamp
     )
 
-    SpacingLarge()
+    SpacingSmall()
 
     val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
     val selectedSuggestedValue by viewModel.selectedSuggestedValue.observeAsState()
@@ -236,53 +236,137 @@ private fun TrackerPage(
                 }
             }
         )
-        SpacingLarge()
     }
 
     when (viewModel) {
         is AddDataPointViewModel.NumericalDataPointViewModel -> {
-            LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                ValueInputTextField(
-                    textFieldValue = viewModel.value,
-                    onValueChange = viewModel::setValueText,
-                    focusManager = focusManager,
-                    focusRequester = valueFocusRequester
-                )
-            }
+            ValueInputTextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                textFieldValue = viewModel.value,
+                onValueChange = viewModel::setValueText,
+                focusManager = focusManager,
+                focusRequester = valueFocusRequester
+            )
         }
         is AddDataPointViewModel.DurationDataPointViewModel -> {
-            LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                DurationInput(
-                    viewModel = viewModel,
-                    focusManager = focusManager,
-                    nextFocusDirection = FocusDirection.Down,
-                    focusRequester = valueFocusRequester
-                )
-            }
+            DurationInput(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                viewModel = viewModel,
+                focusManager = focusManager,
+                nextFocusDirection = FocusDirection.Down,
+                focusRequester = valueFocusRequester
+            )
         }
         else -> {}
     }
 
     LaunchedEffect(currentPage) {
-        delay(50)
+        delay(10)
         val hasSuggestedValues = suggestedValues.any { it.value != null }
         if (currentPage && !hasSuggestedValues) valueFocusRequester.requestFocus()
     }
 
+    LabelAndNoteInputs(viewModel = viewModel)
+}
+
+@Composable
+private fun LabelAndNoteInputs(viewModel: AddDataPointViewModel) {
+    var labelButtonPressed by rememberSaveable { mutableStateOf(false) }
+    var noteButtonPressed by rememberSaveable { mutableStateOf(false) }
+
+    val showLabelInput by remember {
+        derivedStateOf { viewModel.label.text.isNotEmpty() || labelButtonPressed }
+    }
+    val showNoteInput by remember {
+        derivedStateOf { viewModel.note.text.isNotEmpty() || noteButtonPressed }
+    }
+
+    val coroutineScope = rememberCoroutineScope()
+    val noteInputFocusRequester = remember { FocusRequester() }
+    val labelInputFocusRequester = remember { FocusRequester() }
+
     SpacingSmall()
 
-    LabeledRow(label = stringResource(id = R.string.label_colon)) {
+    if (showLabelInput) {
         LabelInputTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
             textFieldValue = viewModel.label,
             onValueChange = viewModel::updateLabel,
-            focusManager = focusManager
+            focusManager = LocalFocusManager.current,
+            focusRequester = labelInputFocusRequester,
         )
     }
 
-    SpacingSmall()
+    if (showNoteInput) {
+        if (showLabelInput) SpacingSmall()
+        FullWidthTextField(
+            modifier = Modifier
+                .heightIn(max = 200.dp)
+                .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+            textFieldValue = viewModel.note,
+            onValueChange = { viewModel.updateNote(it) },
+            focusRequester = noteInputFocusRequester,
+            label = stringResource(id = R.string.note_input_hint),
+            singleLine = false
+        )
+    }
 
-    NoteInput(viewModel)
+    if (showLabelInput xor showNoteInput) SpacingSmall()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        if (!showLabelInput) {
+            AddChipButton(text = stringResource(id = R.string.add_a_label)) {
+                labelButtonPressed = true
+                coroutineScope.launch {
+                    delay(50)
+                    labelInputFocusRequester.requestFocus()
+                }
+            }
+        }
+        if (!showNoteInput) {
+            AddChipButton(text = stringResource(id = R.string.add_a_note)) {
+                noteButtonPressed = true
+                coroutineScope.launch {
+                    delay(50)
+                    noteInputFocusRequester.requestFocus()
+                }
+            }
+        }
+    }
 }
+
+@Composable
+private fun HintHeader(viewModel: AddDataPointsViewModel) =
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = viewModel.indexText.observeAsState("").value,
+            fontSize = MaterialTheme.typography.body1.fontSize,
+            fontWeight = MaterialTheme.typography.body1.fontWeight,
+        )
+        //Faq vecotor icon as a button
+        IconButton(onClick = { viewModel.onTutorialButtonPressed() }) {
+            Icon(
+                painter = painterResource(id = R.drawable.faq_icon),
+                contentDescription = stringResource(id = R.string.help),
+                tint = MaterialTheme.colors.onSurface
+            )
+        }
+    }
 
 @Composable
 private fun SuggestedValues(
@@ -321,60 +405,3 @@ private fun SuggestedValues(
         })
     }
 }
-
-@Composable
-private fun NoteInput(viewModel: AddDataPointViewModel) =
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .width(IntrinsicSize.Max),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        val focusRequester = remember { FocusRequester() }
-        val coroutineScope = rememberCoroutineScope()
-
-        var showNoteBox by rememberSaveable { mutableStateOf(false) }
-
-        if (viewModel.note.text.isNotEmpty() || showNoteBox) {
-            FullWidthTextField(
-                modifier = Modifier.heightIn(max = 200.dp),
-                textFieldValue = viewModel.note,
-                onValueChange = { viewModel.updateNote(it) },
-                focusRequester = focusRequester,
-                label = stringResource(id = R.string.note_input_hint),
-                singleLine = false
-            )
-        } else {
-            AddANoteButton {
-                showNoteBox = true
-                coroutineScope.launch {
-                    delay(100)
-                    focusRequester.requestFocus()
-                }
-            }
-        }
-
-    }
-
-@Composable
-private fun HintHeader(viewModel: AddDataPointsViewModel) =
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = viewModel.indexText.observeAsState("").value,
-            fontSize = MaterialTheme.typography.body1.fontSize,
-            fontWeight = MaterialTheme.typography.body1.fontWeight,
-        )
-        //Faq vecotor icon as a button
-        IconButton(onClick = { viewModel.onTutorialButtonPressed() }) {
-            Icon(
-                painter = painterResource(id = R.drawable.faq_icon),
-                contentDescription = stringResource(id = R.string.help),
-                tint = MaterialTheme.colors.onSurface
-            )
-        }
-    }
-
