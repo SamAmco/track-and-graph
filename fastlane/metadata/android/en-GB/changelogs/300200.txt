@@ -1,0 +1,2 @@
+- New UI for data point input
+- New behaviour for suggested values
