@@ -100,7 +100,6 @@ private fun AddTrackerInputForm(
     modifier = modifier
         .padding(dimensionResource(id = R.dimen.card_padding))
         .fillMaxWidth()
-        .fillMaxHeight()
         .verticalScroll(state = rememberScrollState())
 ) {
     val focusManager = LocalFocusManager.current
@@ -126,11 +125,11 @@ private fun AddTrackerInputForm(
     DurationCheckbox(isDuration.value, viewModel)
 
     val shouldShowConversionSpinner =
-        viewModel.shouldShowDurationConversionModeSpinner.observeAsState(true)
+        viewModel.shouldShowDurationConversionModeSpinner.observeAsState(false)
     val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
 
     if (shouldShowConversionSpinner.value) {
-        SpacingSmall()
+        SpacingLarge()
         DurationConversionModeInput(
             isDuration.value,
             durationConversionMode.value,
@@ -291,15 +290,15 @@ private fun DurationConversionModeInput(
         TrackerHelper.DurationNumericConversionMode.SECONDS to stringResource(id = R.string.seconds)
     )
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         val name =
             if (isDuration) stringResource(id = R.string.numeric_to_duration_mode_header)
             else stringResource(id = R.string.duration_to_numeric_mode_header)
         Text(
             text = name,
             modifier = Modifier
-                .weight(1f)
-                .padding(end = dimensionResource(id = R.dimen.card_padding))
+                .padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
+            style = MaterialTheme.typography.subtitle2
         )
         TextMapSpinner(
             strings = strings,
