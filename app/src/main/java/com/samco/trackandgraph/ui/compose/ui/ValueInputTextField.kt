@@ -16,22 +16,24 @@
 */
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import kotlinx.coroutines.delay
@@ -43,11 +45,13 @@ fun LabelInputTextField(
     modifier: Modifier = Modifier,
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
-    focusManager: FocusManager? = null
+    focusManager: FocusManager? = null,
+    focusRequester: FocusRequester? = null
 ) {
     OutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
+        label = { Text(stringResource(id = R.string.label)) },
         keyboardActions = KeyboardActions(
             onNext = { focusManager?.moveFocus(FocusDirection.Down) }
         ),
@@ -56,7 +60,10 @@ fun LabelInputTextField(
             capitalization = KeyboardCapitalization.Sentences
         ),
         singleLine = true,
-        modifier = modifier
+        modifier = modifier.let {
+            if (focusRequester != null) it.focusRequester(focusRequester)
+            else it
+        }
     )
 }
 
@@ -73,12 +80,16 @@ fun ValueInputTextField(
     OutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
+        label = { Text(stringResource(id = R.string.value)) },
         keyboardActions = KeyboardActions(
             onNext = { focusManager?.moveFocus(FocusDirection.Down) }
         ),
+        textStyle = MaterialTheme.typography.subtitle2,
         placeholder = {
             Text(
-                "1.0",
+                modifier = Modifier.fillMaxWidth(),
+                text = "1.0",
+                style = MaterialTheme.typography.subtitle2,
                 color = MaterialTheme.tngColors.onSurface.copy(
                     alpha = MaterialTheme.tngColors.disabledAlpha
                 )

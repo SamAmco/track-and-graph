@@ -14,6 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
+
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.annotation.StringRes
@@ -30,26 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.tngColors
-
-@Composable
-fun AddANoteButton(
-    onClick: () -> Unit
-) = TextButton(
-    onClick = onClick,
-    colors = ButtonDefaults.textButtonColors(
-        contentColor = MaterialTheme.tngColors.onSurface
-    )
-) {
-    Icon(
-        painter = painterResource(id = R.drawable.edit_icon),
-        contentDescription = stringResource(id = R.string.add_a_note)
-    )
-    Text(
-        text = stringResource(id = R.string.add_a_note),
-        fontSize = MaterialTheme.typography.body1.fontSize,
-        fontWeight = MaterialTheme.typography.body1.fontWeight,
-    )
-}
 
 @Composable
 fun FilledButton(

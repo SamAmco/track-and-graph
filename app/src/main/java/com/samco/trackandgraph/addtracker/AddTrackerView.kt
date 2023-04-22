@@ -310,12 +310,10 @@ private fun DurationConversionModeInput(
 
 @Composable
 private fun LabelInputRow(viewModel: AddTrackerViewModel) {
-    LabeledRow(label = stringResource(id = R.string.label_colon)) {
-        LabelInputTextField(
-            textFieldValue = viewModel.defaultLabel,
-            onValueChange = viewModel::onDefaultLabelChanged
-        )
-    }
+    LabelInputTextField(
+        textFieldValue = viewModel.defaultLabel,
+        onValueChange = viewModel::onDefaultLabelChanged
+    )
 }
 
 @Composable
@@ -323,20 +321,16 @@ private fun ValueInputRow(
     viewModel: AddTrackerViewModel,
     focusManager: FocusManager
 ) {
-    LabeledRow(label = stringResource(id = R.string.value_colon)) {
-        ValueInputTextField(
-            textFieldValue = viewModel.defaultValue,
-            onValueChange = viewModel::onDefaultValueChanged,
-            focusManager = focusManager
-        )
-    }
+    ValueInputTextField(
+        textFieldValue = viewModel.defaultValue,
+        onValueChange = viewModel::onDefaultValueChanged,
+        focusManager = focusManager
+    )
 }
 
 @Composable
 private fun DurationInputRow(viewModel: AddTrackerViewModel) {
-    LabeledRow(label = stringResource(id = R.string.value_colon)) {
-        DurationInput(viewModel = viewModel)
-    }
+    DurationInput(viewModel = viewModel)
 }
 
 @Composable
