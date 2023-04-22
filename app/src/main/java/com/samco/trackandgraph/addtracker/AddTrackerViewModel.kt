@@ -88,7 +88,7 @@ class AddTrackerViewModelImpl @Inject constructor(
         isUpdateModeFlow.asLiveData(viewModelScope.coroutineContext)
     override val showUpdateWarningAlertDialog = MutableLiveData(false)
 
-    override val suggestionType = MutableLiveData(TrackerSuggestionType.VALUE_AND_LABEL)
+    override val suggestionType = MutableLiveData(TrackerSuggestionType.LABEL_ONLY)
     override val suggestionOrder = MutableLiveData(TrackerSuggestionOrder.VALUE_ASCENDING)
 
     override fun onTrackerNameChanged(name: TextFieldValue) {
