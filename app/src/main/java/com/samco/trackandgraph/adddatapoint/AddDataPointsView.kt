@@ -71,7 +71,7 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
                 )
             ) {
                 AddDataPointsView(
-                    modifier = Modifier.fillMaxWidth(0.85f),
+                    modifier = Modifier.fillMaxWidth(0.9f),
                     viewModel = viewModel
                 )
                 BackHandler {
