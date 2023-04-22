@@ -219,23 +219,22 @@ private fun TrackerPage(
     SpacingSmall()
 
     val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
-    val selectedSuggestedValue by viewModel.selectedSuggestedValue.observeAsState()
-
-    val focusScope = rememberCoroutineScope()
+    val selectedSuggestedValue by viewModel.currentValueAsSuggestion.observeAsState()
 
     if (suggestedValues.isNotEmpty()) {
         SuggestedValues(
             suggestedValues,
             selectedSuggestedValue,
             viewModel::onSuggestedValueSelected,
-            onSuggestedValueLongPress = {
-                viewModel.onSuggestedValueLongPress(it)
-                focusScope.launch {
-                    delay(100)
-                    valueFocusRequester.requestFocus()
-                }
-            }
+            viewModel::onSuggestedValueLongPress
         )
+    }
+
+    LaunchedEffect(valueFocusRequester) {
+        viewModel.focusOnValueEvent.collect {
+            delay(100)
+            valueFocusRequester.requestFocus()
+        }
     }
 
     when (viewModel) {
@@ -266,8 +265,8 @@ private fun TrackerPage(
 
     LaunchedEffect(currentPage) {
         delay(10)
-        val hasSuggestedValues = suggestedValues.any { it.value != null }
-        if (currentPage && !hasSuggestedValues) valueFocusRequester.requestFocus()
+        if (currentPage && suggestedValues.all { it.value == null })
+            valueFocusRequester.requestFocus()
     }
 
     LabelAndNoteInputs(viewModel = viewModel)

@@ -27,6 +27,7 @@ import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.base.helpers.PrefHelper
 import com.samco.trackandgraph.base.helpers.doubleFormatter
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
@@ -56,7 +57,9 @@ sealed interface AddDataPointViewModel {
     val label: TextFieldValue
     val note: TextFieldValue
     val suggestedValues: LiveData<List<SuggestedValueViewData>>
-    val selectedSuggestedValue: LiveData<SuggestedValueViewData?>
+    val currentValueAsSuggestion: LiveData<SuggestedValueViewData?>
+
+    val focusOnValueEvent: Flow<Unit>
 
     val oldDataPoint: DataPoint?
 
@@ -211,6 +214,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override val oldDataPoint = config.oldDataPoint
         override val name = MutableLiveData(config.tracker.name)
 
+        override val focusOnValueEvent = MutableSharedFlow<Unit>()
+
         private val onTimestampSelected = MutableSharedFlow<OffsetDateTime>()
         override val timestamp = merge(
             onTimestampSelected,
@@ -238,15 +243,36 @@ class AddDataPointsViewModelImpl @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
             .asLiveData(viewModelScope.coroutineContext)
 
-        override val selectedSuggestedValue = MutableLiveData(
-            config.oldDataPoint?.let {
-                SuggestedValueViewData(
-                    it.value,
-                    getValueString(it.value, config.tracker.dataType.isDuration()),
-                    it.label.let { label -> label.ifEmpty { null } }
+        protected val onUpdateCurrentSuggestion = MutableSharedFlow<Unit>()
+
+        override val currentValueAsSuggestion: LiveData<SuggestedValueViewData?> =
+            onUpdateCurrentSuggestion
+                .map { getAsSuggestedValue(getDouble(), label.text) }
+                .onStart {
+                    config.oldDataPoint?.let { emit(getAsSuggestedValue(it.value, it.label)) }
+                }
+                .asLiveData(viewModelScope.coroutineContext)
+
+        private fun getAsSuggestedValue(value: Double, label: String): SuggestedValueViewData? {
+            return when (config.tracker.suggestionType) {
+                TrackerSuggestionType.NONE -> null
+                TrackerSuggestionType.LABEL_ONLY -> SuggestedValueViewData(
+                    value = null,
+                    valueStr = null,
+                    label = label
+                )
+                TrackerSuggestionType.VALUE_ONLY -> SuggestedValueViewData(
+                    value = value,
+                    valueStr = getValueString(value, config.tracker.dataType.isDuration()),
+                    label = null
+                )
+                TrackerSuggestionType.VALUE_AND_LABEL -> SuggestedValueViewData(
+                    value = value,
+                    valueStr = getValueString(value, config.tracker.dataType.isDuration()),
+                    label = label.ifEmpty { null }
                 )
             }
-        )
+        }
 
         private fun getValueString(value: Double?, isDuration: Boolean): String? = when {
             value == null -> null
@@ -258,7 +284,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
         override fun updateLabel(label: TextFieldValue) {
             this.label = label
-            this.selectedSuggestedValue.value = null
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
         }
 
         override fun updateNote(note: TextFieldValue) {
@@ -273,14 +299,17 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
 
         override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
-            this.selectedSuggestedValue.value = suggestedValue
             setLabelFromSuggestedValue(suggestedValue)
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
+            if (suggestedValue.value == null) onAddClicked()
+            else viewModelScope.launch { focusOnValueEvent.emit(Unit) }
         }
 
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
-            this.selectedSuggestedValue.value = suggestedValue
             setLabelFromSuggestedValue(suggestedValue)
-            onAddClicked()
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
+            if (suggestedValue.value != null) onAddClicked()
+            else viewModelScope.launch { focusOnValueEvent.emit(Unit) }
         }
 
         private fun setLabelFromSuggestedValue(suggestedValue: SuggestedValueViewData) {
@@ -302,7 +331,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
             override fun setValueText(value: TextFieldValue) {
                 this.value = value
-                this.selectedSuggestedValue.value = null
+                viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
             }
 
             override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
@@ -338,17 +367,17 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
         override fun setHoursText(value: TextFieldValue) {
             durationInputViewModel.setHoursText(value)
-            this.selectedSuggestedValue.value = null
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
         }
 
         override fun setMinutesText(value: TextFieldValue) {
             durationInputViewModel.setMinutesText(value)
-            this.selectedSuggestedValue.value = null
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
         }
 
         override fun setSecondsText(value: TextFieldValue) {
             durationInputViewModel.setSecondsText(value)
-            this.selectedSuggestedValue.value = null
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
         }
 
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
