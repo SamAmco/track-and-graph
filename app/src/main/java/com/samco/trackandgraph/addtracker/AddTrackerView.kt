@@ -174,7 +174,9 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
 
 @Composable
 fun SuggestionType(viewModel: AddTrackerViewModel) {
-    val selectedSuggestionType by viewModel.suggestionType.observeAsState(TrackerSuggestionType.VALUE_AND_LABEL)
+    val selectedSuggestionType by viewModel.suggestionType.observeAsState(
+        TrackerSuggestionType.LABEL_ONLY
+    )
 
     val suggestionTypeMap = mapOf(
         TrackerSuggestionType.VALUE_AND_LABEL to stringResource(R.string.value_and_label),
