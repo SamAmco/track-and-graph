@@ -196,11 +196,12 @@ fun SuggestionType(viewModel: AddTrackerViewModel) {
 @Composable
 fun SuggestionOrder(viewModel: AddTrackerViewModel) {
 
-    val selectedSuggestionType by viewModel.suggestionType.observeAsState(TrackerSuggestionType.VALUE_AND_LABEL)
+    val selectedSuggestionType by viewModel.suggestionType
+        .observeAsState(TrackerSuggestionType.LABEL_ONLY)
 
     if (selectedSuggestionType != TrackerSuggestionType.NONE) {
         val selectedSuggestionOrder by viewModel.suggestionOrder.observeAsState(
-            TrackerSuggestionOrder.VALUE_ASCENDING
+            TrackerSuggestionOrder.LABEL_ASCENDING
         )
 
         val suggestionOrderMap = mapOf(
