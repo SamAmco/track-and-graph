@@ -228,6 +228,7 @@ private fun TrackerPage(
             viewModel::onSuggestedValueSelected,
             viewModel::onSuggestedValueLongPress
         )
+        SpacingSmall()
     }
 
     LaunchedEffect(valueFocusRequester) {
