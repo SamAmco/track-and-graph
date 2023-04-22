@@ -27,7 +27,7 @@ Labels and notes are both text inputs. Labels are useful for categorising data. 
 
 ---
 
-Any previous values you have tracked will later appear as buttons on the tracker input dialog. If you press the button that value/label is tracked immediately. If you long press the button the tracker input is filled for you and you can edit it before adding that data point. This means you can create multiple choice style answers for your self.
+Any previous labels you have tracked will later appear as buttons on the tracker input dialog. If you press the button the label field is filled with the selected label. If you long press the button a data point is added immediately with that label. Under the advanced tracker settings you can change the behaviour of suggested values slightly. This is explained in more detail further down.
 
 <img src="images/faq_1_3.png" width="50%">
 
@@ -73,8 +73,10 @@ When creating a tracker you can set a "default value" for that tracker. If you d
 
 <img src="images/faq_1_7.gif" width="50%">
 
-If you want to change the behaviour of the suggested values you can do so using the suggestions type and order settings. When you tap a suggested value the value and label fields are filled out and the data point is tracked immediately. You can long press a suggested value to fill out the fields without tracking so that you can edit one or more of the fields before tracking. 
+If you want to change the behaviour of the suggested values you can do so using the suggestions type and order settings. When you tap a suggested value the value and label fields are filled out and the data point is tracked immediately provided you are using the "Value only" or "Value and Label" suggestion type. Otherwise the dialog will simply fill the label field and allow you to input a value.
 
-By default previous tracked data points are used to create suggestions. Both the value and the label are used to create the suggestion and they are ordered ascending by value. If you change the suggestion type to labels only then tapping a suggestion will track a data point with that label and the default value of 1. If you change it to value only it will track a data point with that value and an empty label.
+If you are using "Value and Label" or "Value only" then long pressing the button will fill out the fields without tracking immediately. If you are using "Label only" then long pressing will track the label immediately with a value of 1.
 
-<img src="images/faq_1_8.gif" width="50%">
+By default only previously tracked labels are used to create suggestions and the suggested labels are sorted alphabetically.
+
+<img src="images/faq_1_8.png" width="50%">

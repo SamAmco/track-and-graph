@@ -14,6 +14,8 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
+@file:OptIn(ExperimentalCoroutinesApi::class)
+
 package com.samco.trackandgraph.adddatapoint
 
 import androidx.compose.runtime.getValue
@@ -25,6 +27,7 @@ import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.base.helpers.PrefHelper
 import com.samco.trackandgraph.base.helpers.doubleFormatter
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
@@ -35,6 +38,7 @@ import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import com.samco.trackandgraph.util.getDoubleFromTextOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -53,7 +57,9 @@ sealed interface AddDataPointViewModel {
     val label: TextFieldValue
     val note: TextFieldValue
     val suggestedValues: LiveData<List<SuggestedValueViewData>>
-    val selectedSuggestedValue: LiveData<SuggestedValueViewData?>
+    val currentValueAsSuggestion: LiveData<SuggestedValueViewData?>
+
+    val focusOnValueEvent: Flow<Unit>
 
     val oldDataPoint: DataPoint?
 
@@ -74,6 +80,7 @@ sealed interface AddDataPointViewModel {
 
 interface AddDataPointsViewModel {
 
+    val hidden: LiveData<Boolean>
     val showTutorial: LiveData<Boolean>
     val updateMode: LiveData<Boolean>
     val indexText: LiveData<String>
@@ -82,6 +89,7 @@ interface AddDataPointsViewModel {
     val currentPageIndex: LiveData<Int>
     val tutorialViewModel: AddDataPointTutorialViewModel
     val showCancelConfirmDialog: LiveData<Boolean>
+    val dismissEvents: Flow<Unit>
 
     fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel>
 
@@ -96,13 +104,20 @@ interface AddDataPointsViewModel {
 }
 
 interface AddDataPointsNavigationViewModel : AddDataPointsViewModel {
-    val dismiss: LiveData<Boolean>
 
-    fun initFromArgs(
-        trackerIds: List<Long>,
-        dataPointTimestamp: OffsetDateTime?,
-        customInitialValue: Double?
+    fun showAddDataPointDialog(
+        trackerId: Long,
+        dataPointTimestamp: OffsetDateTime? = null,
+        customInitialValue: Double? = null
     )
+
+    fun showAddDataPointsDialog(
+        trackerIds: List<Long>,
+        dataPointTimestamp: OffsetDateTime? = null,
+        customInitialValue: Double? = null
+    )
+
+    fun reset()
 }
 
 @HiltViewModel
@@ -129,7 +144,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     private val configFlow = MutableStateFlow<List<Config>>(emptyList())
     private val indexFlow = MutableStateFlow(0)
-    override val dismiss = MutableLiveData(false)
+    override val hidden = MutableLiveData(true)
+    override val dismissEvents = MutableSharedFlow<Unit>()
     private val tutorialButtonPresses = MutableSharedFlow<Unit>()
 
     override val tutorialViewModel = AddDataPointTutorialViewModelImpl()
@@ -144,7 +160,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
                 val hasData = dataInteractor.hasAtLeastOneDataPoint()
                 emit(!hasData && !prefHelper.getHideDataPointTutorial())
             },
-        tutorialViewModel.onTutorialComplete.map { false }
+        tutorialViewModel.onTutorialComplete.map { false },
+        dismissEvents.map { false }
     )
         .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
         .asLiveData(viewModelScope.coroutineContext)
@@ -185,7 +202,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
     }
 
-    private val now = OffsetDateTime.now()
+    private val now get() = OffsetDateTime.now()
 
     private val lastSelectedTimestampGlobal = MutableSharedFlow<OffsetDateTime>()
 
@@ -196,6 +213,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override var tracked = false
         override val oldDataPoint = config.oldDataPoint
         override val name = MutableLiveData(config.tracker.name)
+
+        override val focusOnValueEvent = MutableSharedFlow<Unit>()
 
         private val onTimestampSelected = MutableSharedFlow<OffsetDateTime>()
         override val timestamp = merge(
@@ -224,15 +243,36 @@ class AddDataPointsViewModelImpl @Inject constructor(
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
             .asLiveData(viewModelScope.coroutineContext)
 
-        override val selectedSuggestedValue = MutableLiveData(
-            config.oldDataPoint?.let {
-                SuggestedValueViewData(
-                    it.value,
-                    getValueString(it.value, config.tracker.dataType.isDuration()),
-                    it.label.let { label -> label.ifEmpty { null } }
+        protected val onUpdateCurrentSuggestion = MutableSharedFlow<Unit>()
+
+        override val currentValueAsSuggestion: LiveData<SuggestedValueViewData?> =
+            onUpdateCurrentSuggestion
+                .map { getAsSuggestedValue(getDouble(), label.text) }
+                .onStart {
+                    config.oldDataPoint?.let { emit(getAsSuggestedValue(it.value, it.label)) }
+                }
+                .asLiveData(viewModelScope.coroutineContext)
+
+        private fun getAsSuggestedValue(value: Double, label: String): SuggestedValueViewData? {
+            return when (config.tracker.suggestionType) {
+                TrackerSuggestionType.NONE -> null
+                TrackerSuggestionType.LABEL_ONLY -> SuggestedValueViewData(
+                    value = null,
+                    valueStr = null,
+                    label = label
+                )
+                TrackerSuggestionType.VALUE_ONLY -> SuggestedValueViewData(
+                    value = value,
+                    valueStr = getValueString(value, config.tracker.dataType.isDuration()),
+                    label = null
+                )
+                TrackerSuggestionType.VALUE_AND_LABEL -> SuggestedValueViewData(
+                    value = value,
+                    valueStr = getValueString(value, config.tracker.dataType.isDuration()),
+                    label = label.ifEmpty { null }
                 )
             }
-        )
+        }
 
         private fun getValueString(value: Double?, isDuration: Boolean): String? = when {
             value == null -> null
@@ -244,7 +284,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
         override fun updateLabel(label: TextFieldValue) {
             this.label = label
-            this.selectedSuggestedValue.value = null
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
         }
 
         override fun updateNote(note: TextFieldValue) {
@@ -259,14 +299,17 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
 
         override fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData) {
-            this.selectedSuggestedValue.value = suggestedValue
             setLabelFromSuggestedValue(suggestedValue)
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
+            if (suggestedValue.value == null) onAddClicked()
+            else viewModelScope.launch { focusOnValueEvent.emit(Unit) }
         }
 
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
-            this.selectedSuggestedValue.value = suggestedValue
             setLabelFromSuggestedValue(suggestedValue)
-            onAddClicked()
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
+            if (suggestedValue.value != null) onAddClicked()
+            else viewModelScope.launch { focusOnValueEvent.emit(Unit) }
         }
 
         private fun setLabelFromSuggestedValue(suggestedValue: SuggestedValueViewData) {
@@ -288,7 +331,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
             override fun setValueText(value: TextFieldValue) {
                 this.value = value
-                this.selectedSuggestedValue.value = null
+                viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
             }
 
             override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
@@ -324,17 +367,17 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
         override fun setHoursText(value: TextFieldValue) {
             durationInputViewModel.setHoursText(value)
-            this.selectedSuggestedValue.value = null
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
         }
 
         override fun setMinutesText(value: TextFieldValue) {
             durationInputViewModel.setMinutesText(value)
-            this.selectedSuggestedValue.value = null
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
         }
 
         override fun setSecondsText(value: TextFieldValue) {
             durationInputViewModel.setSecondsText(value)
-            this.selectedSuggestedValue.value = null
+            viewModelScope.launch { onUpdateCurrentSuggestion.emit(Unit) }
         }
 
         override fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData) {
@@ -370,13 +413,11 @@ class AddDataPointsViewModelImpl @Inject constructor(
         onCurrentViewModel {
             if (it.note.text.isNotEmpty() && this.showCancelConfirmDialog.value == false)
                 this.showCancelConfirmDialog.value = true
-            else dismiss.value = true
+            else dismiss()
         }
     }
 
-    override fun onConfirmCancelConfirmed() {
-        dismiss.value = true
-    }
+    override fun onConfirmCancelConfirmed() = dismiss()
 
     override fun onConfirmCancelDismissed() {
         showCancelConfirmDialog.value = false
@@ -421,7 +462,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
     }
 
     private fun incrementPageIndex() {
-        if (!setPageIndex(indexFlow.value + 1)) dismiss.value = true
+        if (!setPageIndex(indexFlow.value + 1)) dismiss()
     }
 
     private fun setPageIndex(index: Int): Boolean {
@@ -431,20 +472,27 @@ class AddDataPointsViewModelImpl @Inject constructor(
         } else false
     }
 
-    override fun initFromArgs(
+    override fun showAddDataPointDialog(
+        trackerId: Long,
+        dataPointTimestamp: OffsetDateTime?,
+        customInitialValue: Double?
+    ) = showAddDataPointsDialog(listOf(trackerId), dataPointTimestamp, customInitialValue)
+
+    override fun showAddDataPointsDialog(
         trackerIds: List<Long>,
         dataPointTimestamp: OffsetDateTime?,
         customInitialValue: Double?
     ) {
         if (initialized) return
         initialized = true
+        hidden.value = false
 
         viewModelScope.launch(io) {
             val configs = trackerIds
                 .mapNotNull { dataInteractor.getTrackerById(it) }
                 .map { getConfig(it, dataPointTimestamp, customInitialValue) }
 
-            if (configs.isEmpty()) dismiss.value = true
+            if (configs.isEmpty()) dismiss()
             else configFlow.emit(configs)
         }
     }
@@ -468,6 +516,20 @@ class AddDataPointsViewModelImpl @Inject constructor(
             note = dataPoint?.note,
             oldDataPoint = dataPoint
         )
+    }
+
+    private fun dismiss() {
+        hidden.value = true
+        viewModelScope.launch { dismissEvents.emit(Unit) }
+    }
+
+    override fun reset() {
+        showCancelConfirmDialog.value = false
+        indexFlow.value = 0
+        lastSelectedTimestampGlobal.resetReplayCache()
+        initialized = false
+        tutorialViewModel.reset()
+        configFlow.value = emptyList()
     }
 
     override fun onCleared() {
