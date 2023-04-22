@@ -14,7 +14,8 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-@file:OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class,
+@file:OptIn(
+    ExperimentalPagerApi::class, ExperimentalComposeUiApi::class,
     ExperimentalLayoutApi::class
 )
 
@@ -185,8 +186,8 @@ private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) 
     val currentPage by viewModel.currentPageIndex.observeAsState(0)
     val scope = rememberCoroutineScope()
 
-    if (currentPage != pagerState.currentPage) {
-        LaunchedEffect(currentPage) {
+    LaunchedEffect(currentPage) {
+        if (currentPage != pagerState.currentPage) {
             scope.launch {
                 pagerState.animateScrollToPage(currentPage)
             }
@@ -267,7 +268,7 @@ private fun TrackerPage(
     }
 
     LaunchedEffect(currentPage) {
-        delay(10)
+        delay(100)
         if (currentPage && suggestedValues.all { it.value == null })
             valueFocusRequester.requestFocus()
     }
