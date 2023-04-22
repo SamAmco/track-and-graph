@@ -14,7 +14,9 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-@file:OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class)
+@file:OptIn(ExperimentalPagerApi::class, ExperimentalComposeUiApi::class,
+    ExperimentalLayoutApi::class
+)
 
 package com.samco.trackandgraph.adddatapoint
 
@@ -319,7 +321,7 @@ private fun LabelAndNoteInputs(viewModel: AddDataPointViewModel) {
 
     if (showLabelInput xor showNoteInput) SpacingSmall()
 
-    Row(
+    FlowRow(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
