@@ -34,9 +34,8 @@ import androidx.recyclerview.widget.*
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.adddatapoint.DURATION_SECONDS_KEY
-import com.samco.trackandgraph.adddatapoint.DataPointInputDialog
-import com.samco.trackandgraph.adddatapoint.TRACKER_LIST_KEY
+import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
+import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.addtracker.*
@@ -46,7 +45,6 @@ import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.bindingForViewLifecycle
-import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -73,6 +71,8 @@ class GroupFragment : Fragment(),
     private lateinit var adapter: GroupAdapter
     private val viewModel by viewModels<GroupViewModel>()
 
+    private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
+
     private var forceNextNotifyDataSetChanged: Boolean = false
 
     init {
@@ -85,6 +85,13 @@ class GroupFragment : Fragment(),
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentGroupBinding.inflate(inflater, container, false)
+
+        binding.composeView.setContent {
+            AddDataPointsDialog(
+                addDataPointsDialogViewModel,
+                onDismissRequest = { addDataPointsDialogViewModel.reset() }
+            )
+        }
 
         this.navController = container?.findNavController()
         binding.lifecycleOwner = viewLifecycleOwner
@@ -310,17 +317,8 @@ class GroupFragment : Fragment(),
     }
 
     private fun onTrackerAddClicked(tracker: DisplayTracker, useDefault: Boolean = true) {
-        /**
-         * @param useDefault: if false the default value will be ignored and the user will be queried for the value
-         */
-        if (tracker.hasDefaultValue && useDefault) {
-            requireContext().performTrackVibrate()
-            viewModel.addDefaultTrackerValue(tracker)
-        } else {
-            val argBundle = Bundle()
-            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(tracker.id))
-            showAddDataPoint(argBundle)
-        }
+        if (tracker.hasDefaultValue && useDefault) viewModel.addDefaultTrackerValue(tracker)
+        else addDataPointsDialogViewModel.showAddDataPointDialog(trackerId = tracker.id)
     }
 
     private fun onTrackerDescriptionClicked(tracker: DisplayTracker) {
@@ -342,17 +340,8 @@ class GroupFragment : Fragment(),
 
     private fun onQueueAddAllClicked() {
         viewModel.trackers.let { trackers ->
-            if (trackers.isEmpty()) return
-            val argBundle = Bundle()
-            argBundle.putLongArray(TRACKER_LIST_KEY, trackers.map { it.id }.toLongArray())
-            showAddDataPoint(argBundle)
+            addDataPointsDialogViewModel.showAddDataPointsDialog(trackerIds = trackers.map { it.id })
         }
-    }
-
-    private fun showAddDataPoint(argBundle: Bundle) {
-        val dialog = DataPointInputDialog()
-        dialog.arguments = argBundle
-        childFragmentManager.let { dialog.show(it, "input_data_points_dialog") }
     }
 
     private fun initializeGridLayout() {
@@ -385,10 +374,11 @@ class GroupFragment : Fragment(),
         }
         viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
             if (it == null) return@observe
-            val argBundle = Bundle()
-            argBundle.putLongArray(TRACKER_LIST_KEY, longArrayOf(it.trackerId))
-            argBundle.putLong(DURATION_SECONDS_KEY, it.duration.seconds)
-            showAddDataPoint(argBundle)
+
+            addDataPointsDialogViewModel.showAddDataPointDialog(
+                trackerId = it.trackerId,
+                customInitialValue = it.duration.seconds.toDouble()
+            )
             viewModel.onConsumedShowDurationInputDialog()
         }
     }

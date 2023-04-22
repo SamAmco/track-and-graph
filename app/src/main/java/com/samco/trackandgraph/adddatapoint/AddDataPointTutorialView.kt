@@ -228,7 +228,7 @@ private fun TutorialPage0() {
                 .height(intrinsicSize = IntrinsicSize.Max)
                 .scale(0.8f)
         ) {
-            Column {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 DateTimeButtonRow(
                     modifier = Modifier.fillMaxWidth(),
                     selectedDateTime = OffsetDateTime.now(),
@@ -237,12 +237,10 @@ private fun TutorialPage0() {
 
                 SpacingSmall()
 
-                LabeledRow(label = stringResource(id = R.string.value_colon)) {
-                    ValueInputTextField(
-                        textFieldValue = TextFieldValue(""),
-                        onValueChange = {}
-                    )
-                }
+                ValueInputTextField(
+                    textFieldValue = TextFieldValue(""),
+                    onValueChange = {}
+                )
             }
 
             //An overlay that fills the parent with a semi transparent background that consumes all click events
@@ -270,19 +268,14 @@ private fun TutorialPage0() {
                 .height(intrinsicSize = IntrinsicSize.Max)
                 .scale(0.8f)
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                LabeledRow(label = stringResource(id = R.string.label_colon)) {
-                    LabelInputTextField(
-                        textFieldValue = TextFieldValue(""),
-                        onValueChange = {}
-                    )
-                }
-
-                SpacingSmall()
-
-                AddANoteButton {}
+                AddChipButton(text = stringResource(id = R.string.add_a_label)) { }
+                AddChipButton(stringResource(id = R.string.add_a_note)) {}
             }
 
             //An overlay that fills the parent with a semi transparent background that consumes all click events
@@ -293,5 +286,7 @@ private fun TutorialPage0() {
                     .clickable(enabled = false, onClick = {})
             )
         }
+
+        SpacingLarge()
     }
 }

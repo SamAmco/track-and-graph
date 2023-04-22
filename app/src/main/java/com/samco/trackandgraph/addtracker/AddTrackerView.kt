@@ -100,7 +100,6 @@ private fun AddTrackerInputForm(
     modifier = modifier
         .padding(dimensionResource(id = R.dimen.card_padding))
         .fillMaxWidth()
-        .fillMaxHeight()
         .verticalScroll(state = rememberScrollState())
 ) {
     val focusManager = LocalFocusManager.current
@@ -126,11 +125,11 @@ private fun AddTrackerInputForm(
     DurationCheckbox(isDuration.value, viewModel)
 
     val shouldShowConversionSpinner =
-        viewModel.shouldShowDurationConversionModeSpinner.observeAsState(true)
+        viewModel.shouldShowDurationConversionModeSpinner.observeAsState(false)
     val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
 
     if (shouldShowConversionSpinner.value) {
-        SpacingSmall()
+        SpacingLarge()
         DurationConversionModeInput(
             isDuration.value,
             durationConversionMode.value,
@@ -174,7 +173,9 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
 
 @Composable
 fun SuggestionType(viewModel: AddTrackerViewModel) {
-    val selectedSuggestionType by viewModel.suggestionType.observeAsState(TrackerSuggestionType.VALUE_AND_LABEL)
+    val selectedSuggestionType by viewModel.suggestionType.observeAsState(
+        TrackerSuggestionType.LABEL_ONLY
+    )
 
     val suggestionTypeMap = mapOf(
         TrackerSuggestionType.VALUE_AND_LABEL to stringResource(R.string.value_and_label),
@@ -195,11 +196,12 @@ fun SuggestionType(viewModel: AddTrackerViewModel) {
 @Composable
 fun SuggestionOrder(viewModel: AddTrackerViewModel) {
 
-    val selectedSuggestionType by viewModel.suggestionType.observeAsState(TrackerSuggestionType.VALUE_AND_LABEL)
+    val selectedSuggestionType by viewModel.suggestionType
+        .observeAsState(TrackerSuggestionType.LABEL_ONLY)
 
     if (selectedSuggestionType != TrackerSuggestionType.NONE) {
         val selectedSuggestionOrder by viewModel.suggestionOrder.observeAsState(
-            TrackerSuggestionOrder.VALUE_ASCENDING
+            TrackerSuggestionOrder.LABEL_ASCENDING
         )
 
         val suggestionOrderMap = mapOf(
@@ -267,13 +269,17 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
     DefaultValueCheckbox(hasDefaultValue.value, viewModel)
 
     if (hasDefaultValue.value) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (isDuration.value) DurationInputRow(viewModel)
+            else ValueInputRow(viewModel, focusManager)
 
-        if (isDuration.value) DurationInputRow(viewModel)
-        else ValueInputRow(viewModel, focusManager)
+            SpacingSmall()
 
-        SpacingSmall()
-
-        LabelInputRow(viewModel)
+            LabelInputRow(viewModel)
+        }
     }
 }
 
@@ -289,15 +295,15 @@ private fun DurationConversionModeInput(
         TrackerHelper.DurationNumericConversionMode.SECONDS to stringResource(id = R.string.seconds)
     )
 
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Column(modifier = Modifier.fillMaxWidth()) {
         val name =
             if (isDuration) stringResource(id = R.string.numeric_to_duration_mode_header)
             else stringResource(id = R.string.duration_to_numeric_mode_header)
         Text(
             text = name,
             modifier = Modifier
-                .weight(1f)
-                .padding(end = dimensionResource(id = R.dimen.card_padding))
+                .padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
+            style = MaterialTheme.typography.subtitle2
         )
         TextMapSpinner(
             strings = strings,
@@ -310,12 +316,10 @@ private fun DurationConversionModeInput(
 
 @Composable
 private fun LabelInputRow(viewModel: AddTrackerViewModel) {
-    LabeledRow(label = stringResource(id = R.string.label_colon)) {
-        LabelInputTextField(
-            textFieldValue = viewModel.defaultLabel,
-            onValueChange = viewModel::onDefaultLabelChanged
-        )
-    }
+    LabelInputTextField(
+        textFieldValue = viewModel.defaultLabel,
+        onValueChange = viewModel::onDefaultLabelChanged
+    )
 }
 
 @Composable
@@ -323,20 +327,16 @@ private fun ValueInputRow(
     viewModel: AddTrackerViewModel,
     focusManager: FocusManager
 ) {
-    LabeledRow(label = stringResource(id = R.string.value_colon)) {
-        ValueInputTextField(
-            textFieldValue = viewModel.defaultValue,
-            onValueChange = viewModel::onDefaultValueChanged,
-            focusManager = focusManager
-        )
-    }
+    ValueInputTextField(
+        textFieldValue = viewModel.defaultValue,
+        onValueChange = viewModel::onDefaultValueChanged,
+        focusManager = focusManager
+    )
 }
 
 @Composable
 private fun DurationInputRow(viewModel: AddTrackerViewModel) {
-    LabeledRow(label = stringResource(id = R.string.value_colon)) {
-        DurationInput(viewModel = viewModel)
-    }
+    DurationInput(viewModel = viewModel)
 }
 
 @Composable
