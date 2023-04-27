@@ -45,6 +45,7 @@ import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.util.bindingForViewLifecycle
+import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -317,7 +318,10 @@ class GroupFragment : Fragment(),
     }
 
     private fun onTrackerAddClicked(tracker: DisplayTracker, useDefault: Boolean = true) {
-        if (tracker.hasDefaultValue && useDefault) viewModel.addDefaultTrackerValue(tracker)
+        if (tracker.hasDefaultValue && useDefault) {
+            requireContext().performTrackVibrate()
+            viewModel.addDefaultTrackerValue(tracker)
+        }
         else addDataPointsDialogViewModel.showAddDataPointDialog(trackerId = tracker.id)
     }
 
