@@ -18,17 +18,16 @@
 package com.samco.trackandgraph.ui
 
 import android.content.Context
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.core.widget.TextViewCompat
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
+import com.samco.trackandgraph.databinding.DescriptionBodyTextBinding
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
 import org.threeten.bp.OffsetDateTime
 
@@ -47,16 +46,10 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
         .show()
 }
 
-private fun getBodyTextView(context: Context, text: String): TextView {
-    val bodyView = TextView(context)
-    TextViewCompat.setTextAppearance(bodyView, R.style.TextAppearance_Body)
-    bodyView.text = text
-    bodyView.setTextIsSelectable(true)
-    val res = context.resources
-    val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
-    val topBottomPadding = res.getDimension(R.dimen.card_padding).toInt()
-    bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
-    return bodyView
+private fun getBodyTextView(context: Context, text: String): View {
+    val bodyView = DescriptionBodyTextBinding.inflate(LayoutInflater.from(context))
+    bodyView.text.text = text
+    return bodyView.root
 }
 
 fun showNoteDialog(inflater: LayoutInflater, context: Context, note: GlobalNote) {
@@ -83,7 +76,7 @@ fun showNoteDialog(
         .show()
 }
 
-fun getNoteDialogHeader(
+private fun getNoteDialogHeader(
     inflater: LayoutInflater,
     context: Context,
     timestamp: OffsetDateTime,
@@ -122,22 +115,10 @@ fun showDataPointDescriptionDialog(
     context: Context, inflater: LayoutInflater, timestamp: OffsetDateTime, displayValue: String,
     note: String, featureDispalayName: String? = null
 ) {
-    val res = context.resources
-
     val headerView =
         getNoteDialogHeader(inflater, context, timestamp, displayValue, featureDispalayName)
 
-    val bodyView = TextView(context)
-    TextViewCompat.setTextAppearance(bodyView, R.style.TextAppearance_Body)
-    bodyView.text = note
-    bodyView.setTextIsSelectable(true)
-    val startEndPadding = res.getDimension(R.dimen.report_dialog_start_end_padding).toInt()
-    val topBottomPadding = res.getDimension(R.dimen.card_padding).toInt()
-    bodyView.setPadding(startEndPadding, topBottomPadding, startEndPadding, topBottomPadding)
-    bodyView.setTextSize(
-        TypedValue.COMPLEX_UNIT_PX,
-        res.getDimension(R.dimen.text_body_size)
-    )
+    val bodyView = getBodyTextView(context, note)
 
     AlertDialog.Builder(context)
         .setCustomTitle(headerView)
