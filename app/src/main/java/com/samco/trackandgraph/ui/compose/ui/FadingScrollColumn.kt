@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -37,10 +38,9 @@ fun FadingScrollColumn(
     color: Color = MaterialTheme.tngColors.surface,
     verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    scrollState: ScrollState = rememberScrollState(),
     content: @Composable ColumnScope.() -> Unit
 ) {
-    val scrollState = rememberScrollState()
-
     val bottomColors = listOf(Color.Transparent, color)
     val topColors = listOf(color, Color.Transparent)
 
