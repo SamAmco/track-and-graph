@@ -16,14 +16,16 @@
 */
 @file:OptIn(
     ExperimentalPagerApi::class, ExperimentalComposeUiApi::class,
-    ExperimentalLayoutApi::class
+    ExperimentalLayoutApi::class, ExperimentalFoundationApi::class
 )
 
 package com.samco.trackandgraph.adddatapoint
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -33,6 +35,10 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.onFocusEvent
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
@@ -48,7 +54,7 @@ import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 
@@ -199,93 +205,118 @@ private fun TrackerPager(modifier: Modifier, viewModel: AddDataPointsViewModel) 
 private fun TrackerPage(
     viewModel: AddDataPointViewModel,
     currentPage: Boolean
-) = FadingScrollColumn(
-    modifier = Modifier.padding(horizontal = 2.dp),
-    horizontalAlignment = Alignment.CenterHorizontally,
 ) {
+    val scrollState = rememberScrollState()
 
-    val focusManager = LocalFocusManager.current
-    val valueFocusRequester = remember { FocusRequester() }
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 2.dp)
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
 
-    TrackerNameHeadline(name = viewModel.name.observeAsState("").value)
+        val focusManager = LocalFocusManager.current
+        val valueFocusRequester = remember { FocusRequester() }
 
-    SpacingSmall()
+        TrackerNameHeadline(name = viewModel.name.observeAsState("").value)
 
-    val selectedDateTime by viewModel.timestamp.observeAsState(OffsetDateTime.now())
-
-    DateTimeButtonRow(
-        modifier = Modifier.fillMaxWidth(),
-        selectedDateTime = selectedDateTime,
-        onDateTimeSelected = viewModel::updateTimestamp
-    )
-
-    SpacingSmall()
-
-    val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
-    val selectedSuggestedValue by viewModel.currentValueAsSuggestion.observeAsState()
-
-    if (suggestedValues.isNotEmpty()) {
-        SuggestedValues(
-            suggestedValues,
-            selectedSuggestedValue,
-            viewModel::onSuggestedValueSelected,
-            viewModel::onSuggestedValueLongPress
-        )
         SpacingSmall()
-    }
 
-    LaunchedEffect(valueFocusRequester) {
-        viewModel.focusOnValueEvent.collect {
+        val selectedDateTime by viewModel.timestamp.observeAsState(OffsetDateTime.now())
+
+        DateTimeButtonRow(
+            modifier = Modifier.fillMaxWidth(),
+            selectedDateTime = selectedDateTime,
+            onDateTimeSelected = viewModel::updateTimestamp
+        )
+
+        SpacingSmall()
+
+        val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
+        val selectedSuggestedValue by viewModel.currentValueAsSuggestion.observeAsState()
+
+        if (suggestedValues.isNotEmpty()) {
+            SuggestedValues(
+                suggestedValues,
+                selectedSuggestedValue,
+                viewModel::onSuggestedValueSelected,
+                viewModel::onSuggestedValueLongPress
+            )
+            SpacingSmall()
+        }
+
+        LaunchedEffect(valueFocusRequester) {
+            viewModel.focusOnValueEvent.collect {
+                delay(100)
+                valueFocusRequester.requestFocus()
+            }
+        }
+
+        when (viewModel) {
+            is AddDataPointViewModel.NumericalDataPointViewModel -> {
+                ValueInputTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                    textFieldValue = viewModel.value,
+                    onValueChange = viewModel::setValueText,
+                    focusManager = focusManager,
+                    focusRequester = valueFocusRequester
+                )
+            }
+            is AddDataPointViewModel.DurationDataPointViewModel -> {
+                DurationInput(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                    viewModel = viewModel,
+                    focusManager = focusManager,
+                    nextFocusDirection = FocusDirection.Down,
+                    focusRequester = valueFocusRequester
+                )
+            }
+            else -> {}
+        }
+
+        LaunchedEffect(currentPage) {
             delay(100)
-            valueFocusRequester.requestFocus()
+            if (currentPage && suggestedValues.all { it.value == null })
+                valueFocusRequester.requestFocus()
         }
-    }
 
-    when (viewModel) {
-        is AddDataPointViewModel.NumericalDataPointViewModel -> {
-            ValueInputTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
-                textFieldValue = viewModel.value,
-                onValueChange = viewModel::setValueText,
-                focusManager = focusManager,
-                focusRequester = valueFocusRequester
-            )
-        }
-        is AddDataPointViewModel.DurationDataPointViewModel -> {
-            DurationInput(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
-                viewModel = viewModel,
-                focusManager = focusManager,
-                nextFocusDirection = FocusDirection.Down,
-                focusRequester = valueFocusRequester
-            )
-        }
-        else -> {}
+        LabelAndNoteInputs(
+            viewModel = viewModel,
+            scrollState = scrollState
+        )
     }
-
-    LaunchedEffect(currentPage) {
-        delay(100)
-        if (currentPage && suggestedValues.all { it.value == null })
-            valueFocusRequester.requestFocus()
-    }
-
-    LabelAndNoteInputs(viewModel = viewModel)
 }
 
 @Composable
-private fun LabelAndNoteInputs(viewModel: AddDataPointViewModel) {
-    var labelButtonPressed by rememberSaveable { mutableStateOf(false) }
-    var noteButtonPressed by rememberSaveable { mutableStateOf(false) }
+private fun LabelAndNoteInputs(
+    viewModel: AddDataPointViewModel,
+    scrollState: ScrollState
+) {
+    var noteBoxHeight by remember { mutableStateOf<Int?>(null) }
 
-    val showLabelInput by remember {
-        derivedStateOf { viewModel.label.text.isNotEmpty() || labelButtonPressed }
+    LaunchedEffect(noteBoxHeight) {
+        if (noteBoxHeight != null) scrollState.scrollTo(scrollState.maxValue)
     }
-    val showNoteInput by remember {
-        derivedStateOf { viewModel.note.text.isNotEmpty() || noteButtonPressed }
+
+    var labelAdded by rememberSaveable { mutableStateOf(false) }
+    var noteAdded by rememberSaveable { mutableStateOf(false) }
+
+    LaunchedEffect(viewModel) {
+        snapshotFlow { viewModel.label.text }
+            .dropWhile { it.isEmpty() }
+            .take(1)
+            .collect { labelAdded = true }
+    }
+
+    LaunchedEffect(viewModel) {
+        snapshotFlow { viewModel.note.text }
+            .dropWhile { it.isEmpty() }
+            .take(1)
+            .collect { noteAdded = true }
     }
 
     val coroutineScope = rememberCoroutineScope()
@@ -294,11 +325,19 @@ private fun LabelAndNoteInputs(viewModel: AddDataPointViewModel) {
 
     SpacingSmall()
 
-    if (showLabelInput) {
+    val bringIntoViewRequester = remember { BringIntoViewRequester() }
+
+    if (labelAdded) {
         LabelInputTextField(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                .bringIntoViewRequester(bringIntoViewRequester)
+                .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large))
+                .onFocusEvent { state ->
+                    if (state.isFocused) {
+                        coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
+                    }
+                },
             textFieldValue = viewModel.label,
             onValueChange = viewModel::updateLabel,
             focusManager = LocalFocusManager.current,
@@ -306,12 +345,15 @@ private fun LabelAndNoteInputs(viewModel: AddDataPointViewModel) {
         )
     }
 
-    if (showNoteInput) {
-        if (showLabelInput) SpacingSmall()
+    if (noteAdded) {
+        if (labelAdded) SpacingSmall()
         FullWidthTextField(
             modifier = Modifier
                 .heightIn(max = 200.dp)
-                .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large))
+                .onGloballyPositioned {
+                    if (noteBoxHeight != it.size.height) noteBoxHeight = it.size.height
+                },
             textFieldValue = viewModel.note,
             onValueChange = { viewModel.updateNote(it) },
             focusRequester = noteInputFocusRequester,
@@ -320,7 +362,7 @@ private fun LabelAndNoteInputs(viewModel: AddDataPointViewModel) {
         )
     }
 
-    if (showLabelInput xor showNoteInput) SpacingSmall()
+    if (labelAdded xor noteAdded) SpacingSmall()
 
     FlowRow(
         modifier = Modifier
@@ -328,18 +370,18 @@ private fun LabelAndNoteInputs(viewModel: AddDataPointViewModel) {
             .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        if (!showLabelInput) {
+        if (!labelAdded) {
             AddChipButton(text = stringResource(id = R.string.add_a_label)) {
-                labelButtonPressed = true
+                labelAdded = true
                 coroutineScope.launch {
                     delay(50)
                     labelInputFocusRequester.requestFocus()
                 }
             }
         }
-        if (!showNoteInput) {
+        if (!noteAdded) {
             AddChipButton(text = stringResource(id = R.string.add_a_note)) {
-                noteButtonPressed = true
+                noteAdded = true
                 coroutineScope.launch {
                     delay(50)
                     noteInputFocusRequester.requestFocus()
