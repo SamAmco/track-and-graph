@@ -1,0 +1,4 @@
+- Fix bug graph durations wrong on updating graph
+- Add scroll to note view dialog
+- Auto-scroll to note and label inputs when they are focused
+- Fix bug track vibrate not working
