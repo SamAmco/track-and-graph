@@ -22,10 +22,7 @@ import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.*
 
 class TimeHistogramDataHelper(
     private val timeHelper: TimeHelper
@@ -81,10 +78,8 @@ class TimeHistogramDataHelper(
         val endTime = getNextEndOfWindow(window, sample.first().timestamp)
 
         return when {
-            sumByCount ->
-                getHistogramBinsForSample(sampleList, window, endTime, ::addOneToBin)
-            else ->
-                getHistogramBinsForSample(sampleList, window, endTime, ::addValueToBin)
+            sumByCount -> getHistogramBinsForSample(sampleList, window, endTime, ::addOneToBin)
+            else -> getHistogramBinsForSample(sampleList, window, endTime, ::addValueToBin)
         }
     }
 
@@ -123,7 +118,9 @@ class TimeHistogramDataHelper(
         var binned = 0
         var nextPoint = sample[0]
         val timeOf = { dp: IDataPoint ->
-            dp.timestamp.atZoneSameInstant(ZoneId.systemDefault())
+            //Drop the offset and use the local time. A time of 8:00 should always go in the 8:00 bin
+            // regardless of what time zone it was tracked in.
+            dp.timestamp.atZoneSimilarLocal(ZoneId.systemDefault())
         }
         while (binned < sample.size) {
             val periodDuration = Duration
