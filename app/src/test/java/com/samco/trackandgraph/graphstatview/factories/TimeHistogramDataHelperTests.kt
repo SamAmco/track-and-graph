@@ -24,17 +24,15 @@ import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.junit.Assert
 import org.junit.Test
-import org.threeten.bp.DayOfWeek
-import org.threeten.bp.Duration
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
+import org.threeten.bp.*
 
 class TimeHistogramDataHelperTests {
     private val timeHelper = TimeHelper(
         object : AggregationPreferences {
             override val firstDayOfWeek = DayOfWeek.MONDAY
             override val startTimeOfDay = Duration.ZERO
-        }
+        },
+        ZoneId.of("UTC")
     )
 
     @Test
@@ -185,7 +183,8 @@ class TimeHistogramDataHelperTests {
             object : AggregationPreferences {
                 override val firstDayOfWeek = DayOfWeek.MONDAY
                 override val startTimeOfDay = Duration.ofHours(4)
-            }
+            },
+            ZoneId.of("UTC")
         )
 
         //WHEN
