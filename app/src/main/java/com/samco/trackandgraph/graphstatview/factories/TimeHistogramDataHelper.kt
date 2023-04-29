@@ -120,7 +120,7 @@ class TimeHistogramDataHelper(
         val timeOf = { dp: IDataPoint ->
             //Drop the offset and use the local time. A time of 8:00 should always go in the 8:00 bin
             // regardless of what time zone it was tracked in.
-            dp.timestamp.atZoneSimilarLocal(ZoneId.systemDefault())
+            dp.timestamp.atZoneSimilarLocal(timeHelper.zoneId)
         }
         while (binned < sample.size) {
             val periodDuration = Duration
