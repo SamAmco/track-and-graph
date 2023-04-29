@@ -25,8 +25,8 @@ import kotlin.math.floor
 import kotlin.math.round
 import kotlin.random.Random
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 class DataDisplayIntervalHelperTest {
 
@@ -320,9 +320,10 @@ private fun printExampleNumerical(start:Double, end: Double) {
         //return interval
     }
 
-
-    @ExperimentalTime
-    private fun printExampleTime(start: Double, end: Double): DataDisplayIntervalHelper.YAxisParameters {
+    private fun printExampleTime(
+        start: Double,
+        end: Double
+    ): DataDisplayIntervalHelper.YAxisParameters {
         val parameters = uut.getYParameters(
             start,
             end,
@@ -344,13 +345,10 @@ private fun printExampleNumerical(start:Double, end: Double) {
         return parameters
     }
 
-    @ExperimentalTime
-    fun duration2string(duration: Duration): String {
-        val hours = floor(duration.inHours).toInt().toString().padStart(2, '0')
-        val mins = floor(duration.inMinutes).rem(60).toInt().toString().padStart(2, '0')
-        val seconds = floor(duration.inSeconds).rem(60).toInt().toString().padStart(2, '0')
-
+    private fun duration2string(duration: Duration): String {
+        val hours = duration.inWholeHours.toInt().toString().padStart(2, '0')
+        val mins = duration.inWholeMinutes.rem(60).toInt().toString().padStart(2, '0')
+        val seconds = duration.inWholeSeconds.rem(60).toInt().toString().padStart(2, '0')
         return "$hours:$mins:$seconds"
-
     }
 }
