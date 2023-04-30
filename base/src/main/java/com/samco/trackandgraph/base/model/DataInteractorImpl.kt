@@ -357,9 +357,14 @@ internal class DataInteractorImpl @Inject constructor(
             }
         }
 
-    override suspend fun duplicateLastValueStat(graphOrStat: GraphOrStat): Long? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun duplicateLastValueStat(graphOrStat: GraphOrStat): Long? =
+        performAtomicUpdate {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val newGraphStat = duplicateGraphOrStat(graphOrStat)
+            dao.getLastValueStatByGraphStatId(graphOrStat.id)?.let {
+                dao.insertLastValueStat(it.copy(id = 0L, graphStatId = newGraphStat))
+            }
+        }
 
     private fun insertGraphStat(graphOrStat: GraphOrStat) =
         dao.insertGraphOrStat(graphOrStat.copy(id = 0L, displayIndex = 0).toEntity())
@@ -417,7 +422,9 @@ internal class DataInteractorImpl @Inject constructor(
         graphOrStat: GraphOrStat,
         config: LastValueStat
     ): Long {
-        TODO("Not yet implemented")
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val id = insertGraphStat(graphOrStat)
+        return dao.insertLastValueStat(config.copy(graphStatId = id).toEntity())
     }
 
     override suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart) =
@@ -511,9 +518,10 @@ internal class DataInteractorImpl @Inject constructor(
             dao.getTimeHistogramByGraphStatId(graphStatId)?.toDto()
         }
 
-    override suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat? =
+        withContext(io) {
+            dao.getLastValueStatByGraphStatId(graphOrStatId)?.toDto()
+        }
 
     override suspend fun getGroupsForGroupSync(id: Long): List<Group> = withContext(io) {
         dao.getGroupsForGroupSync(id).map { it.toDto() }
