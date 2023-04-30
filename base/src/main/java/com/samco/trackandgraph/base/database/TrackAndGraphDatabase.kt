@@ -34,6 +34,7 @@ import com.samco.trackandgraph.base.database.entity.PieChart
 import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.database.entity.TimeHistogram
 import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
+import com.samco.trackandgraph.base.database.entity.LastValueStat
 import com.samco.trackandgraph.base.database.entity.Tracker
 import com.samco.trackandgraph.base.database.migrations.allMigrations
 import com.squareup.moshi.JsonAdapter
@@ -64,9 +65,10 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         LineGraphFeature::class,
         TimeHistogram::class,
         FeatureTimer::class,
-        FunctionEntity::class
+        FunctionEntity::class,
+        LastValueStat::class
     ],
-    version = 50
+    version = 51
 )
 @TypeConverters(Converters::class)
 internal abstract class TrackAndGraphDatabase : RoomDatabase() {

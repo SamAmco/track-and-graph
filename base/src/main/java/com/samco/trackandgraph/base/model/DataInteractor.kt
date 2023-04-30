@@ -95,6 +95,10 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
 
+    suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
+
+    suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat?
+
     suspend fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
     suspend fun getAllGraphStatsSync(): List<GraphOrStat>
@@ -121,6 +125,8 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun duplicateTimeHistogram(graphOrStat: GraphOrStat): Long?
 
+    suspend fun duplicateLastValueStat(graphOrStat: GraphOrStat): Long?
+
     suspend fun insertLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures): Long
 
     suspend fun insertPieChart(graphOrStat: GraphOrStat, pieChart: PieChart): Long
@@ -137,6 +143,8 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun insertTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram): Long
 
+    suspend fun insertLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat): Long
+
     suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart)
 
     suspend fun updateAverageTimeBetweenStat(
@@ -151,11 +159,11 @@ interface DataInteractor : TrackerHelper, DataSampler {
         timeSinceLastStat: TimeSinceLastStat
     )
 
+    suspend fun updateLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat)
+
     suspend fun updateGraphOrStat(graphOrStat: GraphOrStat)
 
     suspend fun updateTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram)
-
-    suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 
     suspend fun getGroupsForGroupSync(id: Long): List<Group>
 

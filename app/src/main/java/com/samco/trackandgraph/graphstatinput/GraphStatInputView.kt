@@ -293,6 +293,10 @@ fun ConfigInputView(
         hiltViewModel<TimeHistogramConfigViewModel>(viewModelStoreOwner)
     timeHistogramConfigViewModel.initFromGraphStatId(graphStatId)
 
+    val lastValueConfigViewModel =
+        hiltViewModel<LastValueConfigViewModel>(viewModelStoreOwner)
+    lastValueConfigViewModel.initFromGraphStatId(graphStatId)
+
     var currentViewModel: GraphStatConfigViewModelBase<*> = lineGraphConfigViewModel
 
     when (graphType) {
@@ -315,6 +319,10 @@ fun ConfigInputView(
         GraphStatType.TIME_HISTOGRAM -> {
             currentViewModel = timeHistogramConfigViewModel
             TimeHistogramConfigView(viewModel = timeHistogramConfigViewModel)
+        }
+        GraphStatType.LAST_VALUE -> {
+            currentViewModel = lastValueConfigViewModel
+            LastValueConfigView(viewModel = lastValueConfigViewModel)
         }
     }
 
