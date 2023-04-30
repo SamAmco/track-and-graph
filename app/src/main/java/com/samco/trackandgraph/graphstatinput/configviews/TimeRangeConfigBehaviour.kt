@@ -7,11 +7,14 @@ import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
 import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import javax.inject.Inject
 
-interface TimeRangeConfigBehaviour {
-    val selectedDuration: GraphStatDurations
+interface EndingAtConfigBehaviour {
     val sampleEndingAt: SampleEndingAt
-    fun updateDuration(duration: GraphStatDurations)
     fun updateSampleEndingAt(endingAt: SampleEndingAt)
+}
+
+interface TimeRangeConfigBehaviour : EndingAtConfigBehaviour {
+    val selectedDuration: GraphStatDurations
+    fun updateDuration(duration: GraphStatDurations)
 }
 
 class TimeRangeConfigBehaviourImpl @Inject constructor() : TimeRangeConfigBehaviour {

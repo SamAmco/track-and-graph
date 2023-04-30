@@ -47,6 +47,10 @@ sealed interface GraphStatConfigEvent {
         data class TimeHistogramConfigData(
             override val config: TimeHistogram
         ) : ConfigData<TimeHistogram>
+
+        data class LastValueConfigData(
+            override val config: LastValueStat
+        ) : ConfigData<LastValueStat>
     }
 }
 

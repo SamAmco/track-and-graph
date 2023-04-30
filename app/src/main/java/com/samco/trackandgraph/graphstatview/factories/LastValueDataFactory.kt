@@ -17,37 +17,36 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
+import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeSinceViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueData
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-class TimeSinceDataFactory @Inject constructor(
+class LastValueDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
     @IODispatcher ioDispatcher: CoroutineDispatcher,
     private val commonHelpers: DataFactoryCommonHelpers
-) : ViewDataFactory<TimeSinceLastStat, ITimeSinceViewData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<LastValueStat, ILastValueData>(dataInteractor, ioDispatcher) {
+
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): ITimeSinceViewData {
-        val timeSinceStat = dataInteractor.getTimeSinceLastStatByGraphStatId(graphOrStat.id)
+    ): ILastValueData {
+        val lastValueStat = dataInteractor.getLastValueStatByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
-        return createViewData(graphOrStat, timeSinceStat, onDataSampled)
+        return createViewData(graphOrStat, lastValueStat, onDataSampled)
     }
 
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
-        config: TimeSinceLastStat,
+        config: LastValueStat,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): ITimeSinceViewData {
+    ): ILastValueData {
         return try {
             val dataPoint = commonHelpers.getLastDataPoint(
                 dataInteractor = dataInteractor,
@@ -59,13 +58,13 @@ class TimeSinceDataFactory @Inject constructor(
                 toValue = config.toValue,
                 onDataSampled = onDataSampled
             ) ?: return notEnoughData(graphOrStat)
-            object : ITimeSinceViewData {
-                override val lastDataPoint = dataPoint
+            object : ILastValueData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
+                override val lastDataPoint = dataPoint
             }
         } catch (throwable: Throwable) {
-            object : ITimeSinceViewData {
+            object : ILastValueData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
                 override val error = throwable
@@ -74,14 +73,14 @@ class TimeSinceDataFactory @Inject constructor(
     }
 
     private fun graphNotFound(graphOrStat: GraphOrStat) =
-        object : ITimeSinceViewData {
+        object : ILastValueData {
             override val state = IGraphStatViewData.State.ERROR
             override val graphOrStat = graphOrStat
             override val error = GraphNotFoundException()
         }
 
     private fun notEnoughData(graphOrStat: GraphOrStat) =
-        object : ITimeSinceViewData {
+        object : ILastValueData {
             override val error = NotEnoughDataException(0)
             override val state = IGraphStatViewData.State.ERROR
             override val graphOrStat = graphOrStat

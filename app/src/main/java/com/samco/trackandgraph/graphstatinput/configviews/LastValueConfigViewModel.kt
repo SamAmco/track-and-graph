@@ -1,29 +1,14 @@
-/*
-* This file is part of Track & Graph
-*
-* Track & Graph is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Track & Graph is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-*/
 package com.samco.trackandgraph.graphstatinput.configviews
 
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.TimeSinceLastStat
+import com.samco.trackandgraph.base.database.dto.LastValueStat
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
+import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -31,24 +16,29 @@ import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 @HiltViewModel
-class TimeSinceLastConfigViewModel @Inject constructor(
+class LastValueConfigViewModel @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     @DefaultDispatcher private val default: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
-    private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl = FilterableFeatureConfigBehaviourImpl(),
+    private val endingAtConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
     private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl(),
-) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.TimeSinceLastConfigData>(
+    private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl = FilterableFeatureConfigBehaviourImpl()
+) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LastValueConfigData>(
     io,
     default,
     ui,
     gsiProvider,
     dataInteractor
-), FilterableFeatureConfigBehaviour by filterableFeatureConfigBehaviour,
+),
+    EndingAtConfigBehaviour by endingAtConfigBehaviour,
+    FilterableFeatureConfigBehaviour by filterableFeatureConfigBehaviour,
     SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour {
 
     init {
+        endingAtConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
+        singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(onUpdate = { onUpdate() })
         filterableFeatureConfigBehaviour.initFilterableFeatureConfigBehaviour(
             onUpdate = { onUpdate() },
             io = io,
@@ -56,26 +46,24 @@ class TimeSinceLastConfigViewModel @Inject constructor(
             coroutineScope = viewModelScope,
             dataInteractor = dataInteractor
         )
-        singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(
-            onUpdate = { onUpdate() },
-            featureChangeCallback = { filterableFeatureConfigBehaviour.onFeatureIdUpdated(it) },
-        )
     }
 
-    private var timeSinceLastStat: TimeSinceLastStat = TimeSinceLastStat(
-        id = 0,
-        graphStatId = 0,
+    private var lastValueStat = LastValueStat(
+        id = -1L,
+        graphStatId = -1L,
         featureId = -1L,
+        endDate = null,
         fromValue = 0.0,
-        toValue = 1.0,
-        labels = listOf(),
+        toValue = 0.0,
+        labels = emptyList(),
         filterByRange = false,
         filterByLabels = false
     )
 
     override fun updateConfig() {
-        timeSinceLastStat = timeSinceLastStat.copy(
+        lastValueStat = lastValueStat.copy(
             featureId = singleFeatureConfigBehaviour.featureId ?: -1L,
+            endDate = endingAtConfigBehaviour.sampleEndingAt.asDateTime(),
             fromValue = filterableFeatureConfigBehaviour.fromValue.text.toDoubleOrNull() ?: 0.0,
             toValue = filterableFeatureConfigBehaviour.toValue.text.toDoubleOrNull() ?: 1.0,
             labels = filterableFeatureConfigBehaviour.selectedLabels,
@@ -84,29 +72,28 @@ class TimeSinceLastConfigViewModel @Inject constructor(
         )
     }
 
-    override fun getConfig(): GraphStatConfigEvent.ConfigData.TimeSinceLastConfigData {
-        return GraphStatConfigEvent.ConfigData.TimeSinceLastConfigData(timeSinceLastStat)
+    override fun getConfig(): GraphStatConfigEvent.ConfigData.LastValueConfigData {
+        return GraphStatConfigEvent.ConfigData.LastValueConfigData(lastValueStat)
     }
 
     override suspend fun validate(): GraphStatConfigEvent.ValidationException? {
-        if (timeSinceLastStat.featureId == -1L)
-            return GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        if (timeSinceLastStat.fromValue > timeSinceLastStat.toValue)
-            return GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_invalid_value_stat_from_to)
-        return null
+        return if (singleFeatureConfigBehaviour.featureId == -1L) {
+            GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+        } else null
     }
 
     override fun onDataLoaded(config: Any?) {
         singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
 
-        if (config !is TimeSinceLastStat) return
-        this.timeSinceLastStat = config
+        if (config !is LastValueStat) return
+        this.lastValueStat = config
 
         //When you set this feature ID it will trigger a callback that updates the filterable
         // feature config behaviour
         singleFeatureConfigBehaviour.featureId = config.featureId
         filterableFeatureConfigBehaviour.getAvailableLabels()
 
+        endingAtConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
         filterableFeatureConfigBehaviour.filterByLabel = config.filterByLabels
         filterableFeatureConfigBehaviour.filterByRange = config.filterByRange
         filterableFeatureConfigBehaviour.fromValue = config.fromValue.asTextFieldValue()
