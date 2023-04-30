@@ -23,7 +23,8 @@ import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 
 class TimeHelper(
-    val aggregationPreferences: AggregationPreferences
+    val aggregationPreferences: AggregationPreferences,
+    val zoneId: ZoneId = ZoneId.systemDefault()
 ) {
 
     /**

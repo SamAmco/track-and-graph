@@ -26,53 +26,45 @@ import org.threeten.bp.temporal.TemporalAmount
 
 data class TimeHistogramWindowData(
     val window: TimeHistogramWindow,
-    val duration: Duration,
     val period: TemporalAmount,
     val numBins: Int
 ) {
     companion object {
         fun getWindowData(window: TimeHistogramWindow): TimeHistogramWindowData = when (window) {
             TimeHistogramWindow.HOUR -> TimeHistogramWindowData(
-                TimeHistogramWindow.HOUR,
-                Duration.ofHours(1),
-                Duration.ofHours(1),
-                60
+                window = TimeHistogramWindow.HOUR,
+                period = Duration.ofHours(1),
+                numBins = 60
             )
             TimeHistogramWindow.DAY -> TimeHistogramWindowData(
-                TimeHistogramWindow.DAY,
-                Duration.ofDays(1),
-                Duration.ofDays(1),
-                24
+                window = TimeHistogramWindow.DAY,
+                period = Period.ofDays(1),
+                numBins = 24
             )
             TimeHistogramWindow.WEEK -> TimeHistogramWindowData(
-                TimeHistogramWindow.WEEK,
-                Duration.ofDays(7),
-                Period.ofWeeks(1),
-                7
+                window = TimeHistogramWindow.WEEK,
+                period = Period.ofWeeks(1),
+                numBins = 7
             )
             TimeHistogramWindow.MONTH -> TimeHistogramWindowData(
-                TimeHistogramWindow.MONTH,
-                Duration.ofDays(30),
-                Period.ofMonths(1),
-                30
+                window = TimeHistogramWindow.MONTH,
+                period = Period.ofMonths(1),
+                numBins = 30
             )
             TimeHistogramWindow.THREE_MONTHS -> TimeHistogramWindowData(
-                TimeHistogramWindow.THREE_MONTHS,
-                Duration.ofDays(365 / 4),
-                Period.ofMonths(3),
-                13
+                window = TimeHistogramWindow.THREE_MONTHS,
+                period = Period.ofMonths(3),
+                numBins = 13
             )
             TimeHistogramWindow.SIX_MONTHS -> TimeHistogramWindowData(
-                TimeHistogramWindow.SIX_MONTHS,
-                Duration.ofDays(365 / 2),
-                Period.ofMonths(6),
-                26
+                window = TimeHistogramWindow.SIX_MONTHS,
+                period = Period.ofMonths(6),
+                numBins = 26
             )
             TimeHistogramWindow.YEAR -> TimeHistogramWindowData(
-                TimeHistogramWindow.YEAR,
-                Duration.ofDays(365),
-                Period.ofYears(1),
-                12
+                window = TimeHistogramWindow.YEAR,
+                period = Period.ofYears(1),
+                numBins = 12
             )
         }
     }
