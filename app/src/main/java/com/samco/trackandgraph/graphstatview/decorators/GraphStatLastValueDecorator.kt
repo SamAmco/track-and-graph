@@ -19,24 +19,33 @@ package com.samco.trackandgraph.graphstatview.decorators
 
 import android.content.Context
 import android.view.View
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueData
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
+import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -57,7 +66,7 @@ class GraphStatLastValueDecorator(listMode: Boolean) :
 
         isDuration = data.isDuration
 
-        binding.composeView.setContent { constructView() }
+        constructView()
         binding.composeView.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
     }
@@ -66,44 +75,80 @@ class GraphStatLastValueDecorator(listMode: Boolean) :
 
     override fun update() {
         super.update()
+        constructView()
+    }
 
-        binding.composeView.setContent { constructView() }
+    private fun constructView() {
+        binding.composeView.setContent {
+            TnGComposeTheme {
+                LastValueStatView()
+            }
+        }
     }
 
     @Composable
-    private fun constructView() = Column(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
-        horizontalAlignment = Alignment.CenterHorizontally
+    private fun LastValueStatView() = CompositionLocalProvider(
+        LocalContentColor provides MaterialTheme.tngColors.onSurface,
     ) {
-        if (!::dataPoint.isInitialized) {
-            //Don't think this should ever happen, but just in case
-            throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
+        Column(
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (!::dataPoint.isInitialized) {
+                //Don't think this should ever happen, but just in case
+                throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
+            }
+
+            val context = LocalContext.current
+
+            val weekdayNames = getWeekDayNames(context)
+
+            val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
+
+            val durationText =
+                formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false)
+
+            Text(
+                text = stringResource(id = R.string.time_ago, durationText),
+                style = MaterialTheme.typography.h5
+            )
+
+            SpacingSmall()
+
+            Box(
+                modifier = Modifier
+                    .border(
+                        1.dp,
+                        MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
+                        MaterialTheme.shapes.small
+                    )
+                    .alpha(0.8f)
+            ) {
+                Row(
+                    modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+
+                    Text(
+                        text = formatDayMonthYearHourMinuteWeekDayTwoLines(
+                            context,
+                            weekdayNames,
+                            dataPoint.timestamp
+                        ),
+                        style = MaterialTheme.typography.body2,
+                        textAlign = TextAlign.Center,
+                    )
+
+                    SpacingLarge()
+
+                    DataPointValueAndDescription(
+                        modifier = Modifier.weight(1f),
+                        dataPoint = dataPoint,
+                        isDuration = isDuration,
+                        restrictNoteText = listMode
+                    )
+                }
+            }
         }
-
-        val context = LocalContext.current
-
-        val weekdayNames = getWeekDayNames(context)
-
-        Text(
-            text = formatDayWeekDayMonthYearHourMinuteOneLine(
-                context,
-                weekdayNames,
-                dataPoint.timestamp
-            ),
-            style = MaterialTheme.typography.body1
-        )
-
-        SpacingSmall()
-
-        val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
-
-        Text(
-            text = formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false),
-            style = MaterialTheme.typography.body1
-        )
-
-        SpacingSmall()
-
-        DataPointValueAndDescription(dataPoint = dataPoint, isDuration = isDuration)
     }
 }

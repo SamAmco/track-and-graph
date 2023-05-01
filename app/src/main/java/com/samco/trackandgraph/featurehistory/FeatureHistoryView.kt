@@ -286,7 +286,8 @@ private fun DataPoint(
                 weekdayNames,
                 dataPoint.timestamp
             ),
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.body2,
         )
         SpacingSmall()
         DataPointValueAndDescription(

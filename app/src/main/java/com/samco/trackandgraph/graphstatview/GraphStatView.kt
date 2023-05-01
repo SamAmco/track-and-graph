@@ -33,6 +33,7 @@ import com.samco.trackandgraph.graphstatview.decorators.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 import java.text.DecimalFormat
 
 class GraphStatView : FrameLayout, IDecoratableGraphStatView {
@@ -147,6 +148,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
             decorate(data.graphOrStat, decorator, data)
             setDynamicViewHeight()
         } catch (throwable: Throwable) {
+            Timber.e(throwable, "Error decorating graph or stat: $graphOrStat")
             onDecorateThrew(graphOrStat, throwable)
         }
     }
@@ -161,6 +163,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         binding.errorMessage.visibility = View.VISIBLE
         val t = ErrorMessageResolver(context).getErrorMessage(throwable)
         binding.errorMessage.text = t
+        binding.progressBar.visibility = View.GONE
         setDynamicViewHeight()
     }
 

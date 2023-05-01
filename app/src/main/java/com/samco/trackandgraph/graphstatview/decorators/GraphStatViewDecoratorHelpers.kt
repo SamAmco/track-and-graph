@@ -62,6 +62,7 @@ internal fun formatTimeToDaysHoursMinutesSeconds(
 
             if (hasHms) {
                 if (twoLines) appendLine()
+                else append(", ")
                 append(hms)
             }
         }
