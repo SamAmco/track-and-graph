@@ -43,19 +43,19 @@ import kotlin.math.roundToInt
 
 class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     GraphStatViewDecorator<ITimeHistogramViewData>(listMode) {
-    private var binding: GraphStatViewBinding? = null
-    private var context: Context? = null
-    private var data: ITimeHistogramViewData? = null
+    private lateinit var binding: GraphStatViewBinding
+    private lateinit var context: Context
+    private lateinit var data: ITimeHistogramViewData
 
     private fun getNameForWindow(window: TimeHistogramWindowData): String {
         return when (window.window) {
-            TimeHistogramWindow.HOUR -> context!!.getString(R.string.minutes)
-            TimeHistogramWindow.DAY -> context!!.getString(R.string.hours)
-            TimeHistogramWindow.WEEK -> context!!.getString(R.string.days)
-            TimeHistogramWindow.MONTH -> context!!.getString(R.string.days)
-            TimeHistogramWindow.THREE_MONTHS -> context!!.getString(R.string.weeks)
-            TimeHistogramWindow.SIX_MONTHS -> context!!.getString(R.string.weeks)
-            TimeHistogramWindow.YEAR -> context!!.getString(R.string.months)
+            TimeHistogramWindow.HOUR -> context.getString(R.string.minutes)
+            TimeHistogramWindow.DAY -> context.getString(R.string.hours)
+            TimeHistogramWindow.WEEK -> context.getString(R.string.days)
+            TimeHistogramWindow.MONTH -> context.getString(R.string.days)
+            TimeHistogramWindow.THREE_MONTHS -> context.getString(R.string.weeks)
+            TimeHistogramWindow.SIX_MONTHS -> context.getString(R.string.weeks)
+            TimeHistogramWindow.YEAR -> context.getString(R.string.months)
         }
     }
 
@@ -75,32 +75,32 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
         context = view.getContext()
         this.data = data
 
-        binding!!.statMessage.visibility = View.INVISIBLE
+        binding.statMessage.visibility = View.INVISIBLE
         initTimeHistogramBody()
     }
 
     private fun initTimeHistogramBody() {
-        binding!!.xyPlot.visibility = View.INVISIBLE
-        binding!!.progressBar.visibility = View.VISIBLE
-        if (!data!!.barValues.isNullOrEmpty()) {
+        binding.xyPlot.visibility = View.INVISIBLE
+        binding.progressBar.visibility = View.VISIBLE
+        if (!data.barValues.isNullOrEmpty()) {
             drawLegend()
             setUpXAxis()
             setUpXAxisTitle()
             setUpYAxis()
             setUpBounds()
             drawBars()
-            binding!!.xyPlot.redraw()
-            binding!!.xyPlot.graph.refreshLayout()
-            binding!!.xyPlot.visibility = View.VISIBLE
-            binding!!.progressBar.visibility = View.GONE
+            binding.xyPlot.redraw()
+            binding.xyPlot.graph.refreshLayout()
+            binding.xyPlot.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
         } else {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_graph)
         }
     }
 
     private fun setUpXAxisTitle() {
-        var title = getNameForWindow(data!!.window!!)
-        if (data!!.window!!.window == TimeHistogramWindow.WEEK) {
+        var title = getNameForWindow(data.window!!)
+        if (data.window!!.window == TimeHistogramWindow.WEEK) {
             val weekDayNameIds = mapOf(
                 DayOfWeek.MONDAY to R.string.mon,
                 DayOfWeek.TUESDAY to R.string.tue,
@@ -111,21 +111,21 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
                 DayOfWeek.SUNDAY to R.string.sun
             )
             val firstDay = WeekFields.of(Locale.getDefault()).firstDayOfWeek
-            val firstDayName = context!!.getString(weekDayNameIds[firstDay] ?: error(""))
+            val firstDayName = context.getString(weekDayNameIds[firstDay] ?: error(""))
             var lastDayIndex = DayOfWeek.values().indexOf(firstDay) - 1
             if (lastDayIndex < 0) lastDayIndex = DayOfWeek.values().size - 1
             val lastDay = DayOfWeek.values()[lastDayIndex]
-            val lastDayName = context!!.getString(weekDayNameIds[lastDay] ?: error(""))
+            val lastDayName = context.getString(weekDayNameIds[lastDay] ?: error(""))
             title += " ($firstDayName-$lastDayName)"
         }
-        binding!!.xyPlot.domainTitle.text = title
+        binding.xyPlot.domainTitle.text = title
     }
 
     private fun setUpYAxis() {
-        val divisions = ((data!!.maxDisplayHeight ?: 0.0) / 10) + 1
-        binding!!.xyPlot.setRangeStep(StepMode.SUBDIVIDE, max(2.0, divisions))
-        binding!!.xyPlot.graph.paddingLeft = context!!.resources.displayMetrics.scaledDensity * 8f
-        binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
+        val divisions = ((data.maxDisplayHeight ?: 0.0) / 10) + 1
+        binding.xyPlot.setRangeStep(StepMode.SUBDIVIDE, max(2.0, divisions))
+        binding.xyPlot.graph.paddingLeft = context.resources.displayMetrics.scaledDensity * 8f
+        binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
             object : Format() {
                 override fun format(
                     obj: Any,
@@ -146,8 +146,8 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     private fun setUpXAxis() {
-        binding!!.xyPlot.setDomainStep(StepMode.SUBDIVIDE, data!!.window!!.numBins + 2.0)
-        binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
+        binding.xyPlot.setDomainStep(StepMode.SUBDIVIDE, data.window!!.numBins + 2.0)
+        binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
             object : Format() {
                 override fun format(
                     obj: Any,
@@ -159,19 +159,19 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
                     // day of the week or day of the month, etc.
                     // Since there is a hour 0 and a minute 0, but not a day or week 0 we have
                         // to add an offset of 1 to the labels if talking about days or weeks.
-                        if (data!!.window!!.window == TimeHistogramWindow.DAY
-                            || data!!.window!!.window == TimeHistogramWindow.HOUR
+                        if (data.window!!.window == TimeHistogramWindow.DAY
+                            || data.window!!.window == TimeHistogramWindow.HOUR
                         )
                             0  // there is a minute 0 and a hour 0: index 0 -> label 0
                         else 1 // but there is no day 0 or week 0:  index 0 -> label 1
 
                     val index = (obj as Double).roundToInt() + zeroIndexOffset
                     val str = if (index >= zeroIndexOffset
-                        && index <= data!!.window!!.numBins
+                        && index <= data.window!!.numBins
                     ) {
-                        val labelInterval = getLabelInterval(data!!.window!!.window)
+                        val labelInterval = getLabelInterval(data.window!!.window)
                         if (index == zeroIndexOffset
-                            || index == data!!.window!!.numBins
+                            || index == data.window!!.numBins
                             || index % labelInterval == 0
                         ) index.toString()
                         else ""
@@ -184,63 +184,57 @@ class GraphStatTimeHistogramDecorator(listMode: Boolean) :
     }
 
     private fun setUpBounds() {
-        binding!!.xyPlot.setRangeBoundaries(
+        binding.xyPlot.setRangeBoundaries(
             0,
-            data!!.maxDisplayHeight ?: 1.0,
+            data.maxDisplayHeight ?: 1.0,
             BoundaryMode.FIXED
         )
-        binding!!.xyPlot.bounds.set(
+        binding.xyPlot.bounds.set(
             -1.0,
-            data!!.window!!.numBins,
+            data.window!!.numBins,
             0.0,
-            data!!.maxDisplayHeight ?: 100.0
+            data.maxDisplayHeight ?: 100.0
         )
-        binding!!.xyPlot.outerLimits.set(
+        binding.xyPlot.outerLimits.set(
             -1.0,
-            data!!.window!!.numBins,
+            data.window!!.numBins,
             0.0,
-            data!!.maxDisplayHeight ?: 100.0
+            data.maxDisplayHeight ?: 100.0
         )
     }
 
     private fun drawLegend() {
-        val labels = data!!.barValues!!.map { it.label }
+        val labels = data.barValues!!.map { it.label }
         if (labels.size > 1) {
-            binding?.legendFlexboxLayout?.visibility = View.VISIBLE
+            binding.legendFlexboxLayout.visibility = View.VISIBLE
             labels.forEachIndexed { i, l ->
                 val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
-                val color = getColor(context!!, dataVisColorList[colorIndex])
-                inflateGraphLegendItem(binding!!, context!!, color, l)
+                val color = getColor(context, dataVisColorList[colorIndex])
+                inflateGraphLegendItem(binding, context, color, l)
             }
         } else {
-            binding?.legendFlexboxLayout?.removeAllViews()
+            binding.legendFlexboxLayout.removeAllViews()
         }
     }
 
     private fun drawBars() {
-        val outlineColor = context!!.getColorFromAttr(R.attr.colorOnSurface)
+        val outlineColor = context.getColorFromAttr(R.attr.colorOnSurface)
 
-        data!!.barValues!!.forEachIndexed { i, bv ->
-            val series = (data!!.barValues!![i]).values.toTypedArray()
+        data.barValues!!.forEachIndexed { i, bv ->
+            val series = (data.barValues!![i]).values.toTypedArray()
             val xySeries = SimpleXYSeries(SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, bv.label, *series)
             val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
-            val color = getColor(context!!, dataVisColorList[colorIndex])
+            val color = getColor(context, dataVisColorList[colorIndex])
             val seriesFormatter = BarFormatter(color, outlineColor)
             seriesFormatter.borderPaint.strokeWidth = PixelUtils.dpToPix(1f)
-            binding!!.xyPlot.addSeries(xySeries, seriesFormatter)
+            binding.xyPlot.addSeries(xySeries, seriesFormatter)
         }
 
-        val renderer = binding!!.xyPlot.getRenderer(BarRenderer::class.java)
+        val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)
         renderer.setBarGroupWidth(BarRenderer.BarGroupWidthMode.FIXED_GAP, PixelUtils.dpToPix(0f))
         renderer.barOrientation = BarRenderer.BarOrientation.STACKED
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {}
-
-    override fun dispose() {
-        binding = null
-        context = null
-        data = null
-    }
 }
 

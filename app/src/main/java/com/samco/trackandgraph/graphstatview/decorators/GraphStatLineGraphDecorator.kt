@@ -56,32 +56,23 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     private val lineGraphHoursDateFormat: DateTimeFormatter = DateTimeFormatter
         .ofPattern("HH:mm")
 
-    private var binding: GraphStatViewBinding? = null
-    private var context: Context? = null
-    private var graphStatView: IDecoratableGraphStatView? = null
-    private var data: ILineGraphViewData? = null
+    private lateinit var binding: GraphStatViewBinding
+    private lateinit var context: Context
+    private lateinit var data: ILineGraphViewData
 
     override fun decorate(view: IDecoratableGraphStatView, data: ILineGraphViewData) {
         this.data = data
-        this.graphStatView = view
         binding = view.getBinding()
         context = view.getContext()
 
         initFromLineGraphBody(listMode)
     }
 
-    override fun dispose() {
-        binding = null
-        context = null
-        graphStatView = null
-        data = null
-    }
-
     override fun setTimeMarker(time: OffsetDateTime) {
-        binding!!.xyPlot.removeMarkers()
+        binding.xyPlot.removeMarkers()
         val markerPaint = getMarkerPaint()
-        val millis = Duration.between(data!!.endTime, time).toMillis()
-        binding!!.xyPlot.addMarker(
+        val millis = Duration.between(data.endTime, time).toMillis()
+        binding.xyPlot.addMarker(
             XValueMarker(
                 millis,
                 null,
@@ -90,22 +81,22 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
                 null
             )
         )
-        binding!!.xyPlot.redraw()
+        binding.xyPlot.redraw()
     }
 
     private fun initFromLineGraphBody(listMode: Boolean) {
-        binding!!.xyPlot.visibility = View.INVISIBLE
-        binding!!.progressBar.visibility = View.VISIBLE
-        if (data!!.hasPlottableData) {
+        binding.xyPlot.visibility = View.INVISIBLE
+        binding.progressBar.visibility = View.VISIBLE
+        if (data.hasPlottableData) {
             drawLineGraphFeatures()
             setUpLineGraphXAxis()
             setUpLineGraphYAxis()
             setLineGraphBounds(listMode)
-            binding!!.xyPlot.redraw()
-            binding!!.xyPlot.graph.refreshLayout()
-            binding!!.xyPlot.visibility = View.VISIBLE
-            binding!!.legendFlexboxLayout.visibility = View.VISIBLE
-            binding!!.progressBar.visibility = View.GONE
+            binding.xyPlot.redraw()
+            binding.xyPlot.graph.refreshLayout()
+            binding.xyPlot.visibility = View.VISIBLE
+            binding.legendFlexboxLayout.visibility = View.VISIBLE
+            binding.progressBar.visibility = View.GONE
         } else {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_graph)
         }
@@ -115,12 +106,12 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         // since we now calculate the bounds to fit the number of intervals we almost always want
         // to set the rangeBoundaries to the bounds.
         // The only exception is when the graph is viewed fullscreen-mode (listMode == False) while dynamic
-        val bounds = data!!.bounds
-        if (data!!.yRangeType == YRangeType.FIXED || listMode) {
-            binding!!.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
+        val bounds = data.bounds
+        if (data.yRangeType == YRangeType.FIXED || listMode) {
+            binding.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
         }
-        binding!!.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
-        binding!!.xyPlot.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+        binding.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
+        binding.xyPlot.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
         setLineGraphPaddingFromBounds(bounds)
     }
 
@@ -130,22 +121,22 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
         val maxY = bounds.maxY.toDouble()
         val maxBound = max(abs(minY), abs(maxY))
         val numDigits = log10(maxBound).toFloat() + 3
-        binding!!.xyPlot.graph.paddingLeft =
-            (numDigits - 1) * (context!!.resources.displayMetrics.scaledDensity) * 3.5f
+        binding.xyPlot.graph.paddingLeft =
+            (numDigits - 1) * (context.resources.displayMetrics.scaledDensity) * 3.5f
 
         //Set up X padding
         val formattedTimestamp = getDateTimeFormattedForDuration()
-        binding!!.xyPlot.graph.paddingBottom =
-            formattedTimestamp.length * (context!!.resources.displayMetrics.scaledDensity)
+        binding.xyPlot.graph.paddingBottom =
+            formattedTimestamp.length * (context.resources.displayMetrics.scaledDensity)
     }
 
     private fun setUpLineGraphYAxis() {
-        binding!!.xyPlot.setRangeStep(
-            data!!.yAxisRangeParameters.first,
-            data!!.yAxisRangeParameters.second
+        binding.xyPlot.setRangeStep(
+            data.yAxisRangeParameters.first,
+            data.yAxisRangeParameters.second
         )
-        if (data!!.durationBasedRange) {
-            binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
+        if (data.durationBasedRange) {
+            binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
                 object : Format() {
                     override fun format(
                         obj: Any,
@@ -162,9 +153,9 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun setUpLineGraphXAxis() {
-        binding!!.xyPlot.domainTitle.text = ""
-        binding!!.xyPlot.setDomainStep(StepMode.SUBDIVIDE, 11.0)
-        binding!!.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
+        binding.xyPlot.domainTitle.text = ""
+        binding.xyPlot.setDomainStep(StepMode.SUBDIVIDE, 11.0)
+        binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
             object : Format() {
                 override fun format(
                     obj: Any,
@@ -183,25 +174,25 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun getDateTimeFormattedForDuration(duration: Duration = Duration.ZERO): String {
-        val timestamp = data!!.endTime
+        val timestamp = data.endTime
             .atZoneSameInstant(ZoneId.systemDefault())
             .plus(duration)
-        val minX = binding!!.xyPlot.bounds.minX
-        val maxX = binding!!.xyPlot.bounds.maxX
-        if (minX == null || maxX == null) return formatDayMonth(context!!, timestamp)
+        val minX = binding.xyPlot.bounds.minX
+        val maxX = binding.xyPlot.bounds.maxX
+        if (minX == null || maxX == null) return formatDayMonth(context, timestamp)
         val durationRange = Duration.ofMillis(abs(maxX.toLong() - minX.toLong()))
         return when {
             durationRange.toMinutes() < 5L -> lineGraphHourMinuteSecondFormat.format(timestamp)
-            durationRange.toDays() >= 304 -> formatMonthYear(context!!, timestamp)
-            durationRange.toDays() >= 1 -> formatDayMonth(context!!, timestamp)
+            durationRange.toDays() >= 304 -> formatMonthYear(context, timestamp)
+            durationRange.toDays() >= 1 -> formatDayMonth(context, timestamp)
             else -> lineGraphHoursDateFormat.format(timestamp)
         }
     }
 
     private fun drawLineGraphFeatures() {
-        for (kvp in data!!.plottableData) {
-            val color = getColor(context!!, dataVisColorList[kvp.key.colorIndex])
-            inflateGraphLegendItem(binding!!, context!!, color, kvp.key.name)
+        for (kvp in data.plottableData) {
+            val color = getColor(context, dataVisColorList[kvp.key.colorIndex])
+            inflateGraphLegendItem(binding, context, color, kvp.key.name)
             kvp.value?.let { addSeries(it, kvp.key) }
         }
     }
@@ -211,7 +202,7 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
             if (listMode && lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
                 getFastLineAndPointFormatter(lineGraphFeature)
             else getLineAndPointFormatter(lineGraphFeature)
-        binding!!.xyPlot.addSeries(series, seriesFormat)
+        binding.xyPlot.addSeries(series, seriesFormat)
     }
 
     private fun getLineAndPointFormatter(lineGraphFeature: LineGraphFeature): LineAndPointFormatter {
@@ -251,10 +242,10 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
     }
 
     private fun getLinePaintWidth() =
-        context!!.resources.getDimension(R.dimen.line_graph_line_thickness)
+        context.resources.getDimension(R.dimen.line_graph_line_thickness)
 
     private fun getVertexPaintWidth() =
-        context!!.resources.getDimension(R.dimen.line_graph_vertex_thickness)
+        context.resources.getDimension(R.dimen.line_graph_vertex_thickness)
 
     private fun getLinePaintColor(lineGraphFeature: LineGraphFeature): Int {
         return getPaintColor(lineGraphFeature)
@@ -267,21 +258,21 @@ class GraphStatLineGraphDecorator(listMode: Boolean) :
 
     private fun getPointLabelFormatter(lineGraphFeature: LineGraphFeature): PointLabelFormatter? {
         if (lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS) return null
-        val color = context!!.getColorFromAttr(android.R.attr.textColorPrimary)
+        val color = context.getColorFromAttr(android.R.attr.textColorPrimary)
         val pointLabelFormatter = PointLabelFormatter(
             color,
-            context!!.resources.getDimension(R.dimen.line_graph_point_label_h_offset),
-            context!!.resources.getDimension(R.dimen.line_graph_point_label_v_offset)
+            context.resources.getDimension(R.dimen.line_graph_point_label_h_offset),
+            context.resources.getDimension(R.dimen.line_graph_point_label_v_offset)
         )
         pointLabelFormatter.textPaint.textAlign = Paint.Align.RIGHT
         return pointLabelFormatter
     }
 
     private fun getPaintColor(lineGraphFeature: LineGraphFeature) =
-        getColor(context!!, dataVisColorList[lineGraphFeature.colorIndex])
+        getColor(context, dataVisColorList[lineGraphFeature.colorIndex])
 
     private fun getMarkerPaint(): Paint {
-        val color = context!!.getColorFromAttr(R.attr.errorTextColor)
+        val color = context.getColorFromAttr(R.attr.errorTextColor)
         val paint = Paint()
         paint.color = color
         paint.strokeWidth = 2f

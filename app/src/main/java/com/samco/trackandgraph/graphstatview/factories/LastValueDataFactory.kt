@@ -20,6 +20,10 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.functions.functions.CompositeFunction
+import com.samco.trackandgraph.functions.functions.DataSampleFunction
+import com.samco.trackandgraph.functions.functions.FilterLabelFunction
+import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
@@ -29,8 +33,7 @@ import javax.inject.Inject
 
 class LastValueDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
-    @IODispatcher ioDispatcher: CoroutineDispatcher,
-    private val commonHelpers: DataFactoryCommonHelpers
+    @IODispatcher ioDispatcher: CoroutineDispatcher
 ) : ViewDataFactory<LastValueStat, ILastValueData>(dataInteractor, ioDispatcher) {
 
     override suspend fun createViewData(
@@ -48,26 +51,23 @@ class LastValueDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILastValueData {
         return try {
-            val dataPoint = commonHelpers.getLastDataPoint(
-                dataInteractor = dataInteractor,
-                featureId = config.featureId,
-                filterByLabels = config.filterByLabels,
-                labels = config.labels,
-                filterByRange = config.filterByRange,
-                fromValue = config.fromValue,
-                toValue = config.toValue,
-                onDataSampled = onDataSampled
+            val lastData = getLastDataPoint(
+                dataInteractor,
+                config,
+                onDataSampled
             ) ?: return notEnoughData(graphOrStat)
             object : ILastValueData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
-                override val lastDataPoint = dataPoint
+                override val lastDataPoint = lastData.dataPoint
+                override val isDuration = lastData.isDuration
             }
         } catch (throwable: Throwable) {
             object : ILastValueData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
                 override val error = throwable
+                override val isDuration = false
             }
         }
     }
@@ -77,6 +77,7 @@ class LastValueDataFactory @Inject constructor(
             override val state = IGraphStatViewData.State.ERROR
             override val graphOrStat = graphOrStat
             override val error = GraphNotFoundException()
+            override val isDuration = false
         }
 
     private fun notEnoughData(graphOrStat: GraphOrStat) =
@@ -84,5 +85,47 @@ class LastValueDataFactory @Inject constructor(
             override val error = NotEnoughDataException(0)
             override val state = IGraphStatViewData.State.ERROR
             override val graphOrStat = graphOrStat
+            override val isDuration = false
         }
+
+    private data class LastDataPointData(
+        val dataPoint: DataPoint,
+        val isDuration: Boolean
+    )
+
+    private suspend fun getLastDataPoint(
+        dataInteractor: DataInteractor,
+        config: LastValueStat,
+        onDataSampled: (List<DataPoint>) -> Unit
+    ): LastDataPointData? {
+        val dataSample = dataInteractor.getDataSampleForFeatureId(config.featureId)
+
+        val filters = mutableListOf<DataSampleFunction>()
+        if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
+        if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
+
+        val sample = CompositeFunction(filters).mapSample(dataSample)
+        val firstIDataPoint = sample.firstOrNull()
+        val rawSample = sample.getRawDataPoints()
+        val firstRawDataPoint = rawSample.firstOrNull()
+        val note = if (firstIDataPoint?.timestamp == firstRawDataPoint?.timestamp) {
+            firstRawDataPoint?.note ?: ""
+        } else ""
+        val isDuration = sample.dataSampleProperties.isDuration
+
+        onDataSampled(rawSample)
+        dataSample.dispose()
+        return firstIDataPoint?.let {
+            LastDataPointData(
+                dataPoint = DataPoint(
+                    timestamp = it.timestamp,
+                    featureId = config.featureId,
+                    value = it.value,
+                    label = it.label,
+                    note = note
+                ),
+                isDuration = isDuration
+            )
+        }
+    }
 }

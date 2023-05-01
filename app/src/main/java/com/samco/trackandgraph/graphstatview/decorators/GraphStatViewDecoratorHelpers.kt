@@ -34,7 +34,11 @@ internal fun inflateGraphLegendItem(
     )
 }
 
-internal fun formatTimeToDaysHoursMinutesSeconds(context: Context, millis: Long): String {
+internal fun formatTimeToDaysHoursMinutesSeconds(
+    context: Context,
+    millis: Long,
+    twoLines: Boolean = true
+): String {
     val totalSeconds = millis / 1000
     val daysNum = (totalSeconds / 86400).toInt()
     val days = daysNum.toString()
@@ -46,9 +50,20 @@ internal fun formatTimeToDaysHoursMinutesSeconds(context: Context, millis: Long)
     val secondsStr = "%02d".format((totalSeconds % 60).toInt())
     val hasHms = (hours + minutes + seconds) > 0
     val hms = "$hoursStr:$minutesStr:$secondsStr"
-    return when {
-        daysNum == 1 -> "$days ${context.getString(R.string.day)}${if (hasHms) "\n" + hms else ""}"
-        daysNum > 0 -> "$days ${context.getString(R.string.days)}${if (hasHms) "\n" + hms else ""}"
-        else -> hms
-    }
+
+    return StringBuilder().apply {
+        if (daysNum == 0) append(hms)
+        else {
+            val daysSuffix =
+                if (daysNum == 1) context.getString(R.string.day)
+                else context.getString(R.string.days)
+
+            append("$days $daysSuffix")
+
+            if (hasHms) {
+                if (twoLines) appendLine()
+                append(hms)
+            }
+        }
+    }.toString()
 }

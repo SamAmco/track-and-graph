@@ -304,6 +304,9 @@ FROM notes_table as n
     @Update
     fun updateTimeHistogram(timeHistogram: TimeHistogram)
 
+    @Update
+    fun updateLastValueStat(lastValueStat: LastValueStat)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTimeHistogram(timeHistogram: TimeHistogram): Long
 
