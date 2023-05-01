@@ -23,7 +23,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.databinding.ListItemNoteBinding
 import com.samco.trackandgraph.graphstatinput.FeatureDataProvider
@@ -59,7 +59,7 @@ class NotesAdapter(
         fun bind(note: GraphNote, featureDataProvider: FeatureDataProvider) {
             this.note = note
             binding.timestampText.text =
-                formatDayWeekDayMonthYearHourMinuteOneLine(
+                formatDayMonthYearHourMinuteWeekDayOneLine(
                     binding.timestampText.context,
                     weekDayNames,
                     note.timestamp

@@ -27,7 +27,7 @@ interface IGraphStatViewDecorator {
      * This will be called once per second after the initial call to decorate in case the
      * view should be updated in any way.
      */
-    fun update() { }
+    fun update() {}
 }
 
 abstract class GraphStatViewDecorator<T : IGraphStatViewData>(protected val listMode: Boolean) :
@@ -35,5 +35,8 @@ abstract class GraphStatViewDecorator<T : IGraphStatViewData>(protected val list
     /**
      * Called as soon as the view and the data are ready to set up and decorate the view
      */
-    abstract fun decorate(view: IDecoratableGraphStatView, data: T)
+    abstract fun decorate(
+        view: IDecoratableGraphStatView,
+        data: T
+    )
 }

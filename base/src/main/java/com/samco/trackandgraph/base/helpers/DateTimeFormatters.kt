@@ -59,7 +59,7 @@ fun getWeekDayNames(context: Context) = listOf(
 private fun weekDayPart(dateTime: OffsetDateTime, weekDayNames: List<String>) =
     "(${weekDayNames[dateTime.dayOfWeek.value - 1]})"
 
-fun formatDayWeekDayMonthYearHourMinuteOneLine(
+fun formatDayMonthYearHourMinuteWeekDayOneLine(
     context: Context,
     weekDayNames: List<String>,
     dateTime: OffsetDateTime
