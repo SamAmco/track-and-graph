@@ -26,9 +26,9 @@ import org.threeten.bp.OffsetDateTime
 
 class GraphStatAverageTimeBetweenDecorator(listMode: Boolean) :
     GraphStatViewDecorator<IAverageTimeBetweenViewData>(listMode) {
-    private var binding: GraphStatViewBinding? = null
-    private var context: Context? = null
-    private var data: IAverageTimeBetweenViewData? = null
+    private lateinit var binding: GraphStatViewBinding
+    private lateinit var context: Context
+    private lateinit var data: IAverageTimeBetweenViewData
 
     override fun decorate(
         view: IDecoratableGraphStatView,
@@ -38,22 +38,17 @@ class GraphStatAverageTimeBetweenDecorator(listMode: Boolean) :
         binding = view.getBinding()
         context = view.getContext()
 
-        binding!!.statMessage.visibility = View.INVISIBLE
+        binding.statMessage.visibility = View.INVISIBLE
         initAverageTimeBetweenStatBody()
     }
 
     override fun setTimeMarker(time: OffsetDateTime) {}
 
-    override fun dispose() {
-        binding = null
-        context = null
-        data = null
-    }
-
     @SuppressLint("SetTextI18n")
     private fun initAverageTimeBetweenStatBody() {
-        binding!!.statMessage.text =
-            formatTimeToDaysHoursMinutesSeconds(context!!, data!!.averageMillis.toLong())
-        binding!!.statMessage.visibility = View.VISIBLE
+        binding.statMessage.text =
+            formatTimeToDaysHoursMinutesSeconds(context, data.averageMillis.toLong())
+        binding.statMessage.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
     }
 }

@@ -38,7 +38,6 @@ class LastValueConfigViewModel @Inject constructor(
 
     init {
         endingAtConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
-        singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(onUpdate = { onUpdate() })
         filterableFeatureConfigBehaviour.initFilterableFeatureConfigBehaviour(
             onUpdate = { onUpdate() },
             io = io,
@@ -46,11 +45,15 @@ class LastValueConfigViewModel @Inject constructor(
             coroutineScope = viewModelScope,
             dataInteractor = dataInteractor
         )
+        singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(
+            onUpdate = { onUpdate() },
+            featureChangeCallback = { filterableFeatureConfigBehaviour.onFeatureIdUpdated(it) }
+        )
     }
 
     private var lastValueStat = LastValueStat(
-        id = -1L,
-        graphStatId = -1L,
+        id = 0,
+        graphStatId = 0,
         featureId = -1L,
         endDate = null,
         fromValue = 0.0,

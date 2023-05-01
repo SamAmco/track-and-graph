@@ -60,7 +60,7 @@ fun DataPointInfoDialog(
 
 @Composable
 fun DataPointValueAndDescription(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     dataPoint: DataPoint,
     isDuration: Boolean
 ) = Column(modifier = modifier) {

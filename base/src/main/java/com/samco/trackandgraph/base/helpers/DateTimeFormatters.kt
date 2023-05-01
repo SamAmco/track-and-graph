@@ -21,7 +21,6 @@ import android.content.Context
 import com.samco.trackandgraph.base.R
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.DataType
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
@@ -164,7 +163,7 @@ fun formatMonthYear(context: Context, temporal: Temporal): String {
 
 fun formatTimeDuration(seconds: Long): String {
     val absSecs = kotlin.math.abs(seconds)
-    val timeStr = String.format("%d:%02d:%02d", seconds / 3600, (absSecs % 3600) / 60, (absSecs % 60))
-    if (seconds < 0 && !timeStr.startsWith("-")) return "-$timeStr"
+    val timeStr = String.format("%d:%02d:%02d", absSecs / 3600, (absSecs % 3600) / 60, (absSecs % 60))
+    if (seconds < 0) return "-$timeStr"
     return timeStr
 }

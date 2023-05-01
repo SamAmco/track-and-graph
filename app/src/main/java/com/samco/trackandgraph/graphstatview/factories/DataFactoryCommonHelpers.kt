@@ -9,6 +9,7 @@ import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import javax.inject.Inject
 
+//TODO delete this
 class DataFactoryCommonHelpers @Inject constructor() {
     suspend fun getLastDataPoint(
         dataInteractor: DataInteractor,

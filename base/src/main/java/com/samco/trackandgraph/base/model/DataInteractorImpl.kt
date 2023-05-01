@@ -461,12 +461,16 @@ internal class DataInteractorImpl @Inject constructor(
         dao.updateTimeSinceLastStat(timeSinceLastStat.toEntity())
     }
 
-    override suspend fun updateLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat) {
-        TODO("Not yet implemented")
-    }
-
     override suspend fun updateGraphOrStat(graphOrStat: GraphOrStat) = performAtomicUpdate {
         dao.updateGraphOrStat(graphOrStat.toEntity())
+    }
+
+    override suspend fun updateLastValueStat(
+        graphOrStat: GraphOrStat,
+        config: LastValueStat
+    ) = performAtomicUpdate {
+        dao.updateGraphOrStat(graphOrStat.toEntity())
+        dao.updateLastValueStat(config.toEntity())
     }
 
     override suspend fun updateTimeHistogram(

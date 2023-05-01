@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.graphstatinput.configviews
 
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +25,10 @@ fun LastValueConfigView(viewModel: LastValueConfigViewModel) {
     ) { viewModel.updateSampleEndingAt(it) }
 
     SpacingSmall()
+
+    Divider()
+
+    SpacingLarge()
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),

@@ -35,9 +35,9 @@ import org.threeten.bp.OffsetDateTime
 class GraphStatPieChartDecorator(listMode: Boolean) :
     GraphStatViewDecorator<IPieChartViewData>(listMode) {
 
-    private var binding: GraphStatViewBinding? = null
-    private var context: Context? = null
-    private var data: IPieChartViewData? = null
+    private lateinit var binding: GraphStatViewBinding
+    private lateinit var context: Context
+    private lateinit var data: IPieChartViewData
 
     override fun decorate(
         view: IDecoratableGraphStatView,
@@ -52,49 +52,43 @@ class GraphStatPieChartDecorator(listMode: Boolean) :
 
     override fun setTimeMarker(time: OffsetDateTime) {}
 
-    override fun dispose() {
-        binding = null
-        context = null
-        data = null
-    }
-
     private fun initFromPieChartBody() {
-        binding!!.pieChart.visibility = View.INVISIBLE
-        binding!!.progressBar.visibility = View.VISIBLE
+        binding.pieChart.visibility = View.INVISIBLE
+        binding.progressBar.visibility = View.VISIBLE
 
-        val segments = data!!.segments
+        val segments = data.segments
             ?: throw GraphStatInitException(
                 R.string.graph_stat_view_not_enough_data_graph
             )
         plotPieChartSegments(segments)
-        binding!!.pieChart.redraw()
-        binding!!.pieChart.getRenderer(PieRenderer::class.java)
+        binding.pieChart.redraw()
+        binding.pieChart.getRenderer(PieRenderer::class.java)
             .setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
 
-        binding!!.pieChart.visibility = View.VISIBLE
-        binding!!.legendFlexboxLayout.visibility = View.VISIBLE
-        binding!!.progressBar.visibility = View.GONE
+        binding.pieChart.visibility = View.VISIBLE
+        binding.legendFlexboxLayout.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun plotPieChartSegments(segments: List<Segment>) {
         segments.forEachIndexed { i, s ->
             val index = (dataVisColorGenerator * i) % dataVisColorList.size
-            val color = getColor(context!!, dataVisColorList[index])
+            val color = getColor(context, dataVisColorList[index])
             val percentage = "%.1f".format(s.value.toDouble())
-            val title = s.title.ifEmpty { context!!.getString(R.string.no_label) }
+            val title = s.title.ifEmpty { context.getString(R.string.no_label) }
             var label = "$title ($percentage%)"
 
             val segForm = SegmentFormatter(color)
             if (segments.size > dataVisColorList.size) {
                 label = "$i: $title ($percentage%)"
                 s.title = i.toString()
-                segForm.labelPaint.textSize = context!!.resources.getDimension(R.dimen.small_label_size)
-                segForm.labelPaint.color = getColor(context!!, R.color.white)
+                segForm.labelPaint.textSize = context.resources.getDimension(R.dimen.small_label_size)
+                segForm.labelPaint.color = getColor(context, R.color.white)
             } else {
                 segForm.labelPaint.color = Color.TRANSPARENT
             }
-            binding!!.pieChart.addSegment(s, segForm)
-            inflateGraphLegendItem(binding!!, context!!, color, label)
+            binding.pieChart.addSegment(s, segForm)
+            inflateGraphLegendItem(binding, context, color, label)
         }
     }
 }

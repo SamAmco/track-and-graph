@@ -92,6 +92,7 @@
     <string name="graph_type_average_time_between">Average Time Between</string>
     <string name="graph_type_time_since">Time Since</string>
     <string name="graph_type_time_histogram">Time Histogram</string>
+    <string name="graph_type_last_value">Last (Time Since)</string>
 
     <string-array name="line_graph_averaging_mode_names">
         <item>No Averaging</item>

@@ -255,7 +255,8 @@ fun GraphStatTypeSelector(
             GraphStatType.PIE_CHART to stringResource(id = R.string.graph_type_pie_chart),
             GraphStatType.AVERAGE_TIME_BETWEEN to stringResource(id = R.string.graph_type_average_time_between),
             GraphStatType.TIME_SINCE to stringResource(id = R.string.graph_type_time_since),
-            GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram)
+            GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram),
+            GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value)
         )
 
         TextMapSpinner(

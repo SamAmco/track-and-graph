@@ -28,16 +28,16 @@ import org.threeten.bp.OffsetDateTime
 
 class GraphStatTimeSinceDecorator(listMode: Boolean) :
     GraphStatViewDecorator<ITimeSinceViewData>(listMode) {
-    private var binding: GraphStatViewBinding? = null
-    private var context: Context? = null
-    private var data: ITimeSinceViewData? = null
+    private lateinit var binding: GraphStatViewBinding
+    private lateinit var context: Context
+    private lateinit var data: ITimeSinceViewData
 
     override fun decorate(view: IDecoratableGraphStatView, data: ITimeSinceViewData) {
         binding = view.getBinding()
         context = view.getContext()
         this.data = data
 
-        binding!!.statMessage.visibility = View.INVISIBLE
+        binding.statMessage.visibility = View.INVISIBLE
         initTimeSinceStatBody()
     }
 
@@ -45,23 +45,17 @@ class GraphStatTimeSinceDecorator(listMode: Boolean) :
 
     private fun initTimeSinceStatBody() {
         update()
-        binding!!.statMessage.visibility = View.VISIBLE
-        binding!!.progressBar.visibility = View.GONE
+        binding.statMessage.visibility = View.VISIBLE
+        binding.progressBar.visibility = View.GONE
     }
 
     override fun update() {
-        val dataPoint = data!!.lastDataPoint
+        val dataPoint = data.lastDataPoint
         if (dataPoint == null) {
             throw GraphStatInitException(R.string.graph_stat_view_not_enough_data_stat)
         } else {
             val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
-            binding!!.statMessage.text = formatTimeToDaysHoursMinutesSeconds(context!!, duration.toMillis())
+            binding.statMessage.text = formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis())
         }
-    }
-
-    override fun dispose() {
-        binding = null
-        context = null
-        data = null
     }
 }

@@ -118,11 +118,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
             DecimalFormat("0.0")
         binding.pieChart.clear()
-        binding.progressBar.visibility = View.GONE
-        binding.xyPlot.visibility = View.GONE
-        binding.pieChart.visibility = View.GONE
-        binding.errorMessage.visibility = View.GONE
-        binding.statMessage.visibility = View.GONE
+        blankViews()
         binding.errorMessage.text = ""
         binding.headerText.text = ""
         binding.statMessage.text = ""
@@ -159,7 +155,6 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
 
     private fun onDecorateThrew(graphOrStat: GraphOrStat?, throwable: Throwable) {
         cleanAllViews()
-        currentDecorator?.dispose()
         currentDecorator = null
         val headerText = graphOrStat?.name ?: ""
         binding.headerText.text = headerText
@@ -182,7 +177,6 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         decorator: GraphStatViewDecorator<T>,
         data: T
     ) {
-        currentDecorator?.dispose()
         currentDecorator = decorator
         val headerText = graphOrStat.name
         binding.headerText.text = headerText
@@ -193,18 +187,13 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         }
     }
 
-    fun initError(errorTextId: Int) {
-        cleanAllViews()
-        binding.errorMessage.visibility = View.VISIBLE
-        binding.errorMessage.text = context.getString(errorTextId)
-    }
-
     private fun blankViews() {
-        binding.legendFlexboxLayout.visibility = View.INVISIBLE
-        binding.xyPlot.visibility = View.INVISIBLE
-        binding.pieChart.visibility = View.INVISIBLE
-        binding.errorMessage.visibility = View.INVISIBLE
-        binding.statMessage.visibility = View.INVISIBLE
+        binding.legendFlexboxLayout.visibility = View.GONE
+        binding.xyPlot.visibility = View.GONE
+        binding.pieChart.visibility = View.GONE
+        binding.errorMessage.visibility = View.GONE
+        binding.statMessage.visibility = View.GONE
+        binding.composeView.visibility = View.GONE
     }
 
     fun <T : IGraphStatViewData> initFromGraphStat(
@@ -212,7 +201,6 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         decorator: GraphStatViewDecorator<T>
     ) {
         if (data.state == IGraphStatViewData.State.LOADING) {
-            currentDecorator?.dispose()
             currentDecorator = null
             blankViews()
             val headerText = data.graphOrStat.name

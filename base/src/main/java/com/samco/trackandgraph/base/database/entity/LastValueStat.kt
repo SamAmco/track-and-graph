@@ -24,26 +24,6 @@ import androidx.room.PrimaryKey
 import org.threeten.bp.OffsetDateTime
 import com.samco.trackandgraph.base.database.dto.LastValueStat
 
-//data class LastValueStat(
-//    val id: Long,
-//    val graphStatId: Long,
-//    val featureId: Long,
-//    val endDate: OffsetDateTime?,
-//    val fromValue: Double,
-//    val toValue: Double,
-//    val labels: List<String>,
-//    val filterByRange: Boolean,
-//    val filterByLabels: Boolean
-//) {
-//    internal fun toEntity() = com.samco.trackandgraph.base.database.entity.LastValueStat(
-//        id,
-//        graphStatId,
-//        featureId,
-//        endDate
-//    )
-//}
-
-
 @Entity(tableName = "last_value_stats_table",
     foreignKeys = [
         ForeignKey(
