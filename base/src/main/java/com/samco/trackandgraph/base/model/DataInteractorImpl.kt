@@ -237,11 +237,6 @@ internal class DataInteractorImpl @Inject constructor(
             dao.getAverageTimeBetweenStatByGraphStatId(graphStatId)?.toDto()
         }
 
-    override suspend fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat? =
-        withContext(io) {
-            dao.getTimeSinceLastStatByGraphStatId(graphStatId)?.toDto()
-        }
-
     override suspend fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat> =
         withContext(io) {
             dao.getGraphsAndStatsByGroupIdSync(groupId).map { it.toDto() }
@@ -339,15 +334,6 @@ internal class DataInteractorImpl @Inject constructor(
             }
         }
 
-    override suspend fun duplicateTimeSinceLastStat(graphOrStat: GraphOrStat): Long? =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
-            val newGraphStat = duplicateGraphOrStat(graphOrStat)
-            dao.getTimeSinceLastStatByGraphStatId(graphOrStat.id)?.let {
-                dao.insertTimeSinceLastStat(it.copy(id = 0L, graphStatId = newGraphStat))
-            }
-        }
-
     override suspend fun duplicateTimeHistogram(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(graphOrStat.groupId)
@@ -400,15 +386,6 @@ internal class DataInteractorImpl @Inject constructor(
         )
     }
 
-    override suspend fun insertTimeSinceLastStat(
-        graphOrStat: GraphOrStat,
-        timeSinceLastStat: TimeSinceLastStat
-    ): Long = performAtomicUpdate {
-        shiftUpGroupChildIndexes(graphOrStat.groupId)
-        val id = insertGraphStat(graphOrStat)
-        dao.insertTimeSinceLastStat(timeSinceLastStat.copy(graphStatId = id).toEntity())
-    }
-
     override suspend fun insertTimeHistogram(
         graphOrStat: GraphOrStat,
         timeHistogram: TimeHistogram
@@ -451,14 +428,6 @@ internal class DataInteractorImpl @Inject constructor(
         dao.insertLineGraphFeatures(lineGraph.features.map {
             it.copy(lineGraphId = lineGraph.id).toEntity()
         })
-    }
-
-    override suspend fun updateTimeSinceLastStat(
-        graphOrStat: GraphOrStat,
-        timeSinceLastStat: TimeSinceLastStat
-    ) = performAtomicUpdate {
-        dao.updateGraphOrStat(graphOrStat.toEntity())
-        dao.updateTimeSinceLastStat(timeSinceLastStat.toEntity())
     }
 
     override suspend fun updateGraphOrStat(graphOrStat: GraphOrStat) = performAtomicUpdate {

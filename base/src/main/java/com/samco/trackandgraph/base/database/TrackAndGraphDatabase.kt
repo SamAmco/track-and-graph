@@ -33,7 +33,6 @@ import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import com.samco.trackandgraph.base.database.entity.PieChart
 import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.database.entity.TimeHistogram
-import com.samco.trackandgraph.base.database.entity.TimeSinceLastStat
 import com.samco.trackandgraph.base.database.entity.LastValueStat
 import com.samco.trackandgraph.base.database.entity.Tracker
 import com.samco.trackandgraph.base.database.migrations.allMigrations
@@ -59,7 +58,6 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         LineGraph::class,
         AverageTimeBetweenStat::class,
         PieChart::class,
-        TimeSinceLastStat::class,
         Reminder::class,
         GlobalNote::class,
         LineGraphFeature::class,

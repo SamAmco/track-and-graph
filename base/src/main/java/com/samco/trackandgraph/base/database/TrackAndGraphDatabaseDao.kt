@@ -221,9 +221,6 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM average_time_between_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
 
-    @Query("SELECT * FROM time_since_last_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
-    fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
-
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
     fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
@@ -285,12 +282,6 @@ FROM notes_table as n
 
     @Update
     fun updateAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat): Long
-
-    @Update
-    fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
