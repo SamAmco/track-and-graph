@@ -36,8 +36,6 @@ class GraphStatInteractorProviderImpl @Inject constructor(
     private val pieChartDataSourceAdapter: PieChartDataSourceAdapter,
     private val averageTimeBetweenDataFactory: AverageTimeBetweenDataFactory,
     private val averageTimeBetweenDataSourceAdapter: AverageTimeBetweenDataSourceAdapter,
-    private val timeSinceDataFactory: TimeSinceDataFactory,
-    private val timeSinceDataSourceAdapter: TimeSinceDataSourceAdapter,
     private val timeHistogramDataFactory: TimeHistogramDataFactory,
     private val timeHistogramDataSourceAdapter: TimeHistogramDataSourceAdapter,
     private val lastValueDataFactory: LastValueDataFactory,
@@ -47,7 +45,6 @@ class GraphStatInteractorProviderImpl @Inject constructor(
     override fun getDataFactory(type: GraphStatType): ViewDataFactory<*, *> {
         return when (type) {
             GraphStatType.LINE_GRAPH -> lineGraphDataFactory
-            GraphStatType.TIME_SINCE -> timeSinceDataFactory
             GraphStatType.PIE_CHART -> pieChartDataFactory
             GraphStatType.TIME_HISTOGRAM -> timeHistogramDataFactory
             GraphStatType.AVERAGE_TIME_BETWEEN -> averageTimeBetweenDataFactory
@@ -60,7 +57,6 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.LINE_GRAPH -> lineGraphDataSourceAdapter
             GraphStatType.PIE_CHART -> pieChartDataSourceAdapter
             GraphStatType.AVERAGE_TIME_BETWEEN -> averageTimeBetweenDataSourceAdapter
-            GraphStatType.TIME_SINCE -> timeSinceDataSourceAdapter
             GraphStatType.TIME_HISTOGRAM -> timeHistogramDataSourceAdapter
             GraphStatType.LAST_VALUE -> lastValueDataSourceAdapter
         }
@@ -71,7 +67,6 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.LINE_GRAPH -> GraphStatLineGraphDecorator(listMode)
             GraphStatType.PIE_CHART -> GraphStatPieChartDecorator(listMode)
             GraphStatType.TIME_HISTOGRAM -> GraphStatTimeHistogramDecorator(listMode)
-            GraphStatType.TIME_SINCE -> GraphStatTimeSinceDecorator(listMode)
             GraphStatType.AVERAGE_TIME_BETWEEN -> GraphStatAverageTimeBetweenDecorator(listMode)
             GraphStatType.LAST_VALUE -> GraphStatLastValueDecorator(listMode)
         }

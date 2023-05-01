@@ -40,10 +40,6 @@ sealed interface GraphStatConfigEvent {
             override val config: AverageTimeBetweenStat
         ) : ConfigData<AverageTimeBetweenStat>
 
-        data class TimeSinceLastConfigData(
-            override val config: TimeSinceLastStat
-        ) : ConfigData<TimeSinceLastStat>
-
         data class TimeHistogramConfigData(
             override val config: TimeHistogram
         ) : ConfigData<TimeHistogram>

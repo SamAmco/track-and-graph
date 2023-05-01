@@ -119,7 +119,7 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
             DecimalFormat("0.0")
         binding.pieChart.clear()
-        blankViews()
+        blankViews(View.GONE)
         binding.errorMessage.text = ""
         binding.headerText.text = ""
         binding.statMessage.text = ""
@@ -184,19 +184,23 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
         val headerText = graphOrStat.name
         binding.headerText.text = headerText
         when (data.state) { //Shouldn't really be loading state here but just for completeness
-            IGraphStatViewData.State.LOADING -> binding.progressBar.visibility = View.VISIBLE
+            IGraphStatViewData.State.LOADING -> initLoading()
             IGraphStatViewData.State.READY -> decorator.decorate(this@GraphStatView, data)
             IGraphStatViewData.State.ERROR -> throw data.error!!
         }
     }
 
-    private fun blankViews() {
-        binding.legendFlexboxLayout.visibility = View.GONE
-        binding.xyPlot.visibility = View.GONE
-        binding.pieChart.visibility = View.GONE
-        binding.errorMessage.visibility = View.GONE
-        binding.statMessage.visibility = View.GONE
-        binding.composeView.visibility = View.GONE
+    //When the views are loading we don't want to change their size so the default is invisible
+    //rather than gone.
+    private fun blankViews(visibility: Int = View.INVISIBLE) {
+        listOf(
+            binding.legendFlexboxLayout,
+            binding.xyPlot,
+            binding.pieChart,
+            binding.errorMessage,
+            binding.statMessage,
+            binding.composeView
+        ).forEach { it.visibility = visibility }
     }
 
     fun <T : IGraphStatViewData> initFromGraphStat(
@@ -213,5 +217,4 @@ class GraphStatView : FrameLayout, IDecoratableGraphStatView {
             trySetDecorator(decorator, data)
         }
     }
-
 }

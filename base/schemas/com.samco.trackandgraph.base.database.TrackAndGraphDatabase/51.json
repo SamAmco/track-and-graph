@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 51,
-    "identityHash": "1b4f9cf1062fd710cd06d89b80358f9c",
+    "identityHash": "e1013b3e13f0517df75143123c53f4e6",
     "entities": [
       {
         "tableName": "features_table",
@@ -703,119 +703,6 @@
         ]
       },
       {
-        "tableName": "time_since_last_stat_table4",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `from_value` REAL NOT NULL, `to_value` REAL NOT NULL, `labels` TEXT NOT NULL, `filter_by_range` INTEGER NOT NULL, `filter_by_labels` INTEGER NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "graphStatId",
-            "columnName": "graph_stat_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "featureId",
-            "columnName": "feature_id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "fromValue",
-            "columnName": "from_value",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "toValue",
-            "columnName": "to_value",
-            "affinity": "REAL",
-            "notNull": true
-          },
-          {
-            "fieldPath": "labels",
-            "columnName": "labels",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "filterByRange",
-            "columnName": "filter_by_range",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "filterByLabels",
-            "columnName": "filter_by_labels",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [
-          {
-            "name": "index_time_since_last_stat_table4_id",
-            "unique": false,
-            "columnNames": [
-              "id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_id` ON `${TABLE_NAME}` (`id`)"
-          },
-          {
-            "name": "index_time_since_last_stat_table4_graph_stat_id",
-            "unique": false,
-            "columnNames": [
-              "graph_stat_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_graph_stat_id` ON `${TABLE_NAME}` (`graph_stat_id`)"
-          },
-          {
-            "name": "index_time_since_last_stat_table4_feature_id",
-            "unique": false,
-            "columnNames": [
-              "feature_id"
-            ],
-            "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_time_since_last_stat_table4_feature_id` ON `${TABLE_NAME}` (`feature_id`)"
-          }
-        ],
-        "foreignKeys": [
-          {
-            "table": "graphs_and_stats_table2",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "graph_stat_id"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          },
-          {
-            "table": "features_table",
-            "onDelete": "CASCADE",
-            "onUpdate": "NO ACTION",
-            "columns": [
-              "feature_id"
-            ],
-            "referencedColumns": [
-              "id"
-            ]
-          }
-        ]
-      },
-      {
         "tableName": "reminders_table",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `display_index` INTEGER NOT NULL, `name` TEXT NOT NULL, `time` TEXT NOT NULL, `checked_days` TEXT NOT NULL)",
         "fields": [
@@ -1397,7 +1284,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1b4f9cf1062fd710cd06d89b80358f9c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e1013b3e13f0517df75143123c53f4e6')"
     ]
   }
 }

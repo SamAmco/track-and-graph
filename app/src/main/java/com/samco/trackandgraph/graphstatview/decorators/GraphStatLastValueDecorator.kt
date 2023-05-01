@@ -67,7 +67,6 @@ class GraphStatLastValueDecorator(listMode: Boolean) :
         isDuration = data.isDuration
 
         constructView()
-        binding.composeView.visibility = View.VISIBLE
         binding.progressBar.visibility = View.GONE
     }
 
@@ -79,6 +78,7 @@ class GraphStatLastValueDecorator(listMode: Boolean) :
     }
 
     private fun constructView() {
+        binding.composeView.visibility = View.VISIBLE
         binding.composeView.setContent {
             TnGComposeTheme {
                 LastValueStatView()
@@ -90,6 +90,7 @@ class GraphStatLastValueDecorator(listMode: Boolean) :
     private fun LastValueStatView() = CompositionLocalProvider(
         LocalContentColor provides MaterialTheme.tngColors.onSurface,
     ) {
+        println("samsam: Setting content for ${dataPoint.timestamp}")
         Column(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
             horizontalAlignment = Alignment.CenterHorizontally

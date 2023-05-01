@@ -254,7 +254,6 @@ fun GraphStatTypeSelector(
             GraphStatType.LINE_GRAPH to stringResource(id = R.string.graph_type_line_graph),
             GraphStatType.PIE_CHART to stringResource(id = R.string.graph_type_pie_chart),
             GraphStatType.AVERAGE_TIME_BETWEEN to stringResource(id = R.string.graph_type_average_time_between),
-            GraphStatType.TIME_SINCE to stringResource(id = R.string.graph_type_time_since),
             GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram),
             GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value)
         )
@@ -286,10 +285,6 @@ fun ConfigInputView(
         hiltViewModel<AverageTimeBetweenConfigViewModel>(viewModelStoreOwner)
     averageTimeBetweenConfigViewModel.initFromGraphStatId(graphStatId)
 
-    val timeSinceLastConfigViewModel =
-        hiltViewModel<TimeSinceLastConfigViewModel>(viewModelStoreOwner)
-    timeSinceLastConfigViewModel.initFromGraphStatId(graphStatId)
-
     val timeHistogramConfigViewModel =
         hiltViewModel<TimeHistogramConfigViewModel>(viewModelStoreOwner)
     timeHistogramConfigViewModel.initFromGraphStatId(graphStatId)
@@ -312,10 +307,6 @@ fun ConfigInputView(
         GraphStatType.AVERAGE_TIME_BETWEEN -> {
             currentViewModel = averageTimeBetweenConfigViewModel
             AverageTimeBetweenConfigView(viewModel = averageTimeBetweenConfigViewModel)
-        }
-        GraphStatType.TIME_SINCE -> {
-            currentViewModel = timeSinceLastConfigViewModel
-            TimeSinceLastConfigView(viewModel = timeSinceLastConfigViewModel)
         }
         GraphStatType.TIME_HISTOGRAM -> {
             currentViewModel = timeHistogramConfigViewModel
