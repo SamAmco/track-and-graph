@@ -29,7 +29,7 @@ import com.androidplot.xy.*
 import com.samco.trackandgraph.databinding.GraphStatViewBinding
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.graphstatview.decorators.*
+import com.samco.trackandgraph.graphstatview.ui.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.OffsetDateTime

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <com.androidplot.xy.XYPlot xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/xyPlot"
+        style="@style/APDefacto.Light"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/graph_height"
+        android:layout_margin="@dimen/card_padding"
+        app:domainLineColor="?attr/colorOnSurface"
+        app:domainLineThickness="0.1dp"
+        app:lineLabelRotationBottom="-28"
+        app:lineLabelTextColorBottom="?android:attr/textColorPrimary"
+        app:lineLabelTextColorLeft="?android:attr/textColorPrimary"
+        app:lineLabelTextColorRight="?android:attr/textColorPrimary"
+        app:lineLabelTextColorTop="?android:attr/textColorPrimary"
+        app:lineLabelTextSizeBottom="@dimen/small_label_size"
+        app:lineLabelTextSizeLeft="@dimen/small_label_size"
+        app:rangeLineColor="?attr/colorOnSurface"
+        app:rangeLineThickness="0.1dp" />
+
+</layout>

@@ -19,7 +19,7 @@ package com.samco.trackandgraph.graphstatproviders
 
 import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatproviders.datasourceadapters.*
-import com.samco.trackandgraph.graphstatview.decorators.*
+import com.samco.trackandgraph.graphstatview.ui.*
 import com.samco.trackandgraph.graphstatview.factories.*
 import javax.inject.Inject
 
@@ -67,7 +67,7 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.LINE_GRAPH -> GraphStatLineGraphDecorator(listMode)
             GraphStatType.PIE_CHART -> GraphStatPieChartDecorator(listMode)
             GraphStatType.TIME_HISTOGRAM -> GraphStatTimeHistogramDecorator(listMode)
-            GraphStatType.AVERAGE_TIME_BETWEEN -> GraphStatAverageTimeBetweenDecorator(listMode)
+            GraphStatType.AVERAGE_TIME_BETWEEN -> AverageTimeBetweenView(listMode)
             GraphStatType.LAST_VALUE -> GraphStatLastValueDecorator(listMode)
         }
     }
