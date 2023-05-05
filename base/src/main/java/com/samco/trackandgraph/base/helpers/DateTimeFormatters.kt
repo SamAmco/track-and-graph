@@ -167,3 +167,38 @@ fun formatTimeDuration(seconds: Long): String {
     if (seconds < 0) return "-$timeStr"
     return timeStr
 }
+
+fun formatTimeToDaysHoursMinutesSeconds(
+    context: Context,
+    millis: Long,
+    twoLines: Boolean = true
+): String {
+    val totalSeconds = millis / 1000
+    val daysNum = (totalSeconds / 86400).toInt()
+    val days = daysNum.toString()
+    val hours = ((totalSeconds % 86400) / 3600).toInt()
+    val minutes = ((totalSeconds % 3600) / 60).toInt()
+    val seconds = (totalSeconds % 60).toInt()
+    val hoursStr = "%02d".format(((totalSeconds % 86400) / 3600).toInt())
+    val minutesStr = "%02d".format(((totalSeconds % 3600) / 60).toInt())
+    val secondsStr = "%02d".format((totalSeconds % 60).toInt())
+    val hasHms = (hours + minutes + seconds) > 0
+    val hms = "$hoursStr:$minutesStr:$secondsStr"
+
+    return StringBuilder().apply {
+        if (daysNum == 0) append(hms)
+        else {
+            val daysSuffix =
+                if (daysNum == 1) context.getString(R.string.day)
+                else context.getString(R.string.days)
+
+            append("$days $daysSuffix")
+
+            if (hasHms) {
+                if (twoLines) appendLine()
+                else append(", ")
+                append(hms)
+            }
+        }
+    }.toString()
+}

@@ -17,10 +17,12 @@
 
 package com.samco.trackandgraph.group
 
+import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -28,22 +30,25 @@ import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.database.dto.GroupChild
 import com.samco.trackandgraph.base.database.dto.GroupChildType
-import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 
 class GroupAdapter(
     private val trackerClickListener: TrackerClickListener,
     private val graphStatClickListener: GraphStatClickListener,
     private val groupClickListener: GroupClickListener,
-    private val gsiProvider: GraphStatInteractorProvider,
 ) : RecyclerView.Adapter<GroupChildViewHolder>() {
     private val groupChildren = mutableListOf<GroupChild>()
 
+    private enum class ViewType {
+        GRAPH,
+        TRACKER,
+        GROUP
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupChildViewHolder {
         return when (viewType) {
-            GroupChildType.GRAPH.ordinal -> GraphStatViewHolder.from(parent, gsiProvider)
-                .apply { setFullSpan(this) }
-            GroupChildType.TRACKER.ordinal -> TrackerViewHolder.from(parent)
+            ViewType.GRAPH.ordinal -> GraphStatViewHolder(ComposeView(parent.context))
+            ViewType.TRACKER.ordinal -> TrackerViewHolder.from(parent)
             else -> GroupViewHolder.from(parent).apply { setFullSpan(this) }
         }
     }
@@ -56,14 +61,14 @@ class GroupAdapter(
 
     override fun onBindViewHolder(holder: GroupChildViewHolder, position: Int) {
         val item = groupChildren[position]
-        when (item.type) {
-            GroupChildType.GRAPH -> (holder as GraphStatViewHolder).bind(
+        when (getItemViewType(position)) {
+            ViewType.GRAPH.ordinal -> (holder as GraphStatViewHolder).bind(
                 extractGraphViewData(item.obj),
                 graphStatClickListener
             )
-            GroupChildType.TRACKER -> (holder as TrackerViewHolder)
+            ViewType.TRACKER.ordinal -> (holder as TrackerViewHolder)
                 .bind(item.obj as DisplayTracker, trackerClickListener)
-            GroupChildType.GROUP -> (holder as GroupViewHolder)
+            ViewType.GROUP.ordinal -> (holder as GroupViewHolder)
                 .bind(item.obj as Group, groupClickListener)
         }
     }
@@ -72,11 +77,18 @@ class GroupAdapter(
         (obj as Pair<*, *>).second as IGraphStatViewData
 
     override fun getItemViewType(position: Int): Int {
-        return groupChildren.getOrNull(position)?.type?.ordinal ?: -1
+        val child = groupChildren.getOrNull(position) ?: return -1
+        return when (child.type) {
+            GroupChildType.GRAPH -> ViewType.GRAPH.ordinal
+            GroupChildType.TRACKER -> ViewType.TRACKER.ordinal
+            GroupChildType.GROUP -> ViewType.GROUP.ordinal
+            else -> -1
+        }
     }
 
     override fun getItemCount(): Int = groupChildren.size
 
+    @SuppressLint("NotifyDataSetChanged")
     fun submitList(newChildren: List<GroupChild>, forceNotifyDataSetChanged: Boolean) {
         if (forceNotifyDataSetChanged) {
             groupChildren.clear()
