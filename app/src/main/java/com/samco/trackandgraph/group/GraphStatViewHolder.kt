@@ -17,16 +17,8 @@
 
 package com.samco.trackandgraph.group
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.res.dimensionResource
-import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.graphstatview.ui.*
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
@@ -49,50 +41,15 @@ class GraphStatViewHolder(
 
         composeView.setContent {
             TnGComposeTheme {
-                GraphStatCard()
+                GraphStatCardView(
+                    isElevated = isElevated,
+                    graphStatViewData = graphStatViewData,
+                    clickListener = clickListener
+                )
             }
         }
     }
 
-    @Composable
-    private fun GraphStatCard() = Card(
-        elevation = if (isElevated)
-            dimensionResource(id = R.dimen.card_elevation) * 3f
-        else dimensionResource(R.dimen.card_elevation)
-    ) {
-        //TODO add a try catch around the graph views and show an error message if it fails
-        Box(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding))
-        ) {
-            //TODO add menu button
-            Column {
-                Text(
-                    text = graphStatViewData.graphOrStat.name,
-                    style = MaterialTheme.typography.h6
-                )
-                Box(modifier = Modifier.weight(1f)) {
-                    if (graphStatViewData.state == IGraphStatViewData.State.LOADING) {
-                        //TODO add loading indicator
-                    } else when (graphStatViewData.graphOrStat.type) {
-                        GraphStatType.LINE_GRAPH ->
-                            LineGraphView(
-                                viewData = graphStatViewData as ILineGraphViewData,
-                                timeMarker = null,
-                                listMode = true
-                            )
-                        GraphStatType.PIE_CHART ->
-                            PieChartView(viewData = graphStatViewData as IPieChartViewData)
-                        GraphStatType.AVERAGE_TIME_BETWEEN ->
-                            AverageTimeBetweenView(viewData = graphStatViewData as IAverageTimeBetweenViewData)
-                        GraphStatType.LAST_VALUE ->
-                            LastValueStatView(viewData = graphStatViewData as ILastValueData)
-                        GraphStatType.TIME_HISTOGRAM ->
-                            TimeHistogramView(viewData = graphStatViewData as ITimeHistogramViewData)
-                    }
-                }
-            }
-        }
-    }
 
     override fun elevateCard() {
         isElevated = true

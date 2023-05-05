@@ -19,7 +19,6 @@
 
 package com.samco.trackandgraph.graphstatinput
 
-import android.view.ViewGroup
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
@@ -36,15 +35,13 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.graphstatinput.configviews.*
-import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
-import com.samco.trackandgraph.graphstatview.GraphStatCardView
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import java.lang.Float.max
@@ -52,7 +49,6 @@ import java.lang.Float.min
 
 @Composable
 internal fun GraphStatInputView(
-    gsiProvider: GraphStatInteractorProvider,
     viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
     graphStatId: Long
@@ -73,9 +69,7 @@ internal fun GraphStatInputView(
                         graphStatId = graphStatId
                     )
 
-                    if (demoVisible) {
-                        DemoOverlay(demoYOffset, demoViewData, gsiProvider)
-                    }
+                    if (demoVisible) demoViewData?.let { DemoOverlay(demoYOffset, it) }
                 }
 
                 if (demoViewData != null) {
@@ -102,8 +96,7 @@ internal fun GraphStatInputView(
 @Composable
 private fun DemoOverlay(
     demoYOffset: Float,
-    demoViewData: IGraphStatViewData?,
-    gsiProvider: GraphStatInteractorProvider
+    demoViewData: IGraphStatViewData,
 ) = Box(
     Modifier
         .background(MaterialTheme.tngColors.surface.copy(alpha = 0.8f))
@@ -122,26 +115,13 @@ private fun DemoOverlay(
         val offsetRatio = max(0f, min(demoYOffset * 3f, displayHeight) / max(1f, displayHeight))
         val offset = -offsetRatio * invisiblePixels
 
-        AndroidView(
+        GraphStatCardView(
             modifier = Modifier
                 .fillMaxWidth()
                 .offset(y = offset.dp)
                 .wrapContentHeight(align = Alignment.Top, unbounded = true)
                 .onSizeChanged { demoHeight = it.height.toFloat() },
-            factory = {
-                GraphStatCardView(it).apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                }
-            },
-            update = { cardView ->
-                demoViewData?.let {
-                    val decorator = gsiProvider.getDecorator(it.graphOrStat.type, true)
-                    cardView.graphStatView.initFromGraphStat(it, decorator)
-                } ?: cardView.graphStatView.initLoading()
-            }
+            graphStatViewData = demoViewData
         )
     }
 }
