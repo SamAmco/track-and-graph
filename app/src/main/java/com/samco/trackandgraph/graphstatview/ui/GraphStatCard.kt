@@ -39,7 +39,10 @@ fun GraphStatCardView(
                 if (graphStatViewData.state == IGraphStatViewData.State.LOADING) {
                     //TODO add loading indicator
                 } else {
-                    GraphStatView(graphStatViewData = graphStatViewData)
+                    GraphStatView(
+                        graphStatViewData = graphStatViewData,
+                        listMode = true
+                    )
                 }
             }
         }

@@ -20,9 +20,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center">
 
-                <com.samco.trackandgraph.graphstatview.GraphStatView
-                    android:id="@+id/graphStatView"
-                    android:layout_width="match_parent"
+                <androidx.compose.ui.platform.ComposeView
+                    android:id="@+id/composeView"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </ScrollView>
         </androidx.cardview.widget.CardView>
@@ -52,22 +52,22 @@
                 android:id="@+id/notesPopupUpButton"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                app:tint="?attr/colorControlNormal"
                 app:layout_constraintBottom_toBottomOf="@id/notesButtonText"
                 app:layout_constraintLeft_toRightOf="@id/notesButtonText"
                 app:layout_constraintTop_toTopOf="@id/notesButtonText"
-                app:srcCompat="@drawable/up_arrow" />
+                app:srcCompat="@drawable/up_arrow"
+                app:tint="?attr/colorControlNormal" />
 
             <ImageView
                 android:id="@+id/notesPopupDownButton"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                app:tint="?attr/colorControlNormal"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@id/notesButtonText"
                 app:layout_constraintLeft_toRightOf="@id/notesButtonText"
                 app:layout_constraintTop_toTopOf="@id/notesButtonText"
-                app:srcCompat="@drawable/down_arrow" />
+                app:srcCompat="@drawable/down_arrow"
+                app:tint="?attr/colorControlNormal" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

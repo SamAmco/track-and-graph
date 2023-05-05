@@ -122,6 +122,7 @@ class ViewGraphStatViewModelImpl @Inject constructor(
 
     private suspend fun emitGraphData(graphStatId: Long) {
         val graphStat = dataInteractor.getGraphStatById(graphStatId)
+        withContext(ui) { graphStatViewData.value = IGraphStatViewData.loading(graphStat) }
         val viewData = gsiProvider
             .getDataFactory(graphStat.type)
             .getViewData(graphStat) {
