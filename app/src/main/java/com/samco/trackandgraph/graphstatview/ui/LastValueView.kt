@@ -18,10 +18,7 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -49,7 +46,9 @@ import org.threeten.bp.OffsetDateTime
 @Composable
 fun LastValueStatView(
     modifier: Modifier = Modifier,
-    viewData: ILastValueData
+    viewData: ILastValueData,
+    listMode: Boolean,
+    graphHeight: Int? = null
 ) = CompositionLocalProvider(
     LocalContentColor provides MaterialTheme.tngColors.onSurface,
 ) {
@@ -57,7 +56,9 @@ fun LastValueStatView(
         LastValueStatViewBody(
             modifier = modifier,
             dataPoint = it,
-            isDuration = viewData.isDuration
+            isDuration = viewData.isDuration,
+            listMode = listMode,
+            graphHeight = graphHeight
         )
 
     } ?: GraphErrorView(
@@ -70,9 +71,16 @@ fun LastValueStatView(
 private fun LastValueStatViewBody(
     modifier: Modifier = Modifier,
     dataPoint: DataPoint,
-    isDuration: Boolean
+    isDuration: Boolean,
+    listMode: Boolean,
+    graphHeight: Int?
 ) = Column(
-    modifier = modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+    modifier = modifier
+        .padding(dimensionResource(id = R.dimen.card_padding))
+        .let {
+            if (graphHeight != null) it.height(graphHeight.dp)
+            else it
+        },
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
     val context = LocalContext.current
@@ -121,7 +129,7 @@ private fun LastValueStatViewBody(
                 modifier = Modifier.weight(1f),
                 dataPoint = dataPoint,
                 isDuration = isDuration,
-                restrictNoteText = true//TODO support non list mode
+                restrictNoteText = listMode
             )
         }
     }

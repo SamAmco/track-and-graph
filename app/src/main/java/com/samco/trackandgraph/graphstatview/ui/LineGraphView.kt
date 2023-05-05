@@ -56,8 +56,9 @@ import kotlin.math.roundToLong
 fun LineGraphView(
     modifier: Modifier = Modifier,
     viewData: ILineGraphViewData,
+    listMode: Boolean,
     timeMarker: OffsetDateTime? = null,
-    listMode: Boolean
+    graphHeight: Int? = null
 ) {
     if (!viewData.hasPlottableData) {
         GraphErrorView(
@@ -69,7 +70,8 @@ fun LineGraphView(
             modifier = modifier,
             viewData = viewData,
             timeMarker = timeMarker,
-            listMode = listMode
+            listMode = listMode,
+            graphHeight = graphHeight
         )
     }
 }
@@ -79,17 +81,20 @@ fun LineGraphBodyView(
     modifier: Modifier,
     viewData: ILineGraphViewData,
     timeMarker: OffsetDateTime? = null,
-    listMode: Boolean
+    listMode: Boolean,
+    graphHeight: Int? = null
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
 
     AndroidViewBinding(GraphXyPlotBinding::inflate) {
-
         xyPlotSetup(
             context = context,
             xyPlot = xyPlot
         )
+
+        if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
+
         drawLineGraphFeatures(
             context = context,
             binding = this,
@@ -120,6 +125,11 @@ fun LineGraphBodyView(
             endTime = viewData.endTime,
             timeMarker = timeMarker
         )
+
+        if (!listMode) {
+            PanZoom.attach(xyPlot, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.STRETCH_HORIZONTAL)
+        }
+
         xyPlot.redraw()
         xyPlot.graph.refreshLayout()
     }

@@ -49,7 +49,8 @@ private data class SegmentInfo(
 @Composable
 fun PieChartView(
     modifier: Modifier = Modifier,
-    viewData: IPieChartViewData
+    viewData: IPieChartViewData,
+    graphHeight: Int? = null
 ) {
     if (viewData.segments.isNullOrEmpty()) {
         GraphErrorView(
@@ -79,7 +80,8 @@ fun PieChartView(
 
         PieChartViewBody(
             modifier = modifier,
-            segments = segments
+            segments = segments,
+            graphHeight = graphHeight
         )
     }
 
@@ -88,13 +90,15 @@ fun PieChartView(
 @Composable
 private fun PieChartViewBody(
     modifier: Modifier = Modifier,
-    segments: List<SegmentInfo>
+    segments: List<SegmentInfo>,
+    graphHeight: Int?
 ) = Column(modifier = modifier) {
     val smallLabelSize = dimensionResource(R.dimen.small_label_size).value
     val labelColor = MaterialTheme.colors.onSurface.toArgb()
 
     AndroidViewBinding(GraphPieChartBinding::inflate) {
 
+        if (graphHeight != null) pieChart.layoutParams.height = graphHeight
         pieChart.backgroundPaint.color = Color.TRANSPARENT
 
         segments.forEachIndexed { i, s ->
