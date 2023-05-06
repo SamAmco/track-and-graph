@@ -39,7 +39,6 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.addtracker.*
-import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
@@ -49,7 +48,6 @@ import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * The group fragment is used on the home page and in any nested group to display the contents of
@@ -63,9 +61,6 @@ class GroupFragment : Fragment(),
     PermissionRequesterUseCase by PermissionRequesterUseCaseImpl() {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
-
-    @Inject
-    lateinit var gsiProvider: GraphStatInteractorProvider
 
     private var binding: FragmentGroupBinding by bindingForViewLifecycle()
 
@@ -105,8 +100,7 @@ class GroupFragment : Fragment(),
         adapter = GroupAdapter(
             createTrackerClickListener(),
             createGraphStatClickListener(),
-            createGroupClickListener(),
-            gsiProvider
+            createGroupClickListener()
         )
         binding.itemList.adapter = adapter
         disableChangeAnimations()

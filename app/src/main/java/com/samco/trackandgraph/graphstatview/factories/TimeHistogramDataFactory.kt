@@ -67,7 +67,7 @@ class TimeHistogramDataFactory @Inject constructor(
                     it.times(10.0).toInt().plus(1).div(10.0),
                     100.0
                 )
-            }
+            } ?: 100.0
 
             object : ITimeHistogramViewData {
                 override val state = IGraphStatViewData.State.READY
