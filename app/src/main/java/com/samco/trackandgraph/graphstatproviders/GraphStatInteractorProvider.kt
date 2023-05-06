@@ -26,7 +26,6 @@ import javax.inject.Inject
 interface GraphStatInteractorProvider {
     fun getDataFactory(type: GraphStatType): ViewDataFactory<*, *>
     fun getDataSourceAdapter(type: GraphStatType): GraphStatDataSourceAdapter<*>
-    fun getDecorator(type: GraphStatType, listMode: Boolean): GraphStatViewDecorator<*>
 }
 
 class GraphStatInteractorProviderImpl @Inject constructor(
@@ -59,16 +58,6 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.AVERAGE_TIME_BETWEEN -> averageTimeBetweenDataSourceAdapter
             GraphStatType.TIME_HISTOGRAM -> timeHistogramDataSourceAdapter
             GraphStatType.LAST_VALUE -> lastValueDataSourceAdapter
-        }
-    }
-
-    override fun getDecorator(type: GraphStatType, listMode: Boolean): GraphStatViewDecorator<*> {
-        return when (type) {
-            GraphStatType.LINE_GRAPH -> GraphStatLineGraphDecorator(listMode)
-            GraphStatType.PIE_CHART -> GraphStatPieChartDecorator(listMode)
-            GraphStatType.TIME_HISTOGRAM -> GraphStatTimeHistogramDecorator(listMode)
-            GraphStatType.AVERAGE_TIME_BETWEEN -> AverageTimeBetweenView(listMode)
-            GraphStatType.LAST_VALUE -> GraphStatLastValueDecorator(listMode)
         }
     }
 }

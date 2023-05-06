@@ -3,14 +3,17 @@ package com.samco.trackandgraph.graphstatview.ui
 import android.content.Context
 import android.graphics.Color
 import android.view.View
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.androidplot.Plot
 import com.androidplot.ui.Anchor
@@ -19,6 +22,7 @@ import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.XYPlot
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
+import com.samco.trackandgraph.ui.compose.ui.SpacingExtraSmall
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.util.getColorFromAttr
 
@@ -79,12 +83,13 @@ fun GraphErrorView(
         modifier = modifier
             .padding(vertical = dimensionResource(id = R.dimen.input_spacing_large)),
         text = stringResource(error),
-        style = MaterialTheme.typography.body1
+        style = MaterialTheme.typography.body1,
+        textAlign = TextAlign.Center
     )
 }
 
 data class GraphLegendItem(
-    val color: Int,
+    @ColorRes val color: Int,
     val label: String
 )
 
@@ -93,9 +98,14 @@ data class GraphLegendItem(
 fun GraphLegend(
     modifier: Modifier = Modifier,
     items: List<GraphLegendItem>
-) = FlowRow(modifier = modifier) {
+) = FlowRow(
+    modifier = modifier
+        .fillMaxWidth(),
+    horizontalArrangement = Arrangement.Center
+) {
     items.forEach {
         GraphLegentItemView(item = it)
+        SpacingSmall()
     }
 }
 
@@ -103,18 +113,19 @@ fun GraphLegend(
 fun GraphLegentItemView(
     modifier: Modifier = Modifier,
     item: GraphLegendItem
-) = Row(modifier = modifier) {
+) = Row(
+    modifier = modifier,
+    verticalAlignment = Alignment.CenterVertically
+) {
 
     ColorCircle(
         color = item.color,
-        size = 22.dp
+        size = 20.dp
     )
 
-    SpacingSmall()
+    Spacer(modifier = Modifier.width(2.dp))
 
     Text(
-        modifier = modifier
-            .padding(vertical = dimensionResource(id = R.dimen.input_spacing_large)),
         text = item.label,
         style = MaterialTheme.typography.body2
     )

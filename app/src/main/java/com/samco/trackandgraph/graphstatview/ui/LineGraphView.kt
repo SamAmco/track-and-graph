@@ -92,6 +92,7 @@ fun LineGraphBodyView(
             context = context,
             xyPlot = xyPlot
         )
+        xyPlot.clear()
 
         if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
 
@@ -137,7 +138,7 @@ fun LineGraphBodyView(
     GraphLegend(
         items = viewData.plottableData.map {
             GraphLegendItem(
-                color = getColor(context, dataVisColorList[it.key.colorIndex]),
+                color = dataVisColorList[it.key.colorIndex],
                 label = it.key.name
             )
         }

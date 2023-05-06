@@ -33,6 +33,7 @@ import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
+import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -51,7 +52,7 @@ fun TimeHistogramView(
     viewData: ITimeHistogramViewData,
     graphHeight: Int? = null
 ) {
-    if (!viewData.barValues.isNullOrEmpty()) {
+    if (viewData.barValues.isNullOrEmpty()) {
         GraphErrorView(
             modifier = modifier,
             error = R.string.graph_stat_view_not_enough_data_graph
@@ -83,6 +84,7 @@ private fun TimeHistogramBodyView(
             context = context,
             xyPlot = xyPlot
         )
+        xyPlot.clear()
 
         if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
 
@@ -114,11 +116,13 @@ private fun TimeHistogramBodyView(
         xyPlot.graph.refreshLayout()
     }
 
+    SpacingSmall()
+
     GraphLegend(
         items = barValues.mapIndexed { i, bar ->
             val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
             GraphLegendItem(
-                color = colorResource(dataVisColorList[colorIndex]).toArgb(),
+                color = dataVisColorList[colorIndex],
                 label = bar.label
             )
         }
