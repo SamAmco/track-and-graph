@@ -87,39 +87,47 @@ fun LineGraphBodyView(
 
     val context = LocalContext.current
 
-    AndroidViewBinding(GraphXyPlotBinding::inflate) {
+    AndroidViewBinding(factory = { inflater, parent, attachToParent ->
+        val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
+
         xyPlotSetup(
             context = context,
-            xyPlot = xyPlot
+            xyPlot = binding.xyPlot
         )
-        xyPlot.clear()
+        binding.xyPlot.clear()
 
-        if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
 
         drawLineGraphFeatures(
             context = context,
-            binding = this,
+            binding = binding,
             plottableData = viewData.plottableData,
             listMode = listMode,
         )
         setUpLineGraphXAxis(
             context = context,
-            binding = this,
+            binding = binding,
             endTime = viewData.endTime,
         )
         setUpLineGraphYAxis(
-            binding = this,
+            binding = binding,
             yAxisRangeParameters = viewData.yAxisRangeParameters,
             durationBasedRange = viewData.durationBasedRange,
         )
         setLineGraphBounds(
             context = context,
-            binding = this,
+            binding = binding,
             bounds = viewData.bounds,
             yRangeType = viewData.yRangeType,
             endTime = viewData.endTime,
             listMode = listMode
         )
+
+        if (!listMode) {
+            PanZoom.attach(binding.xyPlot, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.STRETCH_HORIZONTAL)
+        }
+
+        return@AndroidViewBinding binding
+    }, update = {
         setTimeMarker(
             context = context,
             binding = this,
@@ -127,13 +135,10 @@ fun LineGraphBodyView(
             timeMarker = timeMarker
         )
 
-        if (!listMode) {
-            PanZoom.attach(xyPlot, PanZoom.Pan.HORIZONTAL, PanZoom.Zoom.STRETCH_HORIZONTAL)
-        }
-
+        if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
         xyPlot.redraw()
         xyPlot.graph.refreshLayout()
-    }
+    })
 
     GraphLegend(
         items = viewData.plottableData.map {
@@ -418,5 +423,4 @@ private fun setTimeMarker(
             null
         )
     )
-    binding.xyPlot.redraw()
 }
