@@ -18,10 +18,12 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
+import android.view.LayoutInflater
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
@@ -77,42 +79,48 @@ private fun TimeHistogramBodyView(
 
     val context = LocalContext.current
 
-    AndroidViewBinding(GraphXyPlotBinding::inflate) {
-        xyPlotSetup(
-            context = context,
-            xyPlot = xyPlot
-        )
-        xyPlot.clear()
+    AndroidViewBinding(
+        factory = { inflater, parent, attachToParent ->
+            val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
 
-        if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
+            xyPlotSetup(
+                context = context,
+                xyPlot = binding.xyPlot
+            )
+            binding.xyPlot.clear()
 
-        setUpXAxis(
-            binding = this,
-            window = window
-        )
-        setUpXAxisTitle(
-            context = context,
-            binding = this,
-            window = window
-        )
-        setUpYAxis(
-            context = context,
-            binding = this,
-            maxDisplayHeight = maxDisplayHeight
-        )
-        setUpBounds(
-            binding = this,
-            window = window,
-            maxDisplayHeight = maxDisplayHeight
-        )
-        drawBars(
-            context = context,
-            binding = this,
-            barValues = barValues
-        )
-        xyPlot.redraw()
-        xyPlot.graph.refreshLayout()
-    }
+            setUpXAxis(
+                binding = binding,
+                window = window
+            )
+            setUpXAxisTitle(
+                context = context,
+                binding = binding,
+                window = window
+            )
+            setUpYAxis(
+                context = context,
+                binding = binding,
+                maxDisplayHeight = maxDisplayHeight
+            )
+            setUpBounds(
+                binding = binding,
+                window = window,
+                maxDisplayHeight = maxDisplayHeight
+            )
+            drawBars(
+                context = context,
+                binding = binding,
+                barValues = barValues
+            )
+
+            return@AndroidViewBinding binding
+        },
+        update = {
+            if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
+            xyPlot.redraw()
+            xyPlot.graph.refreshLayout()
+        })
 
     SpacingSmall()
 

@@ -20,7 +20,7 @@ fun GraphStatCardView(
     modifier: Modifier = Modifier,
     isElevated: Boolean = false,
     graphStatViewData: IGraphStatViewData,
-    clickListener: GraphStatClickListener? = null
+    clickListener: GraphStatClickListener? = null,
 ) = Box(
     modifier = Modifier
         .padding(dimensionResource(id = R.dimen.card_margin_small))
