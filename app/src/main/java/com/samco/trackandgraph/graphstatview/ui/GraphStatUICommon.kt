@@ -19,12 +19,15 @@ import com.androidplot.Plot
 import com.androidplot.ui.Anchor
 import com.androidplot.ui.HorizontalPositioning
 import com.androidplot.ui.VerticalPositioning
+import com.androidplot.xy.BoundaryMode
+import com.androidplot.xy.XYGraphWidget
 import com.androidplot.xy.XYPlot
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.SpacingExtraSmall
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.util.getColorFromAttr
+import java.text.DecimalFormat
 
 
 fun xyPlotSetup(
@@ -72,7 +75,14 @@ fun xyPlotSetup(
     xyPlot.graph.gridBackgroundPaint.color = Color.TRANSPARENT
     xyPlot.backgroundPaint.color = Color.TRANSPARENT
     xyPlot.graph.backgroundPaint.color = Color.TRANSPARENT
+
+    xyPlot.graph.paddingLeft = 0f
+    xyPlot.graph.paddingBottom = 0f
+    xyPlot.setRangeBoundaries(0, 1, BoundaryMode.AUTO)
+    xyPlot.setDomainBoundaries(0, 1, BoundaryMode.GROW)
+    xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format = DecimalFormat("0.0")
 }
+
 
 @Composable
 fun GraphErrorView(
