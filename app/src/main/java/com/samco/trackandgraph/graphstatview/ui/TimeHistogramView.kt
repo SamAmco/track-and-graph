@@ -21,9 +21,7 @@ import android.content.Context
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
@@ -203,14 +201,11 @@ private fun setUpXAxis(
                     // to add an offset of 1 to the labels if talking about days or weeks.
                     if (window.window == TimeHistogramWindow.DAY
                         || window.window == TimeHistogramWindow.HOUR
-                    )
-                        0  // there is a minute 0 and a hour 0: index 0 -> label 0
+                    ) 0  // there is a minute 0 and a hour 0: index 0 -> label 0
                     else 1 // but there is no day 0 or week 0:  index 0 -> label 1
 
                 val index = (obj as Double).roundToInt() + zeroIndexOffset
-                val str = if (index >= zeroIndexOffset
-                    && index <= window.numBins
-                ) {
+                val str = if (index >= zeroIndexOffset && index <= window.numBins) {
                     val labelInterval = getLabelInterval(window.window)
                     if (index == zeroIndexOffset
                         || index == window.numBins
