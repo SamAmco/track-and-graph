@@ -128,11 +128,13 @@ class LineGraphDataFactory @Inject constructor(
                     pair.first to series
                 }
             }.awaitAll().toMap()
-            dataSamples.map { it.second }.forEach {
-                val rawDataPoints = it.getRawDataPoints()
-                onDataSampled(rawDataPoints)
-                it.dispose()
-            }
+
+            val rawDataPoints = dataSamples
+                .map { it.second.getRawDataPoints() }
+                .flatten()
+            onDataSampled(rawDataPoints)
+            dataSamples.forEach { it.second.dispose() }
+
             return@withContext features
         }
     }

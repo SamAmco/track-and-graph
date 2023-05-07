@@ -136,8 +136,6 @@ fun LineGraphBodyView(
         )
 
         if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
-        xyPlot.redraw()
-        xyPlot.graph.refreshLayout()
         xyPlot.requestLayout()
     })
 

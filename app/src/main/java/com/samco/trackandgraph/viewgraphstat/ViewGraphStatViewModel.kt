@@ -66,16 +66,17 @@ class ViewGraphStatViewModelImpl @Inject constructor(
 
     override val notes: LiveData<List<GraphNote>> =
         combine(dataPoints, globalNotes) { dataPoints, globalNotes ->
+            val distinctDataPoints = dataPoints.distinct()
+            val oldestTime = distinctDataPoints.minByOrNull { it.timestamp }?.timestamp
+            val newestTime = distinctDataPoints.maxByOrNull { it.timestamp }?.timestamp
+
+            if (oldestTime == null || newestTime == null) return@combine emptyList<GraphNote>()
+
             val filteredGlobalNotes = globalNotes
-                .filter { g ->
-                    val afterOldest =
-                        dataPoints.lastOrNull()?.let { g.timestamp >= it.timestamp } ?: false
-                    val beforeNewest =
-                        dataPoints.firstOrNull()?.let { g.timestamp <= it.timestamp } ?: false
-                    afterOldest && beforeNewest
-                }
+                .filter { g -> g.timestamp in oldestTime..newestTime }
                 .map { GraphNote(it) }
-            dataPoints
+
+            distinctDataPoints
                 .filter { dp -> dp.note.isNotEmpty() }
                 .distinct()
                 .map { GraphNote(it) }
@@ -99,7 +100,8 @@ class ViewGraphStatViewModelImpl @Inject constructor(
     }
 
     private suspend fun getAllGlobalNotes() = withContext(io) {
-        globalNotes.emit(dataInteractor.getAllGlobalNotesSync())
+        val n = dataInteractor.getAllGlobalNotesSync()
+        globalNotes.emit(n)
     }
 
     private suspend fun getAllDataSourceAttributes() {
@@ -125,9 +127,7 @@ class ViewGraphStatViewModelImpl @Inject constructor(
         withContext(ui) { graphStatViewData.value = IGraphStatViewData.loading(graphStat) }
         val viewData = gsiProvider
             .getDataFactory(graphStat.type)
-            .getViewData(graphStat) {
-                viewModelScope.launch(io) { dataPoints.emit(it) }
-            }
+            .getViewData(graphStat) { viewModelScope.launch(io) { dataPoints.emit(it) } }
         withContext(ui) { graphStatViewData.value = viewData }
     }
 

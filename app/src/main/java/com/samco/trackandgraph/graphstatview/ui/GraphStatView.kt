@@ -22,7 +22,7 @@ fun GraphStatView(
     timeMarker: OffsetDateTime? = null,
     graphHeight: Int? = null
 ) = Column(
-    modifier = Modifier.fillMaxWidth(),
+    modifier = modifier.fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
     Text(
@@ -37,7 +37,6 @@ fun GraphStatView(
         when (graphStatViewData.graphOrStat.type) {
             GraphStatType.LINE_GRAPH ->
                 LineGraphView(
-                    modifier = modifier,
                     viewData = graphStatViewData as ILineGraphViewData,
                     timeMarker = timeMarker,
                     listMode = listMode,
@@ -45,26 +44,22 @@ fun GraphStatView(
                 )
             GraphStatType.PIE_CHART ->
                 PieChartView(
-                    modifier = modifier,
                     viewData = graphStatViewData as IPieChartViewData,
                     graphHeight = graphHeight
                 )
             GraphStatType.AVERAGE_TIME_BETWEEN ->
                 AverageTimeBetweenView(
-                    modifier = modifier,
                     viewData = graphStatViewData as IAverageTimeBetweenViewData,
                     graphHeight = graphHeight
                 )
             GraphStatType.LAST_VALUE ->
                 LastValueStatView(
-                    modifier = modifier,
                     viewData = graphStatViewData as ILastValueData,
                     listMode = listMode,
                     graphHeight = graphHeight
                 )
             GraphStatType.TIME_HISTOGRAM ->
                 TimeHistogramView(
-                    modifier = modifier,
                     viewData = graphStatViewData as ITimeHistogramViewData,
                     graphHeight = graphHeight
                 )
