@@ -123,15 +123,19 @@ private fun TimeHistogramBodyView(
 
     SpacingSmall()
 
-    GraphLegend(
-        items = barValues.mapIndexed { i, bar ->
-            val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
-            GraphLegendItem(
-                color = dataVisColorList[colorIndex],
-                label = bar.label
-            )
-        }
-    )
+    if (barValues.size > 1) {
+        GraphLegend(
+            items = barValues.mapIndexed { i, bar ->
+                val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
+                val label = bar.label
+                    .ifEmpty { context.getString(R.string.no_label) }
+                GraphLegendItem(
+                    color = dataVisColorList[colorIndex],
+                    label = label
+                )
+            }
+        )
+    }
 }
 
 private fun setUpXAxisTitle(

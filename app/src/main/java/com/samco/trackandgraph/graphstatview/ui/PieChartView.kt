@@ -127,6 +127,10 @@ private fun PieChartViewBody(
     })
 
     GraphLegend(
-        items = segments.map { GraphLegendItem(color = it.color, label = it.label) }
+        items = segments.map {
+            val label = it.label
+                .ifEmpty { context.getString(R.string.no_label) }
+            GraphLegendItem(color = it.color, label = label)
+        }
     )
 }
