@@ -29,10 +29,22 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
@@ -42,6 +54,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatView
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
@@ -111,16 +124,20 @@ class ViewGraphStatFragment : Fragment() {
     private fun setUpComposeView() {
         binding.composeView.setContent {
             TnGComposeTheme {
-                val timeMarker = viewModel.markedNote.observeAsState()
-                val viewData = viewModel.graphStatViewData.observeAsState()
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    val timeMarker = viewModel.markedNote.observeAsState()
+                    val viewData = viewModel.graphStatViewData.observeAsState()
 
-                viewData.value?.let {
-                    GraphStatView(
-                        graphStatViewData = it,
-                        listMode = false,
-                        timeMarker = timeMarker.value?.timestamp,
-                        graphHeight = graphHeight
-                    )
+                    if (viewData.value != null) {
+                        GraphStatView(
+                            graphStatViewData = viewData.value!!,
+                            listMode = false,
+                            timeMarker = timeMarker.value?.timestamp,
+                            graphHeight = graphHeight
+                        )
+                    }
                 }
             }
         }

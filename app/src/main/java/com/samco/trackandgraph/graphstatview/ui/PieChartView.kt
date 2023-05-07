@@ -97,11 +97,11 @@ private fun PieChartViewBody(
     val smallLabelSize = context.resources.getDimension(R.dimen.small_label_size)
     val labelColor = colorResource(id = R.color.white).toArgb()
 
-    AndroidViewBinding(GraphPieChartBinding::inflate) {
+    AndroidViewBinding(factory = { inflater, parent, attachToParent ->
+        val binding = GraphPieChartBinding.inflate(inflater, parent, attachToParent)
 
-        pieChart.clear()
-        if (graphHeight != null) pieChart.layoutParams.height = graphHeight
-        pieChart.backgroundPaint.color = Color.TRANSPARENT
+        binding.pieChart.clear()
+        binding.pieChart.backgroundPaint.color = Color.TRANSPARENT
 
         segments.forEachIndexed { i, s ->
 
@@ -113,13 +113,18 @@ private fun PieChartViewBody(
                 segForm.labelPaint.color = Color.TRANSPARENT
             }
 
-            pieChart.addSegment(s.segment, segForm)
+            binding.pieChart.addSegment(s.segment, segForm)
         }
 
+        return@AndroidViewBinding binding
+    }, update = {
+
+        if (graphHeight != null) pieChart.layoutParams.height = graphHeight
         pieChart.redraw()
         pieChart.getRenderer(PieRenderer::class.java)
             .setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
-    }
+        pieChart.requestLayout()
+    })
 
     GraphLegend(
         items = segments.map { GraphLegendItem(color = it.color, label = it.label) }
