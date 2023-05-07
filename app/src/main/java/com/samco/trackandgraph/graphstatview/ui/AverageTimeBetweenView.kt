@@ -43,7 +43,7 @@ fun AverageTimeBetweenView(
             context = LocalContext.current,
             millis = viewData.averageMillis.toLong()
         ),
-        style = MaterialTheme.typography.h4,
+        style = MaterialTheme.typography.h3,
         textAlign = TextAlign.Center,
     )
 }
