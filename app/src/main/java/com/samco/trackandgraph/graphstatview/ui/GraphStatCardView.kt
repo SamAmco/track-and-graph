@@ -104,25 +104,10 @@ fun GraphStatCardView(
                 )
             }
 
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = graphStatViewData.graphOrStat.name,
-                    style = MaterialTheme.typography.h6,
-                    textAlign = TextAlign.Center
-                )
-                SpacingSmall()
-                if (graphStatViewData.state == IGraphStatViewData.State.LOADING) {
-                    CircularProgressIndicator()
-                } else {
-                    GraphStatView(
-                        graphStatViewData = graphStatViewData,
-                        listMode = true
-                    )
-                }
-            }
+            GraphStatView(
+                graphStatViewData = graphStatViewData,
+                listMode = true
+            )
         }
     }
 }
