@@ -22,5 +22,5 @@ enum class GraphStatType {
     PIE_CHART,
     AVERAGE_TIME_BETWEEN,
     LAST_VALUE,
-    TIME_HISTOGRAM,
+    TIME_HISTOGRAM
 }
