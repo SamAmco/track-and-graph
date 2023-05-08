@@ -29,6 +29,15 @@ import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Surface
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
@@ -36,21 +45,20 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
-import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
-import com.samco.trackandgraph.graphstatview.GraphStatView
+import com.samco.trackandgraph.graphstatview.ui.GraphStatView
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
     private val viewModel: ViewGraphStatViewModel by viewModels<ViewGraphStatViewModelImpl>()
-    private lateinit var graphStatView: GraphStatView
     private var binding: FragmentViewGraphStatBinding by bindingForViewLifecycle()
     private lateinit var adapter: NotesAdapter
     private val args: ViewGraphStatFragmentArgs by navArgs()
@@ -60,10 +68,9 @@ class ViewGraphStatFragment : Fragment() {
     private val maxGraphHeightRatioLandscape = 0.7f
     private val minGraphHeightRatioLandscape = 0f
 
-    private var showHideNotesAnimator: ValueAnimator? = null
+    private var graphHeight by mutableStateOf(0)
 
-    @Inject
-    lateinit var gsiProvider: GraphStatInteractorProvider
+    private var showHideNotesAnimator: ValueAnimator? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,15 +79,12 @@ class ViewGraphStatFragment : Fragment() {
     ): View {
         this.navController = container?.findNavController()
         binding = FragmentViewGraphStatBinding.inflate(inflater, container, false)
-        graphStatView = binding.graphStatView
 
         viewModel.initFromGraphStatId(args.graphStatId)
 
         setViewInitialState()
-        observeGraphStatViewData()
         listenToShowingNotes()
         listenToFeaturePathProvider()
-        observeNoteMarker()
         listenToBinding()
         return binding.root
     }
@@ -105,12 +109,35 @@ class ViewGraphStatFragment : Fragment() {
         requireActivity().windowManager.defaultDisplay.getSize(windowSize)
         val heightRatio =
             if (isPortrait()) maxGraphHeightRatioPortrait else maxGraphHeightRatioLandscape
-        graphStatView.setGraphHeight((windowSize.y * heightRatio).toInt())
+        graphHeight = (windowSize.y * heightRatio).toInt()
+
+        setUpComposeView()
+    }
+
+    private fun setUpComposeView() {
+        binding.composeView.setContent {
+            TnGComposeTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    val timeMarker = viewModel.markedNote.observeAsState()
+                    val viewData = viewModel.graphStatViewData.observeAsState()
+
+                    if (viewData.value != null) {
+                        GraphStatView(
+                            modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+                            graphStatViewData = viewData.value!!,
+                            listMode = false,
+                            timeMarker = timeMarker.value?.timestamp,
+                            graphHeight = graphHeight
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun setViewInitialState() {
-        graphStatView.addLineGraphPanAndZoom()
-        graphStatView.initLoading()
         binding.showNotesButton.visibility = View.GONE
     }
 
@@ -154,13 +181,6 @@ class ViewGraphStatFragment : Fragment() {
         viewModel.showingNotes.observe(viewLifecycleOwner) { b -> onShowingNotesChanged(b) }
     }
 
-    private fun observeNoteMarker() {
-        viewModel.markedNote.observe(viewLifecycleOwner) { note ->
-            if (note == null) return@observe
-            binding.graphStatView.placeMarker(note.timestamp)
-        }
-    }
-
     private fun onNewNotesList(notes: List<GraphNote>) {
         if (notes.isEmpty()) return
         binding.showNotesButton.visibility = View.VISIBLE
@@ -189,7 +209,7 @@ class ViewGraphStatFragment : Fragment() {
         showHideNotesAnimator?.cancel()
         val startingNotesHeight =
             (binding.notesRecyclerView.layoutParams as LinearLayout.LayoutParams).height
-        val startingGraphHeight = graphStatView.getGraphHeight()
+        val startingGraphHeight = graphHeight
         showHideNotesAnimator = ValueAnimator.ofFloat(0f, 1f)
         showHideNotesAnimator?.apply {
             duration = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
@@ -200,7 +220,7 @@ class ViewGraphStatFragment : Fragment() {
                     startingGraphHeight + ((graphTargetHeight - startingGraphHeight) * nextRatio)
                 val nextNotesHeight =
                     startingNotesHeight + ((notesTargetHeight - startingNotesHeight) * nextRatio)
-                graphStatView.setGraphHeight(nextGraphHeight.toInt())
+                graphHeight = nextGraphHeight.toInt()
                 (binding.notesRecyclerView.layoutParams as LinearLayout.LayoutParams).height =
                     nextNotesHeight.toInt()
                 binding.notesRecyclerView.requestLayout()
@@ -216,13 +236,6 @@ class ViewGraphStatFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         (activity as AppCompatActivity).supportActionBar!!.show()
-    }
-
-    private fun observeGraphStatViewData() {
-        viewModel.graphStatViewData.observe(viewLifecycleOwner) {
-            val decorator = gsiProvider.getDecorator(it.graphOrStat.type, false)
-            graphStatView.initFromGraphStat(it, decorator)
-        }
     }
 }
 

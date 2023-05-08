@@ -17,23 +17,15 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.window.Dialog
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 
 
@@ -45,7 +37,7 @@ fun DataPointInfoDialog(
     onDismissRequest: () -> Unit
 ) = CustomDialog(onDismissRequest) {
     Text(
-        formatDayWeekDayMonthYearHourMinuteOneLine(
+        formatDayMonthYearHourMinuteWeekDayOneLine(
             LocalContext.current,
             weekdayNames,
             dataPoint.timestamp
@@ -60,9 +52,10 @@ fun DataPointInfoDialog(
 
 @Composable
 fun DataPointValueAndDescription(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     dataPoint: DataPoint,
-    isDuration: Boolean
+    isDuration: Boolean,
+    restrictNoteText: Boolean = true
 ) = Column(modifier = modifier) {
     Text(
         text = dataPoint.getDisplayValue(isDuration),
@@ -71,11 +64,19 @@ fun DataPointValueAndDescription(
     )
     if (dataPoint.note.isNotEmpty()) {
         SpacingSmall()
-        Text(
-            text = dataPoint.note,
-            maxLines = 3,
-            overflow = TextOverflow.Ellipsis
-        )
+        if (restrictNoteText) {
+            Text(
+                text = dataPoint.note,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.body2
+            )
+        } else {
+            Text(
+                text = dataPoint.note,
+                style = MaterialTheme.typography.body2
+            )
+        }
     }
 }
 

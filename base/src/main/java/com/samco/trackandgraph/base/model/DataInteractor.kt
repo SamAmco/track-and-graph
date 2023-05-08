@@ -93,7 +93,9 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
 
-    suspend fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
+    suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
+
+    suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat?
 
     suspend fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
@@ -117,9 +119,9 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun duplicateAverageTimeBetweenStat(graphOrStat: GraphOrStat): Long?
 
-    suspend fun duplicateTimeSinceLastStat(graphOrStat: GraphOrStat): Long?
-
     suspend fun duplicateTimeHistogram(graphOrStat: GraphOrStat): Long?
+
+    suspend fun duplicateLastValueStat(graphOrStat: GraphOrStat): Long?
 
     suspend fun insertLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures): Long
 
@@ -130,12 +132,9 @@ interface DataInteractor : TrackerHelper, DataSampler {
         averageTimeBetweenStat: AverageTimeBetweenStat
     ): Long
 
-    suspend fun insertTimeSinceLastStat(
-        graphOrStat: GraphOrStat,
-        timeSinceLastStat: TimeSinceLastStat
-    ): Long
-
     suspend fun insertTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram): Long
+
+    suspend fun insertLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat): Long
 
     suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart)
 
@@ -146,16 +145,11 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun updateLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures)
 
-    suspend fun updateTimeSinceLastStat(
-        graphOrStat: GraphOrStat,
-        timeSinceLastStat: TimeSinceLastStat
-    )
+    suspend fun updateLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat)
 
     suspend fun updateGraphOrStat(graphOrStat: GraphOrStat)
 
     suspend fun updateTimeHistogram(graphOrStat: GraphOrStat, timeHistogram: TimeHistogram)
-
-    suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 
     suspend fun getGroupsForGroupSync(id: Long): List<Group>
 

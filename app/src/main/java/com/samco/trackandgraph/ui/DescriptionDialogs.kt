@@ -24,7 +24,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.DescriptionBodyTextBinding
@@ -85,7 +85,7 @@ private fun getNoteDialogHeader(
 ): View {
     val headerView = ShowNoteDialogHeaderBinding.inflate(inflater)
     headerView.dateTimeText.text =
-        formatDayWeekDayMonthYearHourMinuteOneLine(context, getWeekDayNames(context), timestamp)
+        formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), timestamp)
     headerView.valueText.visibility = if (displayValue.isNullOrEmpty()) View.GONE else View.VISIBLE
     displayValue?.let { headerView.valueText.text = it }
     headerView.featureDisplayNameText.visibility =

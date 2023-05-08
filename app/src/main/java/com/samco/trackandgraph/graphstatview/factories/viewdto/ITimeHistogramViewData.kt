@@ -18,14 +18,15 @@
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
 import com.samco.trackandgraph.TimeHistogramWindowData
+import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 
 interface ITimeHistogramViewData : IGraphStatViewData {
     data class BarValue(val label: String, val values: List<Double>)
 
-    val window: TimeHistogramWindowData?
-        get() = null
+    val window: TimeHistogramWindowData
+        get() = TimeHistogramWindowData.getWindowData(TimeHistogramWindow.WEEK)
     val barValues: List<BarValue>?
         get() = null
-    val maxDisplayHeight: Double?
+    val maxDisplayHeight: Double
         get() = 0.0
 }

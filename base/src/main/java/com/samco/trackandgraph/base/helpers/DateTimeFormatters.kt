@@ -21,7 +21,6 @@ import android.content.Context
 import com.samco.trackandgraph.base.R
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.DataType
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
@@ -60,7 +59,7 @@ fun getWeekDayNames(context: Context) = listOf(
 private fun weekDayPart(dateTime: OffsetDateTime, weekDayNames: List<String>) =
     "(${weekDayNames[dateTime.dayOfWeek.value - 1]})"
 
-fun formatDayWeekDayMonthYearHourMinuteOneLine(
+fun formatDayMonthYearHourMinuteWeekDayOneLine(
     context: Context,
     weekDayNames: List<String>,
     dateTime: OffsetDateTime
@@ -164,7 +163,42 @@ fun formatMonthYear(context: Context, temporal: Temporal): String {
 
 fun formatTimeDuration(seconds: Long): String {
     val absSecs = kotlin.math.abs(seconds)
-    val timeStr = String.format("%d:%02d:%02d", seconds / 3600, (absSecs % 3600) / 60, (absSecs % 60))
-    if (seconds < 0 && !timeStr.startsWith("-")) return "-$timeStr"
+    val timeStr = String.format("%d:%02d:%02d", absSecs / 3600, (absSecs % 3600) / 60, (absSecs % 60))
+    if (seconds < 0) return "-$timeStr"
     return timeStr
+}
+
+fun formatTimeToDaysHoursMinutesSeconds(
+    context: Context,
+    millis: Long,
+    twoLines: Boolean = true
+): String {
+    val totalSeconds = millis / 1000
+    val daysNum = (totalSeconds / 86400).toInt()
+    val days = daysNum.toString()
+    val hours = ((totalSeconds % 86400) / 3600).toInt()
+    val minutes = ((totalSeconds % 3600) / 60).toInt()
+    val seconds = (totalSeconds % 60).toInt()
+    val hoursStr = "%02d".format(((totalSeconds % 86400) / 3600).toInt())
+    val minutesStr = "%02d".format(((totalSeconds % 3600) / 60).toInt())
+    val secondsStr = "%02d".format((totalSeconds % 60).toInt())
+    val hasHms = (hours + minutes + seconds) > 0
+    val hms = "$hoursStr:$minutesStr:$secondsStr"
+
+    return StringBuilder().apply {
+        if (daysNum == 0) append(hms)
+        else {
+            val daysSuffix =
+                if (daysNum == 1) context.getString(R.string.day)
+                else context.getString(R.string.days)
+
+            append("$days $daysSuffix")
+
+            if (hasHms) {
+                if (twoLines) appendLine()
+                else append(", ")
+                append(hms)
+            }
+        }
+    }.toString()
 }

@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -105,7 +104,7 @@ private fun RowScope.DurationInputComponent(
     overrideFocusDirection: FocusDirection? = null,
     focusRequester: FocusRequester? = null
 ) {
-    MiniTextField(
+    MiniNumericTextField(
         modifier = Modifier.alignByBaseline(),
         textFieldValue = textFieldValue,
         onValueChange = onValueChange,
