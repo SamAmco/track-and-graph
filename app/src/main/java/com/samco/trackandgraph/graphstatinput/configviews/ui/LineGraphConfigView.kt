@@ -16,7 +16,7 @@
  */
 @file:OptIn(ExperimentalComposeUiApi::class)
 
-package com.samco.trackandgraph.graphstatinput.configviews
+package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ScrollState

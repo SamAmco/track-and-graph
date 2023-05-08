@@ -42,7 +42,7 @@ import org.threeten.bp.OffsetDateTime
         )
     ]
 )
-data class BarChart(
+internal data class BarChart(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id", index = true)
     val id: Long,
