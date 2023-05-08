@@ -1,0 +1,4 @@
+- Fix crash on edit some text fields
+- Add last data point data to time since 
+
+
