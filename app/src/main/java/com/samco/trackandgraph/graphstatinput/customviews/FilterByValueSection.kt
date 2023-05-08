@@ -14,7 +14,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.CheckboxLabeledExpandingSection
 import com.samco.trackandgraph.graphstatinput.configviews.FilterableFeatureConfigBehaviour
-import com.samco.trackandgraph.ui.compose.ui.MiniTextField
+import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 
 @Composable
@@ -35,7 +35,7 @@ fun FilterByValueSection(viewModel: FilterableFeatureConfigBehaviour) {
                 style = MaterialTheme.typography.body1
             )
 
-            MiniTextField(
+            MiniNumericTextField(
                 modifier = it
                     .weight(1f)
                     .alignByBaseline(),
@@ -52,7 +52,7 @@ fun FilterByValueSection(viewModel: FilterableFeatureConfigBehaviour) {
                 style = MaterialTheme.typography.body1
             )
 
-            MiniTextField(
+            MiniNumericTextField(
                 modifier = Modifier
                     .weight(1f)
                     .alignByBaseline(),

@@ -86,7 +86,7 @@ private fun YRangeFromToInputs(viewModel: LineGraphConfigViewModel) = Row(
         style = MaterialTheme.typography.subtitle2
     )
 
-    MiniTextField(
+    MiniNumericTextField(
         modifier = Modifier
             .weight(1f)
             .alignByBaseline(),
@@ -101,7 +101,7 @@ private fun YRangeFromToInputs(viewModel: LineGraphConfigViewModel) = Row(
         style = MaterialTheme.typography.subtitle2
     )
 
-    MiniTextField(
+    MiniNumericTextField(
         modifier = Modifier
             .weight(1f)
             .alignByBaseline(),
@@ -233,7 +233,7 @@ private fun LineGraphFeatureInputView(
                         style = MaterialTheme.typography.body1
                     )
 
-                    MiniTextField(
+                    MiniNumericTextField(
                         modifier = Modifier
                             .weight(1f)
                             .alignByBaseline(),
@@ -250,7 +250,7 @@ private fun LineGraphFeatureInputView(
                         style = MaterialTheme.typography.body1
                     )
 
-                    MiniTextField(
+                    MiniNumericTextField(
                         modifier = Modifier
                             .weight(1f)
                             .alignByBaseline(),
