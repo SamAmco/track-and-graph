@@ -73,7 +73,7 @@ class LineGraphConfigViewModel @Inject constructor(
         var scale by mutableStateOf(TextFieldValue(scale, TextRange(scale.length)))
             private set
 
-        fun updateName(name: TextFieldValue, triggerUpdate: Boolean = false) {
+        fun updateName(name: TextFieldValue, triggerUpdate: Boolean = true) {
             this.name = name
             if (triggerUpdate) onUpdate()
         }
