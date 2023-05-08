@@ -22,6 +22,7 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.base.database.dto.BarChart
+import com.samco.trackandgraph.base.database.dto.YRangeType
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -59,6 +60,15 @@ internal data class BarChart(
     @ColumnInfo(name = "duration")
     val duration: Duration?,
 
+    @ColumnInfo(name = "y_range_type")
+    val yRangeType: YRangeType,
+
+    @ColumnInfo(name = "y_from")
+    val yFrom: Double,
+
+    @ColumnInfo(name = "y_to")
+    val yTo: Double,
+
     @ColumnInfo(name = "bar_period")
     val barPeriod: BarChartBarPeriod,
 
@@ -66,12 +76,15 @@ internal data class BarChart(
     val sumByCount: Boolean
 ) {
     fun toDto() = BarChart(
-        id,
-        graphStatId,
-        featureId,
-        endDate,
-        duration,
-        barPeriod,
-        sumByCount
+        id = id,
+        graphStatId = graphStatId,
+        featureId = featureId,
+        endDate = endDate,
+        duration = duration,
+        yRangeType = yRangeType,
+        yFrom = yFrom,
+        yTo = yTo,
+        barPeriod = barPeriod,
+        sumByCount = sumByCount
     )
 }

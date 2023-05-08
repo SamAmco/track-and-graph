@@ -10,6 +10,9 @@ data class BarChart(
     val featureId: Long,
     val endDate: OffsetDateTime?,
     val duration: Duration?,
+    val yRangeType: YRangeType,
+    val yFrom: Double,
+    val yTo: Double,
     val barPeriod: BarChartBarPeriod,
     val sumByCount: Boolean
 ) {
@@ -19,6 +22,9 @@ data class BarChart(
         featureId = featureId,
         endDate = endDate,
         duration = duration,
+        yRangeType = yRangeType,
+        yFrom = yFrom,
+        yTo = yTo,
         barPeriod = barPeriod,
         sumByCount = sumByCount
     )

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 52,
-    "identityHash": "d0eb79969dc86354cfb2d822ca95baab",
+    "identityHash": "e4a4d70582438185de726de770a2d63d",
     "entities": [
       {
         "tableName": "features_table",
@@ -1282,7 +1282,7 @@
       },
       {
         "tableName": "bar_charts_table",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `end_date` TEXT, `duration` TEXT, `bar_period` INTEGER NOT NULL, `sum_by_count` INTEGER NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `graph_stat_id` INTEGER NOT NULL, `feature_id` INTEGER NOT NULL, `end_date` TEXT, `duration` TEXT, `y_range_type` INTEGER NOT NULL, `y_from` REAL NOT NULL, `y_to` REAL NOT NULL, `bar_period` INTEGER NOT NULL, `sum_by_count` INTEGER NOT NULL, FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`feature_id`) REFERENCES `features_table`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -1313,6 +1313,24 @@
             "columnName": "duration",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "yRangeType",
+            "columnName": "y_range_type",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yFrom",
+            "columnName": "y_from",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "yTo",
+            "columnName": "y_to",
+            "affinity": "REAL",
+            "notNull": true
           },
           {
             "fieldPath": "barPeriod",
@@ -1391,7 +1409,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd0eb79969dc86354cfb2d822ca95baab')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e4a4d70582438185de726de770a2d63d')"
     ]
   }
 }
