@@ -422,4 +422,5 @@ private fun setTimeMarker(
             null
         )
     )
+    binding.xyPlot.redraw()
 }
