@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatproviders
 
 import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatproviders.datasourceadapters.*
-import com.samco.trackandgraph.graphstatview.ui.*
 import com.samco.trackandgraph.graphstatview.factories.*
 import javax.inject.Inject
 
@@ -38,7 +37,9 @@ class GraphStatInteractorProviderImpl @Inject constructor(
     private val timeHistogramDataFactory: TimeHistogramDataFactory,
     private val timeHistogramDataSourceAdapter: TimeHistogramDataSourceAdapter,
     private val lastValueDataFactory: LastValueDataFactory,
-    private val lastValueDataSourceAdapter: LastValueDataSourceAdapter
+    private val lastValueDataSourceAdapter: LastValueDataSourceAdapter,
+    private val barChartDataFactory: BarChartDataFactory,
+    private val barChartDataSourceAdapter: BarChartDataSourceAdapter
 ) : GraphStatInteractorProvider {
 
     override fun getDataFactory(type: GraphStatType): ViewDataFactory<*, *> {
@@ -48,6 +49,7 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.TIME_HISTOGRAM -> timeHistogramDataFactory
             GraphStatType.AVERAGE_TIME_BETWEEN -> averageTimeBetweenDataFactory
             GraphStatType.LAST_VALUE -> lastValueDataFactory
+            GraphStatType.BAR_CHART -> barChartDataFactory
         }
     }
 
@@ -58,6 +60,7 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.AVERAGE_TIME_BETWEEN -> averageTimeBetweenDataSourceAdapter
             GraphStatType.TIME_HISTOGRAM -> timeHistogramDataSourceAdapter
             GraphStatType.LAST_VALUE -> lastValueDataSourceAdapter
+            GraphStatType.BAR_CHART -> barChartDataSourceAdapter
         }
     }
 }

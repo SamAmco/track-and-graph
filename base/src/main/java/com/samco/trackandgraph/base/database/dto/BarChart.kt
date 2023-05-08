@@ -13,7 +13,7 @@ data class BarChart(
     val barPeriod: BarChartBarPeriod,
     val sumByCount: Boolean
 ) {
-    fun toEntity() = BarChart(
+    internal fun toEntity() = BarChart(
         id = id,
         graphStatId = graphStatId,
         featureId = featureId,
