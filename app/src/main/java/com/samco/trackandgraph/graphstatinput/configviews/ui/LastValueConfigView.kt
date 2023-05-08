@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LastValueConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByLabelSection
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByValueSection
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner

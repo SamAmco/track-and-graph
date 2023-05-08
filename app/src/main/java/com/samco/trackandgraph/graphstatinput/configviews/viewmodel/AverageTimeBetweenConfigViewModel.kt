@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.graphstatinput.configviews
+package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
@@ -24,10 +24,8 @@ import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
-import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
-import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
-import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -100,24 +98,34 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
     override suspend fun validate(): GraphStatConfigEvent.ValidationException? {
         if (averageTimeBetweenStat.featureId == -1L)
             return GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        if (averageTimeBetweenStat.fromValue > averageTimeBetweenStat.toValue)
+        if (averageTimeBetweenStat.filterByRange && (averageTimeBetweenStat.fromValue > averageTimeBetweenStat.toValue))
             return GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_invalid_value_stat_from_to)
         return null
     }
 
     override fun onDataLoaded(config: Any?) {
-        singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
 
-        if (config !is AverageTimeBetweenStat) return
-        this.averageTimeBetweenStat = config
-        timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
-        timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
-        filterableFeatureConfigBehaviour.filterByLabel = config.filterByLabels
-        filterableFeatureConfigBehaviour.filterByRange = config.filterByRange
-        filterableFeatureConfigBehaviour.fromValue = config.fromValue.asTextFieldValue()
-        filterableFeatureConfigBehaviour.toValue = config.toValue.asTextFieldValue()
-        filterableFeatureConfigBehaviour.selectedLabels = config.labels
-        singleFeatureConfigBehaviour.featureId = config.featureId
-        filterableFeatureConfigBehaviour.getAvailableLabels()
+        val avStat = config as? AverageTimeBetweenStat
+
+        singleFeatureConfigBehaviour.onConfigLoaded(
+            map = featurePathProvider.sortedFeatureMap(),
+            featureId = avStat?.featureId
+        )
+
+        filterableFeatureConfigBehaviour.onConfigLoaded(
+            featureId = avStat?.featureId,
+            filterByLabel = avStat?.filterByLabels,
+            filterByRange = avStat?.filterByRange,
+            fromValue = avStat?.fromValue,
+            toValue = avStat?.toValue,
+            selectedLabels = avStat?.labels
+        )
+
+        timeRangeConfigBehaviour.onConfigLoaded(
+            duration = avStat?.duration,
+            endingAt = avStat?.endDate
+        )
+
+        avStat?.let { this.averageTimeBetweenStat = it }
     }
 }

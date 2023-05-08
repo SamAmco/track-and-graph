@@ -14,7 +14,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.graphstatinput.configviews
+package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,8 +30,8 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent.ValidationException
-import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
-import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviourImpl
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -210,24 +210,31 @@ class LineGraphConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
+
+        val lgConfig = config as? LineGraphWithFeatures
+
         featureNameMap = featurePathProvider.sortedFeatureMap()
 
-        if (config !is LineGraphWithFeatures) return
-        lineGraph = config
-        timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
-        timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
-        yRangeType = config.yRangeType
-        yRangeFrom = TextFieldValue(config.yFrom.toString())
-        yRangeTo = TextFieldValue(config.yTo.toString())
-        lineGraphFeatures = config.features
-        config.features.forEach {
-            featureTextFields.add(
-                FeatureTextFields(
-                    it.name,
-                    it.offset.toString(),
-                    it.scale.toString()
+        timeRangeConfigBehaviour.onConfigLoaded(
+            duration = lgConfig?.duration,
+            endingAt = lgConfig?.endDate
+        )
+
+        lgConfig?.let { it ->
+            lineGraph = it
+            yRangeType = it.yRangeType
+            yRangeFrom = TextFieldValue(it.yFrom.toString())
+            yRangeTo = TextFieldValue(it.yTo.toString())
+            lineGraphFeatures = it.features
+            it.features.forEach { lgf ->
+                featureTextFields.add(
+                    FeatureTextFields(
+                        lgf.name,
+                        lgf.offset.toString(),
+                        lgf.scale.toString()
+                    )
                 )
-            )
+            }
         }
     }
 

@@ -1,4 +1,20 @@
-package com.samco.trackandgraph.graphstatinput.configviews
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
@@ -8,9 +24,8 @@ import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
-import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
-import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
@@ -47,7 +62,9 @@ class LastValueConfigViewModel @Inject constructor(
         )
         singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(
             onUpdate = { onUpdate() },
-            featureChangeCallback = { filterableFeatureConfigBehaviour.onFeatureIdUpdated(it) }
+            featureChangeCallback = {
+                filterableFeatureConfigBehaviour.onFeatureIdUpdated(it)
+            }
         )
     }
 
@@ -80,27 +97,36 @@ class LastValueConfigViewModel @Inject constructor(
     }
 
     override suspend fun validate(): GraphStatConfigEvent.ValidationException? {
-        return if (singleFeatureConfigBehaviour.featureId == -1L) {
-            GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
-        } else null
+        if (singleFeatureConfigBehaviour.featureId == -1L)
+            return GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+        if (lastValueStat.filterByRange && (lastValueStat.fromValue > lastValueStat.toValue))
+            return GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_invalid_value_stat_from_to)
+        return null
     }
 
     override fun onDataLoaded(config: Any?) {
-        singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
 
-        if (config !is LastValueStat) return
-        this.lastValueStat = config
+        val lvStat = config as? LastValueStat
 
-        //When you set this feature ID it will trigger a callback that updates the filterable
-        // feature config behaviour
-        singleFeatureConfigBehaviour.featureId = config.featureId
-        filterableFeatureConfigBehaviour.getAvailableLabels()
+        singleFeatureConfigBehaviour.onConfigLoaded(
+            map = featurePathProvider.sortedFeatureMap(),
+            featureId = lvStat?.featureId
+        )
 
-        endingAtConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
-        filterableFeatureConfigBehaviour.filterByLabel = config.filterByLabels
-        filterableFeatureConfigBehaviour.filterByRange = config.filterByRange
-        filterableFeatureConfigBehaviour.fromValue = config.fromValue.asTextFieldValue()
-        filterableFeatureConfigBehaviour.toValue = config.toValue.asTextFieldValue()
-        filterableFeatureConfigBehaviour.selectedLabels = config.labels
+        filterableFeatureConfigBehaviour.onConfigLoaded(
+            featureId = lvStat?.featureId,
+            filterByLabel = lvStat?.filterByLabels,
+            filterByRange = lvStat?.filterByRange,
+            fromValue = lvStat?.fromValue,
+            toValue = lvStat?.toValue,
+            selectedLabels = lvStat?.labels
+        )
+
+        endingAtConfigBehaviour.onConfigLoaded(
+            duration = null,
+            endingAt = lvStat?.endDate
+        )
+
+        lvStat?.let { this.lastValueStat = it }
     }
 }

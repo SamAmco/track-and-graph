@@ -1,4 +1,20 @@
-package com.samco.trackandgraph.graphstatinput.configviews
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.samco.trackandgraph.graphstatinput.configviews.behaviour
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
 import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -58,6 +75,23 @@ class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
         this.ui = ui
         this.coroutineScope = coroutineScope
         this.dataInteractor = dataInteractor
+    }
+
+    fun onConfigLoaded(
+        featureId: Long?,
+        filterByLabel: Boolean?,
+        filterByRange: Boolean?,
+        fromValue: Double?,
+        toValue: Double?,
+        selectedLabels: List<String>?
+    ) {
+        this.filterByLabel = filterByLabel ?: false
+        this.filterByRange = filterByRange ?: false
+        fromValue?.asTextFieldValue()?.let { this.fromValue = it }
+        toValue?.asTextFieldValue()?.let { this.toValue = it }
+        this.selectedLabels = selectedLabels ?: emptyList()
+        this.featureId = featureId
+        getAvailableLabels()
     }
 
     fun getAvailableLabels() {
