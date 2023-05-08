@@ -1,4 +1,20 @@
-package com.samco.trackandgraph.graphstatinput.configviews
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -11,8 +27,10 @@ import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
-import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
-import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.SingleFeatureConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.SingleFeatureConfigBehaviourImpl
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviourImpl
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -78,15 +96,24 @@ class TimeHistogramConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
-        singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
 
-        if (config !is TimeHistogram) return
-        this.timeHistogram = config
-        timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
-        timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
-        singleFeatureConfigBehaviour.featureId = config.featureId
-        selectedWindow = config.window
-        sumByCount = config.sumByCount
+        val timeHist = config as? TimeHistogram
+
+        singleFeatureConfigBehaviour.onConfigLoaded(
+            map = featurePathProvider.sortedFeatureMap(),
+            featureId = timeHist?.featureId
+        )
+
+        timeRangeConfigBehaviour.onConfigLoaded(
+            duration = timeHist?.duration,
+            endingAt = timeHist?.endDate
+        )
+
+        timeHist?.let {
+            this.timeHistogram = config
+            selectedWindow = config.window
+            sumByCount = config.sumByCount
+        }
     }
 
     fun updateWindow(window: TimeHistogramWindow) {

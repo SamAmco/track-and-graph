@@ -16,6 +16,7 @@
 */
 package com.samco.trackandgraph.graphstatinput.configviews
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
@@ -25,16 +26,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.graphstatinput.customviews.FilterByLabelSection
-import com.samco.trackandgraph.graphstatinput.customviews.FilterByValueSection
+import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.PieChartConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
-fun AverageTimeBetweenConfigView(viewModel: AverageTimeBetweenConfigViewModel) {
+fun PieChartConfigView(
+    viewModel: PieChartConfigViewModel
+) = Column {
 
     GraphStatDurationSpinner(
         modifier = Modifier,
@@ -55,7 +58,7 @@ fun AverageTimeBetweenConfigView(viewModel: AverageTimeBetweenConfigViewModel) {
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
-        text = stringResource(id = R.string.select_a_feature),
+        text = stringResource(id = R.string.select_a_discrete_feature),
         style = MaterialTheme.typography.subtitle2
     )
 
@@ -72,13 +75,13 @@ fun AverageTimeBetweenConfigView(viewModel: AverageTimeBetweenConfigViewModel) {
         )
     }
 
-    SpacingLarge()
+    SpacingSmall()
 
-    FilterByLabelSection(viewModel)
-
-    SpacingLarge()
-
-    FilterByValueSection(viewModel)
+    RowCheckbox(
+        checked = viewModel.sumByCount,
+        onCheckedChange = { viewModel.updateSumByCount(it) },
+        text = stringResource(id = R.string.sum_by_count_checkbox_label)
+    )
 
     SpacingSmall()
 }

@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph.graphstatinput.configviews
+package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -26,8 +26,10 @@ import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
-import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
-import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.SingleFeatureConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.SingleFeatureConfigBehaviourImpl
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviourImpl
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -90,14 +92,22 @@ class PieChartConfigViewModel @Inject constructor(
     }
 
     override fun onDataLoaded(config: Any?) {
-        singleFeatureConfigBehaviour.iniFeatureMap(featurePathProvider.sortedFeatureMap())
+        val pc = config as? PieChart
 
-        if (config !is PieChart) return
-        pieChart = config
-        timeRangeConfigBehaviour.selectedDuration = GraphStatDurations.fromDuration(config.duration)
-        timeRangeConfigBehaviour.sampleEndingAt = SampleEndingAt.fromDateTime(config.endDate)
-        singleFeatureConfigBehaviour.featureId = config.featureId
-        sumByCount = config.sumByCount
+        singleFeatureConfigBehaviour.onConfigLoaded(
+            map = featurePathProvider.sortedFeatureMap(),
+            featureId = pc?.featureId
+        )
+
+        timeRangeConfigBehaviour.onConfigLoaded(
+            duration = pc?.duration,
+            endingAt = pc?.endDate
+        )
+
+        pc?.let {
+            this.pieChart = it
+            sumByCount = it.sumByCount
+        }
     }
 
     fun updateSumByCount(sumByCount: Boolean) {

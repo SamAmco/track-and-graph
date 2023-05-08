@@ -23,7 +23,7 @@ import javax.inject.Inject
 
 class LastValueDataSourceAdapter @Inject constructor(
     dataInteractor: DataInteractor
-): GraphStatDataSourceAdapter<LastValueStat>(dataInteractor){
+) : GraphStatDataSourceAdapter<LastValueStat>(dataInteractor) {
     override suspend fun writeConfigToDatabase(
         graphOrStat: GraphOrStat,
         config: LastValueStat,
