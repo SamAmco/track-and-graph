@@ -66,29 +66,16 @@ class LineGraphConfigViewModel @Inject constructor(
         offset: String = "0",
         scale: String = "1"
     ) {
-        var customName = false
+        var name by mutableStateOf(TextFieldValue(name, TextRange(name.length)))
+            private set
+        var offset by mutableStateOf(TextFieldValue(offset, TextRange(offset.length)))
+            private set
+        var scale by mutableStateOf(TextFieldValue(scale, TextRange(scale.length)))
             private set
 
-        var name by mutableStateOf(TextFieldValue(""))
-            private set
-        var offset by mutableStateOf(TextFieldValue(""))
-            private set
-        var scale by mutableStateOf(TextFieldValue(""))
-            private set
-
-        init {
-            this.name = TextFieldValue(name, TextRange(name.length))
-            this.offset = TextFieldValue(offset, TextRange(offset.length))
-            this.scale = TextFieldValue(scale, TextRange(scale.length))
-        }
-
-        fun updateName(name: TextFieldValue, ignoreCustomFlag: Boolean = false) {
-            val triggerUpdate = !ignoreCustomFlag && name.text != this.name.text
+        fun updateName(name: TextFieldValue, triggerUpdate: Boolean = false) {
             this.name = name
-            if (triggerUpdate) {
-                customName = true
-                onUpdate()
-            }
+            if (triggerUpdate) onUpdate()
         }
 
         fun updateOffset(offset: TextFieldValue) {
@@ -247,16 +234,20 @@ class LineGraphConfigViewModel @Inject constructor(
     fun updateLineGraphFeature(index: Int, newLgf: LineGraphFeature) = viewModelScope.launch {
         val newFeatureName = featurePathProvider.features
             .firstOrNull { it.featureId == newLgf.featureId }?.name ?: ""
+        val oldFeatureName = featurePathProvider.features
+            .firstOrNull { it.featureId == lineGraphFeatures[index].featureId }?.name ?: ""
 
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
             val textFields = featureTextFields[index]
-            if (!textFields.customName) textFields.updateName(
-                TextFieldValue(
-                    newFeatureName,
-                    TextRange(newFeatureName.length)
-                ),
-                ignoreCustomFlag = true
-            )
+            if (textFields.name.text == oldFeatureName) {
+                textFields.updateName(
+                    TextFieldValue(
+                        newFeatureName,
+                        TextRange(newFeatureName.length)
+                    ),
+                    triggerUpdate = false
+                )
+            }
             set(
                 index, newLgf.copy(
                     name = textFields.name.text,
