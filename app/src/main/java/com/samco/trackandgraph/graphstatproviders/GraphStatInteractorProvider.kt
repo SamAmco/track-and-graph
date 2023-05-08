@@ -18,16 +18,14 @@
 package com.samco.trackandgraph.graphstatproviders
 
 import com.samco.trackandgraph.base.database.dto.GraphStatType
-import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatproviders.datasourceadapters.*
-import com.samco.trackandgraph.graphstatview.decorators.*
+import com.samco.trackandgraph.graphstatview.ui.*
 import com.samco.trackandgraph.graphstatview.factories.*
 import javax.inject.Inject
 
 interface GraphStatInteractorProvider {
     fun getDataFactory(type: GraphStatType): ViewDataFactory<*, *>
     fun getDataSourceAdapter(type: GraphStatType): GraphStatDataSourceAdapter<*>
-    fun getDecorator(type: GraphStatType, listMode: Boolean): GraphStatViewDecorator<*>
 }
 
 class GraphStatInteractorProviderImpl @Inject constructor(
@@ -37,19 +35,19 @@ class GraphStatInteractorProviderImpl @Inject constructor(
     private val pieChartDataSourceAdapter: PieChartDataSourceAdapter,
     private val averageTimeBetweenDataFactory: AverageTimeBetweenDataFactory,
     private val averageTimeBetweenDataSourceAdapter: AverageTimeBetweenDataSourceAdapter,
-    private val timeSinceDataFactory: TimeSinceDataFactory,
-    private val timeSinceDataSourceAdapter: TimeSinceDataSourceAdapter,
     private val timeHistogramDataFactory: TimeHistogramDataFactory,
-    private val timeHistogramDataSourceAdapter: TimeHistogramDataSourceAdapter
+    private val timeHistogramDataSourceAdapter: TimeHistogramDataSourceAdapter,
+    private val lastValueDataFactory: LastValueDataFactory,
+    private val lastValueDataSourceAdapter: LastValueDataSourceAdapter
 ) : GraphStatInteractorProvider {
 
     override fun getDataFactory(type: GraphStatType): ViewDataFactory<*, *> {
         return when (type) {
             GraphStatType.LINE_GRAPH -> lineGraphDataFactory
-            GraphStatType.TIME_SINCE -> timeSinceDataFactory
             GraphStatType.PIE_CHART -> pieChartDataFactory
             GraphStatType.TIME_HISTOGRAM -> timeHistogramDataFactory
             GraphStatType.AVERAGE_TIME_BETWEEN -> averageTimeBetweenDataFactory
+            GraphStatType.LAST_VALUE -> lastValueDataFactory
         }
     }
 
@@ -58,18 +56,8 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.LINE_GRAPH -> lineGraphDataSourceAdapter
             GraphStatType.PIE_CHART -> pieChartDataSourceAdapter
             GraphStatType.AVERAGE_TIME_BETWEEN -> averageTimeBetweenDataSourceAdapter
-            GraphStatType.TIME_SINCE -> timeSinceDataSourceAdapter
             GraphStatType.TIME_HISTOGRAM -> timeHistogramDataSourceAdapter
-        }
-    }
-
-    override fun getDecorator(type: GraphStatType, listMode: Boolean): GraphStatViewDecorator<*> {
-        return when (type) {
-            GraphStatType.LINE_GRAPH -> GraphStatLineGraphDecorator(listMode)
-            GraphStatType.PIE_CHART -> GraphStatPieChartDecorator(listMode)
-            GraphStatType.TIME_HISTOGRAM -> GraphStatTimeHistogramDecorator(listMode)
-            GraphStatType.TIME_SINCE -> GraphStatTimeSinceDecorator(listMode)
-            GraphStatType.AVERAGE_TIME_BETWEEN -> GraphStatAverageTimeBetweenDecorator(listMode)
+            GraphStatType.LAST_VALUE -> lastValueDataSourceAdapter
         }
     }
 }

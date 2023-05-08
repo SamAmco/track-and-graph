@@ -237,11 +237,6 @@ internal class DataInteractorImpl @Inject constructor(
             dao.getAverageTimeBetweenStatByGraphStatId(graphStatId)?.toDto()
         }
 
-    override suspend fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat? =
-        withContext(io) {
-            dao.getTimeSinceLastStatByGraphStatId(graphStatId)?.toDto()
-        }
-
     override suspend fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat> =
         withContext(io) {
             dao.getGraphsAndStatsByGroupIdSync(groupId).map { it.toDto() }
@@ -339,21 +334,21 @@ internal class DataInteractorImpl @Inject constructor(
             }
         }
 
-    override suspend fun duplicateTimeSinceLastStat(graphOrStat: GraphOrStat): Long? =
-        performAtomicUpdate {
-            shiftUpGroupChildIndexes(graphOrStat.groupId)
-            val newGraphStat = duplicateGraphOrStat(graphOrStat)
-            dao.getTimeSinceLastStatByGraphStatId(graphOrStat.id)?.let {
-                dao.insertTimeSinceLastStat(it.copy(id = 0L, graphStatId = newGraphStat))
-            }
-        }
-
     override suspend fun duplicateTimeHistogram(graphOrStat: GraphOrStat): Long? =
         performAtomicUpdate {
             shiftUpGroupChildIndexes(graphOrStat.groupId)
             val newGraphStat = duplicateGraphOrStat(graphOrStat)
             dao.getTimeHistogramByGraphStatId(graphOrStat.id)?.let {
                 dao.insertTimeHistogram(it.copy(id = 0L, graphStatId = newGraphStat))
+            }
+        }
+
+    override suspend fun duplicateLastValueStat(graphOrStat: GraphOrStat): Long? =
+        performAtomicUpdate {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val newGraphStat = duplicateGraphOrStat(graphOrStat)
+            dao.getLastValueStatByGraphStatId(graphOrStat.id)?.let {
+                dao.insertLastValueStat(it.copy(id = 0L, graphStatId = newGraphStat))
             }
         }
 
@@ -391,15 +386,6 @@ internal class DataInteractorImpl @Inject constructor(
         )
     }
 
-    override suspend fun insertTimeSinceLastStat(
-        graphOrStat: GraphOrStat,
-        timeSinceLastStat: TimeSinceLastStat
-    ): Long = performAtomicUpdate {
-        shiftUpGroupChildIndexes(graphOrStat.groupId)
-        val id = insertGraphStat(graphOrStat)
-        dao.insertTimeSinceLastStat(timeSinceLastStat.copy(graphStatId = id).toEntity())
-    }
-
     override suspend fun insertTimeHistogram(
         graphOrStat: GraphOrStat,
         timeHistogram: TimeHistogram
@@ -407,6 +393,15 @@ internal class DataInteractorImpl @Inject constructor(
         shiftUpGroupChildIndexes(graphOrStat.groupId)
         val id = insertGraphStat(graphOrStat)
         dao.insertTimeHistogram(timeHistogram.copy(graphStatId = id).toEntity())
+    }
+
+    override suspend fun insertLastValueStat(
+        graphOrStat: GraphOrStat,
+        config: LastValueStat
+    ): Long {
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val id = insertGraphStat(graphOrStat)
+        return dao.insertLastValueStat(config.copy(graphStatId = id).toEntity())
     }
 
     override suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart) =
@@ -435,16 +430,16 @@ internal class DataInteractorImpl @Inject constructor(
         })
     }
 
-    override suspend fun updateTimeSinceLastStat(
-        graphOrStat: GraphOrStat,
-        timeSinceLastStat: TimeSinceLastStat
-    ) = performAtomicUpdate {
-        dao.updateGraphOrStat(graphOrStat.toEntity())
-        dao.updateTimeSinceLastStat(timeSinceLastStat.toEntity())
-    }
-
     override suspend fun updateGraphOrStat(graphOrStat: GraphOrStat) = performAtomicUpdate {
         dao.updateGraphOrStat(graphOrStat.toEntity())
+    }
+
+    override suspend fun updateLastValueStat(
+        graphOrStat: GraphOrStat,
+        config: LastValueStat
+    ) = performAtomicUpdate {
+        dao.updateGraphOrStat(graphOrStat.toEntity())
+        dao.updateLastValueStat(config.toEntity())
     }
 
     override suspend fun updateTimeHistogram(
@@ -494,6 +489,11 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram? =
         withContext(io) {
             dao.getTimeHistogramByGraphStatId(graphStatId)?.toDto()
+        }
+
+    override suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat? =
+        withContext(io) {
+            dao.getLastValueStatByGraphStatId(graphOrStatId)?.toDto()
         }
 
     override suspend fun getGroupsForGroupSync(id: Long): List<Group> = withContext(io) {

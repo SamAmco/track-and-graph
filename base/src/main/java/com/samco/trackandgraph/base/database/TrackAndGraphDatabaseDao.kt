@@ -221,9 +221,6 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM average_time_between_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getAverageTimeBetweenStatByGraphStatId(graphStatId: Long): AverageTimeBetweenStat?
 
-    @Query("SELECT * FROM time_since_last_stat_table4 WHERE graph_stat_id = :graphStatId LIMIT 1")
-    fun getTimeSinceLastStatByGraphStatId(graphStatId: Long): TimeSinceLastStat?
-
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE group_id = :groupId ORDER BY display_index ASC, id DESC")
     fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
@@ -287,12 +284,6 @@ FROM notes_table as n
     fun updateAverageTimeBetweenStat(averageTimeBetweenStat: AverageTimeBetweenStat)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat): Long
-
-    @Update
-    fun updateTimeSinceLastStat(timeSinceLastStat: TimeSinceLastStat)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGraphOrStat(graphOrStat: GraphOrStat): Long
 
     @Update
@@ -304,11 +295,20 @@ FROM notes_table as n
     @Update
     fun updateTimeHistogram(timeHistogram: TimeHistogram)
 
+    @Update
+    fun updateLastValueStat(lastValueStat: LastValueStat)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTimeHistogram(timeHistogram: TimeHistogram): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertLastValueStat(lastValueStat: LastValueStat): Long
+
     @Query("SELECT * FROM time_histograms_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
+
+    @Query("SELECT * FROM last_value_stats_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    fun getLastValueStatByGraphStatId(graphStatId: Long): LastValueStat?
 
     @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
     fun getGroupsForGroupSync(id: Long): List<Group>

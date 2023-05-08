@@ -35,11 +35,25 @@ abstract class ViewDataFactory<in I, out T : IGraphStatViewData>(
     protected val dataInteractor: DataInteractor,
     protected val ioDispatcher: CoroutineDispatcher
 ) {
+
+    /**
+     * If the config has been written to the database already it can be retrieved against the
+     * given graph or stat. This should just get the config and call the other createViewData
+     * function.
+     *
+     * @see createViewData(graphOrStat: GraphOrStat, config: I, onDataSampled: (List<DataPoint>) -> Unit)
+     */
     protected abstract suspend fun createViewData(
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
     ): T
 
+    /**
+     * Reads the given graph or stat from the database and generates the data to be displayed.
+     * [onDataSampled] will be called at some point with a list of data points that have been
+     * sampled from the database. No guarantees are made about the sorting or uniqueness of the
+     * data points.
+     */
     protected abstract suspend fun createViewData(
         graphOrStat: GraphOrStat,
         config: I,

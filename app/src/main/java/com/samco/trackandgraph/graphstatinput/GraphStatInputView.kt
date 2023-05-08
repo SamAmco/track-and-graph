@@ -19,7 +19,6 @@
 
 package com.samco.trackandgraph.graphstatinput
 
-import android.view.ViewGroup
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
@@ -36,15 +35,14 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.graphstatinput.configviews.*
-import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
-import com.samco.trackandgraph.graphstatview.GraphStatCardView
+import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import java.lang.Float.max
@@ -52,7 +50,6 @@ import java.lang.Float.min
 
 @Composable
 internal fun GraphStatInputView(
-    gsiProvider: GraphStatInteractorProvider,
     viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
     graphStatId: Long
@@ -73,9 +70,7 @@ internal fun GraphStatInputView(
                         graphStatId = graphStatId
                     )
 
-                    if (demoVisible) {
-                        DemoOverlay(demoYOffset, demoViewData, gsiProvider)
-                    }
+                    if (demoVisible) demoViewData?.let { DemoOverlay(demoYOffset, it) }
                 }
 
                 if (demoViewData != null) {
@@ -102,8 +97,7 @@ internal fun GraphStatInputView(
 @Composable
 private fun DemoOverlay(
     demoYOffset: Float,
-    demoViewData: IGraphStatViewData?,
-    gsiProvider: GraphStatInteractorProvider
+    demoViewData: IGraphStatViewData,
 ) = Box(
     Modifier
         .background(MaterialTheme.tngColors.surface.copy(alpha = 0.8f))
@@ -122,26 +116,13 @@ private fun DemoOverlay(
         val offsetRatio = max(0f, min(demoYOffset * 3f, displayHeight) / max(1f, displayHeight))
         val offset = -offsetRatio * invisiblePixels
 
-        AndroidView(
+        GraphStatCardView(
             modifier = Modifier
                 .fillMaxWidth()
                 .offset(y = offset.dp)
                 .wrapContentHeight(align = Alignment.Top, unbounded = true)
                 .onSizeChanged { demoHeight = it.height.toFloat() },
-            factory = {
-                GraphStatCardView(it).apply {
-                    layoutParams = ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    )
-                }
-            },
-            update = { cardView ->
-                demoViewData?.let {
-                    val decorator = gsiProvider.getDecorator(it.graphOrStat.type, true)
-                    cardView.graphStatView.initFromGraphStat(it, decorator)
-                } ?: cardView.graphStatView.initLoading()
-            }
+            graphStatViewData = demoViewData
         )
     }
 }
@@ -254,8 +235,8 @@ fun GraphStatTypeSelector(
             GraphStatType.LINE_GRAPH to stringResource(id = R.string.graph_type_line_graph),
             GraphStatType.PIE_CHART to stringResource(id = R.string.graph_type_pie_chart),
             GraphStatType.AVERAGE_TIME_BETWEEN to stringResource(id = R.string.graph_type_average_time_between),
-            GraphStatType.TIME_SINCE to stringResource(id = R.string.graph_type_time_since),
-            GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram)
+            GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram),
+            GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value)
         )
 
         TextMapSpinner(
@@ -285,13 +266,13 @@ fun ConfigInputView(
         hiltViewModel<AverageTimeBetweenConfigViewModel>(viewModelStoreOwner)
     averageTimeBetweenConfigViewModel.initFromGraphStatId(graphStatId)
 
-    val timeSinceLastConfigViewModel =
-        hiltViewModel<TimeSinceLastConfigViewModel>(viewModelStoreOwner)
-    timeSinceLastConfigViewModel.initFromGraphStatId(graphStatId)
-
     val timeHistogramConfigViewModel =
         hiltViewModel<TimeHistogramConfigViewModel>(viewModelStoreOwner)
     timeHistogramConfigViewModel.initFromGraphStatId(graphStatId)
+
+    val lastValueConfigViewModel =
+        hiltViewModel<LastValueConfigViewModel>(viewModelStoreOwner)
+    lastValueConfigViewModel.initFromGraphStatId(graphStatId)
 
     var currentViewModel: GraphStatConfigViewModelBase<*> = lineGraphConfigViewModel
 
@@ -308,13 +289,13 @@ fun ConfigInputView(
             currentViewModel = averageTimeBetweenConfigViewModel
             AverageTimeBetweenConfigView(viewModel = averageTimeBetweenConfigViewModel)
         }
-        GraphStatType.TIME_SINCE -> {
-            currentViewModel = timeSinceLastConfigViewModel
-            TimeSinceLastConfigView(viewModel = timeSinceLastConfigViewModel)
-        }
         GraphStatType.TIME_HISTOGRAM -> {
             currentViewModel = timeHistogramConfigViewModel
             TimeHistogramConfigView(viewModel = timeHistogramConfigViewModel)
+        }
+        GraphStatType.LAST_VALUE -> {
+            currentViewModel = lastValueConfigViewModel
+            LastValueConfigView(viewModel = lastValueConfigViewModel)
         }
     }
 

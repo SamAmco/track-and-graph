@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DisplayNote
-import com.samco.trackandgraph.base.helpers.formatDayWeekDayMonthYearHourMinuteOneLine
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
 import com.samco.trackandgraph.ui.FeaturePathProvider
 
@@ -71,7 +71,7 @@ internal class NoteViewHolder private constructor(
         this.note = note
         this.clickListener = clickListener
         binding.timestampText.text =
-            formatDayWeekDayMonthYearHourMinuteOneLine(
+            formatDayMonthYearHourMinuteWeekDayOneLine(
                 binding.root.context,
                 weekDayNames,
                 note.timestamp

@@ -30,6 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -129,19 +130,22 @@ fun CircleSpinner(
 @Composable
 fun ColorCircle(
     modifier: Modifier = Modifier,
+    size: Dp = 54.dp,
     @ColorRes color: Int
 ) = Circle(
     modifier = modifier,
+    size = size,
     backgroundColor = colorResource(id = color)
 ) {}
 
 @Composable
 fun Circle(
     modifier: Modifier = Modifier,
+    size: Dp = 54.dp,
     backgroundColor: Color = MaterialTheme.colors.surface,
     content: @Composable () -> Unit
 ) = Card(
-    modifier = modifier.size(54.dp),
+    modifier = modifier.size(size),
     shape = RoundedCornerShape(100),
     backgroundColor = backgroundColor,
     elevation = 0.dp,
