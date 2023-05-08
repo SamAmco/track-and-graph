@@ -113,6 +113,7 @@ dependencies {
     implementation "androidx.compose.ui:ui-viewbinding:$composeVersion"
     implementation 'androidx.activity:activity-compose:1.7.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1'
+    implementation 'androidx.lifecycle:lifecycle-runtime-compose:2.6.0-beta01'
     implementation "androidx.compose.runtime:runtime-livedata:$composeVersion"
     // Material design stuff you might need at some point
     implementation "androidx.compose.material:material:$composeVersion"

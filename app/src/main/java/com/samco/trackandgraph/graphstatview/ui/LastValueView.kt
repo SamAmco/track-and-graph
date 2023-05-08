@@ -30,6 +30,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
@@ -40,6 +41,8 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -87,7 +90,14 @@ private fun LastValueStatViewBody(
 
     val weekdayNames = getWeekDayNames(context)
 
-    val duration = Duration.between(dataPoint.timestamp, OffsetDateTime.now())
+    val now = flow {
+        while (true) {
+            emit(OffsetDateTime.now())
+            delay(1000)
+        }
+    }.collectAsStateWithLifecycle(OffsetDateTime.now()).value
+
+    val duration = Duration.between(dataPoint.timestamp, now)
 
     val durationText =
         formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false)
