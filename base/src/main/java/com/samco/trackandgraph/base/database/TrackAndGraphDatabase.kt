@@ -33,6 +33,7 @@ import com.samco.trackandgraph.base.database.entity.LineGraphFeature
 import com.samco.trackandgraph.base.database.entity.PieChart
 import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.database.entity.TimeHistogram
+import com.samco.trackandgraph.base.database.entity.BarChart
 import com.samco.trackandgraph.base.database.entity.LastValueStat
 import com.samco.trackandgraph.base.database.entity.Tracker
 import com.samco.trackandgraph.base.database.migrations.allMigrations
@@ -64,9 +65,10 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         TimeHistogram::class,
         FeatureTimer::class,
         FunctionEntity::class,
-        LastValueStat::class
+        LastValueStat::class,
+        BarChart::class,
     ],
-    version = 51
+    version = 52
 )
 @TypeConverters(Converters::class)
 internal abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -238,6 +240,12 @@ internal class Converters {
 
     @TypeConverter
     fun intToDurationPlottingMode(index: Int) = DurationPlottingMode.values()[index]
+
+    @TypeConverter
+    fun barChartBarPeriodToInt(barPeriod: BarChartBarPeriod) = barPeriod.ordinal
+
+    @TypeConverter
+    fun intToBarChartBarPeriod(index: Int) = BarChartBarPeriod.values()[index]
 
     @TypeConverter
     fun timeHistogramWindowToInt(window: TimeHistogramWindow) = window.ordinal
