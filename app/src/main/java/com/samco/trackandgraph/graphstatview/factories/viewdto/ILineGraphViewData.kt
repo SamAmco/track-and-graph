@@ -41,12 +41,4 @@ interface ILineGraphViewData : IGraphStatViewData {
     val yAxisRangeParameters: Pair<StepMode, Double>
         get() = Pair(StepMode.SUBDIVIDE, 11.0)
 
-    companion object {
-        fun loading(graphOrStat: GraphOrStat) = object : ILineGraphViewData {
-            override val state: IGraphStatViewData.State
-                get() = IGraphStatViewData.State.LOADING
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-        }
-    }
 }

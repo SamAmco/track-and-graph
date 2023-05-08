@@ -263,8 +263,8 @@ private fun drawBars(
     val outlineColor = context.getColorFromAttr(R.attr.colorOnSurface)
 
     barValues.forEachIndexed { i, bv ->
-        val series = (barValues[i]).values.toTypedArray()
-        val xySeries = SimpleXYSeries(SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, bv.label, *series)
+        val series = (barValues[i]).values
+        val xySeries = SimpleXYSeries(series, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, bv.label)
         val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
         val color = getColor(context, dataVisColorList[colorIndex])
         val seriesFormatter = BarFormatter(color, outlineColor)
