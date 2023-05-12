@@ -14,13 +14,11 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-package com.samco.trackandgraph.graphstatinput
+package com.samco.trackandgraph.util
 
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
-import com.samco.trackandgraph.ui.FeaturePathProvider
 
 class FeatureDataProvider(
     private val dataSourceData: Map<DataSourceData, Group>

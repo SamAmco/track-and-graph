@@ -207,7 +207,7 @@ class LineGraphConfigViewModel @Inject constructor(
             endingAt = lgConfig?.endDate
         )
 
-        lgConfig?.let { it ->
+        lgConfig?.let {
             lineGraph = it
             yRangeType = it.yRangeType
             yRangeFrom = TextFieldValue(it.yFrom.toString())
