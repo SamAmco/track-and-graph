@@ -110,7 +110,6 @@ class ViewGraphStatViewModelImpl @Inject constructor(
         val dataSourceData = allFeatures.map { feature ->
             FeatureDataProvider.DataSourceData(
                 feature,
-                dataInteractor.getLabelsForFeatureId(feature.featureId).toSet(),
                 dataInteractor.getDataSamplePropertiesForFeatureId(feature.featureId)
                     ?: return@map null
             )
