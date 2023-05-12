@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.util.FeaturePathProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
