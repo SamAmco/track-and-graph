@@ -33,7 +33,13 @@ class FeatureDataProvider(
     )
 
     fun dataSourceDataAlphabetically() =
-        dataSourceData.keys.sortedBy { getPathForFeature(it.feature.featureId) }
+        dataSourceData.keys.map {
+            DataSourceDataWithPath(
+                it.feature,
+                it.dataProperties,
+                getPathForFeature(it.feature.featureId)
+            )
+        }.sortedBy { it.path }
 
     fun getDataSampleProperties(featureId: Long) = dataSourceData.keys.firstOrNull {
         it.feature.featureId == featureId
@@ -41,7 +47,12 @@ class FeatureDataProvider(
 
     data class DataSourceData(
         val feature: Feature,
-        val labels: Set<String>,
-        val dataProperties: DataSampleProperties
+        val dataProperties: DataSampleProperties?
+    )
+
+    data class DataSourceDataWithPath(
+        val feature: Feature,
+        val dataProperties: DataSampleProperties?,
+        val path: String
     )
 }
