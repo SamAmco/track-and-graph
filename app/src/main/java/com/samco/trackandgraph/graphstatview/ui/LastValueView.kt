@@ -103,8 +103,9 @@ private fun LastValueStatViewBody(
         formatTimeToDaysHoursMinutesSeconds(context, duration.toMillis(), false)
 
     Text(
-        text = stringResource(id = R.string.time_ago, durationText),
-        style = MaterialTheme.typography.h5
+        text = durationText,
+        style = MaterialTheme.typography.h4,
+        textAlign = TextAlign.Center
     )
 
     SpacingSmall()
