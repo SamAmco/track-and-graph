@@ -108,13 +108,16 @@ class LastValueConfigViewModel @Inject constructor(
 
         val lvStat = config as? LastValueStat
 
+        val featureMap = featurePathProvider.sortedFeatureMap()
+        val featureId = lvStat?.featureId ?: featureMap.keys.first()
+
         singleFeatureConfigBehaviour.onConfigLoaded(
-            map = featurePathProvider.sortedFeatureMap(),
-            featureId = lvStat?.featureId
+            map = featureMap,
+            featureId = featureId
         )
 
         filterableFeatureConfigBehaviour.onConfigLoaded(
-            featureId = lvStat?.featureId,
+            featureId = featureId,
             filterByLabel = lvStat?.filterByLabels,
             filterByRange = lvStat?.filterByRange,
             fromValue = lvStat?.fromValue,
