@@ -1,4 +1,4 @@
-package com.samco.trackandgraph.graphstatinput.configviews
+package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
