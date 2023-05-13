@@ -25,8 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatTimeToDaysHoursMinutesSeconds
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 
 @Composable
 fun AverageTimeBetweenView(
@@ -34,16 +36,23 @@ fun AverageTimeBetweenView(
     viewData: IAverageTimeBetweenViewData,
     graphHeight: Int? = null
 ) {
-    Text(
-        modifier = modifier.let {
-            if (graphHeight != null) it.height(graphHeight.dp)
-            else it
-        },
-        text = formatTimeToDaysHoursMinutesSeconds(
-            context = LocalContext.current,
-            millis = viewData.averageMillis.toLong()
-        ),
-        style = MaterialTheme.typography.h3,
-        textAlign = TextAlign.Center,
-    )
+    if (viewData.state == IGraphStatViewData.State.ERROR) {
+        GraphErrorView(
+            modifier = modifier,
+            error = R.string.graph_stat_view_not_enough_data_graph
+        )
+    } else {
+        Text(
+            modifier = modifier.let {
+                if (graphHeight != null) it.height(graphHeight.dp)
+                else it
+            },
+            text = formatTimeToDaysHoursMinutesSeconds(
+                context = LocalContext.current,
+                millis = viewData.averageMillis.toLong()
+            ),
+            style = MaterialTheme.typography.h3,
+            textAlign = TextAlign.Center,
+        )
+    }
 }
