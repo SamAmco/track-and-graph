@@ -107,13 +107,16 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
 
         val avStat = config as? AverageTimeBetweenStat
 
+        val featureMap = featurePathProvider.sortedFeatureMap()
+        val featureId = avStat?.featureId ?: featureMap.keys.first()
+
         singleFeatureConfigBehaviour.onConfigLoaded(
-            map = featurePathProvider.sortedFeatureMap(),
-            featureId = avStat?.featureId
+            map = featureMap,
+            featureId = featureId
         )
 
         filterableFeatureConfigBehaviour.onConfigLoaded(
-            featureId = avStat?.featureId,
+            featureId = featureId,
             filterByLabel = avStat?.filterByLabels,
             filterByRange = avStat?.filterByRange,
             fromValue = avStat?.fromValue,

@@ -99,9 +99,11 @@ class TimeHistogramConfigViewModel @Inject constructor(
 
         val timeHist = config as? TimeHistogram
 
+        val featureMap = featurePathProvider.sortedFeatureMap()
+
         singleFeatureConfigBehaviour.onConfigLoaded(
-            map = featurePathProvider.sortedFeatureMap(),
-            featureId = timeHist?.featureId
+            map = featureMap,
+            featureId = timeHist?.featureId ?: featureMap.keys.first()
         )
 
         timeRangeConfigBehaviour.onConfigLoaded(

@@ -41,16 +41,9 @@ class SingleFeatureConfigBehaviourImpl @Inject constructor() : SingleFeatureConf
         featureChangeCallback(id)
     }
 
-    fun onConfigLoaded(map: Map<Long, String>, featureId: Long?) {
+    fun onConfigLoaded(map: Map<Long, String>, featureId: Long) {
         this.featureId = featureId
-        iniFeatureMap(map)
-    }
-
-    private fun iniFeatureMap(map: Map<Long, String>) {
         featureMap = map
-        if (featureId == null) {
-            map.keys.firstOrNull()?.let { featureId = it }
-        }
     }
 
     fun initSingleFeatureConfigBehaviour(

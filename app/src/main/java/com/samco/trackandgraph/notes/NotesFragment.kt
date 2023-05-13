@@ -34,7 +34,7 @@ import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.util.FeaturePathProvider
 import com.samco.trackandgraph.ui.showNoteDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint

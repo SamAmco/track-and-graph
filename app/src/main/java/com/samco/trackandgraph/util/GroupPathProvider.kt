@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.samco.trackandgraph.ui
+package com.samco.trackandgraph.util
 
 import com.samco.trackandgraph.base.database.dto.Group
 
