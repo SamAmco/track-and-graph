@@ -24,11 +24,9 @@ import com.androidplot.xy.XYGraphWidget
 import com.androidplot.xy.XYPlot
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
-import com.samco.trackandgraph.ui.compose.ui.SpacingExtraSmall
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.util.getColorFromAttr
 import java.text.DecimalFormat
-
 
 fun xyPlotSetup(
     context: Context,
