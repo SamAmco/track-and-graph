@@ -89,7 +89,17 @@ class LineGraphConfigViewModel @Inject constructor(
         }
     }
 
-    var featureNameMap: Map<Long, String> by mutableStateOf(emptyMap())
+    data class FeatureSelectionIdentifier(
+        val featureId: Long,
+        val durationPlottingMode: DurationPlottingMode
+    )
+
+    data class FeaturePathViewData(
+        val id: FeatureSelectionIdentifier,
+        val path: String,
+    )
+
+    var featurePaths: List<FeaturePathViewData> by mutableStateOf(emptyList())
 
     var yRangeType by mutableStateOf(YRangeType.DYNAMIC)
         private set
@@ -143,9 +153,6 @@ class LineGraphConfigViewModel @Inject constructor(
             if (f.colorIndex !in dataVisColorList.indices) {
                 return ValidationException(R.string.graph_stat_validation_unrecognised_color)
             }
-            if (!featureNameMap.keys.contains(f.featureId)) {
-                return ValidationException(R.string.graph_stat_validation_invalid_line_graph_feature)
-            }
         }
         if (lineGraph.features.any { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
             && !lineGraph.features.all { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }) {
@@ -196,18 +203,65 @@ class LineGraphConfigViewModel @Inject constructor(
         onUpdate()
     }
 
+    private fun initFeaturePaths() {
+        featurePaths = featurePathProvider.dataSourceDataAlphabetically()
+            .flatMap {
+                val id = it.feature.featureId
+                val path = it.path
+                if (it.dataProperties?.isDuration == true) sequenceOf(
+                    FeaturePathViewData(
+                        id = FeatureSelectionIdentifier(
+                            featureId = id,
+                            durationPlottingMode = DurationPlottingMode.DURATION_IF_POSSIBLE
+                        ),
+                        path = path,
+                    ),
+                    FeaturePathViewData(
+                        id = FeatureSelectionIdentifier(
+                            featureId = id,
+                            durationPlottingMode = DurationPlottingMode.HOURS
+                        ),
+                        path = path
+                    ),
+                    FeaturePathViewData(
+                        id = FeatureSelectionIdentifier(
+                            featureId = id,
+                            durationPlottingMode = DurationPlottingMode.MINUTES
+                        ),
+                        path = path
+                    ),
+                    FeaturePathViewData(
+                        id = FeatureSelectionIdentifier(
+                            featureId = id,
+                            durationPlottingMode = DurationPlottingMode.SECONDS
+                        ),
+                        path = path
+                    ),
+                )
+                else sequenceOf(
+                    FeaturePathViewData(
+                        id = FeatureSelectionIdentifier(
+                            featureId = id,
+                            durationPlottingMode = DurationPlottingMode.NONE
+                        ),
+                        path = path
+                    )
+                )
+            }
+    }
+
     override fun onDataLoaded(config: Any?) {
 
         val lgConfig = config as? LineGraphWithFeatures
 
-        featureNameMap = featurePathProvider.sortedFeatureMap()
+        initFeaturePaths()
 
         timeRangeConfigBehaviour.onConfigLoaded(
             duration = lgConfig?.duration,
             endingAt = lgConfig?.endDate
         )
 
-        lgConfig?.let { it ->
+        lgConfig?.let {
             lineGraph = it
             yRangeType = it.yRangeType
             yRangeFrom = TextFieldValue(it.yFrom.toString())

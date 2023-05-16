@@ -127,7 +127,7 @@ private fun LineGraphFeaturesInputView(
         val lgf = viewModel.lineGraphFeatures[index]
         LineGraphFeatureInputView(
             lgf = lgf,
-            featureMap = viewModel.featureNameMap,
+            features = viewModel.featurePaths,
             textFields = viewModel.getTextFieldsFor(index),
             onRemove = { viewModel.removeLineGraphFeature(index) },
             onUpdate = { viewModel.updateLineGraphFeature(index, it) }
@@ -151,7 +151,7 @@ private fun LineGraphFeaturesInputView(
 @Composable
 private fun LineGraphFeatureInputView(
     lgf: LineGraphFeature,
-    featureMap: Map<Long, String>,
+    features: List<LineGraphConfigViewModel.FeaturePathViewData>,
     textFields: LineGraphConfigViewModel.FeatureTextFields,
     onRemove: () -> Unit,
     onUpdate: (LineGraphFeature) -> Unit
@@ -201,10 +201,42 @@ private fun LineGraphFeatureInputView(
                 }
             }
             Column {
+                val hoursStr = stringResource(id = R.string.hours)
+                val minutesStr = stringResource(id = R.string.minutes)
+                val secondsStr = stringResource(id = R.string.seconds)
+
+                val featureNames = remember(features) {
+                    features.associateBy(
+                        keySelector = { it.id },
+                        valueTransform = {
+                            when (it.id.durationPlottingMode) {
+                                DurationPlottingMode.NONE, DurationPlottingMode.DURATION_IF_POSSIBLE -> it.path
+                                DurationPlottingMode.HOURS -> "${it.path} ($hoursStr)"
+                                DurationPlottingMode.MINUTES -> "${it.path} ($minutesStr)"
+                                DurationPlottingMode.SECONDS -> "${it.path} ($secondsStr)"
+                            }
+                        }
+                    )
+                }
+
+                val selectedItem = remember(lgf) {
+                    LineGraphConfigViewModel.FeatureSelectionIdentifier(
+                        featureId = lgf.featureId,
+                        durationPlottingMode = lgf.durationPlottingMode
+                    )
+                }
+
                 TextMapSpinner(
-                    strings = featureMap,
-                    selectedItem = lgf.featureId,
-                    onItemSelected = { onUpdate(lgf.copy(featureId = it)) }
+                    strings = featureNames,
+                    selectedItem = selectedItem,
+                    onItemSelected = {
+                        onUpdate(
+                            lgf.copy(
+                                featureId = it.featureId,
+                                durationPlottingMode = it.durationPlottingMode
+                            )
+                        )
+                    }
                 )
 
                 val averagingModeNames =

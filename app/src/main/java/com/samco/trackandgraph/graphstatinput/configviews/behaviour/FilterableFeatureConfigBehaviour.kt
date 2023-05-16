@@ -94,7 +94,7 @@ class FilterableFeatureConfigBehaviourImpl @Inject constructor() :
         getAvailableLabels()
     }
 
-    fun getAvailableLabels() {
+    private fun getAvailableLabels() {
         featureId?.let { fId ->
             labelUpdateJob?.cancel()
             labelUpdateJob = coroutineScope.launch(ui) {

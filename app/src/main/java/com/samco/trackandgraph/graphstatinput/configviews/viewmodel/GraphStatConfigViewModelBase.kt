@@ -21,7 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.util.FeatureDataProvider
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -40,7 +40,7 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     private var graphStatId: Long? = null
 
     //This will be available after onDataLoaded is called
-    protected lateinit var featurePathProvider: FeaturePathProvider
+    protected lateinit var featurePathProvider: FeatureDataProvider
         private set
 
     /**
@@ -61,9 +61,17 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     }
 
     private suspend fun loadFeaturePathProvider() {
-        val allFeatures = dataInteractor.getAllFeaturesSync()
+        val allFeatures = dataInteractor.getAllFeaturesSync().map {
+            FeatureDataProvider.DataSourceData(
+                it,
+                dataInteractor.getDataSamplePropertiesForFeatureId(it.featureId)
+            )
+        }
         val allGroups = dataInteractor.getAllGroupsSync()
-        featurePathProvider = FeaturePathProvider(allFeatures, allGroups)
+        featurePathProvider = FeatureDataProvider(
+            allFeatures,
+            allGroups
+        )
     }
 
     private suspend fun loadGraphStat(graphStatId: Long) {

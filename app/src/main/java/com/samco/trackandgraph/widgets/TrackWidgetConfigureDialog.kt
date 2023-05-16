@@ -35,7 +35,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher

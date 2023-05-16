@@ -94,9 +94,11 @@ class PieChartConfigViewModel @Inject constructor(
     override fun onDataLoaded(config: Any?) {
         val pc = config as? PieChart
 
+        val featureMap = featurePathProvider.sortedFeatureMap()
+
         singleFeatureConfigBehaviour.onConfigLoaded(
-            map = featurePathProvider.sortedFeatureMap(),
-            featureId = pc?.featureId
+            map = featureMap,
+            featureId = pc?.featureId ?: featureMap.keys.first()
         )
 
         timeRangeConfigBehaviour.onConfigLoaded(
