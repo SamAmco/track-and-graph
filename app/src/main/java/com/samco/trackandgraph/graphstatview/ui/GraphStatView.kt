@@ -26,8 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.base.database.dto.GraphStatType
+import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.R
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -47,48 +49,75 @@ fun GraphStatView(
         textAlign = TextAlign.Center
     )
     SpacingSmall()
-    if (graphStatViewData.state == IGraphStatViewData.State.LOADING) {
-        Box(
-            modifier = Modifier.heightIn(min = 160.dp),
-            contentAlignment = Alignment.Center
-        ) { CircularProgressIndicator() }
-    } else {
-        when (graphStatViewData.graphOrStat.type) {
-            GraphStatType.LINE_GRAPH ->
-                LineGraphView(
-                    viewData = graphStatViewData as ILineGraphViewData,
-                    timeMarker = timeMarker,
-                    listMode = listMode,
-                    graphHeight = graphHeight
-                )
-            GraphStatType.PIE_CHART ->
-                PieChartView(
-                    viewData = graphStatViewData as IPieChartViewData,
-                    graphHeight = graphHeight
-                )
-            GraphStatType.AVERAGE_TIME_BETWEEN ->
-                AverageTimeBetweenView(
-                    viewData = graphStatViewData as IAverageTimeBetweenViewData,
-                    graphHeight = graphHeight
-                )
-            GraphStatType.LAST_VALUE ->
-                LastValueStatView(
-                    viewData = graphStatViewData as ILastValueData,
-                    listMode = listMode,
-                    graphHeight = graphHeight
-                )
-            GraphStatType.TIME_HISTOGRAM ->
-                TimeHistogramView(
-                    viewData = graphStatViewData as ITimeHistogramViewData,
-                    graphHeight = graphHeight
-                )
-            GraphStatType.BAR_CHART ->
-                BarChartView(
-                    viewData = graphStatViewData as IBarChartData,
-                    timeMarker = timeMarker,
-                    listMode = listMode,
-                    graphHeight = graphHeight
-                )
+    when (graphStatViewData.state) {
+        IGraphStatViewData.State.LOADING -> {
+            Box(
+                modifier = Modifier.heightIn(min = 160.dp),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
         }
+        IGraphStatViewData.State.ERROR -> {
+            GraphErrorView(
+                modifier = modifier,
+                error = (graphStatViewData.error as? GraphStatInitException)
+                    ?.errorTextId
+                    ?: R.string.graph_stat_validation_unknown
+            )
+        }
+        else -> GraphStatInnerView(
+            graphStatViewData = graphStatViewData,
+            listMode = listMode,
+            timeMarker = timeMarker,
+            graphHeight = graphHeight
+        )
     }
+}
+
+@Composable
+private fun GraphStatInnerView(
+    graphStatViewData: IGraphStatViewData,
+    listMode: Boolean,
+    timeMarker: OffsetDateTime? = null,
+    graphHeight: Int? = null
+) = when (graphStatViewData.graphOrStat.type) {
+    GraphStatType.LINE_GRAPH ->
+        LineGraphView(
+            viewData = graphStatViewData as ILineGraphViewData,
+            timeMarker = timeMarker,
+            listMode = listMode,
+            graphHeight = graphHeight
+        )
+
+    GraphStatType.PIE_CHART ->
+        PieChartView(
+            viewData = graphStatViewData as IPieChartViewData,
+            graphHeight = graphHeight
+        )
+
+    GraphStatType.AVERAGE_TIME_BETWEEN ->
+        AverageTimeBetweenView(
+            viewData = graphStatViewData as IAverageTimeBetweenViewData,
+            graphHeight = graphHeight
+        )
+
+    GraphStatType.LAST_VALUE ->
+        LastValueStatView(
+            viewData = graphStatViewData as ILastValueData,
+            listMode = listMode,
+            graphHeight = graphHeight
+        )
+
+    GraphStatType.TIME_HISTOGRAM ->
+        TimeHistogramView(
+            viewData = graphStatViewData as ITimeHistogramViewData,
+            graphHeight = graphHeight
+        )
+
+    GraphStatType.BAR_CHART ->
+        BarChartView(
+            viewData = graphStatViewData as IBarChartData,
+            timeMarker = timeMarker,
+            listMode = listMode,
+            graphHeight = graphHeight
+        )
 }
