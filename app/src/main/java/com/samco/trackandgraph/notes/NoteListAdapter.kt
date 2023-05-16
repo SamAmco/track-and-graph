@@ -29,7 +29,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.databinding.ListItemGlobalNoteBinding
-import com.samco.trackandgraph.ui.FeaturePathProvider
+import com.samco.trackandgraph.util.FeaturePathProvider
 
 internal class NoteListAdapter(
     private val clickListener: NoteClickListener,

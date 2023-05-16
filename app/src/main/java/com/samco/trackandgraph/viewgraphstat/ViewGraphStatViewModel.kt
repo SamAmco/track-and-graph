@@ -23,7 +23,7 @@ import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.graphstatinput.FeatureDataProvider
+import com.samco.trackandgraph.util.FeatureDataProvider
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -110,7 +110,6 @@ class ViewGraphStatViewModelImpl @Inject constructor(
         val dataSourceData = allFeatures.map { feature ->
             FeatureDataProvider.DataSourceData(
                 feature,
-                dataInteractor.getLabelsForFeatureId(feature.featureId).toSet(),
                 dataInteractor.getDataSamplePropertiesForFeatureId(feature.featureId)
                     ?: return@map null
             )

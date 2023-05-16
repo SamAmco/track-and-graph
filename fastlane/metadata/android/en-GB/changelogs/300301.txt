@@ -1,0 +1,3 @@
+- Fix average time between not showing "no data"
+- Fix duration options not showing when adding lines to line graph
+- Increase time since text size
