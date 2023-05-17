@@ -19,6 +19,7 @@ package com.samco.trackandgraph.base.database.sampling
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
+import org.jetbrains.annotations.VisibleForTesting
 import org.threeten.bp.temporal.TemporalAmount
 
 data class DataSampleProperties(
@@ -35,9 +36,9 @@ abstract class DataSample(
 ) : Sequence<IDataPoint> {
     companion object {
         /**
-         * Useful for testing purposes, but this form of data sample will not return any raw data
-         * when queried. You should use a sequence that supports [DataSample.getRawDataPoints]
-         * in production.
+         * Useful for testing purposes or creating a fallback for a failed sample operation, but this
+         * form of data sample will not return any raw data when queried. You should normally use a
+         * sequence that supports [DataSample.getRawDataPoints] in production.
          */
         fun fromSequence(
             data: Sequence<IDataPoint>,
