@@ -74,7 +74,8 @@ class BarChartDataFactory @Inject constructor(
             dataSample: DataSample,
             endTime: ZonedDateTime,
             barSize: BarChartBarPeriod,
-            duration: Duration?
+            duration: Duration?,
+            sumByCount: Boolean
         ): BarData {
             val barDates = mutableListOf<ZonedDateTime>()
             val barValuesByLabel = mutableMapOf<String, MutableList<Double>>()
@@ -121,7 +122,7 @@ class BarChartDataFactory @Inject constructor(
                 }
 
                 //Add the value to the double in the list
-                values[values.size - 1] += next.value
+                values[values.size - 1] += if (sumByCount) 1.0 else next.value
             }
 
             val bars = barValuesByLabel.map { (label, values) ->
@@ -167,9 +168,17 @@ class BarChartDataFactory @Inject constructor(
         barSize: BarChartBarPeriod,
         duration: Duration?,
         isDuration: Boolean,
+        sumByCount: Boolean,
         yRangeType: YRangeType
     ): BarDataWithYAxisParams {
-        val barData = getBarData(timeHelper, dataSample, endTime, barSize, duration)
+        val barData = getBarData(
+            timeHelper = timeHelper,
+            dataSample = dataSample,
+            endTime = endTime,
+            barSize = barSize,
+            duration = duration,
+            sumByCount = sumByCount
+        )
 
         val yAxisParameters = DataDisplayIntervalHelper().getYParameters(
             barData.bounds.minY.toDouble(),
@@ -209,6 +218,7 @@ class BarChartDataFactory @Inject constructor(
                     barSize = config.barPeriod,
                     duration = config.duration,
                     isDuration = dataSample.dataSampleProperties.isDuration,
+                    sumByCount = config.sumByCount,
                     yRangeType = config.yRangeType
                 )
             }
