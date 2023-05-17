@@ -20,13 +20,13 @@ import com.androidplot.xy.RectRegion
 import com.androidplot.xy.SimpleXYSeries
 import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.base.database.dto.YRangeType
-import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZonedDateTime
 
 interface IBarChartData : IGraphStatViewData {
     /**
      * One x date for every bar in the list. You don't necessarily draw all of them on the x axis
      */
-    val xDates: List<OffsetDateTime>
+    val xDates: List<ZonedDateTime>
         get() = emptyList()
 
     /**
@@ -44,8 +44,8 @@ interface IBarChartData : IGraphStatViewData {
     /**
      * The end time of the graph
      */
-    val endTime: OffsetDateTime
-        get() = OffsetDateTime.MIN
+    val endTime: ZonedDateTime
+        get() = ZonedDateTime.now()
 
     /**
      * Whether the y axis should fit to the data or be fixed. This is only dynamic if the user selected

@@ -205,7 +205,7 @@ class LineGraphDataFactory @Inject constructor(
         series: Collection<FastXYSeries?>,
         timeBasedRange: Boolean
     ): Pair<RectRegion, Pair<StepMode, Double>> {
-        val fixed = lineGraph.yRangeType == YRangeType.FIXED;
+        val fixed = lineGraph.yRangeType == YRangeType.FIXED
 
         val bounds = RectRegion()
         series.forEach { it?.let { bounds.union(it.minMax()) } }
