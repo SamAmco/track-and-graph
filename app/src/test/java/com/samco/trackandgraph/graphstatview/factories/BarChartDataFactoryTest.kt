@@ -139,7 +139,7 @@ class BarChartDataFactoryTest {
                 dp(time = end.minusDays(9), value = 3.0, label = "a"),
                 dp(time = end.minusDays(9), value = 4.0, label = "b"),
 
-            ).asSequence()
+                ).asSequence()
         )
 
         //EXECUTE
@@ -161,21 +161,78 @@ class BarChartDataFactoryTest {
             .withNano(0)
             .minusNanos(1)
         assertEquals(2, barData.bars.size)
-        assertEquals(listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0), barData.bars.first { it.title == "a" }.getyVals())
-        assertEquals(listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0), barData.bars.first { it.title == "b" }.getyVals())
-        assertEquals(listOf(
-            endOfDay.minusDays(6),
-            endOfDay.minusDays(5),
-            endOfDay.minusDays(4),
-            endOfDay.minusDays(3),
-            endOfDay.minusDays(2),
-            endOfDay.minusDays(1),
-            endOfDay
-        ), barData.dates)
+        assertEquals(
+            listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
+            barData.bars.first { it.title == "a" }.getyVals()
+        )
+        assertEquals(
+            listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
+            barData.bars.first { it.title == "b" }.getyVals()
+        )
+        assertEquals(
+            listOf(
+                endOfDay.minusDays(6),
+                endOfDay.minusDays(5),
+                endOfDay.minusDays(4),
+                endOfDay.minusDays(3),
+                endOfDay.minusDays(2),
+                endOfDay.minusDays(1),
+                endOfDay
+            ), barData.dates
+        )
         assertEquals(0, barData.bounds.minX.toInt())
         assertEquals(6, barData.bounds.maxX.toInt())
         assertEquals(0, barData.bounds.minY.toInt())
         assertEquals(2, barData.bounds.maxY.toInt())
+    }
+
+    @Test
+    fun `test over daylight savings with different start of day`() {
+        //PREPARE
+        val timeHelper = TimeHelper(
+            object : AggregationPreferences {
+                override val firstDayOfWeek: DayOfWeek = DayOfWeek.MONDAY
+                override val startTimeOfDay: Duration = Duration.ofHours(15)
+            },
+            ZoneId.systemDefault()
+        )
+        //Sun March 26 2023 at 4pm BST (which is the day after the clocks go forward)
+        //actually the offset is +1 but atZoneSimilarLocal will make it +1 for us
+        val end = OffsetDateTime.parse("2023-03-25T16:00:00Z")
+            .atZoneSimilarLocal(ZoneId.of("Europe/London"))
+
+        val dataSample = DataSample.fromSequence(
+            listOf(
+                dp(time = end, label = "a"),
+                dp(time = end.minusDays(1), label = "a"),
+            ).asSequence()
+        )
+
+        //EXECUTE
+        val barData = BarChartDataFactory.getBarData(
+            timeHelper = timeHelper,
+            dataSample = dataSample,
+            endTime = end,
+            barSize = BarChartBarPeriod.DAY,
+            duration = null,
+            sumByCount = false
+        )
+
+        //VERIFY
+        assertEquals(1, barData.bars.size)
+        assertEquals(listOf(1.0, 1.0), barData.bars[0].getyVals())
+        assertEquals(
+            listOf(
+                ZonedDateTime.parse("2023-03-25T14:59:59.999999999Z[Europe/London]"),
+                ZonedDateTime.parse("2023-03-26T14:59:59.999999999+01:00[Europe/London]")
+            ),
+            barData.dates
+        )
+        assertEquals(0, barData.bounds.minX.toInt())
+        assertEquals(1, barData.bounds.maxX.toInt())
+        assertEquals(0, barData.bounds.minY.toInt())
+        assertEquals(1, barData.bounds.maxY.toInt())
+
     }
 
     private fun dp(
