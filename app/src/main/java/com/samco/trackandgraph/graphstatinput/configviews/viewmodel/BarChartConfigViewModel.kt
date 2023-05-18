@@ -16,6 +16,13 @@
  */
 package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.database.dto.BarChart
+import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
+import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -35,8 +42,8 @@ class BarChartConfigViewModel @Inject constructor(
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
     private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
-    private val filterableFeatureConfigBehaviour: FilterableFeatureConfigBehaviourImpl = FilterableFeatureConfigBehaviourImpl(),
     private val singleFeatureConfigBehaviour: SingleFeatureConfigBehaviourImpl = SingleFeatureConfigBehaviourImpl(),
+    private val yRangeConfigBehaviour: YRangeConfigBehaviourImpl = YRangeConfigBehaviourImpl(),
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.BarChartConfigData>(
     io,
     default,
@@ -44,22 +51,74 @@ class BarChartConfigViewModel @Inject constructor(
     gsiProvider,
     dataInteractor
 ), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
-    FilterableFeatureConfigBehaviour by filterableFeatureConfigBehaviour,
-    SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour {
+    SingleFeatureConfigBehaviour by singleFeatureConfigBehaviour,
+    YRangeConfigBehaviour by yRangeConfigBehaviour {
+
+    init {
+        timeRangeConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
+        singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(onUpdate = { onUpdate() })
+        yRangeConfigBehaviour.initYRangeConfigBehaviour(onUpdate = { onUpdate() })
+    }
+
+    var selectedBarPeriod: BarChartBarPeriod by mutableStateOf(BarChartBarPeriod.WEEK)
+        private set
+
+    var sumByCount: Boolean by mutableStateOf(false)
+        private set
+
+    private var barChart = BarChart(
+        id = 0,
+        graphStatId = 0,
+        featureId = 0,
+        endDate = null,
+        duration = null,
+        yRangeType = YRangeType.DYNAMIC,
+        yFrom = 0.0,
+        yTo = 1.0,
+        barPeriod = BarChartBarPeriod.WEEK,
+        sumByCount = false
+    )
 
     override fun updateConfig() {
-        TODO("Not yet implemented")
+        barChart = barChart.copy(
+            endDate = sampleEndingAt.asDateTime(),
+            duration = selectedDuration.duration,
+            yRangeType = yRangeType,
+            yFrom = yRangeFrom.text.toDoubleOrNull() ?: 0.0,
+            yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0,
+            barPeriod = selectedBarPeriod,
+            sumByCount = sumByCount
+        )
     }
 
     override fun getConfig(): GraphStatConfigEvent.ConfigData.BarChartConfigData {
-        TODO("Not yet implemented")
+        return GraphStatConfigEvent.ConfigData.BarChartConfigData(barChart)
     }
 
     override suspend fun validate(): GraphStatConfigEvent.ValidationException? {
-        TODO("Not yet implemented")
+        return if (singleFeatureConfigBehaviour.featureId == -1L) {
+            GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
+        } else null
     }
 
     override fun onDataLoaded(config: Any?) {
-        TODO("Not yet implemented")
+        val bcConfig = config as? BarChart
+
+        timeRangeConfigBehaviour.onConfigLoaded(
+            duration = bcConfig?.duration,
+            endingAt = bcConfig?.endDate
+        )
+
+        yRangeConfigBehaviour.onConfigLoaded(
+            yRangeType = bcConfig?.yRangeType,
+            yFrom = bcConfig?.yFrom,
+            yTo = bcConfig?.yTo
+        )
+
+        bcConfig?.let {
+            barChart = it
+            selectedBarPeriod = it.barPeriod
+            sumByCount = it.sumByCount
+        }
     }
 }
