@@ -66,6 +66,16 @@ class BarChartConfigViewModel @Inject constructor(
     var sumByCount: Boolean by mutableStateOf(false)
         private set
 
+    fun updateSumByCount(value: Boolean) {
+        sumByCount = value
+        onUpdate()
+    }
+
+    fun updateBarPeriod(barChartBarPeriod: BarChartBarPeriod) {
+        selectedBarPeriod = barChartBarPeriod
+        onUpdate()
+    }
+
     private var barChart = BarChart(
         id = 0,
         graphStatId = 0,
@@ -104,9 +114,16 @@ class BarChartConfigViewModel @Inject constructor(
     override fun onDataLoaded(config: Any?) {
         val bcConfig = config as? BarChart
 
+        val featureMap = featurePathProvider.sortedFeatureMap()
+
         timeRangeConfigBehaviour.onConfigLoaded(
             duration = bcConfig?.duration,
             endingAt = bcConfig?.endDate
+        )
+
+        singleFeatureConfigBehaviour.onConfigLoaded(
+            map = featureMap,
+            featureId = bcConfig?.featureId ?: featureMap.keys.first()
         )
 
         yRangeConfigBehaviour.onConfigLoaded(

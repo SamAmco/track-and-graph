@@ -53,8 +53,6 @@ fun LastValueConfigView(viewModel: LastValueConfigViewModel) {
         style = MaterialTheme.typography.subtitle2
     )
 
-    SpacingSmall()
-
     val featureId = viewModel.featureId
     val featureMap = viewModel.featureMap
 

@@ -60,8 +60,6 @@ fun AverageTimeBetweenConfigView(viewModel: AverageTimeBetweenConfigViewModel) {
         style = MaterialTheme.typography.subtitle2
     )
 
-    SpacingSmall()
-
     val featureId = viewModel.featureId
     val featureMap = viewModel.featureMap
 
