@@ -60,8 +60,6 @@ fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
         style = MaterialTheme.typography.subtitle2
     )
 
-    SpacingSmall()
-
     val featureId = viewModel.featureId
     val featureMap = viewModel.featureMap
 

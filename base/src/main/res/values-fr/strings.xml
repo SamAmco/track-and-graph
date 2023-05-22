@@ -97,6 +97,7 @@
         <item>Tracer le total mensuel</item>
         <item>Tracer le total annuel</item>
     </string-array>
+    <string name="graph_type_last_value">Dernier suivi/Durée depuis</string>
     <string name="graph_time_durations_all_data">Toutes les données</string>
     <string name="graph_time_durations_a_day">1 jour</string>
     <string name="graph_time_durations_a_week">1 semaine</string>
@@ -278,5 +279,7 @@
     <string name="no_label">Sin etiqueta</string>
     <string name="confirm_cancel_notes_will_be_lost">Voulez-vous vraiment fermer ? Toutes les notes seront perdues.</string>
     <string name="add_a_label">Ajouter une étiquette</string>
+    <string name="graph_type_bar_chart">Gráfico de barras</string>
+    <string name="bar_interval">Intervalle de mesure</string>
 
 </resources>

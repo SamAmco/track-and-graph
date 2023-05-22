@@ -97,6 +97,7 @@
         <item>Gesamtanzahl monatlich</item>
         <item>Gesamtanzahl jährlich</item>
     </string-array>
+    <string name="graph_type_last_value">Zuletzt verfolgt/Zeit seitdem</string>
     <string name="graph_time_durations_all_data">Alle Daten</string>
     <string name="graph_time_durations_a_day">Einen Tag</string>
     <string name="graph_time_durations_a_week">Eine Woche</string>
@@ -276,4 +277,6 @@
     <string name="no_label">Kein Label</string>
     <string name="confirm_cancel_notes_will_be_lost">Möchten Sie wirklich schließen? Alle Notizen gehen verloren.</string>
     <string name="add_a_label">Label hinzufügen</string>
+    <string name="graph_type_bar_chart">Balkendiagramm</string>
+    <string name="bar_interval">Taktintervall</string>
 </resources>

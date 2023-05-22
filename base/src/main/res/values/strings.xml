@@ -93,6 +93,7 @@
     <string name="graph_type_time_since">Time Since</string>
     <string name="graph_type_time_histogram">Time Histogram</string>
     <string name="graph_type_last_value">Last Tracked/Time Since</string>
+    <string name="graph_type_bar_chart">Bar Chart</string>
 
     <string-array name="line_graph_averaging_mode_names">
         <item>No Averaging</item>
@@ -291,4 +292,5 @@
     <string name="no_label">No label</string>
     <string name="confirm_cancel_notes_will_be_lost">Are you sure you want to close? All notes will be lost.</string>
     <string name="add_a_label">Add a label</string>
+    <string name="bar_interval">Bar interval</string>
 </resources>

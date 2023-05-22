@@ -97,6 +97,7 @@
         <item>Generar totales mensuales</item>
         <item>Generar los totales anuales</item>
     </string-array>
+    <string name="graph_type_last_value">Último seguimiento/Tiempo desde</string>
     <string name="graph_time_durations_all_data">Todos los datos</string>
     <string name="graph_time_durations_a_day">Un día</string>
     <string name="graph_time_durations_a_week">Una semana</string>
@@ -276,4 +277,6 @@
     <string name="no_label">Sin etiqueta</string>
     <string name="confirm_cancel_notes_will_be_lost">¿Estás seguro de que quieres cerrar? Todas las notas se perderán.</string>
     <string name="add_a_label">Agregar una etiqueta</string>
+    <string name="graph_type_bar_chart">Gráfico de barras</string>
+    <string name="bar_interval">Intervalo de barra</string>
 </resources>
