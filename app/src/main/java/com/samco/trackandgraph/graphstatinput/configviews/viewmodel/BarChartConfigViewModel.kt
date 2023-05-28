@@ -91,6 +91,7 @@ class BarChartConfigViewModel @Inject constructor(
 
     override fun updateConfig() {
         barChart = barChart.copy(
+            featureId = this.featureId ?: -1,
             endDate = sampleEndingAt.asDateTime(),
             duration = selectedDuration.duration,
             yRangeType = yRangeType,
