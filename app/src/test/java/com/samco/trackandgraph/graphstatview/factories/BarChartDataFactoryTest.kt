@@ -60,8 +60,8 @@ class BarChartDataFactoryTest {
         assertEquals(1, barData.bars.size)
         assertEquals(listOf(3.0, 1.0, 2.0), barData.bars[0].getyVals())
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
-        assertEquals(0, barData.bounds.minX.toInt())
-        assertEquals(2, barData.bounds.maxX.toInt())
+        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
+        assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
         assertEquals(0, barData.bounds.minY.toInt())
         assertEquals(3, barData.bounds.maxY.toInt())
     }
@@ -107,8 +107,8 @@ class BarChartDataFactoryTest {
         assertEquals(listOf(0.0, 1.0, 2.0), barData.bars.first { it.title == "a" }.getyVals())
         assertEquals(listOf(5.0, 1.0, 4.0), barData.bars.first { it.title == "b" }.getyVals())
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
-        assertEquals(0, barData.bounds.minX.toInt())
-        assertEquals(2, barData.bounds.maxX.toInt())
+        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
+        assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
         assertEquals(0, barData.bounds.minY.toInt())
         assertEquals(6, barData.bounds.maxY.toInt())
     }
@@ -180,8 +180,8 @@ class BarChartDataFactoryTest {
                 endOfDay
             ), barData.dates
         )
-        assertEquals(0, barData.bounds.minX.toInt())
-        assertEquals(6, barData.bounds.maxX.toInt())
+        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
+        assertEquals(6.5, barData.bounds.maxX.toDouble(), 0.1)
         assertEquals(0, barData.bounds.minY.toInt())
         assertEquals(2, barData.bounds.maxY.toInt())
     }
@@ -228,8 +228,8 @@ class BarChartDataFactoryTest {
             ),
             barData.dates
         )
-        assertEquals(0, barData.bounds.minX.toInt())
-        assertEquals(1, barData.bounds.maxX.toInt())
+        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
+        assertEquals(1.5, barData.bounds.maxX.toDouble(), 0.1)
         assertEquals(0, barData.bounds.minY.toInt())
         assertEquals(1, barData.bounds.maxY.toInt())
 
