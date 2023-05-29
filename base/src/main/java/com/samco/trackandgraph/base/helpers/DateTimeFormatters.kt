@@ -39,6 +39,9 @@ private fun getDateTimePref(context: Context): DateFormatSetting {
     return DateFormatSetting.values()[datePrefIndex]
 }
 
+private fun formatDate(formatter: DateTimeFormatter, date: Temporal): String =
+    formatter.format(date)
+
 private fun formatDate(format: String, date: Temporal): String = DateTimeFormatter
     .ofPattern(format)
     .format(date)
@@ -145,20 +148,28 @@ fun formatDayMonthYear(context: Context, temporal: Temporal): String {
     return formatDate(format, temporal)
 }
 
-fun formatDayMonth(context: Context, temporal: Temporal): String {
+fun getDayMonthFormatter(context: Context): DateTimeFormatter {
     val format = when (getDateTimePref(context)) {
         DateFormatSetting.DMY -> "dd/MM"
         DateFormatSetting.MDY, DateFormatSetting.YMD -> "MM/dd"
     }
-    return formatDate(format, temporal)
+    return DateTimeFormatter.ofPattern(format)
 }
 
-fun formatMonthYear(context: Context, temporal: Temporal): String {
+fun formatDayMonth(context: Context, temporal: Temporal): String {
+    return formatDate(getDayMonthFormatter(context), temporal)
+}
+
+fun getMonthYearFormatter(context: Context): DateTimeFormatter {
     val format = when (getDateTimePref(context)) {
         DateFormatSetting.DMY, DateFormatSetting.MDY -> "MM/yy"
         DateFormatSetting.YMD -> "yy/MM"
     }
-    return formatDate(format, temporal)
+    return DateTimeFormatter.ofPattern(format)
+}
+
+fun formatMonthYear(context: Context, temporal: Temporal): String {
+    return formatDate(getMonthYearFormatter(context), temporal)
 }
 
 fun formatTimeDuration(seconds: Long): String {
