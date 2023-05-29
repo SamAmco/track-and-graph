@@ -43,6 +43,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.Temporal
 import java.text.DecimalFormat
 import java.text.FieldPosition
 import java.text.Format
@@ -404,7 +405,7 @@ private fun getMarkerPaint(
 private fun setTimeMarker(
     context: Context,
     binding: GraphXyPlotBinding,
-    endTime: OffsetDateTime,
+    endTime: Temporal,
     timeMarker: OffsetDateTime?
 ) {
     binding.xyPlot.removeMarkers()

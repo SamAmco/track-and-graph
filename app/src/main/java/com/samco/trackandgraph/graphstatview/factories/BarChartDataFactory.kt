@@ -135,7 +135,7 @@ class BarChartDataFactory @Inject constructor(
             val maxY = (0 until (barValuesByLabel.values.firstOrNull()?.size ?: 0))
                 .maxOfOrNull { index -> barValuesByLabel.values.sumOf { it[index] } } ?: 0.0
 
-            val xRegion = SeriesUtils.minMax(listOf(0, barDates.size - 1))
+            val xRegion = SeriesUtils.minMax(listOf(-0.5, (barDates.size - 1) + 0.5))
             val yRegion = SeriesUtils.minMax(listOf(0.0, maxY))
             val bounds = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
 
