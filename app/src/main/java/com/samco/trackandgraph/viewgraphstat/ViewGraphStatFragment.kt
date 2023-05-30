@@ -228,6 +228,11 @@ class ViewGraphStatFragment : Fragment() {
         }?.start()
     }
 
+    override fun onDestroyView() {
+        showHideNotesAnimator?.cancel()
+        super.onDestroyView()
+    }
+
     override fun onResume() {
         super.onResume()
         (activity as AppCompatActivity).supportActionBar!!.hide()
