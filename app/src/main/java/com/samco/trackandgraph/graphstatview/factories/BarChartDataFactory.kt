@@ -131,6 +131,14 @@ class BarChartDataFactory @Inject constructor(
 
             val dates = barDates.asReversed()
 
+            val barSumsByLabel = barValuesByLabel
+                .mapValues { (_, values) -> values.sum() }
+                .toList()
+                .sortedBy { (_, value) -> value }
+                .asReversed()
+
+            val sortedBars = bars.sortedBy { label -> barSumsByLabel.indexOfFirst { it.first == label.title } }
+
             //The values are essentially a grid and we want the largest column sum
             val maxY = (0 until (barValuesByLabel.values.firstOrNull()?.size ?: 0))
                 .maxOfOrNull { index -> barValuesByLabel.values.sumOf { it[index] } } ?: 0.0
@@ -139,7 +147,7 @@ class BarChartDataFactory @Inject constructor(
             val yRegion = SeriesUtils.minMax(listOf(0.0, maxY))
             val bounds = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
 
-            return BarData(bars, dates, bounds)
+            return BarData(sortedBars, dates, bounds)
         }
     }
 
