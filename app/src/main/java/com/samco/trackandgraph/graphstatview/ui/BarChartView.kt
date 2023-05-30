@@ -16,12 +16,17 @@
  */
 package com.samco.trackandgraph.graphstatview.ui
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
+import android.view.MotionEvent
+import android.view.View
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidViewBinding
@@ -53,7 +58,6 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.temporal.Temporal
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
@@ -94,6 +98,24 @@ fun BarChartView(
     }
 }
 
+private class BarMarkerStore {
+    private var highlightedIndex: Int? = null
+
+    private val lock = Any()
+
+    fun setHighlightedIndex(index: Int) = synchronized(lock) {
+        highlightedIndex = index
+    }
+
+    fun clearHighlightedIndex() = synchronized(lock) {
+        highlightedIndex = null
+    }
+
+    fun getHighlightedIndex() = synchronized(lock) {
+        highlightedIndex
+    }
+}
+
 @Composable
 private fun BarChartBodyView(
     modifier: Modifier = Modifier,
@@ -111,6 +133,18 @@ private fun BarChartBodyView(
 
     val context = LocalContext.current
 
+    //TODO we want to make the selected index a state and hoist it up to the parent
+    // then we can draw an overlay with relevant information on it.
+    val barMarkerStore = remember(timeMarker) {
+        val barMarkerStore = BarMarkerStore()
+        timeMarker?.let { marker ->
+            val zonedMarker = marker.atZoneSameInstant(endTime.zone)
+            val index = xDates.indexOfLast { zonedMarker.isAfter(it) } + 1
+            if (index in xDates.indices) barMarkerStore.setHighlightedIndex(index)
+        }
+        barMarkerStore
+    }
+
     AndroidViewBinding(
         factory = { inflater, parent, attachToParent ->
             val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
@@ -124,8 +158,6 @@ private fun BarChartBodyView(
             setBarChartBounds(
                 binding = binding,
                 bounds = bounds,
-                yRangeType = yRangeType,
-                listMode = listMode
             )
 
             val xAxisFormatter = getXAxisFormatter(
@@ -158,28 +190,27 @@ private fun BarChartBodyView(
                 bars = bars
             )
 
-            if (!listMode) {
-                PanZoom.attach(
-                    binding.xyPlot,
-                    PanZoom.Pan.HORIZONTAL,
-                    PanZoom.Zoom.STRETCH_HORIZONTAL
-                )
-            }
 
             return@AndroidViewBinding binding
         },
         update = {
+
             setXAxisNumLabels(
                 context = context,
                 binding = this,
                 xDates = xDates,
             )
-            setTimeMarker(
-                context = context,
-                binding = this,
-                endTime = endTime,
-                timeMarker = timeMarker
-            )
+
+            if (!listMode) {
+                attachPanZoomClickListener(
+                    binding = this,
+                    barMarkerStore = barMarkerStore,
+                )
+                redrawMarkers(
+                    binding = this,
+                    barMarkerStore = barMarkerStore,
+                )
+            }
 
             if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
             xyPlot.requestLayout()
@@ -203,6 +234,74 @@ private fun BarChartBodyView(
     }
 }
 
+@SuppressLint("ClickableViewAccessibility")
+private fun attachPanZoomClickListener(
+    binding: GraphXyPlotBinding,
+    barMarkerStore: BarMarkerStore
+) {
+    val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)
+
+    binding.xyPlot.setOnTouchListener(object : PanZoom(
+        binding.xyPlot,
+        Pan.HORIZONTAL,
+        Zoom.STRETCH_HORIZONTAL
+    ) {
+
+        private var down = false
+        private var pointerX = 0f
+        private var pointerY = 0f
+
+        override fun zoom(motionEvent: MotionEvent?) {
+            super.zoom(motionEvent)
+            redrawMarkers(binding, barMarkerStore)
+        }
+
+        override fun pan(motionEvent: MotionEvent?) {
+            super.pan(motionEvent)
+            redrawMarkers(binding, barMarkerStore)
+        }
+
+        override fun onTouch(view: View, event: MotionEvent): Boolean {
+            val rounded = renderer.plot.screenToSeriesX(event.x).toDouble().roundToInt()
+
+            //Detect a click from a single pointer, otherwise call super
+            if (event.pointerCount == 1) {
+                when (event.action) {
+                    MotionEvent.ACTION_DOWN -> {
+                        down = true
+                        pointerX = event.x
+                        pointerY = event.y
+                        return super.onTouch(view, event)
+                    }
+
+                    MotionEvent.ACTION_UP -> {
+                        val smallX = abs(event.x - pointerX) < 10
+                        val smallY = abs(event.y - pointerY) < 10
+                        if (down && smallX && smallY) {
+                            toggleBarMarker(
+                                binding = binding,
+                                barMarkerStore = barMarkerStore,
+                                index = rounded
+                            )
+                            view.performClick()
+                        }
+                        down = false
+                    }
+
+                    else -> {
+                        down = false
+                        return super.onTouch(view, event)
+                    }
+                }
+            } else {
+                down = false
+                return super.onTouch(view, event)
+            }
+            return super.onTouch(view, event)
+        }
+    })
+}
+
 //TODO a lot of the below code is copy/pasted from other view classes, would be good to refactor
 // the common code out
 private val lineGraphHourMinuteSecondFormat: DateTimeFormatter = DateTimeFormatter
@@ -222,7 +321,9 @@ private fun setXAxisFormatter(
                 toAppendTo: StringBuffer,
                 pos: FieldPosition
             ): StringBuffer {
-                val number = (obj as Number).toDouble()
+                //We minus a tiny amount to favour labelling the previous bar if we're right on the
+                // border between two
+                val number = (obj as Number).toDouble() - 0.0001
                 val rounded = number.roundToInt()
                 //Shouldn't ever happen that we get a date outside of the range, but just in case
                 val date =
@@ -250,8 +351,7 @@ private fun setXAxisNumLabels(
 
     if (dpWidth < 0.1f) return
 
-    //max number of labels is 1 every 50dp
-    val maxLabels = (dpWidth / 40.0).toInt().toDouble()
+    val maxLabels = (dpWidth / 30.0).toInt().toDouble()
 
     var xStep = xDates.size
     for (i in 1 until (xDates.size / 2)) {
@@ -290,18 +390,8 @@ private fun setUpLineGraphYAxis(
     }
 }
 
-private fun setBarChartBounds(
-    binding: GraphXyPlotBinding,
-    bounds: RectRegion,
-    yRangeType: YRangeType,
-    listMode: Boolean
-) {
-    // since we now calculate the bounds to fit the number of intervals we almost always want
-    // to set the rangeBoundaries to the bounds.
-    // The only exception is when the graph is viewed fullscreen-mode (listMode == False) while dynamic
-    if (yRangeType == YRangeType.FIXED || listMode) {
-        binding.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
-    }
+private fun setBarChartBounds(binding: GraphXyPlotBinding, bounds: RectRegion) {
+    binding.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
     binding.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
     binding.xyPlot.outerLimits.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
 }
@@ -369,37 +459,48 @@ private fun drawBars(
     renderer.barOrientation = BarRenderer.BarOrientation.STACKED
 }
 
-private fun getMarkerPaint(
-    context: Context
-): Paint {
-    val color = context.getColorFromAttr(R.attr.errorTextColor)
+private fun getMarkerPaint(binding: GraphXyPlotBinding): Paint {
+    //Calculate the marker width
+    val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)
+    //If the gridRect is null it will throw an exception, this can happen if the graph hasn't been
+    // laid out yet
+    if (binding.xyPlot.graph.gridRect == null) return Paint()
+    val width = abs(renderer.plot.seriesToScreenX(1) - renderer.plot.seriesToScreenX(0))
+
     val paint = Paint()
-    paint.color = color
-    paint.strokeWidth = 2f
+    paint.color = Color.BLACK
+    paint.alpha = (0.2f * 255f).toInt()
+    paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.DARKEN)
+    paint.strokeWidth = width
     return paint
 }
 
-//TODO pretty sure this is wrong. The x-axis scale needs to be decided,
-// it's probably not millis, not sure
-private fun setTimeMarker(
-    context: Context,
+private fun toggleBarMarker(
     binding: GraphXyPlotBinding,
-    endTime: Temporal,
-    timeMarker: OffsetDateTime?
+    barMarkerStore: BarMarkerStore,
+    index: Int
+) {
+    if (barMarkerStore.getHighlightedIndex() == index) barMarkerStore.clearHighlightedIndex()
+    else barMarkerStore.setHighlightedIndex(index)
+    redrawMarkers(binding, barMarkerStore)
+}
+
+private fun redrawMarkers(
+    binding: GraphXyPlotBinding,
+    barMarkerStore: BarMarkerStore
 ) {
     binding.xyPlot.removeMarkers()
-    if (timeMarker == null) return
-
-    val markerPaint = getMarkerPaint(context)
-    val millis = Duration.between(endTime, timeMarker).toMillis()
-    binding.xyPlot.addMarker(
-        XValueMarker(
-            millis,
-            null,
-            VerticalPosition(0f, VerticalPositioning.ABSOLUTE_FROM_TOP),
-            markerPaint,
-            null
+    val markerPaint = getMarkerPaint(binding)
+    barMarkerStore.getHighlightedIndex()?.let {
+        binding.xyPlot.addMarker(
+            XValueMarker(
+                it,
+                null,
+                VerticalPosition(0f, VerticalPositioning.ABSOLUTE_FROM_TOP),
+                markerPaint,
+                null
+            )
         )
-    )
+    }
     binding.xyPlot.redraw()
 }
