@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.SimpleXYSeries
 import com.androidplot.xy.StepMode
-import com.samco.trackandgraph.base.database.dto.YRangeType
 import org.threeten.bp.ZonedDateTime
 
 interface IBarChartData : IGraphStatViewData {
@@ -46,14 +45,6 @@ interface IBarChartData : IGraphStatViewData {
      */
     val endTime: ZonedDateTime
         get() = ZonedDateTime.now()
-
-    /**
-     * Whether the y axis should fit to the data or be fixed. This is only dynamic if the user selected
-     * dynamic, but if you're viewing the graph in list mode you should just ignore it and use fixed
-     * with the bounds instead.
-     */
-    val yRangeType: YRangeType
-        get() = YRangeType.DYNAMIC
 
     /**
      * The bounds of the graph in x and y

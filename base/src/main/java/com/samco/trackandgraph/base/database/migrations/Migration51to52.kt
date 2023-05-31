@@ -33,7 +33,6 @@ val MIGRATION_51_52 = object : Migration(51, 52) {
                     `end_date` TEXT, 
                     `duration` TEXT, 
                     `y_range_type` INTEGER NOT NULL,
-                    `y_from` REAL NOT NULL,
                     `y_to` REAL NOT NULL,
                     `bar_period` INTEGER NOT NULL, 
                     `sum_by_count` INTEGER NOT NULL, 

@@ -75,7 +75,9 @@ class BarChartDataFactory @Inject constructor(
             endTime: ZonedDateTime,
             barSize: BarChartBarPeriod,
             duration: Duration?,
-            sumByCount: Boolean
+            sumByCount: Boolean,
+            yRangeType: YRangeType,
+            yTo: Double,
         ): BarData {
             val barDates = mutableListOf<ZonedDateTime>()
             val barValuesByLabel = mutableMapOf<String, MutableList<Double>>()
@@ -137,14 +139,18 @@ class BarChartDataFactory @Inject constructor(
                 .sortedBy { (_, value) -> value }
                 .asReversed()
 
-            val sortedBars = bars.sortedBy { label -> barSumsByLabel.indexOfFirst { it.first == label.title } }
+            val sortedBars =
+                bars.sortedBy { label -> barSumsByLabel.indexOfFirst { it.first == label.title } }
 
             //The values are essentially a grid and we want the largest column sum
             val maxY = (0 until (barValuesByLabel.values.firstOrNull()?.size ?: 0))
                 .maxOfOrNull { index -> barValuesByLabel.values.sumOf { it[index] } } ?: 0.0
 
             val xRegion = SeriesUtils.minMax(listOf(-0.5, (barDates.size - 1) + 0.5))
-            val yRegion = SeriesUtils.minMax(listOf(0.0, maxY))
+            val yRegion = SeriesUtils.minMax(
+                if (yRangeType == YRangeType.FIXED) listOf(0.0, yTo)
+                else listOf(0.0, maxY)
+            )
             val bounds = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
 
             return BarData(sortedBars, dates, bounds)
@@ -173,26 +179,25 @@ class BarChartDataFactory @Inject constructor(
         timeHelper: TimeHelper,
         dataSample: DataSample,
         endTime: ZonedDateTime,
-        barSize: BarChartBarPeriod,
-        duration: Duration?,
-        isDuration: Boolean,
-        sumByCount: Boolean,
-        yRangeType: YRangeType
+        config: BarChart
     ): BarDataWithYAxisParams {
+
         val barData = getBarData(
             timeHelper = timeHelper,
             dataSample = dataSample,
             endTime = endTime,
-            barSize = barSize,
-            duration = duration,
-            sumByCount = sumByCount
+            barSize = config.barPeriod,
+            duration = config.duration,
+            sumByCount = config.sumByCount,
+            yRangeType = config.yRangeType,
+            yTo = config.yTo
         )
 
         val yAxisParameters = DataDisplayIntervalHelper().getYParameters(
             barData.bounds.minY.toDouble(),
             barData.bounds.maxY.toDouble(),
-            isDuration,
-            yRangeType == YRangeType.FIXED
+            dataSample.dataSampleProperties.isDuration,
+            config.yRangeType == YRangeType.FIXED
         )
 
         val yAxisParameterPair = Pair(yAxisParameters.step_mode, yAxisParameters.n_intervals)
@@ -223,11 +228,7 @@ class BarChartDataFactory @Inject constructor(
                     timeHelper = timeHelper,
                     dataSample = dataSample,
                     endTime = endTime,
-                    barSize = config.barPeriod,
-                    duration = config.duration,
-                    isDuration = dataSample.dataSampleProperties.isDuration,
-                    sumByCount = config.sumByCount,
-                    yRangeType = config.yRangeType
+                    config = config,
                 )
             }
 
@@ -238,7 +239,6 @@ class BarChartDataFactory @Inject constructor(
                 override val bars = barData.bars
                 override val durationBasedRange = dataSample.dataSampleProperties.isDuration
                 override val endTime = endTime
-                override val yRangeType = config.yRangeType
                 override val bounds = barData.bounds
                 override val yAxisRangeParameters = barData.yAxisParameters
                 override val state = IGraphStatViewData.State.READY
