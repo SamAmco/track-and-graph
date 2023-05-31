@@ -20,13 +20,20 @@ import com.androidplot.ui.Anchor
 import com.androidplot.ui.HorizontalPositioning
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.BoundaryMode
+import com.androidplot.xy.StepMode
 import com.androidplot.xy.XYGraphWidget
 import com.androidplot.xy.XYPlot
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.helpers.formatTimeDuration
+import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.util.getColorFromAttr
 import java.text.DecimalFormat
+import java.text.FieldPosition
+import java.text.Format
+import java.text.ParsePosition
+import kotlin.math.roundToLong
 
 fun xyPlotSetup(
     context: Context,
@@ -81,6 +88,31 @@ fun xyPlotSetup(
     xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format = DecimalFormat("0.0")
 }
 
+fun setUpXYPlotYAxis(
+    binding: GraphXyPlotBinding,
+    yAxisRangeParameters: Pair<StepMode, Double>,
+    durationBasedRange: Boolean
+) {
+    binding.xyPlot.setRangeStep(
+        yAxisRangeParameters.first,
+        yAxisRangeParameters.second
+    )
+    if (durationBasedRange) {
+        binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
+            object : Format() {
+                override fun format(
+                    obj: Any,
+                    toAppendTo: StringBuffer,
+                    pos: FieldPosition
+                ): StringBuffer {
+                    val sec = (obj as Number).toDouble().roundToLong()
+                    return toAppendTo.append(formatTimeDuration(sec))
+                }
+
+                override fun parseObject(source: String, pos: ParsePosition) = null
+            }
+    }
+}
 
 @Composable
 fun GraphErrorView(

@@ -94,7 +94,6 @@ private class BarMarkerStore {
     }
 }
 
-
 @Composable
 fun BarChartView(
     modifier: Modifier = Modifier,
@@ -240,7 +239,7 @@ private fun BarChartBodyView(
                 xAxisFormatter = xAxisFormatter
             )
 
-            setUpLineGraphYAxis(
+            setUpXYPlotYAxis(
                 binding = binding,
                 yAxisRangeParameters = yAxisRangeParameters,
                 durationBasedRange = durationBasedRange
@@ -368,14 +367,7 @@ private fun attachPanZoomClickListener(
     })
 }
 
-//TODO a lot of the below code is copy/pasted from other view classes, would be good to refactor
-// the common code out
-private val lineGraphHourMinuteSecondFormat: DateTimeFormatter = DateTimeFormatter
-    .ofPattern("HH:mm:ss")
-private val lineGraphHoursDateFormat: DateTimeFormatter = DateTimeFormatter
-    .ofPattern("HH:mm")
-
-private fun setXAxisFormatter(
+fun setXAxisFormatter(
     binding: GraphXyPlotBinding,
     xDates: List<ZonedDateTime>,
     xAxisFormatter: DateTimeFormatter
@@ -430,32 +422,6 @@ private fun setXAxisNumLabels(
     binding.xyPlot.setDomainStep(StepMode.SUBDIVIDE, min((xStep + 1).toDouble(), maxLabels))
 }
 
-private fun setUpLineGraphYAxis(
-    binding: GraphXyPlotBinding,
-    yAxisRangeParameters: Pair<StepMode, Double>,
-    durationBasedRange: Boolean
-) {
-    binding.xyPlot.setRangeStep(
-        yAxisRangeParameters.first,
-        yAxisRangeParameters.second
-    )
-    if (durationBasedRange) {
-        binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
-            object : Format() {
-                override fun format(
-                    obj: Any,
-                    toAppendTo: StringBuffer,
-                    pos: FieldPosition
-                ): StringBuffer {
-                    val sec = (obj as Number).toDouble().roundToLong()
-                    return toAppendTo.append(formatTimeDuration(sec))
-                }
-
-                override fun parseObject(source: String, pos: ParsePosition) = null
-            }
-    }
-}
-
 private fun setBarChartBounds(binding: GraphXyPlotBinding, bounds: RectRegion) {
     binding.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
     binding.xyPlot.bounds.set(bounds.minX, bounds.maxX, bounds.minY, bounds.maxY)
@@ -492,10 +458,10 @@ private fun getXAxisFormatter(
     if (minX == null || maxX == null) return getDayMonthFormatter(context)
     val durationRange = Duration.between(minX, maxX)
     return when {
-        durationRange.toMinutes() < 5L -> lineGraphHourMinuteSecondFormat
+        durationRange.toMinutes() < 5L -> DateTimeFormatter.ofPattern("HH:mm:ss")
         durationRange.toDays() >= 304 -> getMonthYearFormatter(context)
         durationRange.toDays() >= 1 -> getDayMonthFormatter(context)
-        else -> lineGraphHoursDateFormat
+        else -> DateTimeFormatter.ofPattern("HH:mm")
     }
 }
 
