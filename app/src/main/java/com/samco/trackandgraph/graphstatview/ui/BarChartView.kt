@@ -502,7 +502,7 @@ private fun getMarkerPaint(binding: GraphXyPlotBinding): Paint {
     val paint = Paint()
     paint.color = binding.root.context.getColorFromAttr(R.attr.colorOnSurface)
     paint.alpha = (0.2f * 255f).toInt()
-    paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SCREEN)
+    paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.OVERLAY)
     paint.strokeWidth = width
     return paint
 }
