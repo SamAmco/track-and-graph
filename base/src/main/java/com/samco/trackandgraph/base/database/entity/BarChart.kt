@@ -63,9 +63,6 @@ internal data class BarChart(
     @ColumnInfo(name = "y_range_type")
     val yRangeType: YRangeType,
 
-    @ColumnInfo(name = "y_from")
-    val yFrom: Double,
-
     @ColumnInfo(name = "y_to")
     val yTo: Double,
 
@@ -82,7 +79,6 @@ internal data class BarChart(
         endDate = endDate,
         duration = duration,
         yRangeType = yRangeType,
-        yFrom = yFrom,
         yTo = yTo,
         barPeriod = barPeriod,
         sumByCount = sumByCount

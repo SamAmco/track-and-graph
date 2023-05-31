@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.base.database.dto.YRangeType
@@ -34,10 +35,9 @@ import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.BarChartConf
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
-import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
+import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
-import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
@@ -61,7 +61,18 @@ fun BarChartConfigView(
         onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
     )
 
-    if (viewModel.yRangeType == YRangeType.FIXED) YRangeFromToInputs(viewModel)
+    if (viewModel.yRangeType == YRangeType.FIXED) {
+        LabeledRow(label = stringResource(id = R.string.y_range_max)) {
+            MiniNumericTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .alignByBaseline(),
+                textAlign = TextAlign.Center,
+                textFieldValue = viewModel.yRangeTo,
+                onValueChange = { viewModel.updateYRangeTo(it) }
+            )
+        }
+    }
 
     SpacingSmall()
 
@@ -85,8 +96,6 @@ fun BarChartConfigView(
             onItemSelected = { viewModel.updateFeatureId(it) }
         )
     }
-
-    //SpacingSmall()
 
     val strings = stringArrayResource(id = R.array.time_histogram_windows)
     val barIntervalNames = remember {
@@ -113,8 +122,6 @@ fun BarChartConfigView(
     }
 
     SpacingSmall()
-
-    //TODO add spinner for bar period
 
     RowCheckbox(
         checked = viewModel.sumByCount,

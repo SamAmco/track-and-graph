@@ -83,7 +83,6 @@ class BarChartConfigViewModel @Inject constructor(
         endDate = null,
         duration = null,
         yRangeType = YRangeType.DYNAMIC,
-        yFrom = 0.0,
         yTo = 1.0,
         barPeriod = BarChartBarPeriod.WEEK,
         sumByCount = false
@@ -95,7 +94,6 @@ class BarChartConfigViewModel @Inject constructor(
             endDate = sampleEndingAt.asDateTime(),
             duration = selectedDuration.duration,
             yRangeType = yRangeType,
-            yFrom = yRangeFrom.text.toDoubleOrNull() ?: 0.0,
             yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0,
             barPeriod = selectedBarPeriod,
             sumByCount = sumByCount
@@ -129,7 +127,7 @@ class BarChartConfigViewModel @Inject constructor(
 
         yRangeConfigBehaviour.onConfigLoaded(
             yRangeType = bcConfig?.yRangeType,
-            yFrom = bcConfig?.yFrom,
+            yFrom = 0.0,
             yTo = bcConfig?.yTo
         )
 

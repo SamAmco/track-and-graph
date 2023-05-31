@@ -293,4 +293,5 @@
     <string name="confirm_cancel_notes_will_be_lost">Are you sure you want to close? All notes will be lost.</string>
     <string name="add_a_label">Add a label</string>
     <string name="bar_interval">Bar interval</string>
+    <string name="y_range_max">Y range max</string>
 </resources>
