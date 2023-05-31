@@ -24,11 +24,22 @@ import android.graphics.PorterDuffXfermode
 import android.view.MotionEvent
 import androidx.compose.material.Surface
 import android.view.View
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,9 +47,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.ui.VerticalPosition
@@ -55,11 +68,12 @@ import com.androidplot.xy.XValueMarker
 import com.androidplot.xy.XYGraphWidget
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
-import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.helpers.getDayMonthFormatter
 import com.samco.trackandgraph.base.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartData
+import com.samco.trackandgraph.ui.compose.ui.ColorCircle
+import com.samco.trackandgraph.ui.compose.ui.SpacingExtraSmall
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -77,7 +91,6 @@ import kotlin.math.log10
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 private class BarMarkerStore {
     var highlightedIndex by mutableStateOf(null as Int?)
@@ -131,7 +144,9 @@ fun BarChartView(
 
         if (!listMode) barMarkerStore.highlightedIndex?.let {
             BarChartDataOverlay(
-                modifier = Modifier.align(Alignment.TopEnd),
+                modifier = Modifier
+                    .wrapContentHeight(Alignment.Top)
+                    .align(Alignment.TopEnd),
                 context = LocalContext.current,
                 highlightedIndex = it,
                 xDates = viewData.xDates,
@@ -142,8 +157,8 @@ fun BarChartView(
     }
 }
 
-private fun doubleToString(value: Double): String {
-    val scale = min(3, value.toBigDecimal().scale())
+private fun doubleToString(value: Double, maxPlaces: Int = 3): String {
+    val scale = min(maxPlaces, value.toBigDecimal().scale())
     return String.format("%.${scale}f", value)
 }
 
@@ -155,7 +170,9 @@ private fun BarChartDataOverlay(
     xDates: List<ZonedDateTime>,
     bars: List<SimpleXYSeries>,
     barPeriod: TemporalAmount
-) = Surface(modifier = modifier) {
+) = Surface(modifier = modifier.width(IntrinsicSize.Max)) {
+
+    var expanded by remember { mutableStateOf(false) }
 
     val total = remember(highlightedIndex, bars) {
         doubleToString(bars.sumOf { it.getyVals()[highlightedIndex].toDouble() })
@@ -170,7 +187,25 @@ private fun BarChartDataOverlay(
         formatDayMonthYearHourMinute(context, xDates[highlightedIndex])
     }
 
-    Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding))) {
+    //a list of label: value (percentage) strings for each label for the current bar
+    val extraDetails = remember(highlightedIndex, xDates, bars) {
+        val values = bars.associate {
+            it.title to it.getyVals()[highlightedIndex].toDouble()
+        }
+        val sum = values.values.sum()
+
+        bars.map {
+            val percentage = ((values[it.title] ?: 0.0) / sum) * 100.0
+            "${it.title}: " +
+                    doubleToString(values[it.title] ?: 0.0) +
+                    " (${doubleToString(percentage, 1)}%)"
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(dimensionResource(id = R.dimen.card_padding))
+    ) {
 
         Text(
             text = stringResource(id = R.string.from_formatted, fromText),
@@ -186,6 +221,48 @@ private fun BarChartDataOverlay(
             text = stringResource(id = R.string.total_formatted, total),
             style = MaterialTheme.typography.body1,
         )
+
+        SpacingSmall()
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(id = R.string.info),
+                style = MaterialTheme.typography.body1,
+            )
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(24.dp)
+                    .rotate(if (expanded) 180f else 0f)
+            )
+        }
+
+        SpacingSmall()
+
+        if (expanded) {
+            extraDetails.forEachIndexed { index, labelInfo ->
+                Row {
+                    val colorIndex = (index * dataVisColorGenerator) % dataVisColorList.size
+                    ColorCircle(
+                        color = dataVisColorList[colorIndex],
+                        size = 16.dp
+                    )
+                    SpacingExtraSmall()
+                    Text(
+                        text = labelInfo,
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
     }
 }
 
