@@ -130,4 +130,20 @@ fun BarChartConfigView(
     )
 
     SpacingSmall()
+
+    LabeledRow(
+        label = stringResource(id = R.string.scale),
+        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
+    ) {
+        MiniNumericTextField(
+            modifier = Modifier
+                .weight(1f)
+                .alignByBaseline(),
+            textAlign = TextAlign.Center,
+            textFieldValue = viewModel.scale,
+            onValueChange = { viewModel.updateScale(it) }
+        )
+    }
+
+    SpacingSmall()
 }

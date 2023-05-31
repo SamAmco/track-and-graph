@@ -34,6 +34,7 @@ val MIGRATION_51_52 = object : Migration(51, 52) {
                     `duration` TEXT, 
                     `y_range_type` INTEGER NOT NULL,
                     `y_to` REAL NOT NULL,
+                    `scale` REAL NOT NULL,
                     `bar_period` INTEGER NOT NULL, 
                     `sum_by_count` INTEGER NOT NULL, 
                      FOREIGN KEY(`graph_stat_id`) REFERENCES `graphs_and_stats_table2`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE, 
