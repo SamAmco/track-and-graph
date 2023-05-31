@@ -281,6 +281,7 @@ class BarChartDataFactory @Inject constructor(
                 override val yAxisRangeParameters = barData.yAxisParameters
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
+                override val barPeriod = config.barPeriod.asTemporalAmount()
             }
         } catch (t: Throwable) {
             Timber.d(t, "Error creating bar chart data")

@@ -19,7 +19,10 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.SimpleXYSeries
 import com.androidplot.xy.StepMode
+import org.threeten.bp.Duration
+import org.threeten.bp.Period
 import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 interface IBarChartData : IGraphStatViewData {
     /**
@@ -57,4 +60,10 @@ interface IBarChartData : IGraphStatViewData {
      */
     val yAxisRangeParameters: Pair<StepMode, Double>
         get() = Pair(StepMode.SUBDIVIDE, 11.0)
+
+    /**
+     * The period/duration of a single bar
+     */
+    val barPeriod: TemporalAmount
+        get() = Period.ofDays(1)
 }
