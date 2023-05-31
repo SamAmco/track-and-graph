@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.BarChart
 import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
@@ -66,6 +67,14 @@ class BarChartConfigViewModel @Inject constructor(
     var sumByCount: Boolean by mutableStateOf(false)
         private set
 
+    var scale: TextFieldValue by mutableStateOf(TextFieldValue("1.0"))
+        private set
+
+    fun updateScale(value: TextFieldValue) {
+        scale = value
+        onUpdate()
+    }
+
     fun updateSumByCount(value: Boolean) {
         sumByCount = value
         onUpdate()
@@ -84,6 +93,7 @@ class BarChartConfigViewModel @Inject constructor(
         duration = null,
         yRangeType = YRangeType.DYNAMIC,
         yTo = 1.0,
+        scale = 1.0,
         barPeriod = BarChartBarPeriod.WEEK,
         sumByCount = false
     )
@@ -95,6 +105,7 @@ class BarChartConfigViewModel @Inject constructor(
             duration = selectedDuration.duration,
             yRangeType = yRangeType,
             yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0,
+            scale = scale.text.toDoubleOrNull() ?: 1.0,
             barPeriod = selectedBarPeriod,
             sumByCount = sumByCount
         )
@@ -135,6 +146,7 @@ class BarChartConfigViewModel @Inject constructor(
             barChart = it
             selectedBarPeriod = it.barPeriod
             sumByCount = it.sumByCount
+            scale = TextFieldValue(it.scale.toString())
         }
     }
 }

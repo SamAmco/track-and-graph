@@ -68,6 +68,25 @@ class BarChartDataFactory @Inject constructor(
             BarChartBarPeriod.YEAR -> Period.ofYears(1)
         }
 
+        /**
+         * Calculates the bar data for a bar chart. The output is:
+         *
+         * - A list of SimpleXYSeries. Each SimpleXYSeries represents all the bars for a given label.
+         *  the series are sorted by the sum of their values, in descending order.
+         *
+         * - A list of ZonedDateTimes. Each ZonedDateTime represents the end of a bar. The dates
+         *  should ascend in order spaced by barSize. The list of bars and dates should always be the
+         *  same size.
+         *
+         * - A RectRegion representing the bounds of the data. The x bounds will be 0 to the number of
+         * bars. The y bounds will be 0 to the max stacked value of any bar or [yTo] if [yRangeType] is [YRangeType.FIXED].
+         *
+         * There should be one bar per [barSize] between [endTime] and [endTime] - [duration].
+         *
+         * All values in every SimpleXYSeries will be multiplied by [scale]. If you use sumByCount,
+         * the value multiplied will be the number of data points for a bar rather than the sum of
+         * their values.
+         */
         @VisibleForTesting
         fun getBarData(
             timeHelper: TimeHelper,
@@ -78,11 +97,13 @@ class BarChartDataFactory @Inject constructor(
             sumByCount: Boolean,
             yRangeType: YRangeType,
             yTo: Double,
+            scale: Double
         ): BarData {
             val barDates = mutableListOf<ZonedDateTime>()
             val barValuesByLabel = mutableMapOf<String, MutableList<Double>>()
             val iterator = dataSample.iterator()
 
+            //First find the last end time of the last bar
             val roundedEndTime = timeHelper.findEndOfTemporal(
                 endTime,
                 barSize.asTemporalAmount()
@@ -97,6 +118,7 @@ class BarChartDataFactory @Inject constructor(
             var currentBarStartTime = roundedEndTime.minus(barPeriod)
             var currentBarEndTime = roundedEndTime
 
+            //Then count backwards from the last end time to the start time of the duration
             while (iterator.hasNext()) {
                 //Grab the next data point to be placed
                 val next = iterator.next()
@@ -127,20 +149,35 @@ class BarChartDataFactory @Inject constructor(
                 values[values.size - 1] += if (sumByCount) 1.0 else next.value
             }
 
-            val bars = barValuesByLabel.map { (label, values) ->
-                SimpleXYSeries(values.asReversed(), SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, label)
+            //Multiply all values by scale
+            barValuesByLabel.forEach { (_, u) ->
+                u.forEachIndexed { index, value ->
+                    u[index] = value * scale
+                }
             }
-
-            val dates = barDates.asReversed()
 
             val barSumsByLabel = barValuesByLabel
                 .mapValues { (_, values) -> values.sum() }
                 .toList()
-                .sortedBy { (_, value) -> value }
-                .asReversed()
+                .sortedByDescending { (_, value) -> value }
 
-            val sortedBars =
-                bars.sortedBy { label -> barSumsByLabel.indexOfFirst { it.first == label.title } }
+            val bars = barValuesByLabel
+                .map { (label, values) ->
+                    //Reverse the order because the values are added from newest to
+                    // oldest but should be displayed from oldest to newest
+                    SimpleXYSeries(
+                        values.asReversed(),
+                        SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,
+                        label
+                    )
+                }
+                //Sort the layers from largest to smallest so the label with the largest total of
+                // values is on the bottom
+                .sortedBy { label -> barSumsByLabel.indexOfFirst { it.first == label.title } }
+
+            // reverse the order because the values are added from newest to
+            // oldest but should be displayed from oldest to newest
+            val dates = barDates.asReversed()
 
             //The values are essentially a grid and we want the largest column sum
             val maxY = (0 until (barValuesByLabel.values.firstOrNull()?.size ?: 0))
@@ -153,7 +190,7 @@ class BarChartDataFactory @Inject constructor(
             )
             val bounds = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
 
-            return BarData(sortedBars, dates, bounds)
+            return BarData(bars, dates, bounds)
         }
     }
 
@@ -190,7 +227,8 @@ class BarChartDataFactory @Inject constructor(
             duration = config.duration,
             sumByCount = config.sumByCount,
             yRangeType = config.yRangeType,
-            yTo = config.yTo
+            yTo = config.yTo,
+            scale = config.scale
         )
 
         val yAxisParameters = DataDisplayIntervalHelper().getYParameters(

@@ -12,6 +12,7 @@ data class BarChart(
     val duration: Duration?,
     val yRangeType: YRangeType,
     val yTo: Double,
+    val scale: Double,
     val barPeriod: BarChartBarPeriod,
     val sumByCount: Boolean
 ) {
@@ -23,6 +24,7 @@ data class BarChart(
         duration = duration,
         yRangeType = yRangeType,
         yTo = yTo,
+        scale = scale,
         barPeriod = barPeriod,
         sumByCount = sumByCount
     )
