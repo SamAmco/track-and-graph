@@ -279,4 +279,8 @@
     <string name="add_a_label">Label hinzufügen</string>
     <string name="graph_type_bar_chart">Balkendiagramm</string>
     <string name="bar_interval">Taktintervall</string>
+    <string name="y_range_max">Y-Bereich max</string>
+    <string name="total_formatted">Gesamt: %s</string>
+    <string name="from_formatted">Aus: %s</string>
+    <string name="to_formatted">Zu: %s</string>
 </resources>
