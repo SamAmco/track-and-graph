@@ -43,6 +43,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.Temporal
 import java.text.DecimalFormat
 import java.text.FieldPosition
 import java.text.Format
@@ -108,7 +109,7 @@ fun LineGraphBodyView(
             binding = binding,
             endTime = viewData.endTime,
         )
-        setUpLineGraphYAxis(
+        setUpXYPlotYAxis(
             binding = binding,
             yAxisRangeParameters = viewData.yAxisRangeParameters,
             durationBasedRange = viewData.durationBasedRange,
@@ -165,7 +166,6 @@ private fun setLineGraphBounds(
     // since we now calculate the bounds to fit the number of intervals we almost always want
     // to set the rangeBoundaries to the bounds.
     // The only exception is when the graph is viewed fullscreen-mode (listMode == False) while dynamic
-    val bounds = bounds
     if (yRangeType == YRangeType.FIXED || listMode) {
         binding.xyPlot.setRangeBoundaries(bounds.minY, bounds.maxY, BoundaryMode.FIXED)
     }
@@ -201,32 +201,6 @@ private fun setLineGraphPaddingFromBounds(
     )
     binding.xyPlot.graph.paddingBottom =
         formattedTimestamp.length * (context.resources.displayMetrics.scaledDensity)
-}
-
-private fun setUpLineGraphYAxis(
-    binding: GraphXyPlotBinding,
-    yAxisRangeParameters: Pair<StepMode, Double>,
-    durationBasedRange: Boolean
-) {
-    binding.xyPlot.setRangeStep(
-        yAxisRangeParameters.first,
-        yAxisRangeParameters.second
-    )
-    if (durationBasedRange) {
-        binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
-            object : Format() {
-                override fun format(
-                    obj: Any,
-                    toAppendTo: StringBuffer,
-                    pos: FieldPosition
-                ): StringBuffer {
-                    val sec = (obj as Number).toDouble().roundToLong()
-                    return toAppendTo.append(formatTimeDuration(sec))
-                }
-
-                override fun parseObject(source: String, pos: ParsePosition) = null
-            }
-    }
 }
 
 private fun setUpLineGraphXAxis(
@@ -405,7 +379,7 @@ private fun getMarkerPaint(
 private fun setTimeMarker(
     context: Context,
     binding: GraphXyPlotBinding,
-    endTime: OffsetDateTime,
+    endTime: Temporal,
     timeMarker: OffsetDateTime?
 ) {
     binding.xyPlot.removeMarkers()

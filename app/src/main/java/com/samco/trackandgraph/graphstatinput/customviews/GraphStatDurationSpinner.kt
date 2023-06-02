@@ -26,7 +26,6 @@ import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
-
 @Composable
 fun GraphStatDurationSpinner(
     modifier: Modifier = Modifier,

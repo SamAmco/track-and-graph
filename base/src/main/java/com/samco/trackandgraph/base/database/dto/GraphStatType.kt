@@ -23,4 +23,5 @@ enum class GraphStatType {
     AVERAGE_TIME_BETWEEN,
     LAST_VALUE,
     TIME_HISTOGRAM,
+    BAR_CHART
 }

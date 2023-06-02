@@ -64,6 +64,10 @@ sealed interface GraphStatConfigEvent {
         data class LastValueConfigData(
             override val config: LastValueStat
         ) : ConfigData<LastValueStat>
+
+        data class BarChartConfigData(
+            override val config: BarChart
+        ) : ConfigData<BarChart>
     }
 }
 

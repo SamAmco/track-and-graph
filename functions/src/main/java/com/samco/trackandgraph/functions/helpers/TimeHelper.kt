@@ -79,7 +79,7 @@ class TimeHelper(
     }
 
     fun toZonedDateTime(dateTime: OffsetDateTime): ZonedDateTime {
-        return toZonedDateTime(dateTime, ZoneId.systemDefault())
+        return toZonedDateTime(dateTime, zoneId)
     }
 
     fun toZonedDateTime(dateTime: OffsetDateTime, zoneId: ZoneId): ZonedDateTime {
@@ -93,7 +93,7 @@ class TimeHelper(
         dateTime: OffsetDateTime,
         temporalAmount: TemporalAmount,
     ): ZonedDateTime {
-        return findBeginningOfTemporal(dateTime, temporalAmount, ZoneId.systemDefault())
+        return findBeginningOfTemporal(dateTime, temporalAmount, zoneId)
     }
 
     /**

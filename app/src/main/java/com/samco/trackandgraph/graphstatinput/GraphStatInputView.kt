@@ -39,12 +39,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.graphstatinput.configviews.*
-import com.samco.trackandgraph.graphstatinput.configviews.ui.AverageTimeBetweenConfigView
-import com.samco.trackandgraph.graphstatinput.configviews.ui.LastValueConfigView
-import com.samco.trackandgraph.graphstatinput.configviews.ui.LineGraphConfigView
-import com.samco.trackandgraph.graphstatinput.configviews.ui.PieChartConfigView
-import com.samco.trackandgraph.graphstatinput.configviews.ui.TimeHistogramConfigView
+import com.samco.trackandgraph.graphstatinput.configviews.ui.*
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
@@ -241,7 +236,8 @@ fun GraphStatTypeSelector(
             GraphStatType.PIE_CHART to stringResource(id = R.string.graph_type_pie_chart),
             GraphStatType.AVERAGE_TIME_BETWEEN to stringResource(id = R.string.graph_type_average_time_between),
             GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram),
-            GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value)
+            GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value),
+            GraphStatType.BAR_CHART to stringResource(id = R.string.graph_type_bar_chart),
         )
 
         TextMapSpinner(
@@ -279,6 +275,10 @@ fun ConfigInputView(
         hiltViewModel<LastValueConfigViewModel>(viewModelStoreOwner)
     lastValueConfigViewModel.initFromGraphStatId(graphStatId)
 
+    val barChartConfigViewModel =
+        hiltViewModel<BarChartConfigViewModel>(viewModelStoreOwner)
+    barChartConfigViewModel.initFromGraphStatId(graphStatId)
+
     var currentViewModel: GraphStatConfigViewModelBase<*> = lineGraphConfigViewModel
 
     when (graphType) {
@@ -301,6 +301,10 @@ fun ConfigInputView(
         GraphStatType.LAST_VALUE -> {
             currentViewModel = lastValueConfigViewModel
             LastValueConfigView(viewModel = lastValueConfigViewModel)
+        }
+        GraphStatType.BAR_CHART -> {
+            currentViewModel = barChartConfigViewModel
+            BarChartConfigView(viewModel = barChartConfigViewModel)
         }
     }
 

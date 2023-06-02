@@ -34,6 +34,7 @@ import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LineGraphCon
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
+import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -59,9 +60,7 @@ fun LineGraphConfigView(
         onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
     )
 
-    if (viewModel.yRangeType == YRangeType.FIXED) {
-        YRangeFromToInputs(viewModel)
-    }
+    if (viewModel.yRangeType == YRangeType.FIXED) YRangeFromToInputs(viewModel)
 
     SpacingSmall()
 
@@ -72,44 +71,6 @@ fun LineGraphConfigView(
     LineGraphFeaturesInputView(scrollState, viewModel)
 
     SpacingSmall()
-}
-
-@Composable
-private fun YRangeFromToInputs(viewModel: LineGraphConfigViewModel) = Row(
-    modifier = Modifier
-        .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
-        .fillMaxWidth(),
-    horizontalArrangement = Arrangement.SpaceEvenly
-) {
-    Text(
-        modifier = Modifier.alignByBaseline(),
-        text = stringResource(id = R.string.from),
-        style = MaterialTheme.typography.subtitle2
-    )
-
-    MiniNumericTextField(
-        modifier = Modifier
-            .weight(1f)
-            .alignByBaseline(),
-        textAlign = TextAlign.Center,
-        textFieldValue = viewModel.yRangeFrom,
-        onValueChange = { viewModel.updateYRangeFrom(it) }
-    )
-
-    Text(
-        modifier = Modifier.alignByBaseline(),
-        text = stringResource(id = R.string.to),
-        style = MaterialTheme.typography.subtitle2
-    )
-
-    MiniNumericTextField(
-        modifier = Modifier
-            .weight(1f)
-            .alignByBaseline(),
-        textAlign = TextAlign.Center,
-        textFieldValue = viewModel.yRangeTo,
-        onValueChange = { viewModel.updateYRangeTo(it) }
-    )
 }
 
 @Composable
