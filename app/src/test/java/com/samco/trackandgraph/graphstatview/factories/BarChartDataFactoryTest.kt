@@ -2,6 +2,7 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
@@ -46,7 +47,10 @@ class BarChartDataFactoryTest {
             endTime = end,
             barSize = BarChartBarPeriod.DAY,
             duration = null,
-            sumByCount = false
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0
         )
 
         //VERIFY
@@ -92,7 +96,10 @@ class BarChartDataFactoryTest {
             endTime = end,
             barSize = BarChartBarPeriod.DAY,
             duration = null,
-            sumByCount = false
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0
         )
 
         //VERIFY
@@ -104,8 +111,11 @@ class BarChartDataFactoryTest {
             .withNano(0)
             .minusNanos(1)
         assertEquals(2, barData.bars.size)
-        assertEquals(listOf(0.0, 1.0, 2.0), barData.bars.first { it.title == "a" }.getyVals())
-        assertEquals(listOf(5.0, 1.0, 4.0), barData.bars.first { it.title == "b" }.getyVals())
+
+        //b comes first because the sum of all b values is larger than the sum of all a values
+        assertEquals(listOf(0.0, 1.0, 2.0), barData.bars[1].getyVals())
+        assertEquals(listOf(5.0, 1.0, 4.0), barData.bars[0].getyVals())
+
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
         assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
         assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
@@ -137,9 +147,8 @@ class BarChartDataFactoryTest {
                 dp(time = end.minusDays(8), value = 3.0, label = "a"),
                 dp(time = end.minusDays(8), value = 2.0, label = "b"),
                 dp(time = end.minusDays(9), value = 3.0, label = "a"),
-                dp(time = end.minusDays(9), value = 4.0, label = "b"),
-
-                ).asSequence()
+                dp(time = end.minusDays(9), value = 4.0, label = "b")
+            ).asSequence()
         )
 
         //EXECUTE
@@ -149,7 +158,10 @@ class BarChartDataFactoryTest {
             endTime = end,
             barSize = BarChartBarPeriod.DAY,
             duration = Duration.ofDays(7),
-            sumByCount = true
+            sumByCount = true,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0
         )
 
         //VERIFY
@@ -187,7 +199,7 @@ class BarChartDataFactoryTest {
     }
 
     @Test
-    fun `test over daylight savings with different start of day`() {
+    fun `test bar chart over daylight savings with different start of day`() {
         //PREPARE
         val timeHelper = TimeHelper(
             object : AggregationPreferences {
@@ -215,7 +227,10 @@ class BarChartDataFactoryTest {
             endTime = end,
             barSize = BarChartBarPeriod.DAY,
             duration = null,
-            sumByCount = false
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0
         )
 
         //VERIFY
@@ -233,6 +248,88 @@ class BarChartDataFactoryTest {
         assertEquals(0, barData.bounds.minY.toInt())
         assertEquals(1, barData.bounds.maxY.toInt())
 
+    }
+
+    @Test
+    fun `test bar chart fixed y to`() {
+        //PREPARE
+        val end = ZonedDateTime.now().withHour(22)
+
+        val dataSample = DataSample.fromSequence(
+            listOf(
+                dp(end),
+                dp(end.minusHours(1)),
+                dp(end.minusDays(1)),
+                dp(end.minusDays(2).minusHours(1)),
+                dp(end.minusDays(2).minusHours(2)),
+                dp(end.minusDays(2).minusHours(3))
+            ).asSequence()
+        )
+
+        //EXECUTE
+        val barData = BarChartDataFactory.getBarData(
+            timeHelper = defaultTimeHelper,
+            dataSample = dataSample,
+            endTime = end,
+            barSize = BarChartBarPeriod.DAY,
+            duration = null,
+            sumByCount = false,
+            yRangeType = YRangeType.FIXED,
+            yTo = 80.0,
+            scale = 1.0
+        )
+
+        //VERIFY
+        assertEquals(1, barData.bars.size)
+        assertEquals(listOf(3.0, 1.0, 2.0), barData.bars[0].getyVals())
+        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
+        assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
+        assertEquals(0, barData.bounds.minY.toInt())
+        assertEquals(80, barData.bounds.maxY.toInt())
+    }
+
+    @Test
+    fun `test bar chart with scale`() {
+        //PREPARE
+        val end = ZonedDateTime.now().withHour(22)
+
+        val dataSample = DataSample.fromSequence(
+            listOf(
+                dp(time = end, label = "a"),
+                dp(time = end.minusHours(1), label = "a"),
+                dp(time = end.minusHours(5), value = 4.0, label = "b"),
+                dp(time = end.minusDays(1), label = "a"),
+                dp(time = end.minusDays(1), label = "b"),
+                dp(time = end.minusDays(2), label = "b"),
+                dp(time = end.minusDays(2).minusHours(1), value = 2.0, label = "b"),
+                dp(time = end.minusDays(2).minusHours(2), label = "b"),
+                dp(time = end.minusDays(2).minusHours(3), label = "b")
+            ).asSequence()
+        )
+
+        //EXECUTE
+        val barData = BarChartDataFactory.getBarData(
+            timeHelper = defaultTimeHelper,
+            dataSample = dataSample,
+            endTime = end,
+            barSize = BarChartBarPeriod.DAY,
+            duration = null,
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 3.0
+        )
+
+        //VERIFY
+        assertEquals(2, barData.bars.size)
+
+        //b comes first because the sum of all b values is larger than the sum of all a values
+        assertEquals(listOf(0.0, 3.0, 6.0), barData.bars[1].getyVals())
+        assertEquals(listOf(15.0, 3.0, 12.0), barData.bars[0].getyVals())
+        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
+        assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
+        assertEquals(0, barData.bounds.minY.toInt())
+        assertEquals(18, barData.bounds.maxY.toInt())
     }
 
     private fun dp(
