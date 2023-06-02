@@ -56,6 +56,8 @@ fun DateTimeButtonRow(
                 odt
                     .withHour(selectedDateTime.hour)
                     .withMinute(selectedDateTime.minute)
+                    .withSecond(selectedDateTime.second)
+                    .withNano(selectedDateTime.nano)
             )
         }
     )
