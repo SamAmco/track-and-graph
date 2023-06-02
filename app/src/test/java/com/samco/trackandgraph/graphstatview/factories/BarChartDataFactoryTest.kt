@@ -25,7 +25,7 @@ class BarChartDataFactoryTest {
     )
 
     @Test
-    fun `test bar chart, no label, no end time, no duration`() {
+    fun `test bar chart, no label, end time, no duration`() {
         //PREPARE
         val end = ZonedDateTime.now().withHour(22)
 
@@ -71,7 +71,7 @@ class BarChartDataFactoryTest {
     }
 
     @Test
-    fun `test bar chart, with multiple labels, no end time, no duration`() {
+    fun `test bar chart, with multiple labels, end time, no duration`() {
         //PREPARE
         val end = ZonedDateTime.now().withHour(22)
 
@@ -330,6 +330,47 @@ class BarChartDataFactoryTest {
         assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
         assertEquals(0, barData.bounds.minY.toInt())
         assertEquals(18, barData.bounds.maxY.toInt())
+    }
+
+    @Test
+    fun `test bar chart no end time`() {
+        //PREPARE
+        val end = ZonedDateTime.now().withHour(22)
+
+        val dataSample = DataSample.fromSequence(
+            listOf(
+                dp(end.minusHours(1)),
+                dp(end.minusDays(1)),
+                dp(end.minusDays(2).minusHours(1)),
+                dp(end.minusDays(2).minusHours(2)),
+                dp(end.minusDays(2).minusHours(3))
+            ).asSequence()
+        )
+
+        //EXECUTE
+        val barData = BarChartDataFactory.getBarData(
+            timeHelper = defaultTimeHelper,
+            dataSample = dataSample,
+            endTime = null,
+            barSize = BarChartBarPeriod.DAY,
+            duration = null,
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0
+        )
+
+        //VERIFY
+        val endOfDay = end
+            .plusDays(1)
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0)
+            .minusNanos(1)
+        assertEquals(1, barData.bars.size)
+        assertEquals(listOf(3.0, 1.0, 1.0), barData.bars[0].getyVals())
+        assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
     }
 
     private fun dp(

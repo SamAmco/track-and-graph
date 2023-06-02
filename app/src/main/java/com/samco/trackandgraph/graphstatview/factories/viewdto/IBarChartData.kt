@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.SimpleXYSeries
 import com.androidplot.xy.StepMode
-import org.threeten.bp.Duration
 import org.threeten.bp.Period
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
