@@ -32,6 +32,8 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent.ValidationException
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviour
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviourImpl
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.YRangeConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.YRangeConfigBehaviourImpl
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -48,17 +50,20 @@ class LineGraphConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
-    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl()
+    private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
+    private val yRangeConfigBehaviour: YRangeConfigBehaviourImpl = YRangeConfigBehaviourImpl()
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LineGraphConfigData>(
     io,
     default,
     ui,
     gsiProvider,
     dataInteractor
-), TimeRangeConfigBehaviour by timeRangeConfigBehaviour {
+), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
+    YRangeConfigBehaviour by yRangeConfigBehaviour {
 
     init {
         timeRangeConfigBehaviour.initTimeRangeConfigBehaviour { onUpdate() }
+        yRangeConfigBehaviour.initYRangeConfigBehaviour { onUpdate() }
     }
 
     inner class FeatureTextFields(
@@ -101,12 +106,6 @@ class LineGraphConfigViewModel @Inject constructor(
 
     var featurePaths: List<FeaturePathViewData> by mutableStateOf(emptyList())
 
-    var yRangeType by mutableStateOf(YRangeType.DYNAMIC)
-        private set
-    var yRangeFrom by mutableStateOf(TextFieldValue("0.0"))
-        private set
-    var yRangeTo by mutableStateOf(TextFieldValue("1.0"))
-        private set
     var lineGraphFeatures by mutableStateOf(emptyList<LineGraphFeature>())
         private set
 
@@ -162,21 +161,6 @@ class LineGraphConfigViewModel @Inject constructor(
             return ValidationException(R.string.graph_stat_validation_bad_fixed_range)
         }
         return null
-    }
-
-    fun updateYRangeType(type: YRangeType) {
-        yRangeType = type
-        onUpdate()
-    }
-
-    fun updateYRangeFrom(from: TextFieldValue) {
-        yRangeFrom = from.asValidatedDouble()
-        onUpdate()
-    }
-
-    fun updateYRangeTo(to: TextFieldValue) {
-        yRangeTo = to.asValidatedDouble()
-        onUpdate()
     }
 
     fun onAddLineGraphFeatureClicked() = viewModelScope.launch {
@@ -261,11 +245,14 @@ class LineGraphConfigViewModel @Inject constructor(
             endingAt = lgConfig?.endDate
         )
 
+        yRangeConfigBehaviour.onConfigLoaded(
+            yRangeType = lgConfig?.yRangeType,
+            yFrom = lgConfig?.yFrom,
+            yTo = lgConfig?.yTo
+        )
+
         lgConfig?.let {
             lineGraph = it
-            yRangeType = it.yRangeType
-            yRangeFrom = TextFieldValue(it.yFrom.toString())
-            yRangeTo = TextFieldValue(it.yTo.toString())
             lineGraphFeatures = it.features
             it.features.forEach { lgf ->
                 featureTextFields.add(

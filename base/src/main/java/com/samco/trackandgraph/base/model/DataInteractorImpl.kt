@@ -352,6 +352,15 @@ internal class DataInteractorImpl @Inject constructor(
             }
         }
 
+    override suspend fun duplicateBarChart(graphOrStat: GraphOrStat): Long? =
+        performAtomicUpdate {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val newGraphStat = duplicateGraphOrStat(graphOrStat)
+            dao.getBarChartByGraphStatId(graphOrStat.id)?.let {
+                dao.insertBarChart(it.copy(id = 0L, graphStatId = newGraphStat))
+            }
+        }
+
     private fun insertGraphStat(graphOrStat: GraphOrStat) =
         dao.insertGraphOrStat(graphOrStat.copy(id = 0L, displayIndex = 0).toEntity())
 
@@ -404,6 +413,12 @@ internal class DataInteractorImpl @Inject constructor(
         return dao.insertLastValueStat(config.copy(graphStatId = id).toEntity())
     }
 
+    override suspend fun insertBarChart(graphOrStat: GraphOrStat, barChart: BarChart): Long {
+        shiftUpGroupChildIndexes(graphOrStat.groupId)
+        val id = insertGraphStat(graphOrStat)
+        return dao.insertBarChart(barChart.copy(graphStatId = id).toEntity())
+    }
+
     override suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart) =
         performAtomicUpdate {
             dao.updateGraphOrStat(graphOrStat.toEntity())
@@ -440,6 +455,14 @@ internal class DataInteractorImpl @Inject constructor(
     ) = performAtomicUpdate {
         dao.updateGraphOrStat(graphOrStat.toEntity())
         dao.updateLastValueStat(config.toEntity())
+    }
+
+    override suspend fun updateBarChart(
+        graphOrStat: GraphOrStat,
+        barChart: BarChart
+    ) = performAtomicUpdate {
+        dao.updateGraphOrStat(graphOrStat.toEntity())
+        dao.updateBarChart(barChart.toEntity())
     }
 
     override suspend fun updateTimeHistogram(
@@ -494,6 +517,11 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat? =
         withContext(io) {
             dao.getLastValueStatByGraphStatId(graphOrStatId)?.toDto()
+        }
+
+    override suspend fun getBarChartByGraphStatId(graphStatId: Long): BarChart? =
+        withContext(io) {
+            dao.getBarChartByGraphStatId(graphStatId)?.toDto()
         }
 
     override suspend fun getGroupsForGroupSync(id: Long): List<Group> = withContext(io) {

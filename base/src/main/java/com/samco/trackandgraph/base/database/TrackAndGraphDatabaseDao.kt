@@ -298,17 +298,26 @@ FROM notes_table as n
     @Update
     fun updateLastValueStat(lastValueStat: LastValueStat)
 
+    @Update
+    fun updateBarChart(barChart: BarChart)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertTimeHistogram(timeHistogram: TimeHistogram): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertLastValueStat(lastValueStat: LastValueStat): Long
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertBarChart(barChart: BarChart): Long
+
     @Query("SELECT * FROM time_histograms_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getTimeHistogramByGraphStatId(graphStatId: Long): TimeHistogram?
 
     @Query("SELECT * FROM last_value_stats_table WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getLastValueStatByGraphStatId(graphStatId: Long): LastValueStat?
+
+    @Query("SELECT * FROM bar_charts_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    fun getBarChartByGraphStatId(graphStatId: Long): BarChart?
 
     @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
     fun getGroupsForGroupSync(id: Long): List<Group>

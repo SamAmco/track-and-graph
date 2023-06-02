@@ -41,11 +41,13 @@ class GraphStatViewHolder(
 
         composeView.setContent {
             TnGComposeTheme {
-                GraphStatCardView(
-                    isElevated = isElevated,
-                    graphStatViewData = graphStatViewData,
-                    clickListener = clickListener
-                )
+                key(graphStat) {
+                    GraphStatCardView(
+                        isElevated = isElevated,
+                        graphStatViewData = graphStatViewData,
+                        clickListener = clickListener
+                    )
+                }
             }
         }
     }

@@ -97,6 +97,8 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat?
 
+    suspend fun getBarChartByGraphStatId(graphStatId: Long): BarChart?
+
     suspend fun getGraphsAndStatsByGroupIdSync(groupId: Long): List<GraphOrStat>
 
     suspend fun getAllGraphStatsSync(): List<GraphOrStat>
@@ -123,6 +125,8 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun duplicateLastValueStat(graphOrStat: GraphOrStat): Long?
 
+    suspend fun duplicateBarChart(graphOrStat: GraphOrStat): Long?
+
     suspend fun insertLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures): Long
 
     suspend fun insertPieChart(graphOrStat: GraphOrStat, pieChart: PieChart): Long
@@ -136,6 +140,8 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun insertLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat): Long
 
+    suspend fun insertBarChart(graphOrStat: GraphOrStat, barChart: BarChart): Long
+
     suspend fun updatePieChart(graphOrStat: GraphOrStat, pieChart: PieChart)
 
     suspend fun updateAverageTimeBetweenStat(
@@ -146,6 +152,8 @@ interface DataInteractor : TrackerHelper, DataSampler {
     suspend fun updateLineGraph(graphOrStat: GraphOrStat, lineGraph: LineGraphWithFeatures)
 
     suspend fun updateLastValueStat(graphOrStat: GraphOrStat, config: LastValueStat)
+
+    suspend fun updateBarChart(graphOrStat: GraphOrStat, barChart: BarChart)
 
     suspend fun updateGraphOrStat(graphOrStat: GraphOrStat)
 

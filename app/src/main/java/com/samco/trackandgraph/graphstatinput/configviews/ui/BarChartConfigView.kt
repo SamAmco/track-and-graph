@@ -16,27 +16,35 @@
 */
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
-import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.TimeHistogramConfigViewModel
+import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
+import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.BarChartConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
-import com.samco.trackandgraph.ui.compose.ui.*
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
+import com.samco.trackandgraph.ui.compose.ui.LabeledRow
+import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
+import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
+import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
-fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
-
+fun BarChartConfigView(
+    viewModel: BarChartConfigViewModel
+) {
     GraphStatDurationSpinner(
         modifier = Modifier,
         selectedDuration = viewModel.selectedDuration,
@@ -48,11 +56,29 @@ fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
         sampleEndingAt = viewModel.sampleEndingAt
     ) { viewModel.updateSampleEndingAt(it) }
 
+    GraphStatYRangeTypeSpinner(
+        yRangeType = viewModel.yRangeType,
+        onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
+    )
+
+    if (viewModel.yRangeType == YRangeType.FIXED) {
+        LabeledRow(label = stringResource(id = R.string.y_range_max)) {
+            MiniNumericTextField(
+                modifier = Modifier
+                    .weight(1f)
+                    .alignByBaseline(),
+                textAlign = TextAlign.Center,
+                textFieldValue = viewModel.yRangeTo,
+                onValueChange = { viewModel.updateYRangeTo(it) }
+            )
+        }
+    }
+
     SpacingSmall()
 
     Divider()
 
-    SpacingLarge()
+    SpacingSmall()
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
@@ -71,27 +97,27 @@ fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
         )
     }
 
-    SpacingSmall()
+    val strings = stringArrayResource(id = R.array.time_histogram_windows)
+    val barIntervalNames = remember {
+        mapOf(
+            BarChartBarPeriod.HOUR to strings[0],
+            BarChartBarPeriod.DAY to strings[1],
+            BarChartBarPeriod.WEEK to strings[2],
+            BarChartBarPeriod.MONTH to strings[3],
+            BarChartBarPeriod.THREE_MONTHS to strings[4],
+            BarChartBarPeriod.SIX_MONTHS to strings[5],
+            BarChartBarPeriod.YEAR to strings[6]
+        )
+    }
 
     LabeledRow(
-        label = stringResource(id = R.string.time_window_size),
+        label = stringResource(id = R.string.bar_interval),
         paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
     ) {
-        val stringArray = stringArrayResource(id = R.array.time_histogram_windows)
-        val timeWindows = mapOf(
-            TimeHistogramWindow.HOUR to stringArray[0],
-            TimeHistogramWindow.DAY to stringArray[1],
-            TimeHistogramWindow.WEEK to stringArray[2],
-            TimeHistogramWindow.MONTH to stringArray[3],
-            TimeHistogramWindow.THREE_MONTHS to stringArray[4],
-            TimeHistogramWindow.SIX_MONTHS to stringArray[5],
-            TimeHistogramWindow.YEAR to stringArray[6]
-        )
-
         TextMapSpinner(
-            strings = timeWindows,
-            selectedItem = viewModel.selectedWindow,
-            onItemSelected = { viewModel.updateWindow(it) }
+            strings = barIntervalNames,
+            selectedItem = viewModel.selectedBarPeriod,
+            onItemSelected = viewModel::updateBarPeriod
         )
     }
 
@@ -102,6 +128,22 @@ fun TimeHistogramConfigView(viewModel: TimeHistogramConfigViewModel) = Column {
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
     )
+
+    SpacingSmall()
+
+    LabeledRow(
+        label = stringResource(id = R.string.scale),
+        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
+    ) {
+        MiniNumericTextField(
+            modifier = Modifier
+                .weight(1f)
+                .alignByBaseline(),
+            textAlign = TextAlign.Center,
+            textFieldValue = viewModel.scale,
+            onValueChange = { viewModel.updateScale(it) }
+        )
+    }
 
     SpacingSmall()
 }

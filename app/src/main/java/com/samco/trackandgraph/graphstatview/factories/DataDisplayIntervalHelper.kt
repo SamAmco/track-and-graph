@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.graphstatview.factories
 
 import com.androidplot.xy.StepMode
+import org.jetbrains.annotations.VisibleForTesting
 import java.lang.Exception
 import kotlin.math.ceil
 import kotlin.math.floor
@@ -110,7 +111,9 @@ class DataDisplayIntervalHelper {
     }
 
     fun getYParameters(
-        y_min: Double, y_max: Double, time_data: Boolean,
+        y_min: Double,
+        y_max: Double,
+        time_data: Boolean,
         fixedBounds: Boolean,
         throw_exc_if_non_found: Boolean = false
     ): YAxisParameters {
@@ -131,6 +134,7 @@ class DataDisplayIntervalHelper {
         return fallback
     }
 
+    @VisibleForTesting
     fun getYParametersInternal(
         y_min: Double, y_max: Double, time_data: Boolean,
         fixedBounds: Boolean, throw_exc_if_non_found: Boolean
