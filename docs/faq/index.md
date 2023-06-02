@@ -7,5 +7,6 @@
 	2. [Pie charts](faq_3_2.md)
 	3. [Stats](faq_3_3.md)
 	4. [Time histograms](faq_3_4.md)
+	5. [Bar charts](faq_3_5.md)
 4. [How do notes work?](faq_4.md)
 5. [How do i read the timestamps](faq_5.md)
