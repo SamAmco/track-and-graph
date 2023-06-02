@@ -91,7 +91,7 @@ class BarChartDataFactory @Inject constructor(
         fun getBarData(
             timeHelper: TimeHelper,
             dataSample: DataSample,
-            endTime: ZonedDateTime,
+            endTime: ZonedDateTime?,
             barSize: BarChartBarPeriod,
             duration: Duration?,
             sumByCount: Boolean,
@@ -102,21 +102,14 @@ class BarChartDataFactory @Inject constructor(
             val barDates = mutableListOf<ZonedDateTime>()
             val barValuesByLabel = mutableMapOf<String, MutableList<Double>>()
             val iterator = dataSample.iterator()
-
-            //First find the last end time of the last bar
-            val roundedEndTime = timeHelper.findEndOfTemporal(
-                endTime,
-                barSize.asTemporalAmount()
-            )
-
-            barDates.add(roundedEndTime)
-
-            val endTimeMinusDuration = duration?.let { roundedEndTime.minus(it) }
-
             val barPeriod = barSize.asTemporalAmount()
 
-            var currentBarStartTime = roundedEndTime.minus(barPeriod)
-            var currentBarEndTime = roundedEndTime
+            //Some variables we will calculate as soon as we have the first data point
+            // and use to iterate backwards from the end time grouping the data points into bars
+            var roundedEndTime: ZonedDateTime? = null
+            var endTimeMinusDuration: ZonedDateTime? = null
+            var currentBarStartTime: ZonedDateTime? = null
+            var currentBarEndTime: ZonedDateTime? = null
 
             //Then count backwards from the last end time to the start time of the duration
             while (iterator.hasNext()) {
@@ -124,14 +117,26 @@ class BarChartDataFactory @Inject constructor(
                 val next = iterator.next()
                 val timestamp = timeHelper.toZonedDateTime(next.timestamp)
 
+                //If we were passed a null end time find the end time of the first data point
+                // instead
+                if (roundedEndTime == null) {
+                    roundedEndTime = endTime?.let {
+                        timeHelper.findEndOfTemporal(it, barSize.asTemporalAmount())
+                    } ?: timeHelper.findEndOfTemporal(timestamp, barSize.asTemporalAmount())
+                    currentBarStartTime = roundedEndTime.minus(barPeriod)
+                    currentBarEndTime = roundedEndTime
+                    endTimeMinusDuration = duration?.let { roundedEndTime.minus(it) }
+                    barDates.add(roundedEndTime)
+                }
+
                 //If the next data point is before the start of the duration we are interested in, we
                 // can stop
                 if (endTimeMinusDuration != null && timestamp.isBefore(endTimeMinusDuration)) break
 
                 while (timestamp.isBefore(currentBarStartTime)) {
                     //we have reached the end of the current bar, so we need to move to the next one
-                    currentBarStartTime = currentBarStartTime.minus(barPeriod)
-                    currentBarEndTime = currentBarEndTime.minus(barPeriod)
+                    currentBarStartTime = currentBarStartTime!!.minus(barPeriod)
+                    currentBarEndTime = currentBarEndTime!!.minus(barPeriod)
                     barDates.add(currentBarEndTime)
                 }
 
@@ -215,7 +220,7 @@ class BarChartDataFactory @Inject constructor(
     private fun getBarDataWithYAxisParams(
         timeHelper: TimeHelper,
         dataSample: DataSample,
-        endTime: ZonedDateTime,
+        endTime: ZonedDateTime?,
         config: BarChart
     ): BarDataWithYAxisParams {
 
@@ -254,12 +259,17 @@ class BarChartDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit
     ): IBarChartData {
         val dataSample = dataInteractor.getDataSampleForFeatureId(config.featureId)
+
+        if (!dataSample.iterator().hasNext()) return object : IBarChartData {
+            override val state = IGraphStatViewData.State.READY
+            override val graphOrStat = graphOrStat
+        }
+
         try {
             //TODO basically everywhere you see zone id i think you might wanna use time helper
             // and inject it.
             val timeHelper = TimeHelper(GlobalAggregationPreferences)
             val endTime = config.endDate?.let { timeHelper.toZonedDateTime(it) }
-                ?: ZonedDateTime.now()
 
             val barData = withContext(ioDispatcher) {
                 getBarDataWithYAxisParams(
@@ -276,7 +286,7 @@ class BarChartDataFactory @Inject constructor(
                 override val xDates = barData.dates
                 override val bars = barData.bars
                 override val durationBasedRange = dataSample.dataSampleProperties.isDuration
-                override val endTime = endTime
+                override val endTime = endTime ?: barData.dates.last()
                 override val bounds = barData.bounds
                 override val yAxisRangeParameters = barData.yAxisParameters
                 override val state = IGraphStatViewData.State.READY
