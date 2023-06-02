@@ -1,0 +1,4 @@
+- Add Bar charts
+- Fix bug graphs not updating and wrong graph showing on scroll
+
+
