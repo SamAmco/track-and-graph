@@ -66,8 +66,10 @@ class GroupAdapter(
                 extractGraphViewData(item.obj),
                 graphStatClickListener
             )
+
             ViewType.TRACKER.ordinal -> (holder as TrackerViewHolder)
                 .bind(item.obj as DisplayTracker, trackerClickListener)
+
             ViewType.GROUP.ordinal -> (holder as GroupViewHolder)
                 .bind(item.obj as Group, groupClickListener)
         }
@@ -150,11 +152,13 @@ private class ListDiffCallback(
                 val newObj = (new.obj as Group).copy(displayIndex = 0)
                 oldObj == newObj
             }
+
             GroupChildType.TRACKER -> {
                 val oldObj = (old.obj as DisplayTracker).copy(displayIndex = 0)
                 val newObj = (new.obj as DisplayTracker).copy(displayIndex = 0)
                 oldObj == newObj
             }
+
             GroupChildType.GRAPH -> {
                 val oldPair = old.obj as Pair<*, *>
                 val newPair = new.obj as Pair<*, *>

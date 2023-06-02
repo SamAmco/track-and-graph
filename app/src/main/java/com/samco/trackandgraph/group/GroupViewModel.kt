@@ -15,6 +15,8 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+@file:OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+
 package com.samco.trackandgraph.group
 
 import androidx.lifecycle.*
@@ -53,8 +55,38 @@ class GroupViewModel @Inject constructor(
         .hasAtLeastOneTracker()
         .asLiveData(viewModelScope.coroutineContext)
 
-    lateinit var groupChildren: LiveData<List<GroupChild>>
-        private set
+    private val groupId = MutableSharedFlow<Long>(1, 1)
+
+    val groupChildren: LiveData<List<GroupChild>> = groupId
+        .distinctUntilChanged()
+        .flatMapLatest { groupId ->
+            dataInteractor.getDataUpdateEvents()
+                .onStart { emit(Unit) }
+                .debounce(100)
+                .flatMapLatest { getGroupChildrenForGroupId(groupId) }
+        }
+        .flowOn(ui)
+        .asLiveData(viewModelScope.coroutineContext)
+
+    private fun getGroupChildrenForGroupId(groupId: Long) = flow {
+        //Start getting the trackers and groups
+        val trackerDataDeferred = getTrackerChildrenAsync(groupId)
+        val groupDataDeferred = getGroupChildrenAsync(groupId)
+        //Then get the graphs
+        getGraphViewData(groupId).collect { graphDataPairs ->
+            val trackerData = trackerDataDeferred.await()
+            val groupData = groupDataDeferred.await()
+            val graphData = graphsToGroupChildren(graphDataPairs)
+            val children = mutableListOf<GroupChild>().apply {
+                addAll(trackerData)
+                addAll(groupData)
+                addAll(graphData)
+            }
+            sortChildren(children)
+            val next = children.toList()
+            emit(next)
+        }
+    }
 
     val trackers
         get() = groupChildren.value
@@ -62,45 +94,8 @@ class GroupViewModel @Inject constructor(
             ?.map { it.obj as DisplayTracker }
             ?: emptyList()
 
-    private var initialized = false
-
-    private var groupId: Long? = null
-
     fun setGroup(groupId: Long) {
-        if (initialized) return
-        this.groupId = groupId
-        initialized = true
-        initGroupChildren(groupId)
-    }
-
-    @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
-    private fun initGroupChildren(groupId: Long) {
-        groupChildren = dataInteractor.getDataUpdateEvents()
-            .onStart { emit(Unit) }
-            .debounce(100)
-            .flatMapLatest {
-                flow {
-                    //Start getting the trackers and groups
-                    val trackerDataDeferred = getTrackerChildrenAsync(groupId)
-                    val groupDataDeferred = getGroupChildrenAsync(groupId)
-                    //Then get the graphs
-                    getGraphViewData(groupId).collect { graphDataPairs ->
-                        val trackerData = trackerDataDeferred.await()
-                        val groupData = groupDataDeferred.await()
-                        val graphData = graphsToGroupChildren(graphDataPairs)
-                        val children = mutableListOf<GroupChild>().apply {
-                            addAll(trackerData)
-                            addAll(groupData)
-                            addAll(graphData)
-                        }
-                        sortChildren(children)
-                        val next = children.toList()
-                        emit(next)
-                    }
-                }
-            }
-            .flowOn(ui)
-            .asLiveData(viewModelScope.coroutineContext)
+        viewModelScope.launch { this@GroupViewModel.groupId.emit(groupId) }
     }
 
     private fun sortChildren(children: MutableList<GroupChild>) = children.sortWith { a, b ->
@@ -184,7 +179,7 @@ class GroupViewModel @Inject constructor(
     }
 
     fun adjustDisplayIndexes(items: List<GroupChild>) = viewModelScope.launch(io) {
-        groupId?.let { dataInteractor.updateGroupChildOrder(it, items) }
+        groupId.take(1).collect { dataInteractor.updateGroupChildOrder(it, items) }
     }
 
     fun onDeleteGraphStat(id: Long) =
