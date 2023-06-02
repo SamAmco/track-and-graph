@@ -1,6 +1,6 @@
 # Statistics
 
-Currently there are only a couple of supported statistics: "Average time between" and "Time since".
+Currently there are only a couple of supported statistics: "Average time between" and "Last Tracked/Time since".
 
 ---
 
@@ -15,7 +15,7 @@ First select a data set and then optionally add filters for label and value rang
 The statistics are calculated in the following ways:
 
 - Average time between shows the duration between the first and last data point matching all filters in the feature divided by the number of data points matching all features minus 1 `(last-first)/(size - 1)`
-- Time since last shows the time since the last data point matching all filters
+- Last Tracked/Time since last shows the last data point matching all filters and also the time since that data point was tracked
 
 ---
 
