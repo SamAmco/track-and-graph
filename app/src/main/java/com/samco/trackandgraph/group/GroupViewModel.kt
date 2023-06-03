@@ -27,11 +27,13 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.util.Stopwatch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -130,6 +132,7 @@ class GroupViewModel @Inject constructor(
 
     private suspend fun getGraphViewData(groupId: Long) =
         flow<List<Pair<Long, IGraphStatViewData>>> {
+            val stopwatch = Stopwatch().apply { start() }
             val graphStats = dataInteractor.getGraphsAndStatsByGroupIdSync(groupId)
             graphStats.forEach {
                 gsiProvider.getDataSourceAdapter(it.type).preen(it)
@@ -150,6 +153,8 @@ class GroupViewModel @Inject constructor(
             // There was a bug previously where the loading and ready states had the same time using
             // Instant.now() which caused ready states to be missed and infinite loading to be shown
             emit(batch.map { Pair(System.nanoTime() + 1, it.await()) })
+            stopwatch.stop()
+            Timber.i("Took ${stopwatch.elapsedMillis}ms to generate view data for ${graphStats.size} graph(s)")
         }.flowOn(io)
 
     private fun graphsToGroupChildren(graphs: List<Pair<Long, IGraphStatViewData>>): List<GroupChild> {
