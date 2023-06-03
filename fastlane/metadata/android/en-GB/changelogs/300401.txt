@@ -1,0 +1,3 @@
+- Fix bug crash on click empty bar in bar chart
+
+
