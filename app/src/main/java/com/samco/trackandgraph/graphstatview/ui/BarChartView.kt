@@ -172,8 +172,6 @@ private fun BarChartDataOverlay(
     barPeriod: TemporalAmount
 ) = Surface(modifier = modifier.width(IntrinsicSize.Max)) {
 
-    var expanded by remember { mutableStateOf(false) }
-
     val total = remember(highlightedIndex, bars) {
         doubleToString(bars.sumOf { it.getyVals()[highlightedIndex].toDouble() })
     }
@@ -194,7 +192,8 @@ private fun BarChartDataOverlay(
         }
         val sum = values.values.sum()
 
-        bars.map {
+        if (sum < 1e-6) emptyList()
+        else bars.map {
             val percentage = ((values[it.title] ?: 0.0) / sum) * 100.0
             "${it.title}: " +
                     doubleToString(values[it.title] ?: 0.0) +
@@ -203,10 +202,8 @@ private fun BarChartDataOverlay(
     }
 
     Column(
-        modifier = Modifier
-            .padding(dimensionResource(id = R.dimen.card_padding))
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding))
     ) {
-
         Text(
             text = stringResource(id = R.string.from_formatted, fromText),
             style = MaterialTheme.typography.body1,
@@ -222,45 +219,54 @@ private fun BarChartDataOverlay(
             style = MaterialTheme.typography.body1,
         )
 
-        SpacingSmall()
+        if (extraDetails.isNotEmpty()) BarChartDataOverlayExtraDetails(extraDetails)
+    }
+}
 
-        Row(
+@Composable
+private fun BarChartDataOverlayExtraDetails(
+    extraDetails: List<String>
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    SpacingSmall()
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { expanded = !expanded },
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = stringResource(id = R.string.info),
+            style = MaterialTheme.typography.body1,
+        )
+        Icon(
+            imageVector = Icons.Default.ArrowDropDown,
+            contentDescription = null,
             modifier = Modifier
-                .fillMaxWidth()
-                .clickable { expanded = !expanded },
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(id = R.string.info),
-                style = MaterialTheme.typography.body1,
-            )
-            Icon(
-                imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .rotate(if (expanded) 180f else 0f)
-            )
-        }
+                .size(24.dp)
+                .rotate(if (expanded) 180f else 0f)
+        )
+    }
 
-        SpacingSmall()
+    SpacingSmall()
 
-        if (expanded) {
-            extraDetails.forEachIndexed { index, labelInfo ->
-                Row {
-                    val colorIndex = (index * dataVisColorGenerator) % dataVisColorList.size
-                    ColorCircle(
-                        color = dataVisColorList[colorIndex],
-                        size = 16.dp
-                    )
-                    SpacingExtraSmall()
-                    Text(
-                        text = labelInfo,
-                        style = MaterialTheme.typography.body1,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
+    if (expanded) {
+        extraDetails.forEachIndexed { index, labelInfo ->
+            Row {
+                val colorIndex = (index * dataVisColorGenerator) % dataVisColorList.size
+                ColorCircle(
+                    color = dataVisColorList[colorIndex],
+                    size = 16.dp
+                )
+                SpacingExtraSmall()
+                Text(
+                    text = labelInfo,
+                    style = MaterialTheme.typography.body1,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
         }
     }
