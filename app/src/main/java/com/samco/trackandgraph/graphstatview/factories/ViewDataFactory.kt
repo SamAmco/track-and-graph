@@ -21,8 +21,10 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.util.Stopwatch
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 /**
  * An abstract factory for generating data for a graph or stat ready to be displayed by an appropriate
@@ -65,14 +67,25 @@ abstract class ViewDataFactory<in I, out T : IGraphStatViewData>(
         graphOrStat: GraphOrStat,
         config: Any,
         onDataSampled: (List<DataPoint>) -> Unit = {}
-    ): T = withContext(ioDispatcher) {
-        return@withContext createViewData(graphOrStat, config as I, onDataSampled)
+    ): T = timeCreateViewData(graphOrStat) {
+        createViewData(graphOrStat, config as I, onDataSampled)
     }
 
     suspend fun getViewData(
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit = {}
+    ): T = timeCreateViewData(graphOrStat) {
+        createViewData(graphOrStat, onDataSampled)
+    }
+
+    private suspend fun timeCreateViewData(
+        graphOrStat: GraphOrStat,
+        createDelegate: suspend () -> T
     ): T = withContext(ioDispatcher) {
-        return@withContext createViewData(graphOrStat, onDataSampled)
+        val stopwatch = Stopwatch().apply { start() }
+        val viewData = createDelegate()
+        stopwatch.stop()
+        Timber.i("Took ${stopwatch.elapsedMillis}ms to generate view data for ${graphOrStat.id}:${graphOrStat.name}")
+        return@withContext viewData
     }
 }
