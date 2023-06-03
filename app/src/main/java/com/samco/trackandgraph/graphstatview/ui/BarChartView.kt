@@ -24,6 +24,12 @@ import android.graphics.PorterDuffXfermode
 import android.view.MotionEvent
 import androidx.compose.material.Surface
 import android.view.View
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -170,7 +176,11 @@ private fun BarChartDataOverlay(
     xDates: List<ZonedDateTime>,
     bars: List<SimpleXYSeries>,
     barPeriod: TemporalAmount
-) = Surface(modifier = modifier.width(IntrinsicSize.Max)) {
+) = Surface(
+    modifier = modifier
+        .width(IntrinsicSize.Max)
+        .animateContentSize()
+) {
 
     val total = remember(highlightedIndex, bars) {
         doubleToString(bars.sumOf { it.getyVals()[highlightedIndex].toDouble() })
@@ -251,10 +261,15 @@ private fun BarChartDataOverlayExtraDetails(
         )
     }
 
+
     SpacingSmall()
 
-    if (expanded) {
-        extraDetails.forEachIndexed { index, labelInfo ->
+    extraDetails.forEachIndexed { index, labelInfo ->
+        AnimatedVisibility(
+            visible = expanded,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
+        ) {
             Row {
                 val colorIndex = (index * dataVisColorGenerator) % dataVisColorList.size
                 ColorCircle(
