@@ -68,7 +68,7 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         LastValueStat::class,
         BarChart::class,
     ],
-    version = 52
+    version = 53
 )
 @TypeConverters(Converters::class)
 internal abstract class TrackAndGraphDatabase : RoomDatabase() {
