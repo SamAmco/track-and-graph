@@ -43,7 +43,7 @@ abstract class DataSample(
         fun fromSequence(
             data: Sequence<IDataPoint>,
             dataSampleProperties: DataSampleProperties = DataSampleProperties(),
-            onDispose: () -> Unit = {}
+            onDispose: () -> Unit
         ): DataSample {
             return object : DataSample(dataSampleProperties) {
                 override fun getRawDataPoints() = emptyList<DataPoint>()
@@ -60,7 +60,7 @@ abstract class DataSample(
             data: Sequence<IDataPoint>,
             dataSampleProperties: DataSampleProperties = DataSampleProperties(),
             getRawDataPoints: () -> List<DataPoint>,
-            onDispose: () -> Unit = {}
+            onDispose: () -> Unit
         ): DataSample {
             return object : DataSample(dataSampleProperties) {
                 override fun getRawDataPoints() = getRawDataPoints()

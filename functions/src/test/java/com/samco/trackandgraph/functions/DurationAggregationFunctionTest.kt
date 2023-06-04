@@ -57,7 +57,7 @@ class DurationAggregationFunctionTest {
                 "2021-10-11T08:08:16.310+01:00",
                 "2021-10-04T00:20:00.197+01:00"
             ).map { iDataPoint(toODT(it), 1.0, "") }
-            val rawData = DataSample.fromSequence(dataPoints.asSequence())
+            val rawData = fromSequence(dataPoints.asSequence())
 
             //WHEN
             val answer = DurationAggregationFunction(
@@ -103,7 +103,7 @@ class DurationAggregationFunctionTest {
             val plotTotalTime = Duration.ofHours(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample.fromSequence(dataPoints)
+            val rawData = fromSequence(dataPoints)
 
             //WHEN
             val answer =
@@ -127,7 +127,7 @@ class DurationAggregationFunctionTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample.fromSequence(dataPoints)
+            val rawData = fromSequence(dataPoints)
 
             //WHEN
             val answer = DurationAggregationFunction(
@@ -150,7 +150,7 @@ class DurationAggregationFunctionTest {
             val plotTotalTime: TemporalAmount = Period.ofYears(1)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample.fromSequence(dataPoints)
+            val rawData = fromSequence(dataPoints)
 
             //WHEN
             val answer = DurationAggregationFunction(
@@ -171,7 +171,7 @@ class DurationAggregationFunctionTest {
             //GIVEN
             val plotTotalTime: TemporalAmount = Period.ofMonths(1)
             val dataPoints = emptyList<IDataPoint>()
-            val rawData = DataSample.fromSequence(dataPoints.asSequence())
+            val rawData = fromSequence(dataPoints.asSequence())
 
             //WHEN
             val answer = DurationAggregationFunction(
@@ -195,7 +195,7 @@ class DurationAggregationFunctionTest {
             val plotTotalTime: TemporalAmount = Period.ofMonths(3)
             val plotTotals = listOf(8, 3, 1, 7)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample.fromSequence(dataPoints)
+            val rawData = fromSequence(dataPoints)
 
             //WHEN
             val answer = DurationAggregationFunction(
@@ -219,7 +219,7 @@ class DurationAggregationFunctionTest {
             val plotTotalTime: TemporalAmount = Period.ofWeeks(1)
             val plotTotals = listOf(8, 3, 1)
             val dataPoints = generateDataPoints(endTime, plotTotalTime, plotTotals)
-            val rawData = DataSample.fromSequence(dataPoints)
+            val rawData = fromSequence(dataPoints)
 
             //WHEN
             val answer = DurationAggregationFunction(
@@ -252,7 +252,7 @@ class DurationAggregationFunctionTest {
                     Triple(DayOfWeek.SUNDAY, 2 * 60 + 30, 1.0),
                 )
             )
-            val rawData = DataSample.fromSequence(dataPoints)
+            val rawData = fromSequence(dataPoints)
 
             val timeHelper = TimeHelper(
                 object : AggregationPreferences {

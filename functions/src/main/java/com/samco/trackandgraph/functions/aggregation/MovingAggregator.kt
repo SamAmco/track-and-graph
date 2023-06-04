@@ -20,7 +20,9 @@ package com.samco.trackandgraph.functions.aggregation
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.sequencehelpers.cache
+import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
 
 /**
  * Calculate the moving aggregation-parents of all of the data points given over the moving duration given.
@@ -29,13 +31,19 @@ import org.threeten.bp.Duration
  * The data points in the input sample are expected to be in date order with the oldest data points
  * earliest in the list
  */
-internal class MovingAggregator(private val movingAggDuration: Duration) : DataAggregator {
-    override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
-        return AggregatedDataSample.fromDataSample(
+internal class MovingAggregator(
+    private val movingAggDuration: Duration,
+    private val calculateValue: (List<IDataPoint>) -> Double,
+    private val calculateLabel: (List<IDataPoint>) -> String,
+) : DataSampleFunction {
+
+
+    override suspend fun mapSample(dataSample: DataSample): DataSample {
+        return DataSample.fromSequence(
             data = getSequence(dataSample),
-            dataSample = dataSample,
             dataSampleProperties = dataSample.dataSampleProperties,
-            getRawDataPoints = dataSample::getRawDataPoints
+            getRawDataPoints = dataSample::getRawDataPoints,
+            onDispose = dataSample::dispose
         )
     }
 
@@ -51,10 +59,11 @@ internal class MovingAggregator(private val movingAggDuration: Duration) : DataA
                 .toList()
 
             yield(
-                AggregatedDataPoint(
-                    timestamp = current.timestamp,
-                    parents = parents
-                )
+                object : IDataPoint() {
+                    override val timestamp: OffsetDateTime = current.timestamp
+                    override val value: Double = calculateValue(parents)
+                    override val label: String = calculateLabel(parents)
+                }
             )
         }
     }
