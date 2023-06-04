@@ -52,7 +52,7 @@ class MovingAverageFunctionTest {
 
             //WHEN
             MovingAverageFunction(averagingDuration)
-                .mapSample(DataSample.fromSequence(sequence))
+                .mapSample(fromSequence(sequence))
                 .take(3)
                 .toList()
 
@@ -87,7 +87,7 @@ class MovingAverageFunctionTest {
 
             //WHEN
             MovingAverageFunction(averagingDuration)
-                .mapSample(DataSample.fromSequence(sequence))
+                .mapSample(fromSequence(sequence))
                 .toList()
 
             //THEN
@@ -119,7 +119,7 @@ class MovingAverageFunctionTest {
 
             //WHEN
             val answer = MovingAverageFunction(averagingDuration)
-                .mapSample(DataSample.fromSequence(dataPoints.asSequence()))
+                .mapSample(fromSequence(dataPoints.asSequence()))
 
             //THEN
             val expected = listOf(3.0, 7.0, 8.0, 2.0, 1.5, 2.0, 2.0, 0.0, 5.0)
@@ -137,7 +137,7 @@ class MovingAverageFunctionTest {
 
             //WHEN
             val answer = MovingAverageFunction(averagingDuration)
-                .mapSample(DataSample.fromSequence(dataPoints.asSequence()))
+                .mapSample(fromSequence(dataPoints.asSequence()))
 
             //THEN
             assertEquals(0, answer.toList().size)
