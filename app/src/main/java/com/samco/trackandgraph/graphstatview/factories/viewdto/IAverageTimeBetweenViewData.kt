@@ -24,6 +24,9 @@ interface IAverageTimeBetweenViewData : IGraphStatViewData{
     val averageMillis: Double
         get() = 0.0
 
+    val enoughData: Boolean
+        get() = false
+
     companion object {
         fun loading(graphOrStat: GraphOrStat) = object : IAverageTimeBetweenViewData {
             override val state: IGraphStatViewData.State

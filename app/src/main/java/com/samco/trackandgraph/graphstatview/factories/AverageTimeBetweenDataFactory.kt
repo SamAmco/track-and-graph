@@ -86,7 +86,7 @@ class AverageTimeBetweenDataFactory @Inject constructor(
             val dataPoints = withContext(Dispatchers.IO) {
                 dataSample.toList()
             }
-            if (dataPoints.size < 2) return notEnoughData(graphOrStat, dataPoints.size)
+            if (dataPoints.size < 2) return notEnoughData(graphOrStat)
             val averageMillis = withContext(Dispatchers.Default) {
                 calculateAverageTimeBetween(dataPoints)
             }
@@ -113,10 +113,10 @@ class AverageTimeBetweenDataFactory @Inject constructor(
             override val graphOrStat = graphOrStat
         }
 
-    private fun notEnoughData(graphOrStat: GraphOrStat, numDataPoints: Int) =
+    private fun notEnoughData(graphOrStat: GraphOrStat) =
         object : IAverageTimeBetweenViewData {
-            override val error = NotEnoughDataException(numDataPoints)
-            override val state = IGraphStatViewData.State.ERROR
+            override val state = IGraphStatViewData.State.READY
+            override val enoughData = false
             override val graphOrStat = graphOrStat
         }
 
