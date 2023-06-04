@@ -103,7 +103,6 @@ class GroupFragment : Fragment(),
             createGroupClickListener()
         )
         binding.itemList.adapter = adapter
-        disableChangeAnimations()
         addItemTouchHelper()
         scrollToTopOnItemAdded()
 
@@ -163,10 +162,6 @@ class GroupFragment : Fragment(),
                 }
             }
         }
-    }
-
-    private fun disableChangeAnimations() {
-        (binding.itemList.itemAnimator as DefaultItemAnimator).supportsChangeAnimations = false
     }
 
     private fun addItemTouchHelper() {
