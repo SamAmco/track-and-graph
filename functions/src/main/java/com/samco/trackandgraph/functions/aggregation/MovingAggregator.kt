@@ -19,14 +19,12 @@ package com.samco.trackandgraph.functions.aggregation
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.sampling.DataSample
-import com.samco.trackandgraph.base.sequencehelpers.cache
 import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
 /**
- * Calculate the moving aggregation-parents of all of the data points given over the moving duration given.
- * RawAggregatedDatapoints will be returned containing one data point for every data point in the input set.
+ * Calculate the moving aggregation of all of the data points given over the moving duration given.
  *
  * The data points in the input sample are expected to be in date order with the oldest data points
  * earliest in the list
@@ -48,23 +46,55 @@ internal class MovingAggregator(
     }
 
     private fun getSequence(dataSample: Sequence<IDataPoint>) = sequence {
-        val cachedSample = dataSample.cache()
-        for ((index, current) in cachedSample.mapIndexed { idx, point -> Pair(idx, point) }) {
-            val parents = cachedSample
-                .drop(index)
-                .takeWhile { dp ->
-                    //We expect the durations to be negative but < just compares the absolute values
-                    Duration.between(dp.timestamp, current.timestamp) < movingAggDuration
-                }
-                .toList()
 
+        val iterator = dataSample.iterator()
+
+        var currentStart: OffsetDateTime? = null
+        val currentList = mutableListOf<IDataPoint>()
+
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+
+            //If we're right at the start of the list, set the current start time
+            if (currentStart == null) currentStart = next.timestamp
+
+            //If the next data point is outside of the window, yield the current window of data points
+            // and move the start time backwards to the next data point. Keep yielding until the next
+            // data point is within the window or the list is empty.
+            while (Duration.between(next.timestamp, currentStart) >= movingAggDuration) {
+                yield(
+                    object : IDataPoint() {
+                        override val timestamp: OffsetDateTime = currentStart!!
+                        override val value: Double = calculateValue(currentList)
+                        override val label: String = calculateLabel(currentList)
+                    }
+                )
+
+                currentList.removeFirst()
+
+                if (currentList.isEmpty()) {
+                    currentStart = next.timestamp
+                    //Explicitly breaking here saves us from comparing a duration of 0 and getting
+                    // true causing un-expected behaviour if you passed 0 for movingAggDuration
+                    break
+                } else currentStart = currentList.first().timestamp
+            }
+
+            //Move the current data point into the window
+            currentList.add(next)
+        }
+
+        //Yield the remaining data points. Each data point will be the average of all remaining
+        // data points within the window
+        while (currentList.isNotEmpty()) {
             yield(
                 object : IDataPoint() {
-                    override val timestamp: OffsetDateTime = current.timestamp
-                    override val value: Double = calculateValue(parents)
-                    override val label: String = calculateLabel(parents)
+                    override val timestamp: OffsetDateTime = currentList[0].timestamp
+                    override val value: Double = calculateValue(currentList)
+                    override val label: String = calculateLabel(currentList)
                 }
             )
+            currentList.removeFirst()
         }
     }
 }
