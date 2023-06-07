@@ -103,6 +103,7 @@ class GroupFragment : Fragment(),
             createGroupClickListener()
         )
         binding.itemList.adapter = adapter
+        binding.itemList.itemAnimator = null
         addItemTouchHelper()
         scrollToTopOnItemAdded()
 
@@ -357,7 +358,7 @@ class GroupFragment : Fragment(),
 
     private fun listenToViewModel() {
         viewModel.hasTrackers.observe(viewLifecycleOwner) {}
-        viewModel.groupChildren.observe(viewLifecycleOwner) {
+        viewModel.allChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it, forceNextNotifyDataSetChanged)
             if (forceNextNotifyDataSetChanged) forceNextNotifyDataSetChanged = false
             updateShowQueueTrackButton()

@@ -79,9 +79,10 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     /**
      * Emits a unit every time currently displayed data may have changed.
-     * For example if you create/update/remove a data point.
+     *
+     * @see [DataUpdateType]
      */
-    fun getDataUpdateEvents(): SharedFlow<Unit>
+    fun getDataUpdateEvents(): SharedFlow<DataUpdateType>
 
     suspend fun getGraphStatById(graphStatId: Long): GraphOrStat
 

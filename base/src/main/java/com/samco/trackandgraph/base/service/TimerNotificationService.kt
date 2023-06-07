@@ -28,6 +28,7 @@ import com.samco.trackandgraph.base.R
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.DataUpdateType
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
@@ -92,8 +93,7 @@ class TimerNotificationService : Service() {
                     if (isPrimary) {
                         startForeground(id, notification)
                         calledStartForeGround = true
-                    }
-                    else notificationManager.notify(id, notification)
+                    } else notificationManager.notify(id, notification)
                     delay(1000)
                 }
             }
@@ -159,6 +159,8 @@ class TimerNotificationService : Service() {
         updateJobIsRunning = true
         jobScope.launch {
             dataInteractor.getDataUpdateEvents()
+                .filter { it is DataUpdateType.Tracker }
+                .map { }
                 .onStart { emit(Unit) }
                 .debounce(200)
                 .collect {

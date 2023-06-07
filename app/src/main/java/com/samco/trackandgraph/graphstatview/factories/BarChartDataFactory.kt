@@ -32,7 +32,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
@@ -47,7 +47,7 @@ import javax.inject.Inject
 class BarChartDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
     @IODispatcher ioDispatcher: CoroutineDispatcher
-) : ViewDataFactory<BarChart, IBarChartData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<BarChart, IBarChartViewData>(dataInteractor, ioDispatcher) {
 
     companion object {
 
@@ -202,9 +202,9 @@ class BarChartDataFactory @Inject constructor(
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): IBarChartData = dataInteractor.getBarChartByGraphStatId(graphOrStat.id)?.let {
+    ): IBarChartViewData = dataInteractor.getBarChartByGraphStatId(graphOrStat.id)?.let {
         createViewData(graphOrStat, it, onDataSampled)
-    } ?: object : IBarChartData {
+    } ?: object : IBarChartViewData {
         override val state = IGraphStatViewData.State.ERROR
         override val error = GraphStatInitException(R.string.graph_stat_view_not_found)
         override val graphOrStat = graphOrStat
@@ -257,10 +257,10 @@ class BarChartDataFactory @Inject constructor(
         graphOrStat: GraphOrStat,
         config: BarChart,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): IBarChartData {
+    ): IBarChartViewData {
         val dataSample = dataInteractor.getDataSampleForFeatureId(config.featureId)
 
-        if (!dataSample.iterator().hasNext()) return object : IBarChartData {
+        if (!dataSample.iterator().hasNext()) return object : IBarChartViewData {
             override val state = IGraphStatViewData.State.READY
             override val graphOrStat = graphOrStat
         }
@@ -282,7 +282,7 @@ class BarChartDataFactory @Inject constructor(
 
             onDataSampled(dataSample.getRawDataPoints())
 
-            return object : IBarChartData {
+            return object : IBarChartViewData {
                 override val xDates = barData.dates
                 override val bars = barData.bars
                 override val durationBasedRange = dataSample.dataSampleProperties.isDuration
@@ -295,7 +295,7 @@ class BarChartDataFactory @Inject constructor(
             }
         } catch (t: Throwable) {
             Timber.d(t, "Error creating bar chart data")
-            return object : IBarChartData {
+            return object : IBarChartViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val error = GraphStatInitException(R.string.graph_stat_validation_unknown)
                 override val graphOrStat = graphOrStat

@@ -3,13 +3,13 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 
-interface ILastValueData : IGraphStatViewData {
+interface ILastValueViewData : IGraphStatViewData {
     val isDuration: Boolean
     val lastDataPoint: DataPoint?
         get() = null
 
     companion object {
-        fun loading(graphOrStat: GraphOrStat) = object : ILastValueData {
+        fun loading(graphOrStat: GraphOrStat) = object : ILastValueViewData {
             override val isDuration: Boolean
                 get() = false
             override val state: IGraphStatViewData.State

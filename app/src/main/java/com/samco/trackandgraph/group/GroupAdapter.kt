@@ -26,11 +26,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.samco.trackandgraph.base.database.dto.DisplayTracker
-import com.samco.trackandgraph.base.database.dto.Group
-import com.samco.trackandgraph.base.database.dto.GroupChild
 import com.samco.trackandgraph.base.database.dto.GroupChildType
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 
 class GroupAdapter(
     private val trackerClickListener: TrackerClickListener,
@@ -63,28 +59,24 @@ class GroupAdapter(
         val item = groupChildren[position]
         when (getItemViewType(position)) {
             ViewType.GRAPH.ordinal -> (holder as GraphStatViewHolder).bind(
-                extractGraphViewData(item.obj),
+                (item as GroupChild.ChildGraph).graph.viewData,
                 graphStatClickListener
             )
 
             ViewType.TRACKER.ordinal -> (holder as TrackerViewHolder)
-                .bind(item.obj as DisplayTracker, trackerClickListener)
+                .bind((item as GroupChild.ChildTracker).displayTracker, trackerClickListener)
 
             ViewType.GROUP.ordinal -> (holder as GroupViewHolder)
-                .bind(item.obj as Group, groupClickListener)
+                .bind((item as GroupChild.ChildGroup).group, groupClickListener)
         }
     }
 
-    private fun extractGraphViewData(obj: Any): IGraphStatViewData =
-        (obj as Pair<*, *>).second as IGraphStatViewData
-
     override fun getItemViewType(position: Int): Int {
         val child = groupChildren.getOrNull(position) ?: return -1
-        return when (child.type) {
-            GroupChildType.GRAPH -> ViewType.GRAPH.ordinal
-            GroupChildType.TRACKER -> ViewType.TRACKER.ordinal
-            GroupChildType.GROUP -> ViewType.GROUP.ordinal
-            else -> -1
+        return when (child) {
+            is GroupChild.ChildGraph -> ViewType.GRAPH.ordinal
+            is GroupChild.ChildTracker -> ViewType.TRACKER.ordinal
+            is GroupChild.ChildGroup -> ViewType.GROUP.ordinal
         }
     }
 
@@ -146,24 +138,24 @@ private class ListDiffCallback(
     override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
         val old = oldList[oldItemPosition]
         val new = newList[newItemPosition]
-        return when (old.type) {
-            GroupChildType.GROUP -> {
-                val oldObj = (old.obj as Group).copy(displayIndex = 0)
-                val newObj = (new.obj as Group).copy(displayIndex = 0)
+        return when {
+            old is GroupChild.ChildGroup && new is GroupChild.ChildGroup -> {
+                val oldObj = old.group.copy(displayIndex = 0)
+                val newObj = new.group.copy(displayIndex = 0)
                 oldObj == newObj
             }
 
-            GroupChildType.TRACKER -> {
-                val oldObj = (old.obj as DisplayTracker).copy(displayIndex = 0)
-                val newObj = (new.obj as DisplayTracker).copy(displayIndex = 0)
+            old is GroupChild.ChildTracker && new is GroupChild.ChildTracker -> {
+                val oldObj = old.displayTracker.copy(displayIndex = 0)
+                val newObj = new.displayTracker.copy(displayIndex = 0)
                 oldObj == newObj
             }
 
-            GroupChildType.GRAPH -> {
-                val oldPair = old.obj as Pair<*, *>
-                val newPair = new.obj as Pair<*, *>
-                return (oldPair.first as Long) == (newPair.first as Long)
+            old is GroupChild.ChildGraph && new is GroupChild.ChildGraph -> {
+                return old.graph.time == new.graph.time
             }
+
+            else -> false
         }
     }
 }
