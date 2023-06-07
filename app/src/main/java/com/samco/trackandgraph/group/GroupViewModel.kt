@@ -62,13 +62,15 @@ class GroupViewModel @Inject constructor(
     private val groupId = MutableSharedFlow<Long>(1, 1)
 
     private enum class UpdateType {
-        TRACKERS, GROUPS, GRAPHS, ALL, DISPLAY_INDICES
+        TRACKERS, GROUPS, GRAPHS, ALL, DISPLAY_INDICES, PREEN
     }
 
     private fun asUpdateType(dataUpdateType: DataUpdateType) = when (dataUpdateType) {
         DataUpdateType.DataPoint -> listOf(UpdateType.TRACKERS, UpdateType.GRAPHS)
         DataUpdateType.Tracker -> listOf(UpdateType.TRACKERS)
         DataUpdateType.Group -> listOf(UpdateType.GROUPS)
+        DataUpdateType.GroupDeleted -> listOf(UpdateType.GROUPS, UpdateType.PREEN)
+        DataUpdateType.FeatureDeleted -> listOf(UpdateType.TRACKERS, UpdateType.PREEN)
         DataUpdateType.GraphOrStat -> listOf(UpdateType.GRAPHS)
         DataUpdateType.DisplayIndex -> listOf(UpdateType.DISPLAY_INDICES)
         DataUpdateType.Function, DataUpdateType.GlobalNote, DataUpdateType.Reminder -> null
@@ -89,10 +91,18 @@ class GroupViewModel @Inject constructor(
             it.second in arrayOf(
                 UpdateType.GRAPHS,
                 UpdateType.ALL,
+                UpdateType.PREEN,
                 UpdateType.DISPLAY_INDICES
             )
         }
         .map { Pair(it.second, getGraphObjects(it.first)) }
+        .filter { pair ->
+            //If the update type is preen then preen all the graphs and wait for the next update
+            if (pair.first == UpdateType.PREEN) {
+                pair.second.forEach { !gsiProvider.getDataSourceAdapter(it.type).preen(it) }
+                false
+            } else true
+        }
         .flatMapLatestScan(emptyList<GraphWithViewData>()) { viewData, graphUpdate ->
             val (type, graphStats) = graphUpdate
             //Only get graph data for graphs that were not already loaded
@@ -173,7 +183,7 @@ class GroupViewModel @Inject constructor(
             it.second in arrayOf(
                 UpdateType.TRACKERS,
                 UpdateType.ALL,
-                UpdateType.DISPLAY_INDICES
+                UpdateType.DISPLAY_INDICES,
             )
         }
         .map { getTrackerChildren(it.first) }
@@ -184,7 +194,7 @@ class GroupViewModel @Inject constructor(
             it.second in arrayOf(
                 UpdateType.GROUPS,
                 UpdateType.ALL,
-                UpdateType.DISPLAY_INDICES
+                UpdateType.DISPLAY_INDICES,
             )
         }
         .map { getGroupChildren(it.first) }

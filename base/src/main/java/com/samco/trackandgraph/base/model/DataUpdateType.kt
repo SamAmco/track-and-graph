@@ -7,14 +7,24 @@ sealed class DataUpdateType {
     object DataPoint : DataUpdateType()
 
     /**
-     * A group was added/updated/deleted
+     * A group was added/updated
      */
     object Group : DataUpdateType()
 
     /**
-     * A tracker was added/updated/deleted
+     * A group was deleted
+     */
+    object GroupDeleted : DataUpdateType()
+
+    /**
+     * A tracker was added/updated
      */
     object Tracker : DataUpdateType()
+
+    /**
+     * A feature was deleted
+     */
+    object FeatureDeleted : DataUpdateType()
 
     /**
      * A graph was added/updated/deleted

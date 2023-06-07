@@ -79,7 +79,7 @@ internal class DataInteractorImpl @Inject constructor(
         //Trigger a feature delete request for all deleted features
         deletedFeatureIds.forEach { serviceManager.requestWidgetsDisabledForFeatureId(it) }
         //Emit a data update event
-        dataUpdateEvents.emit(DataUpdateType.Group)
+        dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
     }
 
     override suspend fun updateGroup(group: Group) = withContext(io) {
@@ -176,7 +176,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun deleteFeature(featureId: Long) = withContext(io) {
         dao.deleteFeature(featureId)
         serviceManager.requestWidgetsDisabledForFeatureId(featureId = featureId)
-        dataUpdateEvents.emit(DataUpdateType.Tracker)
+        dataUpdateEvents.emit(DataUpdateType.FeatureDeleted)
     }
 
     override suspend fun updateReminders(reminders: List<Reminder>) = withContext(io) {
