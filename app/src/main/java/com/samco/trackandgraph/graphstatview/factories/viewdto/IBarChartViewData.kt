@@ -23,7 +23,7 @@ import org.threeten.bp.Period
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
-interface IBarChartData : IGraphStatViewData {
+interface IBarChartViewData : IGraphStatViewData {
     /**
      * One x date for every bar in the list. You don't necessarily draw all of them on the x axis
      */

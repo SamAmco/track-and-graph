@@ -27,19 +27,19 @@ import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
 class LastValueDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
     @IODispatcher ioDispatcher: CoroutineDispatcher
-) : ViewDataFactory<LastValueStat, ILastValueData>(dataInteractor, ioDispatcher) {
+) : ViewDataFactory<LastValueStat, ILastValueViewData>(dataInteractor, ioDispatcher) {
 
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): ILastValueData {
+    ): ILastValueViewData {
         val lastValueStat = dataInteractor.getLastValueStatByGraphStatId(graphOrStat.id)
             ?: return graphNotFound(graphOrStat)
         return createViewData(graphOrStat, lastValueStat, onDataSampled)
@@ -49,21 +49,21 @@ class LastValueDataFactory @Inject constructor(
         graphOrStat: GraphOrStat,
         config: LastValueStat,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): ILastValueData {
+    ): ILastValueViewData {
         return try {
             val lastData = getLastDataPoint(
                 dataInteractor,
                 config,
                 onDataSampled
             ) ?: return notEnoughData(graphOrStat)
-            object : ILastValueData {
+            object : ILastValueViewData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
                 override val lastDataPoint = lastData.dataPoint
                 override val isDuration = lastData.isDuration
             }
         } catch (throwable: Throwable) {
-            object : ILastValueData {
+            object : ILastValueViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
                 override val error = throwable
@@ -73,7 +73,7 @@ class LastValueDataFactory @Inject constructor(
     }
 
     private fun graphNotFound(graphOrStat: GraphOrStat) =
-        object : ILastValueData {
+        object : ILastValueViewData {
             override val state = IGraphStatViewData.State.ERROR
             override val graphOrStat = graphOrStat
             override val error = GraphNotFoundException()
@@ -81,7 +81,7 @@ class LastValueDataFactory @Inject constructor(
         }
 
     private fun notEnoughData(graphOrStat: GraphOrStat) =
-        object : ILastValueData {
+        object : ILastValueViewData {
             override val error = NotEnoughDataException(0)
             override val state = IGraphStatViewData.State.ERROR
             override val graphOrStat = graphOrStat

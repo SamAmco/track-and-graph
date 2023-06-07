@@ -71,7 +71,7 @@ import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
 import com.samco.trackandgraph.base.helpers.getDayMonthFormatter
 import com.samco.trackandgraph.base.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.SpacingExtraSmall
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
@@ -110,7 +110,7 @@ private class BarMarkerStore {
 @Composable
 fun BarChartView(
     modifier: Modifier = Modifier,
-    viewData: IBarChartData,
+    viewData: IBarChartViewData,
     listMode: Boolean,
     timeMarker: OffsetDateTime? = null,
     graphHeight: Int? = null
