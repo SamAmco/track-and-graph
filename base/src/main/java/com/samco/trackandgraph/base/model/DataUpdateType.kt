@@ -1,53 +1,31 @@
 package com.samco.trackandgraph.base.model
 
 sealed class DataUpdateType {
-    /**
-     * A data point was added/updated/deleted
-     */
+    /**A data point was created/updated/deleted **/
     object DataPoint : DataUpdateType()
 
-    /**
-     * A group was added/updated
-     */
-    object Group : DataUpdateType()
-
-    /**
-     * A group was deleted
-     */
+    object GroupCreated : DataUpdateType()
+    object GroupUpdated : DataUpdateType()
     object GroupDeleted : DataUpdateType()
 
-    /**
-     * A tracker was added/updated
-     */
-    object Tracker : DataUpdateType()
+    object TrackerCreated : DataUpdateType()
+    object TrackerUpdated : DataUpdateType()
+    object TrackerDeleted : DataUpdateType()
 
-    /**
-     * A feature was deleted
-     */
-    object FeatureDeleted : DataUpdateType()
+    object GraphOrStatCreated : DataUpdateType()
+    object GraphOrStatUpdated : DataUpdateType()
+    object GraphOrStatDeleted : DataUpdateType()
 
-    /**
-     * A graph was added/updated/deleted
-     */
-    object GraphOrStat : DataUpdateType()
-
-    /**
-     * A reminder was added/updated/deleted
-     */
+    /**A reminder was created/updated/deleted **/
     object Reminder : DataUpdateType()
 
-    /**
-     * A global note was added/updated/deleted
-     */
+    /**A global note was created/updated/deleted **/
     object GlobalNote : DataUpdateType()
 
-    /**
-     * Display indexes were changed
-     */
+    /**Display indices were updated **/
     object DisplayIndex : DataUpdateType()
 
-    /**
-     * A function was added/updated/deleted
-     */
+    /**A global note was created/updated/deleted **/
+    //TODO split out function into separate CRUD events
     object Function : DataUpdateType()
 }

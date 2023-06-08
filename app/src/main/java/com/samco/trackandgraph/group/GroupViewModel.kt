@@ -29,6 +29,7 @@ import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.util.Stopwatch
+import com.samco.trackandgraph.util.bufferWithTimeout
 import com.samco.trackandgraph.util.flatMapLatestScan
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -67,13 +68,29 @@ class GroupViewModel @Inject constructor(
 
     private fun asUpdateType(dataUpdateType: DataUpdateType) = when (dataUpdateType) {
         DataUpdateType.DataPoint -> listOf(UpdateType.TRACKERS, UpdateType.GRAPHS)
-        DataUpdateType.Tracker -> listOf(UpdateType.TRACKERS)
-        DataUpdateType.Group -> listOf(UpdateType.GROUPS)
+        DataUpdateType.TrackerCreated -> listOf(UpdateType.TRACKERS, UpdateType.DISPLAY_INDICES)
+        DataUpdateType.TrackerDeleted -> listOf(
+            UpdateType.TRACKERS,
+            UpdateType.DISPLAY_INDICES,
+            UpdateType.PREEN,
+            UpdateType.GRAPHS
+        )
+
+        DataUpdateType.GroupCreated, DataUpdateType.GroupDeleted -> listOf(
+            UpdateType.GROUPS,
+            UpdateType.DISPLAY_INDICES
+        )
+
         DataUpdateType.GroupDeleted -> listOf(UpdateType.GROUPS, UpdateType.PREEN)
-        DataUpdateType.FeatureDeleted -> listOf(UpdateType.TRACKERS, UpdateType.PREEN)
-        DataUpdateType.GraphOrStat -> listOf(UpdateType.GRAPHS)
         DataUpdateType.DisplayIndex -> listOf(UpdateType.DISPLAY_INDICES)
         DataUpdateType.Function, DataUpdateType.GlobalNote, DataUpdateType.Reminder -> null
+        DataUpdateType.GraphOrStatCreated, DataUpdateType.GraphOrStatDeleted -> listOf(
+            UpdateType.DISPLAY_INDICES
+        )
+
+        DataUpdateType.GraphOrStatUpdated -> listOf(UpdateType.GRAPHS)
+        DataUpdateType.GroupUpdated -> listOf(UpdateType.GROUPS)
+        DataUpdateType.TrackerUpdated -> listOf(UpdateType.TRACKERS)
     }
 
     private val onUpdateChildrenForGroup =
@@ -85,24 +102,40 @@ class GroupViewModel @Inject constructor(
                 .flatMapConcat { it.asFlow() }
                 .onStart { emit(UpdateType.ALL) }
         ) { a, b -> Pair(a, b) }
+            .shareIn(viewModelScope, SharingStarted.Lazily, 1)
+
+    init {
+        viewModelScope.launch {
+            onUpdateChildrenForGroup
+                .filter { it.second == UpdateType.PREEN }
+                .debounce(20)
+                .collect { pair -> preenGraphs(pair.first) }
+        }
+    }
+
+    private suspend fun preenGraphs(groupId: Long) = withContext(io) {
+        getGraphObjects(groupId).forEach {
+            !gsiProvider.getDataSourceAdapter(it.type).preen(it)
+        }
+    }
 
     private val graphChildren = onUpdateChildrenForGroup
         .filter {
             it.second in arrayOf(
                 UpdateType.GRAPHS,
                 UpdateType.ALL,
-                UpdateType.PREEN,
                 UpdateType.DISPLAY_INDICES
             )
         }
-        .map { Pair(it.second, getGraphObjects(it.first)) }
-        .filter { pair ->
-            //If the update type is preen then preen all the graphs and wait for the next update
-            if (pair.first == UpdateType.PREEN) {
-                pair.second.forEach { !gsiProvider.getDataSourceAdapter(it.type).preen(it) }
-                false
-            } else true
+        .bufferWithTimeout(10)
+        .map { bufferedEvents ->
+            //If the update type is all or graphs then do a full update
+            //otherwise the type will be display indices and we will do a partial update
+            bufferedEvents.firstOrNull {
+                it.second == UpdateType.GRAPHS || it.second == UpdateType.ALL
+            } ?: bufferedEvents.first()
         }
+        .map { Pair(it.second, getGraphObjects(it.first)) }
         .flatMapLatestScan(emptyList<GraphWithViewData>()) { viewData, graphUpdate ->
             val (type, graphStats) = graphUpdate
             //Only get graph data for graphs that were not already loaded
@@ -186,6 +219,7 @@ class GroupViewModel @Inject constructor(
                 UpdateType.DISPLAY_INDICES,
             )
         }
+        .debounce(10L)
         .map { getTrackerChildren(it.first) }
         .flowOn(io)
 
@@ -197,12 +231,14 @@ class GroupViewModel @Inject constructor(
                 UpdateType.DISPLAY_INDICES,
             )
         }
+        .debounce(10L)
         .map { getGroupChildren(it.first) }
         .flowOn(io)
 
     val allChildren: LiveData<List<GroupChild>> =
         combine(graphChildren, trackersChildren, groupChildren) { a, b, c -> Triple(a, b, c) }
-            .debounce(10L)
+            //This debounce should be longer than the children debounce
+            .debounce(50L)
             .map { (graphs, trackers, groups) ->
                 val children = mutableListOf<GroupChild>().apply {
                     addAll(graphs)

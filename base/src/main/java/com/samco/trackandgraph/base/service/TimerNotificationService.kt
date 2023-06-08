@@ -159,7 +159,7 @@ class TimerNotificationService : Service() {
         updateJobIsRunning = true
         jobScope.launch {
             dataInteractor.getDataUpdateEvents()
-                .filter { it is DataUpdateType.Tracker }
+                .filter { it is DataUpdateType.TrackerUpdated || it is DataUpdateType.TrackerDeleted }
                 .map { }
                 .onStart { emit(Unit) }
                 .debounce(200)
