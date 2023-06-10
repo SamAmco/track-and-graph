@@ -210,6 +210,10 @@ class BarChartDataFactory @Inject constructor(
         override val graphOrStat = graphOrStat
     }
 
+    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
+        return dataInteractor.getBarChartByGraphStatId(graphOrStatId)?.featureId == featureId
+    }
+
     private data class BarDataWithYAxisParams(
         val bars: List<SimpleXYSeries>,
         val dates: List<ZonedDateTime>,

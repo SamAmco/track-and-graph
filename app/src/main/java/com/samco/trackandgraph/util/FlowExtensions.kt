@@ -32,7 +32,7 @@ fun <T, R> Flow<T>.flatMapLatestScan(
     }
 }
 
-fun <T> Flow<T>.bufferWithTimeout(timeoutMillis: Long): Flow<List<T>> = channelFlow {
+fun <T> Flow<T>.debounceBuffer(timeoutMillis: Long): Flow<List<T>> = channelFlow {
     val currentList = mutableListOf<T>()
     var delayedEmitJob: Job? = null
 

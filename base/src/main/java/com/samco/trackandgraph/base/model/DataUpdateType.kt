@@ -1,8 +1,8 @@
 package com.samco.trackandgraph.base.model
 
 sealed class DataUpdateType {
-    /**A data point was created/updated/deleted **/
-    object DataPoint : DataUpdateType()
+    /**Data point(s) were created/updated/deleted for a given feature**/
+    data class DataPoint(val featureId: Long) : DataUpdateType()
 
     object GroupCreated : DataUpdateType()
     object GroupUpdated : DataUpdateType()
@@ -12,8 +12,8 @@ sealed class DataUpdateType {
     object TrackerUpdated : DataUpdateType()
     object TrackerDeleted : DataUpdateType()
 
-    object GraphOrStatCreated : DataUpdateType()
-    object GraphOrStatUpdated : DataUpdateType()
+    data class GraphOrStatCreated(val graphStatId: Long) : DataUpdateType()
+    data class GraphOrStatUpdated(val graphStatId: Long) : DataUpdateType()
     object GraphOrStatDeleted : DataUpdateType()
 
     /**A reminder was created/updated/deleted **/
