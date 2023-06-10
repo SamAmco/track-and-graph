@@ -66,6 +66,7 @@ class GroupViewModel @Inject constructor(
         object Trackers : UpdateType()
         object Groups : UpdateType()
         object AllGraphs : UpdateType()
+        object GraphDeleted : UpdateType()
         data class GraphsForFeature(val featureId: Long) : UpdateType()
         data class Graph(val graphId: Long) : UpdateType()
         object All : UpdateType()
@@ -82,7 +83,11 @@ class GroupViewModel @Inject constructor(
             UpdateType.GraphsForFeature(dataUpdateType.featureId)
         )
 
-        DataUpdateType.TrackerCreated -> listOf(UpdateType.Trackers, UpdateType.DisplayIndices)
+        DataUpdateType.TrackerCreated -> listOf(
+            UpdateType.Trackers,
+            UpdateType.DisplayIndices
+        )
+
         DataUpdateType.TrackerDeleted -> listOf(
             UpdateType.Trackers,
             UpdateType.DisplayIndices,
@@ -95,22 +100,36 @@ class GroupViewModel @Inject constructor(
             UpdateType.DisplayIndices
         )
 
-        DataUpdateType.GroupDeleted -> listOf(UpdateType.Groups, UpdateType.Preen)
-        DataUpdateType.DisplayIndex -> listOf(UpdateType.DisplayIndices)
+        DataUpdateType.GroupDeleted -> listOf(
+            UpdateType.Groups,
+            UpdateType.Preen,
+            UpdateType.DisplayIndices
+        )
+
+        DataUpdateType.DisplayIndex -> listOf(
+            UpdateType.DisplayIndices
+        )
+
         is DataUpdateType.GraphOrStatCreated -> listOf(
-            UpdateType.Graph(dataUpdateType.graphStatId)
+            UpdateType.Graph(dataUpdateType.graphStatId),
+            UpdateType.DisplayIndices
         )
 
         DataUpdateType.GraphOrStatDeleted -> listOf(
-            UpdateType.DisplayIndices
+            UpdateType.DisplayIndices,
+            UpdateType.GraphDeleted
         )
 
         is DataUpdateType.GraphOrStatUpdated -> listOf(
             UpdateType.Graph(dataUpdateType.graphStatId)
         )
 
-        DataUpdateType.GroupUpdated -> listOf(UpdateType.Groups)
-        DataUpdateType.TrackerUpdated -> listOf(UpdateType.Trackers)
+        DataUpdateType.GroupUpdated -> listOf(
+            UpdateType.Groups
+        )
+        DataUpdateType.TrackerUpdated -> listOf(
+            UpdateType.Trackers
+        )
 
         DataUpdateType.Function, DataUpdateType.GlobalNote, DataUpdateType.Reminder -> null
     }
@@ -146,7 +165,8 @@ class GroupViewModel @Inject constructor(
             it.second in arrayOf(
                 UpdateType.All,
                 UpdateType.AllGraphs,
-                UpdateType.DisplayIndices
+                UpdateType.DisplayIndices,
+                UpdateType.GraphDeleted
             )
                     || it.second is UpdateType.GraphsForFeature
                     || it.second is UpdateType.Graph
@@ -158,6 +178,14 @@ class GroupViewModel @Inject constructor(
                 val types = bufferedEvents.associateBy { it.second }
                 types[UpdateType.All]?.let { yield(it) }
                 types[UpdateType.AllGraphs]?.let { yield(it) }
+
+                //Special case if you delete a graph you typically get both display indices and
+                //graph deleted events. Graph deleted is more significant so we only emit that
+                if (types.size == 2
+                    && types.containsKey(UpdateType.GraphDeleted)
+                    && types.containsKey(UpdateType.DisplayIndices)) {
+                    yield(types[UpdateType.GraphDeleted])
+                }
 
                 //If we missed more than one specific event just update all
                 //graphs. This should happen very rarely
@@ -172,13 +200,17 @@ class GroupViewModel @Inject constructor(
                 emptyList()
             )
         ) { pair, event ->
-            if (pair.second.isEmpty() || event.second !is UpdateType.GraphsForFeature) {
-                Pair(event.second, getGraphObjects(event.first))
+            val lastGraphList = pair.second
+            val eventType = event.second
+            val groupId = event.first
+
+            if (lastGraphList.isEmpty() || eventType !is UpdateType.GraphsForFeature) {
+                Pair(eventType, getGraphObjects(groupId))
             }
             //Don't need to get the graphs from the database again if the update type is
             //GraphsForFeature as this simply means a feature was updated and we need to
             //recalculate the inner graph data
-            else Pair(event.second, pair.second)
+            else Pair(eventType, lastGraphList)
         }
         //Get the graph view data for the graphs
         .flatMapLatestScan(emptyList<GraphWithViewData>()) { viewData, graphUpdate ->
@@ -187,7 +219,9 @@ class GroupViewModel @Inject constructor(
             //Get the graph data for any graphs that need updating
             return@flatMapLatestScan when (type) {
                 UpdateType.All, UpdateType.AllGraphs -> getGraphViewData(graphStats)
-                UpdateType.DisplayIndices -> mapNewGraphsToOldViewData(viewData, graphStats)
+                UpdateType.DisplayIndices, UpdateType.GraphDeleted -> {
+                    mapNewGraphsToOldViewData(viewData, graphStats)
+                }
                 is UpdateType.Graph -> withUpdatedGraph(viewData, graphStats, type.graphId)
                 is UpdateType.GraphsForFeature ->
                     withUpdatedIfAffected(viewData, graphStats, type.featureId)
@@ -232,24 +266,21 @@ class GroupViewModel @Inject constructor(
 
     private fun mapNewGraphsToOldViewData(
         viewData: List<GraphWithViewData>,
-        graphStats: List<GraphOrStat>
+        newGraphStats: List<GraphOrStat>
     ): Flow<List<GraphWithViewData>> {
         val oldGraphsById = viewData.associateBy { it.graph.id }
 
-        val dontUpdate = graphStats
+        val dontUpdate = newGraphStats
             .map { Pair(it, oldGraphsById[it.id]?.viewData) }
             .filter { it.second?.viewData?.state == IGraphStatViewData.State.READY }
             .mapNotNull { pair -> pair.second?.let { GraphWithViewData(pair.first, it) } }
 
-        val update = graphStats
+        val update = newGraphStats
             .map { Pair(it, oldGraphsById[it.id]?.viewData) }
             .filter { it.second?.viewData?.state != IGraphStatViewData.State.READY }
             .map { it.first }
 
-        return combine(
-            flow { emit(dontUpdate) },
-            getGraphViewData(update)
-        ) { a, b -> a + b }
+        return getGraphViewData(update).map { dontUpdate + it }
     }
 
     private fun GraphOrStat.asLoading() = GraphWithViewData(
