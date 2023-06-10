@@ -103,7 +103,7 @@ class GroupFragment : Fragment(),
             createGroupClickListener()
         )
         binding.itemList.adapter = adapter
-        binding.itemList.itemAnimator = null
+        //binding.itemList.itemAnimator = null
         addItemTouchHelper()
         scrollToTopOnItemAdded()
 
