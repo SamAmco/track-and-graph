@@ -100,6 +100,7 @@ class AverageTimeBetweenDataFactory @Inject constructor(
             object : IAverageTimeBetweenViewData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
+                override val enoughData: Boolean = true
                 override val averageMillis = averageMillis
             }
         } catch (throwable: Throwable) {
