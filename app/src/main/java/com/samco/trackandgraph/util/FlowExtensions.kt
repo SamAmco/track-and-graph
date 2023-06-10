@@ -6,27 +6,26 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
 fun <T, R> Flow<T>.flatMapLatestScan(
     initial: R,
     transform: suspend (R, T) -> Flow<R>
 ): Flow<R> = channelFlow {
-    var innerFlow: Flow<R>?
+    var previousFlow: Job? = null
     var lastElement: R = initial
-    var job: Job? = null
 
     collect { value ->
-        innerFlow = transform(lastElement, value)
+        previousFlow?.apply {
+            cancel()
+            join()
+        }
 
-        job?.cancel()
-
-        coroutineScope {
-            job = launch(start = CoroutineStart.UNDISPATCHED) {
-                innerFlow?.collect { transformedValue ->
-                    lastElement = transformedValue
-                    send(transformedValue)
-                }
+        previousFlow = launch(start = CoroutineStart.UNDISPATCHED) {
+            transform(lastElement, value).collect { transformedValue ->
+                lastElement = transformedValue
+                send(transformedValue)
             }
         }
     }
