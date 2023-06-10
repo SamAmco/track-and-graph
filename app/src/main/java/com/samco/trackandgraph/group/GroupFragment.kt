@@ -180,9 +180,7 @@ class GroupFragment : Fragment(),
                     //Scroll to the top when we've added something new to our group,
                     // but not when the adapter is being re-populated, e.g. when returning
                     // to this fragment from a nested group
-                    if (itemCount == 1) binding.itemList.postDelayed({
-                        binding.itemList.smoothScrollToPosition(0)
-                    }, 300)
+                    if (itemCount == 1) binding.itemList.smoothScrollToPosition(0)
                 }
             }
         )
@@ -311,8 +309,7 @@ class GroupFragment : Fragment(),
         if (tracker.hasDefaultValue && useDefault) {
             requireContext().performTrackVibrate()
             viewModel.addDefaultTrackerValue(tracker)
-        }
-        else addDataPointsDialogViewModel.showAddDataPointDialog(trackerId = tracker.id)
+        } else addDataPointsDialogViewModel.showAddDataPointDialog(trackerId = tracker.id)
     }
 
     private fun onTrackerDescriptionClicked(tracker: DisplayTracker) {

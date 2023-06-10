@@ -301,7 +301,7 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     private fun duplicateGraphOrStat(graphOrStat: GraphOrStat) =
-        dao.insertGraphOrStat(graphOrStat.copy(id = 0L).toEntity())
+        dao.insertGraphOrStat(graphOrStat.copy(id = 0L, displayIndex = 0).toEntity())
 
     private suspend fun <R> performAtomicUpdate(
         updateType: DataUpdateType? = null,
