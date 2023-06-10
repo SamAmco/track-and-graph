@@ -49,12 +49,8 @@ abstract class GraphStatDataSourceAdapter<I>(
 
     protected abstract suspend fun shouldPreen(graphOrStat: GraphOrStat): Boolean
 
-    suspend fun preen(graphOrStat: GraphOrStat): Boolean {
-        if (shouldPreen(graphOrStat)) {
-            dataInteractor.deleteGraphOrStat(graphOrStat)
-            return true
-        }
-        return false
+    suspend fun preen(graphOrStat: GraphOrStat) {
+        if (shouldPreen(graphOrStat)) dataInteractor.deleteGraphOrStat(graphOrStat)
     }
 
     abstract suspend fun duplicateGraphOrStat(graphOrStat: GraphOrStat)

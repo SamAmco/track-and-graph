@@ -62,6 +62,12 @@ abstract class ViewDataFactory<in I, out T : IGraphStatViewData>(
         onDataSampled: (List<DataPoint>) -> Unit
     ): T
 
+    /**
+     * Should return true if any change in the data for the given feature might affect the data
+     * produced by this factory.
+     */
+    abstract suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean
+
     @Suppress("UNCHECKED_CAST")
     suspend fun getViewData(
         graphOrStat: GraphOrStat,
