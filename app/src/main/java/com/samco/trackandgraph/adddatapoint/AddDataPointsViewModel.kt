@@ -67,6 +67,7 @@ sealed interface AddDataPointViewModel {
     fun updateLabel(label: TextFieldValue)
     fun updateNote(note: TextFieldValue)
     fun updateTimestamp(timestamp: OffsetDateTime)
+    fun addDataPoint()
     fun onSuggestedValueSelected(suggestedValue: SuggestedValueViewData)
     fun onSuggestedValueLongPress(suggestedValue: SuggestedValueViewData)
 
@@ -281,6 +282,8 @@ class AddDataPointsViewModelImpl @Inject constructor(
         }
 
         override fun getTracker() = config.tracker
+
+        override fun addDataPoint() = onAddClicked()
 
         override fun updateLabel(label: TextFieldValue) {
             this.label = label
