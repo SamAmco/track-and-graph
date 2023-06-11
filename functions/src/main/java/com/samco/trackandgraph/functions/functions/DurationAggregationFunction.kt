@@ -20,6 +20,8 @@ package com.samco.trackandgraph.functions.functions
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.functions.aggregation.FixedBinAggregator
+import com.samco.trackandgraph.functions.aggregation.dataPointsLabel
+import com.samco.trackandgraph.functions.aggregation.sumDataPoints
 import org.threeten.bp.temporal.TemporalAmount
 
 /**
@@ -41,9 +43,7 @@ class DurationAggregationFunction(
     private val timeHelper: TimeHelper,
     private val binSize: TemporalAmount,
 ) : DataSampleFunction {
-    override suspend fun mapSample(dataSample: DataSample): DataSample {
-        return FixedBinAggregator(timeHelper, binSize)
-            .aggregate(dataSample)
-            .sum()
-    }
+    override suspend fun mapSample(dataSample: DataSample) =
+        FixedBinAggregator(timeHelper, binSize, ::sumDataPoints, ::dataPointsLabel)
+            .mapSample(dataSample)
 }

@@ -51,6 +51,10 @@ class TimeHistogramDataFactory @Inject constructor(
         return createViewData(graphOrStat, timeHistogram, onDataSampled)
     }
 
+    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
+        return dataInteractor.getTimeHistogramByGraphStatId(graphOrStatId)?.featureId == featureId
+    }
+
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         config: TimeHistogram,

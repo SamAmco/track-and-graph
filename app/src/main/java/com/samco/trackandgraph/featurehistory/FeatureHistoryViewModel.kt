@@ -1,11 +1,15 @@
+@file:OptIn(FlowPreview::class)
+
 package com.samco.trackandgraph.featurehistory
 
+import android.provider.ContactsContract.Data
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.DataUpdateType
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -51,10 +55,14 @@ class FeatureHistoryViewModelImpl @Inject constructor(
         val dataPoints: List<DataPoint>
     )
 
+    private val dataUpdates = dataInteractor
+        .getDataUpdateEvents()
+        .map { }
+        .debounce(10)
+        .onStart { emit(Unit) }
+
     private val dataSample =
-        combine(
-            featureIdFlow,
-            dataInteractor.getDataUpdateEvents().onStart { emit(Unit) }) { id, _ -> id }
+        combine(featureIdFlow, dataUpdates) { id, _ -> id }
             .map { featureId ->
                 val dataSample = dataInteractor.getDataSampleForFeatureId(featureId)
                 val answer = RawData(

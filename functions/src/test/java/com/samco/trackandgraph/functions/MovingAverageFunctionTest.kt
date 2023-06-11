@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.functions.MovingAverageFunction
 import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.runBlocking
@@ -52,7 +51,7 @@ class MovingAverageFunctionTest {
 
             //WHEN
             MovingAverageFunction(averagingDuration)
-                .mapSample(DataSample.fromSequence(sequence))
+                .mapSample(fromSequence(sequence))
                 .take(3)
                 .toList()
 
@@ -87,7 +86,7 @@ class MovingAverageFunctionTest {
 
             //WHEN
             MovingAverageFunction(averagingDuration)
-                .mapSample(DataSample.fromSequence(sequence))
+                .mapSample(fromSequence(sequence))
                 .toList()
 
             //THEN
@@ -113,16 +112,17 @@ class MovingAverageFunctionTest {
                 2.0 to 48L,
                 4.0 to 49L,
                 0.0 to 50L,
-                5.0 to 70L
+                5.0 to 70L,
+                3.0 to 75L
             ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
             val averagingDuration = Duration.ofHours(10)
 
             //WHEN
             val answer = MovingAverageFunction(averagingDuration)
-                .mapSample(DataSample.fromSequence(dataPoints.asSequence()))
+                .mapSample(fromSequence(dataPoints.asSequence()))
 
             //THEN
-            val expected = listOf(3.0, 7.0, 8.0, 2.0, 1.5, 2.0, 2.0, 0.0, 5.0)
+            val expected = listOf(3.0, 7.0, 8.0, 2.0, 1.5, 2.0, 2.0, 0.0, 4.0, 3.0)
             val actual = answer.map { dp -> dp.value }.toList()
             assertEquals(expected, actual)
         }
@@ -137,7 +137,7 @@ class MovingAverageFunctionTest {
 
             //WHEN
             val answer = MovingAverageFunction(averagingDuration)
-                .mapSample(DataSample.fromSequence(dataPoints.asSequence()))
+                .mapSample(fromSequence(dataPoints.asSequence()))
 
             //THEN
             assertEquals(0, answer.toList().size)

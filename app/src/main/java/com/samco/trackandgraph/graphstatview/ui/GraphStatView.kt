@@ -16,7 +16,10 @@
  */
 package com.samco.trackandgraph.graphstatview.ui
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -24,12 +27,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
-import com.samco.trackandgraph.graphstatview.factories.viewdto.*
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
-import com.samco.trackandgraph.R
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -52,10 +62,11 @@ fun GraphStatView(
     when (graphStatViewData.state) {
         IGraphStatViewData.State.LOADING -> {
             Box(
-                modifier = Modifier.heightIn(min = 160.dp),
+                modifier = Modifier.heightIn(min = guessHeight(graphStatViewData)),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
         }
+
         IGraphStatViewData.State.ERROR -> {
             GraphErrorView(
                 modifier = modifier,
@@ -64,12 +75,20 @@ fun GraphStatView(
                     ?: R.string.graph_stat_validation_unknown
             )
         }
+
         else -> GraphStatInnerView(
             graphStatViewData = graphStatViewData,
             listMode = listMode,
             timeMarker = timeMarker,
             graphHeight = graphHeight
         )
+    }
+}
+
+private fun guessHeight(graphStatViewData: IGraphStatViewData): Dp {
+    return when (graphStatViewData.graphOrStat.type) {
+        GraphStatType.AVERAGE_TIME_BETWEEN, GraphStatType.LAST_VALUE -> 125.dp
+        GraphStatType.LINE_GRAPH, GraphStatType.PIE_CHART, GraphStatType.TIME_HISTOGRAM, GraphStatType.BAR_CHART -> 240.dp
     }
 }
 
@@ -102,7 +121,7 @@ private fun GraphStatInnerView(
 
     GraphStatType.LAST_VALUE ->
         LastValueStatView(
-            viewData = graphStatViewData as ILastValueData,
+            viewData = graphStatViewData as ILastValueViewData,
             listMode = listMode,
             graphHeight = graphHeight
         )
@@ -115,7 +134,7 @@ private fun GraphStatInnerView(
 
     GraphStatType.BAR_CHART ->
         BarChartView(
-            viewData = graphStatViewData as IBarChartData,
+            viewData = graphStatViewData as IBarChartViewData,
             timeMarker = timeMarker,
             listMode = listMode,
             graphHeight = graphHeight

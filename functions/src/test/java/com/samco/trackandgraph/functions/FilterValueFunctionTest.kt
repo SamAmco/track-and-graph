@@ -46,7 +46,7 @@ class FilterValueFunctionTest {
                 DpInput(5, "", 100.0),
                 DpInput(10, "", 300.0)
             ).map { makedp(now, it) }
-            val dataSample = DataSample.fromSequence(inputPoints.asSequence())
+            val dataSample = fromSequence(inputPoints.asSequence())
 
             //WHEN
             val answer = FilterValueFunction(150.0, 350.0)
@@ -75,7 +75,7 @@ class FilterValueFunctionTest {
                 DpInput(5, "A", 1.0),
                 DpInput(10, "B", 2.0)
             ).map { makedp(now, it) }
-            val dataSample = DataSample.fromSequence(inputPoints.asSequence())
+            val dataSample = fromSequence(inputPoints.asSequence())
 
             //WHEN
             val answer = FilterLabelFunction(setOf("A"))
@@ -104,7 +104,7 @@ class FilterValueFunctionTest {
                 DpInput(5, "A", 100.0),
                 DpInput(10, "B", 2.0)
             ).map { makedp(now, it) }
-            val dataSample = DataSample.fromSequence(inputPoints.asSequence())
+            val dataSample = fromSequence(inputPoints.asSequence())
 
             //WHEN
             val answer = CompositeFunction(

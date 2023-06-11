@@ -73,15 +73,16 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun insertDataPoint(dataPoint: DataPoint): Long
 
-    suspend fun insertDataPoints(dataPoint: List<DataPoint>)
+    suspend fun insertDataPoints(dataPoints: List<DataPoint>)
 
-    suspend fun updateDataPoints(dataPoint: List<DataPoint>)
+    suspend fun updateDataPoints(dataPoints: List<DataPoint>)
 
     /**
      * Emits a unit every time currently displayed data may have changed.
-     * For example if you create/update/remove a data point.
+     *
+     * @see [DataUpdateType]
      */
-    fun getDataUpdateEvents(): SharedFlow<Unit>
+    fun getDataUpdateEvents(): SharedFlow<DataUpdateType>
 
     suspend fun getGraphStatById(graphStatId: Long): GraphOrStat
 

@@ -19,7 +19,9 @@ package com.samco.trackandgraph.functions.aggregation
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import com.samco.trackandgraph.functions.helpers.TimeHelper
+import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
 /**
@@ -33,14 +35,16 @@ import org.threeten.bp.temporal.TemporalAmount
 internal class FixedBinAggregator(
     private val timeHelper: TimeHelper,
     private val binSize: TemporalAmount,
-) : DataAggregator {
+    private val calculateValue: (List<IDataPoint>) -> Double,
+    private val calculateLabel: (List<IDataPoint>) -> String,
+) : DataSampleFunction {
 
-    override suspend fun aggregate(dataSample: DataSample): AggregatedDataSample {
-        return AggregatedDataSample.fromDataSample(
+    override suspend fun mapSample(dataSample: DataSample): DataSample {
+        return DataSample.fromSequence(
             data = getSequence(dataSample),
-            dataSample = dataSample,
+            getRawDataPoints = dataSample::getRawDataPoints,
             dataSampleProperties = dataSample.dataSampleProperties.copy(regularity = binSize),
-            getRawDataPoints = dataSample::getRawDataPoints
+            onDispose = dataSample::dispose
         )
     }
 
@@ -55,9 +59,9 @@ internal class FixedBinAggregator(
             val next = iterator.next()
             while (timeHelper.toZonedDateTime(next.timestamp) < nextCutOff) {
                 yield(
-                    AggregatedDataPoint(
+                    getDataPoint(
                         timestamp = nextBinTimeStamp.toOffsetDateTime(),
-                        parents = nextPoints
+                        points = nextPoints
                     )
                 )
                 nextBinTimeStamp = nextBinTimeStamp.minus(binSize)
@@ -67,10 +71,19 @@ internal class FixedBinAggregator(
             nextPoints.add(next)
         }
         yield(
-            AggregatedDataPoint(
+            getDataPoint(
                 timestamp = nextBinTimeStamp.toOffsetDateTime(),
-                parents = nextPoints
+                points = nextPoints
             )
         )
+    }
+
+    private inline fun getDataPoint(
+        timestamp: OffsetDateTime,
+        points: List<IDataPoint>,
+    ) = object : IDataPoint() {
+        override val timestamp: OffsetDateTime = timestamp
+        override val value: Double = calculateValue(points)
+        override val label: String = calculateLabel(points)
     }
 }

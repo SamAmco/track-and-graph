@@ -104,6 +104,11 @@ class LineGraphDataFactory @Inject constructor(
         return createViewData(graphOrStat, lineGraph, onDataSampled)
     }
 
+    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
+        return dataInteractor.getLineGraphByGraphStatId(graphOrStatId)?.features
+            ?.any { it.featureId == featureId } ?: false
+    }
+
     private suspend fun generatePlottingData(
         lineGraph: LineGraphWithFeatures,
         endTime: OffsetDateTime,

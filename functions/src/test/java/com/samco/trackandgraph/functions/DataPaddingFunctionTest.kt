@@ -50,7 +50,7 @@ class DataPaddingFunctionTest {
     fun test_invalid_regularity() {
         runBlocking {
             //GIVEN
-            val sample = DataSample.fromSequence(emptySequence())
+            val sample = fromSequence(emptySequence())
 
             //WHEN
             DataPaddingFunction(defaultTimeHelper, null, null as TemporalAmount?)
@@ -66,7 +66,7 @@ class DataPaddingFunctionTest {
             val dataSampleProperties = DataSampleProperties(
                 regularity = Duration.ofHours(1)
             )
-            val sample = DataSample.fromSequence(emptySequence(), dataSampleProperties)
+            val sample = fromSequence(emptySequence(), dataSampleProperties)
 
             //WHEN
             val dataPoints = DataPaddingFunction(defaultTimeHelper, null, null as TemporalAmount?)
@@ -85,7 +85,7 @@ class DataPaddingFunctionTest {
             val dataSampleProperties = DataSampleProperties(
                 regularity = Duration.ofHours(1)
             )
-            val sample = DataSample.fromSequence(emptySequence(), dataSampleProperties)
+            val sample = fromSequence(emptySequence(), dataSampleProperties)
 
             //WHEN
             val dataPoints = DataPaddingFunction(defaultTimeHelper, null, Period.ofDays(1))
@@ -111,7 +111,7 @@ class DataPaddingFunctionTest {
             val dataSampleProperties = DataSampleProperties(
                 regularity = Duration.ofHours(1)
             )
-            val sample = DataSample.fromSequence(emptySequence(), dataSampleProperties)
+            val sample = fromSequence(emptySequence(), dataSampleProperties)
 
             //WHEN
             val dataPoints = DataPaddingFunction(defaultTimeHelper, now, null as TemporalAmount?)
@@ -141,7 +141,7 @@ class DataPaddingFunctionTest {
             )
             val sequence =
                 listOf(3, 5, 7).map { makedp(endOfDay.minusHours(it.toLong())) }.asSequence()
-            val sample = DataSample.fromSequence(sequence, dataSampleProperties)
+            val sample = fromSequence(sequence, dataSampleProperties)
 
             //WHEN
             val dataPoints = CompositeFunction(
@@ -187,7 +187,7 @@ class DataPaddingFunctionTest {
             val sequence = listOf(7, 5, 3)
                 .map { makedp(endOfDay.minusMinutes(30).plusHours(it.toLong())) }
                 .asSequence()
-            val sample = DataSample.fromSequence(sequence, dataSampleProperties)
+            val sample = fromSequence(sequence, dataSampleProperties)
 
             //WHEN
             val dataPoints = CompositeFunction(
@@ -240,7 +240,7 @@ class DataPaddingFunctionTest {
             val sequence = listOf(1, 3, 4)
                 .map { makedp(endOfDay.plusMinutes(30).minusHours(it.toLong())) }
                 .asSequence()
-            val sample = DataSample.fromSequence(sequence, dataSampleProperties)
+            val sample = fromSequence(sequence, dataSampleProperties)
 
             //WHEN
             val dataPoints = CompositeFunction(
@@ -289,7 +289,7 @@ class DataPaddingFunctionTest {
             val sequence = listOf(1, 2)
                 .map { makedp(endDate.minusSeconds(1).minusWeeks(it.toLong())) }
                 .asSequence()
-            val sample = DataSample.fromSequence(sequence, dataSampleProperties)
+            val sample = fromSequence(sequence, dataSampleProperties)
 
             //WHEN
             val dataPoints = CompositeFunction(
