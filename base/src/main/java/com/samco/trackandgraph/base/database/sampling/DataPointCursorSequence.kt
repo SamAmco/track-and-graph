@@ -19,8 +19,9 @@ package com.samco.trackandgraph.base.database.sampling
 
 import android.database.Cursor
 import com.samco.trackandgraph.base.database.dto.IDataPoint
-import com.samco.trackandgraph.base.database.odtFromString
-import java.lang.Exception
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 import java.util.*
 
 internal class DataPointCursorSequence(
@@ -60,13 +61,21 @@ internal class DataPointCursorSequence(
         }
 
         private fun getCursorDataPoint(): com.samco.trackandgraph.base.database.dto.DataPoint {
+            val epochMilli = cursor.getLong(0)
+            val featureId = cursor.getLong(1)
+            val utcOffsetSec = cursor.getInt(2)
+            val value = cursor.getDouble(3)
+            val label = cursor.getString(4)
+            val note = cursor.getString(5)
             return com.samco.trackandgraph.base.database.dto.DataPoint(
-                odtFromString(cursor.getString(0))
-                    ?: throw Exception("Could not read timestamp for data point row"),
-                cursor.getLong(1),
-                cursor.getDouble(2),
-                cursor.getString(3),
-                cursor.getString(4),
+                timestamp = OffsetDateTime.ofInstant(
+                    Instant.ofEpochMilli(epochMilli),
+                    ZoneOffset.ofTotalSeconds(utcOffsetSec)
+                ),
+                featureId = featureId,
+                value = value,
+                label = label,
+                note = note
             )
         }
     }

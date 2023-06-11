@@ -1,16 +1,16 @@
-/* 
+/*
 * This file is part of Track & Graph
-* 
+*
 * Track & Graph is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
-* 
+*
 * Track & Graph is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
@@ -26,7 +26,6 @@ import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
 import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
 import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
 import kotlinx.coroutines.flow.Flow
-import org.threeten.bp.OffsetDateTime
 
 private const val getTrackersQuery = """
     SELECT 
@@ -46,8 +45,8 @@ private const val getTrackersQuery = """
     LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
             """
 
-private const val getDisplayTrackersQuery =
-    """ SELECT
+private const val getDisplayTrackersQuery = """ 
+    SELECT
         features_table.name as name,
         features_table.group_id as group_id,
         features_table.display_index as display_index,
@@ -58,21 +57,29 @@ private const val getDisplayTrackersQuery =
         trackers_table.has_default_value as has_default_value,
         trackers_table.default_value as default_value,
         trackers_table.default_label as default_label,
-        num_data_points as num_data_points,
-        last_timestamp as last_timestamp,
-        start_instant as start_instant
+        num_data_points,
+        last_epoch_milli,
+        last_utc_offset_sec,
+        start_instant 
         FROM (
             trackers_table
             LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
             LEFT JOIN (
-                SELECT feature_id as id, COUNT(*) as num_data_points, MAX(timestamp) as last_timestamp
+                SELECT feature_id as id, COUNT(*) as num_data_points
                 FROM data_points_table GROUP BY feature_id
-            ) as feature_data
-                ON feature_data.id = trackers_table.feature_id
+            ) as feature_data ON feature_data.id = trackers_table.feature_id
+            LEFT JOIN (
+                SELECT feature_id, epoch_milli as last_epoch_milli, utc_offset_sec as last_utc_offset_sec
+                FROM data_points_table as dpt
+                INNER JOIN (
+                    SELECT feature_id as fid, MAX(epoch_milli) as max_epoch_milli
+                    FROM data_points_table 
+                    GROUP BY feature_id
+                ) as max_data ON max_data.fid = dpt.feature_id AND dpt.epoch_milli = max_data.max_epoch_milli
+            ) as last_data ON last_data.feature_id = trackers_table.feature_id
             LEFT JOIN (
                 SELECT * FROM feature_timers_table
-            ) as timer_data
-            ON timer_data.feature_id = trackers_table.feature_id
+            ) as timer_data ON timer_data.feature_id = trackers_table.feature_id
         )
     """
 
@@ -190,19 +197,19 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateDataPoints(dataPoint: List<DataPoint>)
 
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY epoch_milli DESC")
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND timestamp = :timestamp")
-    fun getDataPointByTimestampAndFeatureSync(featureId: Long, timestamp: OffsetDateTime): DataPoint
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND epoch_milli = :epochMilli")
+    fun getDataPointByTimestampAndFeatureSync(featureId: Long, epochMilli: Long): DataPoint
 
     @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :featureId")
     fun getDataPointCount(featureId: Long): Int
 
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY epoch_milli DESC LIMIT :limit OFFSET :offset")
     fun getDataPoints(featureId: Long, limit: Int, offset: Int): List<DataPoint>
 
-    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY timestamp DESC")
+    @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId ORDER BY epoch_milli DESC")
     fun getDataPointsCursor(featureId: Long): Cursor
 
     @Query("SELECT * FROM graphs_and_stats_table2 WHERE id = :graphStatId LIMIT 1")
@@ -229,23 +236,23 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query(
         """
-SELECT * FROM (
-SELECT dp.timestamp as timestamp, t.id as tracker_id, dp.feature_id as feature_id, f.name as feature_name, g.id as group_id, dp.note as note
-FROM data_points_table as dp
-LEFT JOIN features_table as f ON dp.feature_id = f.id
-LEFT JOIN trackers_table as t ON dp.feature_id = t.feature_id
-LEFT JOIN groups_table as g ON f.group_id = g.id
-WHERE dp.note IS NOT NULL AND dp.note != ""
-) UNION SELECT * FROM (
-SELECT n.timestamp as timestamp, NULL as tracker_id, NULL as feature_id, NULL as feature_name, NULL as group_id, n.note as note
-FROM notes_table as n
-) ORDER BY timestamp DESC
-"""
+        SELECT * FROM (
+            SELECT dp.epoch_milli as epoch_milli, dp.utc_offset_sec as utc_offset_sec, t.id as tracker_id, dp.feature_id as feature_id, f.name as feature_name, g.id as group_id, dp.note as note
+            FROM data_points_table as dp
+            LEFT JOIN features_table as f ON dp.feature_id = f.id
+            LEFT JOIN trackers_table as t ON dp.feature_id = t.feature_id
+            LEFT JOIN groups_table as g ON f.group_id = g.id
+            WHERE dp.note IS NOT NULL AND dp.note != ""
+        ) UNION SELECT * FROM (
+            SELECT n.epoch_milli as epoch_milli, n.utc_offset_sec as utc_offset_sec, NULL as tracker_id, NULL as feature_id, NULL as feature_name, NULL as group_id, n.note as note
+            FROM notes_table as n
+        ) ORDER BY epoch_milli DESC
+        """
     )
     fun getAllDisplayNotes(): Flow<List<DisplayNote>>
 
-    @Query("UPDATE data_points_table SET note = '' WHERE timestamp = :timestamp AND feature_id = :featureId")
-    fun removeNote(timestamp: OffsetDateTime, featureId: Long)
+    @Query("UPDATE data_points_table SET note = '' WHERE epoch_milli = :epochMilli AND feature_id = :featureId")
+    fun removeNote(epochMilli: Long, featureId: Long)
 
     @Delete
     fun deleteGlobalNote(note: GlobalNote)
@@ -253,8 +260,8 @@ FROM notes_table as n
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGlobalNote(note: GlobalNote): Long
 
-    @Query("SELECT * FROM notes_table WHERE timestamp = :timestamp LIMIT 1")
-    fun getGlobalNoteByTimeSync(timestamp: OffsetDateTime?): GlobalNote?
+    @Query("SELECT * FROM notes_table WHERE epoch_milli = :epochMilli LIMIT 1")
+    fun getGlobalNoteByTimeSync(epochMilli: Long): GlobalNote?
 
     @Query("SELECT * FROM notes_table")
     fun getAllGlobalNotesSync(): List<GlobalNote>

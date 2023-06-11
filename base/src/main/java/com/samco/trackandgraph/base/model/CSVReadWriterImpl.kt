@@ -187,7 +187,8 @@ internal class CSVReadWriterImpl @Inject constructor(
         insertTracker(existingTrackers, existingTrackersByName, newTracker)
         points.add(
             DataPointEntity(
-                timestamp = rec.timestamp,
+                epochMilli = rec.timestamp.toInstant().toEpochMilli(),
+                utcOffsetSec = rec.timestamp.offset.totalSeconds,
                 featureId = newTracker.featureId,
                 value = rec.value,
                 label = rec.label,
@@ -206,7 +207,8 @@ internal class CSVReadWriterImpl @Inject constructor(
         validateDataType(tracker, rec.isDuration, lineNumber)
         points.add(
             DataPointEntity(
-                timestamp = rec.timestamp,
+                epochMilli = rec.timestamp.toInstant().toEpochMilli(),
+                utcOffsetSec = rec.timestamp.offset.totalSeconds,
                 featureId = tracker.featureId,
                 value = rec.value,
                 label = rec.label,

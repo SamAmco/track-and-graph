@@ -22,6 +22,7 @@ import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 internal data class DisplayTracker(
     @ColumnInfo(name = "id")
@@ -48,8 +49,11 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "default_label")
     val defaultLabel: String,
 
-    @ColumnInfo(name = "last_timestamp")
-    val timestamp: OffsetDateTime?,
+    @ColumnInfo(name = "last_epoch_milli")
+    val lastEpochMilli: Long,
+
+    @ColumnInfo(name = "last_utc_offset_sec")
+    val lastUtcOffsetSec: Int,
 
     @ColumnInfo(name = "num_data_points")
     val numDataPoints: Long?,
@@ -72,7 +76,10 @@ internal data class DisplayTracker(
         hasDefaultValue = hasDefaultValue,
         defaultValue = defaultValue,
         defaultLabel = defaultLabel,
-        timestamp = timestamp,
+        timestamp = OffsetDateTime.ofInstant(
+            Instant.ofEpochMilli(lastEpochMilli),
+            ZoneOffset.ofTotalSeconds(lastUtcOffsetSec)
+        ),
         numDataPoints = numDataPoints,
         displayIndex = displayIndex,
         description = description,
