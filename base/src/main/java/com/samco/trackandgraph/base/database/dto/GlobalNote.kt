@@ -25,7 +25,8 @@ data class GlobalNote(
     val note: String = ""
 ) {
     internal fun toEntity() = GlobalNote(
-        timestamp,
-        note
+        epochMilli = timestamp.toInstant().toEpochMilli(),
+        utcOffsetSec = timestamp.offset.totalSeconds,
+        note = note
     )
 }
