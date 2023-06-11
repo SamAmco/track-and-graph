@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -34,8 +35,14 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 fun CustomDialog(
     onDismissRequest: () -> Unit,
     scrollContent: Boolean = true,
+    usePlatformDefaultWidth: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
-) = Dialog(onDismissRequest = onDismissRequest) {
+) = Dialog(
+    onDismissRequest = onDismissRequest,
+    properties = DialogProperties(
+        usePlatformDefaultWidth = usePlatformDefaultWidth,
+    )
+) {
     DialogTheme {
         Surface {
             Column(
@@ -51,19 +58,23 @@ fun CustomDialog(
 }
 
 @Composable
-fun SlimConfirmCancelDialog(
+fun CustomConfirmCancelDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
+    customWidthPercentage: Float? = null,
     @StringRes continueText: Int = R.string.continue_word,
     @StringRes dismissText: Int = R.string.cancel,
     continueEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
-    scrollContent = false
+    scrollContent = false,
+    usePlatformDefaultWidth = customWidthPercentage == null,
 ) {
     Column(
-        Modifier
+        if (customWidthPercentage != null) {
+            Modifier.fillMaxWidth(customWidthPercentage)
+        } else Modifier
             .wrapContentHeight()
             .verticalScroll(rememberScrollState())
     ) {
@@ -97,6 +108,7 @@ fun ConfirmCancelDialog(
     onConfirm: () -> Unit,
     @StringRes continueText: Int = R.string.continue_word,
     @StringRes dismissText: Int = R.string.cancel,
+    confirmButtonEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) = DialogTheme {
     AlertDialog(
@@ -112,6 +124,7 @@ fun ConfirmCancelDialog(
         confirmButton = {
             SmallTextButton(
                 stringRes = continueText,
+                enabled = confirmButtonEnabled,
                 onClick = onConfirm
             )
         },
