@@ -21,11 +21,13 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.IDataPoint
+import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 @Entity(
     tableName = "data_points_table",
-    primaryKeys = ["timestamp", "feature_id"],
+    primaryKeys = ["epoch_milli", "feature_id"],
     foreignKeys = [
         ForeignKey(
             entity = Feature::class,
@@ -36,23 +38,29 @@ import org.threeten.bp.OffsetDateTime
     ]
 )
 internal data class DataPoint(
-    @ColumnInfo(name = "timestamp", index = true)
-    override val timestamp: OffsetDateTime = OffsetDateTime.now(),
+    @ColumnInfo(name = "epoch_milli", index = true)
+    val epochMilli: Long,
 
     @ColumnInfo(name = "feature_id", index = true)
     val featureId: Long,
 
+    @ColumnInfo(name = "utc_offset_sec")
+    val utcOffsetSec: Int,
+
     @ColumnInfo(name = "value")
-    override val value: Double,
+    val value: Double,
 
     @ColumnInfo(name = "label")
-    override val label: String,
+    val label: String,
 
     @ColumnInfo(name = "note")
     val note: String
-) : IDataPoint() {
+) {
     fun toDto() = DataPoint(
-        timestamp,
+        OffsetDateTime.ofInstant(
+            Instant.ofEpochMilli(epochMilli),
+            ZoneOffset.ofTotalSeconds(utcOffsetSec)
+        ),
         featureId,
         value,
         label,

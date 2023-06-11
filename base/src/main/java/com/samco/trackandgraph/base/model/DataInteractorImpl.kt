@@ -274,7 +274,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun removeNote(timestamp: OffsetDateTime, trackerId: Long) {
         withContext(io) {
             dao.getTrackerById(trackerId)?.featureId?.let { featureId ->
-                dao.removeNote(timestamp, featureId).also {
+                dao.removeNote(timestamp.toInstant().toEpochMilli(), featureId).also {
                     dataUpdateEvents.emit(DataUpdateType.DataPoint(featureId))
                 }
             }
@@ -293,7 +293,9 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun getGlobalNoteByTimeSync(timestamp: OffsetDateTime?): GlobalNote? =
         withContext(io) {
-            dao.getGlobalNoteByTimeSync(timestamp)?.toDto()
+            timestamp?.let {
+                dao.getGlobalNoteByTimeSync(it.toInstant().toEpochMilli())?.toDto()
+            }
         }
 
     override suspend fun getAllGlobalNotesSync(): List<GlobalNote> = withContext(io) {

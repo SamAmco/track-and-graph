@@ -57,5 +57,3 @@ internal data class Feature(
         description = this@Feature.description
     )
 }
-
-
