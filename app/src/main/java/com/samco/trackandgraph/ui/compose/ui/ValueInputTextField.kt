@@ -44,14 +44,18 @@ fun LabelInputTextField(
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     focusManager: FocusManager? = null,
-    focusRequester: FocusRequester? = null
+    focusRequester: FocusRequester? = null,
+    onNextOverride: (() -> Unit)? = null
 ) {
     SlimOutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = { Text(stringResource(id = R.string.label)) },
         keyboardActions = KeyboardActions(
-            onNext = { focusManager?.moveFocus(FocusDirection.Down) }
+            onNext = {
+                if (onNextOverride != null) onNextOverride()
+                else focusManager?.moveFocus(FocusDirection.Down)
+            }
         ),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
@@ -71,7 +75,8 @@ fun ValueInputTextField(
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     focusManager: FocusManager? = null,
-    focusRequester: FocusRequester? = null
+    focusRequester: FocusRequester? = null,
+    onNextOverride: (() -> Unit)? = null
 ) {
     val focusUpdateScope = rememberCoroutineScope()
 
@@ -80,7 +85,10 @@ fun ValueInputTextField(
         onValueChange = { onValueChange(it) },
         label = { Text(stringResource(id = R.string.value)) },
         keyboardActions = KeyboardActions(
-            onNext = { focusManager?.moveFocus(FocusDirection.Down) }
+            onNext = {
+                if (onNextOverride != null) onNextOverride()
+                else focusManager?.moveFocus(FocusDirection.Down)
+            }
         ),
         textStyle = MaterialTheme.typography.subtitle2,
         placeholder = {
