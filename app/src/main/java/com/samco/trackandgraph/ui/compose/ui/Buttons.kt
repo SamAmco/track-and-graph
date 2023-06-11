@@ -91,7 +91,10 @@ fun SelectorTextButton(
     modifier = modifier,
     onClick = onClick,
     shape = MaterialTheme.shapes.small,
-    contentPadding = PaddingValues(8.dp),
+    contentPadding = PaddingValues(
+        horizontal = 8.dp,
+        vertical = 6.dp
+    ),
     colors = ButtonDefaults.buttonColors(
         backgroundColor = MaterialTheme.tngColors.selectorButtonColor
     )
