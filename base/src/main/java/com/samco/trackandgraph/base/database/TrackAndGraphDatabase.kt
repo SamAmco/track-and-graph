@@ -254,8 +254,8 @@ internal class Converters {
     fun intToTimeHistogramWindow(index: Int) = TimeHistogramWindow.values()[index]
 }
 
-//TODO It turns out that parsing an OffsetDateTime allocates quite a lot of memory.
-// This triggers the garbage collector when reading a lot of data points often causing frame drops
+//TODO It turns out that parsing an OffsetDateTime allocates quite a lot of memory and takes a long
+// time. It often triggers the garbage collector, when reading a lot of data points, causing frame drops
 // while opening a group :/  It would be really nice to find a more minimal database representation
 // that's faster to read back and doesn't allocate as much memory.
 fun odtFromString(value: String): OffsetDateTime? =
