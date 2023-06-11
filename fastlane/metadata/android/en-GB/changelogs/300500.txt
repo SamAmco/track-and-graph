@@ -1,0 +1,4 @@
+- Significant performance improvements for graph loading
+- Improved tracker input dialog behaviour (next button adds data point or goes to next)
+- Fix bug labels lost when updating from duration to continuous
+- Slimmer outlined text fields and buttons
