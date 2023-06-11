@@ -133,8 +133,9 @@ private fun UpdateWarningDialog(
 @Composable
 private fun UpdateDialog(
     viewModel: UpdateDialogViewModel
-) = SlimConfirmCancelDialog(
+) = CustomConfirmCancelDialog(
     onDismissRequest = viewModel::onCancelUpdate,
+    customWidthPercentage = 0.9f,
     onConfirm = viewModel::onUpdateClicked,
     continueText = R.string.update,
     continueEnabled = viewModel.updateButtonEnabled.observeAsState(false).value
