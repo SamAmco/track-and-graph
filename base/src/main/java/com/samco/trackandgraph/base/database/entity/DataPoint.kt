@@ -27,7 +27,7 @@ import org.threeten.bp.OffsetDateTime
     tableName = "data_points_table",
     primaryKeys = ["timestamp", "feature_id"],
     foreignKeys = [
-        androidx.room.ForeignKey(
+        ForeignKey(
             entity = Feature::class,
             parentColumns = arrayOf("id"),
             childColumns = arrayOf("feature_id"),
@@ -36,7 +36,7 @@ import org.threeten.bp.OffsetDateTime
     ]
 )
 internal data class DataPoint(
-    @ColumnInfo(name = "timestamp")
+    @ColumnInfo(name = "timestamp", index = true)
     override val timestamp: OffsetDateTime = OffsetDateTime.now(),
 
     @ColumnInfo(name = "feature_id", index = true)

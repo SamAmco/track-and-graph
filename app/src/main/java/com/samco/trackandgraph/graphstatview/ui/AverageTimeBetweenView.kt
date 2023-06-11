@@ -36,7 +36,7 @@ fun AverageTimeBetweenView(
     viewData: IAverageTimeBetweenViewData,
     graphHeight: Int? = null
 ) {
-    if (viewData.state == IGraphStatViewData.State.ERROR) {
+    if (!viewData.enoughData) {
         GraphErrorView(
             modifier = modifier,
             error = R.string.graph_stat_view_not_enough_data_graph

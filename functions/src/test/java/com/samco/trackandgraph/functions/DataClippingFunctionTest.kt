@@ -31,7 +31,7 @@ class DataClippingFunctionTest {
     fun clipDataSample_empty_sample() = runBlocking {
         //WHEN
         val answer = DataClippingFunction(null, null)
-            .mapSample(DataSample.fromSequence(emptySequence()))
+            .mapSample(fromSequence(emptySequence()))
 
         //THEN
         assertEquals(0, answer.toList().size)
@@ -48,7 +48,7 @@ class DataClippingFunctionTest {
                 consumed++
             }
         }.map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(sequence)
+        val dataSample = fromSequence(sequence)
 
         //WHEN
         DataClippingFunction(
@@ -77,7 +77,7 @@ class DataClippingFunctionTest {
             0.0 to 50L,
             5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
 
         //WHEN
         val answer = DataClippingFunction(null, null).mapSample(dataSample)
@@ -101,7 +101,7 @@ class DataClippingFunctionTest {
             0.0 to 50L,
             5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofHours(30)
 
         //WHEN
@@ -126,7 +126,7 @@ class DataClippingFunctionTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofHours(100)
 
         //WHEN
@@ -151,7 +151,7 @@ class DataClippingFunctionTest {
             0.0 to 50L,
             5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, now.minusHours(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofHours(1)
 
         //WHEN
@@ -176,7 +176,7 @@ class DataClippingFunctionTest {
             0.0 to 50L,
             5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, future.minusHours(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofHours(35)
 
         //WHEN
@@ -201,7 +201,7 @@ class DataClippingFunctionTest {
             0.0 to 50L,
             5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
         val endTime = now.minusDays(20)
 
         //WHEN
@@ -226,7 +226,7 @@ class DataClippingFunctionTest {
             0.0 to 50L,
             5.0 to 70L
         ).map { (value, hoursBefore) -> makedp(value, future.minusDays(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
 
         //WHEN
         val answer = DataClippingFunction(OffsetDateTime.now(), null).mapSample(dataSample)
@@ -250,7 +250,7 @@ class DataClippingFunctionTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
 
         //WHEN
         val answer = DataClippingFunction(now, null).mapSample(dataSample)
@@ -275,7 +275,7 @@ class DataClippingFunctionTest {
             0.0 to 50L,
             5.0 to 70L
         ).map { (value, daysBefore) -> makedp(value, future.minusDays(daysBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofDays(30)
 
         //WHEN
@@ -300,7 +300,7 @@ class DataClippingFunctionTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.minusDays(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofDays(3)
 
         //WHEN
@@ -325,7 +325,7 @@ class DataClippingFunctionTest {
             7.0 to 20L,
             3.0 to 10L
         ).map { (value, hoursBefore) -> makedp(value, now.plusMonths(3).minusDays(hoursBefore)) }
-        val dataSample = DataSample.fromSequence(dataPoints.asSequence())
+        val dataSample = fromSequence(dataPoints.asSequence())
         val sampleDuration = Duration.ofDays(20)
 
         //WHEN

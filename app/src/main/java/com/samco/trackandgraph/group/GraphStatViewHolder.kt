@@ -23,6 +23,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.*
 import com.samco.trackandgraph.graphstatview.ui.*
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 
+
 class GraphStatViewHolder(
     private val composeView: ComposeView,
 ) : GroupChildViewHolder(composeView) {
@@ -39,16 +40,22 @@ class GraphStatViewHolder(
         this.graphStatViewData = graphStat
         this.clickListener = clickListener
 
-        composeView.setContent {
-            TnGComposeTheme {
-                key(graphStat) {
-                    GraphStatCardView(
-                        isElevated = isElevated,
-                        graphStatViewData = graphStatViewData,
-                        clickListener = clickListener
-                    )
-                }
-            }
+        composeView.setContent { GraphStatContent(graphStat = graphStat) }
+
+        //This fixes a bug because compose views don't calculate their height immediately,
+        // scrolling up through a recycler view causes jumpy behviour. See this issue:
+        // https://issuetracker.google.com/issues/240449681
+        composeView.getChildAt(0)?.requestLayout()
+    }
+
+    @Composable
+    private fun GraphStatContent(graphStat: IGraphStatViewData) = TnGComposeTheme {
+        key(graphStat) {
+            GraphStatCardView(
+                isElevated = isElevated,
+                graphStatViewData = graphStatViewData,
+                clickListener = clickListener
+            )
         }
     }
 

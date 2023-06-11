@@ -35,7 +35,7 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
 import com.samco.trackandgraph.base.helpers.formatTimeToDaysHoursMinutesSeconds
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
@@ -48,7 +48,7 @@ import org.threeten.bp.OffsetDateTime
 @Composable
 fun LastValueStatView(
     modifier: Modifier = Modifier,
-    viewData: ILastValueData,
+    viewData: ILastValueViewData,
     listMode: Boolean,
     graphHeight: Int? = null
 ) = CompositionLocalProvider(

@@ -74,6 +74,11 @@ class AverageTimeBetweenDataFactory @Inject constructor(
         return createViewData(graphOrStat, timeBetweenStat, onDataSampled)
     }
 
+    override suspend fun affectedBy(graphOrStatId: Long, featureId: Long): Boolean {
+        return dataInteractor.getAverageTimeBetweenStatByGraphStatId(graphOrStatId)
+            ?.featureId == featureId
+    }
+
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
         config: AverageTimeBetweenStat,
@@ -86,7 +91,7 @@ class AverageTimeBetweenDataFactory @Inject constructor(
             val dataPoints = withContext(Dispatchers.IO) {
                 dataSample.toList()
             }
-            if (dataPoints.size < 2) return notEnoughData(graphOrStat, dataPoints.size)
+            if (dataPoints.size < 2) return notEnoughData(graphOrStat)
             val averageMillis = withContext(Dispatchers.Default) {
                 calculateAverageTimeBetween(dataPoints)
             }
@@ -95,6 +100,7 @@ class AverageTimeBetweenDataFactory @Inject constructor(
             object : IAverageTimeBetweenViewData {
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
+                override val enoughData: Boolean = true
                 override val averageMillis = averageMillis
             }
         } catch (throwable: Throwable) {
@@ -113,10 +119,10 @@ class AverageTimeBetweenDataFactory @Inject constructor(
             override val graphOrStat = graphOrStat
         }
 
-    private fun notEnoughData(graphOrStat: GraphOrStat, numDataPoints: Int) =
+    private fun notEnoughData(graphOrStat: GraphOrStat) =
         object : IAverageTimeBetweenViewData {
-            override val error = NotEnoughDataException(numDataPoints)
-            override val state = IGraphStatViewData.State.ERROR
+            override val state = IGraphStatViewData.State.READY
+            override val enoughData = false
             override val graphOrStat = graphOrStat
         }
 

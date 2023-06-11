@@ -26,8 +26,6 @@ enum class GroupChildType { GROUP, TRACKER, GRAPH }
  */
 data class GroupChild(
     val type: GroupChildType,
-    //TODO move obj out of this class
-    val obj: Any,
     val id: Long,
     val displayIndex: Int
 )

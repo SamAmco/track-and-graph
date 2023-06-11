@@ -68,7 +68,7 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         LastValueStat::class,
         BarChart::class,
     ],
-    version = 52
+    version = 53
 )
 @TypeConverters(Converters::class)
 internal abstract class TrackAndGraphDatabase : RoomDatabase() {
@@ -254,6 +254,10 @@ internal class Converters {
     fun intToTimeHistogramWindow(index: Int) = TimeHistogramWindow.values()[index]
 }
 
+//TODO It turns out that parsing an OffsetDateTime allocates quite a lot of memory and takes a long
+// time. It often triggers the garbage collector, when reading a lot of data points, causing frame drops
+// while opening a group :/  It would be really nice to find a more minimal database representation
+// that's faster to read back and doesn't allocate as much memory.
 fun odtFromString(value: String): OffsetDateTime? =
     if (value.isEmpty()) null
     else databaseFormatter.parse(value, OffsetDateTime::from)

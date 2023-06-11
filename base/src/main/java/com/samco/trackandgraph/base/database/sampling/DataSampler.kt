@@ -42,7 +42,7 @@ internal class DataSamplerImpl @Inject constructor(
                 getRawDataPoints = cursorSequence::getRawDataPoints,
                 onDispose = cursorSequence::dispose
             )
-        } ?: DataSample.fromSequence(emptySequence())
+        } ?: DataSample.fromSequence(emptySequence(), onDispose = {})
         //TODO if there is a function for the feature ID we need to return a data sample for the function
     }
 
