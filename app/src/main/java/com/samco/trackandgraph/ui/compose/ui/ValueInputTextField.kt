@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,7 +31,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -48,7 +46,7 @@ fun LabelInputTextField(
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null
 ) {
-    OutlinedTextField(
+    SlimOutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = { Text(stringResource(id = R.string.label)) },
@@ -77,7 +75,7 @@ fun ValueInputTextField(
 ) {
     val focusUpdateScope = rememberCoroutineScope()
 
-    OutlinedTextField(
+    SlimOutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = { Text(stringResource(id = R.string.value)) },
