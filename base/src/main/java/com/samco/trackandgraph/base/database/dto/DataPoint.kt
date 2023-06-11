@@ -32,10 +32,11 @@ data class DataPoint(
     val note: String
 ) {
     internal fun toEntity() = DataPoint(
-        timestamp,
-        featureId,
-        value,
-        label,
-        note
+        epochMilli = timestamp.toInstant().toEpochMilli(),
+        utcOffsetSec = timestamp.offset.totalSeconds,
+        featureId = featureId,
+        value = value,
+        label = label,
+        note = note
     )
 }

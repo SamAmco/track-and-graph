@@ -130,7 +130,8 @@ internal class TrackerHelperImpl @Inject constructor(
                 defaultValue = defaultValue ?: oldTracker.defaultValue,
                 defaultLabel = defaultLabel ?: oldTracker.defaultLabel,
                 suggestionType = suggestionType?.toEntity() ?: oldTracker.suggestionType.toEntity(),
-                suggestionOrder = suggestionOrder?.toEntity() ?: oldTracker.suggestionOrder.toEntity()
+                suggestionOrder = suggestionOrder?.toEntity()
+                    ?: oldTracker.suggestionOrder.toEntity()
             )
             dao.updateFeature(newFeature)
             dao.updateTracker(newTracker)
@@ -151,8 +152,10 @@ internal class TrackerHelperImpl @Inject constructor(
                         durationNumericConversionMode
                     )
                 }
+
                 else -> {}
             }
+
             DataType.DURATION -> when (newType) {
                 DataType.CONTINUOUS -> {
                     if (durationNumericConversionMode == null) noConversionModeError()
@@ -161,6 +164,7 @@ internal class TrackerHelperImpl @Inject constructor(
                         durationNumericConversionMode
                     )
                 }
+
                 else -> {}
             }
         }
@@ -182,11 +186,12 @@ internal class TrackerHelperImpl @Inject constructor(
         val newDataPoints = oldDataPoints.map {
             val newValue = it.value / divisor
             DataPointEntity(
-                it.timestamp,
-                it.featureId,
-                newValue,
-                "",
-                it.note
+                epochMilli = it.epochMilli,
+                featureId = it.featureId,
+                utcOffsetSec = it.utcOffsetSec,
+                value = newValue,
+                label = it.label,
+                note = it.note
             )
         }
         dao.updateDataPoints(newDataPoints)
@@ -206,11 +211,12 @@ internal class TrackerHelperImpl @Inject constructor(
         val newDataPoints = oldDataPoints.map {
             val newValue = it.value * multiplier
             DataPointEntity(
-                it.timestamp,
-                it.featureId,
-                newValue,
-                it.label,
-                it.note
+                epochMilli = it.epochMilli,
+                featureId = it.featureId,
+                utcOffsetSec = it.utcOffsetSec,
+                value = newValue,
+                label = it.label,
+                note = it.note
             )
         }
         dao.updateDataPoints(newDataPoints)
@@ -299,7 +305,10 @@ internal class TrackerHelperImpl @Inject constructor(
         timestamp: OffsetDateTime
     ): DataPoint? = withContext(io) {
         return@withContext dao.getTrackerById(trackerId)?.featureId?.let {
-            dao.getDataPointByTimestampAndFeatureSync(it, timestamp).toDto()
+            dao.getDataPointByTimestampAndFeatureSync(
+                featureId = it,
+                epochMilli = timestamp.toInstant().toEpochMilli()
+            ).toDto()
         }
     }
 }

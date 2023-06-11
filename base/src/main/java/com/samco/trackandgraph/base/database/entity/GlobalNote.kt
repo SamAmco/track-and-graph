@@ -20,21 +20,29 @@ package com.samco.trackandgraph.base.database.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import com.samco.trackandgraph.base.database.dto.GlobalNote
+import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 @Entity(
     tableName = "notes_table",
-    primaryKeys = ["timestamp"]
+    primaryKeys = ["epoch_milli"]
 )
 internal data class GlobalNote(
-    @ColumnInfo(name = "timestamp")
-    val timestamp: OffsetDateTime = OffsetDateTime.now(),
+    @ColumnInfo(name = "epoch_milli", index = true)
+    val epochMilli: Long,
+
+    @ColumnInfo(name = "utc_offset_sec")
+    val utcOffsetSec: Int,
 
     @ColumnInfo(name = "note")
     val note: String
 ) {
     fun toDto() = GlobalNote(
-        timestamp,
+        OffsetDateTime.ofInstant(
+            Instant.ofEpochMilli(epochMilli),
+            ZoneOffset.ofTotalSeconds(utcOffsetSec)
+        ),
         note
     )
 }
