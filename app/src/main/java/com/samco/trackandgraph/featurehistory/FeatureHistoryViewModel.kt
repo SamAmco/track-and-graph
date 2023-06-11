@@ -1,3 +1,5 @@
+@file:OptIn(FlowPreview::class)
+
 package com.samco.trackandgraph.featurehistory
 
 import android.provider.ContactsContract.Data
@@ -56,6 +58,7 @@ class FeatureHistoryViewModelImpl @Inject constructor(
     private val dataUpdates = dataInteractor
         .getDataUpdateEvents()
         .map { }
+        .debounce(10)
         .onStart { emit(Unit) }
 
     private val dataSample =
