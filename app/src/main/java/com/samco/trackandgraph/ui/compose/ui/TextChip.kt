@@ -9,7 +9,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -75,7 +74,10 @@ fun TngChip(
     onClick: () -> Unit = {},
     onLongPress: () -> Unit = {},
     shape: Shape = MaterialTheme.shapes.medium,
-    contentPaddingValues: PaddingValues = PaddingValues(dimensionResource(id = R.dimen.card_padding)),
+    contentPaddingValues: PaddingValues = PaddingValues(
+        horizontal = dimensionResource(id = R.dimen.card_padding),
+        vertical = 8.dp
+    ),
     content: @Composable RowScope.() -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }

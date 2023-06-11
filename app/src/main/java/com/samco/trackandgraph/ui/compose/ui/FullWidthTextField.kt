@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -56,7 +55,7 @@ fun FullWidthTextField(
             capitalization = KeyboardCapitalization.Sentences
         )
 
-    OutlinedTextField(
+    SlimOutlinedTextField(
         value = textFieldValue,
         label = { Text(text = label) },
         onValueChange = { onValueChange(it) },

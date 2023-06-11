@@ -252,6 +252,23 @@ private fun TrackerPage(
             }
         }
 
+        var labelAdded by rememberSaveable { mutableStateOf(false) }
+        var noteAdded by rememberSaveable { mutableStateOf(false) }
+
+        LaunchedEffect(viewModel) {
+            snapshotFlow { viewModel.label.text }
+                .dropWhile { it.isEmpty() }
+                .take(1)
+                .collect { labelAdded = true }
+        }
+
+        LaunchedEffect(viewModel) {
+            snapshotFlow { viewModel.note.text }
+                .dropWhile { it.isEmpty() }
+                .take(1)
+                .collect { noteAdded = true }
+        }
+
         when (viewModel) {
             is AddDataPointViewModel.NumericalDataPointViewModel -> {
                 ValueInputTextField(
@@ -261,7 +278,11 @@ private fun TrackerPage(
                     textFieldValue = viewModel.value,
                     onValueChange = viewModel::setValueText,
                     focusManager = focusManager,
-                    focusRequester = valueFocusRequester
+                    focusRequester = valueFocusRequester,
+                    onNextOverride = {
+                        if (labelAdded || noteAdded) focusManager.moveFocus(FocusDirection.Down)
+                        else viewModel.addDataPoint()
+                    }
                 )
             }
             is AddDataPointViewModel.DurationDataPointViewModel -> {
@@ -286,7 +307,11 @@ private fun TrackerPage(
 
         LabelAndNoteInputs(
             viewModel = viewModel,
-            scrollState = scrollState
+            scrollState = scrollState,
+            labelAdded = labelAdded,
+            noteAdded = noteAdded,
+            onLabelAdded = { labelAdded = true },
+            onNoteAdded = { noteAdded = true }
         )
     }
 }
@@ -294,29 +319,18 @@ private fun TrackerPage(
 @Composable
 private fun LabelAndNoteInputs(
     viewModel: AddDataPointViewModel,
-    scrollState: ScrollState
+    scrollState: ScrollState,
+    labelAdded: Boolean,
+    noteAdded: Boolean,
+    onLabelAdded: () -> Unit,
+    onNoteAdded: () -> Unit
 ) {
+    val focusManager = LocalFocusManager.current
+
     var noteBoxHeight by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(noteBoxHeight) {
         if (noteBoxHeight != null) scrollState.scrollTo(scrollState.maxValue)
-    }
-
-    var labelAdded by rememberSaveable { mutableStateOf(false) }
-    var noteAdded by rememberSaveable { mutableStateOf(false) }
-
-    LaunchedEffect(viewModel) {
-        snapshotFlow { viewModel.label.text }
-            .dropWhile { it.isEmpty() }
-            .take(1)
-            .collect { labelAdded = true }
-    }
-
-    LaunchedEffect(viewModel) {
-        snapshotFlow { viewModel.note.text }
-            .dropWhile { it.isEmpty() }
-            .take(1)
-            .collect { noteAdded = true }
     }
 
     val coroutineScope = rememberCoroutineScope()
@@ -340,8 +354,12 @@ private fun LabelAndNoteInputs(
                 },
             textFieldValue = viewModel.label,
             onValueChange = viewModel::updateLabel,
-            focusManager = LocalFocusManager.current,
+            focusManager = focusManager,
             focusRequester = labelInputFocusRequester,
+            onNextOverride = {
+                if (noteAdded) focusManager.moveFocus(FocusDirection.Down)
+                else viewModel.addDataPoint()
+            }
         )
     }
 
@@ -372,7 +390,7 @@ private fun LabelAndNoteInputs(
     ) {
         if (!labelAdded) {
             AddChipButton(text = stringResource(id = R.string.add_a_label)) {
-                labelAdded = true
+                onLabelAdded()
                 coroutineScope.launch {
                     delay(50)
                     labelInputFocusRequester.requestFocus()
@@ -381,7 +399,7 @@ private fun LabelAndNoteInputs(
         }
         if (!noteAdded) {
             AddChipButton(text = stringResource(id = R.string.add_a_note)) {
-                noteAdded = true
+                onNoteAdded()
                 coroutineScope.launch {
                     delay(50)
                     noteInputFocusRequester.requestFocus()

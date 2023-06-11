@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -32,7 +31,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -46,14 +44,18 @@ fun LabelInputTextField(
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     focusManager: FocusManager? = null,
-    focusRequester: FocusRequester? = null
+    focusRequester: FocusRequester? = null,
+    onNextOverride: (() -> Unit)? = null
 ) {
-    OutlinedTextField(
+    SlimOutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = { Text(stringResource(id = R.string.label)) },
         keyboardActions = KeyboardActions(
-            onNext = { focusManager?.moveFocus(FocusDirection.Down) }
+            onNext = {
+                if (onNextOverride != null) onNextOverride()
+                else focusManager?.moveFocus(FocusDirection.Down)
+            }
         ),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
@@ -73,16 +75,20 @@ fun ValueInputTextField(
     textFieldValue: TextFieldValue,
     onValueChange: (TextFieldValue) -> Unit,
     focusManager: FocusManager? = null,
-    focusRequester: FocusRequester? = null
+    focusRequester: FocusRequester? = null,
+    onNextOverride: (() -> Unit)? = null
 ) {
     val focusUpdateScope = rememberCoroutineScope()
 
-    OutlinedTextField(
+    SlimOutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = { Text(stringResource(id = R.string.value)) },
         keyboardActions = KeyboardActions(
-            onNext = { focusManager?.moveFocus(FocusDirection.Down) }
+            onNext = {
+                if (onNextOverride != null) onNextOverride()
+                else focusManager?.moveFocus(FocusDirection.Down)
+            }
         ),
         textStyle = MaterialTheme.typography.subtitle2,
         placeholder = {
