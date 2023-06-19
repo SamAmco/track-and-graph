@@ -61,6 +61,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <include
+            android:id="@+id/loadingOverlay"
+            layout="@layout/layout_loading_overlay"/>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
