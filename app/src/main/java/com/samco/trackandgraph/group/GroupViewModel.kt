@@ -56,8 +56,20 @@ class GroupViewModel @Inject constructor(
     private val _showDurationInputDialog = MutableLiveData<DurationInputDialogData?>()
     val showDurationInputDialog: LiveData<DurationInputDialogData?> = _showDurationInputDialog
 
-    val hasTrackers: LiveData<Boolean> = dataInteractor
-        .hasAtLeastOneTracker()
+    private val hasTrackersFlow = dataInteractor.hasAtLeastOneTracker()
+
+    /**
+     * Show a loading screen until the database has been loaded in case we're in the middle of a
+     * heavy migration.
+     */
+    private val databaseLoading = hasTrackersFlow
+        .map { false }
+        .flowOn(io)
+        .onStart { emit(true) }
+
+    val loading = databaseLoading.asLiveData(viewModelScope.coroutineContext)
+
+    val hasTrackers: LiveData<Boolean> = hasTrackersFlow
         .asLiveData(viewModelScope.coroutineContext)
 
     private val groupId = MutableSharedFlow<Long>(1, 1)
@@ -127,6 +139,7 @@ class GroupViewModel @Inject constructor(
         DataUpdateType.GroupUpdated -> listOf(
             UpdateType.Groups
         )
+
         DataUpdateType.TrackerUpdated -> listOf(
             UpdateType.Trackers
         )
@@ -183,7 +196,8 @@ class GroupViewModel @Inject constructor(
                 //graph deleted events. Graph deleted is more significant so we only emit that
                 if (types.size == 2
                     && types.containsKey(UpdateType.GraphDeleted)
-                    && types.containsKey(UpdateType.DisplayIndices)) {
+                    && types.containsKey(UpdateType.DisplayIndices)
+                ) {
                     yield(types[UpdateType.GraphDeleted])
                 }
 
@@ -222,6 +236,7 @@ class GroupViewModel @Inject constructor(
                 UpdateType.DisplayIndices, UpdateType.GraphDeleted -> {
                     mapNewGraphsToOldViewData(viewData, graphStats)
                 }
+
                 is UpdateType.Graph -> withUpdatedGraph(viewData, graphStats, type.graphId)
                 is UpdateType.GraphsForFeature ->
                     withUpdatedIfAffected(viewData, graphStats, type.featureId)
@@ -342,7 +357,7 @@ class GroupViewModel @Inject constructor(
         .map { getGroupChildren(it.first) }
         .flowOn(io)
 
-    val allChildren: LiveData<List<GroupChild>> =
+    private val allChildrenFlow: StateFlow<List<GroupChild>> =
         combine(graphChildren, trackersChildren, groupChildren) { a, b, c -> Triple(a, b, c) }
             //This debounce should be longer than the children debounce
             .debounce(50L)
@@ -357,7 +372,19 @@ class GroupViewModel @Inject constructor(
             }
             .flowOn(io)
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-            .asLiveData(viewModelScope.coroutineContext)
+
+    val allChildren = allChildrenFlow.asLiveData(viewModelScope.coroutineContext)
+
+    val showEmptyGroupText: LiveData<Boolean> = combine(
+        allChildrenFlow.map { it.isEmpty() },
+        databaseLoading,
+        groupId
+    ) { childrenEmpty, loading, groupId ->
+        childrenEmpty && !loading && groupId == 0L
+    }
+        .onStart { emit(false) }
+        .distinctUntilChanged()
+        .asLiveData(viewModelScope.coroutineContext)
 
     val trackers
         get() = allChildren.value

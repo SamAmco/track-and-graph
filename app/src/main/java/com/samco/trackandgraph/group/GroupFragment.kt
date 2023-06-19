@@ -26,6 +26,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
@@ -354,14 +355,17 @@ class GroupFragment : Fragment(),
     }
 
     private fun listenToViewModel() {
+        viewModel.loading.observe(viewLifecycleOwner) {
+            binding.loadingOverlay.visibility = if (it) View.VISIBLE else View.GONE
+        }
         viewModel.hasTrackers.observe(viewLifecycleOwner) {}
+        viewModel.showEmptyGroupText.observe(viewLifecycleOwner) {
+            binding.emptyGroupText.visibility = if (it) View.VISIBLE else View.INVISIBLE
+        }
         viewModel.allChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it, forceNextNotifyDataSetChanged)
-            if (forceNextNotifyDataSetChanged) forceNextNotifyDataSetChanged = false
+            forceNextNotifyDataSetChanged = false
             updateShowQueueTrackButton()
-            binding.emptyGroupText.visibility =
-                if (it.isEmpty() && args.groupId == 0L) View.VISIBLE
-                else View.INVISIBLE
         }
         viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
             if (it == null) return@observe
