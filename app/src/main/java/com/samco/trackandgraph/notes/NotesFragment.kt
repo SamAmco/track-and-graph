@@ -19,6 +19,7 @@ package com.samco.trackandgraph.notes
 
 import android.os.Bundle
 import android.view.*
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -32,10 +33,13 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.database.dto.DisplayNote
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
+import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.FeaturePathProvider
 import com.samco.trackandgraph.ui.showNoteDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NotesFragment : Fragment() {
@@ -46,6 +50,9 @@ class NotesFragment : Fragment() {
     private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
     private val globalNoteDialogViewModel: GlobalNoteInputViewModel by viewModels<GlobalNoteInputViewModelImpl>()
 
+    @Inject
+    lateinit var tngSettings: TngSettings
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,10 +62,12 @@ class NotesFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         binding.composeView.setContent {
-            NotesView(
-                addDataPointsDialogViewModel = addDataPointsDialogViewModel,
-                globalNoteDialogViewModel = globalNoteDialogViewModel
-            )
+            CompositionLocalProvider(LocalSettings provides tngSettings) {
+                NotesView(
+                    addDataPointsDialogViewModel = addDataPointsDialogViewModel,
+                    globalNoteDialogViewModel = globalNoteDialogViewModel
+                )
+            }
         }
 
         listenToFeatureNameProvider()

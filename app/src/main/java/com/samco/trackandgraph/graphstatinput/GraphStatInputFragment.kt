@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
@@ -30,15 +31,21 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class GraphStatInputFragment : Fragment() {
     private var navController: NavController? = null
     private val args: GraphStatInputFragmentArgs by navArgs()
     private val viewModel: GraphStatInputViewModel by viewModels<GraphStatInputViewModelImpl>()
+
+    @Inject
+    lateinit var tngSettings: TngSettings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,12 +67,14 @@ class GraphStatInputFragment : Fragment() {
         navController = container?.findNavController()
         return ComposeView(requireContext()).apply {
             setContent {
-                TnGComposeTheme {
-                    GraphStatInputView(
-                        viewModelStoreOwner = this@GraphStatInputFragment,
-                        viewModel = viewModel,
-                        graphStatId = args.graphStatId
-                    )
+                CompositionLocalProvider(LocalSettings provides tngSettings) {
+                    TnGComposeTheme {
+                        GraphStatInputView(
+                            viewModelStoreOwner = this@GraphStatInputFragment,
+                            viewModel = viewModel,
+                            graphStatId = args.graphStatId
+                        )
+                    }
                 }
             }
         }
