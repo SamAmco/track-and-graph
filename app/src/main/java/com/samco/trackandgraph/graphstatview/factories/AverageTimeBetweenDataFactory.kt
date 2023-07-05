@@ -30,7 +30,6 @@ import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
-import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.CoroutineDispatcher

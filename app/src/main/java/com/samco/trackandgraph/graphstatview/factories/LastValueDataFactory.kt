@@ -25,7 +25,6 @@ import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
-import com.samco.trackandgraph.graphstatview.exceptions.NotEnoughDataException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import kotlinx.coroutines.CoroutineDispatcher
@@ -86,8 +85,7 @@ class LastValueDataFactory @Inject constructor(
 
     private fun notEnoughData(graphOrStat: GraphOrStat) =
         object : ILastValueViewData {
-            override val error = NotEnoughDataException(0)
-            override val state = IGraphStatViewData.State.ERROR
+            override val state = IGraphStatViewData.State.READY
             override val graphOrStat = graphOrStat
             override val isDuration = false
         }
@@ -108,7 +106,8 @@ class LastValueDataFactory @Inject constructor(
         if (config.filterByLabels) filters.add(FilterLabelFunction(config.labels.toSet()))
         if (config.filterByRange) filters.add(FilterValueFunction(config.fromValue, config.toValue))
 
-        val sample = CompositeFunction(filters).mapSample(dataSample)
+        val sampleFunc = CompositeFunction(filters)
+        val sample = sampleFunc.mapSample(dataSample)
         val firstIDataPoint = sample.firstOrNull()
         val rawSample = sample.getRawDataPoints()
         val firstRawDataPoint = rawSample.firstOrNull()
