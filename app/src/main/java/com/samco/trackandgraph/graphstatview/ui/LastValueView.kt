@@ -62,7 +62,6 @@ fun LastValueStatView(
             listMode = listMode,
             graphHeight = graphHeight
         )
-
     } ?: GraphErrorView(
         modifier = modifier,
         error = R.string.graph_stat_view_not_enough_data_stat
