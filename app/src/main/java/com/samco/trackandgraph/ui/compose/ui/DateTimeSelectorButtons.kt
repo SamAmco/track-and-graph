@@ -30,6 +30,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.base.helpers.formatHourMinute
@@ -100,6 +101,7 @@ fun TimeButton(
                 .setHour(dateTime.hour)
                 .setMinute(dateTime.minute)
                 .setTimeFormat(CLOCK_24H)
+                .setInputMode(INPUT_MODE_CLOCK)
                 .build()
             picker.apply {
                 addOnPositiveButtonClickListener {
