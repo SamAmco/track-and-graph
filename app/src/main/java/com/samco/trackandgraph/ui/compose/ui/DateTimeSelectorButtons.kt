@@ -28,16 +28,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.base.helpers.formatHourMinute
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
+import java.util.Calendar
+import kotlin.math.absoluteValue
 
 @Composable
 fun DateTimeButtonRow(
@@ -120,11 +124,12 @@ fun DateButton(
     onDateSelected: (OffsetDateTime) -> Unit
 ) = Box {
     val context = LocalContext.current
+    val firstDayOfWeek = LocalSettings.current.firstDayOfWeek
     SelectorTextButton(
         modifier = modifier,
         text = formatDayMonthYear(context, dateTime),
         onClick = {
-            showDateDialog(context, onDateSelected, dateTime)
+            showDateDialog(context, onDateSelected, firstDayOfWeek, dateTime)
         }
     )
 }
@@ -132,16 +137,32 @@ fun DateButton(
 fun showDateDialog(
     context: Context,
     onDateSelected: (OffsetDateTime) -> Unit,
+    firstDayOfWeek: DayOfWeek,
     dateTime: OffsetDateTime = OffsetDateTime.now()
 ) {
     val tag = "DatePicker"
     val fragmentManager = findFragmentManager(context) ?: return
     val fragment = fragmentManager.findFragmentByTag(tag)
     val existingPicker = fragment as? MaterialDatePicker<*>
+    val dowMap = mapOf(
+        DayOfWeek.MONDAY to Calendar.MONDAY,
+        DayOfWeek.TUESDAY to Calendar.TUESDAY,
+        DayOfWeek.WEDNESDAY to Calendar.WEDNESDAY,
+        DayOfWeek.THURSDAY to Calendar.THURSDAY,
+        DayOfWeek.FRIDAY to Calendar.FRIDAY,
+        DayOfWeek.SATURDAY to Calendar.SATURDAY,
+        DayOfWeek.SUNDAY to Calendar.SUNDAY
+    )
     val picker = existingPicker ?: MaterialDatePicker.Builder
         .datePicker()
         .setSelection(dateTime.toInstant().toEpochMilli())
+        .setCalendarConstraints(
+            CalendarConstraints.Builder()
+                .setFirstDayOfWeek(dowMap[firstDayOfWeek] ?: Calendar.MONDAY)
+                .build()
+        )
         .build()
+
     picker.apply {
         addOnPositiveButtonClickListener { obj ->
             val epochMillis = (obj as? Long) ?: return@addOnPositiveButtonClickListener

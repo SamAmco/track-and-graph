@@ -28,7 +28,8 @@ interface AggregationPreferences {
 }
 
 //TODO aggregation preferences are just statically coded here for now but should ultimately
-// be more configurable
+// be more configurable. See [TngSettingsImpl] for the other copy of this code. That is where
+// the settings should really be I think. This should be deleted once that migration is done.
 object GlobalAggregationPreferences : AggregationPreferences {
     override val firstDayOfWeek: DayOfWeek = getFirstDayFromSettings()
     override val startTimeOfDay: Duration = getStartTimeOfDayFromSettings()

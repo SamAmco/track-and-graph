@@ -81,7 +81,7 @@ dependencies {
 
     api 'androidx.core:core-ktx:1.10.0'
     //Apparently we need material for the instrumented tests to build. idk why
-    api 'com.google.android.material:material:1.8.0'
+    api 'com.google.android.material:material:1.9.0'
 
     //Dependency Injection
     implementation "com.google.dagger:hilt-android:2.44"
