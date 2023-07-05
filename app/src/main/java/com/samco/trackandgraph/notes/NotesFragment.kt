@@ -28,10 +28,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.database.dto.DisplayNote
-import com.samco.trackandgraph.base.database.stringFromOdt
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.FragmentNotesBinding
 import com.samco.trackandgraph.util.FeaturePathProvider
@@ -42,10 +40,11 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class NotesFragment : Fragment() {
     private var binding: FragmentNotesBinding by bindingForViewLifecycle()
-    private val viewModel by viewModels<NotesViewModel>()
     private lateinit var adapter: NoteListAdapter
 
+    private val viewModel by viewModels<NotesViewModel>()
     private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
+    private val globalNoteDialogViewModel: GlobalNoteInputViewModel by viewModels<GlobalNoteInputViewModelImpl>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,9 +55,9 @@ class NotesFragment : Fragment() {
         binding.lifecycleOwner = viewLifecycleOwner
 
         binding.composeView.setContent {
-            AddDataPointsDialog(
-                viewModel = addDataPointsDialogViewModel,
-                onDismissRequest = { addDataPointsDialogViewModel.reset() }
+            NotesView(
+                addDataPointsDialogViewModel = addDataPointsDialogViewModel,
+                globalNoteDialogViewModel = globalNoteDialogViewModel
             )
         }
 
@@ -83,8 +82,7 @@ class NotesFragment : Fragment() {
 
         override fun onMenuItemSelected(item: MenuItem): Boolean {
             if (item.itemId == R.id.add_global_note) {
-                val dialog = GlobalNoteInputDialog()
-                childFragmentManager.let { dialog.show(it, "note_input_dialog") }
+                globalNoteDialogViewModel.openDialog(null)
                 return true
             }
             return false
@@ -151,13 +149,7 @@ class NotesFragment : Fragment() {
             ?: showEditGlobalNoteDialog(note)
 
     private fun showEditGlobalNoteDialog(note: DisplayNote) {
-        childFragmentManager.apply {
-            GlobalNoteInputDialog().apply {
-                arguments = Bundle().apply {
-                    putString(GLOBAL_NOTE_TIMESTAMP_KEY, stringFromOdt(note.timestamp))
-                }
-            }.show(this, "global_note_edit_dialog")
-        }
+        globalNoteDialogViewModel.openDialog(note.timestamp)
     }
 
     private fun showEditDataPointDialog(trackerId: Long, note: DisplayNote) {

@@ -25,7 +25,6 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.GlobalNote
-import com.samco.trackandgraph.base.database.odtFromString
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
@@ -38,14 +37,14 @@ import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 interface GlobalNoteInputViewModel {
+    val show: LiveData<Boolean>
     val note: TextFieldValue
     val dateTime: LiveData<OffsetDateTime>
-    val dismiss: LiveData<Boolean>
     val updateMode: LiveData<Boolean>
     val addButtonEnabled: LiveData<Boolean>
     val showConfirmCancelDialog: LiveData<Boolean>
 
-    fun init(timestampStr: String?)
+    fun openDialog(timestamp: OffsetDateTime?)
     fun updateNoteText(text: TextFieldValue)
     fun updateTimeStamp(timeStamp: OffsetDateTime)
     fun onAddClicked()
@@ -74,30 +73,35 @@ class GlobalNoteInputViewModelImpl @Inject constructor(
         .map { it.text.isNotBlank() }
         .asLiveData(viewModelScope.coroutineContext)
 
-    override val showConfirmCancelDialog = MutableLiveData<Boolean>(false)
+    override val showConfirmCancelDialog = MutableLiveData(false)
 
     private val addCompleteEvents = MutableSharedFlow<Unit>()
+    private val showEvents = MutableSharedFlow<Unit>()
 
-    override val dismiss = merge(onCancelConfirmedEvents, addCompleteEvents)
-        .map { true }
-        .asLiveData(viewModelScope.coroutineContext)
+    override val show = merge(
+        showEvents.map { true },
+        merge(onCancelConfirmedEvents, addCompleteEvents).map { false }
+    ).asLiveData(viewModelScope.coroutineContext)
 
-    private var initialized = false
-
-    override fun init(timestampStr: String?) {
-        if (initialized) return
-        initialized = true
-
+    override fun openDialog(timestamp: OffsetDateTime?) {
         viewModelScope.launch(io) {
-            val globalNote = timestampStr?.let {
-                odtFromString(it)?.let { odt ->
-                    dataInteractor.getGlobalNoteByTimeSync(odt)
-                }
+            val globalNote = timestamp?.let {
+                dataInteractor.getGlobalNoteByTimeSync(it)
             }
             withContext(ui) {
-                globalNote?.let { initFromGlobalNote(it) }
+                if (globalNote != null) initFromGlobalNote(globalNote)
+                else initForNewNote()
+                showConfirmCancelDialog.value = false
             }
+            showEvents.emit(Unit)
         }
+    }
+
+    private fun initForNewNote() {
+        foundNote = null
+        this.note = TextFieldValue()
+        this.dateTime.value = OffsetDateTime.now()
+        this.updateMode.value = false
     }
 
     private fun initFromGlobalNote(note: GlobalNote) {
