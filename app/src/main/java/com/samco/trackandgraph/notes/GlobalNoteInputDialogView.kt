@@ -21,11 +21,12 @@ package com.samco.trackandgraph.notes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -33,23 +34,34 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
+import kotlinx.coroutines.delay
 import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
-    Surface {
+    if (viewModel.show.observeAsState(false).value) {
         DialogTheme {
-            GlobalNoteDialogViewContent(viewModel)
-            if (viewModel.showConfirmCancelDialog.observeAsState(false).value) {
-                ConfirmCancelDialog(
-                    onDismissRequest = viewModel::onCancelDismissed,
-                    onConfirm = viewModel::onCancelConfirmed,
-                    body = R.string.confirm_cancel_notes_will_be_lost
+            Dialog(
+                onDismissRequest = { viewModel.onCancelConfirmed() },
+                properties = DialogProperties(
+                    usePlatformDefaultWidth = false,
+                    dismissOnClickOutside = false
                 )
+            ) {
+                GlobalNoteDialogViewContent(viewModel)
+                if (viewModel.showConfirmCancelDialog.observeAsState(false).value) {
+                    ConfirmCancelDialog(
+                        onDismissRequest = viewModel::onCancelDismissed,
+                        onConfirm = viewModel::onCancelConfirmed,
+                        body = R.string.confirm_cancel_notes_will_be_lost
+                    )
+                }
             }
         }
     }
@@ -60,13 +72,13 @@ private fun GlobalNoteDialogViewContent(viewModel: GlobalNoteInputViewModel) {
     Column(
         modifier = Modifier
             .heightIn(max = 400.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(0.9f)
             .background(color = MaterialTheme.tngColors.surface)
             .padding(dimensionResource(id = R.dimen.card_padding))
     ) {
         val selectedDateTime by viewModel.dateTime.observeAsState(OffsetDateTime.now())
 
-        val focusRequester = FocusRequester()
+        val focusRequester = remember { FocusRequester() }
 
         SpacingLarge()
 
@@ -104,5 +116,11 @@ private fun GlobalNoteDialogViewContent(viewModel: GlobalNoteInputViewModel) {
             onAddClicked = viewModel::onAddClicked,
             addButtonEnabled = viewModel.addButtonEnabled.observeAsState(false).value
         )
+
+        LaunchedEffect(focusRequester) {
+            delay(10L)
+            focusRequester.requestFocus()
+        }
+
     }
 }
