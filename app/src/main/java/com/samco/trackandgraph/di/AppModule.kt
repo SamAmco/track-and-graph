@@ -25,11 +25,14 @@ import com.samco.trackandgraph.base.helpers.PrefHelper
 import com.samco.trackandgraph.base.helpers.PrefHelperImpl
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
+import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.settings.TngSettingsImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -46,4 +49,8 @@ class AppModule {
 
     @Provides
     fun getPrefHelper(impl: PrefHelperImpl): PrefHelper = impl
+
+    @Provides
+    @Singleton
+    fun getTngSettings(impl: TngSettingsImpl): TngSettings = impl
 }
