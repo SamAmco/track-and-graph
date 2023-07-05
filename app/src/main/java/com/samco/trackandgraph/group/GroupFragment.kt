@@ -20,13 +20,13 @@ package com.samco.trackandgraph.group
 import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
@@ -43,12 +43,15 @@ import com.samco.trackandgraph.addtracker.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
+import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.*
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 /**
  * The group fragment is used on the home page and in any nested group to display the contents of
@@ -72,6 +75,9 @@ class GroupFragment : Fragment(),
 
     private var forceNextNotifyDataSetChanged: Boolean = false
 
+    @Inject
+    lateinit var tngSettings: TngSettings
+
     init {
         initNotificationsPermissionRequester(this)
     }
@@ -84,10 +90,12 @@ class GroupFragment : Fragment(),
         binding = FragmentGroupBinding.inflate(inflater, container, false)
 
         binding.composeView.setContent {
-            AddDataPointsDialog(
-                addDataPointsDialogViewModel,
-                onDismissRequest = { addDataPointsDialogViewModel.reset() }
-            )
+            CompositionLocalProvider(LocalSettings provides tngSettings) {
+                AddDataPointsDialog(
+                    addDataPointsDialogViewModel,
+                    onDismissRequest = { addDataPointsDialogViewModel.reset() }
+                )
+            }
         }
 
         this.navController = container?.findNavController()

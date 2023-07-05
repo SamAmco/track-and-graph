@@ -18,6 +18,7 @@ package com.samco.trackandgraph.featurehistory
 
 import android.os.Bundle
 import android.view.*
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -28,13 +29,19 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FragmentFeatureHistory : Fragment() {
     private val viewModel by viewModels<FeatureHistoryViewModelImpl>()
     private val args: FragmentFeatureHistoryArgs by navArgs()
+
+    @Inject
+    lateinit var tngSettings: TngSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -46,8 +53,10 @@ class FragmentFeatureHistory : Fragment() {
 
         return ComposeView(requireContext()).apply {
             setContent {
-                TnGComposeTheme {
-                    FeatureHistoryView(viewModel = viewModel)
+                CompositionLocalProvider(LocalSettings provides tngSettings) {
+                    TnGComposeTheme {
+                        FeatureHistoryView(viewModel = viewModel)
+                    }
                 }
             }
         }

@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.Spinner
 import com.samco.trackandgraph.ui.compose.ui.showDateDialog
@@ -77,6 +78,7 @@ fun GraphStatEndingAtSpinner(
         )
 
         val context = LocalContext.current
+        val firstDayOfWeek = LocalSettings.current.firstDayOfWeek
 
         Spinner(
             modifier = modifier,
@@ -85,9 +87,13 @@ fun GraphStatEndingAtSpinner(
             onItemSelected = { option ->
                 when (option) {
                     SampleEndingAtOption.LATEST -> onSampleEndingAtChanged(SampleEndingAt.Latest)
-                    SampleEndingAtOption.CUSTOM -> showDateDialog(context, {
-                        onSampleEndingAtChanged(SampleEndingAt.Custom(it))
-                    })
+                    SampleEndingAtOption.CUSTOM -> showDateDialog(
+                        context = context,
+                        firstDayOfWeek = firstDayOfWeek,
+                        onDateSelected = {
+                            onSampleEndingAtChanged(SampleEndingAt.Custom(it))
+                        }
+                    )
                 }
             },
             selectedItemFactory = { modifier, item, expanded ->
