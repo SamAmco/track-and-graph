@@ -38,7 +38,7 @@ class BarChartDataFactoryTest {
                 dp(end.minusDays(2).minusHours(2)),
                 dp(end.minusDays(2).minusHours(3))
             ).asSequence()
-        )
+        ) {}
 
         //EXECUTE
         val barData = BarChartDataFactory.getBarData(
@@ -87,7 +87,7 @@ class BarChartDataFactoryTest {
                 dp(time = end.minusDays(2).minusHours(2), label = "b"),
                 dp(time = end.minusDays(2).minusHours(3), label = "b")
             ).asSequence()
-        )
+        ) {}
 
         //EXECUTE
         val barData = BarChartDataFactory.getBarData(
@@ -149,7 +149,7 @@ class BarChartDataFactoryTest {
                 dp(time = end.minusDays(9), value = 3.0, label = "a"),
                 dp(time = end.minusDays(9), value = 4.0, label = "b")
             ).asSequence()
-        )
+        ) {}
 
         //EXECUTE
         val barData = BarChartDataFactory.getBarData(
@@ -218,7 +218,7 @@ class BarChartDataFactoryTest {
                 dp(time = end, label = "a"),
                 dp(time = end.minusDays(1), label = "a"),
             ).asSequence()
-        )
+        ) {}
 
         //EXECUTE
         val barData = BarChartDataFactory.getBarData(
@@ -264,7 +264,7 @@ class BarChartDataFactoryTest {
                 dp(end.minusDays(2).minusHours(2)),
                 dp(end.minusDays(2).minusHours(3))
             ).asSequence()
-        )
+        ) {}
 
         //EXECUTE
         val barData = BarChartDataFactory.getBarData(
@@ -305,7 +305,7 @@ class BarChartDataFactoryTest {
                 dp(time = end.minusDays(2).minusHours(2), label = "b"),
                 dp(time = end.minusDays(2).minusHours(3), label = "b")
             ).asSequence()
-        )
+        ) {}
 
         //EXECUTE
         val barData = BarChartDataFactory.getBarData(
@@ -345,7 +345,7 @@ class BarChartDataFactoryTest {
                 dp(end.minusDays(2).minusHours(2)),
                 dp(end.minusDays(2).minusHours(3))
             ).asSequence()
-        )
+        ) {}
 
         //EXECUTE
         val barData = BarChartDataFactory.getBarData(

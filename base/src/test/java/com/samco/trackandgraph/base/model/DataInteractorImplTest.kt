@@ -79,16 +79,18 @@ class DataInteractorImplTest {
             defaultLabel = ""
         )
 
+        val dataPointTime = OffsetDateTime.parse("2020-01-02T00:00:00Z")
         val testDataPoint = DataPoint(
-            OffsetDateTime.MAX,
+            dataPointTime,
             featureId = 0L,
             value = 0.0,
             label = "",
             note = ""
         )
 
+        val noteTime = OffsetDateTime.parse("2020-01-01T00:00:00Z")
         val testGlobalNote = GlobalNote(
-            timestamp = OffsetDateTime.MAX,
+            timestamp = noteTime,
             note = "hi hi"
         )
 
@@ -139,7 +141,7 @@ class DataInteractorImplTest {
         uut.insertDataPoint(testDataPoint)
         uut.insertDataPoints(listOf(testDataPoint))
         uut.updateDataPoints(listOf(testDataPoint))
-        uut.removeNote(OffsetDateTime.MAX, 0L)
+        uut.removeNote(noteTime, 0L)
         uut.deleteGlobalNote(testGlobalNote)
         uut.insertGlobalNote(testGlobalNote)
         uut.insertFunction(testFunction)

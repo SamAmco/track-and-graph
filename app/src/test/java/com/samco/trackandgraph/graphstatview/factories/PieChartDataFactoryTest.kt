@@ -89,7 +89,7 @@ class PieChartDataFactoryTest {
                 dataPoint(4.0, "label4"),
                 dataPoint(4.0, "label4"),
             )
-        )
+        ) {}
 
         whenever(dataInteractor.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(
@@ -125,7 +125,7 @@ class PieChartDataFactoryTest {
                 dataPoint(4.0, "label4"),
                 dataPoint(4.0, "label4"),
             )
-        )
+        ) {}
 
         whenever(dataInteractor.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(
@@ -155,7 +155,7 @@ class PieChartDataFactoryTest {
                 dataPoint(1.0, "label1"),
                 dataPoint(1.0, ""),
             )
-        )
+        ) {}
 
         whenever(dataInteractor.getDataSampleForFeatureId(eq(featureId))).thenReturn(dataSample)
         whenever(dataInteractor.getPieChartByGraphStatId(eq(graphStatId))).thenReturn(

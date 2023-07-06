@@ -21,7 +21,6 @@ import com.samco.trackandgraph.graphstatview.factories.DataDisplayIntervalHelper
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
-import kotlin.math.floor
 import kotlin.math.round
 import kotlin.random.Random
 import kotlin.time.Duration
@@ -33,11 +32,13 @@ class DataDisplayIntervalHelperTest {
     private val uut = DataDisplayIntervalHelper()
 
     private fun getYParametersInternalWithFallback(
-        y_min: Double, y_max: Double, time_data: Boolean,
-        fixedBounds: Boolean, throw_exc_if_non_found: Boolean
+        y_min: Double,
+        y_max: Double,
+        time_data: Boolean,
+        fixedBounds: Boolean,
     ): DataDisplayIntervalHelper.PossibleInterval {
         val parameters =
-            uut.getYParametersInternal(y_min, y_max, time_data, fixedBounds, throw_exc_if_non_found)
+            uut.getYParametersInternal(y_min, y_max, time_data, fixedBounds)
         if (parameters != null) {
             return parameters
         }
@@ -56,7 +57,7 @@ class DataDisplayIntervalHelperTest {
             val y_min = 39.2
             val y_max = 309.2
 
-            printExampleNumerical(y_min.toDouble(), y_max.toDouble())
+            printExampleNumerical(y_min, y_max)
         }
     }
 
@@ -83,11 +84,10 @@ class DataDisplayIntervalHelperTest {
                 val end = start + length
 
                 val interval = getYParametersInternalWithFallback(
-                    start,
-                    end,
+                    y_min = start,
+                    y_max = end,
                     time_data = true,
-                    fixedBounds = false,
-                    throw_exc_if_non_found = false
+                    fixedBounds = false
                 )
 
                 if (interval.percentage_range_used > RANGE_USED_BELOW) continue
@@ -110,8 +110,10 @@ class DataDisplayIntervalHelperTest {
                 val end = start + length
 
                 val interval = uut.getYParameters(
-                    start, end, time_data = false, fixedBounds = false,
-                    throw_exc_if_non_found = false
+                    y_min = start,
+                    y_max = end,
+                    time_data = false,
+                    fixedBounds = false
                 )
 
                 val range_used = length / (interval.bounds_max - interval.bounds_min)
@@ -150,9 +152,10 @@ class DataDisplayIntervalHelperTest {
         for (start in startValues.shuffled().slice(0..numberOfStartValues)) {
             for (length in lengthValues.shuffled().slice(0..numberOfLengthValues)) {
                 val interval = uut.getYParametersInternal(
-                    start, start + length,
-                    time_data = time_data,
-                    fixedBounds = false, throw_exc_if_non_found = false
+                    yMin = start,
+                    yMax = start + length,
+                    timeData = time_data,
+                    fixedBounds = false
                 )
 
                 if (interval != null) {
@@ -218,80 +221,76 @@ class DataDisplayIntervalHelperTest {
 
     @Test
     fun find_solution_for_everything_numerical() {
-        runBlocking {
-            find_solution_for_everything(time_data = false, long_test = false)
-            /**
-             * Output from 2021.02.19:
-            minimum range used: 0.79
+        find_solution_for_everything(time_data = false, long_test = false)
+        /**
+         * Output from 2021.02.19:
+        minimum range used: 0.79
 
-            1.00 -> 0.97:  3.15%
-            0.97 -> 0.94:  9.67%
-            0.94 -> 0.91: 23.16%
-            0.91 -> 0.88: 29.49%
-            0.88 -> 0.85: 26.87%
-            0.85 -> 0.82:  6.02%
-            0.82 -> 0.79:  1.63%
-            0.79 -> 0.76:  0.00%
-            0.76 -> 0.73:  0.00%
-            0.73 -> 0.70:  0.00%
-            Didn't find a good solution for 0.050559418398955745%
-            How many lines are drawn how often:
-            6: 13.56%
-            7: 16.09%
-            8: 21.75%
-            9: 20.28%
-            10: 12.51%
-            11:  5.42%
-            12: 10.39%
-            Which divisors are chosen how often:
-            1: 45.72%
-            2: 26.16%
-            3:  5.60%
-            4: 14.19%
-            5:  5.91%
-            8:  2.42%
-             */
-        }
+        1.00 -> 0.97:  3.15%
+        0.97 -> 0.94:  9.67%
+        0.94 -> 0.91: 23.16%
+        0.91 -> 0.88: 29.49%
+        0.88 -> 0.85: 26.87%
+        0.85 -> 0.82:  6.02%
+        0.82 -> 0.79:  1.63%
+        0.79 -> 0.76:  0.00%
+        0.76 -> 0.73:  0.00%
+        0.73 -> 0.70:  0.00%
+        Didn't find a good solution for 0.050559418398955745%
+        How many lines are drawn how often:
+        6: 13.56%
+        7: 16.09%
+        8: 21.75%
+        9: 20.28%
+        10: 12.51%
+        11:  5.42%
+        12: 10.39%
+        Which divisors are chosen how often:
+        1: 45.72%
+        2: 26.16%
+        3:  5.60%
+        4: 14.19%
+        5:  5.91%
+        8:  2.42%
+         */
     }
 
     @Test
     fun find_solution_for_everything_time() {
-        runBlocking {
-            find_solution_for_everything(time_data = true, long_test = false)
-            /**
-             * Output from 2021.02.19:
-            minimum range used: 0.79
+        find_solution_for_everything(time_data = true, long_test = false)
+        /**
+         * Output from 2021.02.19:
+        minimum range used: 0.79
 
-            1.00 -> 0.97:  3.45%
-            0.97 -> 0.94: 11.98%
-            0.94 -> 0.91: 20.93%
-            0.91 -> 0.88: 26.81%
-            0.88 -> 0.85: 26.58%
-            0.85 -> 0.82:  7.53%
-            0.82 -> 0.79:  2.71%
-            0.79 -> 0.76:  0.01%
-            0.76 -> 0.73:  0.00%
-            0.73 -> 0.70:  0.00%
-            Didn't find a good solution for 0.570686596271549%
-            How many lines are drawn how often:
-            6:  8.60%
-            7: 13.30%
-            8: 22.38%
-            9: 23.07%
-            10: 15.94%
-            11:  8.27%
-            12:  8.43%
-            Which divisors are chosen how often:
-            1: 31.23%
-            2:  8.99%
-            3:  4.70%
-            4:  2.76%
-            6:  2.43%
-            12:  1.94%
-            24: 31.63%
-            30: 16.32%
-             */
-        }
+        1.00 -> 0.97:  3.45%
+        0.97 -> 0.94: 11.98%
+        0.94 -> 0.91: 20.93%
+        0.91 -> 0.88: 26.81%
+        0.88 -> 0.85: 26.58%
+        0.85 -> 0.82:  7.53%
+        0.82 -> 0.79:  2.71%
+        0.79 -> 0.76:  0.01%
+        0.76 -> 0.73:  0.00%
+        0.73 -> 0.70:  0.00%
+        Didn't find a good solution for 0.570686596271549%
+        How many lines are drawn how often:
+        6:  8.60%
+        7: 13.30%
+        8: 22.38%
+        9: 23.07%
+        10: 15.94%
+        11:  8.27%
+        12:  8.43%
+        Which divisors are chosen how often:
+        1: 31.23%
+        2:  8.99%
+        3:  4.70%
+        4:  2.76%
+        6:  2.43%
+        12:  1.94%
+        24: 31.63%
+        30: 16.32%
+         */
     }
 
     /*
@@ -325,11 +324,10 @@ private fun printExampleNumerical(start:Double, end: Double) {
         end: Double
     ): DataDisplayIntervalHelper.YAxisParameters {
         val parameters = uut.getYParameters(
-            start,
-            end,
+            y_min = start,
+            y_max = end,
             time_data = true,
-            fixedBounds = false,
-            throw_exc_if_non_found = false
+            fixedBounds = false
         )
         val boundsRange = parameters.bounds_max - parameters.bounds_min
         val interval = boundsRange / (parameters.n_intervals - 1)

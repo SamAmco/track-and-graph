@@ -4,6 +4,7 @@ import com.nhaarman.mockitokotlin2.*
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.sampling.DataSample
@@ -14,6 +15,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import java.io.ByteArrayInputStream
@@ -41,7 +43,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
 
     private val testDataPoints = listOf(
         //A,2022-09-14T21:30:41.432+01:00,1,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 9,
@@ -58,7 +60,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //A,2022-09-14T12:55:37.508+01:00,-10.1,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 9,
@@ -75,7 +77,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //"B",2022-09-17T21:14:56.864+01:00,0.0,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 9,
@@ -92,7 +94,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //"B",2022-09-03T19:36:45.924+01:00,2.859,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 9,
@@ -109,7 +111,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //"B",2022-08-28T19:30:39.711+01:00,1.0,So:me n:ot:e
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 8,
@@ -126,7 +128,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = "So:me n:ot:e"
         ),
         //Tracker C,2022-09-16T00:13:27.182+01:00,0.0:Label 1,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 9,
@@ -143,7 +145,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //Tracker C,2022-09-15T00:20:40.986+01:00,1.0:Label 2,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 9,
@@ -160,7 +162,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //Tracker C,2022-09-13T22:55:46.533+01:00,3:Label 1,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 9,
@@ -177,7 +179,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //Tracker C,2022-09-12T23:00:55.750+01:00,-2:Label 3,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2022,
                 9,
@@ -194,7 +196,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //D,2021-02-09T11:07:28Z,1:10:00,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2021,
                 2,
@@ -211,7 +213,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //D,2021-02-09T11:07:28Z,1:10:00:,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2021,
                 2,
@@ -228,7 +230,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //D,2021-02-08T11:17:39.165Z,-10:-30:20:Some: :la:bel,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2021,
                 2,
@@ -245,7 +247,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = ""
         ),
         //D,2021-02-05T11:10:01.807Z,12345:18:20,Some note ending with colon:,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2021,
                 2,
@@ -262,7 +264,7 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
             note = "Some note ending with colon:"
         ),
         //D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
-        DataPoint(
+        toDp(
             timestamp = OffsetDateTime.of(
                 2021,
                 2,
@@ -410,9 +412,10 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
                 val dataSampleProperties =
                     DataSampleProperties(isDuration = feature.featureId == 3L)
                 feature to DataSample.fromSequence(
-                    data = tuple.value.asSequence(),
+                    data = tuple.value.map { it.asIDataPoint() }.asSequence(),
                     dataSampleProperties = dataSampleProperties,
-                    getRawDataPoints = { tuple.value.map { it.toDto() } }
+                    getRawDataPoints = { tuple.value.map { it.toDto() } },
+                    onDispose = {}
                 )
             }
             .toMap()
@@ -465,4 +468,34 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:
                 .insertTracker(it.copy(id = 0, featureId = 0))
         }
     }
+
+    private fun DataPoint.asIDataPoint(): IDataPoint {
+        val dpTs = OffsetDateTime.ofInstant(
+            Instant.ofEpochMilli(epochMilli),
+            ZoneOffset.ofTotalSeconds(utcOffsetSec)
+        )
+        val dpValue = this.value
+        val dpLabel = this.label
+
+        return object : IDataPoint() {
+            override val timestamp: OffsetDateTime = dpTs
+            override val value: Double = dpValue
+            override val label: String = dpLabel
+        }
+    }
+
+    private fun toDp(
+        timestamp: OffsetDateTime,
+        featureId: Long,
+        value: Double,
+        label: String,
+        note: String
+    ) = DataPoint(
+        epochMilli = timestamp.toInstant().toEpochMilli(),
+        utcOffsetSec = timestamp.offset.totalSeconds,
+        featureId = featureId,
+        value = value,
+        label = label,
+        note = note
+    )
 }

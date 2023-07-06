@@ -257,7 +257,8 @@ class TrackerHelperImpl_UpdateDataPoints_Test {
 
     private fun List<Pair<Double, String>>.dataPoints() = this.map {
         DataPoint(
-            timestamp = OffsetDateTime.MAX,
+            epochMilli = Long.MAX_VALUE,
+            utcOffsetSec = 0,
             featureId = 0L,
             value = it.first,
             label = it.second,
