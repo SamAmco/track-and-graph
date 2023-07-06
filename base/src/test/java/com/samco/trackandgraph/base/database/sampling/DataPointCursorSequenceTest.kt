@@ -6,6 +6,7 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Test
+import java.time.OffsetDateTime
 
 class DataPointCursorSequenceTest {
     @Test
@@ -25,11 +26,13 @@ class DataPointCursorSequenceTest {
             cursorPosition++
             true
         }
-        whenever(cursor.getString(eq(0))).thenReturn("2022-09-14T21:30:41.432+01:00")
+        val odt = OffsetDateTime.parse("2022-09-14T21:30:41.432+01:00")
+        whenever(cursor.getLong(eq(0))).thenReturn(odt.toInstant().toEpochMilli())
         whenever(cursor.getLong(eq(1))).thenReturn(featureId)
-        whenever(cursor.getDouble(eq(2))).thenAnswer { (value++).toDouble() }
-        whenever(cursor.getString(eq(3))).thenReturn("")
+        whenever(cursor.getInt(eq(2))).thenReturn(1)
+        whenever(cursor.getDouble(eq(3))).thenAnswer { (value++).toDouble() }
         whenever(cursor.getString(eq(4))).thenReturn("")
+        whenever(cursor.getString(eq(5))).thenReturn("")
 
         val sequence = DataPointCursorSequence(cursor)
 
@@ -41,7 +44,7 @@ class DataPointCursorSequenceTest {
         //VERIFY
         assertEquals(backingData, output1.map { it.value.toInt() })
         assertEquals(backingData, output2.map { it.value.toInt() })
-        verify(cursor, times(backingData.size)).getDouble(eq(2))
+        verify(cursor, times(backingData.size)).getDouble(eq(3))
         assertEquals(backingData.size, cursorPosition)
         assertFalse(iterator1.hasNext())
     }

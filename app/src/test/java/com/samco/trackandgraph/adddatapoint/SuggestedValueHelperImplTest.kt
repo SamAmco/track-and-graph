@@ -94,7 +94,7 @@ class SuggestedValueHelperImplTest {
         assert(!isSortedByValueAscending(dataPoints.toList()))
 
         whenever(dataInteractor.getDataSampleForFeatureId(any()))
-            .thenReturn(DataSample.fromSequence(dataPoints))
+            .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         //suggested values is a flow of lists of SuggestedValue
         val suggestedValues = uut.getSuggestedValues(
@@ -129,7 +129,7 @@ class SuggestedValueHelperImplTest {
             )
 
             whenever(dataInteractor.getDataSampleForFeatureId(any()))
-                .thenReturn(DataSample.fromSequence(dataPoints))
+                .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             //suggested values is a flow of lists of SuggestedValue
             val suggestedValueAndLabels = uut.getSuggestedValues(
@@ -197,7 +197,7 @@ class SuggestedValueHelperImplTest {
             )
 
             whenever(dataInteractor.getDataSampleForFeatureId(any()))
-                .thenReturn(DataSample.fromSequence(dataPoints))
+                .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
                 testTracker.copy(
@@ -328,7 +328,7 @@ class SuggestedValueHelperImplTest {
             )
 
             whenever(dataInteractor.getDataSampleForFeatureId(any()))
-                .thenReturn(DataSample.fromSequence(dataPoints))
+                .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
                 testTracker.copy(
@@ -451,7 +451,7 @@ class SuggestedValueHelperImplTest {
             )
 
             whenever(dataInteractor.getDataSampleForFeatureId(any()))
-                .thenReturn(DataSample.fromSequence(dataPoints))
+                .thenReturn(DataSample.fromSequence(dataPoints) {})
 
             val suggestedValuesValueAscending = uut.getSuggestedValues(
                 testTracker.copy(
@@ -585,7 +585,7 @@ class SuggestedValueHelperImplTest {
         )
 
         whenever(dataInteractor.getDataSampleForFeatureId(any()))
-            .thenReturn(DataSample.fromSequence(dataPoints))
+            .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         val suggestedValuesValueAscending = uut.getSuggestedValues(
             testTracker.copy(
@@ -656,7 +656,7 @@ class SuggestedValueHelperImplTest {
         val dataPoints = dpFromValues(values)
 
         whenever(dataInteractor.getDataSampleForFeatureId(any()))
-            .thenReturn(DataSample.fromSequence(dataPoints))
+            .thenReturn(DataSample.fromSequence(dataPoints) {})
 
         val sizes = mutableListOf<Int>()
 

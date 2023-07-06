@@ -156,7 +156,7 @@ class TimeHistogramDataHelperTests {
     @Test
     fun test_getHistogramBinsForSample_no_data() {
         //GIVEN
-        val sample = DataSample.fromSequence(emptySequence())
+        val sample = DataSample.fromSequence(emptySequence()) {}
         val window = TimeHistogramWindow.HOUR
         val sumByCount = false
 
@@ -191,12 +191,18 @@ class TimeHistogramDataHelperTests {
         val answer = TimeHistogramDataHelper(timeHelper)
             .getHistogramBinsForSample(sample, window, sumByCount)
 
+        //So it would be :
+        //Monday: 2, Tuesday: 3, Wednesday: 3, Thursday: 2, Friday: 2, Saturday: 2, Sunday: 2
+        //But because the startTimeOfDay is 4, each data point is actually assigned to the day before
+        // and it becomes:
+        //Monday: 3, Tuesday: 3, Wednesday: 2, Thursday: 2, Friday: 2, Saturday: 2, Sunday: 2
+
         //THEN
         answer!!
         Assert.assertEquals(1, answer.keys.size)
         val vals = answer[""] ?: error("Key 0 not found")
         Assert.assertEquals(7, vals.size)
-        val expected = listOf(2, 3, 3, 2, 2, 2, 2)
+        val expected = listOf(3, 3, 2, 2, 2, 2, 2)
         val total = expected.sum().toDouble()
         Assert.assertEquals(expected.map { (it / total) * 100.0 }, vals)
     }
@@ -204,12 +210,12 @@ class TimeHistogramDataHelperTests {
     private fun makeDataSampleWithLables(dataPoints: List<Triple<Double, OffsetDateTime, String>>) =
         DataSample.fromSequence(
             dataPoints.map { makeDp(it.second, it.first, it.third) }.asSequence()
-        )
+        ) {}
 
     private fun makeDataSample(dataPoints: List<Pair<Double, OffsetDateTime>>) =
         DataSample.fromSequence(
             dataPoints.map { makeDp(it.second, it.first, "") }.asSequence()
-        )
+        ) {}
 
     private fun makeDp(timestamp: OffsetDateTime, value: Double, label: String) =
         object : IDataPoint() {
