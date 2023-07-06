@@ -109,9 +109,7 @@ class DataDisplayIntervalHelper {
         val yRange = yMax - yMin
         // if we can't evenly divide the y_range we can't do anything, so return a bad dummy interval, which will get filtered out
         // this is a little more complex than it should be because of floating point errors
-        if (yRange.div(proto.interval)
-                .rem(1) != 0.0
-        ) return null //PossibleInterval(0.0, false, 999, 0.0, 0.0, 0.0, 1.0)
+        if (yRange.div(proto.interval).rem(1) != 0.0) return null
 
         return PossibleInterval(
             interval = proto.interval,
@@ -153,7 +151,7 @@ class DataDisplayIntervalHelper {
     companion object {
         private const val MIN_INTERVALS = 6
         private const val MAX_INTERVALS = 12
-        private val MIN_USED_RANGE_STEPS = listOf(0.849, 0.79)
+        private val MIN_USED_RANGE_STEPS = listOf(0.99999, 0.9, 0.8, 0.7)
     }
 
     @VisibleForTesting
@@ -187,8 +185,8 @@ class DataDisplayIntervalHelper {
             .flatMap { div ->
                 (-1..1).map { exp_offset ->
                     PossibleIntervalProto(
-                        normedBase * base.pow(exp_offset.toDouble()) / div,
-                        div in preferred_divisors,
+                        interval = normedBase * base.pow(exp_offset.toDouble()) / div,
+                        preferred = div in preferred_divisors,
                         base = normedBase * base.pow(exp_offset.toDouble())
                     )
                 }

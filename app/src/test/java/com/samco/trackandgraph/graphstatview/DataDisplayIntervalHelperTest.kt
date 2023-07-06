@@ -17,7 +17,9 @@
 
 package com.samco.trackandgraph.graphstatview
 
+import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.graphstatview.factories.DataDisplayIntervalHelper
+import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -215,8 +217,28 @@ class DataDisplayIntervalHelperTest {
         //assertEquals( 0, errors)
         println()
         print("Some of the combinations where the algorithm did not fine a good solution (start, end): ")
-        println(no_solution_vals.slice(0..15))
+        println(no_solution_vals.take(16))
         assertTrue(100 * errors.toDouble() / nRuns.toDouble() <= allowed_error_percentage)
+    }
+
+    @Test
+    fun `test prefer whole number divisions`() {
+        val answer = uut.getYParameters(
+            y_min = 0.0,
+            y_max = 12.0,
+            time_data = false,
+            fixedBounds = true
+        )
+
+        assertEquals(
+            DataDisplayIntervalHelper.YAxisParameters(
+                step_mode = StepMode.SUBDIVIDE,
+                n_intervals = 7.0,
+                bounds_min = 0.0,
+                bounds_max = 12.0
+            ),
+            answer
+        )
     }
 
     @Test
