@@ -37,19 +37,20 @@ fun CustomDialog(
     scrollContent: Boolean = true,
     usePlatformDefaultWidth: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
-) = Dialog(
-    onDismissRequest = onDismissRequest,
-    properties = DialogProperties(
-        usePlatformDefaultWidth = usePlatformDefaultWidth,
-    )
-) {
-    DialogTheme {
+) = DialogTheme {
+    Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = DialogProperties(
+            usePlatformDefaultWidth = usePlatformDefaultWidth,
+        )
+    ) {
         Surface {
             Column(
                 modifier = Modifier
                     .padding(dimensionResource(id = R.dimen.card_padding_large))
-                    .apply {
-                        if (scrollContent) verticalScroll(state = rememberScrollState())
+                    .let {
+                        if (scrollContent) it.verticalScroll(state = rememberScrollState())
+                        else it
                     },
                 content = content
             )
