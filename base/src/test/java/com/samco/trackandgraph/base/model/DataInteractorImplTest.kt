@@ -140,7 +140,6 @@ class DataInteractorImplTest {
         uut.deleteDataPoint(testDataPoint)
         uut.insertDataPoint(testDataPoint)
         uut.insertDataPoints(listOf(testDataPoint))
-        uut.updateDataPoints(listOf(testDataPoint))
         uut.removeNote(noteTime, 0L)
         uut.deleteGlobalNote(testGlobalNote)
         uut.insertGlobalNote(testGlobalNote)
@@ -148,7 +147,7 @@ class DataInteractorImplTest {
         uut.updateFunction(testFunction)
 
         //VERIFY
-        assertEquals(13, count)
+        assertEquals(12, count)
         collectJob.cancel()
         verify(trackerHelper, times(1)).insertTracker(eq(testTracker))
         verify(trackerHelper, times(1)).updateTracker(eq(testTracker))

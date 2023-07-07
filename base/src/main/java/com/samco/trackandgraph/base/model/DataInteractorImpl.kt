@@ -225,13 +225,6 @@ internal class DataInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateDataPoints(dataPoints: List<DataPoint>) = withContext(io) {
-        if (dataPoints.isEmpty()) return@withContext
-        dao.updateDataPoints(dataPoints.map { it.toEntity() }).also {
-            dataUpdateEvents.emit(DataUpdateType.DataPoint(dataPoints.first().featureId))
-        }
-    }
-
     override fun getDataUpdateEvents(): SharedFlow<DataUpdateType> = dataUpdateEvents
 
     override suspend fun getGraphStatById(graphStatId: Long): GraphOrStat = withContext(io) {
