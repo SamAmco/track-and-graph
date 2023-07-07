@@ -204,7 +204,7 @@ class GroupViewModel @Inject constructor(
                 //If we missed more than one specific event just update all
                 //graphs. This should happen very rarely
                 if (types.size > 1) yield(Pair(bufferedEvents[0].first, UpdateType.AllGraphs))
-                else if (bufferedEvents.size == 1) yield(bufferedEvents[0])
+                else if (types.size == 1) yield(bufferedEvents[0])
             }.firstOrNull()
         }
         //Get the graph objects for the group
@@ -252,6 +252,7 @@ class GroupViewModel @Inject constructor(
         graphStats: List<GraphOrStat>,
         featureId: Long
     ): Flow<List<GraphWithViewData>> = flow {
+
         val affected = viewData
             .map { it.graph }
             .filter { gsiProvider.getDataFactory(it.type).affectedBy(it.id, featureId) }
