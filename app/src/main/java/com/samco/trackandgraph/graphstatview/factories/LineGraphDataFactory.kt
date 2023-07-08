@@ -130,7 +130,7 @@ class LineGraphDataFactory @Inject constructor(
             // hence the parallelization
             val features = dataSamples.map { pair ->
                 async {
-                    val clippedSample = DataClippingFunction(endTime, lineGraph.duration)
+                    val clippedSample = DataClippingFunction(endTime, lineGraph.sampleSize)
                         .mapSample(pair.second)
 
                     //Calling toList on the data sample evaluates it and causes the whole pipeline
@@ -172,7 +172,7 @@ class LineGraphDataFactory @Inject constructor(
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
             else -> CompositeFunction(
                 DurationAggregationFunction(timeHelper, plottingPeriod!!),
-                DataPaddingFunction(timeHelper, config.endDate, config.duration)
+                DataPaddingFunction(timeHelper, config.endDate, config.sampleSize)
             )
         }
         val averageCalculator = when (lineGraphFeature.averagingMode) {

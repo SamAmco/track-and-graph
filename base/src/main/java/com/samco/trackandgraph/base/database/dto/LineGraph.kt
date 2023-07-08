@@ -17,14 +17,14 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-import com.samco.trackandgraph.base.database.entity.LineGraph
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAmount
+import com.samco.trackandgraph.base.database.entity.LineGraph
 
 data class LineGraph(
     val id: Long,
     val graphStatId: Long,
-    val duration: Duration?,
+    val sampleSize: TemporalAmount?,
     val yRangeType: YRangeType,
     val yFrom: Double,
     val yTo: Double,
@@ -33,7 +33,7 @@ data class LineGraph(
     internal fun toEntity() = LineGraph(
         id,
         graphStatId,
-        duration,
+        sampleSize,
         yRangeType,
         yFrom,
         yTo,

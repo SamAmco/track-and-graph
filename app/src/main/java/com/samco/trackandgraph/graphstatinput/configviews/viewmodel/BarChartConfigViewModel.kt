@@ -90,7 +90,7 @@ class BarChartConfigViewModel @Inject constructor(
         graphStatId = 0,
         featureId = 0,
         endDate = null,
-        duration = null,
+        sampleSize = null,
         yRangeType = YRangeType.DYNAMIC,
         yTo = 1.0,
         scale = 1.0,
@@ -102,7 +102,7 @@ class BarChartConfigViewModel @Inject constructor(
         barChart = barChart.copy(
             featureId = this.featureId ?: -1,
             endDate = sampleEndingAt.asDateTime(),
-            duration = selectedDuration.duration,
+            sampleSize = selectedDuration.temporalAmount,
             yRangeType = yRangeType,
             yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0,
             scale = scale.text.toDoubleOrNull() ?: 1.0,
@@ -127,7 +127,7 @@ class BarChartConfigViewModel @Inject constructor(
         val featureMap = featurePathProvider.sortedFeatureMap()
 
         timeRangeConfigBehaviour.onConfigLoaded(
-            duration = bcConfig?.duration,
+            sampleSize = bcConfig?.sampleSize,
             endingAt = bcConfig?.endDate
         )
 
