@@ -16,18 +16,18 @@
 */
 package com.samco.trackandgraph.base.database.dto
 
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 data class LineGraphWithFeatures(
     val id: Long,
     val graphStatId: Long,
     val features: List<LineGraphFeature>,
-    val duration: Duration?,
+    val sampleSize: TemporalAmount?,
     val yRangeType: YRangeType,
     val yFrom: Double,
     val yTo: Double,
     val endDate: OffsetDateTime?
 ) {
-    fun toLineGraph() = LineGraph(id, graphStatId, duration, yRangeType, yFrom, yTo, endDate)
+    fun toLineGraph() = LineGraph(id, graphStatId, sampleSize, yRangeType, yFrom, yTo, endDate)
 }

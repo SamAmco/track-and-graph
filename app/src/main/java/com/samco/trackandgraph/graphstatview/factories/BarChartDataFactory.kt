@@ -81,7 +81,7 @@ class BarChartDataFactory @Inject constructor(
          * - A RectRegion representing the bounds of the data. The x bounds will be 0 to the number of
          * bars. The y bounds will be 0 to the max stacked value of any bar or [yTo] if [yRangeType] is [YRangeType.FIXED].
          *
-         * There should be one bar per [barSize] between [endTime] and [endTime] - [duration].
+         * There should be one bar per [barSize] between [endTime] and [endTime] - [sampleSize].
          *
          * All values in every SimpleXYSeries will be multiplied by [scale]. If you use sumByCount,
          * the value multiplied will be the number of data points for a bar rather than the sum of
@@ -93,7 +93,7 @@ class BarChartDataFactory @Inject constructor(
             dataSample: DataSample,
             endTime: ZonedDateTime?,
             barSize: BarChartBarPeriod,
-            duration: Duration?,
+            sampleSize: TemporalAmount?,
             sumByCount: Boolean,
             yRangeType: YRangeType,
             yTo: Double,
@@ -125,7 +125,7 @@ class BarChartDataFactory @Inject constructor(
                     } ?: timeHelper.findEndOfTemporal(timestamp, barSize.asTemporalAmount())
                     currentBarStartTime = roundedEndTime.minus(barPeriod)
                     currentBarEndTime = roundedEndTime
-                    endTimeMinusDuration = duration?.let { roundedEndTime.minus(it) }
+                    endTimeMinusDuration = sampleSize?.let { roundedEndTime.minus(it) }
                     barDates.add(roundedEndTime)
                 }
 
@@ -233,7 +233,7 @@ class BarChartDataFactory @Inject constructor(
             dataSample = dataSample,
             endTime = endTime,
             barSize = config.barPeriod,
-            duration = config.duration,
+            sampleSize = config.sampleSize,
             sumByCount = config.sumByCount,
             yRangeType = config.yRangeType,
             yTo = config.yTo,

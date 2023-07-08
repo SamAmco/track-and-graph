@@ -40,13 +40,13 @@ fun GraphStatDurationSpinner(
         )
     ) {
         val spinnerItems = mapOf(
-            GraphStatDurations.ALL_DATA to stringResource(id = R.string.graph_time_durations_all_data),
-            GraphStatDurations.A_DAY to stringResource(id = R.string.graph_time_durations_a_day),
-            GraphStatDurations.A_WEEK to stringResource(id = R.string.graph_time_durations_a_week),
-            GraphStatDurations.A_MONTH to stringResource(id = R.string.graph_time_durations_a_month),
-            GraphStatDurations.THREE_MONTHS to stringResource(id = R.string.graph_time_durations_three_months),
-            GraphStatDurations.SIX_MONTHS to stringResource(id = R.string.graph_time_durations_six_months),
-            GraphStatDurations.A_YEAR to stringResource(id = R.string.graph_time_durations_a_year)
+            GraphStatDurations.allData to stringResource(id = R.string.graph_time_durations_all_data),
+            GraphStatDurations.aDay to stringResource(id = R.string.graph_time_durations_a_day),
+            GraphStatDurations.aWeek to stringResource(id = R.string.graph_time_durations_a_week),
+            GraphStatDurations.aMonth to stringResource(id = R.string.graph_time_durations_a_month),
+            GraphStatDurations.threeMonths to stringResource(id = R.string.graph_time_durations_three_months),
+            GraphStatDurations.sixMonths to stringResource(id = R.string.graph_time_durations_six_months),
+            GraphStatDurations.aYear to stringResource(id = R.string.graph_time_durations_a_year)
         )
 
         TextMapSpinner(

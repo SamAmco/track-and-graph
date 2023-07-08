@@ -63,7 +63,7 @@ class PieChartDataFactoryTest {
         id = 1L,
         graphStatId = graphStatId,
         featureId = featureId,
-        duration = null,
+        sampleSize = null,
         endDate = null,
         sumByCount = false
     )

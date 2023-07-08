@@ -44,7 +44,9 @@ import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.LocalTime
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
 import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.TemporalAmount
 import java.lang.Exception
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
@@ -188,11 +190,14 @@ internal class Converters {
         value?.let { stringFromOdt(it) } ?: ""
 
     @TypeConverter
-    fun durationToString(value: Duration?): String = value?.let { value.toString() } ?: ""
+    fun temporalAmountToString(value: TemporalAmount?): String = value?.let { value.toString() } ?: ""
 
     @TypeConverter
-    fun stringToDuration(value: String): Duration? =
-        if (value.isEmpty()) null else Duration.parse(value)
+    fun stringToTemporalAmount(value: String): TemporalAmount? = when {
+        value.startsWith("PT") -> Duration.parse(value)
+        value.startsWith("P") -> Period.parse(value)
+        else -> null
+    }
 
     @TypeConverter
     fun localTimeToString(value: LocalTime) = value.toString()

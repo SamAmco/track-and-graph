@@ -69,7 +69,7 @@ class TimeHistogramConfigViewModel @Inject constructor(
         id = 0L,
         graphStatId = 0L,
         featureId = -1L,
-        duration = null,
+        sampleSize = null,
         window = TimeHistogramWindow.DAY,
         sumByCount = false,
         endDate = null
@@ -78,7 +78,7 @@ class TimeHistogramConfigViewModel @Inject constructor(
     override fun updateConfig() {
         timeHistogram = timeHistogram.copy(
             featureId = singleFeatureConfigBehaviour.featureId ?: -1L,
-            duration = timeRangeConfigBehaviour.selectedDuration.duration,
+            sampleSize = timeRangeConfigBehaviour.selectedDuration.temporalAmount,
             window = selectedWindow,
             sumByCount = sumByCount,
             endDate = timeRangeConfigBehaviour.sampleEndingAt.asDateTime()
@@ -107,7 +107,7 @@ class TimeHistogramConfigViewModel @Inject constructor(
         )
 
         timeRangeConfigBehaviour.onConfigLoaded(
-            duration = timeHist?.duration,
+            sampleSize = timeHist?.sampleSize,
             endingAt = timeHist?.endDate
         )
 

@@ -17,14 +17,14 @@
 package com.samco.trackandgraph.base.database.dto
 
 import com.samco.trackandgraph.base.database.entity.PieChart
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 data class PieChart(
     val id: Long,
     val graphStatId: Long,
     val featureId: Long,
-    val duration: Duration?,
+    val sampleSize: TemporalAmount?,
     val endDate: OffsetDateTime?,
     val sumByCount: Boolean
 ) {
@@ -32,7 +32,7 @@ data class PieChart(
         id,
         graphStatId,
         featureId,
-        duration,
+        sampleSize,
         endDate,
         sumByCount
     )
