@@ -54,20 +54,16 @@ class LineGraphDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILineGraphViewData {
         try {
-            val endTime = config.endDate ?: OffsetDateTime.now()
-            val plottableData = generatePlottingData(
-                config,
-                endTime,
-                onDataSampled
-            )
+            val plottableData = generatePlottingData(config, onDataSampled)
             val hasPlottableData = plottableData
+                .seriesPerFeature
                 .any { kvp -> kvp.value != null }
 
             val durationBasedRange = config.features
                 .any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
             val (bounds, yAxisParameters) = getYAxisParameters(
                 config,
-                plottableData.values,
+                plottableData.seriesPerFeature.values,
                 durationBasedRange
             )
 
@@ -76,8 +72,8 @@ class LineGraphDataFactory @Inject constructor(
                 override val yRangeType = config.yRangeType
                 override val bounds = bounds
                 override val hasPlottableData = hasPlottableData
-                override val endTime = endTime
-                override val plottableData = plottableData
+                override val endTime = plottableData.endTime
+                override val plottableData = plottableData.seriesPerFeature
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
                 override val yAxisRangeParameters = yAxisParameters
@@ -109,24 +105,38 @@ class LineGraphDataFactory @Inject constructor(
             ?.any { it.featureId == featureId } ?: false
     }
 
+    private data class PlottingData(
+        val seriesPerFeature: Map<LineGraphFeature, FastXYSeries?>,
+        val endTime: OffsetDateTime
+    )
+
     private suspend fun generatePlottingData(
         lineGraph: LineGraphWithFeatures,
-        endTime: OffsetDateTime,
         onDataSampled: (List<DataPoint>) -> Unit
-    ): Map<LineGraphFeature, FastXYSeries?> = coroutineScope {
+    ): PlottingData = coroutineScope {
         withContext(defaultDispatcher) {
             //Create all the data samples in parallel (this shouldn't actually take long but why not)
             val dataSamples = lineGraph.features.map { lgf ->
                 async { Pair(lgf, tryGetPlottingData(lineGraph, lgf)) }
             }.awaitAll()
 
+            //Get the end time of the graph. If not specified it's the time of the last data
+            // point of any of the features
+            val endTime = lineGraph.endDate ?: dataSamples
+                .mapNotNull { it.second.firstOrNull() }
+                .maxOf { it.timestamp }
+
             //Generate the actual plotting data for each sample. This is the part that will take longer
             // hence the parallelization
             val features = dataSamples.map { pair ->
                 async {
+                    val clippedSample = DataClippingFunction(endTime, lineGraph.duration)
+                        .mapSample(pair.second)
+
                     //Calling toList on the data sample evaluates it and causes the whole pipeline
                     // to be processed
-                    val dataPoints = pair.second.toList().asReversed()
+                    val dataPoints = clippedSample.toList().asReversed()
+
                     val series = if (dataPoints.size >= 2) {
                         getXYSeriesFromDataPoints(dataPoints, endTime, pair.first)
                     } else null
@@ -140,7 +150,10 @@ class LineGraphDataFactory @Inject constructor(
             onDataSampled(rawDataPoints)
             dataSamples.forEach { it.second.dispose() }
 
-            return@withContext features
+            return@withContext PlottingData(
+                features,
+                endTime
+            )
         }
     }
 
@@ -153,7 +166,6 @@ class LineGraphDataFactory @Inject constructor(
         val rawDataSample = withContext(ioDispatcher) {
             dataInteractor.getDataSampleForFeatureId(lineGraphFeature.featureId)
         }
-        val clippingCalculator = DataClippingFunction(config.endDate, config.duration)
 
         val timeHelper = TimeHelper(GlobalAggregationPreferences)
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
@@ -167,7 +179,7 @@ class LineGraphDataFactory @Inject constructor(
             LineGraphAveraginModes.NO_AVERAGING -> IdentityFunction()
             else -> MovingAverageFunction(movingAvDuration!!)
         }
-        return CompositeFunction(aggregationCalculator, averageCalculator, clippingCalculator)
+        return CompositeFunction(aggregationCalculator, averageCalculator)
             .mapSample(rawDataSample)
     }
 
@@ -183,6 +195,7 @@ class LineGraphDataFactory @Inject constructor(
             DurationPlottingMode.MINUTES -> 60.0
             else -> 1.0
         }
+
         val yValues = dataSample.map { dp ->
             (dp.value * scale / durationDivisor) + offset
         }
