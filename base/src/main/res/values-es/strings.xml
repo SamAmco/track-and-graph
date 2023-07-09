@@ -115,6 +115,7 @@
     </string-array>
 
 
+    <string name="custom">Costumbre</string>
     <string name="import_exception_unknown">Error de importación: Se ha producido un error desconocido</string>
     <string name="import_exception_bad_headers">Error de importación: Las cabeceras no coinciden con las esperadas: %1$s</string>
     <string name="import_exception_inconsistent_record">Error de importación: Lq traza de la línea %1$s no es consistente con las cabeceras requeridas</string>
@@ -283,4 +284,46 @@
     <string name="total_formatted">Total: %s</string>
     <string name="from_formatted">De: %s</string>
     <string name="to_formatted">A: %s</string>
+    <string name="seconds_generic">Segundo(s)</string>
+    <string name="minutes_generic">Minuto(s)</string>
+    <string name="hours_generic">Hora(s)</string>
+    <string name="days_generic">Día(s)</string>
+    <string name="weeks_generic">Semana(s)</string>
+    <string name="months_generic">Mes(es)</string>
+    <string name="years_generic">Año(s)</string>
+
+    <plurals name="seconds">
+        <item quantity="one">%d segundo</item>
+        <item quantity="other">%d segundos</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%d minuto</item>
+        <item quantity="other">%d minutos</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">%d hora</item>
+        <item quantity="other">%d horas</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">%d día</item>
+        <item quantity="other">%d días</item>
+    </plurals>
+
+    <plurals name="weeks">
+        <item quantity="one">%d semana</item>
+        <item quantity="other">%d semanas</item>
+    </plurals>
+
+    <plurals name="months">
+        <item quantity="one">%d mes</item>
+        <item quantity="other">%d meses</item>
+    </plurals>
+
+    <plurals name="years">
+        <item quantity="one">%d año</item>
+        <item quantity="other">%d años</item>
+    </plurals>
 </resources>

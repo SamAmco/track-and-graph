@@ -115,6 +115,7 @@
     </string-array>
 
 
+    <string name="custom">Brauch</string>
     <string name="import_exception_unknown">Import fehlgeschlagen: Ein unbekannter Fehler ist aufgetreten</string>
     <string name="import_exception_bad_headers">Import fehlgeschlagen: Kopfzeilen stimmten nicht mit den erwarteten Kopfzeilen überein: %1$s</string>
     <string name="import_exception_inconsistent_record">Import fehlgeschlagen: Datensatz in Zeile %1$s stimmt nicht mit den erforderlichen Kopfzeilen überein: %1$s</string>
@@ -283,4 +284,46 @@
     <string name="total_formatted">Gesamt: %s</string>
     <string name="from_formatted">Aus: %s</string>
     <string name="to_formatted">Zu: %s</string>
+    <string name="seconds_generic">Sekunde(n)</string>
+    <string name="minutes_generic">Minute(n)</string>
+    <string name="hours_generic">Stunde(n)</string>
+    <string name="days_generic">Tag(e)</string>
+    <string name="weeks_generic">Woche(n)</string>
+    <string name="months_generic">Monat(e)</string>
+    <string name="years_generic">Jahr(e)</string>
+
+    <plurals name="seconds">
+        <item quantity="one">%d Sekunde</item>
+        <item quantity="other">%d Sekunden</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%d Minute</item>
+        <item quantity="other">%d Minuten</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">%d Stunde</item>
+        <item quantity="other">%d Stunden</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">%d Tag</item>
+        <item quantity="other">%d Tage</item>
+    </plurals>
+
+    <plurals name="weeks">
+        <item quantity="one">%d Woche</item>
+        <item quantity="other">%d Wochen</item>
+    </plurals>
+
+    <plurals name="months">
+        <item quantity="one">%d Monat</item>
+        <item quantity="other">%d Monate</item>
+    </plurals>
+
+    <plurals name="years">
+        <item quantity="one">%d Jahr</item>
+        <item quantity="other">%d Jahre</item>
+    </plurals>
 </resources>

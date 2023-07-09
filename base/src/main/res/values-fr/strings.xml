@@ -115,6 +115,7 @@
     </string-array>
 
 
+    <string name="custom">Coutume</string>
     <string name="import_exception_unknown">L\'importation a échoué : une erreur inconnue s\'est produite</string>
     <string name="import_exception_bad_headers">L\'importation a échoué : les en-têtes ne correspondent pas aux en-têtes attendus : %1$s</string>
     <string name="import_exception_inconsistent_record">L\'importation a échoué : l\'enregistrement sur la ligne %1$s ne correspond pas aux en-têtes requis</string>
@@ -285,5 +286,53 @@
     <string name="total_formatted">Total: %s</string>
     <string name="from_formatted">Depuis: %s</string>
     <string name="to_formatted">Pour: %s</string>
+    <string name="seconds_generic">Seconde(s)</string>
+    <string name="minutes_generic">Minute(s)</string>
+    <string name="hours_generic">Heure(s)</string>
+    <string name="days_generic">Jour(s)</string>
+    <string name="weeks_generic">Semaine(s)</string>
+    <string name="months_generic">Mois</string>
+    <string name="years_generic">Année(s)</string>
 
+    <plurals name="seconds">
+        <item quantity="one">%d seconde</item>
+        <item quantity="many">%d secondes</item>
+        <item quantity="other">%d secondes</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%d minute</item>
+        <item quantity="many">%d minutes</item>
+        <item quantity="other">%d minutes</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">%d heure</item>
+        <item quantity="many">%d heures</item>
+        <item quantity="other">%d heures</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">%d jour</item>
+        <item quantity="many">%d jours</item>
+        <item quantity="other">%d jours</item>
+    </plurals>
+
+    <plurals name="weeks">
+        <item quantity="one">%d semaine</item>
+        <item quantity="many">%d semaines</item>
+        <item quantity="other">%d semaines</item>
+    </plurals>
+
+    <plurals name="months">
+        <item quantity="one">%d mois</item>
+        <item quantity="many">%d mois</item>
+        <item quantity="other">%d mois</item>
+    </plurals>
+
+    <plurals name="years">
+        <item quantity="one">%d an</item>
+        <item quantity="many">%d années</item>
+        <item quantity="other">%d années</item>
+    </plurals>
 </resources>
