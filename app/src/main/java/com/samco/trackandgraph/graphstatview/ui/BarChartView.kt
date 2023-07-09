@@ -74,6 +74,7 @@ import com.androidplot.xy.XValueMarker
 import com.androidplot.xy.XYGraphWidget
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.helpers.getDayMonthFormatter
 import com.samco.trackandgraph.base.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
@@ -157,7 +158,8 @@ fun BarChartView(
                 highlightedIndex = it,
                 xDates = viewData.xDates,
                 bars = viewData.bars,
-                barPeriod = viewData.barPeriod
+                barPeriod = viewData.barPeriod,
+                viewData.durationBasedRange
             )
         }
     }
@@ -175,7 +177,8 @@ private fun BarChartDataOverlay(
     highlightedIndex: Int,
     xDates: List<ZonedDateTime>,
     bars: List<SimpleXYSeries>,
-    barPeriod: TemporalAmount
+    barPeriod: TemporalAmount,
+    durationBasedRange: Boolean
 ) = Surface(
     modifier = modifier
         .width(IntrinsicSize.Max)
@@ -183,7 +186,9 @@ private fun BarChartDataOverlay(
 ) {
 
     val total = remember(highlightedIndex, bars) {
-        doubleToString(bars.sumOf { it.getyVals()[highlightedIndex].toDouble() })
+        val totalVal = bars.sumOf { it.getyVals()[highlightedIndex].toDouble() }
+        if (durationBasedRange) formatTimeDuration(totalVal.toLong())
+        else doubleToString(totalVal)
     }
 
     val fromText = remember(highlightedIndex, xDates) {
@@ -204,10 +209,13 @@ private fun BarChartDataOverlay(
 
         if (sum < 1e-6) emptyList()
         else bars.map {
-            val percentage = ((values[it.title] ?: 0.0) / sum) * 100.0
-            "${it.title}: " +
-                    doubleToString(values[it.title] ?: 0.0) +
-                    " (${doubleToString(percentage, 1)}%)"
+            val value = values[it.title] ?: 0.0
+            val percentage = (value / sum) * 100.0
+            val percentageStr = doubleToString(percentage, 1)
+            val str =
+                if (durationBasedRange) formatTimeDuration(value.toLong())
+                else doubleToString(value)
+            return@map "${it.title}: $str ($percentageStr%)"
         }
     }
 
