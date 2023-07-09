@@ -1,0 +1,11 @@
+- Add option for custom sample size durations/periods
+- Improve Y-Axis label choices for line/bar graphs
+- Fix bugs: 
+    - line graphs should clip from last data point in the graph to sample size prior
+    - time durations not formatted correctly for bar chart details view
+    - bar charts showing blank when no data
+    - notes not scrolling
+    - calendar should use correct first day of week
+    - time button should prefer clock face to text input
+    - global note input dialog not working
+
