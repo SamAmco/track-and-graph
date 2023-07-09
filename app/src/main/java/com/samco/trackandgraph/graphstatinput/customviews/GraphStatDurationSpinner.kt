@@ -352,8 +352,9 @@ private fun CustomDurationDialog(
                 ),
                 maxLines = 1,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                onValueChange = {
-                    if (it != selectedNumber) selectedNumber = it
+                onValueChange = { tfv ->
+                    val filtered = tfv.copy(text = tfv.text.filter { it.isDigit() })
+                    if (filtered != selectedNumber) selectedNumber = filtered
                 }
             )
 
