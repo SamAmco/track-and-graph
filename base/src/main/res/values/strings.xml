@@ -120,6 +120,7 @@
     <string name="graph_time_durations_three_months">Three Months</string>
     <string name="graph_time_durations_six_months">Six Months</string>
     <string name="graph_time_durations_a_year">A Year</string>
+    <string name="custom">Custom</string>
     <string-array name="y_range_styles">
         <item>Dynamic</item>
         <item>Fixed</item>
@@ -298,4 +299,47 @@
     <string name="total_formatted">Total: %s</string>
     <string name="from_formatted">From: %s</string>
     <string name="to_formatted">To: %s</string>
+
+    <string name="seconds_generic">Second(s)</string>
+    <string name="minutes_generic">Minute(s)</string>
+    <string name="hours_generic">Hour(s)</string>
+    <string name="days_generic">Day(s)</string>
+    <string name="weeks_generic">Week(s)</string>
+    <string name="months_generic">Month(s)</string>
+    <string name="years_generic">Year(s)</string>
+
+    <plurals name="seconds">
+        <item quantity="one">%d Second</item>
+        <item quantity="other">%d Seconds</item>
+    </plurals>
+
+    <plurals name="minutes">
+        <item quantity="one">%d Minute</item>
+        <item quantity="other">%d Minutes</item>
+    </plurals>
+
+    <plurals name="hours">
+        <item quantity="one">%d Hour</item>
+        <item quantity="other">%d Hours</item>
+    </plurals>
+
+    <plurals name="days">
+        <item quantity="one">%d Day</item>
+        <item quantity="other">%d Days</item>
+    </plurals>
+
+    <plurals name="weeks">
+        <item quantity="one">%d Week</item>
+        <item quantity="other">%d Weeks</item>
+    </plurals>
+
+    <plurals name="months">
+        <item quantity="one">%d Month</item>
+        <item quantity="other">%d Months</item>
+    </plurals>
+
+    <plurals name="years">
+        <item quantity="one">%d Year</item>
+        <item quantity="other">%d Years</item>
+    </plurals>
 </resources>
