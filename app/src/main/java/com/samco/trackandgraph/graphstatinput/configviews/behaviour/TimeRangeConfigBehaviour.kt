@@ -19,8 +19,8 @@ package com.samco.trackandgraph.graphstatinput.configviews.behaviour
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.samco.trackandgraph.graphstatinput.customviews.GraphStatSampleSize
 import com.samco.trackandgraph.graphstatinput.customviews.SampleEndingAt
-import com.samco.trackandgraph.graphstatinput.dtos.GraphStatDurations
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
 import javax.inject.Inject
@@ -31,14 +31,14 @@ interface EndingAtConfigBehaviour {
 }
 
 interface TimeRangeConfigBehaviour : EndingAtConfigBehaviour {
-    val selectedDuration: GraphStatDurations
-    fun updateDuration(duration: GraphStatDurations)
+    val selectedDuration: GraphStatSampleSize
+    fun updateDuration(duration: GraphStatSampleSize)
 }
 
 class TimeRangeConfigBehaviourImpl @Inject constructor() : TimeRangeConfigBehaviour {
     private lateinit var onUpdate: () -> Unit
 
-    override var selectedDuration by mutableStateOf(GraphStatDurations.allData)
+    override var selectedDuration by mutableStateOf<GraphStatSampleSize>(GraphStatSampleSize.AllData)
 
     override var sampleEndingAt by mutableStateOf<SampleEndingAt>(SampleEndingAt.Latest)
 
@@ -50,11 +50,11 @@ class TimeRangeConfigBehaviourImpl @Inject constructor() : TimeRangeConfigBehavi
         sampleSize: TemporalAmount?,
         endingAt: OffsetDateTime?
     ) {
-        sampleSize?.let { selectedDuration = GraphStatDurations.fromTemporalAmount(it) }
+        sampleSize?.let { selectedDuration = GraphStatSampleSize.fromTemporalAmount(it) }
         endingAt?.let { sampleEndingAt = SampleEndingAt.fromDateTime(it) }
     }
 
-    override fun updateDuration(duration: GraphStatDurations) {
+    override fun updateDuration(duration: GraphStatSampleSize) {
         selectedDuration = duration
         onUpdate()
     }
