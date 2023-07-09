@@ -24,7 +24,7 @@ or for release:
 
 	# bundle exec fastlane supply --aab app/release/app-release.aab
 
-7. While this is uploading you can build an apk for the release (using Android Studio)
+7. Wait for the upload to complete and then build an apk for the release (using Android Studio) .. Typically android studio deletes the aab when you start the apk build (hence why you might want to wait)
 
 8. Commit everything and merge the release/hotfix branch back into master
 
