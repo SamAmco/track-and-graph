@@ -22,8 +22,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.YRangeType
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 @Entity(
     tableName = "line_graphs_table3",
@@ -43,7 +43,7 @@ internal data class LineGraph(
     val graphStatId: Long,
 
     @ColumnInfo(name = "duration")
-    val duration: Duration?,
+    val sampleSize: TemporalAmount?,
 
     @ColumnInfo(name = "y_range_type")
     val yRangeType: YRangeType,

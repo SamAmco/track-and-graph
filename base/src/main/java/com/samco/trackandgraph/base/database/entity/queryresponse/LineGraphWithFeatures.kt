@@ -21,8 +21,8 @@ import androidx.room.Relation
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.database.entity.LineGraph
 import com.samco.trackandgraph.base.database.entity.LineGraphFeature
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 internal data class LineGraphWithFeatures(
     @ColumnInfo(name = "id", index = true)
@@ -35,7 +35,7 @@ internal data class LineGraphWithFeatures(
     val features: List<LineGraphFeature>,
 
     @ColumnInfo(name = "duration")
-    val duration: Duration?,
+    val sampleSize: TemporalAmount?,
 
     @ColumnInfo(name = "y_range_type")
     val yRangeType: YRangeType,
@@ -53,12 +53,12 @@ internal data class LineGraphWithFeatures(
         id,
         graphStatId,
         features.map { it.toDto() },
-        duration,
+        sampleSize,
         yRangeType,
         yFrom,
         yTo,
         endDate
     )
 
-    fun toLineGraph() = LineGraph(id, graphStatId, duration, yRangeType, yFrom, yTo, endDate)
+    fun toLineGraph() = LineGraph(id, graphStatId, sampleSize, yRangeType, yFrom, yTo, endDate)
 }

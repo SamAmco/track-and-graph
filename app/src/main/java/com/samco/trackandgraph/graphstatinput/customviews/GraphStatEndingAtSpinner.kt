@@ -66,9 +66,7 @@ fun GraphStatEndingAtSpinner(
 ) {
     LabeledRow(
         label = stringResource(id = R.string.ending_at_colon),
-        paddingValues = PaddingValues(
-            start = dimensionResource(id = R.dimen.card_padding)
-        )
+        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
     ) {
         val strings = stringArrayResource(id = R.array.ending_at_values)
 

@@ -25,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.samco.trackandgraph.R
@@ -36,6 +37,9 @@ fun CustomDialog(
     onDismissRequest: () -> Unit,
     scrollContent: Boolean = true,
     usePlatformDefaultWidth: Boolean = true,
+    paddingValues: PaddingValues = PaddingValues(
+        dimensionResource(id = R.dimen.card_padding_large)
+    ),
     content: @Composable ColumnScope.() -> Unit,
 ) = DialogTheme {
     Dialog(
@@ -47,7 +51,7 @@ fun CustomDialog(
         Surface {
             Column(
                 modifier = Modifier
-                    .padding(dimensionResource(id = R.dimen.card_padding_large))
+                    .padding(paddingValues)
                     .let {
                         if (scrollContent) it.verticalScroll(state = rememberScrollState())
                         else it
@@ -71,6 +75,12 @@ fun CustomConfirmCancelDialog(
     onDismissRequest = onDismissRequest,
     scrollContent = false,
     usePlatformDefaultWidth = customWidthPercentage == null,
+    paddingValues = PaddingValues(
+        start = dimensionResource(id = R.dimen.card_padding_large),
+        end = dimensionResource(id = R.dimen.card_padding_large),
+        bottom = dimensionResource(id = R.dimen.card_padding),
+        top = dimensionResource(id = R.dimen.card_padding_large),
+    )
 ) {
     Column(
         if (customWidthPercentage != null) {

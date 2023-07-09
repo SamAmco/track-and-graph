@@ -23,7 +23,9 @@ import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.ChronoUnit
 import org.threeten.bp.temporal.Temporal
+import org.threeten.bp.temporal.TemporalAmount
 import java.text.DecimalFormat
 
 //TODO should really refactor all this stuff into classes and interfaces
@@ -174,7 +176,8 @@ fun formatMonthYear(context: Context, temporal: Temporal): String {
 
 fun formatTimeDuration(seconds: Long): String {
     val absSecs = kotlin.math.abs(seconds)
-    val timeStr = String.format("%d:%02d:%02d", absSecs / 3600, (absSecs % 3600) / 60, (absSecs % 60))
+    val timeStr =
+        String.format("%d:%02d:%02d", absSecs / 3600, (absSecs % 3600) / 60, (absSecs % 60))
     if (seconds < 0) return "-$timeStr"
     return timeStr
 }
@@ -213,3 +216,4 @@ fun formatTimeToDaysHoursMinutesSeconds(
         }
     }.toString()
 }
+

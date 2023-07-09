@@ -21,8 +21,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.PieChart
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 @Entity(tableName = "pie_charts_table2",
     foreignKeys = [
@@ -51,7 +51,7 @@ internal data class PieChart(
     val featureId: Long,
 
     @ColumnInfo(name = "duration")
-    val duration: Duration?,
+    val sampleSize: TemporalAmount?,
 
     @ColumnInfo(name = "end_date")
     val endDate: OffsetDateTime?,
@@ -63,7 +63,7 @@ internal data class PieChart(
         id,
         graphStatId,
         featureId,
-        duration,
+        sampleSize,
         endDate,
         sumByCount
     )
