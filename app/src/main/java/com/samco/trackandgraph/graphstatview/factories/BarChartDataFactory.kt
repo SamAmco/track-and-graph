@@ -43,6 +43,7 @@ import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.abs
 
 class BarChartDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
@@ -188,10 +189,13 @@ class BarChartDataFactory @Inject constructor(
             val maxY = (0 until (barValuesByLabel.values.firstOrNull()?.size ?: 0))
                 .maxOfOrNull { index -> barValuesByLabel.values.sumOf { it[index] } } ?: 0.0
 
+            //If maxY is 0, we want to show a range of 0 to 1
+            val maxYForRange = if (abs(maxY) < 0.0000001) 1.0 else maxY
+
             val xRegion = SeriesUtils.minMax(listOf(-0.5, (barDates.size - 1) + 0.5))
             val yRegion = SeriesUtils.minMax(
                 if (yRangeType == YRangeType.FIXED) listOf(0.0, yTo)
-                else listOf(0.0, maxY)
+                else listOf(0.0, maxYForRange)
             )
             val bounds = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
 

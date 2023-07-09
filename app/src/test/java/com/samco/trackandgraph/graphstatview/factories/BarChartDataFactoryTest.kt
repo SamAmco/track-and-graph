@@ -25,6 +25,46 @@ class BarChartDataFactoryTest {
     )
 
     @Test
+    fun `test should not return a range of 0 to 0 if theres no data`() {
+        //PREPARE
+        val end = ZonedDateTime.now().withHour(22)
+
+        val dataSample = DataSample.fromSequence(
+            listOf(dp(end, value = 0.0)).asSequence()
+        ) {}
+
+        //EXECUTE
+        val barData = BarChartDataFactory.getBarData(
+            timeHelper = defaultTimeHelper,
+            dataSample = dataSample,
+            endTime = null,
+            barSize = BarChartBarPeriod.DAY,
+            sampleSize = null,
+            sumByCount = false,
+            yRangeType = YRangeType.DYNAMIC,
+            yTo = 0.0,
+            scale = 1.0
+        )
+
+        //VERIFY
+        val endOfDay = end
+            .plusDays(1)
+            .withHour(0)
+            .withMinute(0)
+            .withSecond(0)
+            .withNano(0)
+            .minusNanos(1)
+        assertEquals(1, barData.bars.size)
+        assertEquals(listOf(endOfDay), barData.dates)
+        assertEquals(listOf(0.0), barData.bars[0].getyVals())
+
+        assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
+        assertEquals(0.5, barData.bounds.maxX.toDouble(), 0.1)
+        assertEquals(0, barData.bounds.minY.toInt())
+        assertEquals(1, barData.bounds.maxY.toInt())
+    }
+
+    @Test
     fun `test bar chart, no label, end time, no duration`() {
         //PREPARE
         val end = ZonedDateTime.now().withHour(22)
