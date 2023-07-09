@@ -71,7 +71,7 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
         featureId = -1L,
         fromValue = 0.0,
         toValue = 1.0,
-        duration = null,
+        sampleSize = null,
         labels = listOf(),
         endDate = null,
         filterByRange = false,
@@ -83,7 +83,7 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
             featureId = featureId ?: -1L,
             fromValue = fromValue.text.toDoubleOrNull() ?: 0.0,
             toValue = toValue.text.toDoubleOrNull() ?: 1.0,
-            duration = selectedDuration.duration,
+            sampleSize = selectedDuration.temporalAmount,
             labels = selectedLabels,
             endDate = sampleEndingAt.asDateTime(),
             filterByRange = filterByRange,
@@ -125,7 +125,7 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
         )
 
         timeRangeConfigBehaviour.onConfigLoaded(
-            duration = avStat?.duration,
+            sampleSize = avStat?.sampleSize,
             endingAt = avStat?.endDate
         )
 

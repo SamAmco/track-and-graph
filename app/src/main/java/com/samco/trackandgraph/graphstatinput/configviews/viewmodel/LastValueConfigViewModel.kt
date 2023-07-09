@@ -126,7 +126,7 @@ class LastValueConfigViewModel @Inject constructor(
         )
 
         endingAtConfigBehaviour.onConfigLoaded(
-            duration = null,
+            sampleSize = null,
             endingAt = lvStat?.endDate
         )
 

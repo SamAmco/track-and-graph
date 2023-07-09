@@ -21,8 +21,8 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 @Entity(tableName = "average_time_between_stat_table4",
     foreignKeys = [
@@ -57,7 +57,7 @@ internal data class AverageTimeBetweenStat(
     val toValue: Double,
 
     @ColumnInfo(name = "duration")
-    val duration: Duration?,
+    val sampleSize: TemporalAmount?,
 
     @ColumnInfo(name = "labels")
     val labels: List<String>,
@@ -77,7 +77,7 @@ internal data class AverageTimeBetweenStat(
         featureId,
         fromValue,
         toValue,
-        duration,
+        sampleSize,
         labels,
         endDate,
         filterByRange,

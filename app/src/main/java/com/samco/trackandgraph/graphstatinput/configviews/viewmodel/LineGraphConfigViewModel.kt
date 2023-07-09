@@ -116,7 +116,7 @@ class LineGraphConfigViewModel @Inject constructor(
         id = 0L,
         graphStatId = 0L,
         features = listOf(),
-        duration = null,
+        sampleSize = null,
         yRangeType = YRangeType.DYNAMIC,
         yFrom = 0.0,
         yTo = 1.0,
@@ -125,7 +125,7 @@ class LineGraphConfigViewModel @Inject constructor(
 
     override fun updateConfig() {
         lineGraph = lineGraph.copy(
-            duration = selectedDuration.duration,
+            sampleSize = selectedDuration.temporalAmount,
             endDate = sampleEndingAt.asDateTime(),
             yRangeType = yRangeType,
             features = lineGraphFeatures.mapIndexed { index, f ->
@@ -241,7 +241,7 @@ class LineGraphConfigViewModel @Inject constructor(
         initFeaturePaths()
 
         timeRangeConfigBehaviour.onConfigLoaded(
-            duration = lgConfig?.duration,
+            sampleSize = lgConfig?.sampleSize,
             endingAt = lgConfig?.endDate
         )
 

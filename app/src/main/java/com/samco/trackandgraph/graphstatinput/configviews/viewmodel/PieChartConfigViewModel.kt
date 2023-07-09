@@ -65,7 +65,7 @@ class PieChartConfigViewModel @Inject constructor(
         id = 0L,
         graphStatId = 0L,
         featureId = -1L,
-        duration = null,
+        sampleSize = null,
         endDate = null,
         sumByCount = false
     )
@@ -73,7 +73,7 @@ class PieChartConfigViewModel @Inject constructor(
     override fun updateConfig() {
         pieChart = pieChart.copy(
             featureId = this.featureId ?: -1L,
-            duration = selectedDuration.duration,
+            sampleSize = selectedDuration.temporalAmount,
             endDate = sampleEndingAt.asDateTime(),
             sumByCount = sumByCount
         )
@@ -102,7 +102,7 @@ class PieChartConfigViewModel @Inject constructor(
         )
 
         timeRangeConfigBehaviour.onConfigLoaded(
-            duration = pc?.duration,
+            sampleSize = pc?.sampleSize,
             endingAt = pc?.endDate
         )
 

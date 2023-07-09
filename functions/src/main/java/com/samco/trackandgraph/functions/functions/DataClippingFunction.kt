@@ -18,12 +18,12 @@
 package com.samco.trackandgraph.functions.functions
 
 import com.samco.trackandgraph.base.database.sampling.DataSample
-import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 class DataClippingFunction(
     private val endTime: OffsetDateTime?,
-    private val sampleDuration: Duration?
+    private val sampleDuration: TemporalAmount?
 ) : DataSampleFunction {
     /**
      * Return all the data points in the sample that lie within the sampleDuration leading up to the endTime.
