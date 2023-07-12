@@ -40,8 +40,8 @@ android {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 23
         targetSdkVersion 33
-        versionCode 300600
-        versionName "3.6.0"
+        versionCode 300601
+        versionName "3.6.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
