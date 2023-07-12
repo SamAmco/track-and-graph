@@ -20,6 +20,7 @@ package com.samco.trackandgraph.timers
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,6 +28,8 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,12 +51,16 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
 
     private val addDataPointsViewModel by viewModels<AddDataPointsViewModelImpl>()
 
+    @Inject
+    lateinit var tngSettings: TngSettings
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val composeView = ComposeView(this).apply {
             setContent {
-                AddDataPointsDialog(viewModel = addDataPointsViewModel) { finish() }
+                CompositionLocalProvider(LocalSettings provides tngSettings) {
+                    AddDataPointsDialog(viewModel = addDataPointsViewModel) { finish() }
+                }
             }
         }
         setContentView(composeView)
