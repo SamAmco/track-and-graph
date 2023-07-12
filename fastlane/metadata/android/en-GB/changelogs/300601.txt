@@ -1,0 +1,3 @@
+- Fix bug tracker widget data point input dialog crashing
+
+
