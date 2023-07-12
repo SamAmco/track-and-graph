@@ -90,7 +90,9 @@ class PendingIntentProviderImpl @Inject constructor(
     override fun getTrackWidgetUpdateForFeatureIdIntent(featureId: Long): Intent {
         return Intent(
             AppWidgetManager.ACTION_APPWIDGET_UPDATE,
-            null, context, TrackWidgetProvider::class.java
+            null,
+            context,
+            TrackWidgetProvider::class.java
         ).apply { putExtra(UPDATE_FEATURE_ID, featureId) }
     }
 

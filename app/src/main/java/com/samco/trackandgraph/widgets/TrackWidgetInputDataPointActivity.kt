@@ -21,6 +21,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -35,6 +36,8 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.base.service.TrackWidgetProvider
 import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
+import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
@@ -49,13 +52,18 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
 
     private val addDataPointDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
 
+    @Inject
+    lateinit var tngSettings: TngSettings
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val composeView = ComposeView(this).apply {
             setContent {
-                AddDataPointsDialog(
-                    viewModel = addDataPointDialogViewModel,
-                    onDismissRequest = { finish() })
+                CompositionLocalProvider(LocalSettings provides tngSettings) {
+                    AddDataPointsDialog(
+                        viewModel = addDataPointDialogViewModel,
+                        onDismissRequest = { finish() })
+                }
             }
         }
         setContentView(composeView)
@@ -83,6 +91,7 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
                 performTrackVibrate()
                 finish()
             }
+
             else -> showDialog(tracker.id)
         }
     }
