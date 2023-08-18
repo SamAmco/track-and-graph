@@ -76,10 +76,12 @@ internal data class DisplayTracker(
         hasDefaultValue = hasDefaultValue,
         defaultValue = defaultValue,
         defaultLabel = defaultLabel,
-        timestamp = OffsetDateTime.ofInstant(
-            Instant.ofEpochMilli(lastEpochMilli),
-            ZoneOffset.ofTotalSeconds(lastUtcOffsetSec)
-        ),
+        timestamp = lastEpochMilli.takeIf { it != 0L }?.let {
+            OffsetDateTime.ofInstant(
+                Instant.ofEpochMilli(it),
+                ZoneOffset.ofTotalSeconds(lastUtcOffsetSec)
+            )
+        },
         numDataPoints = numDataPoints,
         displayIndex = displayIndex,
         description = description,
