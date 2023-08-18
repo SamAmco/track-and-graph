@@ -79,6 +79,7 @@ class LineGraphDataFactory @Inject constructor(
                 override val yAxisRangeParameters = yAxisParameters
             }
         } catch (throwable: Throwable) {
+            throwable.printStackTrace()
             return object : ILineGraphViewData {
                 override val state = IGraphStatViewData.State.ERROR
                 override val graphOrStat = graphOrStat
@@ -124,7 +125,8 @@ class LineGraphDataFactory @Inject constructor(
             // point of any of the features
             val endTime = lineGraph.endDate ?: dataSamples
                 .mapNotNull { it.second.firstOrNull() }
-                .maxOf { it.timestamp }
+                .maxOfOrNull { it.timestamp }
+                ?: OffsetDateTime.now()
 
             //Generate the actual plotting data for each sample. This is the part that will take longer
             // hence the parallelization
