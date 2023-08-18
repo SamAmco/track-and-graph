@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.notes
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 
@@ -13,5 +14,7 @@ fun NotesView(
         viewModel = addDataPointsDialogViewModel,
         onDismissRequest = { addDataPointsDialogViewModel.reset() }
     )
-    GlobalNoteInputDialogView(viewModel = globalNoteDialogViewModel)
+    if (globalNoteDialogViewModel.show.observeAsState(false).value) {
+        GlobalNoteInputDialogView(viewModel = globalNoteDialogViewModel)
+    }
 }
