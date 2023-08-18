@@ -16,15 +16,20 @@
 */
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.AverageTimeBetweenConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByLabelSection
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByValueSection
@@ -35,7 +40,19 @@ import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
-fun AverageTimeBetweenConfigView(viewModel: AverageTimeBetweenConfigViewModel) {
+fun AverageTimeBetweenConfigView(
+    scrollState: ScrollState,
+    viewModelStoreOwner: ViewModelStoreOwner,
+    graphStatId: Long,
+    onConfigEvent: (GraphStatConfigEvent?) -> Unit
+) {
+    val viewModel = hiltViewModel<AverageTimeBetweenConfigViewModel>(viewModelStoreOwner).apply {
+        initFromGraphStatId(graphStatId)
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.getConfigFlow().collect { onConfigEvent(it) }
+    }
 
     GraphStatDurationSpinner(
         modifier = Modifier,

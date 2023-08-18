@@ -257,59 +257,48 @@ fun ConfigInputView(
 ) {
     val graphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
 
-    val lineGraphConfigViewModel = hiltViewModel<LineGraphConfigViewModel>(viewModelStoreOwner)
-    lineGraphConfigViewModel.initFromGraphStatId(graphStatId)
-
-    val pieChartConfigViewModel = hiltViewModel<PieChartConfigViewModel>(viewModelStoreOwner)
-    pieChartConfigViewModel.initFromGraphStatId(graphStatId)
-
-    val averageTimeBetweenConfigViewModel =
-        hiltViewModel<AverageTimeBetweenConfigViewModel>(viewModelStoreOwner)
-    averageTimeBetweenConfigViewModel.initFromGraphStatId(graphStatId)
-
-    val timeHistogramConfigViewModel =
-        hiltViewModel<TimeHistogramConfigViewModel>(viewModelStoreOwner)
-    timeHistogramConfigViewModel.initFromGraphStatId(graphStatId)
-
-    val lastValueConfigViewModel =
-        hiltViewModel<LastValueConfigViewModel>(viewModelStoreOwner)
-    lastValueConfigViewModel.initFromGraphStatId(graphStatId)
-
-    val barChartConfigViewModel =
-        hiltViewModel<BarChartConfigViewModel>(viewModelStoreOwner)
-    barChartConfigViewModel.initFromGraphStatId(graphStatId)
-
-    var currentViewModel: GraphStatConfigViewModelBase<*> = lineGraphConfigViewModel
-
     when (graphType) {
-        GraphStatType.LINE_GRAPH -> {
-            currentViewModel = lineGraphConfigViewModel
-            LineGraphConfigView(scrollState = scrollState, viewModel = lineGraphConfigViewModel)
-        }
-        GraphStatType.PIE_CHART -> {
-            currentViewModel = pieChartConfigViewModel
-            PieChartConfigView(viewModel = pieChartConfigViewModel)
-        }
-        GraphStatType.AVERAGE_TIME_BETWEEN -> {
-            currentViewModel = averageTimeBetweenConfigViewModel
-            AverageTimeBetweenConfigView(viewModel = averageTimeBetweenConfigViewModel)
-        }
-        GraphStatType.TIME_HISTOGRAM -> {
-            currentViewModel = timeHistogramConfigViewModel
-            TimeHistogramConfigView(viewModel = timeHistogramConfigViewModel)
-        }
-        GraphStatType.LAST_VALUE -> {
-            currentViewModel = lastValueConfigViewModel
-            LastValueConfigView(viewModel = lastValueConfigViewModel)
-        }
-        GraphStatType.BAR_CHART -> {
-            currentViewModel = barChartConfigViewModel
-            BarChartConfigView(viewModel = barChartConfigViewModel)
-        }
-    }
+        GraphStatType.LINE_GRAPH -> LineGraphConfigView(
+            scrollState = scrollState,
+            viewModelStoreOwner = viewModelStoreOwner,
+            graphStatId = graphStatId,
+            onConfigEvent = { viewModel.onConfigEvent(it) },
+        )
 
-    LaunchedEffect(currentViewModel) {
-        currentViewModel.getConfigFlow()
-            .collect { viewModel.onConfigEvent(it) }
+        GraphStatType.PIE_CHART -> PieChartConfigView(
+            scrollState = scrollState,
+            viewModelStoreOwner = viewModelStoreOwner,
+            graphStatId = graphStatId,
+            onConfigEvent = { viewModel.onConfigEvent(it) },
+        )
+
+        GraphStatType.AVERAGE_TIME_BETWEEN -> AverageTimeBetweenConfigView(
+            scrollState = scrollState,
+            viewModelStoreOwner = viewModelStoreOwner,
+            graphStatId = graphStatId,
+            onConfigEvent = { viewModel.onConfigEvent(it) },
+        )
+
+        GraphStatType.TIME_HISTOGRAM -> TimeHistogramConfigView(
+            scrollState = scrollState,
+            viewModelStoreOwner = viewModelStoreOwner,
+            graphStatId = graphStatId,
+            onConfigEvent = { viewModel.onConfigEvent(it) },
+        )
+
+        GraphStatType.LAST_VALUE -> LastValueConfigView(
+            scrollState = scrollState,
+            viewModelStoreOwner = viewModelStoreOwner,
+            graphStatId = graphStatId,
+            onConfigEvent = { viewModel.onConfigEvent(it) },
+        )
+
+        GraphStatType.BAR_CHART -> BarChartConfigView(
+            scrollState = scrollState,
+            viewModelStoreOwner = viewModelStoreOwner,
+            graphStatId = graphStatId,
+            onConfigEvent = { viewModel.onConfigEvent(it) },
+        )
+
     }
 }

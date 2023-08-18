@@ -16,21 +16,26 @@
 */
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
 import com.samco.trackandgraph.base.database.dto.YRangeType
+import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.BarChartConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
@@ -43,8 +48,19 @@ import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
 fun BarChartConfigView(
-    viewModel: BarChartConfigViewModel
+    scrollState: ScrollState,
+    viewModelStoreOwner: ViewModelStoreOwner,
+    graphStatId: Long,
+    onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
+    val viewModel = hiltViewModel<BarChartConfigViewModel>(viewModelStoreOwner).apply {
+        initFromGraphStatId(graphStatId)
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.getConfigFlow().collect { onConfigEvent(it) }
+    }
+
     GraphStatDurationSpinner(
         modifier = Modifier,
         selectedDuration = viewModel.selectedDuration,

@@ -28,8 +28,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LineGraphConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
@@ -42,8 +45,18 @@ import kotlinx.coroutines.launch
 @Composable
 fun LineGraphConfigView(
     scrollState: ScrollState,
-    viewModel: LineGraphConfigViewModel
+    viewModelStoreOwner: ViewModelStoreOwner,
+    graphStatId: Long,
+    onConfigEvent: (GraphStatConfigEvent?) -> Unit
 ) {
+    val viewModel = hiltViewModel<LineGraphConfigViewModel>(viewModelStoreOwner).apply {
+        initFromGraphStatId(graphStatId)
+    }
+
+    LaunchedEffect(viewModel) {
+        viewModel.getConfigFlow().collect { onConfigEvent(it) }
+    }
+
     GraphStatDurationSpinner(
         modifier = Modifier,
         selectedDuration = viewModel.selectedDuration,

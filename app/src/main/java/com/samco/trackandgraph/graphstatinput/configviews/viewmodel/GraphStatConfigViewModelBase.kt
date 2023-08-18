@@ -61,8 +61,6 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     }
 
     private suspend fun loadFeaturePathProvider() {
-        //TODO there are 6 graph types and each one calls this the second you open
-        // the graph stat input screen :/ .. it seems negligible but it's not ideal
         val allFeatures = dataInteractor.getAllFeaturesSync().map {
             FeatureDataProvider.DataSourceData(
                 it,
