@@ -166,6 +166,12 @@ class LineGraphConfigViewModel @Inject constructor(
     fun onAddLineGraphFeatureClicked() = viewModelScope.launch {
         val firstFeature = featurePathProvider.features.firstOrNull()
         val featureName = firstFeature?.name ?: ""
+        val isDuration = firstFeature?.featureId?.let {
+            featurePathProvider.getDataSampleProperties(it)?.isDuration
+        } == true
+        val durationPlottingMode =
+            if (isDuration) DurationPlottingMode.DURATION_IF_POSSIBLE
+            else DurationPlottingMode.NONE
         featureTextFields.add(FeatureTextFields(featureName))
         lineGraphFeatures = lineGraphFeatures.toMutableList().apply {
             add(
@@ -180,7 +186,7 @@ class LineGraphConfigViewModel @Inject constructor(
                     pointStyle = LineGraphPointStyle.NONE,
                     offset = 0.toDouble(),
                     scale = 1.toDouble(),
-                    durationPlottingMode = DurationPlottingMode.NONE,
+                    durationPlottingMode = durationPlottingMode
                 )
             )
         }
