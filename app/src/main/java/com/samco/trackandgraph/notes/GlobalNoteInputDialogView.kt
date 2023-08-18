@@ -14,13 +14,13 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalComposeUiApi::class, ExperimentalComposeUiApi::class)
+@file:OptIn(ExperimentalComposeUiApi::class)
 
 package com.samco.trackandgraph.notes
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -38,42 +38,38 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.DialogTheme
-import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.delay
 import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
-    if (viewModel.show.observeAsState(false).value) {
-        DialogTheme {
-            Dialog(
-                onDismissRequest = { viewModel.onCancelConfirmed() },
-                properties = DialogProperties(
-                    usePlatformDefaultWidth = false,
-                    dismissOnClickOutside = false
+    DialogTheme {
+        Dialog(
+            onDismissRequest = { viewModel.onCancelConfirmed() },
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false,
+                dismissOnClickOutside = false
+            )
+        ) {
+            GlobalNoteDialogViewContent(viewModel)
+            if (viewModel.showConfirmCancelDialog.observeAsState(false).value) {
+                ConfirmCancelDialog(
+                    onDismissRequest = viewModel::onCancelDismissed,
+                    onConfirm = viewModel::onCancelConfirmed,
+                    body = R.string.confirm_cancel_notes_will_be_lost
                 )
-            ) {
-                GlobalNoteDialogViewContent(viewModel)
-                if (viewModel.showConfirmCancelDialog.observeAsState(false).value) {
-                    ConfirmCancelDialog(
-                        onDismissRequest = viewModel::onCancelDismissed,
-                        onConfirm = viewModel::onCancelConfirmed,
-                        body = R.string.confirm_cancel_notes_will_be_lost
-                    )
-                }
             }
         }
     }
 }
 
 @Composable
-private fun GlobalNoteDialogViewContent(viewModel: GlobalNoteInputViewModel) {
+private fun GlobalNoteDialogViewContent(viewModel: GlobalNoteInputViewModel) = Surface {
     Column(
         modifier = Modifier
             .heightIn(max = 400.dp)
             .fillMaxWidth(0.9f)
-            .background(color = MaterialTheme.tngColors.surface)
             .padding(dimensionResource(id = R.dimen.card_padding))
     ) {
         val selectedDateTime by viewModel.dateTime.observeAsState(OffsetDateTime.now())
