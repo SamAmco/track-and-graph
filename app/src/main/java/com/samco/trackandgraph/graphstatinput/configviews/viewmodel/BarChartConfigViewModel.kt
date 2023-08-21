@@ -19,7 +19,9 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.BarChart
 import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
@@ -33,6 +35,12 @@ import com.samco.trackandgraph.graphstatinput.configviews.behaviour.*
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,6 +68,11 @@ class BarChartConfigViewModel @Inject constructor(
         singleFeatureConfigBehaviour.initSingleFeatureConfigBehaviour(onUpdate = { onUpdate() })
         yRangeConfigBehaviour.initYRangeConfigBehaviour(onUpdate = { onUpdate() })
     }
+
+    private val isTimeBasedRange = snapshotFlow { featureId }
+        .filterNotNull()
+        .map { featurePathProvider.getDataSampleProperties(it)?.isDuration == true }
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     var selectedBarPeriod: BarChartBarPeriod by mutableStateOf(BarChartBarPeriod.WEEK)
         private set
@@ -104,12 +117,16 @@ class BarChartConfigViewModel @Inject constructor(
             endDate = sampleEndingAt.asDateTime(),
             sampleSize = selectedDuration.temporalAmount,
             yRangeType = yRangeType,
-            yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0,
+            yTo = getYTo(),
             scale = scale.text.toDoubleOrNull() ?: 1.0,
             barPeriod = selectedBarPeriod,
             sumByCount = sumByCount
         )
     }
+
+    private fun getYTo(): Double =
+        if (isTimeBasedRange.value) yRangeToDurationViewModel.getDurationAsDouble()
+        else yRangeTo.text.toDoubleOrNull() ?: 1.0
 
     override fun getConfig(): GraphStatConfigEvent.ConfigData.BarChartConfigData {
         return GraphStatConfigEvent.ConfigData.BarChartConfigData(barChart)
@@ -139,7 +156,8 @@ class BarChartConfigViewModel @Inject constructor(
         yRangeConfigBehaviour.onConfigLoaded(
             yRangeType = bcConfig?.yRangeType,
             yFrom = 0.0,
-            yTo = bcConfig?.yTo
+            yTo = bcConfig?.yTo,
+            timeBasedRange = isTimeBasedRange
         )
 
         bcConfig?.let {
@@ -147,6 +165,12 @@ class BarChartConfigViewModel @Inject constructor(
             selectedBarPeriod = it.barPeriod
             sumByCount = it.sumByCount
             scale = TextFieldValue(it.scale.toString())
+        }
+
+        viewModelScope.launch {
+            isTimeBasedRange.drop(1).collect {
+                onUpdate()
+            }
         }
     }
 }

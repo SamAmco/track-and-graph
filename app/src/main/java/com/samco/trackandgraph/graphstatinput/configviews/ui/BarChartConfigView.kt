@@ -40,6 +40,7 @@ import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.BarChartConf
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
+import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
@@ -78,16 +79,7 @@ fun BarChartConfigView(
     )
 
     if (viewModel.yRangeType == YRangeType.FIXED) {
-        LabeledRow(label = stringResource(id = R.string.y_range_max)) {
-            MiniNumericTextField(
-                modifier = Modifier
-                    .weight(1f)
-                    .alignByBaseline(),
-                textAlign = TextAlign.Center,
-                textFieldValue = viewModel.yRangeTo,
-                onValueChange = { viewModel.updateYRangeTo(it) }
-            )
-        }
+        YRangeFromToInputs(viewModel = viewModel, fromEnabled = false)
     }
 
     SpacingSmall()

@@ -35,6 +35,8 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
 
     private var configFlow = MutableStateFlow<GraphStatConfigEvent>(GraphStatConfigEvent.Loading)
 
+    private var initJob: Job? = null
+
     private var updateJob: Job? = null
 
     private var graphStatId: Long? = null
@@ -52,12 +54,12 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
         if (this.graphStatId == graphStatId) return
         this.graphStatId = graphStatId
 
-        viewModelScope.launch(io) {
+        initJob = viewModelScope.launch(io) {
             configFlow.emit(GraphStatConfigEvent.Loading)
             loadFeaturePathProvider()
             loadGraphStat(graphStatId)
-            withContext(ui) { onUpdate() }
         }
+        viewModelScope.launch(ui) { onUpdate() }
     }
 
     private suspend fun loadFeaturePathProvider() {
@@ -91,6 +93,7 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     protected fun onUpdate() {
         updateJob?.cancel()
         updateJob = viewModelScope.launch(default) {
+            withContext(io) { initJob?.join() }
             configFlow.emit(GraphStatConfigEvent.Loading)
             updateConfig()
             configFlow.emit(validate() ?: getConfig())

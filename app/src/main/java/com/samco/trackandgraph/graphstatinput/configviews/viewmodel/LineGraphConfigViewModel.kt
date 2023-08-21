@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
@@ -40,6 +41,10 @@ import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -109,6 +114,9 @@ class LineGraphConfigViewModel @Inject constructor(
     var lineGraphFeatures by mutableStateOf(emptyList<LineGraphFeature>())
         private set
 
+    private val isTimeBasedRange = snapshotFlow { lineGraphFeatures }
+        .map { lgfs -> lgfs.any { it.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE } }
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     private val featureTextFields = mutableListOf<FeatureTextFields>()
 
@@ -135,10 +143,19 @@ class LineGraphConfigViewModel @Inject constructor(
                     scale = featureTextFields[index].scale.text.toDoubleOrNull() ?: 1.0
                 )
             },
-            yFrom = yRangeFrom.text.toDoubleOrNull() ?: 0.0,
-            yTo = yRangeTo.text.toDoubleOrNull() ?: 1.0
+            yFrom = getYFrom(),
+            yTo = getYTo()
         )
     }
+
+    private fun getYFrom(): Double =
+        if (isTimeBasedRange.value) yRangeFromDurationViewModel.getDurationAsDouble()
+        else yRangeFrom.text.toDoubleOrNull() ?: 0.0
+
+    private fun getYTo(): Double =
+        if (isTimeBasedRange.value) yRangeToDurationViewModel.getDurationAsDouble()
+        else yRangeTo.text.toDoubleOrNull() ?: 1.0
+
 
     override fun getConfig(): GraphStatConfigEvent.ConfigData.LineGraphConfigData {
         return GraphStatConfigEvent.ConfigData.LineGraphConfigData(lineGraph)
@@ -254,7 +271,8 @@ class LineGraphConfigViewModel @Inject constructor(
         yRangeConfigBehaviour.onConfigLoaded(
             yRangeType = lgConfig?.yRangeType,
             yFrom = lgConfig?.yFrom,
-            yTo = lgConfig?.yTo
+            yTo = lgConfig?.yTo,
+            timeBasedRange = isTimeBasedRange
         )
 
         lgConfig?.let {
@@ -268,6 +286,12 @@ class LineGraphConfigViewModel @Inject constructor(
                         lgf.scale.toString()
                     )
                 )
+            }
+        }
+
+        viewModelScope.launch {
+            isTimeBasedRange.drop(1).collect {
+                onUpdate()
             }
         }
     }
