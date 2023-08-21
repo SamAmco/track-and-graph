@@ -1,0 +1,3 @@
+- Fix bug reminders not working after device reboot
+
+
