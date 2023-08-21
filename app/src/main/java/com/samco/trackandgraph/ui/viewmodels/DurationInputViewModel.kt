@@ -26,18 +26,27 @@ open class DurationInputViewModelImpl : DurationInputViewModel {
     override var minutes by mutableStateOf(TextFieldValue(""))
     override var seconds by mutableStateOf(TextFieldValue(""))
 
+    private var onChange: ((Double) -> Unit)? = null
+
     private fun TextFieldValue.getDouble() = getDoubleFromTextOrNull(this.text ?: "") ?: 0.0
+
+    fun setOnChangeListener(onChange: (Double) -> Unit) {
+        this.onChange = onChange
+    }
 
     override fun setHoursText(value: TextFieldValue) {
         hours = value.copy(text = value.text.asValidatedInt())
+        this.onChange?.invoke(getDurationAsDouble())
     }
 
     override fun setMinutesText(value: TextFieldValue) {
         minutes = value.copy(text = value.text.asValidatedInt())
+        this.onChange?.invoke(getDurationAsDouble())
     }
 
     override fun setSecondsText(value: TextFieldValue) {
         seconds = value.copy(text = value.text.asValidatedDouble())
+        this.onChange?.invoke(getDurationAsDouble())
     }
 
     override fun setDurationFromDouble(value: Double) {
@@ -53,6 +62,7 @@ open class DurationInputViewModelImpl : DurationInputViewModel {
         hours = TextFieldValue(numHours.toString(), TextRange(hrsString.length))
         minutes = TextFieldValue(numMinutes.toString(), TextRange(minString.length))
         seconds = TextFieldValue(numSeconds.toString(), TextRange(secString.length))
+        this.onChange?.invoke(getDurationAsDouble())
     }
 
     override fun getDurationAsDouble(): Double {

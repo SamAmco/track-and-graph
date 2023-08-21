@@ -37,7 +37,7 @@ import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
-fun DurationInputPreview() = DurationInput(
+private fun DurationInputPreview() = DurationInput(
     modifier = Modifier,
     viewModel = DurationInputViewModelImpl()
 )
