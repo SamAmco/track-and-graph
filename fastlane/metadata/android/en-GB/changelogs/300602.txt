@@ -1,0 +1,6 @@
+- Fix bug showing wrong date for old tracker
+- Fix bug global note dialog looks wrong in dark mode
+- Fix bug blank feature selected in line graph config view
+- Fix bug empty line graph showing unkown error occurred
+- Fix bug y range max wrong input type for duration data
+
