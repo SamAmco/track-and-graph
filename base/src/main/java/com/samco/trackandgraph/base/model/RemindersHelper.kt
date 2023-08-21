@@ -19,7 +19,6 @@ package com.samco.trackandgraph.base.model
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
-import android.util.Log
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -32,7 +31,6 @@ import com.squareup.moshi.Types
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import org.threeten.bp.LocalTime
@@ -66,7 +64,7 @@ internal class RemindersHelperImpl @Inject constructor(
 
     override val coroutineContext: CoroutineContext = Job() + io
 
-    private val onSyncRequest = MutableSharedFlow<Unit>()
+    private val onSyncRequest = MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
 
     private val syncMutex = Mutex()
     private val clearMutex = Mutex()

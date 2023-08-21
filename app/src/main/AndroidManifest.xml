@@ -60,12 +60,14 @@
         <receiver
             android:name=".base.service.RecreateAlarms"
             android:enabled="true"
-            android:exported="true">
+            android:directBootAware="true"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.DATE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.LOCKED_BOOT_COMPLETED" />
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
@@ -81,7 +83,7 @@
                 android:resource="@xml/track_widget_info" />
         </receiver>
 
-        <!--TODO you'll need to follow this guide when you traget android 14
+        <!--TODO you'll need to follow this guide when you target android 14
             https://developer.android.com/about/versions/14/changes/fgs-types-required
         -->
         <service

@@ -123,6 +123,7 @@ class RecreateAlarms : BroadcastReceiver() {
             "android.intent.action.TIME_SET",
             "android.intent.action.TIMEZONE_CHANGED",
             "android.intent.action.BOOT_COMPLETED",
+            "android.intent.action.LOCKED_BOOT_COMPLETED",
             "android.intent.action.QUICKBOOT_POWERON",
             "android.intent.action.MY_PACKAGE_REPLACED"
         )
