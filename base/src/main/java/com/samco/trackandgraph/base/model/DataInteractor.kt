@@ -32,13 +32,6 @@ import java.io.OutputStream
 //TODO for legacy reasons this class still contains some direct proxies to the database. This code should
 // be abstracted away over time
 interface DataInteractor : TrackerHelper, DataSampler {
-    @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
-    fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
-
-    fun getDatabaseFilePath(): String?
-
-    fun closeOpenHelper()
-
     suspend fun insertGroup(group: Group): Long
 
     suspend fun deleteGroup(id: Long)

@@ -88,9 +88,6 @@ private const val getDisplayTrackersQuery = """
 // awareness from the model layer
 @Dao
 internal interface TrackAndGraphDatabaseDao {
-    @RawQuery
-    fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGroup(group: Group): Long
 
