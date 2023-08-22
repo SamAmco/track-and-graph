@@ -55,19 +55,6 @@ internal class DataInteractorImpl @Inject constructor(
         onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
 
-    @Deprecated(message = "Create a function that performs the interaction for you in the model implementation")
-    override fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int {
-        return dao.doRawQuery(supportSQLiteQuery)
-    }
-
-    override fun getDatabaseFilePath(): String? {
-        return database.openHelper.readableDatabase.path
-    }
-
-    override fun closeOpenHelper() {
-        database.openHelper.close()
-    }
-
     override suspend fun insertGroup(group: Group): Long = withContext(io) {
         dao.insertGroup(group.toEntity())
             .also { dataUpdateEvents.emit(DataUpdateType.GroupCreated) }

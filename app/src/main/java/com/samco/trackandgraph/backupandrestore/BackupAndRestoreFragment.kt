@@ -21,6 +21,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,12 +29,12 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
-import androidx.sqlite.db.SimpleSQLiteQuery
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.model.AlarmInteractor
-import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.base.model.BackupRestoreInteractor
+import com.samco.trackandgraph.base.model.BackupResult
+import com.samco.trackandgraph.base.model.RestoreResult
 import com.samco.trackandgraph.databinding.BackupAndRestoreFragmentBinding
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -41,9 +42,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import org.threeten.bp.OffsetDateTime
-import java.io.File
-import java.io.InputStream
-import java.io.OutputStream
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
@@ -96,11 +94,13 @@ class BackupAndRestoreFragment : Fragment() {
             when (it) {
                 true -> restartApp()
                 false -> {
-                    val color = binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
+                    val color =
+                        binding.restoreFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
                     binding.restoreFeedbackText.setTextColor(color)
                     val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
                     binding.restoreFeedbackText.text = getString(R.string.restore_failed, errorText)
                 }
+
                 else -> {
                     binding.restoreFeedbackText.text = ""
                 }
@@ -117,6 +117,7 @@ class BackupAndRestoreFragment : Fragment() {
                     binding.backupFeedbackText.setTextColor(color)
                     binding.backupFeedbackText.text = getString(R.string.backup_successful)
                 }
+
                 false -> {
                     val color =
                         binding.backupFeedbackText.context.getColorFromAttr(R.attr.errorTextColor)
@@ -124,6 +125,7 @@ class BackupAndRestoreFragment : Fragment() {
                     val errorText = viewModel.error?.stringResource?.let { r -> getString(r) } ?: ""
                     binding.backupFeedbackText.text = getString(R.string.backup_failed, errorText)
                 }
+
                 else -> {
                     binding.backupFeedbackText.text = ""
                 }
@@ -167,25 +169,15 @@ class BackupAndRestoreFragment : Fragment() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
         super.onActivityResult(requestCode, resultCode, resultData)
         when (requestCode) {
-            EXPORT_DATABASE_REQUEST_CODE -> {
-                viewModel.exportDatabase(
-                    resultData?.data?.let { activity?.contentResolver?.openOutputStream(it) }
-
-                )
-            }
-            RESTORE_DATABASE_REQUEST_CODE -> {
-                viewModel.restoreDatabase(
-                    resultData?.data?.let { activity?.contentResolver?.openInputStream(it) }
-                )
-            }
+            EXPORT_DATABASE_REQUEST_CODE -> viewModel.exportDatabase(resultData?.data)
+            RESTORE_DATABASE_REQUEST_CODE -> viewModel.restoreDatabase(resultData?.data)
         }
     }
 }
 
 @HiltViewModel
 class BackupAndRestoreViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor,
-    private val alarmInteractor: AlarmInteractor
+    private val backupRestoreInteractor: BackupRestoreInteractor
 ) : ViewModel() {
     class BackupRestoreException(val stringResource: Int?)
 
@@ -204,83 +196,63 @@ class BackupAndRestoreViewModel @Inject constructor(
     private var workerJob = Job()
     private val ioScope = CoroutineScope(Dispatchers.IO + workerJob)
 
-    fun exportDatabase(outputStream: OutputStream?) {
-        val databaseFilePath = dataInteractor.getDatabaseFilePath()
-
-        if (outputStream == null) {
-            error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
-            _backupResult.value = false
-            return
-        }
-        if (databaseFilePath == null) {
-            error = BackupRestoreException(R.string.backup_error_could_not_find_database_file)
-            _backupResult.value = false
-            return
-        }
-        val databaseFile = File(databaseFilePath)
-        if (!databaseFile.exists()) {
-            error = BackupRestoreException(R.string.backup_error_failed_to_copy_database)
-            _backupResult.value = false
-            return
-        }
-        _inProgress.value = true
+    fun exportDatabase(uri: Uri?) {
         ioScope.launch {
-            try {
-                dataInteractor.doRawQuery(
-                    SimpleSQLiteQuery("PRAGMA wal_checkpoint(full)")
-                )
+            if (uri == null) {
+                error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
+                _backupResult.value = false
+                return@launch
+            }
 
-                databaseFile.inputStream().use { inputStream ->
-                    outputStream.use { inputStream.copyTo(it) }
+            withContext(Dispatchers.Main) { _inProgress.value = true }
+
+            when (backupRestoreInteractor.performManualBackup(uri)) {
+                BackupResult.SUCCESS -> withContext(Dispatchers.Main) { _backupResult.value = true }
+                BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE -> withContext(Dispatchers.Main) {
+                    error = BackupRestoreException(R.string.backup_error_could_not_write_to_file)
+                    _backupResult.value = false
                 }
 
-                withContext(Dispatchers.Main) {
-                    _backupResult.value = true
-                    _inProgress.value = false
+                BackupResult.FAIL_COULD_NOT_FIND_DATABASE -> withContext(Dispatchers.Main) {
+                    error =
+                        BackupRestoreException(R.string.backup_error_could_not_find_database_file)
+                    _backupResult.value = false
                 }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+
+                BackupResult.FAIL_COULD_NOT_COPY -> withContext(Dispatchers.Main) {
                     error = BackupRestoreException(R.string.backup_error_failed_to_copy_database)
                     _backupResult.value = false
                 }
             }
+
+            withContext(Dispatchers.Main) { _inProgress.value = false }
         }
     }
 
-    fun restoreDatabase(inputStream: InputStream?) {
-
-        val databaseFilePath = dataInteractor.getDatabaseFilePath()
-
-        if (inputStream == null) {
-            error = BackupRestoreException(R.string.restore_error_could_not_read_from_database_file)
-            _restoreResult.value = false
-            return
-        }
-        if (databaseFilePath == null) {
-            error = BackupRestoreException(R.string.restore_error_could_not_write_to_database)
-            _restoreResult.value = false
-            return
-        }
-
-        _inProgress.value = true
+    fun restoreDatabase(uri: Uri?) {
         ioScope.launch {
-            try {
-                alarmInteractor.clearAlarms()
-                dataInteractor.closeOpenHelper()
+            if (uri == null) {
+                error = BackupRestoreException(R.string.restore_error_could_not_read_from_database_file)
+                _restoreResult.value = false
+                return@launch
+            }
 
-                inputStream.use { inStream ->
-                    File(databaseFilePath).outputStream().use { inStream.copyTo(it) }
+            withContext(Dispatchers.Main) { _inProgress.value = true }
+
+            when (backupRestoreInteractor.performManualRestore(uri)) {
+                RestoreResult.SUCCESS -> withContext(Dispatchers.Main) { _restoreResult.value = true }
+                RestoreResult.FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE -> withContext(Dispatchers.Main) {
+                    error = BackupRestoreException(R.string.restore_error_could_not_read_from_database_file)
+                    _restoreResult.value = false
                 }
-                withContext(Dispatchers.Main) {
-                    _restoreResult.value = true
-                    _inProgress.value = false
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
+
+                RestoreResult.FAIL_COULD_NOT_COPY -> withContext(Dispatchers.Main) {
                     error = BackupRestoreException(R.string.restore_error_failed_to_copy_database)
                     _restoreResult.value = false
                 }
             }
+
+            withContext(Dispatchers.Main) { _inProgress.value = false }
         }
     }
 
