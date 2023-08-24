@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -47,57 +49,67 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel(), BackupAndRestoreViewModel {
 
-    private val onExportRequested = MutableSharedFlow<Uri?>(extraBufferCapacity = 1)
+    private val onBackupRequest = MutableSharedFlow<Uri?>(extraBufferCapacity = 1)
     private val onRestoreRequested = MutableSharedFlow<Uri?>(extraBufferCapacity = 1)
 
-    override val backupState = onExportRequested
-        .flatMapLatest { uri ->
-            flow {
-                if (uri == null) {
-                    emit(OperationState.Error(R.string.backup_error_could_not_write_to_file))
-                    return@flow
-                }
+    override val backupState = merge(
+        onRestoreRequested.map { OperationState.Idle },
+        onBackupRequest
+            .flatMapLatest { uri ->
+                flow {
+                    emit(OperationState.InProgress)
 
-                when (backupRestoreInteractor.performManualBackup(uri)) {
-                    BackupResult.SUCCESS -> emit(OperationState.Success)
-
-                    BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE ->
+                    if (uri == null) {
                         emit(OperationState.Error(R.string.backup_error_could_not_write_to_file))
+                        return@flow
+                    }
 
-                    BackupResult.FAIL_COULD_NOT_FIND_DATABASE ->
-                        emit(OperationState.Error(R.string.backup_error_could_not_find_database_file))
+                    when (backupRestoreInteractor.performManualBackup(uri)) {
+                        BackupResult.SUCCESS -> emit(OperationState.Success)
 
-                    BackupResult.FAIL_COULD_NOT_COPY ->
-                        emit(OperationState.Error(R.string.backup_error_failed_to_copy_database))
+                        BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE ->
+                            emit(OperationState.Error(R.string.backup_error_could_not_write_to_file))
+
+                        BackupResult.FAIL_COULD_NOT_FIND_DATABASE ->
+                            emit(OperationState.Error(R.string.backup_error_could_not_find_database_file))
+
+                        BackupResult.FAIL_COULD_NOT_COPY ->
+                            emit(OperationState.Error(R.string.backup_error_failed_to_copy_database))
+                    }
                 }
             }
-        }
-        .flowOn(io)
+            .flowOn(io)
+    )
         .stateIn(viewModelScope, SharingStarted.Eagerly, OperationState.Idle)
 
-    override val restoreState = onRestoreRequested
-        .flatMapLatest { uri ->
-            flow {
-                if (uri == null) {
-                    emit(OperationState.Error(R.string.restore_error_could_not_read_from_database_file))
-                    return@flow
-                }
+    override val restoreState = merge(
+        onBackupRequest.map { OperationState.Idle },
+        onRestoreRequested
+            .flatMapLatest { uri ->
+                flow {
+                    emit(OperationState.InProgress)
 
-                when (backupRestoreInteractor.performManualRestore(uri)) {
-                    RestoreResult.SUCCESS -> emit(OperationState.Success)
-
-                    RestoreResult.FAIL_INVALID_DATABASE ->
-                        emit(OperationState.Error(R.string.restore_error_invalid_database_file))
-
-                    RestoreResult.FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE ->
+                    if (uri == null) {
                         emit(OperationState.Error(R.string.restore_error_could_not_read_from_database_file))
+                        return@flow
+                    }
 
-                    RestoreResult.FAIL_COULD_NOT_COPY ->
-                        emit(OperationState.Error(R.string.restore_error_failed_to_copy_database))
+                    when (backupRestoreInteractor.performManualRestore(uri)) {
+                        RestoreResult.SUCCESS -> emit(OperationState.Success)
+
+                        RestoreResult.FAIL_INVALID_DATABASE ->
+                            emit(OperationState.Error(R.string.restore_error_invalid_database_file))
+
+                        RestoreResult.FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE ->
+                            emit(OperationState.Error(R.string.restore_error_could_not_read_from_database_file))
+
+                        RestoreResult.FAIL_COULD_NOT_COPY ->
+                            emit(OperationState.Error(R.string.restore_error_failed_to_copy_database))
+                    }
                 }
             }
-        }
-        .flowOn(io)
+            .flowOn(io)
+    )
         .stateIn(viewModelScope, SharingStarted.Eagerly, OperationState.Idle)
 
     override val inProgress = combine(restoreState, backupState) { restore, backup ->
@@ -105,7 +117,7 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     override fun exportDatabase(uri: Uri?) {
-        viewModelScope.launch { onExportRequested.emit(uri) }
+        viewModelScope.launch { onBackupRequest.emit(uri) }
     }
 
     override fun restoreDatabase(uri: Uri?) {
