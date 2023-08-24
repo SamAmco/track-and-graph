@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="restore_successful"><![CDATA["Restore was successful! Track & Graph must now be restarted. "]]></string>
+</resources>
