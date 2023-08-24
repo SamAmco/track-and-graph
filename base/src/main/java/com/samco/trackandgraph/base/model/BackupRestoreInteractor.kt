@@ -18,8 +18,10 @@
 package com.samco.trackandgraph.base.model
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
 import androidx.sqlite.db.SimpleSQLiteQuery
+import com.samco.trackandgraph.base.database.TNG_DATABASE_VERSION
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import dagger.hilt.android.qualifiers.ApplicationContext
 import timber.log.Timber
@@ -35,6 +37,7 @@ enum class BackupResult {
 
 enum class RestoreResult {
     SUCCESS,
+    FAIL_INVALID_DATABASE,
     FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE,
     FAIL_COULD_NOT_COPY
 }
@@ -81,26 +84,56 @@ internal class BackupRestoreInteractorImpl @Inject constructor(
     }
 
     override suspend fun performManualRestore(uri: Uri): RestoreResult {
-        val databaseFileOutputStream = database.openHelper.writableDatabase.path
-            ?.let { path -> File(path).takeIf { it.exists() } }
-            ?.outputStream()
-            ?: return RestoreResult.FAIL_COULD_NOT_COPY
-
-        val inputStream = context.contentResolver.openInputStream(uri)
-            ?: return RestoreResult.FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE
-
-        databaseFileOutputStream.use { outputStream ->
+        context.contentResolver.openInputStream(uri)?.use { inputStream ->
             try {
+                val tempFile = File.createTempFile("dbrestore", "db")
+
+                tempFile.outputStream().use { tempOutStream ->
+                    inputStream.use { it.copyTo(tempOutStream) }
+                }
+
+                if (!isValidDatabase(tempFile)) {
+                    return RestoreResult.FAIL_INVALID_DATABASE
+                }
+
                 alarmInteractor.clearAlarms()
                 database.openHelper.close()
-                inputStream.use { it.copyTo(outputStream) }
+
+                tempFile.inputStream().use {
+                    val databaseFileOutputStream = database.openHelper.writableDatabase.path
+                        ?.let { path -> File(path).takeIf { it.exists() } }
+                        ?.outputStream()
+                        ?: return RestoreResult.FAIL_COULD_NOT_COPY
+
+                    it.copyTo(databaseFileOutputStream)
+                }
+
+                tempFile.deleteOnExit()
 
                 return RestoreResult.SUCCESS
             } catch (t: Throwable) {
                 Timber.e(t, "Error clearing alarms before restore")
                 return RestoreResult.FAIL_COULD_NOT_COPY
             }
+        } ?: return RestoreResult.FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE
+    }
+
+    private fun isValidDatabase(dbFile: File): Boolean {
+        var db: SQLiteDatabase? = null
+        try {
+            db = SQLiteDatabase.openDatabase(
+                dbFile.path,
+                null,
+                SQLiteDatabase.OPEN_READONLY
+            )
+
+            if (db.version > TNG_DATABASE_VERSION) return false
+        } catch (t: Throwable) {
+            return false
+        } finally {
+            db?.close()
         }
+        return true
     }
 
     override suspend fun performAutoBackup(): BackupResult {
