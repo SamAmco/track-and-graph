@@ -86,6 +86,9 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
                 when (backupRestoreInteractor.performManualRestore(uri)) {
                     RestoreResult.SUCCESS -> emit(OperationState.Success)
 
+                    RestoreResult.FAIL_INVALID_DATABASE ->
+                        emit(OperationState.Error(R.string.restore_error_invalid_database_file))
+
                     RestoreResult.FAIL_COULD_NOT_FIND_OR_READ_DATABASE_FILE ->
                         emit(OperationState.Error(R.string.restore_error_could_not_read_from_database_file))
 
