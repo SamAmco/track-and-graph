@@ -20,7 +20,6 @@ package com.samco.trackandgraph.base.helpers
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
