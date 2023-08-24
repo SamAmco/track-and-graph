@@ -21,19 +21,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class BackupAndRestoreFragment : Fragment() {
 
     private val viewModel by viewModels<BackupAndRestoreViewModelImpl>()
+
+    @Inject
+    lateinit var tngSettings: TngSettings
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,7 +49,11 @@ class BackupAndRestoreFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                TnGComposeTheme { BackupAndRestoreView(viewModel = viewModel) }
+                CompositionLocalProvider(LocalSettings provides tngSettings) {
+                    TnGComposeTheme {
+                        BackupAndRestoreView(viewModel = viewModel)
+                    }
+                }
             }
         }
     }

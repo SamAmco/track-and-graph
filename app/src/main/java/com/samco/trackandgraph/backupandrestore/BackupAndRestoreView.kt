@@ -1,3 +1,22 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+@file:OptIn(ExperimentalLayoutApi::class)
+
 package com.samco.trackandgraph.backupandrestore
 
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -7,34 +26,53 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.ConfirmDialog
+import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.DateButton
+import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.TimeButton
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.ChronoUnit
 import kotlin.system.exitProcess
 
 @Composable
@@ -113,6 +151,30 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
 
     Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
 
+    var showConfigureAutoBackupDialog by rememberSaveable { mutableStateOf(false) }
+
+    Button(onClick = {
+        showConfigureAutoBackupDialog = true
+    }) {
+        Text(
+            text = stringResource(id = R.string.configure_auto_backup).uppercase(),
+            style = MaterialTheme.typography.button
+        )
+    }
+
+    if (showConfigureAutoBackupDialog) {
+        ConfigureAutoBackupDialog(
+            viewModel = hiltViewModel<AutoBackupViewModelImpl>(),
+            onDismiss = { showConfigureAutoBackupDialog = false }
+        )
+    }
+
+    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
+
+    CenterGradientDivider()
+
+    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
+
     var showPreRestoreDialog by rememberSaveable { mutableStateOf(false) }
 
     val restoreLauncher = rememberLauncherForActivityResult(
@@ -137,8 +199,6 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
             style = MaterialTheme.typography.button
         )
     }
-
-    //TODO show a dialog to confirm restore
 
     when (val restoreState = viewModel.restoreState.collectAsStateWithLifecycle().value) {
         is BackupAndRestoreViewModel.OperationState.Error -> {
@@ -166,7 +226,8 @@ private fun PreRestoreDialog(
     onDismiss: () -> Unit
 ) = ConfirmDialog(
     onConfirm = onConfirm,
-    onDismissRequest = onDismiss) {
+    onDismissRequest = onDismiss
+) {
     Text(
         text = stringResource(id = R.string.restore_hint_text),
         style = MaterialTheme.typography.subtitle2,
@@ -210,3 +271,97 @@ private fun CenterGradientDivider() = BoxWithConstraints(
     )
 }
 
+@Composable
+private fun ConfigureAutoBackupDialog(
+    viewModel: AutoBackupViewModel,
+    onDismiss: () -> Unit,
+) {
+    CustomConfirmCancelDialog(
+        onDismissRequest = onDismiss,
+        customWidthPercentage = 0.9f,
+        onConfirm = {
+            viewModel.onConfirmAutoBackup()
+            onDismiss()
+        },
+        continueText = R.string.apply,
+        continueEnabled = viewModel.autoBackupConfigValid.collectAsStateWithLifecycle().value,
+    ) {
+
+        val focusRequester = remember { FocusRequester() }
+
+        Text(
+            text = stringResource(id = R.string.backup_every),
+            style = MaterialTheme.typography.h6,
+        )
+
+        SpacingSmall()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            OutlinedTextField(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .width(64.dp),
+                value = viewModel.autoBackupIntervalTextFieldValue.value,
+                onValueChange = viewModel::onBackupIntervalChanged,
+                textStyle = MaterialTheme.typography.h6
+                    .copy(textAlign = TextAlign.Center),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+            )
+
+            SpacingSmall()
+
+            val strings = mapOf(
+                ChronoUnit.HOURS to stringResource(id = R.string.hours_generic),
+                ChronoUnit.DAYS to stringResource(id = R.string.days_generic),
+                ChronoUnit.WEEKS to stringResource(id = R.string.weeks_generic),
+            )
+
+            TextMapSpinner(
+                modifier = Modifier.width(128.dp),
+                strings = strings,
+                selectedItem = viewModel.autoBackupUnit.collectAsStateWithLifecycle().value,
+                onItemSelected = { viewModel.onBackupUnitChanged(it) }
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+        }
+
+        SpacingLarge()
+
+        Text(
+            text = stringResource(id = R.string.next_backup_at),
+            style = MaterialTheme.typography.h6,
+        )
+
+        SpacingSmall()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            DateButton(
+                dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
+                onDateSelected = viewModel::onAutoBackupFirstDateChanged
+            )
+
+            SpacingSmall()
+
+            TimeButton(
+                dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
+                onTimeSelected = viewModel::onAutoBackupFirstDateChanged
+            )
+        }
+
+        LaunchedEffect(focusRequester) {
+            focusRequester.requestFocus()
+        }
+    }
+}
