@@ -15,9 +15,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -42,13 +47,20 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
 
-    Text(
-        text = stringResource(id = R.string.backup_hint_text),
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.4f)
-    )
-
     Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
+
+    Card(
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Text(
+            modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding_large)),
+            text = stringResource(id = R.string.backup_hint_text),
+            style = MaterialTheme.typography.subtitle2,
+            color = MaterialTheme.colors.onSurface
+        )
+    }
+
+    Spacer(modifier = Modifier.weight(0.2f))
 
     val backupLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/vnd.sqlite3")
@@ -97,43 +109,28 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
 
     Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
 
-    BoxWithConstraints(
-        Modifier
-            .fillMaxWidth()
-            .height(2.dp)
-    ) {
-        val aspectRatio = maxWidth / maxHeight
-        Box(
-            Modifier
-                .fillMaxSize()
-                .scale(maxOf(aspectRatio, 1f), maxOf(1 / aspectRatio, 1f))
-                .background(
-                    brush = Brush.radialGradient(
-                        colors = listOf(
-                            MaterialTheme.colors.secondary,
-                            MaterialTheme.colors.surface.copy(alpha = 0.0f)
-                        ),
-                    ),
-                )
-        )
-    }
+    CenterGradientDivider()
 
     Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
 
-    Text(
-        text = stringResource(id = R.string.restore_hint_text),
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.4f)
-    )
-
-    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
+    var showPreRestoreDialog by rememberSaveable { mutableStateOf(false) }
 
     val restoreLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
     ) { viewModel.restoreDatabase(it) }
 
+    if (showPreRestoreDialog) {
+        PreRestoreDialog(
+            onConfirm = {
+                showPreRestoreDialog = false
+                restoreLauncher.launch(arrayOf("*/*"))
+            },
+            onDismiss = { showPreRestoreDialog = false }
+        )
+    }
+
     Button(onClick = {
-        restoreLauncher.launch(arrayOf("*/*"))
+        showPreRestoreDialog = true
     }) {
         Text(
             text = stringResource(id = R.string.restore_data).uppercase(),
@@ -159,6 +156,22 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
         BackupAndRestoreViewModel.OperationState.InProgress -> {
         }
     }
+
+    Spacer(modifier = Modifier.weight(1f))
+}
+
+@Composable
+private fun PreRestoreDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) = ConfirmDialog(
+    onConfirm = onConfirm,
+    onDismissRequest = onDismiss) {
+    Text(
+        text = stringResource(id = R.string.restore_hint_text),
+        style = MaterialTheme.typography.subtitle2,
+        color = MaterialTheme.colors.onSurface,
+    )
 }
 
 @Composable
@@ -170,7 +183,30 @@ private fun RestoreCompleteDialog() = ConfirmDialog(
 ) {
     Text(
         text = stringResource(id = R.string.restore_successful),
-        style = MaterialTheme.typography.body1,
+        style = MaterialTheme.typography.subtitle2,
         color = MaterialTheme.colors.onSurface
     )
 }
+
+@Composable
+private fun CenterGradientDivider() = BoxWithConstraints(
+    Modifier
+        .fillMaxWidth()
+        .height(2.dp)
+) {
+    val aspectRatio = maxWidth / maxHeight
+    Box(
+        Modifier
+            .fillMaxSize()
+            .scale(maxOf(aspectRatio, 1f), maxOf(1 / aspectRatio, 1f))
+            .background(
+                brush = Brush.radialGradient(
+                    colors = listOf(
+                        MaterialTheme.colors.secondary,
+                        MaterialTheme.colors.surface.copy(alpha = 0.0f)
+                    ),
+                ),
+            )
+    )
+}
+
