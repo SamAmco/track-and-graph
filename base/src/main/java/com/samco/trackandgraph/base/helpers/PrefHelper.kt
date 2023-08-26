@@ -19,18 +19,25 @@ package com.samco.trackandgraph.base.helpers
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.temporal.ChronoUnit
 import javax.inject.Inject
 
 const val THEME_SETTING_PREF_KEY = "theme_setting"
 const val DATE_FORMAT_SETTING_PREF_KEY = "date_format_setting"
 const val FIRST_RUN_PREF_KEY = "firstrun2"
 const val HIDE_DATA_POINT_TUTORIAL_PREF_KEY = "HIDE_DATA_POINT_TUTORIAL_PREF_KEY"
+const val AUTO_BACKUP_CONFIG_PREF_KEY = "auto_backup_config"
+const val LAST_AUTO_BACKUP_TIME_PREF_KEY = "last_auto_backup_time"
 
 fun getPrefs(context: Context, mode: Int = AppCompatActivity.MODE_PRIVATE): SharedPreferences {
     return context.getSharedPreferences("com.samco.trackandgraph", mode)
 }
+
 
 interface PrefHelper {
     fun getHideDataPointTutorial(): Boolean
@@ -48,11 +55,28 @@ interface PrefHelper {
     fun setThemeValue(themeValue: Int)
 
     fun setHideDataPointTutorial(hide: Boolean)
+
+    data class BackupConfigData(
+        val uri: Uri,
+        val firstDate: OffsetDateTime,
+        val interval: Int,
+        val units: ChronoUnit
+    )
+
+    fun setAutoBackupConfig(backupConfig: BackupConfigData?)
+
+    fun getAutoBackupConfig(): BackupConfigData?
+
+    fun setLastAutoBackupTime(time: OffsetDateTime)
+
+    fun getLastAutoBackupTime(): OffsetDateTime?
 }
 
 class PrefHelperImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : PrefHelper {
+
+    private val moshi: Moshi = Moshi.Builder().build()
 
     private val prefs get() = getPrefs(context)
 
@@ -72,7 +96,8 @@ class PrefHelperImpl @Inject constructor(
     override fun getDateFormatValue(): Int =
         prefs.getInt(DATE_FORMAT_SETTING_PREF_KEY, DateFormatSetting.DMY.ordinal)
 
-    override fun getThemeValue(defaultThemeValue: Int): Int = prefs.getInt(THEME_SETTING_PREF_KEY, defaultThemeValue)
+    override fun getThemeValue(defaultThemeValue: Int): Int =
+        prefs.getInt(THEME_SETTING_PREF_KEY, defaultThemeValue)
 
     override fun setThemeValue(themeValue: Int) {
         prefs.edit().putInt(THEME_SETTING_PREF_KEY, themeValue).apply()
@@ -80,5 +105,32 @@ class PrefHelperImpl @Inject constructor(
 
     override fun setHideDataPointTutorial(hide: Boolean) {
         prefs.edit().putBoolean(HIDE_DATA_POINT_TUTORIAL_PREF_KEY, hide).apply()
+    }
+
+    override fun setAutoBackupConfig(backupConfig: PrefHelper.BackupConfigData?) {
+        if (backupConfig == null) {
+            prefs.edit().remove(AUTO_BACKUP_CONFIG_PREF_KEY).apply()
+        } else {
+            prefs.edit().putString(
+                AUTO_BACKUP_CONFIG_PREF_KEY,
+                moshi.adapter(PrefHelper.BackupConfigData::class.java).toJson(backupConfig)
+            ).apply()
+        }
+    }
+
+    override fun getAutoBackupConfig(): PrefHelper.BackupConfigData? {
+        return prefs.getString(AUTO_BACKUP_CONFIG_PREF_KEY, null)?.let {
+            moshi.adapter(PrefHelper.BackupConfigData::class.java).fromJson(it)
+        }
+    }
+
+    override fun setLastAutoBackupTime(time: OffsetDateTime) {
+        prefs.edit().putString(LAST_AUTO_BACKUP_TIME_PREF_KEY, time.toString()).apply()
+    }
+
+    override fun getLastAutoBackupTime(): OffsetDateTime? {
+        return prefs.getString(LAST_AUTO_BACKUP_TIME_PREF_KEY, null)?.let {
+            OffsetDateTime.parse(it)
+        }
     }
 }

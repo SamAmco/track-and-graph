@@ -162,9 +162,16 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
         )
     }
 
+    val autoBackupViewModel = hiltViewModel<AutoBackupViewModelImpl>()
+
     if (showConfigureAutoBackupDialog) {
         ConfigureAutoBackupDialog(
-            viewModel = hiltViewModel<AutoBackupViewModelImpl>(),
+            viewModel = autoBackupViewModel,
+            onConfirm = {
+                showConfigureAutoBackupDialog = false
+                //TODO show notification permission if on high enough API
+                autoBackupViewModel.onConfirmAutoBackup()
+            },
             onDismiss = { showConfigureAutoBackupDialog = false }
         )
     }
@@ -274,15 +281,13 @@ private fun CenterGradientDivider() = BoxWithConstraints(
 @Composable
 private fun ConfigureAutoBackupDialog(
     viewModel: AutoBackupViewModel,
+    onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     CustomConfirmCancelDialog(
         onDismissRequest = onDismiss,
         customWidthPercentage = 0.9f,
-        onConfirm = {
-            viewModel.onConfirmAutoBackup()
-            onDismiss()
-        },
+        onConfirm = onConfirm,
         continueText = R.string.apply,
         continueEnabled = viewModel.autoBackupConfigValid.collectAsStateWithLifecycle().value,
     ) {

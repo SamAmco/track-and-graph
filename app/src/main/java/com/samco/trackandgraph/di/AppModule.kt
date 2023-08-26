@@ -21,6 +21,8 @@ import android.content.ContentResolver
 import android.content.Context
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelper
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelperImpl
+import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractor
+import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractorImpl
 import com.samco.trackandgraph.base.helpers.PrefHelper
 import com.samco.trackandgraph.base.helpers.PrefHelperImpl
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
@@ -48,9 +50,17 @@ class AppModule {
     fun getSuggestedValueHelper(impl: SuggestedValueHelperImpl): SuggestedValueHelper = impl
 
     @Provides
+    @Singleton
+    //Must be singleton because it is a dependency of work manager worker
     fun getPrefHelper(impl: PrefHelperImpl): PrefHelper = impl
 
     @Provides
     @Singleton
     fun getTngSettings(impl: TngSettingsImpl): TngSettings = impl
+
+    @Provides
+    @Singleton
+    //Must be singleton because it is a dependency of work manager worker
+    fun getBackupRestoreInteractor(impl: BackupRestoreInteractorImpl): BackupRestoreInteractor = impl
+
 }
