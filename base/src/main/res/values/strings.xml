@@ -313,6 +313,12 @@
     <string name="apply">Apply</string>
     <string name="backup_every">Backup every: </string>
     <string name="next_backup_at">"Next backup at: "</string>
+    <string name="backup_notification_channel_name">Auto-Backup Notifications</string>
+    <string name="backup_notification_channel_description">Let\'s you know when an auto-backup is being performed and if it failed.</string>
+    <string name="backup_notification_title">Backup in progress…</string>
+    <string name="backup_failed_notification_title">Auto-backup failed</string>
+    <string name="backup_failed_notification_could_not_write_to_file"><![CDATA[Track & Graph could not find or gain access to your backup location.]]></string>
+    <string name="backup_failed_notification_could_not_copy">Something went wrong while backing up your data. Your backup may be corrupt or incomplete.</string>
 
     <plurals name="seconds">
         <item quantity="one">%d Second</item>

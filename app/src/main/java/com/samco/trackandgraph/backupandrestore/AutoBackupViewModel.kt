@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.backupandrestore
 
+import android.net.Uri
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
@@ -27,12 +28,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import javax.inject.Inject
@@ -44,6 +48,7 @@ interface AutoBackupViewModel {
     val autoBackupConfigValid: StateFlow<Boolean>
 
     fun onConfirmAutoBackup()
+    fun onBackupLocationChanged(uri: Uri)
     fun onBackupIntervalChanged(text: TextFieldValue)
     fun onBackupUnitChanged(unit: ChronoUnit)
     fun onAutoBackupFirstDateChanged(offsetDateTime: OffsetDateTime)
@@ -51,32 +56,45 @@ interface AutoBackupViewModel {
 }
 
 @HiltViewModel
-class AutoBackupViewModelImpl @Inject constructor() : ViewModel(), AutoBackupViewModel {
+class AutoBackupViewModelImpl @Inject constructor(
+    private val interactor: BackupRestoreInteractor
+) : ViewModel(), AutoBackupViewModel {
+
+    private val onUserSetUri = MutableSharedFlow<Uri>()
+
+    private val uri: StateFlow<Uri?> = onUserSetUri
+        .onStart { interactor.getAutoBackupConfiguration()?.uri?.let { emit(it) } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     override val autoBackupFirstDate = MutableStateFlow(OffsetDateTime.now().plusHours(1))
 
-    override var autoBackupIntervalTextFieldValue: MutableState<TextFieldValue> = mutableStateOf(
-        TextFieldValue(
-            "1", TextRange(0, 1)
-        )
-    )
+    override var autoBackupIntervalTextFieldValue: MutableState<TextFieldValue> =
+        mutableStateOf(TextFieldValue("1", TextRange(0, 1)))
 
     override val autoBackupUnit = MutableStateFlow(ChronoUnit.DAYS)
 
-    override val autoBackupConfigValid: StateFlow<Boolean> = combine(
-        autoBackupFirstDate.map { it.isAfter(OffsetDateTime.now()) },
-        snapshotFlow { autoBackupIntervalTextFieldValue.value }
-            .map { tfv -> tfv.text.toIntOrNull()?.let { it > 0 } == true },
-        autoBackupUnit.map {
-            setOf(ChronoUnit.HOURS, ChronoUnit.DAYS, ChronoUnit.WEEKS).contains(it)
-        }
-    ) { a, b, c -> a && b && c }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, true)
+    private val currentBackupConfig: StateFlow<BackupConfig?> = combine(
+        uri,
+        autoBackupFirstDate,
+        snapshotFlow { autoBackupIntervalTextFieldValue.value.text },
+        autoBackupUnit
+    ) { uri, firstDate, interval, unit ->
+        val intervalInt = interval.toIntOrNull() ?: return@combine null
+        val uriNonNull = uri ?: return@combine null
+        val config = BackupConfig(uriNonNull, firstDate, intervalInt, unit)
+        if (interactor.validAutoBackupConfiguration(config)) config else null
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, BackupConfig(Uri.EMPTY, OffsetDateTime.now(), 1, ChronoUnit.DAYS))
+
+    override val autoBackupConfigValid: StateFlow<Boolean> = currentBackupConfig
+        .map { it != null }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     override fun onConfirmAutoBackup() {
-        if (!autoBackupConfigValid.value) return
+        currentBackupConfig.value?.let { interactor.setAutoBackupConfiguration(it) }
+    }
 
-        //TODO
+    override fun onBackupLocationChanged(uri: Uri) {
+        viewModelScope.launch { onUserSetUri.emit(uri) }
     }
 
     override fun onBackupIntervalChanged(text: TextFieldValue) {
