@@ -36,8 +36,8 @@ class TrackAndGraphApplication : Application(), Configuration.Provider {
         AndroidThreeTen.init(this)
     }
 
-    override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder()
+    override val workManagerConfiguration: Configuration by lazy {
+        Configuration.Builder()
             .setWorkerFactory(hiltWorkerFactory)
             .build()
     }

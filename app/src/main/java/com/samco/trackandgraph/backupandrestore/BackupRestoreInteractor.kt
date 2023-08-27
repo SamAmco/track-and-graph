@@ -32,6 +32,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ForegroundInfo
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.samco.trackandgraph.base.R
@@ -39,14 +40,19 @@ import com.samco.trackandgraph.base.database.TNG_DATABASE_VERSION
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.helpers.PrefHelper
 import com.samco.trackandgraph.base.model.AlarmInteractor
+import com.samco.trackandgraph.base.model.di.IODispatcher
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.withContext
+import org.threeten.bp.Instant.ofEpochMilli
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 import java.io.File
@@ -90,9 +96,17 @@ data class BackupConfig(
     )
 }
 
+data class AutoBackupInfo(
+    val uri: Uri,
+    val nextScheduled: OffsetDateTime,
+    val interval: Int,
+    val units: ChronoUnit,
+    val lastSuccessful: OffsetDateTime?
+)
+
 interface BackupRestoreInteractor {
 
-    val autoBackupConfig: Flow<BackupConfig?>
+    val autoBackupConfig: Flow<AutoBackupInfo?>
 
     suspend fun performManualBackup(uri: Uri): BackupResult
 
@@ -104,7 +118,7 @@ interface BackupRestoreInteractor {
 
     fun validAutoBackupConfiguration(backupConfig: BackupConfig): Boolean
 
-    fun getAutoBackupConfiguration(): BackupConfig?
+    suspend fun getAutoBackupInfo(): AutoBackupInfo?
 
     fun disableAutoBackup()
 }
@@ -113,14 +127,15 @@ class BackupRestoreInteractorImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
     private val alarmInteractor: AlarmInteractor,
     @ApplicationContext private val context: Context,
-    private val prefHelper: PrefHelper
+    private val prefHelper: PrefHelper,
+    @IODispatcher private val io: CoroutineDispatcher
 ) : BackupRestoreInteractor {
 
     private val backupConfigChanged = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    override val autoBackupConfig: Flow<BackupConfig?> = backupConfigChanged
+    override val autoBackupConfig: Flow<AutoBackupInfo?> = backupConfigChanged
         .onStart { emit(Unit) }
-        .map { getAutoBackupConfiguration() }
+        .map { getAutoBackupInfo() }
 
     override suspend fun performManualBackup(uri: Uri): BackupResult {
         val writableDatabase = database.openHelper.writableDatabase
@@ -202,7 +217,9 @@ class BackupRestoreInteractorImpl @Inject constructor(
     override suspend fun performAutoBackup(): BackupResult {
         val uri = prefHelper.getAutoBackupConfig()?.uri
             ?: return BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE
-        return performManualBackup(uri)
+        return performManualBackup(uri).also {
+            if (it == BackupResult.SUCCESS) prefHelper.setLastAutoBackupTime(OffsetDateTime.now())
+        }
     }
 
     private fun validUri(uri: Uri): Boolean {
@@ -242,8 +259,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
     class PeriodicBackupWorker @AssistedInject constructor(
         @Assisted context: Context,
         @Assisted workerParameters: WorkerParameters,
-        private val interactor: BackupRestoreInteractor,
-        private val prefHelper: PrefHelper
+        private val interactor: BackupRestoreInteractor
     ) : CoroutineWorker(context, workerParameters) {
 
         override suspend fun doWork(): Result {
@@ -255,11 +271,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
             }
 
             return when (val result = interactor.performAutoBackup()) {
-                BackupResult.SUCCESS -> {
-                    prefHelper.setLastAutoBackupTime(OffsetDateTime.now())
-                    Result.success()
-                }
-
+                BackupResult.SUCCESS -> Result.success()
                 BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE,
                 BackupResult.FAIL_COULD_NOT_FIND_DATABASE,
                 BackupResult.FAIL_COULD_NOT_COPY -> {
@@ -386,7 +398,38 @@ class BackupRestoreInteractorImpl @Inject constructor(
         backupConfigChanged.tryEmit(Unit)
     }
 
-    override fun getAutoBackupConfiguration(): BackupConfig? {
+    override suspend fun getAutoBackupInfo(): AutoBackupInfo? {
+        val config = getAutoBackupConfiguration() ?: return null
+
+        val nextScheduledMillis = withContext(io) {
+            WorkManager.getInstance(context)
+                .getWorkInfosForUniqueWork(AUTO_BACKUP_WORK_NAME)
+                .get()
+                ?.let { workInfos ->
+                    workInfos
+                        .firstOrNull()
+                        ?.takeIf { it.state == WorkInfo.State.ENQUEUED }
+                        ?.nextScheduleTimeMillis
+                }
+        } ?: return null
+
+        val nextScheduledOdt = OffsetDateTime.ofInstant(
+            ofEpochMilli(nextScheduledMillis),
+            ZoneId.systemDefault()
+        )
+
+        val lastSuccessful = prefHelper.getLastAutoBackupTime()
+
+        return AutoBackupInfo(
+            uri = config.uri,
+            nextScheduled = nextScheduledOdt,
+            interval = config.interval,
+            units = config.units,
+            lastSuccessful = lastSuccessful
+        )
+    }
+
+    private fun getAutoBackupConfiguration(): BackupConfig? {
         return prefHelper.getAutoBackupConfig()?.let { BackupConfig(it) }
     }
 
