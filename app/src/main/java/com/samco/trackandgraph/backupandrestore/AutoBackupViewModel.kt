@@ -57,6 +57,7 @@ interface AutoBackupViewModel {
     fun onBackupUnitChanged(unit: ChronoUnit)
     fun onAutoBackupFirstDateChanged(offsetDateTime: OffsetDateTime)
     fun onAutoBackupFirstDateChanged(selectedTime: SelectedTime)
+    fun onCancelConfig()
 }
 
 @HiltViewModel
@@ -66,10 +67,12 @@ class AutoBackupViewModelImpl @Inject constructor(
 
     private val onUserSetUri = MutableSharedFlow<Uri>(extraBufferCapacity = 1)
 
-    private val storedBackupConfig = interactor
-        .autoBackupConfig
-        .distinctUntilChanged()
-        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
+    private val onCancelEdit = MutableSharedFlow<Unit>()
+
+    private val storedBackupConfig = merge(
+        interactor.autoBackupConfig.distinctUntilChanged(),
+        onCancelEdit.map { interactor.getAutoBackupConfiguration() }
+    ).shareIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
 
     private val uri: StateFlow<Uri?> = merge(
         onUserSetUri,
@@ -179,5 +182,9 @@ class AutoBackupViewModelImpl @Inject constructor(
                 .withMinute(selectedTime.minute)
         )
         viewModelScope.launch { onUserSetAutoBackupDate.emit(new) }
+    }
+
+    override fun onCancelConfig() {
+        viewModelScope.launch { onCancelEdit.emit(Unit) }
     }
 }

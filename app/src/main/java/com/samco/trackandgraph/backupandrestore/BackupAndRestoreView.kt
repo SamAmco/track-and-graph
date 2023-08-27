@@ -51,7 +51,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -250,7 +249,10 @@ private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
                             //TODO show notification permission if on high enough API
                             autoBackupViewModel.onConfirmAutoBackup()
                         },
-                        onDismiss = { showConfigureAutoBackupDialog = false }
+                        onDismiss = {
+                            showConfigureAutoBackupDialog = false
+                            autoBackupViewModel.onCancelConfig()
+                        }
                     )
                 }
             }
@@ -392,11 +394,9 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Column {
         )
     }
 
-    SpacingSmall()
+    SpacingLarge()
     Divider()
-    SpacingSmall()
-
-    val focusRequester = remember { FocusRequester() }
+    SpacingLarge()
 
     Text(
         modifier = Modifier.fillMaxWidth(),
@@ -415,9 +415,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Column {
         Spacer(modifier = Modifier.weight(1f))
 
         MiniNumericTextField(
-            modifier = Modifier
-                .focusRequester(focusRequester)
-                .width(64.dp),
+            modifier = Modifier.width(64.dp),
             textFieldValue = viewModel.autoBackupIntervalTextFieldValue.value,
             onValueChange = viewModel::onBackupIntervalChanged,
             textAlign = TextAlign.Center
@@ -441,9 +439,9 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Column {
         Spacer(modifier = Modifier.weight(1f))
     }
 
-    SpacingSmall()
+    SpacingLarge()
     Divider()
-    SpacingSmall()
+    SpacingLarge()
 
     Text(
         modifier = Modifier.fillMaxWidth(),
@@ -461,6 +459,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Column {
         DateButton(
             dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
             onDateSelected = viewModel::onAutoBackupFirstDateChanged,
+            allowPastDates = false
         )
 
         SpacingSmall()
@@ -469,9 +468,5 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Column {
             dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
             onTimeSelected = viewModel::onAutoBackupFirstDateChanged,
         )
-    }
-
-    LaunchedEffect(focusRequester) {
-        focusRequester.requestFocus()
     }
 }
