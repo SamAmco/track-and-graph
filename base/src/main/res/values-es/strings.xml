@@ -175,7 +175,7 @@
     <string name="backup_and_restore">Respaldo y restauración</string>
     <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluyendo todos los datos trazados, los gráficos y los recordatorios. Deberías hacer una copia de seguridad de tus datos en un dispositivo externo o en un almacenamiento en la nube con regularidad en caso de que tu dispositivo se pierda o se rompa.</string>
     <string name="restore_hint_text">ADVERTENCIA: La restauración desde una copia de seguridad borrará todos los datos y la configuración actual de la aplicación. Track &amp; Graph se reiniciará una vez completada la restauración.</string>
-    <string name="backup_data">Respaldar datos</string>
+    <string name="backup">Respaldar datos</string>
     <string name="restore_data">Restaurar datos</string>
     <string name="backup_successful">¡Respaldado con éxito!</string>
     <string name="backup_failed">Error de respaldo. %1$s</string>

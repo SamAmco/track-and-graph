@@ -197,7 +197,7 @@
     <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken.</string>
     <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app. You should back up your data first!</string>
     <string name="restore_successful"><![CDATA["Restore was successful! Track & Graph must now be restarted."]]></string>
-    <string name="backup_data">Backup data</string>
+    <string name="backup">Backup</string>
     <string name="restore_data">Restore data</string>
     <string name="backup_successful">Backup Successful!</string>
     <string name="backup_failed">Backup failed. %1$s</string>
@@ -310,7 +310,7 @@
     <string name="weeks_generic">Week(s)</string>
     <string name="months_generic">Month(s)</string>
     <string name="years_generic">Year(s)</string>
-    <string name="configure_auto_backup">Configure Auto-backup…</string>
+    <string name="auto_backup">Auto-backup</string>
     <string name="apply">Apply</string>
     <string name="backup_every">Backup every: </string>
     <string name="next_backup_at">"Next backup at: "</string>

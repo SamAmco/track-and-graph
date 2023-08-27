@@ -51,10 +51,12 @@ interface BackupAndRestoreViewModel {
 
     val restoreState: StateFlow<OperationState>
     val backupState: StateFlow<OperationState>
+    val autoBackupEnabled: StateFlow<Boolean>
     val inProgress: StateFlow<Boolean>
 
     fun exportDatabase(uri: Uri?)
     fun restoreDatabase(uri: Uri?)
+    fun disableAutoBackup()
 }
 
 @HiltViewModel
@@ -95,6 +97,11 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
             .flowOn(io)
     )
         .stateIn(viewModelScope, SharingStarted.Eagerly, OperationState.Idle)
+
+    override val autoBackupEnabled: StateFlow<Boolean> = backupRestoreInteractor
+        .autoBackupConfig
+        .map { it != null }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     override val restoreState = merge(
         onBackupRequest.map { OperationState.Idle },
@@ -137,4 +144,6 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
     override fun restoreDatabase(uri: Uri?) {
         viewModelScope.launch { onRestoreRequested.emit(uri) }
     }
+
+    override fun disableAutoBackup() = backupRestoreInteractor.disableAutoBackup()
 }

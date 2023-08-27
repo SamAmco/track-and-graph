@@ -42,10 +42,15 @@ import com.samco.trackandgraph.base.model.AlarmInteractor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 import java.io.File
+import java.lang.Long.max
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -87,6 +92,8 @@ data class BackupConfig(
 
 interface BackupRestoreInteractor {
 
+    val autoBackupConfig: Flow<BackupConfig?>
+
     suspend fun performManualBackup(uri: Uri): BackupResult
 
     suspend fun performManualRestore(uri: Uri): RestoreResult
@@ -108,6 +115,13 @@ class BackupRestoreInteractorImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val prefHelper: PrefHelper
 ) : BackupRestoreInteractor {
+
+    private val backupConfigChanged = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    override val autoBackupConfig: Flow<BackupConfig?> = backupConfigChanged
+        .onStart { emit(Unit) }
+        .map { getAutoBackupConfiguration() }
+
     override suspend fun performManualBackup(uri: Uri): BackupResult {
         val writableDatabase = database.openHelper.writableDatabase
         val databaseFile = writableDatabase.path
@@ -353,12 +367,14 @@ class BackupRestoreInteractorImpl @Inject constructor(
             else -> throw IllegalArgumentException("Invalid unit")
         }
 
+        val secondsDelay = max(
+            10L,
+            backupConfig.firstDate.toEpochSecond() - OffsetDateTime.now().toEpochSecond()
+        )
+
         val periodicWorkRequest =
             PeriodicWorkRequestBuilder<PeriodicBackupWorker>(interval, unit)
-                .setInitialDelay(
-                    backupConfig.firstDate.toEpochSecond() - OffsetDateTime.now().toEpochSecond(),
-                    TimeUnit.SECONDS
-                )
+                .setInitialDelay(secondsDelay, TimeUnit.SECONDS)
                 .build()
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
@@ -366,6 +382,8 @@ class BackupRestoreInteractorImpl @Inject constructor(
             ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             periodicWorkRequest
         )
+
+        backupConfigChanged.tryEmit(Unit)
     }
 
     override fun getAutoBackupConfiguration(): BackupConfig? {
@@ -375,5 +393,6 @@ class BackupRestoreInteractorImpl @Inject constructor(
     override fun disableAutoBackup() {
         prefHelper.setAutoBackupConfig(null)
         WorkManager.getInstance(context).cancelUniqueWork(AUTO_BACKUP_WORK_NAME)
+        backupConfigChanged.tryEmit(Unit)
     }
 }
