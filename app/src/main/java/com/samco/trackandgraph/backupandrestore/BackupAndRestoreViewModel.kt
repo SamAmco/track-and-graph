@@ -35,25 +35,24 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.samco.trackandgraph.backupandrestore.BackupAndRestoreViewModel.OperationState as OperationState
 
 interface BackupAndRestoreViewModel {
-    sealed class OperationState {
-        object Idle : OperationState()
-        object InProgress : OperationState()
-        object Success : OperationState()
-        data class Error(val stringResource: Int) : OperationState()
-    }
 
-    val restoreState: StateFlow<OperationState>
-    val backupState: StateFlow<OperationState>
+    val backupError: StateFlow<Int?>
+    val backupSuccessful: StateFlow<Boolean>
+    val restoreError: StateFlow<Int?>
+    val restoreSuccessful: StateFlow<Boolean>
     val autoBackupEnabled: StateFlow<Boolean>
     val inProgress: StateFlow<Boolean>
 
+    fun onBackupSuccessfulConsumed()
+    fun onBackupErrorConsumed()
+    fun onRestoreErrorConsumed()
     fun exportDatabase(uri: Uri?)
     fun restoreDatabase(uri: Uri?)
     fun disableAutoBackup()
@@ -65,10 +64,17 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel(), BackupAndRestoreViewModel {
 
+    private sealed class OperationState {
+        object Idle : OperationState()
+        object InProgress : OperationState()
+        object Success : OperationState()
+        data class Error(val stringResource: Int) : OperationState()
+    }
+
     private val onBackupRequest = MutableSharedFlow<Uri?>(extraBufferCapacity = 1)
     private val onRestoreRequested = MutableSharedFlow<Uri?>(extraBufferCapacity = 1)
 
-    override val backupState = merge(
+    private val backupState = merge(
         onRestoreRequested.map { OperationState.Idle },
         onBackupRequest
             .flatMapLatest { uri ->
@@ -103,7 +109,7 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
         .map { it != null }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    override val restoreState = merge(
+    private val restoreState = merge(
         onBackupRequest.map { OperationState.Idle },
         onRestoreRequested
             .flatMapLatest { uri ->
@@ -133,9 +139,46 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
     )
         .stateIn(viewModelScope, SharingStarted.Eagerly, OperationState.Idle)
 
+    private val onBackupSuccessfulConsumed = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val onBackupErrorConsumed = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val onRestoreErrorConsumed = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
+    override val backupError: StateFlow<Int?> =
+        merge(
+            onBackupErrorConsumed.map { null },
+            backupState.mapNotNull { (it as? OperationState.Error)?.stringResource },
+        ).stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    override val backupSuccessful: StateFlow<Boolean> = merge(
+        onBackupSuccessfulConsumed.map { false },
+        backupState.mapNotNull { (it is OperationState.Success) },
+    ).stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    override val restoreError: StateFlow<Int?> =
+        merge(
+            onRestoreErrorConsumed.map { null },
+            restoreState.mapNotNull { (it as? OperationState.Error)?.stringResource },
+        ).stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    override val restoreSuccessful: StateFlow<Boolean> = merge(
+        restoreState.mapNotNull { (it is OperationState.Success) },
+    ).stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     override val inProgress = combine(restoreState, backupState) { restore, backup ->
         restore == OperationState.InProgress || backup == OperationState.InProgress
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    override fun onBackupSuccessfulConsumed() {
+        viewModelScope.launch { onBackupSuccessfulConsumed.emit(Unit) }
+    }
+
+    override fun onBackupErrorConsumed() {
+        viewModelScope.launch { onBackupErrorConsumed.emit(Unit) }
+    }
+
+    override fun onRestoreErrorConsumed() {
+        viewModelScope.launch { onRestoreErrorConsumed.emit(Unit) }
+    }
 
     override fun exportDatabase(uri: Uri?) {
         viewModelScope.launch { onBackupRequest.emit(uri) }

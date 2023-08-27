@@ -19,6 +19,7 @@
 
 package com.samco.trackandgraph.backupandrestore
 
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -50,6 +51,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,6 +80,8 @@ import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TimeButton
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import kotlin.system.exitProcess
@@ -98,32 +102,21 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
 
     BackupCard(viewModel = viewModel)
 
-    //TODO do this in a toast instead
-    /*
-        when (val backupState = viewModel.backupState.collectAsStateWithLifecycle().value) {
-            is BackupAndRestoreViewModel.OperationState.Error -> {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
-                Text(
-                    text = stringResource(id = backupState.stringResource),
-                    style = MaterialTheme.typography.subtitle2,
-                    color = MaterialTheme.colors.error
-                )
-            }
+    val context = LocalContext.current
 
-            BackupAndRestoreViewModel.OperationState.Success -> {
-                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
-                Text(
-                    text = stringResource(id = R.string.backup_successful),
-                    style = MaterialTheme.typography.subtitle2,
-                    color = MaterialTheme.colors.onError
-                )
-            }
+    val backupSuccessText = stringResource(id = R.string.backup_successful)
 
-            BackupAndRestoreViewModel.OperationState.Idle,
-            BackupAndRestoreViewModel.OperationState.InProgress -> {
-            }
+    LaunchedEffect(context) {
+        viewModel.backupError.filterNotNull().collect {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
         }
-    */
+    }
+
+    LaunchedEffect(context) {
+        viewModel.backupSuccessful.filter { it }.collect {
+            Toast.makeText(context, backupSuccessText, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Spacer(modifier = Modifier.weight(1f))
 
@@ -152,25 +145,33 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
         )
     }
 
-    //TODO show errors in a dialog as well
-    when (val restoreState = viewModel.restoreState.collectAsStateWithLifecycle().value) {
-        is BackupAndRestoreViewModel.OperationState.Error -> {
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
-            Text(
-                text = stringResource(id = restoreState.stringResource),
-                style = MaterialTheme.typography.subtitle2,
-                color = MaterialTheme.colors.error
-            )
-        }
+    val restoreError = viewModel.restoreError.collectAsStateWithLifecycle().value
 
-        BackupAndRestoreViewModel.OperationState.Success -> RestoreCompleteDialog()
+    if (restoreError != null) {
+        RestoreErrorDialog(
+            error = restoreError,
+            onDismiss = { viewModel.onRestoreErrorConsumed() },
+        )
+    }
 
-        BackupAndRestoreViewModel.OperationState.Idle,
-        BackupAndRestoreViewModel.OperationState.InProgress -> {
-        }
+    if (viewModel.restoreSuccessful.collectAsStateWithLifecycle().value) {
+        RestoreCompleteDialog()
     }
 
     Spacer(modifier = Modifier.weight(1f))
+}
+
+@Composable
+fun RestoreErrorDialog(error: Int, onDismiss: () -> Unit) = ConfirmDialog(
+    continueText = R.string.ok,
+    onConfirm = onDismiss,
+    onDismissRequest = onDismiss
+) {
+    Text(
+        text = stringResource(id = error),
+        style = MaterialTheme.typography.subtitle2,
+        color = MaterialTheme.colors.onSurface
+    )
 }
 
 @Composable
