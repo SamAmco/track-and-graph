@@ -71,7 +71,7 @@ class AutoBackupViewModelImpl @Inject constructor(
 
     private val storedBackupConfig = merge(
         interactor.autoBackupConfig.distinctUntilChanged(),
-        onCancelEdit.map { interactor.getAutoBackupConfiguration() }
+        onCancelEdit.map { interactor.getAutoBackupInfo() }
     ).shareIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
 
     private val uri: StateFlow<Uri?> = merge(
@@ -87,7 +87,7 @@ class AutoBackupViewModelImpl @Inject constructor(
 
     override val autoBackupFirstDate = merge(
         onUserSetAutoBackupDate,
-        storedBackupConfig.mapNotNull { it?.firstDate }
+        storedBackupConfig.mapNotNull { it?.nextScheduled }
     ).stateIn(viewModelScope, SharingStarted.Eagerly, OffsetDateTime.now().plusHours(1))
 
     override var autoBackupIntervalTextFieldValue: MutableState<TextFieldValue> =
