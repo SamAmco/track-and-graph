@@ -177,7 +177,7 @@
     <string name="backup_and_restore">Sauvegarde et restauration</string>
     <string name="backup_hint_text">La sauvegarde permet d\'enregistrer toutes les données de votre appli, y compris toutes les données suivies, les graphiques et les rappels. Vous devriez sauvegarder régulièrement vos données sur un périphérique externe ou un stockage dans le cloud au cas où votre appareil serait perdu ou cassé.</string>
     <string name="restore_hint_text">ATTENTION : La restauration à partir d\'une sauvegarde effacera toutes les données et la configuration actuellement dans l\'app. Track &amp; Graph redémarrera une fois la restauration terminée.</string>
-    <string name="backup_data">Sauvegarder les données</string>
+    <string name="backup">Sauvegarder les données</string>
     <string name="restore_data">Restaurer les données</string>
     <string name="backup_successful">Sauvegarde réussie !</string>
     <string name="backup_failed">Sauvegarde échouée. %1$s</string>

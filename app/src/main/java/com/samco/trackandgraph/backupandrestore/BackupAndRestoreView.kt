@@ -22,30 +22,31 @@ package com.samco.trackandgraph.backupandrestore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Checkbox
 import androidx.compose.material.Divider
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -56,15 +57,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -73,7 +73,6 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.ConfirmDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DateButton
-import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
@@ -95,104 +94,49 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
 
-    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
+    SpacingLarge()
 
-    Card(
-        shape = MaterialTheme.shapes.medium
-    ) {
-        Text(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding_large)),
-            text = stringResource(id = R.string.backup_hint_text),
-            style = MaterialTheme.typography.subtitle2,
-            color = MaterialTheme.colors.onSurface
-        )
-    }
+    BackupCard(viewModel = viewModel)
 
-    Spacer(modifier = Modifier.weight(0.2f))
+    //TODO do this in a toast instead
+    /*
+        when (val backupState = viewModel.backupState.collectAsStateWithLifecycle().value) {
+            is BackupAndRestoreViewModel.OperationState.Error -> {
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
+                Text(
+                    text = stringResource(id = backupState.stringResource),
+                    style = MaterialTheme.typography.subtitle2,
+                    color = MaterialTheme.colors.error
+                )
+            }
 
-    val backupLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
-    ) { viewModel.exportDatabase(it) }
+            BackupAndRestoreViewModel.OperationState.Success -> {
+                Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
+                Text(
+                    text = stringResource(id = R.string.backup_successful),
+                    style = MaterialTheme.typography.subtitle2,
+                    color = MaterialTheme.colors.onError
+                )
+            }
 
-    val context = LocalContext.current
-
-    Button(onClick = {
-        val now = OffsetDateTime.now()
-        val generatedName = context.getString(
-            R.string.backup_file_name_suffix,
-            "TrackAndGraphBackup", now.year, now.monthValue,
-            now.dayOfMonth, now.hour, now.minute, now.second
-        )
-        backupLauncher.launch(generatedName)
-    }) {
-        Text(
-            text = stringResource(id = R.string.backup_data).uppercase(),
-            style = MaterialTheme.typography.button
-        )
-    }
-
-    when (val backupState = viewModel.backupState.collectAsStateWithLifecycle().value) {
-        is BackupAndRestoreViewModel.OperationState.Error -> {
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
-            Text(
-                text = stringResource(id = backupState.stringResource),
-                style = MaterialTheme.typography.subtitle2,
-                color = MaterialTheme.colors.error
-            )
+            BackupAndRestoreViewModel.OperationState.Idle,
+            BackupAndRestoreViewModel.OperationState.InProgress -> {
+            }
         }
+    */
 
-        BackupAndRestoreViewModel.OperationState.Success -> {
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
-            Text(
-                text = stringResource(id = R.string.backup_successful),
-                style = MaterialTheme.typography.subtitle2,
-                color = MaterialTheme.colors.onError
-            )
-        }
-
-        BackupAndRestoreViewModel.OperationState.Idle,
-        BackupAndRestoreViewModel.OperationState.InProgress -> {
-        }
-    }
-
-    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
-
-    CenterGradientDivider()
-
-    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
-
-    var showConfigureAutoBackupDialog by rememberSaveable { mutableStateOf(false) }
-
-    Button(onClick = {
-        showConfigureAutoBackupDialog = true
-    }) {
-        Text(
-            text = stringResource(id = R.string.configure_auto_backup).uppercase(),
-            style = MaterialTheme.typography.button
-        )
-    }
-
-    val autoBackupViewModel = hiltViewModel<AutoBackupViewModelImpl>()
-
-    if (showConfigureAutoBackupDialog) {
-        ConfigureAutoBackupDialog(
-            viewModel = autoBackupViewModel,
-            onConfirm = {
-                showConfigureAutoBackupDialog = false
-                //TODO show notification permission if on high enough API
-                autoBackupViewModel.onConfirmAutoBackup()
-            },
-            onDismiss = { showConfigureAutoBackupDialog = false }
-        )
-    }
-
-    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
-
-    CenterGradientDivider()
-
-    Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
+    Spacer(modifier = Modifier.weight(1f))
 
     var showPreRestoreDialog by rememberSaveable { mutableStateOf(false) }
+
+    Button(
+        onClick = { showPreRestoreDialog = true },
+    ) {
+        Text(
+            text = stringResource(id = R.string.restore_data).uppercase(),
+            style = MaterialTheme.typography.button
+        )
+    }
 
     val restoreLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument()
@@ -208,15 +152,7 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
         )
     }
 
-    Button(onClick = {
-        showPreRestoreDialog = true
-    }) {
-        Text(
-            text = stringResource(id = R.string.restore_data).uppercase(),
-            style = MaterialTheme.typography.button
-        )
-    }
-
+    //TODO show errors in a dialog as well
     when (val restoreState = viewModel.restoreState.collectAsStateWithLifecycle().value) {
         is BackupAndRestoreViewModel.OperationState.Error -> {
             Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.input_spacing_large)))
@@ -235,6 +171,113 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
     }
 
     Spacer(modifier = Modifier.weight(1f))
+}
+
+@Composable
+private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
+    shape = MaterialTheme.shapes.medium
+) {
+    val context = LocalContext.current
+
+    Column(
+        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding_large))
+    ) {
+        Text(
+            text = stringResource(id = R.string.backup_hint_text),
+            style = MaterialTheme.typography.subtitle2,
+            color = MaterialTheme.colors.onSurface
+        )
+
+        SpacingLarge()
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+
+            Row(
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+                        shape = MaterialTheme.shapes.medium
+                    )
+                    .padding(start = dimensionResource(id = R.dimen.card_padding)),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+
+                Text(
+                    text = stringResource(id = R.string.auto_backup).uppercase(),
+                    style = MaterialTheme.typography.button
+                )
+
+                SpacingSmall()
+
+                var showConfigureAutoBackupDialog by rememberSaveable { mutableStateOf(false) }
+
+                val autoBackupEnabled by viewModel.autoBackupEnabled.collectAsStateWithLifecycle()
+
+                Checkbox(
+                    checked = autoBackupEnabled,
+                    onCheckedChange = {
+                        if (it) showConfigureAutoBackupDialog = true
+                        else viewModel.disableAutoBackup()
+                    }
+                )
+
+                if (autoBackupEnabled) {
+                    IconButton(onClick = { showConfigureAutoBackupDialog = true }) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.edit_icon),
+                            contentDescription = stringResource(id = R.string.edit)
+                        )
+                    }
+                }
+
+                val autoBackupViewModel = hiltViewModel<AutoBackupViewModelImpl>()
+
+                if (showConfigureAutoBackupDialog) {
+                    ConfigureAutoBackupDialog(
+                        viewModel = autoBackupViewModel,
+                        onConfirm = {
+                            showConfigureAutoBackupDialog = false
+                            //TODO show notification permission if on high enough API
+                            autoBackupViewModel.onConfirmAutoBackup()
+                        },
+                        onDismiss = { showConfigureAutoBackupDialog = false }
+                    )
+                }
+            }
+
+            SpacingSmall()
+
+            val backupLauncher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
+            ) { viewModel.exportDatabase(it) }
+
+            Button(
+                modifier = Modifier.fillMaxHeight(),
+                onClick = {
+                    val now = OffsetDateTime.now()
+                    val generatedName = context.getString(
+                        R.string.backup_file_name_suffix,
+                        "TrackAndGraphBackup", now.year, now.monthValue,
+                        now.dayOfMonth, now.hour, now.minute, now.second
+                    )
+                    backupLauncher.launch(generatedName)
+                }) {
+                Text(
+                    text = stringResource(id = R.string.backup).uppercase(),
+                    style = MaterialTheme.typography.button
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -266,6 +309,7 @@ private fun RestoreCompleteDialog() = ConfirmDialog(
     )
 }
 
+//TODO do we get rid of this?
 @Composable
 private fun CenterGradientDivider() = BoxWithConstraints(
     Modifier
@@ -301,32 +345,12 @@ private fun ConfigureAutoBackupDialog(
         continueText = R.string.apply,
         continueEnabled = viewModel.autoBackupConfigValid.collectAsStateWithLifecycle().value,
     ) {
-        val enabled = viewModel.autoBackupEnabled.collectAsStateWithLifecycle().value
-        LabeledRow(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            label = stringResource(id = R.string.enable_auto_backup)
-        ) {
-            Checkbox(
-                checked = enabled,
-                onCheckedChange = viewModel::onAutoBackupEnabledChanged
-            )
-        }
-
-        SpacingSmall()
-        Divider()
-        SpacingSmall()
-
-        AutoBackupInnerLayout(viewModel = viewModel, enabled = enabled)
+        AutoBackupInnerLayout(viewModel = viewModel)
     }
 }
 
 @Composable
-private fun AutoBackupInnerLayout(
-    viewModel: AutoBackupViewModel,
-    enabled: Boolean,
-) = Column(
-    modifier = Modifier.alpha(if (enabled) 1f else 0.5f),
-) {
+private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Column {
     val location = viewModel.autoBackupLocation.collectAsStateWithLifecycle().value
 
     val selectFileLauncher = rememberLauncherForActivityResult(
@@ -354,13 +378,7 @@ private fun AutoBackupInnerLayout(
 
     Button(
         modifier = Modifier.align(Alignment.CenterHorizontally),
-        enabled = enabled,
         onClick = { selectFileLauncher.launch(defaultAutoBackupFileName) },
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = if (location == null)
-                MaterialTheme.colors.error
-            else MaterialTheme.colors.primary
-        )
     ) {
 
         val text = if (location == null)
@@ -399,7 +417,6 @@ private fun AutoBackupInnerLayout(
             modifier = Modifier
                 .focusRequester(focusRequester)
                 .width(64.dp),
-            enabled = enabled,
             textFieldValue = viewModel.autoBackupIntervalTextFieldValue.value,
             onValueChange = viewModel::onBackupIntervalChanged,
             textAlign = TextAlign.Center
@@ -416,7 +433,6 @@ private fun AutoBackupInnerLayout(
         TextMapSpinner(
             modifier = Modifier.width(128.dp),
             strings = strings,
-            enabled = enabled,
             selectedItem = viewModel.autoBackupUnit.collectAsStateWithLifecycle().value,
             onItemSelected = { viewModel.onBackupUnitChanged(it) }
         )
@@ -444,7 +460,6 @@ private fun AutoBackupInnerLayout(
         DateButton(
             dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
             onDateSelected = viewModel::onAutoBackupFirstDateChanged,
-            enabled = enabled
         )
 
         SpacingSmall()
@@ -452,7 +467,6 @@ private fun AutoBackupInnerLayout(
         TimeButton(
             dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
             onTimeSelected = viewModel::onAutoBackupFirstDateChanged,
-            enabled = enabled
         )
     }
 
