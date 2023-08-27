@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -21,6 +22,20 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!--This provider declaration is to enable hilt work manager compatibility it is documented here:
+            https://developer.android.com/guide/background/persistent/configuration/custom-configuration#remove-default
+            although this seems to say something else but the above version works and this does not:
+            https://developer.android.com/jetpack/androidx/releases/work#2.6.0-alpha01
+            You can also see the hilt documentation here:
+            https://developer.android.com/training/dependency-injection/hilt-jetpack#workmanager
+            -->
+        <!-- If you want to disable android.startup completely. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove">
+        </provider>
 
         <activity
             android:name="com.samco.trackandgraph.MainActivity"
@@ -59,9 +74,9 @@
         <receiver android:name=".base.service.AlarmReceiver" />
         <receiver
             android:name=".base.service.RecreateAlarms"
-            android:enabled="true"
             android:directBootAware="true"
-            android:exported="true" >
+            android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.DATE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />

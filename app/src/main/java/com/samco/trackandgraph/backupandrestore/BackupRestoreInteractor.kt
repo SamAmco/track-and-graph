@@ -93,9 +93,9 @@ interface BackupRestoreInteractor {
 
     suspend fun performAutoBackup(): BackupResult
 
-    fun validAutoBackupConfiguration(backupConfig: BackupConfig): Boolean
+    suspend fun backupNowAndSetAutoBackupConfig(backupConfig: BackupConfig)
 
-    fun setAutoBackupConfiguration(backupConfig: BackupConfig)
+    fun validAutoBackupConfiguration(backupConfig: BackupConfig): Boolean
 
     fun getAutoBackupConfiguration(): BackupConfig?
 
@@ -191,11 +191,9 @@ class BackupRestoreInteractorImpl @Inject constructor(
         return performManualBackup(uri)
     }
 
-    //TODO test if just calling validUri truncates the file to 0 bytes even though we don't write
-    // anything.
     private fun validUri(uri: Uri): Boolean {
         try {
-            context.contentResolver.openOutputStream(uri, "wt")
+            context.contentResolver.openOutputStream(uri, "w")
                 ?.use { return true }
                 ?: return false
         } catch (t: Throwable) {
@@ -235,7 +233,12 @@ class BackupRestoreInteractorImpl @Inject constructor(
     ) : CoroutineWorker(context, workerParameters) {
 
         override suspend fun doWork(): Result {
-            setForeground(createForegroundInfo())
+            try {
+                setForeground(createForegroundInfo())
+            } catch (e: Exception) {
+                //This can happen sometimes when the app is in the background
+                Timber.e(e, "setForeground failed")
+            }
 
             return when (val result = interactor.performAutoBackup()) {
                 BackupResult.SUCCESS -> {
@@ -285,6 +288,10 @@ class BackupRestoreInteractorImpl @Inject constructor(
             notificationManager.notify(AUTO_BACKUP_FAIL_NOTIFICATION_ID, notification)
         }
 
+        override suspend fun getForegroundInfo(): ForegroundInfo {
+            return createForegroundInfo()
+        }
+
         @RequiresApi(Build.VERSION_CODES.O)
         private fun createChannel() {
             val id = AUTO_BACKUP_NOTIFICATION_CHANNEL_ID
@@ -321,7 +328,8 @@ class BackupRestoreInteractorImpl @Inject constructor(
         }
     }
 
-    override fun setAutoBackupConfiguration(backupConfig: BackupConfig) {
+    override suspend fun backupNowAndSetAutoBackupConfig(backupConfig: BackupConfig) {
+        performManualBackup(backupConfig.uri)
 
         context.contentResolver.takePersistableUriPermission(
             backupConfig.uri,
