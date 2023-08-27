@@ -42,17 +42,20 @@ import org.threeten.bp.temporal.ChronoUnit
 import javax.inject.Inject
 
 interface AutoBackupViewModel {
+    val autoBackupEnabled: StateFlow<Boolean>
+    val autoBackupLocation: StateFlow<String?>
     val autoBackupFirstDate: StateFlow<OffsetDateTime>
     val autoBackupIntervalTextFieldValue: State<TextFieldValue>
     val autoBackupUnit: StateFlow<ChronoUnit>
     val autoBackupConfigValid: StateFlow<Boolean>
 
     fun onConfirmAutoBackup()
-    fun onBackupLocationChanged(uri: Uri)
+    fun onBackupLocationChanged(uri: Uri?)
     fun onBackupIntervalChanged(text: TextFieldValue)
     fun onBackupUnitChanged(unit: ChronoUnit)
     fun onAutoBackupFirstDateChanged(offsetDateTime: OffsetDateTime)
     fun onAutoBackupFirstDateChanged(selectedTime: SelectedTime)
+    fun onAutoBackupEnabledChanged(enabled: Boolean)
 }
 
 @HiltViewModel
@@ -64,6 +67,16 @@ class AutoBackupViewModelImpl @Inject constructor(
 
     private val uri: StateFlow<Uri?> = onUserSetUri
         .onStart { interactor.getAutoBackupConfiguration()?.uri?.let { emit(it) } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
+    private val onUserCheckedEnabledChanged = MutableSharedFlow<Boolean>(extraBufferCapacity = 1)
+
+    override val autoBackupEnabled = onUserCheckedEnabledChanged
+        .onStart { emit(interactor.getAutoBackupConfiguration() != null) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    override val autoBackupLocation: StateFlow<String?> = uri
+        .map { it?.toString() }
         .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     override val autoBackupFirstDate = MutableStateFlow(OffsetDateTime.now().plusHours(1))
@@ -85,15 +98,18 @@ class AutoBackupViewModelImpl @Inject constructor(
         if (interactor.validAutoBackupConfiguration(config)) config else null
     }.stateIn(viewModelScope, SharingStarted.Eagerly, BackupConfig(Uri.EMPTY, OffsetDateTime.now(), 1, ChronoUnit.DAYS))
 
+    //TODO also valid if not enabled
     override val autoBackupConfigValid: StateFlow<Boolean> = currentBackupConfig
         .map { it != null }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    //TODO or set disabled
     override fun onConfirmAutoBackup() {
         currentBackupConfig.value?.let { interactor.setAutoBackupConfiguration(it) }
     }
 
-    override fun onBackupLocationChanged(uri: Uri) {
+    override fun onBackupLocationChanged(uri: Uri?) {
+        if (uri == null) return
         viewModelScope.launch { onUserSetUri.emit(uri) }
     }
 
@@ -121,5 +137,9 @@ class AutoBackupViewModelImpl @Inject constructor(
         autoBackupFirstDate.value = current
             .withHour(selectedTime.hour)
             .withMinute(selectedTime.minute)
+    }
+
+    override fun onAutoBackupEnabledChanged(enabled: Boolean) {
+        viewModelScope.launch { onUserCheckedEnabledChanged.emit(enabled) }
     }
 }

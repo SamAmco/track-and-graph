@@ -193,12 +193,15 @@ class BackupRestoreInteractorImpl @Inject constructor(
 
     //TODO test if just calling validUri truncates the file to 0 bytes even though we don't write
     // anything.
-    private fun validUri(uri: Uri) =
-        context.contentResolver.openOutputStream(uri, "wt").let {
-            val valid = it != null
-            it?.close()
-            valid
+    private fun validUri(uri: Uri): Boolean {
+        try {
+            context.contentResolver.openOutputStream(uri, "wt")
+                ?.use { return true }
+                ?: return false
+        } catch (t: Throwable) {
+            return false
         }
+    }
 
     private fun validUnit(unit: ChronoUnit) =
         setOf(

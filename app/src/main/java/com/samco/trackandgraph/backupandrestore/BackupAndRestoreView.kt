@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,7 +39,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonColors
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.Checkbox
+import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -51,6 +56,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -67,6 +73,8 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.ConfirmDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DateButton
+import com.samco.trackandgraph.ui.compose.ui.LabeledRow
+import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
@@ -74,6 +82,8 @@ import com.samco.trackandgraph.ui.compose.ui.TimeButton
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.ChronoUnit
 import kotlin.system.exitProcess
+
+private const val SQLITE_MIME_TYPE = "application/vnd.sqlite3"
 
 @Composable
 fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
@@ -101,7 +111,7 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
     Spacer(modifier = Modifier.weight(0.2f))
 
     val backupLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument("application/vnd.sqlite3")
+        contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
     ) { viewModel.exportDatabase(it) }
 
     val context = LocalContext.current
@@ -291,82 +301,162 @@ private fun ConfigureAutoBackupDialog(
         continueText = R.string.apply,
         continueEnabled = viewModel.autoBackupConfigValid.collectAsStateWithLifecycle().value,
     ) {
+        val enabled = viewModel.autoBackupEnabled.collectAsStateWithLifecycle().value
+        LabeledRow(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            label = stringResource(id = R.string.enable_auto_backup)
+        ) {
+            Checkbox(
+                checked = enabled,
+                onCheckedChange = viewModel::onAutoBackupEnabledChanged
+            )
+        }
 
-        val focusRequester = remember { FocusRequester() }
+        SpacingSmall()
+        Divider()
+        SpacingSmall()
+
+        AutoBackupInnerLayout(viewModel = viewModel, enabled = enabled)
+    }
+}
+
+@Composable
+private fun AutoBackupInnerLayout(
+    viewModel: AutoBackupViewModel,
+    enabled: Boolean,
+) = Column(
+    modifier = Modifier.alpha(if (enabled) 1f else 0.5f),
+) {
+    val location = viewModel.autoBackupLocation.collectAsStateWithLifecycle().value
+
+    val selectFileLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
+    ) { viewModel.onBackupLocationChanged(it) }
+
+    val defaultAutoBackupFileName = stringResource(id = R.string.default_auto_backup_file_name)
+
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = stringResource(id = R.string.backup_location),
+        style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+    )
+
+    SpacingSmall()
+
+    if (location != null) {
+        Text(
+            text = location,
+            style = MaterialTheme.typography.body2.copy(textAlign = TextAlign.Center),
+        )
+
+        SpacingSmall()
+    }
+
+    Button(
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        enabled = enabled,
+        onClick = { selectFileLauncher.launch(defaultAutoBackupFileName) },
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = if (location == null)
+                MaterialTheme.colors.error
+            else MaterialTheme.colors.primary
+        )
+    ) {
+
+        val text = if (location == null)
+            stringResource(id = R.string.select_location)
+        else stringResource(id = R.string.select_new_location)
 
         Text(
-            text = stringResource(id = R.string.backup_every),
-            style = MaterialTheme.typography.h6,
+            text = text,
+            style = MaterialTheme.typography.button
+        )
+    }
+
+    SpacingSmall()
+    Divider()
+    SpacingSmall()
+
+    val focusRequester = remember { FocusRequester() }
+
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = stringResource(id = R.string.backup_every),
+        style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+    )
+
+    SpacingSmall()
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        MiniNumericTextField(
+            modifier = Modifier
+                .focusRequester(focusRequester)
+                .width(64.dp),
+            enabled = enabled,
+            textFieldValue = viewModel.autoBackupIntervalTextFieldValue.value,
+            onValueChange = viewModel::onBackupIntervalChanged,
+            textAlign = TextAlign.Center
         )
 
         SpacingSmall()
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+        val strings = mapOf(
+            ChronoUnit.HOURS to stringResource(id = R.string.hours_generic),
+            ChronoUnit.DAYS to stringResource(id = R.string.days_generic),
+            ChronoUnit.WEEKS to stringResource(id = R.string.weeks_generic),
+        )
 
-            Spacer(modifier = Modifier.weight(1f))
+        TextMapSpinner(
+            modifier = Modifier.width(128.dp),
+            strings = strings,
+            enabled = enabled,
+            selectedItem = viewModel.autoBackupUnit.collectAsStateWithLifecycle().value,
+            onItemSelected = { viewModel.onBackupUnitChanged(it) }
+        )
 
-            OutlinedTextField(
-                modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .width(64.dp),
-                value = viewModel.autoBackupIntervalTextFieldValue.value,
-                onValueChange = viewModel::onBackupIntervalChanged,
-                textStyle = MaterialTheme.typography.h6
-                    .copy(textAlign = TextAlign.Center),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            )
+        Spacer(modifier = Modifier.weight(1f))
+    }
 
-            SpacingSmall()
+    SpacingSmall()
+    Divider()
+    SpacingSmall()
 
-            val strings = mapOf(
-                ChronoUnit.HOURS to stringResource(id = R.string.hours_generic),
-                ChronoUnit.DAYS to stringResource(id = R.string.days_generic),
-                ChronoUnit.WEEKS to stringResource(id = R.string.weeks_generic),
-            )
+    Text(
+        modifier = Modifier.fillMaxWidth(),
+        text = stringResource(id = R.string.next_backup_at),
+        style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+    )
 
-            TextMapSpinner(
-                modifier = Modifier.width(128.dp),
-                strings = strings,
-                selectedItem = viewModel.autoBackupUnit.collectAsStateWithLifecycle().value,
-                onItemSelected = { viewModel.onBackupUnitChanged(it) }
-            )
+    SpacingSmall()
 
-            Spacer(modifier = Modifier.weight(1f))
-        }
-
-        SpacingLarge()
-
-        Text(
-            text = stringResource(id = R.string.next_backup_at),
-            style = MaterialTheme.typography.h6,
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        DateButton(
+            dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
+            onDateSelected = viewModel::onAutoBackupFirstDateChanged,
+            enabled = enabled
         )
 
         SpacingSmall()
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            DateButton(
-                dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
-                onDateSelected = viewModel::onAutoBackupFirstDateChanged
-            )
+        TimeButton(
+            dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
+            onTimeSelected = viewModel::onAutoBackupFirstDateChanged,
+            enabled = enabled
+        )
+    }
 
-            SpacingSmall()
-
-            TimeButton(
-                dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
-                onTimeSelected = viewModel::onAutoBackupFirstDateChanged
-            )
-        }
-
-        LaunchedEffect(focusRequester) {
-            focusRequester.requestFocus()
-        }
+    LaunchedEffect(focusRequester) {
+        focusRequester.requestFocus()
     }
 }

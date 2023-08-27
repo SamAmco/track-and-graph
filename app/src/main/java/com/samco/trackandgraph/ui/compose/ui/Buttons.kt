@@ -86,11 +86,13 @@ fun SmallTextButton(
 fun SelectorTextButton(
     modifier: Modifier,
     text: String,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ) = Button(
     modifier = modifier,
     onClick = onClick,
     shape = MaterialTheme.shapes.small,
+    enabled = enabled,
     contentPadding = PaddingValues(
         horizontal = 8.dp,
         vertical = 6.dp
