@@ -88,6 +88,7 @@ data class SelectedTime(
 fun TimeButton(
     modifier: Modifier = Modifier,
     dateTime: OffsetDateTime,
+    enabled: Boolean = true,
     onTimeSelected: (SelectedTime) -> Unit
 ) = Box {
 
@@ -97,6 +98,7 @@ fun TimeButton(
     SelectorTextButton(
         modifier = modifier,
         text = formatHourMinute(dateTime),
+        enabled = enabled,
         onClick = {
             val fragmentManager = findFragmentManager(context) ?: return@SelectorTextButton
             val fragment = fragmentManager.findFragmentByTag(tag)
@@ -121,13 +123,15 @@ fun TimeButton(
 fun DateButton(
     modifier: Modifier = Modifier,
     dateTime: OffsetDateTime,
-    onDateSelected: (OffsetDateTime) -> Unit
+    enabled: Boolean = true,
+    onDateSelected: (OffsetDateTime) -> Unit,
 ) = Box {
     val context = LocalContext.current
     val firstDayOfWeek = LocalSettings.current.firstDayOfWeek
     SelectorTextButton(
         modifier = modifier,
         text = formatDayMonthYear(context, dateTime),
+        enabled = enabled,
         onClick = {
             showDateDialog(context, onDateSelected, firstDayOfWeek, dateTime)
         }

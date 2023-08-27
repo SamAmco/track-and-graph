@@ -33,6 +33,7 @@
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="select_file">Select File</string>
+    <string name="select_location">Select Location…</string>
     <string name="empty_group_hint">Welcome to Track &amp; Graph!\n\n Tap + in the top right and select Tracker to get started.</string>
     <string name="no_trackers_graph_stats_hint">Please create a Tracker before creating any graphs.</string>
     <string name="ru_sure_del_group">Are you sure you want to delete this group and everything in it? You can not reverse this.</string>
@@ -319,6 +320,10 @@
     <string name="backup_failed_notification_title">Auto-backup failed</string>
     <string name="backup_failed_notification_could_not_write_to_file"><![CDATA[Track & Graph could not find or gain access to your backup location.]]></string>
     <string name="backup_failed_notification_could_not_copy">Something went wrong while backing up your data. Your backup may be corrupt or incomplete.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Select New Location</string>
+    <string name="backup_location">Backup Location</string>
+    <string name="enable_auto_backup">Enable Auto-Backup</string>
 
     <plurals name="seconds">
         <item quantity="one">%d Second</item>

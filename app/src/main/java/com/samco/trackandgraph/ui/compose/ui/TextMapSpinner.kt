@@ -27,6 +27,7 @@ fun <T> TextMapSpinner(
     modifier: Modifier = Modifier,
     strings: Map<T, String>,
     selectedItem: T,
+    enabled: Boolean = true,
     onItemSelected: (T) -> Unit
 ) {
     Spinner(
@@ -34,6 +35,7 @@ fun <T> TextMapSpinner(
         items = strings.keys.toList(),
         selectedItem = selectedItem,
         onItemSelected = onItemSelected,
+        enabled = enabled,
         selectedItemFactory = { modifier, item, expanded ->
             Text(
                 modifier = modifier.weight(1f),

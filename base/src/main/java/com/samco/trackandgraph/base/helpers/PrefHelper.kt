@@ -21,6 +21,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.JsonReader
+import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.threeten.bp.OffsetDateTime
@@ -56,6 +60,7 @@ interface PrefHelper {
 
     fun setHideDataPointTutorial(hide: Boolean)
 
+    @JsonClass(generateAdapter = true)
     data class BackupConfigData(
         val uri: Uri,
         val firstDate: OffsetDateTime,
@@ -76,7 +81,26 @@ class PrefHelperImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : PrefHelper {
 
-    private val moshi: Moshi = Moshi.Builder().build()
+    private val moshi: Moshi = Moshi.Builder()
+        .add(OffsetDateTime::class.java, object : JsonAdapter<OffsetDateTime>() {
+            override fun fromJson(reader: JsonReader): OffsetDateTime? {
+                return OffsetDateTime.parse(reader.nextString())
+            }
+
+            override fun toJson(writer: JsonWriter, value: OffsetDateTime?) {
+                writer.value(value.toString())
+            }
+        })
+        .add(Uri::class.java, object : JsonAdapter<Uri>() {
+            override fun fromJson(reader: JsonReader): Uri? {
+                return Uri.parse(reader.nextString())
+            }
+
+            override fun toJson(writer: JsonWriter, value: Uri?) {
+                writer.value(value.toString())
+            }
+        })
+        .build()
 
     private val prefs get() = getPrefs(context)
 

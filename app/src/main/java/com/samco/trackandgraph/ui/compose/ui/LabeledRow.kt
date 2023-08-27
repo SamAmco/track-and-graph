@@ -35,7 +35,7 @@ fun LabeledRow(
     paddingValues: PaddingValues = PaddingValues(horizontal = dimensionResource(id = R.dimen.card_padding)),
     input: @Composable RowScope.() -> Unit
 ) = Row(
-    modifier = Modifier.padding(paddingValues),
+    modifier = modifier.padding(paddingValues),
     verticalAlignment = Alignment.CenterVertically
 ) {
     Text(
