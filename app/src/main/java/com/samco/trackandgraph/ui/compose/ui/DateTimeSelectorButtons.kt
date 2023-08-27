@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
@@ -124,6 +125,7 @@ fun DateButton(
     modifier: Modifier = Modifier,
     dateTime: OffsetDateTime,
     enabled: Boolean = true,
+    allowPastDates: Boolean = true,
     onDateSelected: (OffsetDateTime) -> Unit,
 ) = Box {
     val context = LocalContext.current
@@ -133,7 +135,7 @@ fun DateButton(
         text = formatDayMonthYear(context, dateTime),
         enabled = enabled,
         onClick = {
-            showDateDialog(context, onDateSelected, firstDayOfWeek, dateTime)
+            showDateDialog(context, onDateSelected, firstDayOfWeek, allowPastDates, dateTime)
         }
     )
 }
@@ -142,6 +144,7 @@ fun showDateDialog(
     context: Context,
     onDateSelected: (OffsetDateTime) -> Unit,
     firstDayOfWeek: DayOfWeek,
+    allowPastDates: Boolean = true,
     dateTime: OffsetDateTime = OffsetDateTime.now()
 ) {
     val tag = "DatePicker"
@@ -162,6 +165,10 @@ fun showDateDialog(
         .setSelection(dateTime.toInstant().toEpochMilli())
         .setCalendarConstraints(
             CalendarConstraints.Builder()
+                .let {
+                    if (allowPastDates) it
+                    else it.setValidator(DateValidatorPointForward.now())
+                }
                 .setFirstDayOfWeek(dowMap[firstDayOfWeek] ?: Calendar.MONDAY)
                 .build()
         )
