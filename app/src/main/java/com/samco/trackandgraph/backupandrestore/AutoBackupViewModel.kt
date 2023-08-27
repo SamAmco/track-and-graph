@@ -105,7 +105,9 @@ class AutoBackupViewModelImpl @Inject constructor(
 
     //TODO or set disabled
     override fun onConfirmAutoBackup() {
-        currentBackupConfig.value?.let { interactor.setAutoBackupConfiguration(it) }
+        currentBackupConfig.value?.let {
+            viewModelScope.launch { interactor.backupNowAndSetAutoBackupConfig(it) }
+        }
     }
 
     override fun onBackupLocationChanged(uri: Uri?) {
