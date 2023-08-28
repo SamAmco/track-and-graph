@@ -37,17 +37,25 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 interface BackupAndRestoreViewModel {
+
+    data class AutoBackupInfo(
+        val lastSuccessful: OffsetDateTime?,
+        val nextScheduled: OffsetDateTime?
+    )
 
     val backupError: StateFlow<Int?>
     val backupSuccessful: StateFlow<Boolean>
     val restoreError: StateFlow<Int?>
     val restoreSuccessful: StateFlow<Boolean>
     val autoBackupEnabled: StateFlow<Boolean>
+    val autoBackupInfo: StateFlow<AutoBackupInfo?>
     val inProgress: StateFlow<Boolean>
 
     fun onBackupSuccessfulConsumed()
@@ -108,6 +116,18 @@ class BackupAndRestoreViewModelImpl @Inject constructor(
         .autoBackupConfig
         .map { it != null }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    override val autoBackupInfo: StateFlow<BackupAndRestoreViewModel.AutoBackupInfo?> =
+        backupRestoreInteractor.autoBackupConfig
+            .map { config ->
+                config?.let {
+                    BackupAndRestoreViewModel.AutoBackupInfo(
+                        lastSuccessful = it.lastSuccessful,
+                        nextScheduled = it.nextScheduled
+                    )
+                }
+            }
+            .stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val restoreState = merge(
         onBackupRequest.map { OperationState.Idle },
