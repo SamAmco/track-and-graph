@@ -143,7 +143,13 @@ class BackupRestoreInteractorImpl @Inject constructor(
             ?.let { path -> File(path).takeIf { it.exists() } }
             ?: return BackupResult.FAIL_COULD_NOT_FIND_DATABASE
 
-        context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+        val outputStream = try {
+            context.contentResolver.openOutputStream(uri, "wt")
+        } catch (t: Throwable) {
+            return BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE
+        }
+
+        outputStream?.use { outStream ->
             try {
                 writableDatabase.query(SimpleSQLiteQuery("PRAGMA wal_checkpoint(full)")).apply {
                     moveToFirst()
@@ -151,7 +157,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
                     close()
                 }
 
-                databaseFile.inputStream().use { it.copyTo(outputStream) }
+                databaseFile.inputStream().use { it.copyTo(outStream) }
 
                 return BackupResult.SUCCESS
             } catch (t: Throwable) {
@@ -219,6 +225,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
             ?: return BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE
         return performManualBackup(uri).also {
             if (it == BackupResult.SUCCESS) prefHelper.setLastAutoBackupTime(OffsetDateTime.now())
+            backupConfigChanged.emit(Unit)
         }
     }
 

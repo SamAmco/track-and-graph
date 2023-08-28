@@ -19,6 +19,8 @@
 
 package com.samco.trackandgraph.backupandrestore
 
+import android.content.Context
+import android.graphics.drawable.GradientDrawable
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -71,6 +73,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
+import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.ui.ConfirmDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DateButton
@@ -177,7 +181,6 @@ fun RestoreErrorDialog(error: Int, onDismiss: () -> Unit) = ConfirmDialog(
 private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
     shape = MaterialTheme.shapes.medium
 ) {
-    val context = LocalContext.current
 
     Column(
         modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding_large))
@@ -190,6 +193,56 @@ private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
 
         SpacingLarge()
 
+        val autoBackupInfo = viewModel.autoBackupInfo.collectAsStateWithLifecycle().value
+
+        val context = LocalContext.current
+
+        if (autoBackupInfo != null) {
+            CenterGradientDivider()
+            SpacingLarge()
+            val lastSuccessful = autoBackupInfo.lastSuccessful?.let {
+                formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), it)
+            } ?: stringResource(id = R.string.none)
+
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = stringResource(id = R.string.last_successful_backup),
+                style = MaterialTheme.typography.subtitle2,
+                color = MaterialTheme.colors.onSurface,
+            )
+
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = lastSuccessful,
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onSurface,
+            )
+
+            SpacingLarge()
+
+            val nextScheduled = autoBackupInfo.nextScheduled?.let {
+                formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), it)
+            } ?: stringResource(id = R.string.none)
+
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = stringResource(id = R.string.next_scheduled_backup),
+                style = MaterialTheme.typography.subtitle2,
+                color = MaterialTheme.colors.onSurface,
+            )
+
+            Text(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                text = nextScheduled,
+                style = MaterialTheme.typography.body1,
+                color = MaterialTheme.colors.onSurface,
+            )
+
+            SpacingLarge()
+            CenterGradientDivider()
+            SpacingLarge()
+        }
+
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -198,88 +251,98 @@ private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
 
-            Row(
-                modifier = Modifier
-                    .wrapContentWidth()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
-                        shape = MaterialTheme.shapes.medium
-                    )
-                    .padding(start = dimensionResource(id = R.dimen.card_padding)),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-
-                Text(
-                    text = stringResource(id = R.string.auto_backup).uppercase(),
-                    style = MaterialTheme.typography.button
-                )
-
-                SpacingSmall()
-
-                var showConfigureAutoBackupDialog by rememberSaveable { mutableStateOf(false) }
-
-                val autoBackupEnabled by viewModel.autoBackupEnabled.collectAsStateWithLifecycle()
-
-                Checkbox(
-                    checked = autoBackupEnabled,
-                    onCheckedChange = {
-                        if (it) showConfigureAutoBackupDialog = true
-                        else viewModel.disableAutoBackup()
-                    }
-                )
-
-                if (autoBackupEnabled) {
-                    IconButton(onClick = { showConfigureAutoBackupDialog = true }) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.edit_icon),
-                            contentDescription = stringResource(id = R.string.edit)
-                        )
-                    }
-                }
-
-                val autoBackupViewModel = hiltViewModel<AutoBackupViewModelImpl>()
-
-                if (showConfigureAutoBackupDialog) {
-                    ConfigureAutoBackupDialog(
-                        viewModel = autoBackupViewModel,
-                        onConfirm = {
-                            showConfigureAutoBackupDialog = false
-                            //TODO show notification permission if on high enough API
-                            autoBackupViewModel.onConfirmAutoBackup()
-                        },
-                        onDismiss = {
-                            showConfigureAutoBackupDialog = false
-                            autoBackupViewModel.onCancelConfig()
-                        }
-                    )
-                }
-            }
+            AutoBackupControls(viewModel)
 
             SpacingSmall()
 
-            val backupLauncher = rememberLauncherForActivityResult(
-                contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
-            ) { viewModel.exportDatabase(it) }
-
-            Button(
-                modifier = Modifier.fillMaxHeight(),
-                onClick = {
-                    val now = OffsetDateTime.now()
-                    val generatedName = context.getString(
-                        R.string.backup_file_name_suffix,
-                        "TrackAndGraphBackup", now.year, now.monthValue,
-                        now.dayOfMonth, now.hour, now.minute, now.second
-                    )
-                    backupLauncher.launch(generatedName)
-                }) {
-                Text(
-                    text = stringResource(id = R.string.backup).uppercase(),
-                    style = MaterialTheme.typography.button
-                )
-            }
+            BackupButton(viewModel)
         }
+    }
+}
+
+@Composable
+private fun BackupButton(viewModel: BackupAndRestoreViewModel) {
+    val context = LocalContext.current
+
+    val backupLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
+    ) { viewModel.exportDatabase(it) }
+
+    Button(
+        modifier = Modifier.fillMaxHeight(),
+        onClick = {
+            val now = OffsetDateTime.now()
+            val generatedName = context.getString(
+                R.string.backup_file_name_suffix,
+                "TrackAndGraphBackup", now.year, now.monthValue,
+                now.dayOfMonth, now.hour, now.minute, now.second
+            )
+            backupLauncher.launch(generatedName)
+        }) {
+        Text(
+            text = stringResource(id = R.string.backup).uppercase(),
+            style = MaterialTheme.typography.button
+        )
+    }
+}
+
+@Composable
+private fun AutoBackupControls(viewModel: BackupAndRestoreViewModel) = Row(
+    modifier = Modifier
+        .wrapContentWidth()
+        .border(
+            width = 1.dp,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+            shape = MaterialTheme.shapes.medium
+        )
+        .padding(start = dimensionResource(id = R.dimen.card_padding)),
+    verticalAlignment = Alignment.CenterVertically,
+    horizontalArrangement = Arrangement.SpaceEvenly
+) {
+
+    Text(
+        text = stringResource(id = R.string.auto_backup).uppercase(),
+        style = MaterialTheme.typography.button
+    )
+
+    SpacingSmall()
+
+    var showConfigureAutoBackupDialog by rememberSaveable { mutableStateOf(false) }
+
+    val autoBackupEnabled by viewModel.autoBackupEnabled.collectAsStateWithLifecycle()
+
+    Checkbox(
+        checked = autoBackupEnabled,
+        onCheckedChange = {
+            if (it) showConfigureAutoBackupDialog = true
+            else viewModel.disableAutoBackup()
+        }
+    )
+
+    if (autoBackupEnabled) {
+        IconButton(onClick = { showConfigureAutoBackupDialog = true }) {
+            Icon(
+                painter = painterResource(id = R.drawable.edit_icon),
+                contentDescription = stringResource(id = R.string.edit)
+            )
+        }
+    }
+
+    val autoBackupViewModel = hiltViewModel<AutoBackupViewModelImpl>()
+
+    if (showConfigureAutoBackupDialog) {
+        ConfigureAutoBackupDialog(
+            viewModel = autoBackupViewModel,
+            onConfirm = {
+                showConfigureAutoBackupDialog = false
+                //TODO show notification permission if on high enough API
+                autoBackupViewModel.onConfirmAutoBackup()
+            },
+            onDismiss = {
+                showConfigureAutoBackupDialog = false
+                autoBackupViewModel.onCancelConfig()
+            }
+        )
     }
 }
 
