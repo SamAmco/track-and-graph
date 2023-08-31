@@ -345,4 +345,5 @@
     <string name="next_scheduled_backup">Nächste geplante Sicherung</string>
     <string name="notification_permission_prompt">Sie sollten Benachrichtigungen für Track &amp; Graph zur Benachrichtigung, wenn die automatische Sicherung aus irgendeinem Grund fehlschlägt.</string>
     <string name="restore_hint_text">ACHTUNG: Bei der Wiederherstellung aus einem Backup werden alle derzeit in der App vorhandenen Daten und Einstellungen gelöscht. Sie sollten zuerst Ihre Daten sichern!</string>
+    <string name="default_auto_backup_file_name">SicherungTrackUndGraph.db</string>
 </resources>
