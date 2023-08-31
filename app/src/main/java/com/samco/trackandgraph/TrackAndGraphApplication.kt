@@ -17,16 +17,28 @@
 package com.samco.trackandgraph
 
 import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.jakewharton.threetenabp.AndroidThreeTen
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
+import javax.inject.Inject
 
 @HiltAndroidApp
-class TrackAndGraphApplication : Application() {
+class TrackAndGraphApplication : Application(), Configuration.Provider {
+
+    @Inject
+    lateinit var hiltWorkerFactory: HiltWorkerFactory
 
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
         AndroidThreeTen.init(this)
+    }
+
+    override val workManagerConfiguration: Configuration by lazy {
+        Configuration.Builder()
+            .setWorkerFactory(hiltWorkerFactory)
+            .build()
     }
 }

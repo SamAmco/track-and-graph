@@ -19,7 +19,6 @@ package com.samco.trackandgraph.base.database
 import android.database.Cursor
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayTracker
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
@@ -88,9 +87,6 @@ private const val getDisplayTrackersQuery = """
 // awareness from the model layer
 @Dao
 internal interface TrackAndGraphDatabaseDao {
-    @RawQuery
-    fun doRawQuery(supportSQLiteQuery: SupportSQLiteQuery): Int
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertGroup(group: Group): Long
 

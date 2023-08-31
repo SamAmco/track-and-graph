@@ -105,5 +105,5 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     androidTestImplementation 'androidx.test:runner:1.4.0'
-    androidTestImplementation "androidx.room:room-testing:2.4.2"
+    androidTestImplementation "androidx.room:room-testing:2.5.1"
 }

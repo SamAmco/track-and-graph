@@ -38,7 +38,8 @@ fun MiniNumericTextField(
     focusRequester: FocusRequester? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     focusUpdateScope: CoroutineScope = rememberCoroutineScope(),
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors()
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+    enabled: Boolean = true
 ) {
     BasicTextField(
         value = textFieldValue,
@@ -50,6 +51,7 @@ fun MiniNumericTextField(
             color = MaterialTheme.tngColors.onSurface
         ),
         cursorBrush = SolidColor(MaterialTheme.tngColors.primary),
+        enabled = enabled,
         interactionSource = interactionSource,
         //Due to a bug tracked here: https://issuetracker.google.com/issues/215116019
         //we currently can't use decorationBox to display a 0 when the field is empty.
