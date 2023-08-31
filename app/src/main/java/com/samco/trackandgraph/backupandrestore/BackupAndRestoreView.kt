@@ -19,11 +19,14 @@
 
 package com.samco.trackandgraph.backupandrestore
 
+import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.drawable.GradientDrawable
+import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -32,10 +35,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -62,8 +63,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -71,6 +70,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
@@ -290,6 +290,7 @@ private fun BackupButton(
     }
 }
 
+@SuppressLint("InlinedApi")
 @Composable
 private fun AutoBackupControls(modifier: Modifier, viewModel: BackupAndRestoreViewModel) = Row(
     modifier = modifier
@@ -333,12 +334,22 @@ private fun AutoBackupControls(modifier: Modifier, viewModel: BackupAndRestoreVi
 
     val autoBackupViewModel = hiltViewModel<AutoBackupViewModelImpl>()
 
+    var showNotificationPermissionPromptDialog by remember { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
     if (showConfigureAutoBackupDialog) {
         ConfigureAutoBackupDialog(
             viewModel = autoBackupViewModel,
             onConfirm = {
                 showConfigureAutoBackupDialog = false
-                //TODO show notification permission if on high enough API
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    if (!hasNotificationPermission(context)) {
+                        showNotificationPermissionPromptDialog = true
+                    }
+                }
+
                 autoBackupViewModel.onConfirmAutoBackup()
             },
             onDismiss = {
@@ -347,6 +358,47 @@ private fun AutoBackupControls(modifier: Modifier, viewModel: BackupAndRestoreVi
             }
         )
     }
+
+    val permissionRequestLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { }
+
+    if (showNotificationPermissionPromptDialog) {
+        NotificationPermissionPromptDialog(
+            onConfirm = {
+                showNotificationPermissionPromptDialog = false
+                permissionRequestLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            },
+            onDismiss = {
+                showNotificationPermissionPromptDialog = false
+                permissionRequestLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        )
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private fun hasNotificationPermission(context: Context): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context,
+        android.Manifest.permission.POST_NOTIFICATIONS
+    ) == PackageManager.PERMISSION_GRANTED
+}
+
+@Composable
+private fun NotificationPermissionPromptDialog(
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) = ConfirmDialog(
+    onConfirm = onConfirm,
+    onDismissRequest = onDismiss,
+    continueText = R.string.ok
+) {
+    Text(
+        text = stringResource(id = R.string.notification_permission_prompt),
+        style = MaterialTheme.typography.subtitle2,
+        color = MaterialTheme.colors.onSurface
+    )
 }
 
 @Composable

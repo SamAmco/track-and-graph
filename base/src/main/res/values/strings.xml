@@ -326,6 +326,7 @@
     <string name="enable_auto_backup">Enable Auto-Backup</string>
     <string name="last_successful_backup">Last Successful Backup</string>
     <string name="next_scheduled_backup">Next Scheduled Backup</string>
+    <string name="notification_permission_prompt">You should enable notifications for Track &amp; Graph to be notified if Auto-Backup fails for any reason.</string>
 
     <plurals name="seconds">
         <item quantity="one">%d Second</item>
