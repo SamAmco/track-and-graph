@@ -28,7 +28,6 @@ import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import dagger.hilt.android.qualifiers.ApplicationContext
 import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.temporal.ChronoUnit
 import javax.inject.Inject
 
 const val THEME_SETTING_PREF_KEY = "theme_setting"
@@ -60,12 +59,19 @@ interface PrefHelper {
 
     fun setHideDataPointTutorial(hide: Boolean)
 
+    @JsonClass(generateAdapter = false)
+    enum class BackupConfigUnit {
+        HOURS,
+        DAYS,
+        WEEKS
+    }
+
     @JsonClass(generateAdapter = true)
     data class BackupConfigData(
         val uri: Uri,
         val firstDate: OffsetDateTime,
         val interval: Int,
-        val units: ChronoUnit
+        val units: BackupConfigUnit
     )
 
     fun setAutoBackupConfig(backupConfig: BackupConfigData?)
