@@ -354,4 +354,5 @@
     <string name="next_scheduled_backup">Prochaine sauvegarde planifiée</string>
     <string name="notification_permission_prompt">Vous devez activer les notifications pour Track &amp; Graph pour être averti si la sauvegarde automatique échoue pour une raison quelconque.</string>
     <string name="restore_hint_text">AVERTISSEMENT : la restauration à partir d\'une sauvegarde effacera toutes les données et la configuration actuellement présentes dans l\'application. Vous devriez d\'abord sauvegarder vos données !</string>
+    <string name="default_auto_backup_file_name">SauvegardeTrackEtGraph.db</string>
 </resources>
