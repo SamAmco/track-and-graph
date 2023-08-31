@@ -174,17 +174,12 @@
     <string name="use_default_value">Establece un valor por defecto</string>
     <string name="backup_and_restore">Respaldo y restauración</string>
     <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluyendo todos los datos trazados, los gráficos y los recordatorios. Deberías hacer una copia de seguridad de tus datos en un dispositivo externo o en un almacenamiento en la nube con regularidad en caso de que tu dispositivo se pierda o se rompa.</string>
-    <string name="restore_hint_text">ADVERTENCIA: La restauración desde una copia de seguridad borrará todos los datos y la configuración actual de la aplicación. Track &amp; Graph se reiniciará una vez completada la restauración.</string>
-    <string name="backup">Respaldar datos</string>
     <string name="restore_data">Restaurar datos</string>
     <string name="backup_successful">¡Respaldado con éxito!</string>
     <string name="backup_failed">Error de respaldo. %1$s</string>
     <string name="backup_error_could_not_write_to_file">No se pudo encontrar o escribir en el archivo seleccionado.</string>
-    <string name="restore_error_could_not_write_to_database">No se pudo encontrar o escribir en la base de datos.</string>
-    <string name="restore_error_could_not_read_from_database_file">No se ha podido encontrar o leer el archivo de base de datos seleccionado.</string>
     <string name="backup_error_could_not_find_database_file">No se ha podido encontrar o leer el archivo de la base de datos.</string>
     <string name="backup_error_failed_to_copy_database">Algo salió mal mientras se copiaba el archivo de la base de datos.</string>
-    <string name="restore_error_failed_to_copy_database">Algo salió mal al restaurar la base de datos.</string>
     <string name="restore_failed">Fallo en la restauración. %1$s</string>
     <string name="add_a_longer_description_optional">Añadir una descripción más larga (opcional)</string>
     <string name="no_data_points_history_fragment_hint">Su historial de traza se mostrará aquí cuando haya introducido algunos datos.</string>
@@ -326,4 +321,28 @@
         <item quantity="one">%d año</item>
         <item quantity="other">%d años</item>
     </plurals>
+    <string name="backup_now">Copia ahora</string>
+    <string name="restore_error_could_not_write_to_database">¡La restauración falló! No se pudo encontrar ni escribir en la base de datos.</string>
+    <string name="restore_error_could_not_read_from_database_file">¡La restauración falló! No se pudo encontrar ni leer el archivo de base de datos seleccionado.</string>
+    <string name="restore_error_failed_to_copy_database">¡La restauración falló! Algo salió mal al restaurar la base de datos.</string>
+    <string name="select_location">Seleccione Ubicación…</string>
+    <string name="restore_successful">¡La restauración fue exitosa! Track &amp; Graph se debe reiniciar el gráfico.</string>
+    <string name="restore_error_invalid_database_file">¡La restauración falló! El archivo seleccionado no parecía ser una copia de seguridad válida.</string>
+    <string name="auto_backup">Copia de seguridad automática</string>
+    <string name="apply">Aplicar</string>
+    <string name="backup_every">Copia de seguridad cada:</string>
+    <string name="next_backup_at">Próxima copia de seguridad en:</string>
+    <string name="backup_notification_channel_name">Notificaciones de copia de seguridad automática</string>
+    <string name="backup_notification_channel_description">Le informaremos cuándo se está realizando una copia de seguridad automática y si falló.</string>
+    <string name="backup_notification_title">Respaldo en proceso…</string>
+    <string name="backup_failed_notification_title">Error en la copia de seguridad automática</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph no pudo encontrar ni obtener acceso a su ubicación de respaldo.</string>
+    <string name="backup_failed_notification_could_not_copy">Algo salió mal al realizar la copia de seguridad de tus datos. Su copia de seguridad puede estar corrupta o incompleta.</string>
+    <string name="select_new_location">Seleccionar nueva ubicación</string>
+    <string name="backup_location">Ubicación de la copia de seguridad</string>
+    <string name="enable_auto_backup">Habilitar copia de seguridad automática</string>
+    <string name="last_successful_backup">Última copia de seguridad exitosa</string>
+    <string name="next_scheduled_backup">Siguiente copia de seguridad programada</string>
+    <string name="notification_permission_prompt">Debes habilitar las notificaciones para Track &amp; Graph para recibir notificaciones si la copia de seguridad automática falla por algún motivo.</string>
+    <string name="restore_hint_text">ADVERTENCIA: La restauración desde una copia de seguridad borrará todos los datos y la configuración actual en la aplicación. ¡Primero debes hacer una copia de seguridad de tus datos!</string>
 </resources>

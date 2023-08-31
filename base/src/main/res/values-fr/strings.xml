@@ -176,17 +176,12 @@
     <string name="use_default_value">Définir une valeur par défaut</string>
     <string name="backup_and_restore">Sauvegarde et restauration</string>
     <string name="backup_hint_text">La sauvegarde permet d\'enregistrer toutes les données de votre appli, y compris toutes les données suivies, les graphiques et les rappels. Vous devriez sauvegarder régulièrement vos données sur un périphérique externe ou un stockage dans le cloud au cas où votre appareil serait perdu ou cassé.</string>
-    <string name="restore_hint_text">ATTENTION : La restauration à partir d\'une sauvegarde effacera toutes les données et la configuration actuellement dans l\'app. Track &amp; Graph redémarrera une fois la restauration terminée.</string>
-    <string name="backup">Sauvegarder les données</string>
     <string name="restore_data">Restaurer les données</string>
     <string name="backup_successful">Sauvegarde réussie !</string>
     <string name="backup_failed">Sauvegarde échouée. %1$s</string>
     <string name="backup_error_could_not_write_to_file">Impossible de trouver ou d\'écrire dans le fichier sélectionné.</string>
-    <string name="restore_error_could_not_write_to_database">Impossible de trouver ou d\'écrire dans la base de données.</string>
-    <string name="restore_error_could_not_read_from_database_file">Impossible de trouver ou de lire le fichier de base de données sélectionné.</string>
     <string name="backup_error_could_not_find_database_file">Impossible de trouver ou de lire le fichier de base de données.</string>
     <string name="backup_error_failed_to_copy_database">Quelque chose s\'est mal passé lors de la copie du fichier de base de données.</string>
-    <string name="restore_error_failed_to_copy_database">Quelque chose s\'est mal passé lors de la restauration de la base de données.</string>
     <string name="restore_failed">Restauration échouée. %1$s</string>
     <string name="add_a_longer_description_optional">Ajoutez une description plus longue (facultative)</string>.
     <string name="no_data_points_history_fragment_hint">Votre historique de suivi s\'affichera ici lorsque vous aurez saisi des données.</string>
@@ -335,4 +330,28 @@
         <item quantity="many">%d années</item>
         <item quantity="other">%d années</item>
     </plurals>
+    <string name="backup_now">Sauvegarder maintenant</string>
+    <string name="restore_error_could_not_write_to_database">La restauration a échoué ! Impossible de trouver ou d\'écrire dans la base de données.</string>
+    <string name="restore_error_could_not_read_from_database_file">La restauration a échoué ! Impossible de trouver ou de lire le fichier de base de données sélectionné.</string>
+    <string name="restore_error_failed_to_copy_database">La restauration a échoué ! Une erreur s\'est produite lors de la restauration de la base de données.</string>
+    <string name="select_location">Sélectionnez l\'emplacement…</string>
+    <string name="restore_successful">La restauration a réussi ! Track &amp; Graph doit maintenant être redémarré.</string>
+    <string name="restore_error_invalid_database_file">La restauration a échoué ! Le fichier sélectionné ne semble pas être une sauvegarde valide.</string>
+    <string name="auto_backup">Sauvegarde automatique</string>
+    <string name="apply">Appliquer</string>
+    <string name="backup_every">Sauvegardez tous les :</string>
+    <string name="next_backup_at">Prochaine sauvegarde à :</string>
+    <string name="backup_notification_channel_name">Notifications de sauvegarde automatique</string>
+    <string name="backup_notification_channel_description">Vous permet de savoir quand une sauvegarde automatique est effectuée et si elle a échoué.</string>
+    <string name="backup_notification_title">Sauvegarde en cours…</string>
+    <string name="backup_failed_notification_title">La sauvegarde automatique a échoué</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph n\'a pas pu trouver ou accéder à votre emplacement de sauvegarde.</string>
+    <string name="backup_failed_notification_could_not_copy">Une erreur s\'est produite lors de la sauvegarde de vos données. Votre sauvegarde est peut-être corrompue ou incomplète.</string>
+    <string name="select_new_location">Sélectionnez un nouvel emplacement</string>
+    <string name="backup_location">Emplacement de sauvegarde</string>
+    <string name="enable_auto_backup">Activer la sauvegarde automatique</string>
+    <string name="last_successful_backup">Dernière sauvegarde réussie</string>
+    <string name="next_scheduled_backup">Prochaine sauvegarde planifiée</string>
+    <string name="notification_permission_prompt">Vous devez activer les notifications pour Track &amp; Graph pour être averti si la sauvegarde automatique échoue pour une raison quelconque.</string>
+    <string name="restore_hint_text">AVERTISSEMENT : la restauration à partir d\'une sauvegarde effacera toutes les données et la configuration actuellement présentes dans l\'application. Vous devriez d\'abord sauvegarder vos données !</string>
 </resources>

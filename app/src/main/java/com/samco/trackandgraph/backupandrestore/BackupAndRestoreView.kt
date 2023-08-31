@@ -284,7 +284,7 @@ private fun BackupButton(
             backupLauncher.launch(generatedName)
         }) {
         Text(
-            text = stringResource(id = R.string.backup).uppercase(),
+            text = stringResource(id = R.string.backup_now).uppercase(),
             style = MaterialTheme.typography.button
         )
     }

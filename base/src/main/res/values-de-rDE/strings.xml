@@ -174,17 +174,12 @@
     <string name="use_default_value">Einen Standardwert festlegen</string>
     <string name="backup_and_restore">Sichern und Wiederherstellen</string>
     <string name="backup_hint_text">Die Sicherung sichert alle Ihre Anwendungsdaten einschließlich aller verfolgten Daten, Grafiken und Erinnerungen. Sie sollten Ihre Daten regelmäßig auf ein externes Gerät oder einen Cloud Speicher sichern, für den Fall, dass Ihr Gerät verloren geht oder kaputt geht.</string>
-    <string name="restore_hint_text">WARNUNG: Das Wiederherstellen aus einer Sicherung löscht alle Daten und Einstellungen, die sich derzeit in der App befinden. Track &amp; Graph wird nach Abschluss der Wiederherstellung neu gestartet.</string>
-    <string name="backup">Sicherung</string>
     <string name="restore_data">Wiederherstellung</string>
     <string name="backup_successful">Sicherung war erfolgreich!</string>
     <string name="backup_failed">Sicherung fehlgeschlagen. %1$s</string>
     <string name="backup_error_could_not_write_to_file">Konnte die ausgewählte Datei nicht finden oder sie kann nicht geschrieben werden.</string>
-    <string name="restore_error_could_not_write_to_database">Konnte die ausgewählte Datenbank nicht finden oder sie kann nicht geschrieben werden.</string>
-    <string name="restore_error_could_not_read_from_database_file">Konnte die ausgewählte Datenbank nicht finden oder sie kann nicht gelesen werden.</string>
     <string name="backup_error_could_not_find_database_file">Konnte die ausgewählte Datenbank nicht finden oder lesen.</string>
     <string name="backup_error_failed_to_copy_database">Beim Kopieren der Datenbankdatei ging etwas schief.</string>
-    <string name="restore_error_failed_to_copy_database">Beim Wiederherstellen der Datenbankdatei ging etwas schief.</string>
     <string name="restore_failed">Wiederherstellung fehlgeschlagen. %1$s</string>
     <string name="add_a_longer_description_optional">Eine längere Beschreibung hinzufügen (optional)</string>
     <string name="no_data_points_history_fragment_hint">Ihr Tracking-Verlauf wird hier angezeigt, wenn Sie einige Daten eingegeben haben.</string>
@@ -326,4 +321,28 @@
         <item quantity="one">%d Jahr</item>
         <item quantity="other">%d Jahre</item>
     </plurals>
+    <string name="backup_now">Jetzt sichern</string>
+    <string name="restore_error_could_not_write_to_database">Wiederherstellung fehlgeschlagen! Die Datenbank konnte nicht gefunden oder in sie geschrieben werden.</string>
+    <string name="restore_error_could_not_read_from_database_file">Wiederherstellung fehlgeschlagen! Die ausgewählte Datenbankdatei konnte nicht gefunden oder gelesen werden.</string>
+    <string name="restore_error_failed_to_copy_database">Wiederherstellung fehlgeschlagen! Beim Wiederherstellen der Datenbank ist ein Fehler aufgetreten.</string>
+    <string name="select_location">Ort auswählen…</string>
+    <string name="restore_successful">Die Wiederherstellung war erfolgreich! Track &amp; Graph muss nun neu gestartet werden.</string>
+    <string name="restore_error_invalid_database_file">Wiederherstellung fehlgeschlagen! Die ausgewählte Datei schien kein gültiges Backup zu sein.</string>
+    <string name="auto_backup">Automatische Sicherung</string>
+    <string name="apply">Anwenden</string>
+    <string name="backup_every">Sichern Sie alle:</string>
+    <string name="next_backup_at">Nächstes Backup unter:</string>
+    <string name="backup_notification_channel_name">Automatische Backup-Benachrichtigungen</string>
+    <string name="backup_notification_channel_description">Lassen Sie sich darüber informieren, wann eine automatische Sicherung durchgeführt wird und ob diese fehlgeschlagen ist.</string>
+    <string name="backup_notification_title">Sicherung läuft…</string>
+    <string name="backup_failed_notification_title">Die automatische Sicherung ist fehlgeschlagen</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph konnte Ihren Backup-Speicherort nicht finden oder darauf zugreifen.</string>
+    <string name="backup_failed_notification_could_not_copy">Beim Sichern Ihrer Daten ist ein Fehler aufgetreten. Ihr Backup ist möglicherweise beschädigt oder unvollständig.</string>
+    <string name="select_new_location">Wählen Sie „Neuer Standort“.</string>
+    <string name="backup_location">Backup-Speicherort</string>
+    <string name="enable_auto_backup">Aktivieren Sie die automatische Sicherung</string>
+    <string name="last_successful_backup">Letzte erfolgreiche Sicherung</string>
+    <string name="next_scheduled_backup">Nächste geplante Sicherung</string>
+    <string name="notification_permission_prompt">Sie sollten Benachrichtigungen für Track &amp; Graph zur Benachrichtigung, wenn die automatische Sicherung aus irgendeinem Grund fehlschlägt.</string>
+    <string name="restore_hint_text">ACHTUNG: Bei der Wiederherstellung aus einem Backup werden alle derzeit in der App vorhandenen Daten und Einstellungen gelöscht. Sie sollten zuerst Ihre Daten sichern!</string>
 </resources>

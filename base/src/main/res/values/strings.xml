@@ -33,7 +33,6 @@
     <string name="yes">Yes</string>
     <string name="cancel">Cancel</string>
     <string name="select_file">Select File</string>
-    <string name="select_location">Select Location…</string>
     <string name="empty_group_hint">Welcome to Track &amp; Graph!\n\n Tap + in the top right and select Tracker to get started.</string>
     <string name="no_trackers_graph_stats_hint">Please create a Tracker before creating any graphs.</string>
     <string name="ru_sure_del_group">Are you sure you want to delete this group and everything in it? You can not reverse this.</string>
@@ -195,19 +194,12 @@
     <string name="use_default_value">Set a default value</string>
     <string name="backup_and_restore">Backup and Restore</string>
     <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken.</string>
-    <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app. You should back up your data first!</string>
-    <string name="restore_successful"><![CDATA["Restore was successful! Track & Graph must now be restarted."]]></string>
-    <string name="backup">Backup Now</string>
     <string name="restore_data">Restore data</string>
     <string name="backup_successful">Backup Successful!</string>
     <string name="backup_failed">Backup failed. %1$s</string>
     <string name="backup_error_could_not_write_to_file">Could not find or write to the selected file.</string>
-    <string name="restore_error_could_not_write_to_database">Restore failed! Could not find or write to the database.</string>
-    <string name="restore_error_could_not_read_from_database_file">Restore failed! Could not find or read the selected database file.</string>
     <string name="backup_error_could_not_find_database_file">Could not find or read database file.</string>
     <string name="backup_error_failed_to_copy_database">Something went wrong while copying the database file.</string>
-    <string name="restore_error_failed_to_copy_database">Restore failed! Something went wrong while restoring the database.</string>
-    <string name="restore_error_invalid_database_file">Restore failed! The selected file did not appear to be a valid backup.</string>
     <string name="restore_failed">Restore failed. %1$s</string>
     <string name="add_a_longer_description_optional">Add a longer description (optional)</string>
     <string name="no_data_points_history_fragment_hint">Your tracking history will show up here when you have input some data.</string>
@@ -310,23 +302,6 @@
     <string name="weeks_generic">Week(s)</string>
     <string name="months_generic">Month(s)</string>
     <string name="years_generic">Year(s)</string>
-    <string name="auto_backup">Auto-backup</string>
-    <string name="apply">Apply</string>
-    <string name="backup_every">Backup every: </string>
-    <string name="next_backup_at">"Next backup at: "</string>
-    <string name="backup_notification_channel_name">Auto-Backup Notifications</string>
-    <string name="backup_notification_channel_description">Let\'s you know when an auto-backup is being performed and if it failed.</string>
-    <string name="backup_notification_title">Backup in progress…</string>
-    <string name="backup_failed_notification_title">Auto-backup failed</string>
-    <string name="backup_failed_notification_could_not_write_to_file"><![CDATA[Track & Graph could not find or gain access to your backup location.]]></string>
-    <string name="backup_failed_notification_could_not_copy">Something went wrong while backing up your data. Your backup may be corrupt or incomplete.</string>
-    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
-    <string name="select_new_location">Select New Location</string>
-    <string name="backup_location">Backup Location</string>
-    <string name="enable_auto_backup">Enable Auto-Backup</string>
-    <string name="last_successful_backup">Last Successful Backup</string>
-    <string name="next_scheduled_backup">Next Scheduled Backup</string>
-    <string name="notification_permission_prompt">You should enable notifications for Track &amp; Graph to be notified if Auto-Backup fails for any reason.</string>
 
     <plurals name="seconds">
         <item quantity="one">%d Second</item>
@@ -362,4 +337,30 @@
         <item quantity="one">%d Year</item>
         <item quantity="other">%d Years</item>
     </plurals>
+
+    <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app. You should back up your data first!</string>
+    <string name="backup_now">Backup Now</string>
+    <string name="restore_error_could_not_write_to_database">Restore failed! Could not find or write to the database.</string>
+    <string name="restore_error_could_not_read_from_database_file">Restore failed! Could not find or read the selected database file.</string>
+    <string name="restore_error_failed_to_copy_database">Restore failed! Something went wrong while restoring the database.</string>
+    <string name="select_location">Select Location…</string>
+    <string name="restore_successful">Restore was successful! Track &amp; Graph must now be restarted.</string>
+    <string name="restore_error_invalid_database_file">Restore failed! The selected file did not appear to be a valid backup.</string>
+    <string name="auto_backup">Auto-backup</string>
+    <string name="apply">Apply</string>
+    <string name="backup_every">Backup every: </string>
+    <string name="next_backup_at">"Next backup at: "</string>
+    <string name="backup_notification_channel_name">Auto-Backup Notifications</string>
+    <string name="backup_notification_channel_description">Let\'s you know when an auto-backup is being performed and if it failed.</string>
+    <string name="backup_notification_title">Backup in progress…</string>
+    <string name="backup_failed_notification_title">Auto-backup failed</string>
+    <string name="backup_failed_notification_could_not_write_to_file">Track &amp; Graph could not find or gain access to your backup location.</string>
+    <string name="backup_failed_notification_could_not_copy">Something went wrong while backing up your data. Your backup may be corrupt or incomplete.</string>
+    <string name="default_auto_backup_file_name">TrackAndGraphBackup.db</string>
+    <string name="select_new_location">Select New Location</string>
+    <string name="backup_location">Backup Location</string>
+    <string name="enable_auto_backup">Enable Auto-Backup</string>
+    <string name="last_successful_backup">Last Successful Backup</string>
+    <string name="next_scheduled_backup">Next Scheduled Backup</string>
+    <string name="notification_permission_prompt">You should enable notifications for Track &amp; Graph to be notified if Auto-Backup fails for any reason.</string>
 </resources>
