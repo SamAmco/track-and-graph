@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -181,7 +182,6 @@ fun RestoreErrorDialog(error: Int, onDismiss: () -> Unit) = ConfirmDialog(
 private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
     shape = MaterialTheme.shapes.medium
 ) {
-
     Column(
         modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding_large))
     ) {
@@ -195,73 +195,77 @@ private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
 
         val autoBackupInfo = viewModel.autoBackupInfo.collectAsStateWithLifecycle().value
 
-        val context = LocalContext.current
+        if (autoBackupInfo != null) AutoBackupInfo(autoBackupInfo)
 
-        if (autoBackupInfo != null) {
-            CenterGradientDivider()
-            SpacingLarge()
-            val lastSuccessful = autoBackupInfo.lastSuccessful?.let {
-                formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), it)
-            } ?: stringResource(id = R.string.none)
+        AutoBackupControls(
+            Modifier.align(Alignment.CenterHorizontally),
+            viewModel
+        )
 
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = stringResource(id = R.string.last_successful_backup),
-                style = MaterialTheme.typography.subtitle2,
-                color = MaterialTheme.colors.onSurface,
-            )
+        SpacingSmall()
 
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = lastSuccessful,
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onSurface,
-            )
-
-            SpacingLarge()
-
-            val nextScheduled = autoBackupInfo.nextScheduled?.let {
-                formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), it)
-            } ?: stringResource(id = R.string.none)
-
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = stringResource(id = R.string.next_scheduled_backup),
-                style = MaterialTheme.typography.subtitle2,
-                color = MaterialTheme.colors.onSurface,
-            )
-
-            Text(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                text = nextScheduled,
-                style = MaterialTheme.typography.body1,
-                color = MaterialTheme.colors.onSurface,
-            )
-
-            SpacingLarge()
-            CenterGradientDivider()
-            SpacingLarge()
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-
-            AutoBackupControls(viewModel)
-
-            SpacingSmall()
-
-            BackupButton(viewModel)
-        }
+        BackupButton(
+            Modifier.align(Alignment.CenterHorizontally),
+            viewModel
+        )
     }
 }
 
 @Composable
-private fun BackupButton(viewModel: BackupAndRestoreViewModel) {
+private fun ColumnScope.AutoBackupInfo(autoBackupInfo: BackupAndRestoreViewModel.AutoBackupInfo) {
+
+    val context = LocalContext.current
+
+    CenterGradientDivider()
+    SpacingLarge()
+    val lastSuccessful = autoBackupInfo.lastSuccessful?.let {
+        formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), it)
+    } ?: stringResource(id = R.string.none)
+
+    Text(
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        text = stringResource(id = R.string.last_successful_backup),
+        style = MaterialTheme.typography.subtitle2,
+        color = MaterialTheme.colors.onSurface,
+    )
+
+    Text(
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        text = lastSuccessful,
+        style = MaterialTheme.typography.body1,
+        color = MaterialTheme.colors.onSurface,
+    )
+
+    SpacingLarge()
+
+    val nextScheduled = autoBackupInfo.nextScheduled?.let {
+        formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), it)
+    } ?: stringResource(id = R.string.none)
+
+    Text(
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        text = stringResource(id = R.string.next_scheduled_backup),
+        style = MaterialTheme.typography.subtitle2,
+        color = MaterialTheme.colors.onSurface,
+    )
+
+    Text(
+        modifier = Modifier.align(Alignment.CenterHorizontally),
+        text = nextScheduled,
+        style = MaterialTheme.typography.body1,
+        color = MaterialTheme.colors.onSurface,
+    )
+
+    SpacingLarge()
+    CenterGradientDivider()
+    SpacingLarge()
+}
+
+@Composable
+private fun BackupButton(
+    modifier: Modifier,
+    viewModel: BackupAndRestoreViewModel
+) {
     val context = LocalContext.current
 
     val backupLauncher = rememberLauncherForActivityResult(
@@ -269,7 +273,7 @@ private fun BackupButton(viewModel: BackupAndRestoreViewModel) {
     ) { viewModel.exportDatabase(it) }
 
     Button(
-        modifier = Modifier.fillMaxHeight(),
+        modifier = modifier,
         onClick = {
             val now = OffsetDateTime.now()
             val generatedName = context.getString(
@@ -287,8 +291,8 @@ private fun BackupButton(viewModel: BackupAndRestoreViewModel) {
 }
 
 @Composable
-private fun AutoBackupControls(viewModel: BackupAndRestoreViewModel) = Row(
-    modifier = Modifier
+private fun AutoBackupControls(modifier: Modifier, viewModel: BackupAndRestoreViewModel) = Row(
+    modifier = modifier
         .wrapContentWidth()
         .border(
             width = 1.dp,
@@ -296,8 +300,7 @@ private fun AutoBackupControls(viewModel: BackupAndRestoreViewModel) = Row(
             shape = MaterialTheme.shapes.medium
         )
         .padding(start = dimensionResource(id = R.dimen.card_padding)),
-    verticalAlignment = Alignment.CenterVertically,
-    horizontalArrangement = Arrangement.SpaceEvenly
+    verticalAlignment = Alignment.CenterVertically
 ) {
 
     Text(

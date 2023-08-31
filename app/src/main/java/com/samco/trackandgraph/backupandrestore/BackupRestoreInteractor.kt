@@ -362,14 +362,14 @@ class BackupRestoreInteractorImpl @Inject constructor(
     }
 
     override suspend fun backupNowAndSetAutoBackupConfig(backupConfig: BackupConfig) {
-        performManualBackup(backupConfig.uri)
-
         context.contentResolver.takePersistableUriPermission(
             backupConfig.uri,
             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         )
 
         prefHelper.setAutoBackupConfig(backupConfig.asPrefHelperData())
+
+        performAutoBackup()
 
         val unit = when (backupConfig.units) {
             ChronoUnit.HOURS -> TimeUnit.HOURS
