@@ -44,6 +44,7 @@ fun <T> Spinner(
     onItemSelected: (T) -> Unit,
     selectedItemFactory: @Composable RowScope.(Modifier, T, Boolean) -> Unit,
     dropdownItemFactory: @Composable (T, Int) -> Unit,
+    enabled: Boolean = true,
     enableTrailingIcon: Boolean = true,
     dropdownContentAlignment: Alignment.Horizontal = Alignment.Start
 ) {
@@ -53,12 +54,17 @@ fun <T> Spinner(
         Row(
             modifier = modifier
                 .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
-                .clickable { expanded = !expanded },
+                .let {
+                    if(enabled) it.clickable { expanded = !expanded }
+                    else it
+                },
             verticalAlignment = Alignment.CenterVertically
         ) {
             selectedItemFactory(Modifier, selectedItem, expanded)
             if (enableTrailingIcon)
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded) { expanded = !expanded }
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded) {
+                    if (enabled) expanded = !expanded
+                }
         }
 
         DropdownMenu(
@@ -69,6 +75,7 @@ fun <T> Spinner(
         ) {
             items.forEachIndexed { index, element ->
                 DropdownMenuItem(
+                    enabled = enabled,
                     onClick = {
                         onItemSelected(items[index])
                         expanded = false

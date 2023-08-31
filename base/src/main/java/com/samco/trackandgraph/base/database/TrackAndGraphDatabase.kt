@@ -51,6 +51,8 @@ import java.lang.Exception
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
+const val TNG_DATABASE_VERSION = 54
+
 @Database(
     entities = [
         Feature::class,
@@ -70,11 +72,11 @@ private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_
         LastValueStat::class,
         BarChart::class,
     ],
-    version = 54
+    version = TNG_DATABASE_VERSION
 )
 @TypeConverters(Converters::class)
-internal abstract class TrackAndGraphDatabase : RoomDatabase() {
-    abstract val trackAndGraphDatabaseDao: TrackAndGraphDatabaseDao
+abstract class TrackAndGraphDatabase : RoomDatabase() {
+    internal abstract val trackAndGraphDatabaseDao: TrackAndGraphDatabaseDao
 
     companion object {
         @Volatile
