@@ -197,7 +197,7 @@
     <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken.</string>
     <string name="restore_hint_text">WARNING: Restoring from a backup will erase all data and setup currently in the app. You should back up your data first!</string>
     <string name="restore_successful"><![CDATA["Restore was successful! Track & Graph must now be restarted."]]></string>
-    <string name="backup">Backup</string>
+    <string name="backup">Backup Now</string>
     <string name="restore_data">Restore data</string>
     <string name="backup_successful">Backup Successful!</string>
     <string name="backup_failed">Backup failed. %1$s</string>
