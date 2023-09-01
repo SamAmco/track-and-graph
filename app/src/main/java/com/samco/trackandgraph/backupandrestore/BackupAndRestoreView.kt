@@ -40,6 +40,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -64,11 +65,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -430,7 +433,6 @@ private fun RestoreCompleteDialog() = ConfirmDialog(
     )
 }
 
-//TODO do we get rid of this?
 @Composable
 private fun CenterGradientDivider() = BoxWithConstraints(
     Modifier
@@ -479,120 +481,129 @@ private fun ConfigureAutoBackupDialog(
 }
 
 @Composable
-private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Column {
-    val location = viewModel.autoBackupLocation.collectAsStateWithLifecycle().value
-
-    val selectFileLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
-    ) { viewModel.onBackupLocationChanged(it) }
-
-    val defaultAutoBackupFileName = stringResource(id = R.string.default_auto_backup_file_name)
-
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = stringResource(id = R.string.backup_location),
-        style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
-    )
-
-    SpacingSmall()
-
-    if (location != null) {
-        Text(
-            text = location,
-            style = MaterialTheme.typography.body2.copy(textAlign = TextAlign.Center),
-        )
-
-        SpacingSmall()
-    }
-
-    Button(
-        modifier = Modifier.align(Alignment.CenterHorizontally),
-        onClick = { selectFileLauncher.launch(defaultAutoBackupFileName) },
+private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
+    modifier = Modifier
+        .heightIn(max = LocalConfiguration.current.screenHeightDp.dp * 0.8f)
+) {
+    Column(
+        Modifier.verticalScroll(rememberScrollState())
     ) {
+        val location = viewModel.autoBackupLocation.collectAsStateWithLifecycle().value
 
-        val text = if (location == null)
-            stringResource(id = R.string.select_location)
-        else stringResource(id = R.string.select_new_location)
+        val selectFileLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.CreateDocument(SQLITE_MIME_TYPE)
+        ) { viewModel.onBackupLocationChanged(it) }
+
+        val defaultAutoBackupFileName = stringResource(id = R.string.default_auto_backup_file_name)
 
         Text(
-            text = text,
-            style = MaterialTheme.typography.button
-        )
-    }
-
-    SpacingLarge()
-    Divider()
-    SpacingLarge()
-
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = stringResource(id = R.string.backup_every),
-        style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
-    )
-
-    SpacingSmall()
-
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        MiniNumericTextField(
-            modifier = Modifier.width(64.dp),
-            textFieldValue = viewModel.autoBackupIntervalTextFieldValue.value,
-            onValueChange = viewModel::onBackupIntervalChanged,
-            textAlign = TextAlign.Center
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(id = R.string.backup_location),
+            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
         )
 
         SpacingSmall()
 
-        val strings = mapOf(
-            ChronoUnit.HOURS to stringResource(id = R.string.hours_generic),
-            ChronoUnit.DAYS to stringResource(id = R.string.days_generic),
-            ChronoUnit.WEEKS to stringResource(id = R.string.weeks_generic),
-        )
+        if (location != null) {
+            Text(
+                text = location,
+                style = MaterialTheme.typography.body2.copy(textAlign = TextAlign.Center),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+            )
 
-        TextMapSpinner(
-            modifier = Modifier.width(128.dp),
-            strings = strings,
-            selectedItem = viewModel.autoBackupUnit.collectAsStateWithLifecycle().value,
-            onItemSelected = { viewModel.onBackupUnitChanged(it) }
-        )
+            SpacingSmall()
+        }
 
-        Spacer(modifier = Modifier.weight(1f))
-    }
+        Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = { selectFileLauncher.launch(defaultAutoBackupFileName) },
+        ) {
 
-    SpacingLarge()
-    Divider()
-    SpacingLarge()
+            val text = if (location == null)
+                stringResource(id = R.string.select_location)
+            else stringResource(id = R.string.select_new_location)
 
-    Text(
-        modifier = Modifier.fillMaxWidth(),
-        text = stringResource(id = R.string.next_backup_at),
-        style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
-    )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.button
+            )
+        }
 
-    SpacingSmall()
+        SpacingLarge()
+        Divider()
+        SpacingLarge()
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
-    ) {
-        DateButton(
-            dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
-            onDateSelected = viewModel::onAutoBackupFirstDateChanged,
-            allowPastDates = false
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(id = R.string.backup_every),
+            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
         )
 
         SpacingSmall()
 
-        TimeButton(
-            dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
-            onTimeSelected = viewModel::onAutoBackupFirstDateChanged,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            MiniNumericTextField(
+                modifier = Modifier.width(64.dp),
+                textFieldValue = viewModel.autoBackupIntervalTextFieldValue.value,
+                onValueChange = viewModel::onBackupIntervalChanged,
+                textAlign = TextAlign.Center
+            )
+
+            SpacingSmall()
+
+            val strings = mapOf(
+                ChronoUnit.HOURS to stringResource(id = R.string.hours_generic),
+                ChronoUnit.DAYS to stringResource(id = R.string.days_generic),
+                ChronoUnit.WEEKS to stringResource(id = R.string.weeks_generic),
+            )
+
+            TextMapSpinner(
+                modifier = Modifier.width(128.dp),
+                strings = strings,
+                selectedItem = viewModel.autoBackupUnit.collectAsStateWithLifecycle().value,
+                onItemSelected = { viewModel.onBackupUnitChanged(it) }
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+        }
+
+        SpacingLarge()
+        Divider()
+        SpacingLarge()
+
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = stringResource(id = R.string.next_backup_at),
+            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
         )
+
+        SpacingSmall()
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            DateButton(
+                dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
+                onDateSelected = viewModel::onAutoBackupFirstDateChanged,
+                allowPastDates = false
+            )
+
+            SpacingSmall()
+
+            TimeButton(
+                dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,
+                onTimeSelected = viewModel::onAutoBackupFirstDateChanged,
+            )
+        }
     }
 }
