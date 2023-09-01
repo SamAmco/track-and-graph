@@ -459,6 +459,14 @@ private fun ConfigureAutoBackupDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.autoBackupConfigFailures.collect {
+            Toast.makeText(context, it, Toast.LENGTH_LONG).show()
+        }
+    }
+
     CustomConfirmCancelDialog(
         onDismissRequest = onDismiss,
         customWidthPercentage = 0.9f,
