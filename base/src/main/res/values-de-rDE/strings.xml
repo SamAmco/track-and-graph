@@ -176,7 +176,6 @@
     <string name="backup_hint_text">Die Sicherung sichert alle Ihre Anwendungsdaten einschließlich aller verfolgten Daten, Grafiken und Erinnerungen. Sie sollten Ihre Daten regelmäßig auf ein externes Gerät oder einen Cloud Speicher sichern, für den Fall, dass Ihr Gerät verloren geht oder kaputt geht.</string>
     <string name="restore_data">Wiederherstellung</string>
     <string name="backup_successful">Sicherung war erfolgreich!</string>
-    <string name="backup_failed">Sicherung fehlgeschlagen. %1$s</string>
     <string name="backup_error_could_not_write_to_file">Konnte die ausgewählte Datei nicht finden oder sie kann nicht geschrieben werden.</string>
     <string name="backup_error_could_not_find_database_file">Konnte die ausgewählte Datenbank nicht finden oder lesen.</string>
     <string name="backup_error_failed_to_copy_database">Beim Kopieren der Datenbankdatei ging etwas schief.</string>

@@ -26,13 +26,16 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -50,6 +53,7 @@ interface AutoBackupViewModel {
     val autoBackupIntervalTextFieldValue: State<TextFieldValue>
     val autoBackupUnit: StateFlow<ChronoUnit>
     val autoBackupConfigValid: StateFlow<Boolean>
+    val autoBackupConfigFailures: Flow<Int>
 
     fun onConfirmAutoBackup()
     fun onBackupLocationChanged(uri: Uri?)
@@ -133,10 +137,24 @@ class AutoBackupViewModelImpl @Inject constructor(
         .map { it != null }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    override fun onConfirmAutoBackup() {
-        currentBackupConfig.value?.let {
-            viewModelScope.launch { interactor.backupNowAndSetAutoBackupConfig(it) }
+    private val onBackupConfigApply = MutableSharedFlow<Unit>()
+
+    override val autoBackupConfigFailures: Flow<Int> = onBackupConfigApply
+        .mapNotNull { currentBackupConfig.value }
+        .map { interactor.backupNowAndSetAutoBackupConfig(it) }
+        .filter { it != BackupResult.SUCCESS }
+        .map {
+            when (it) {
+                BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE -> R.string.backup_error_could_not_write_to_file
+                BackupResult.FAIL_COULD_NOT_FIND_DATABASE -> R.string.backup_error_could_not_find_database_file
+                BackupResult.FAIL_COULD_NOT_COPY -> R.string.backup_error_failed_to_copy_database
+                BackupResult.SUCCESS -> throw IllegalStateException("Invalid backup result")
+            }
         }
+        .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
+
+    override fun onConfirmAutoBackup() {
+        viewModelScope.launch { onBackupConfigApply.emit(Unit) }
     }
 
     override fun onBackupLocationChanged(uri: Uri?) {
