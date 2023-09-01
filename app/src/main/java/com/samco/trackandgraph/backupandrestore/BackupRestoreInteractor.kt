@@ -131,7 +131,7 @@ interface BackupRestoreInteractor {
 
     suspend fun performAutoBackup(): BackupResult
 
-    suspend fun backupNowAndSetAutoBackupConfig(backupConfig: BackupConfig)
+    suspend fun backupNowAndSetAutoBackupConfig(backupConfig: BackupConfig): BackupResult
 
     fun validAutoBackupConfiguration(backupConfig: BackupConfig): Boolean
 
@@ -246,16 +246,6 @@ class BackupRestoreInteractorImpl @Inject constructor(
         }
     }
 
-    private fun validUri(uri: Uri): Boolean {
-        try {
-            context.contentResolver.openOutputStream(uri, "w")
-                ?.use { return true }
-                ?: return false
-        } catch (t: Throwable) {
-            return false
-        }
-    }
-
     private fun validUnit(unit: ChronoUnit) =
         setOf(
             ChronoUnit.HOURS,
@@ -264,8 +254,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
         ).contains(unit)
 
     override fun validAutoBackupConfiguration(backupConfig: BackupConfig): Boolean {
-        return validUri(backupConfig.uri) &&
-                backupConfig.firstDate.isAfter(OffsetDateTime.now()) &&
+        return backupConfig.firstDate.isAfter(OffsetDateTime.now()) &&
                 backupConfig.interval > 0 &&
                 validUnit(backupConfig.units)
     }
@@ -287,6 +276,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
     ) : CoroutineWorker(context, workerParameters) {
 
         override suspend fun doWork(): Result {
+            Timber.d("Performing auto backup")
             try {
                 setForeground(createForegroundInfo())
             } catch (e: Exception) {
@@ -295,7 +285,10 @@ class BackupRestoreInteractorImpl @Inject constructor(
             }
 
             return when (val result = interactor.performAutoBackup()) {
-                BackupResult.SUCCESS -> Result.success()
+                BackupResult.SUCCESS -> {
+                    Timber.d("Auto backup successful")
+                    Result.success()
+                }
                 BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE,
                 BackupResult.FAIL_COULD_NOT_FIND_DATABASE,
                 BackupResult.FAIL_COULD_NOT_COPY -> {
@@ -378,16 +371,33 @@ class BackupRestoreInteractorImpl @Inject constructor(
         }
     }
 
-    override suspend fun backupNowAndSetAutoBackupConfig(backupConfig: BackupConfig) {
-        context.contentResolver.takePersistableUriPermission(
-            backupConfig.uri,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        )
+    override suspend fun backupNowAndSetAutoBackupConfig(backupConfig: BackupConfig): BackupResult {
+        try {
+            context.contentResolver.takePersistableUriPermission(
+                backupConfig.uri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
 
-        prefHelper.setAutoBackupConfig(backupConfig.asPrefHelperData())
+            prefHelper.setAutoBackupConfig(backupConfig.asPrefHelperData())
 
-        performAutoBackup()
+            val backupResult = performAutoBackup()
 
+            if (backupResult != BackupResult.SUCCESS) {
+                prefHelper.setAutoBackupConfig(null)
+                return backupResult
+            }
+
+            setupWorkManager(backupConfig)
+
+            backupConfigChanged.tryEmit(Unit)
+            return backupResult
+        } catch (t: Throwable) {
+            Timber.e(t, "Error setting auto backup config")
+            return BackupResult.FAIL_COULD_NOT_WRITE_TO_FILE
+        }
+    }
+
+    private fun setupWorkManager(backupConfig: BackupConfig) {
         val unit = when (backupConfig.units) {
             ChronoUnit.HOURS -> TimeUnit.HOURS
             ChronoUnit.DAYS -> TimeUnit.DAYS
@@ -418,8 +428,6 @@ class BackupRestoreInteractorImpl @Inject constructor(
             ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
             periodicWorkRequest
         )
-
-        backupConfigChanged.tryEmit(Unit)
     }
 
     override suspend fun getAutoBackupInfo(): AutoBackupInfo? {

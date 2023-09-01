@@ -196,7 +196,6 @@
     <string name="backup_hint_text">Backup saves all of your app data including all tracked data, graphs and reminders. You should back up your data to an external device or cloud storage regularly in case your device gets lost or broken.</string>
     <string name="restore_data">Restore data</string>
     <string name="backup_successful">Backup Successful!</string>
-    <string name="backup_failed">Backup failed. %1$s</string>
     <string name="backup_error_could_not_write_to_file">Could not find or write to the selected file.</string>
     <string name="backup_error_could_not_find_database_file">Could not find or read database file.</string>
     <string name="backup_error_failed_to_copy_database">Something went wrong while copying the database file.</string>
@@ -267,8 +266,8 @@
     <string name="data_point_tutorial_page_3_description">Use labels if you want to group the data points</string>
     <string name="data_point_tutorial_page_3_hint">(Hint: If you want to add more context or description use the note instead of the label field)</string>
     <string name="help">Help</string>
-    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v3.7.1/docs/faq/index.md#faq</string>
-    <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v3.7.1/docs/faq/faq_1.md#how-do-i-start-tracking-something</string>
+    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v3.7.2/docs/faq/index.md#faq</string>
+    <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v3.7.2/docs/faq/faq_1.md#how-do-i-start-tracking-something</string>
     <string name="advanced_options">Advanced options</string>
     <string name="type_colon">"Type: "</string>
     <string name="order_colon">"Order: "</string>

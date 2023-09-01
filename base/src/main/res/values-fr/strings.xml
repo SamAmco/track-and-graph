@@ -178,7 +178,6 @@
     <string name="backup_hint_text">La sauvegarde permet d\'enregistrer toutes les données de votre appli, y compris toutes les données suivies, les graphiques et les rappels. Vous devriez sauvegarder régulièrement vos données sur un périphérique externe ou un stockage dans le cloud au cas où votre appareil serait perdu ou cassé.</string>
     <string name="restore_data">Restaurer les données</string>
     <string name="backup_successful">Sauvegarde réussie !</string>
-    <string name="backup_failed">Sauvegarde échouée. %1$s</string>
     <string name="backup_error_could_not_write_to_file">Impossible de trouver ou d\'écrire dans le fichier sélectionné.</string>
     <string name="backup_error_could_not_find_database_file">Impossible de trouver ou de lire le fichier de base de données.</string>
     <string name="backup_error_failed_to_copy_database">Quelque chose s\'est mal passé lors de la copie du fichier de base de données.</string>

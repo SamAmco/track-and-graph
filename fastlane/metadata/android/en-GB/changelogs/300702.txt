@@ -1,0 +1,5 @@
+- Fix bug google drive auto-backup locations not working
+- Fix bug auto-backup location text pushing controls off screen
+- Improve auto-backup first date/time controls behaviour
+
+
