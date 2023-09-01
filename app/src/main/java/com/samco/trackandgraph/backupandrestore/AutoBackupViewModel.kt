@@ -162,10 +162,10 @@ class AutoBackupViewModelImpl @Inject constructor(
         viewModelScope.launch { onUserSetUri.emit(uri) }
     }
 
-    private fun moveUntilValid(odt: OffsetDateTime): OffsetDateTime {
+    private fun moveUntilValid(odt: OffsetDateTime, unit: ChronoUnit): OffsetDateTime {
         var new = odt
         while (new.isBefore(OffsetDateTime.now())) {
-            new = new.plus(1, autoBackupUnit.value)
+            new = new.plus(1, unit)
         }
         return new
     }
@@ -187,7 +187,8 @@ class AutoBackupViewModelImpl @Inject constructor(
                 .withHour(current.hour)
                 .withMinute(current.minute)
                 .withSecond(current.second)
-                .withNano(current.nano)
+                .withNano(current.nano),
+            ChronoUnit.HOURS
         )
         viewModelScope.launch { onUserSetAutoBackupDate.emit(new) }
     }
@@ -197,7 +198,8 @@ class AutoBackupViewModelImpl @Inject constructor(
         val new = moveUntilValid(
             current
                 .withHour(selectedTime.hour)
-                .withMinute(selectedTime.minute)
+                .withMinute(selectedTime.minute),
+            ChronoUnit.DAYS
         )
         viewModelScope.launch { onUserSetAutoBackupDate.emit(new) }
     }
