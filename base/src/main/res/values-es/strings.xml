@@ -176,7 +176,6 @@
     <string name="backup_hint_text">La copia de seguridad guarda todos los datos de tu app, incluyendo todos los datos trazados, los gráficos y los recordatorios. Deberías hacer una copia de seguridad de tus datos en un dispositivo externo o en un almacenamiento en la nube con regularidad en caso de que tu dispositivo se pierda o se rompa.</string>
     <string name="restore_data">Restaurar datos</string>
     <string name="backup_successful">¡Respaldado con éxito!</string>
-    <string name="backup_failed">Error de respaldo. %1$s</string>
     <string name="backup_error_could_not_write_to_file">No se pudo encontrar o escribir en el archivo seleccionado.</string>
     <string name="backup_error_could_not_find_database_file">No se ha podido encontrar o leer el archivo de la base de datos.</string>
     <string name="backup_error_failed_to_copy_database">Algo salió mal mientras se copiaba el archivo de la base de datos.</string>
