@@ -18,7 +18,6 @@
 package com.samco.trackandgraph.base.model
 
 import androidx.lifecycle.LiveData
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import kotlinx.coroutines.flow.Flow
@@ -28,9 +27,6 @@ import java.io.InputStream
 import java.io.OutputStream
 
 //TODO This is too monolithic right now, needs to be split into multiple repository classes ideally.
-
-//TODO for legacy reasons this class still contains some direct proxies to the database. This code should
-// be abstracted away over time
 interface DataInteractor : TrackerHelper, DataSampler {
     suspend fun insertGroup(group: Group): Long
 
@@ -69,7 +65,7 @@ interface DataInteractor : TrackerHelper, DataSampler {
     suspend fun insertDataPoints(dataPoints: List<DataPoint>)
 
     /**
-     * Emits a unit every time currently displayed data may have changed.
+     * Emits an event every time currently displayed data may have changed.
      *
      * @see [DataUpdateType]
      */

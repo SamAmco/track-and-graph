@@ -37,6 +37,8 @@ import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
+import com.samco.trackandgraph.addgroup.AddGroupDialog
+import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.addtracker.*
@@ -72,6 +74,7 @@ class GroupFragment : Fragment(),
     private val viewModel by viewModels<GroupViewModel>()
 
     private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
+    private val addGroupDialogViewModel by viewModels<AddGroupDialogViewModelImpl>()
 
     private var forceNextNotifyDataSetChanged: Boolean = false
 
@@ -94,6 +97,11 @@ class GroupFragment : Fragment(),
                 AddDataPointsDialog(
                     addDataPointsDialogViewModel,
                     onDismissRequest = { addDataPointsDialogViewModel.reset() }
+                )
+
+                AddGroupDialog(
+                    viewModel = addGroupDialogViewModel,
+                    onDismissRequest = { addGroupDialogViewModel.hide() }
                 )
             }
         }
@@ -228,12 +236,10 @@ class GroupFragment : Fragment(),
     }
 
     private fun onEditGroupClicked(group: Group) {
-        val dialog = AddGroupDialog()
-        val args = Bundle()
-        args.putLong(ADD_GROUP_DIALOG_PARENT_ID_KEY, this.args.groupId)
-        args.putLong(ADD_GROUP_DIALOG_ID_KEY, group.id)
-        dialog.arguments = args
-        dialog.show(childFragmentManager, "add_group_dialog")
+        addGroupDialogViewModel.show(
+            parentGroupId = group.parentGroupId,
+            groupId = group.id
+        )
     }
 
     private fun onGroupSelected(group: Group) {
@@ -454,11 +460,10 @@ class GroupFragment : Fragment(),
     }
 
     private fun onAddGroupClicked() {
-        val dialog = AddGroupDialog()
-        val args = Bundle()
-        args.putLong(ADD_GROUP_DIALOG_PARENT_ID_KEY, this.args.groupId)
-        dialog.arguments = args
-        dialog.show(childFragmentManager, "add_group_dialog")
+        addGroupDialogViewModel.show(
+            parentGroupId = args.groupId,
+            groupId = null
+        )
     }
 
     private fun onTrackerDeleteClicked(tracker: DisplayTracker) {
