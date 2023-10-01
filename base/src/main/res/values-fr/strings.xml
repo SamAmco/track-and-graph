@@ -57,8 +57,8 @@
 
     <string-array name="time_histogram_windows">
         <item>Horaire</item>
-        <item>Journalier</item>
         <item>Quotidien</item>
+        <item>Hebdomadaire</item>
         <item>Mensuel</item>
         <item>Trimestriel</item>
         <item>Bi-annuel</item>
