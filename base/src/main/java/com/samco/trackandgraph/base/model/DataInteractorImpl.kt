@@ -75,6 +75,16 @@ internal class DataInteractorImpl @Inject constructor(
     }
 
     override suspend fun updateGroup(group: Group) = withContext(io) {
+        //We need to ensure we're not attempting to move a group to its own child
+        // as this would create an infinite loop
+        val visited = mutableListOf(group.id)
+        var currentParentId = group.parentGroupId
+        while (currentParentId != null) {
+            if (visited.contains(currentParentId)) throw IllegalArgumentException("Illegal group move detected")
+            visited.add(currentParentId)
+            currentParentId = dao.getGroupById(currentParentId).parentGroupId
+        }
+
         dao.updateGroup(group.toEntity())
             .also { dataUpdateEvents.emit(DataUpdateType.GroupUpdated) }
     }

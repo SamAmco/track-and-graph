@@ -20,25 +20,46 @@ package com.samco.trackandgraph.util
 import com.samco.trackandgraph.base.database.dto.Group
 
 open class GroupPathProvider(
-    val groups: Collection<Group>
+    val groups: Collection<Group>,
+    private val groupFilterId: Long? = null
 ) {
     private val separator = "/"
 
-    private val groupsById = groups.map { it.id to it }.toMap()
+    private val groupsById = groups.associateBy { it.id }
 
-    private val groupPaths = groups.map { group ->
+    private val groupParentChains = groups.associate { group ->
         group.id to run {
-            if (group.parentGroupId == null) return@run separator
-            var path = ""
+            val chain = mutableListOf<Group>()
             var currentGroup = group
-            while (true) {
-                val parentId = currentGroup.parentGroupId ?: break
-                path = separator + currentGroup.name + path
-                currentGroup = groupsById[parentId] ?: break
-            }
-            return@run path
+            do {
+                chain.add(currentGroup)
+                currentGroup = groupsById[currentGroup.parentGroupId] ?: break
+
+                // It shouldn't be possible in the current version to create an infinite
+                // loop, but legacy versions may have a bug that allows this, so we must break
+                // out of the loop if we detect it.
+            } while (!chain.contains(currentGroup))
+            return@run chain
         }
-    }.toMap()
+    }
+
+    private val filteredGroupChains = groupParentChains
+        .filter { (_, chain) -> chain.none { it.id == groupFilterId } }
+
+    val filteredGroups = filteredGroupChains
+        .map { (_, chain) -> chain.first() }
+
+    private val groupPaths = filteredGroupChains
+        .mapValues { (_, chain) ->
+            chain
+                //Iterate from root to leaf
+                .asReversed()
+                //Ignore the root group, as it has no name
+                .filter { it.parentGroupId != null }
+                //Join to / separated string starting with the root /
+                .joinToString(separator = separator, prefix = separator) { it.name }
+        }
+
 
     fun getPathForGroup(id: Long): String = groupPaths[id] ?: ""
 }
