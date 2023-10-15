@@ -51,7 +51,7 @@ class PathProviderTest {
     )
 
     @Test
-    fun test_group_path_provider() {
+    fun `test group path provider`() {
         //PREPARE
         val provider = GroupPathProvider(groups)
 
@@ -72,6 +72,40 @@ class PathProviderTest {
         assertEquals("/group2", ans4)
         assertEquals("/group2/group2child", ans5)
         assertEquals("/group2/group2child/group2childChild", ans6)
+    }
+
+    @Test
+    //At one point it was possible to move groups into their own children creating a cycle
+    // which lead to an infinite loop when calculating the path. This shouldn't be possible moving forward,
+    // but to break the infinite loop we need to handle cycles elegantly.
+    fun `test group paths with accidental cycle`() {
+        //PREPARE
+        val provider = GroupPathProvider(
+            listOf(
+                group("a", 1, 2),
+                group("b", 2, 1),
+            )
+        )
+
+        //EXECUTE
+        val ans1 = provider.getPathForGroup(1)
+        val ans2 = provider.getPathForGroup(2)
+
+        //VERIFY
+        assertEquals("/b/a", ans1)
+        assertEquals("/a/b", ans2)
+    }
+
+    @Test
+    fun `test group path provider filters out groups with the group filter id`() {
+        //PREPARE
+        val provider = GroupPathProvider(groups, groupFilterId = 4)
+
+        //VERIFY
+        assertEquals(
+            listOf(0L, 1L, 2L, 3L),
+            provider.filteredGroups.map { it.id }
+        )
     }
 
     @Test

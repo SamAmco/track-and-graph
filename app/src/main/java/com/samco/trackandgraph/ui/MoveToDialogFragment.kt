@@ -105,7 +105,7 @@ class MoveToDialogFragment : DialogFragment() {
     }
 
     private fun inflateGroupItems(groupPathProvider: GroupPathProvider) {
-        for (item in groupPathProvider.groups) {
+        for (item in groupPathProvider.filteredGroups) {
             val groupItemView =
                 ListItemMoveToGroupBinding.inflate(layoutInflater, binding.groupsLayout, false)
             groupItemView.groupNameText.text = groupPathProvider.getPathForGroup(item.id)
@@ -157,8 +157,10 @@ class MoveToDialogViewModel @Inject constructor(
         this.mode = mode
         viewModelScope.launch(io) {
             val groups = dataInteractor.getAllGroupsSync().toMutableList()
-            if (mode == MoveDialogType.GROUP) groups.removeAll { it.id == id }
-            val groupPathProvider = GroupPathProvider(groups)
+            val groupPathProvider = GroupPathProvider(
+                groups = groups,
+                groupFilterId = if (mode == MoveDialogType.GROUP) id else null
+            )
             when (mode) {
                 MoveDialogType.TRACKER -> tracker = dataInteractor.getTrackerById(id)
                 MoveDialogType.GRAPH -> graphStat = dataInteractor.getGraphStatById(id)

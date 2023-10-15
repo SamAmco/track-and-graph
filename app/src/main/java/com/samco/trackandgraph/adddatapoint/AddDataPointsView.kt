@@ -61,9 +61,7 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
 
     val hidden by viewModel.hidden.observeAsState(true)
 
-    LaunchedEffect(true) {
-        viewModel.dismissEvents.collect { onDismissRequest() }
-    }
+    LaunchedEffect(Unit) { viewModel.dismissEvents.collect { onDismissRequest() } }
 
     if (!hidden) {
         DialogTheme {
@@ -283,6 +281,7 @@ private fun TrackerPage(
                     }
                 )
             }
+
             is AddDataPointViewModel.DurationDataPointViewModel -> {
                 DurationInput(
                     modifier = Modifier
@@ -294,6 +293,7 @@ private fun TrackerPage(
                     focusRequester = valueFocusRequester
                 )
             }
+
             else -> {}
         }
 
