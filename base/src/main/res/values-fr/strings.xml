@@ -57,8 +57,8 @@
 
     <string-array name="time_histogram_windows">
         <item>Horaire</item>
-        <item>Journalier</item>
         <item>Quotidien</item>
+        <item>Hebdomadaire</item>
         <item>Mensuel</item>
         <item>Trimestriel</item>
         <item>Bi-annuel</item>
@@ -135,13 +135,13 @@
     <string name="graph_stat_view_not_found">Une erreur est survenue lors de la recherche de ce graphique</string>.
     <string name="graph_stat_view_not_enough_data_stat">Cette statistique s\'affichera lorsqu\'il y aura suffisamment de données.</string>
     <string name="graph_stat_view_not_enough_data_graph">Ce graphique s\'affichera quand il y aura suffisamment de données.</string>
-    <string name="finish">Finish</string>
+    <string name="finish">Terminer</string>
     <string name="about_description"><![CDATA[Track & Graph est un logiciel gratuit et open source sous licence GPL 3.0.]]></string>
     <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
     <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">Les bibliothèques open source suivantes ont été utilisées : </string>
-    <string name="about">About</string>
+    <string name="about">À propos</string>
     <string name="nav_header_title"><![CDATA[Track & Graph]]></string>
 
     <string name="faq">FAQ</string>
@@ -187,10 +187,10 @@
     <string name="info">Info</string>
     <string name="no_description">Aucune description</string>
     <string name="description">Description</string>
-    <string name="note_input_hint">Notes...</string>
+    <string name="note_input_hint">Notes…</string>
     <string name="add_a_note">Ajouter une note</string>
     <string name="notes">Notes</string>
-    <string name="delete_reminder_content_description">Delete Reminder</string>
+    <string name="delete_reminder_content_description">Supprimer le rappel</string>
     <string name="theme_colon">Thème : </string>
     <string name="date_format_colon">Format de la date : </string>
     <string name="add_data_point_button_content_description">Ajouter un bouton de point de données</string>
@@ -201,7 +201,7 @@
     <string name="edit_data_point_button_content_description">Bouton de modification de point de données</string>
     <string name="add_multiple_choice_answer_button_content_description">Ajouter un bouton de réponse à choix multiple</string>
     <string name="ending_at_colon">Échantillon se terminant à :</string>
-    <string name="duplicate">Duplicate</string>
+    <string name="duplicate">Dupliquer</string>
     <string name="no_notes_hint_text">Les notes ajoutées lors du suivi s\'afficheront ici. Vous pouvez également ajouter des notes globales en utilisant le bouton +.</string>
     <string name="add_a_global_note">Ajouter une note globale : </string>
     <string name="months">Mois</string>
@@ -271,10 +271,10 @@
     <string name="track_all">Suivre tout</string>
     <string name="more_details">Plus de détails</string>
     <string name="suggestions">Suggestions</string>
-    <string name="no_label">Sin etiqueta</string>
+    <string name="no_label">Sans étiquette</string>
     <string name="confirm_cancel_notes_will_be_lost">Voulez-vous vraiment fermer ? Toutes les notes seront perdues.</string>
     <string name="add_a_label">Ajouter une étiquette</string>
-    <string name="graph_type_bar_chart">Gráfico de barras</string>
+    <string name="graph_type_bar_chart">Diagramme à barres</string>
     <string name="bar_interval">Intervalle de mesure</string>
     <string name="y_range_max">Plage Y max</string>
     <string name="total_formatted">Total: %s</string>
