@@ -163,5 +163,14 @@ private class ListDiffCallback(
 abstract class GroupChildViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     abstract fun elevateCard()
     abstract fun dropCard()
+
+    /**
+     * @brief Called each seconds, usually to refresh precise timers
+     */
     open fun update() {}
+
+    /**
+     * @brief Called when the application is resumed, usually to refresh loose timers
+     */
+    open fun onResume() {}
 }

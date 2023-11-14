@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.base.helpers
 
 import android.content.Context
+import android.text.format.DateUtils
 import com.samco.trackandgraph.base.R
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
@@ -217,3 +218,8 @@ fun formatTimeToDaysHoursMinutesSeconds(
     }.toString()
 }
 
+fun formatRelativeTimeSpan(
+    dateTime: OffsetDateTime
+): String {
+    return DateUtils.getRelativeTimeSpanString(dateTime.toInstant().toEpochMilli()).toString()
+}

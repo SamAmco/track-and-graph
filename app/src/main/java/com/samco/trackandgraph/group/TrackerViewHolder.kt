@@ -23,7 +23,7 @@ import android.widget.PopupMenu
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
-import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.base.helpers.formatRelativeTimeSpan
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.ListItemTrackerBinding
 import org.threeten.bp.Duration
@@ -75,6 +75,11 @@ class TrackerViewHolder private constructor(
     override fun update() {
         super.update()
         updateTimerText()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        setLastDateText()
     }
 
     private fun updateTimerText() {
@@ -129,7 +134,7 @@ class TrackerViewHolder private constructor(
         binding.lastDateText.text = if (timestamp == null) {
             binding.lastDateText.context.getString(R.string.no_data)
         } else {
-            formatDayMonthYearHourMinute(binding.lastDateText.context, timestamp)
+            formatRelativeTimeSpan(timestamp)
         }
     }
 
