@@ -60,34 +60,18 @@
 
                 <TextView
                     android:id="@+id/lastDateText"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="5dp"
                     android:layout_marginEnd="@dimen/card_margin_small"
-                    android:gravity="start|center"
+                    android:gravity="center|center"
                     android:paddingVertical="8dp"
                     android:textAppearance="@style/TextAppearance.Body"
                     app:layout_constraintBottom_toTopOf="@id/divider"
-                    app:layout_constraintLeft_toRightOf="@id/historyIcon"
+                    app:layout_constraintLeft_toRightOf="parent"
                     app:layout_constraintRight_toRightOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/trackGroupNameText"
-                    tools:text="02/03/19  20:18" />
-
-                <ImageView
-                    android:id="@+id/historyIcon"
-                    android:layout_width="28dp"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="@dimen/card_margin_small"
-                    android:alpha="0.55"
-                    android:background="@null"
-                    android:contentDescription="@string/tracked_data_history_button_content_description"
-                    android:scaleType="fitCenter"
-                    app:layout_constraintBottom_toBottomOf="@id/lastDateText"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toLeftOf="@id/lastDateText"
-                    app:layout_constraintTop_toTopOf="@id/lastDateText"
-                    app:srcCompat="@drawable/history"
-                    app:tint="?attr/colorControlNormal" />
+                    tools:text="123 days ago" />
 
                 <View
                     android:id="@+id/divider"
