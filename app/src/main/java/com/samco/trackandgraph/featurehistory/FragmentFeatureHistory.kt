@@ -50,6 +50,7 @@ class FragmentFeatureHistory : Fragment() {
     ): View {
         viewModel.initViewModel(args.featureId)
         viewModel.tracker.map { it != null }.observe(viewLifecycleOwner) { initMenuProvider(it) }
+        viewModel.dataPoints.map { it.size }.observe(viewLifecycleOwner) { updateDataPointsCount(it) }
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -72,6 +73,16 @@ class FragmentFeatureHistory : Fragment() {
         }
     }
 
+    private fun updateDataPointsCount(numDataPoints: Int) {
+        val text = if (numDataPoints > 0) {
+            context?.getString(R.string.data_points, numDataPoints)
+        } else {
+            null
+        }
+
+        (requireActivity() as MainActivity).setActionBarSubtitle(text)
+    }
+
     private inner class FeatureHistoryMenuProvider(
         private val isTracker: Boolean
     ) : MenuProvider {
@@ -92,7 +103,7 @@ class FragmentFeatureHistory : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(NavButtonStyle.UP, args.featureName)
+        (requireActivity() as MainActivity).setActionBarConfig(NavButtonStyle.UP, args.featureName, true)
     }
 }
 

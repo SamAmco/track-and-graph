@@ -41,7 +41,6 @@ class TrackerViewHolder private constructor(
         this.clickListener = clickListener
         this.dropElevation = binding.cardView.cardElevation
         setLastDateText()
-        setNumEntriesText()
         binding.trackGroupNameText.text = tracker.name
         binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
         initClickEvents(tracker, clickListener)
@@ -130,15 +129,6 @@ class TrackerViewHolder private constructor(
             binding.lastDateText.context.getString(R.string.no_data)
         } else {
             formatDayMonthYearHourMinute(binding.lastDateText.context, timestamp)
-        }
-    }
-
-    private fun setNumEntriesText() {
-        val numDataPoints = tracker?.numDataPoints
-        binding.numEntriesText.text = if (numDataPoints != null) {
-            binding.numEntriesText.context.getString(R.string.data_points, numDataPoints)
-        } else {
-            binding.numEntriesText.context.getString(R.string.no_data)
         }
     }
 

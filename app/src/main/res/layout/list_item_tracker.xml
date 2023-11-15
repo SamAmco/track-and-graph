@@ -101,21 +101,6 @@
                     app:layout_constraintTop_toBottomOf="@id/lastDateText"
                     tools:ignore="ContentDescription" />
 
-                <TextView
-                    android:id="@+id/numEntriesText"
-                    android:layout_width="0dp"
-                    android:layout_height="35dp"
-                    android:layout_marginStart="@dimen/card_margin_small"
-                    android:gravity="bottom|start"
-                    android:maxLines="1"
-                    android:ellipsize="end"
-                    android:textAppearance="@style/TextAppearance.Body"
-                    app:layout_constraintBottom_toBottomOf="@id/addButtons"
-                    app:layout_constraintEnd_toStartOf="@id/playStopButtons"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/divider"
-                    tools:text="1345 Tracked" />
-
                 <FrameLayout
                     android:id="@+id/addButtons"
                     android:layout_width="45dp"
@@ -149,16 +134,16 @@
 
                 <FrameLayout
                     android:id="@+id/playStopButtons"
-                    android:layout_width="45dp"
+                    android:layout_width="match_parent"
                     android:layout_height="45dp"
-                    app:layout_constraintEnd_toStartOf="@id/addButtons"
+                    app:layout_constraintEnd_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@id/addButtons">
 
                     <ImageButton
                         android:id="@+id/playTimerButton"
-                        android:layout_width="match_parent"
+                        android:layout_width="45dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="bottom|end"
+                        android:layout_gravity="bottom|center"
                         android:background="@null"
                         android:contentDescription="@string/add_data_point_button_content_description"
                         android:scaleType="fitXY"
@@ -167,9 +152,9 @@
 
                     <ImageButton
                         android:id="@+id/stopTimerButton"
-                        android:layout_width="match_parent"
+                        android:layout_width="45dp"
                         android:layout_height="match_parent"
-                        android:layout_gravity="bottom|end"
+                        android:layout_gravity="bottom|center"
                         android:background="@null"
                         android:contentDescription="@string/add_data_point_button_content_description"
                         android:scaleType="fitXY"
