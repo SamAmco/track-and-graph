@@ -23,25 +23,25 @@
     <string name="edit">Editer</string>
     <string name="update">Mettre à jour</string>
     <string name="graph_or_stat_name">Nom du graphique : </string>
-    <string name="tracker_name">Que voulez vous suivre ?</string>
+    <string name="tracker_name">Nom du suivi</string>
     <string name="tracker_type">Il s\'agit d\'un temps ou d\'une durée</string>
     <string name="yes">Oui</string>
     <string name="cancel">Annuler</string>
     <string name="select_file">Sélectionner un fichier</string>
-    <string name="empty_group_hint">Bienvenue sur Track &amp; Graphique!\n\nAppuyez sur + en haut à droite et sélectionnez Tracker pour commencer.</string>
+    <string name="empty_group_hint">Bienvenue sur Track &amp; Graph!\n\nAppuyez sur + en haut à droite et sélectionnez Suivi pour commencer.</string>
     <string name="no_trackers_graph_stats_hint">Veuillez créer un suivi avant de créer des graphiques.</string>
     <string name="ru_sure_del_group">Êtes-vous sûr de vouloir supprimer ce groupe et tout ce qu\'il contient ? Vous ne pouvez pas faire marche arrière.</string>
-    <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ces données ?</string>
-    <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette donnée ?</string>
-    <string name="tracker_name_cannot_be_null">Veuillez ajouter un nom</string>
+    <string name="ru_sure_del_feature">Êtes-vous sûr de vouloir supprimer ce suivi ?</string>
+    <string name="ru_sure_del_data_point">Êtes-vous sûr de vouloir supprimer cette entrée ?</string>
+    <string name="tracker_name_cannot_be_null">Veuillez préciser un nom</string>
     <string name="tracker_with_that_name_exists">Vous suivez déjà quelque chose avec ce nom</string>
-    <string name="data_points">%1$d Suivi</string>
+    <string name="data_points">%1$d entrée(s)</string>
     <string name="no_data">Aucune donnée</string>
     <string name="skip">Passez</string>
     <string name="exportButton">Exporter</string>
     <string name="importButton">Importer</string>
     <string name="export_to">Exportez les données suivies de ce groupe au format CSV :</string>
-    <string name="import_from">Importez les données suivies dans ce groupe à partir de CSV:</string>
+    <string name="import_from">Importez les données suivies dans ce groupe à partir d\'un fichier CSV:</string>
     <string name="import_warning">Attention : l\'import est irréversible. Track &amp; Graph essaiera de fusionner toutes les données importées avec les données existantes dans ce groupe par nom.</string>
     <string name="add_a_graph_or_stat">Ajouter un Graphique ou une Statistique</string>
     <string name="graph_type_label">Type de Graphique : </string>
@@ -75,19 +75,19 @@
         <item>Nuit</item>
     </string-array>
     <string name="graph_type_line_graph">Graphique linéraire</string>
-    <string name="graph_type_pie_chart">Camenbert</string>
-    <string name="graph_type_average_time_between">Temps moyen entre</string>
-    <string name="graph_type_time_since">Temps depuis</string>
+    <string name="graph_type_pie_chart">Camembert</string>
+    <string name="graph_type_average_time_between">Ecart moyen entre entrées</string>
+    <string name="graph_type_time_since">Temps depuis la dernière entrée</string>
     <string name="graph_type_time_histogram">Histogramme temporel</string>
     <string-array name="line_graph_averaging_mode_names">
-        <item>Pas de calcul de la moyenne</item>
-        <item>Moyenne glissante quotidienne</item>
+        <item>Pas de moyenne glissante</item>
+        <item>Moyenne glissante sur un jour</item>
         <item>Moyenne glissante sur trois jours</item>
-        <item>Moyenne glissante hebdomadaire</item>
-        <item>Moyenne glissante mensuelle</item>
+        <item>Moyenne glissante sur une semaine</item>
+        <item>Moyenne glissante sur un mois</item>
         <item>Moyenne glissante sur trois mois</item>
         <item>Moyenne glissante sur six mois</item>
-        <item>Moyenne glissante annuelle</item>
+        <item>Moyenne glissante sur un an</item>
     </string-array>
     <string-array name="line_graph_plot_mode_names">
         <item>Tracer quand la données existe</item>
@@ -107,7 +107,7 @@
     <string name="graph_time_durations_a_year">1 an</string>
     <string-array name="y_range_styles">
         <item>Dynamique</item>
-        <item>Corrigées</item>
+        <item>Fixe</item>
     </string-array>
     <string-array name="ending_at_values">
         <item>Dernières</item>
@@ -115,7 +115,7 @@
     </string-array>
 
 
-    <string name="custom">Coutume</string>
+    <string name="custom">Personnalisé</string>
     <string name="import_exception_unknown">L\'importation a échoué : une erreur inconnue s\'est produite</string>
     <string name="import_exception_bad_headers">L\'importation a échoué : les en-têtes ne correspondent pas aux en-têtes attendus : %1$s</string>
     <string name="import_exception_inconsistent_record">L\'importation a échoué : l\'enregistrement sur la ligne %1$s ne correspond pas aux en-têtes requis</string>
@@ -147,7 +147,7 @@
     <string name="faq">FAQ</string>
     <string name="tutorial_text_1">Utilisez des suivi pour suivre vos données.</string>
     <string name="tutorial_text_2">Utilisez des graphiques et des statistiques pour visualiser les données.</string>
-    <string name="tutorial_text_3">Utilisez des groupes pour organiser vos suivie, graphiques et statistiques.</string>
+    <string name="tutorial_text_3">Utilisez des groupes pour organiser vos suivis, graphiques et statistiques.</string>
     <string name="got_it">J\'ai compris!</string>
     <string name="move_to_colon">Déplacer vers : </string>
     <string name="move_to">Déplacer vers</string>
@@ -166,11 +166,11 @@
     <string name="sat">Sam</string>
     <string name="sun">Dim</string>
     <string name="reminders_notifications_channel_name">Rappels</string>
-    <string name="reminders_notifications_channel_description">Notifications créées par l\'utilisateur pour vous rappeler les suivis</string>.
-    <string name="default_reminder_name">Commencez à suivre !</string>
+    <string name="reminders_notifications_channel_description">Notifications créées par l\'utilisateur pour vous rappeler vos suivis</string>.
+    <string name="default_reminder_name">Commencez le suivi !</string>
     <string name="range_style">Style de plage : </string>
 
-    <string name="track_widget_configure_no_data_error">Veuillez d\'abord suivre certaines données.</string>
+    <string name="track_widget_configure_no_data_error">Veuillez d\'abord ajouter quelques entrées.</string>
     <string name="track_widget_configure_no_data_selected_error">Vous devez sélectionner un ensemble de données valide pour créer un widget de suivi.</string>
     <string name="create">Créer</string>
     <string name="use_default_value">Définir une valeur par défaut</string>
@@ -183,7 +183,7 @@
     <string name="backup_error_failed_to_copy_database">Quelque chose s\'est mal passé lors de la copie du fichier de base de données.</string>
     <string name="restore_failed">Restauration échouée. %1$s</string>
     <string name="add_a_longer_description_optional">Ajoutez une description plus longue (facultative)</string>.
-    <string name="no_data_points_history_fragment_hint">Votre historique de suivi s\'affichera ici lorsque vous aurez saisi des données.</string>
+    <string name="no_data_points_history_fragment_hint">Votre historique de suivi s\'affichera ici lorsque vous aurez saisi des entrées.</string>
     <string name="info">Info</string>
     <string name="no_description">Aucune description</string>
     <string name="description">Description</string>
@@ -193,12 +193,12 @@
     <string name="delete_reminder_content_description">Supprimer le rappel</string>
     <string name="theme_colon">Thème : </string>
     <string name="date_format_colon">Format de la date : </string>
-    <string name="add_data_point_button_content_description">Ajouter un bouton de point de données</string>
-    <string name="tracked_data_menu_button_content_description">Bouton de menu des données suivies</string>
-    <string name="tracked_data_history_button_content_description">Bouton d\'historique des données suivies</string>
+    <string name="add_data_point_button_content_description">Bouton pour ajouter une entrée</string>
+    <string name="tracked_data_menu_button_content_description">Bouton pour le menu du suivi</string>
+    <string name="tracked_data_history_button_content_description">Bouton d\'historique des entrées</string>
     <string name="delete_line_button_content_description">Bouton de suppression de ligne</string>
-    <string name="delete_data_point_button_content_description">Bouton de suppression de point de données</string>
-    <string name="edit_data_point_button_content_description">Bouton de modification de point de données</string>
+    <string name="delete_data_point_button_content_description">Bouton de suppression de l\'entrée</string>
+    <string name="edit_data_point_button_content_description">Bouton de modification de l\'entrée</string>
     <string name="add_multiple_choice_answer_button_content_description">Ajouter un bouton de réponse à choix multiple</string>
     <string name="ending_at_colon">Échantillon se terminant à :</string>
     <string name="duplicate">Dupliquer</string>
@@ -213,7 +213,7 @@
     <string name="numeric_to_duration_mode_header">Les valeurs précédemment suivies représentent : </string>
     <string name="duration_to_numeric_mode_header">Qu\'est-ce que les valeurs précédemment suivies doivent être converties en : </string>
     <string name="graph_stat_validation_mixed_time_value_line_graph_features">Vous ne pouvez pas mélanger les durées avec d\'autres types de données. Pensez à tracer des heures, des minutes ou des secondes</string>.
-    <string name="sum_by_count_checkbox_label">Cochez ici pour compter le nombre de points de données suivis plutôt que le total de leurs valeurs.</string>
+    <string name="sum_by_count_checkbox_label">Cochez ici pour compter le nombre d\'entrées plutôt que le total de leurs valeurs.</string>
     <string name="time_window_size">Taille de la fenêtre de temps : </string>
     <string name="hold_to_preview">Maintenir pour visualiser l\'aperçu</string>
     <string name="hours_suffix">h</string>
@@ -237,27 +237,27 @@
     <string name="name_your_function">Nommez votre fonction :</string>
     <string name="write_your_function_here"># Écrivez votre fonction ici</string>
     <string name="add_some_data_sources">Ajouter des sources de données</string>
-    <string name="value">Évaluer</string>
+    <string name="value">Valeur</string>
     <string name="label">Étiquette</string>
-    <string name="continue_word">Continuez</string>
-    <string name="update_all_data_points">Mettez à jour tous les points de données :</string>
+    <string name="continue_word">Continuer</string>
+    <string name="update_all_data_points">Mettez à jour toutes les entrées :</string>
     <string name="where_colon">Où:</string>
     <string name="to_colon">Pour:</string>
     <string name="value_equals">Valeur =</string>
     <string name="label_equals">Libellé =</string>
-    <string name="adding_your_first_data_point">Un tutoriel rapide sur l\'ajout de points de données :</string>
+    <string name="adding_your_first_data_point">Un tutoriel rapide sur l\'ajout d\'entrées :</string>
     <string name="next">Suivant</string>
-    <string name="each_data_point_has_a_timestamp_and_value">Chaque point de données a un horodatage et une valeur :</string>
-    <string name="it_can_also_optionally_have_a_label_and_a_note">Il peut aussi éventuellement avoir une étiquette et une note :</string>
+    <string name="each_data_point_has_a_timestamp_and_value">Chaque entrée a un horodatage et une valeur :</string>
+    <string name="it_can_also_optionally_have_a_label_and_a_note">Elle peut aussi éventuellement avoir une étiquette et une note :</string>
     <string name="data_point_tutorial_page_2_description">La valeur est un nombre afin que vous puissiez voir comment vos données évoluent au fil du temps</string>
     <string name="data_point_tutorial_page_2_hint">(Astuce : si vous ne vous souciez pas de la valeur, utilisez simplement la valeur par défaut de 1)</string>
-    <string name="data_point_tutorial_page_3_description">Utilisez des étiquettes si vous souhaitez regrouper les points de données</string>
+    <string name="data_point_tutorial_page_3_description">Utilisez des étiquettes si vous souhaitez regrouper les entrées</string>
     <string name="data_point_tutorial_page_3_hint">(Astuce : si vous souhaitez ajouter plus de contexte ou de description, utilisez la note au lieu du champ d\'étiquette)</string>
-    <string name="help">Aider</string>
+    <string name="help">Aide</string>
     
     <string name="advanced_options">Options avancées</string>
-    <string name="type_colon">\"Taper: \"</string>
-    <string name="order_colon">\"Ordre: \"</string>
+    <string name="type_colon">\"Type : \"</string>
+    <string name="order_colon">\"Ordre : \"</string>
     <string name="value_and_label">Valeur et étiquette</string>
     <string name="value_only">Valeur uniquement</string>
     <string name="label_only">Étiquette uniquement</string>
