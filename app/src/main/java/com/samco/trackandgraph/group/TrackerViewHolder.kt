@@ -65,9 +65,6 @@ class TrackerViewHolder private constructor(
         binding.lastDateText.visibility =
             if (tracker.timerStartInstant == null) View.VISIBLE else View.INVISIBLE
 
-        binding.historyIcon.visibility =
-            if (tracker.timerStartInstant == null) View.VISIBLE else View.INVISIBLE
-
         if (tracker.timerStartInstant != null) {
             updateTimerText()
             binding.timerText.visibility = View.VISIBLE
