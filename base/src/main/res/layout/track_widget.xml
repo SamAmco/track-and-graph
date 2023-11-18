@@ -66,7 +66,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="@dimen/card_margin_small"
             android:layout_marginBottom="@dimen/card_margin_small"
-            android:src="@drawable/add_box"
+            android:src="@drawable/ic_add_record"
             android:tint="?attr/colorControlNormal" />
 
         <ImageView
@@ -77,7 +77,7 @@
             android:layout_alignParentBottom="true"
             android:layout_marginEnd="@dimen/card_margin_small"
             android:layout_marginBottom="@dimen/card_margin_small"
-            android:src="@drawable/add_box"
+            android:src="@drawable/ic_add_record"
             android:tint="?attr/colorSecondary" />
 
         <ImageView
