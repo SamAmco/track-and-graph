@@ -1,0 +1,5 @@
+- Change Tracker card design
+- Translation fixes
+- Fix cyclical groups bug
+
+
