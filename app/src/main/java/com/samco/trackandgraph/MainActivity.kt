@@ -132,21 +132,32 @@ class MainActivity : AppCompatActivity() {
 
     private data class NavBarConfig(
         val buttonStyle: NavButtonStyle,
-        val title: String? = null
+        val title: String? = null,
+        val clearSubtitle: Boolean = false
     )
+
+    fun setActionBarSubtitle(subtitle: String? = null) {
+        supportActionBar?.subtitle = subtitle
+    }
 
     /**
      * Set the title in the action bar and whether to show the menu button or the back button
      * in the top left. Every fragment should call this.
      */
-    fun setActionBarConfig(buttonStyle: NavButtonStyle, title: String? = null) {
-        setActionBarConfig(NavBarConfig(buttonStyle, title))
+    fun setActionBarConfig(buttonStyle: NavButtonStyle, title: String? = null, clearSubtitle: Boolean = false) {
+        setActionBarConfig(NavBarConfig(buttonStyle, title, clearSubtitle))
     }
 
     private fun setActionBarConfig(config: NavBarConfig) {
         currentNavBarConfig = config
         val title = config.title ?: getString(R.string.app_name)
         supportActionBar?.title = title
+
+        if (!config.clearSubtitle)
+        {
+            supportActionBar?.subtitle = null
+        }
+
         when (config.buttonStyle) {
             NavButtonStyle.MENU -> {
                 actionBarDrawerToggle.isDrawerIndicatorEnabled = true
