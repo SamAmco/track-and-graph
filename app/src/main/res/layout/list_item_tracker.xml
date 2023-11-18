@@ -101,7 +101,7 @@
                         android:background="@null"
                         android:contentDescription="@string/add_data_point_button_content_description"
                         android:scaleType="fitXY"
-                        app:srcCompat="@drawable/add_box"
+                        app:srcCompat="@drawable/ic_add_record"
                         app:tint="?attr/colorControlNormal" />
 
                     <ImageView
@@ -112,7 +112,7 @@
                         android:background="@null"
                         android:contentDescription="@string/add_data_point_button_content_description"
                         android:scaleType="fitXY"
-                        app:srcCompat="@drawable/add_box"
+                        app:srcCompat="@drawable/ic_add_record"
                         app:tint="?attr/colorSecondary" />
                 </FrameLayout>
 
