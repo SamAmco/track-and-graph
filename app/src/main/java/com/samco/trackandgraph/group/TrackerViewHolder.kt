@@ -48,29 +48,30 @@ class TrackerViewHolder private constructor(
     }
 
     private fun initTimerControls(tracker: DisplayTracker, clickListener: TrackerClickListener) {
-        binding.playStopButtons.visibility =
-            if (tracker.dataType == DataType.DURATION) View.VISIBLE
-            else View.GONE
+        if (tracker.dataType != DataType.DURATION) {
+            binding.playTimerButton.visibility = View.GONE
+            binding.stopTimerButton.visibility = View.GONE
+            binding.timerText.visibility = View.GONE
+            binding.lastDateText.visibility = View.VISIBLE
+        } else if (tracker.timerStartInstant != null) {
+            binding.timerText.visibility = View.VISIBLE
+            binding.playTimerButton.visibility = View.GONE
+            binding.stopTimerButton.visibility = View.VISIBLE
+            binding.lastDateText.visibility = View.GONE
+            updateTimerText()
+        } else {
+            binding.timerText.visibility = View.GONE
+            binding.playTimerButton.visibility = View.VISIBLE
+            binding.stopTimerButton.visibility = View.GONE
+            binding.lastDateText.visibility = View.VISIBLE
+            binding.timerText.text = formatTimeDuration(0)
+        }
+
         binding.playTimerButton.setOnClickListener {
             clickListener.onPlayTimer(tracker)
         }
         binding.stopTimerButton.setOnClickListener {
             clickListener.onStopTimer(tracker)
-        }
-        binding.playTimerButton.visibility =
-            if (tracker.timerStartInstant == null) View.VISIBLE else View.GONE
-        binding.stopTimerButton.visibility =
-            if (tracker.timerStartInstant == null) View.GONE else View.VISIBLE
-
-        binding.lastDateText.visibility =
-            if (tracker.timerStartInstant == null) View.VISIBLE else View.INVISIBLE
-
-        if (tracker.timerStartInstant != null) {
-            updateTimerText()
-            binding.timerText.visibility = View.VISIBLE
-        } else {
-            binding.timerText.visibility = View.GONE
-            binding.timerText.text = formatTimeDuration(0)
         }
     }
 
@@ -96,9 +97,15 @@ class TrackerViewHolder private constructor(
         var lastX = 0
         var lastY = 0
         val isInCorner = {
-            val rect = binding.addButtons
-            lastX > rect.x && lastX < (rect.x + rect.width) &&
-                    lastY > rect.y && lastY < (rect.y + rect.height)
+            val rect = binding.innerLayoutContainer
+
+            //45dp in px
+            val cornerSize = 45 * binding.root.context.resources.displayMetrics.density
+
+            lastX > (rect.width - cornerSize)
+                    && lastX < rect.width
+                    && lastY > (rect.height - cornerSize)
+                    && lastY < rect.height
         }
         binding.cardView.setOnLongClickListener {
             if (isInCorner()) {
