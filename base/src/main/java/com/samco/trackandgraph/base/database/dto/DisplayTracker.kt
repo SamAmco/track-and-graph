@@ -30,7 +30,6 @@ data class DisplayTracker(
     val defaultValue: Double,
     val defaultLabel: String,
     val timestamp: OffsetDateTime?,
-    val numDataPoints: Long?,
     val displayIndex: Int,
     val description: String,
     val timerStartInstant: Instant?

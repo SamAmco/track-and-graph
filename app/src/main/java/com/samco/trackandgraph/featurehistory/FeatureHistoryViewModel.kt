@@ -2,14 +2,12 @@
 
 package com.samco.trackandgraph.featurehistory
 
-import android.provider.ContactsContract.Data
 import androidx.lifecycle.*
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.database.sampling.DataSampleProperties
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.DataUpdateType
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
