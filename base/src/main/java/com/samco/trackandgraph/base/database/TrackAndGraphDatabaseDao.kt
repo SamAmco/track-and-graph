@@ -56,17 +56,12 @@ private const val getDisplayTrackersQuery = """
         trackers_table.has_default_value as has_default_value,
         trackers_table.default_value as default_value,
         trackers_table.default_label as default_label,
-        num_data_points,
         last_epoch_milli,
         last_utc_offset_sec,
         start_instant 
         FROM (
             trackers_table
             LEFT JOIN features_table ON trackers_table.feature_id = features_table.id
-            LEFT JOIN (
-                SELECT feature_id as id, COUNT(*) as num_data_points
-                FROM data_points_table GROUP BY feature_id
-            ) as feature_data ON feature_data.id = trackers_table.feature_id
             LEFT JOIN (
                 SELECT feature_id, epoch_milli as last_epoch_milli, utc_offset_sec as last_utc_offset_sec
                 FROM data_points_table as dpt
