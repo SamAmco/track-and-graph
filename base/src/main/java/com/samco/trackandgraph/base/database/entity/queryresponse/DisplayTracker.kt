@@ -55,9 +55,6 @@ internal data class DisplayTracker(
     @ColumnInfo(name = "last_utc_offset_sec")
     val lastUtcOffsetSec: Int,
 
-    @ColumnInfo(name = "num_data_points")
-    val numDataPoints: Long?,
-
     @ColumnInfo(name = "display_index")
     val displayIndex: Int,
 
@@ -82,7 +79,6 @@ internal data class DisplayTracker(
                 ZoneOffset.ofTotalSeconds(lastUtcOffsetSec)
             )
         },
-        numDataPoints = numDataPoints,
         displayIndex = displayIndex,
         description = description,
         timerStartInstant = timerStartInstant
