@@ -123,6 +123,17 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "PropellantDyke",
+      "name": "PropellantDyke",
+      "avatar_url": "https://avatars.githubusercontent.com/u/118541570?v=4",
+      "profile": "https://github.com/PropellantDyke",
+      "contributions": [
+        "code",
+        "design",
+        "translation"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -131,5 +142,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
