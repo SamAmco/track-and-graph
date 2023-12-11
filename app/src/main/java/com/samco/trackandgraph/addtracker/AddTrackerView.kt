@@ -344,7 +344,7 @@ private fun DefaultValueCheckbox(
     hasDefaultValue: Boolean,
     viewModel: AddTrackerViewModel
 ) {
-    RowCheckbox(
+    RowSwitch(
         checked = hasDefaultValue,
         onCheckedChange = { viewModel.onHasDefaultValueChanged(it) },
         text = stringResource(id = R.string.use_default_value)
@@ -356,7 +356,7 @@ private fun DurationCheckbox(
     isDuration: Boolean,
     viewModel: AddTrackerViewModel
 ) {
-    RowCheckbox(
+    RowSwitch(
         checked = isDuration,
         onCheckedChange = { viewModel.onIsDurationCheckChanged(it) },
         text = stringResource(id = R.string.tracker_type)
