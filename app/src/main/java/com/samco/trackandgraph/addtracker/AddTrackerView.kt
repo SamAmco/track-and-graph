@@ -109,6 +109,8 @@ private fun AddTrackerInputForm(
 
     SpacingSmall()
 
+    FormLabel(text = stringResource(id = R.string.tracker_name))
+
     NameInput(
         viewModel,
         focusManager,
@@ -117,6 +119,8 @@ private fun AddTrackerInputForm(
     )
 
     SpacingLarge()
+
+    FormLabelOptional(text = stringResource(id = R.string.description))
 
     DescriptionInput(viewModel)
 
@@ -164,7 +168,11 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
                 style = MaterialTheme.typography.subtitle2
             )
 
+            FormLabel(text = stringResource(id = R.string.suggestions_type))
+
             SuggestionType(viewModel)
+
+            FormLabel(text = stringResource(id = R.string.suggestions_order))
 
             SuggestionOrder(viewModel)
         }
@@ -184,13 +192,11 @@ fun SuggestionType(viewModel: AddTrackerViewModel) {
         TrackerSuggestionType.NONE to stringResource(R.string.none)
     )
 
-    LabeledRow(label = stringResource(id = R.string.type_colon)) {
-        TextMapSpinner(
-            strings = suggestionTypeMap,
-            selectedItem = selectedSuggestionType,
-            onItemSelected = { viewModel.onSuggestionTypeChanged(it) }
-        )
-    }
+    TextMapSpinner(
+        strings = suggestionTypeMap,
+        selectedItem = selectedSuggestionType,
+        onItemSelected = { viewModel.onSuggestionTypeChanged(it) }
+    )
 }
 
 @Composable
@@ -213,13 +219,11 @@ fun SuggestionOrder(viewModel: AddTrackerViewModel) {
             TrackerSuggestionOrder.OLDEST to stringResource(R.string.oldest)
         )
 
-        LabeledRow(label = stringResource(id = R.string.order_colon)) {
-            TextMapSpinner(
-                strings = suggestionOrderMap,
-                selectedItem = selectedSuggestionOrder,
-                onItemSelected = { viewModel.onSuggestionOrderChanged(it) }
-            )
-        }
+        TextMapSpinner(
+            strings = suggestionOrderMap,
+            selectedItem = selectedSuggestionOrder,
+            onItemSelected = { viewModel.onSuggestionOrderChanged(it) }
+        )
     }
 }
 
@@ -270,13 +274,16 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
 
     if (hasDefaultValue.value) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxWidth()
         ) {
+            FormLabel(text = stringResource(id = R.string.value))
+
             if (isDuration.value) DurationInputRow(viewModel)
             else ValueInputRow(viewModel, focusManager)
 
             SpacingSmall()
+
+            FormLabel(text = stringResource(id = R.string.label))
 
             LabelInputRow(viewModel)
         }
@@ -299,12 +306,9 @@ private fun DurationConversionModeInput(
         val name =
             if (isDuration) stringResource(id = R.string.numeric_to_duration_mode_header)
             else stringResource(id = R.string.duration_to_numeric_mode_header)
-        Text(
-            text = name,
-            modifier = Modifier
-                .padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
-            style = MaterialTheme.typography.subtitle2
-        )
+
+        FormLabel(text = name)
+
         TextMapSpinner(
             strings = strings,
             selectedItem = durationConversionMode
@@ -318,7 +322,8 @@ private fun DurationConversionModeInput(
 private fun LabelInputRow(viewModel: AddTrackerViewModel) {
     LabelInputTextField(
         textFieldValue = viewModel.defaultLabel,
-        onValueChange = viewModel::onDefaultLabelChanged
+        onValueChange = viewModel::onDefaultLabelChanged,
+        showLabel = false
     )
 }
 
@@ -330,7 +335,8 @@ private fun ValueInputRow(
     ValueInputTextField(
         textFieldValue = viewModel.defaultValue,
         onValueChange = viewModel::onDefaultValueChanged,
-        focusManager = focusManager
+        focusManager = focusManager,
+        showLabel = false
     )
 }
 
@@ -370,7 +376,6 @@ private fun DescriptionInput(
 ) = FullWidthTextField(
     textFieldValue = viewModel.trackerDescription,
     onValueChange = viewModel::onTrackerDescriptionChanged,
-    label = stringResource(id = R.string.add_a_longer_description_optional),
     singleLine = false
 )
 
@@ -384,7 +389,6 @@ private fun NameInput(
 ) = FullWidthTextField(
     textFieldValue = viewModel.trackerName,
     onValueChange = viewModel::onTrackerNameChanged,
-    label = stringResource(id = R.string.tracker_name),
     focusManager = focusManager,
     focusRequester = focusRequester,
     keyboardController = keyboardController
