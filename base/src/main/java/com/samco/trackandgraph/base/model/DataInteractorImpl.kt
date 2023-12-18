@@ -81,7 +81,7 @@ internal class DataInteractorImpl @Inject constructor(
         while (currentParentId != null) {
             if (visited.contains(currentParentId)) throw IllegalArgumentException("Illegal group move detected")
             visited.add(currentParentId)
-            currentParentId = dao.getGroupById(currentParentId).parentGroupId
+            currentParentId = dao.getGroupById(currentParentId).parentGroupId ?: 0L
         }
 
         dao.updateGroup(group.toEntity())
