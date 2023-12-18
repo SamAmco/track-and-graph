@@ -1,0 +1,3 @@
+- Minor efficiency improvements
+- Remove divider from tracker card
+
