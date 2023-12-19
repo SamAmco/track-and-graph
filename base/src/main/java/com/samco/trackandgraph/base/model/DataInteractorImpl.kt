@@ -20,7 +20,6 @@ package com.samco.trackandgraph.base.model
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import androidx.room.withTransaction
-import androidx.sqlite.db.SupportSQLiteQuery
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
@@ -82,7 +81,7 @@ internal class DataInteractorImpl @Inject constructor(
         while (currentParentId != null) {
             if (visited.contains(currentParentId)) throw IllegalArgumentException("Illegal group move detected")
             visited.add(currentParentId)
-            currentParentId = dao.getGroupById(currentParentId).parentGroupId
+            currentParentId = dao.getGroupById(currentParentId).parentGroupId ?: 0L
         }
 
         dao.updateGroup(group.toEntity())
