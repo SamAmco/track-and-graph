@@ -129,6 +129,7 @@ class DemoDBGenerator {
     @Test
     fun generateDemoDB(): Unit = runBlocking {
         createScreenshotsGroup(dataInteractor)
+        createFaq1Group(dataInteractor)
         writeDBToFile()
     }
 
