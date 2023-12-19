@@ -128,8 +128,11 @@ class DemoDBGenerator {
 
     @Test
     fun generateDemoDB(): Unit = runBlocking {
+        println("creating screenshot data")
         createScreenshotsGroup(dataInteractor)
+        println("creating faq1 data")
         createFaq1Group(dataInteractor)
+        println("writing to a db file")
         writeDBToFile()
     }
 
@@ -142,9 +145,11 @@ class DemoDBGenerator {
                 close()
             }
 
+
         val dbFile = database.openHelper.writableDatabase.path?.let { File(it) } ?: throw Exception(
             "Could not get DB file"
         )
+
         val outFile = File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
             "tng_demo_database.db"
@@ -179,7 +184,7 @@ suspend fun createWaveData(
     sinTransform: SinTransform = SinTransform(10.0, 3.0),
     randomSeed: Int = 0,
     randomOffsetScalar: Double = 5.0,
-    numDataPoints: Int = 1000,
+    numDataPoints: Int = 500,
     spacing: Duration = Duration.ofDays(1),
     spacingRandomisationHours: Int = 6,
     endPoint: OffsetDateTime = OffsetDateTime.now(),
