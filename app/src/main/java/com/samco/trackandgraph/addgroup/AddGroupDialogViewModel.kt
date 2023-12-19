@@ -117,7 +117,7 @@ class AddGroupDialogViewModelImpl @Inject constructor(
                         id = 0,
                         name = name,
                         displayIndex = 0,
-                        parentGroupId = parentGroupId,
+                        parentGroupId = parentGroupId ?: 0L,
                         colorIndex = colorIndex
                     )
                 )
