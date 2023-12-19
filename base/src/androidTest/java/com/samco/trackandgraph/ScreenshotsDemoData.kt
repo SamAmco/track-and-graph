@@ -32,6 +32,7 @@ import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.base.database.dto.Reminder
 import com.samco.trackandgraph.base.database.dto.TimeHistogram
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.model.DataInteractor
 import org.threeten.bp.Duration
@@ -96,7 +97,7 @@ private suspend fun createRestDaysGroup(dataInteractor: DataInteractor, parent: 
         randomOffsetScalar = 1.0,
         spacing = Duration.ofDays(1),
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22),
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1),
         roundToInt = true,
         clampMin = 0.0,
         clampMax = 3.0,
@@ -204,7 +205,7 @@ private suspend fun createStressPieChart(
 
 private suspend fun createGroupListForScreenshots(dataInteractor: DataInteractor, parent: Long) {
     val groupListGroup = dataInteractor.insertGroup(
-        createGroup(name = "Track & Graph\n Groups list", parentGroupId = parent)
+        createGroup(name = "Track & Graph                              Groups list", parentGroupId = parent)
     )
 
     dataInteractor.insertGroup(
@@ -474,10 +475,11 @@ private suspend fun createStressTracker(dataInteractor: DataInteractor, dailyGro
         dataInteractor = dataInteractor,
         trackerId = stressTracker,
         sinTransform = SinTransform(3.0, 50.0, -1.0),
-        randomOffsetScalar = 1.0,
+        randomOffsetScalar = 0.0,
         spacing = Duration.ofDays(1),
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22),
+        numDataPoints = 50,
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1),
         roundToInt = true,
         clampMin = 0.0,
         clampMax = 3.0,
@@ -492,6 +494,7 @@ private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyG
             description = "Just random data",
             groupId = dailyGroupId,
             dataType = DataType.DURATION,
+            suggestionType = TrackerSuggestionType.NONE,
             displayIndex = 7
         )
     )
@@ -503,7 +506,8 @@ private suspend fun createStudyingTracker(dataInteractor: DataInteractor, dailyG
         randomOffsetScalar = 0.5,
         spacing = Duration.ofDays(1),
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22)
+        numDataPoints = 1,
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 }
 
@@ -514,6 +518,7 @@ private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyG
             description = "Just random data",
             groupId = dailyGroupId,
             hasDefaultValue = true,
+            suggestionType = TrackerSuggestionType.NONE,
             defaultValue = 1.0,
             displayIndex = 6
         )
@@ -524,9 +529,10 @@ private suspend fun createExerciseTracker(dataInteractor: DataInteractor, dailyG
         trackerId = exerciseTracker,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
+        numDataPoints = 1,
         spacing = Duration.ofDays(1),
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22)
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 }
 
@@ -535,6 +541,7 @@ private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGro
         createTracker(
             name = "Weight",
             description = "Just random data",
+            suggestionType = TrackerSuggestionType.NONE,
             groupId = dailyGroupId,
             displayIndex = 5
         )
@@ -545,9 +552,10 @@ private suspend fun createWeightTracker(dataInteractor: DataInteractor, dailyGro
         trackerId = weightTracker,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
+        numDataPoints = 1,
         spacing = Duration.ofDays(1),
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22)
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 }
 
@@ -558,6 +566,7 @@ private suspend fun createWorkTracker(dataInteractor: DataInteractor, dailyGroup
             description = "Just random data",
             groupId = dailyGroupId,
             dataType = DataType.DURATION,
+            suggestionType = TrackerSuggestionType.NONE,
             displayIndex = 4
         )
     )
@@ -568,8 +577,9 @@ private suspend fun createWorkTracker(dataInteractor: DataInteractor, dailyGroup
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
         spacing = Duration.ofDays(1),
+        numDataPoints = 1,
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22)
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 }
 
@@ -580,6 +590,7 @@ private suspend fun createMeditationTracker(dataInteractor: DataInteractor, dail
             description = "Just random data",
             groupId = dailyGroupId,
             dataType = DataType.DURATION,
+            suggestionType = TrackerSuggestionType.NONE,
             displayIndex = 3
         )
     )
@@ -589,9 +600,10 @@ private suspend fun createMeditationTracker(dataInteractor: DataInteractor, dail
         trackerId = meditationTracker,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
+        numDataPoints = 1,
         spacing = Duration.ofDays(1),
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22)
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 }
 
@@ -601,6 +613,7 @@ private suspend fun createAlcoholTracker(dataInteractor: DataInteractor, dailyGr
             name = "Alcohol",
             groupId = dailyGroupId,
             description = "Just random data",
+            suggestionType = TrackerSuggestionType.NONE,
             displayIndex = 2
         )
     )
@@ -610,9 +623,10 @@ private suspend fun createAlcoholTracker(dataInteractor: DataInteractor, dailyGr
         trackerId = alcoholTracker,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
+        numDataPoints = 1,
         spacing = Duration.ofDays(1),
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22)
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 }
 
@@ -622,6 +636,7 @@ private suspend fun createProductivityTracker(dataInteractor: DataInteractor, da
             name = "Productivity",
             description = "Just random data",
             groupId = dailyGroupId,
+            suggestionType = TrackerSuggestionType.NONE,
             displayIndex = 1
         )
     )
@@ -631,9 +646,10 @@ private suspend fun createProductivityTracker(dataInteractor: DataInteractor, da
         trackerId = productivityTracker,
         sinTransform = SinTransform(1.0, 50.0, 6.0),
         randomOffsetScalar = 0.5,
+        numDataPoints = 1,
         spacing = Duration.ofDays(1),
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22)
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 }
 
@@ -643,6 +659,7 @@ private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGrou
             name = "Sleep",
             groupId = dailyGroupId,
             dataType = DataType.DURATION,
+            suggestionType = TrackerSuggestionType.NONE,
             displayIndex = 0
         )
     )
@@ -653,6 +670,6 @@ private suspend fun createSleepTracker(dataInteractor: DataInteractor, dailyGrou
         sinTransform = SinTransform(SEC_PER_HOUR * 1.5, 50.0, SEC_PER_HOUR * 6.0),
         randomOffsetScalar = 0.5,
         spacingRandomisationHours = 4,
-        endPoint = OffsetDateTime.now().withHour(22)
+        endPoint = OffsetDateTime.now().withHour(22).minusDays(1)
     )
 }
