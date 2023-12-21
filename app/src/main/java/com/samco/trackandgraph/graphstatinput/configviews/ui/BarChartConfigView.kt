@@ -17,16 +17,11 @@
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -41,9 +36,9 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
-import com.samco.trackandgraph.ui.compose.ui.LabeledRow
+import com.samco.trackandgraph.ui.compose.ui.FormLabel
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
-import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
+import com.samco.trackandgraph.ui.compose.ui.RowSwitch
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
@@ -88,11 +83,7 @@ fun BarChartConfigView(
 
     SpacingSmall()
 
-    Text(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
-        text = stringResource(id = R.string.select_a_feature),
-        style = MaterialTheme.typography.subtitle2
-    )
+    FormLabel(text = stringResource(id = R.string.select_a_feature))
 
     val featureId = viewModel.featureId
     val featureMap = viewModel.featureMap
@@ -118,20 +109,17 @@ fun BarChartConfigView(
         )
     }
 
-    LabeledRow(
-        label = stringResource(id = R.string.bar_interval),
-        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
-    ) {
-        TextMapSpinner(
-            strings = barIntervalNames,
-            selectedItem = viewModel.selectedBarPeriod,
-            onItemSelected = viewModel::updateBarPeriod
-        )
-    }
+    FormLabel(text = stringResource(id = R.string.bar_interval))
+
+    TextMapSpinner(
+        strings = barIntervalNames,
+        selectedItem = viewModel.selectedBarPeriod,
+        onItemSelected = viewModel::updateBarPeriod
+    )
 
     SpacingSmall()
 
-    RowCheckbox(
+    RowSwitch(
         checked = viewModel.sumByCount,
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
@@ -139,19 +127,13 @@ fun BarChartConfigView(
 
     SpacingSmall()
 
-    LabeledRow(
-        label = stringResource(id = R.string.scale),
-        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
-    ) {
-        MiniNumericTextField(
-            modifier = Modifier
-                .weight(1f)
-                .alignByBaseline(),
-            textAlign = TextAlign.Center,
-            textFieldValue = viewModel.scale,
-            onValueChange = { viewModel.updateScale(it) }
-        )
-    }
+    FormLabel(text = stringResource(id = R.string.scale))
+
+    MiniNumericTextField(
+        textAlign = TextAlign.Center,
+        textFieldValue = viewModel.scale,
+        onValueChange = { viewModel.updateScale(it) }
+    )
 
     SpacingSmall()
 }

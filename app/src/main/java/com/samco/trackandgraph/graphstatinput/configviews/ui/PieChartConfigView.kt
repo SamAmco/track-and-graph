@@ -34,7 +34,8 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.PieChartConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
-import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
+import com.samco.trackandgraph.ui.compose.ui.FormLabel
+import com.samco.trackandgraph.ui.compose.ui.RowSwitch
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
@@ -72,11 +73,7 @@ fun PieChartConfigView(
 
     SpacingLarge()
 
-    Text(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
-        text = stringResource(id = R.string.select_a_discrete_feature),
-        style = MaterialTheme.typography.subtitle2
-    )
+    FormLabel(text = stringResource(id = R.string.select_a_discrete_feature))
 
     val featureId = viewModel.featureId
     val featureMap = viewModel.featureMap
@@ -91,7 +88,7 @@ fun PieChartConfigView(
 
     SpacingSmall()
 
-    RowCheckbox(
+    RowSwitch(
         checked = viewModel.sumByCount,
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)

@@ -71,11 +71,7 @@ fun TimeHistogramConfigView(
 
     SpacingLarge()
 
-    Text(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
-        text = stringResource(id = R.string.select_a_feature),
-        style = MaterialTheme.typography.subtitle2
-    )
+    FormLabel(text = stringResource(id = R.string.select_a_feature))
 
     val featureId = viewModel.featureId
     val featureMap = viewModel.featureMap
@@ -90,31 +86,28 @@ fun TimeHistogramConfigView(
 
     SpacingSmall()
 
-    LabeledRow(
-        label = stringResource(id = R.string.time_window_size),
-        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
-    ) {
-        val stringArray = stringArrayResource(id = R.array.time_histogram_windows)
-        val timeWindows = mapOf(
-            TimeHistogramWindow.HOUR to stringArray[0],
-            TimeHistogramWindow.DAY to stringArray[1],
-            TimeHistogramWindow.WEEK to stringArray[2],
-            TimeHistogramWindow.MONTH to stringArray[3],
-            TimeHistogramWindow.THREE_MONTHS to stringArray[4],
-            TimeHistogramWindow.SIX_MONTHS to stringArray[5],
-            TimeHistogramWindow.YEAR to stringArray[6]
-        )
+    FormLabel(text = stringResource(id = R.string.time_window_size))
 
-        TextMapSpinner(
-            strings = timeWindows,
-            selectedItem = viewModel.selectedWindow,
-            onItemSelected = { viewModel.updateWindow(it) }
-        )
-    }
+    val stringArray = stringArrayResource(id = R.array.time_histogram_windows)
+    val timeWindows = mapOf(
+        TimeHistogramWindow.HOUR to stringArray[0],
+        TimeHistogramWindow.DAY to stringArray[1],
+        TimeHistogramWindow.WEEK to stringArray[2],
+        TimeHistogramWindow.MONTH to stringArray[3],
+        TimeHistogramWindow.THREE_MONTHS to stringArray[4],
+        TimeHistogramWindow.SIX_MONTHS to stringArray[5],
+        TimeHistogramWindow.YEAR to stringArray[6]
+    )
+
+    TextMapSpinner(
+        strings = timeWindows,
+        selectedItem = viewModel.selectedWindow,
+        onItemSelected = { viewModel.updateWindow(it) }
+    )
 
     SpacingSmall()
 
-    RowCheckbox(
+    RowSwitch(
         checked = viewModel.sumByCount,
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)

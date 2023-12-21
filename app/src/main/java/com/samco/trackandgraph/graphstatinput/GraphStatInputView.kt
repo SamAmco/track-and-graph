@@ -190,16 +190,19 @@ private fun GraphStatInputViewForm(
         .verticalScroll(state = scrollState)
 ) {
 
+    FormLabel(text = stringResource(id = R.string.graph_or_stat_name))
+
     FullWidthTextField(
         textFieldValue = viewModel.graphName,
-        onValueChange = { viewModel.setGraphStatName(it) },
-        label = stringResource(id = R.string.graph_or_stat_name)
+        onValueChange = { viewModel.setGraphStatName(it) }
     )
 
     SpacingSmall()
 
     val updateMode = viewModel.updateMode.observeAsState(false)
     if (!updateMode.value) {
+        FormLabel(text = stringResource(id = R.string.graph_type_label))
+
         val selectedGraphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
         GraphStatTypeSelector(
             selectedItem = selectedGraphType,
@@ -224,28 +227,20 @@ fun GraphStatTypeSelector(
     selectedItem: GraphStatType,
     setGraphType: (GraphStatType) -> Unit
 ) {
-    LabeledRow(
-        label = stringResource(R.string.graph_type_label),
-        paddingValues = PaddingValues(
-            start = dimensionResource(id = R.dimen.card_padding)
-        )
-    ) {
+    val spinnerItems = mapOf(
+        GraphStatType.LINE_GRAPH to stringResource(id = R.string.graph_type_line_graph),
+        GraphStatType.BAR_CHART to stringResource(id = R.string.graph_type_bar_chart),
+        GraphStatType.PIE_CHART to stringResource(id = R.string.graph_type_pie_chart),
+        GraphStatType.AVERAGE_TIME_BETWEEN to stringResource(id = R.string.graph_type_average_time_between),
+        GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram),
+        GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value),
+    )
 
-        val spinnerItems = mapOf(
-            GraphStatType.LINE_GRAPH to stringResource(id = R.string.graph_type_line_graph),
-            GraphStatType.BAR_CHART to stringResource(id = R.string.graph_type_bar_chart),
-            GraphStatType.PIE_CHART to stringResource(id = R.string.graph_type_pie_chart),
-            GraphStatType.AVERAGE_TIME_BETWEEN to stringResource(id = R.string.graph_type_average_time_between),
-            GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram),
-            GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value),
-        )
-
-        TextMapSpinner(
-            strings = spinnerItems,
-            selectedItem = selectedItem,
-            onItemSelected = { setGraphType(it) },
-        )
-    }
+    TextMapSpinner(
+        strings = spinnerItems,
+        selectedItem = selectedItem,
+        onItemSelected = { setGraphType(it) },
+    )
 }
 
 @Composable

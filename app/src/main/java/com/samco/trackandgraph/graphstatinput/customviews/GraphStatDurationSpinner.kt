@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.graphstatinput.customviews
 
 import android.content.Context
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
@@ -34,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,7 +40,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.LabeledRow
+import com.samco.trackandgraph.ui.compose.ui.FormLabel
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.Spinner
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
@@ -178,61 +176,55 @@ fun GraphStatDurationSpinner(
         )
     }
 
-    LabeledRow(
-        modifier = modifier,
-        label = label,
-        paddingValues = PaddingValues(
-            start = dimensionResource(id = R.dimen.card_padding)
-        )
-    ) {
-        val spinnerItems = mapOf(
-            GraphStatSampleSizeOption.ALL_DATA to stringResource(id = R.string.graph_time_durations_all_data),
-            GraphStatSampleSizeOption.A_DAY to stringResource(id = R.string.graph_time_durations_a_day),
-            GraphStatSampleSizeOption.A_WEEK to stringResource(id = R.string.graph_time_durations_a_week),
-            GraphStatSampleSizeOption.A_MONTH to stringResource(id = R.string.graph_time_durations_a_month),
-            GraphStatSampleSizeOption.THREE_MONTHS to stringResource(id = R.string.graph_time_durations_three_months),
-            GraphStatSampleSizeOption.SIX_MONTHS to stringResource(id = R.string.graph_time_durations_six_months),
-            GraphStatSampleSizeOption.A_YEAR to stringResource(id = R.string.graph_time_durations_a_year),
-            GraphStatSampleSizeOption.CUSTOM to stringResource(id = R.string.custom)
-        )
+    FormLabel(text = label)
 
-        Spinner(
-            items = spinnerItems.keys.toList(),
-            selectedItem = selectedDuration.option,
-            onItemSelected = {
-                if (it == GraphStatSampleSizeOption.CUSTOM) {
-                    showCustomDialog = true
-                } else {
-                    onDurationSelected(GraphStatSampleSize.fromOption(it))
-                }
-            },
-            selectedItemFactory = { modifier, item, _ ->
-                val text = when (item) {
-                    GraphStatSampleSizeOption.CUSTOM -> {
-                        selectedDuration.temporalAmount?.let {
-                            formatTemporalAmountAsSampleSize(context, it)
-                        } ?: spinnerItems[item] ?: ""//should never be empty
-                    }
+    val spinnerItems = mapOf(
+        GraphStatSampleSizeOption.ALL_DATA to stringResource(id = R.string.graph_time_durations_all_data),
+        GraphStatSampleSizeOption.A_DAY to stringResource(id = R.string.graph_time_durations_a_day),
+        GraphStatSampleSizeOption.A_WEEK to stringResource(id = R.string.graph_time_durations_a_week),
+        GraphStatSampleSizeOption.A_MONTH to stringResource(id = R.string.graph_time_durations_a_month),
+        GraphStatSampleSizeOption.THREE_MONTHS to stringResource(id = R.string.graph_time_durations_three_months),
+        GraphStatSampleSizeOption.SIX_MONTHS to stringResource(id = R.string.graph_time_durations_six_months),
+        GraphStatSampleSizeOption.A_YEAR to stringResource(id = R.string.graph_time_durations_a_year),
+        GraphStatSampleSizeOption.CUSTOM to stringResource(id = R.string.custom)
+    )
 
-                    else -> spinnerItems[item] ?: ""//should never be empty
-                }
-
-                Text(
-                    modifier = modifier.weight(1f),
-                    text = text,
-                    fontSize = MaterialTheme.typography.body1.fontSize,
-                    fontWeight = MaterialTheme.typography.body1.fontWeight,
-                )
-            },
-            dropdownItemFactory = { item, _ ->
-                Text(
-                    text = spinnerItems[item] ?: "",
-                    fontSize = MaterialTheme.typography.body1.fontSize,
-                    fontWeight = MaterialTheme.typography.body1.fontWeight
-                )
+    Spinner(
+        items = spinnerItems.keys.toList(),
+        selectedItem = selectedDuration.option,
+        onItemSelected = {
+            if (it == GraphStatSampleSizeOption.CUSTOM) {
+                showCustomDialog = true
+            } else {
+                onDurationSelected(GraphStatSampleSize.fromOption(it))
             }
-        )
-    }
+        },
+        selectedItemFactory = { modifier, item, _ ->
+            val text = when (item) {
+                GraphStatSampleSizeOption.CUSTOM -> {
+                    selectedDuration.temporalAmount?.let {
+                        formatTemporalAmountAsSampleSize(context, it)
+                    } ?: spinnerItems[item] ?: ""//should never be empty
+                }
+
+                else -> spinnerItems[item] ?: ""//should never be empty
+            }
+
+            Text(
+                modifier = modifier.weight(1f),
+                text = text,
+                fontSize = MaterialTheme.typography.body1.fontSize,
+                fontWeight = MaterialTheme.typography.body1.fontWeight,
+            )
+        },
+        dropdownItemFactory = { item, _ ->
+            Text(
+                text = spinnerItems[item] ?: "",
+                fontSize = MaterialTheme.typography.body1.fontSize,
+                fontWeight = MaterialTheme.typography.body1.fontWeight
+            )
+        }
+    )
 }
 
 private data class QuantityAndUnit(
