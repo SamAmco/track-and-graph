@@ -34,17 +34,14 @@ fun AddCreateBar(
 ) = Surface(
     modifier = Modifier.fillMaxWidth()
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-    ) {
+    if (errorText != null)
+    {
         Text(
             text = errorText?.let { stringResource(id = it) } ?: "",
             color = MaterialTheme.colors.error,
             fontSize = MaterialTheme.typography.body2.fontSize,
             fontWeight = MaterialTheme.typography.body2.fontWeight,
             modifier = Modifier
-                .weight(1f)
                 .padding(8.dp)
                 .fillMaxWidth()
         )

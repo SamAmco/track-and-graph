@@ -53,20 +53,19 @@ import com.samco.trackandgraph.ui.compose.ui.*
 fun AddTrackerView(viewModel: AddTrackerViewModel) {
     val focusRequester = FocusRequester()
     val isUpdateMode by viewModel.isUpdateMode.observeAsState(false)
-    val errorText by viewModel.errorText.observeAsState()
+    val errors by viewModel.errors.observeAsState(listOf())
     val openDialog by viewModel.showUpdateWarningAlertDialog.observeAsState(false)
 
     Surface(color = MaterialTheme.colors.background) {
         Column(Modifier.fillMaxSize()) {
+
             AddTrackerInputForm(
                 modifier = Modifier.weight(1f),
                 viewModel = viewModel,
                 focusRequester = focusRequester,
                 isInUpdateMode = isUpdateMode,
-                isInErrorState = (errorText != null)
+                errors = errors
             )
-
-            AddCreateBar(errorText)
 
             if (openDialog) UpdateWarningDialog(
                 onDismissRequest = viewModel::onDismissUpdateWarningCancel,
@@ -94,7 +93,7 @@ private fun AddTrackerInputForm(
     modifier: Modifier,
     viewModel: AddTrackerViewModel,
     focusRequester: FocusRequester,
-    isInErrorState: Boolean,
+    errors: List<AddTrackerViewModel.AddTrackerError>,
     isInUpdateMode: Boolean
 ) = Column(
     modifier = modifier
@@ -117,6 +116,9 @@ private fun AddTrackerInputForm(
         focusRequester,
         keyboardController
     )
+
+    FormError(stringResource(id = R.string.tracker_name_cannot_be_null), errors.contains(AddTrackerViewModel.AddTrackerError.NoName))
+    FormError(stringResource(id = R.string.tracker_with_that_name_exists), errors.contains(AddTrackerViewModel.AddTrackerError.NameAlreadyExists))
 
     SpacingLarge()
 
@@ -144,6 +146,8 @@ private fun AddTrackerInputForm(
     SpacingLarge()
 
     AdvancedOptions(viewModel)
+
+    val isInErrorState = errors.isNotEmpty()
 
     FormSaveButton(
         isInErrorState = isInErrorState,
