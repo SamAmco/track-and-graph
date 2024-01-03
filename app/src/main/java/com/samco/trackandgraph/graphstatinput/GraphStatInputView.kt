@@ -63,11 +63,16 @@ internal fun GraphStatInputView(
                 var demoYOffset by remember { mutableStateOf(0f) }
                 var demoVisible by remember { mutableStateOf(false) }
 
+                val errorMessageId = viewModel.validationException.observeAsState().value?.errorMessageId
+                val isInUpdateMode = viewModel.updateMode.observeAsState().value ?: false
+
                 Box(modifier = Modifier.weight(1f)) {
                     GraphStatInputViewForm(
                         viewModelStoreOwner = viewModelStoreOwner,
                         viewModel = viewModel,
-                        graphStatId = graphStatId
+                        graphStatId = graphStatId,
+                        isInUpdateMode = isInUpdateMode,
+                        isInErrorState = (errorMessageId != null)
                     )
 
                     if (demoVisible) demoViewData?.let { DemoOverlay(demoYOffset, it) }
@@ -82,11 +87,7 @@ internal fun GraphStatInputView(
                         onDragOffset = { demoYOffset -= it })
                 }
 
-                AddCreateBar(
-                    errorText = viewModel.validationException.observeAsState().value?.errorMessageId,
-                    onCreateUpdateClicked = viewModel::createGraphOrStat,
-                    isUpdateMode = viewModel.updateMode.observeAsState().value ?: false
-                )
+                AddCreateBar(errorMessageId)
             }
 
             if (loading.value) LoadingOverlay()
@@ -179,7 +180,9 @@ private fun GraphStatInputViewForm(
     viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
     graphStatId: Long,
-    scrollState: ScrollState = rememberScrollState()
+    scrollState: ScrollState = rememberScrollState(),
+    isInErrorState: Boolean,
+    isInUpdateMode: Boolean
 ) = Column(
     modifier = modifier
         .padding(
@@ -219,6 +222,12 @@ private fun GraphStatInputViewForm(
         viewModel = viewModel,
         graphStatId = graphStatId,
         scrollState = scrollState
+    )
+
+    FormSaveButton(
+        isInErrorState = isInErrorState,
+        isInUpdateMode = isInUpdateMode,
+        onCreateUpdateClicked = viewModel::createGraphOrStat
     )
 }
 

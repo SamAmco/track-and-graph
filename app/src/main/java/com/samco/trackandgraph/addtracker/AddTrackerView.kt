@@ -61,14 +61,12 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
             AddTrackerInputForm(
                 modifier = Modifier.weight(1f),
                 viewModel = viewModel,
-                focusRequester = focusRequester
+                focusRequester = focusRequester,
+                isInUpdateMode = isUpdateMode,
+                isInErrorState = (errorText != null)
             )
 
-            AddCreateBar(
-                errorText = errorText,
-                onCreateUpdateClicked = viewModel::onCreateUpdateClicked,
-                isUpdateMode = isUpdateMode
-            )
+            AddCreateBar(errorText)
 
             if (openDialog) UpdateWarningDialog(
                 onDismissRequest = viewModel::onDismissUpdateWarningCancel,
@@ -95,7 +93,9 @@ private fun UpdateWarningDialog(
 private fun AddTrackerInputForm(
     modifier: Modifier,
     viewModel: AddTrackerViewModel,
-    focusRequester: FocusRequester
+    focusRequester: FocusRequester,
+    isInErrorState: Boolean,
+    isInUpdateMode: Boolean
 ) = Column(
     modifier = modifier
         .padding(dimensionResource(id = R.dimen.card_padding))
@@ -144,6 +144,12 @@ private fun AddTrackerInputForm(
     SpacingLarge()
 
     AdvancedOptions(viewModel)
+
+    FormSaveButton(
+        isInErrorState = isInErrorState,
+        isInUpdateMode = isInUpdateMode,
+        onCreateUpdateClicked = viewModel::onCreateUpdateClicked,
+    )
 }
 
 @Composable
