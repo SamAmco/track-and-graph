@@ -383,7 +383,7 @@ private fun DurationCheckbox(
 @Composable
 private fun DescriptionInput(
     viewModel: AddTrackerViewModel
-) = FullWidthTextField(
+) = FormTextInput(
     textFieldValue = viewModel.trackerDescription,
     onValueChange = viewModel::onTrackerDescriptionChanged,
     singleLine = false
@@ -396,7 +396,7 @@ private fun NameInput(
     focusManager: FocusManager,
     focusRequester: FocusRequester,
     keyboardController: SoftwareKeyboardController?
-) = FullWidthTextField(
+) = FormTextInput(
     textFieldValue = viewModel.trackerName,
     onValueChange = viewModel::onTrackerNameChanged,
     focusManager = focusManager,
