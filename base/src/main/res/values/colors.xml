@@ -63,6 +63,7 @@
     <color name="visColor12">#1B8200</color>
 
     <!-- Forms -->
+    <color name="form_background">#fffbfa</color>
     <color name="form_primary">#f46d43</color>
     <color name="form_input_bg">#ffffff</color>
     <color name="form_input_border">#e8d7d0</color>

@@ -95,65 +95,65 @@ private fun AddTrackerInputForm(
     focusRequester: FocusRequester,
     errors: List<AddTrackerViewModel.AddTrackerError>,
     isInUpdateMode: Boolean
-) = Column(
-    modifier = modifier
-        .padding(dimensionResource(id = R.dimen.card_padding))
-        .fillMaxWidth()
-        .verticalScroll(state = rememberScrollState())
-) {
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
+) = FormSurface {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+    ) {
+        val focusManager = LocalFocusManager.current
+        val keyboardController = LocalSoftwareKeyboardController.current
 
-    val isDuration = viewModel.isDuration.observeAsState(false)
+        val isDuration = viewModel.isDuration.observeAsState(false)
 
-    SpacingSmall()
+        SpacingSmall()
 
-    FormLabel(text = stringResource(id = R.string.tracker_name))
+        FormLabel(text = stringResource(id = R.string.tracker_name))
 
-    NameInput(
-        viewModel,
-        focusManager,
-        focusRequester,
-        keyboardController
-    )
+        NameInput(
+            viewModel,
+            focusManager,
+            focusRequester,
+            keyboardController
+        )
 
-    FormError(stringResource(id = R.string.tracker_name_cannot_be_null), errors.contains(AddTrackerViewModel.AddTrackerError.NoName))
-    FormError(stringResource(id = R.string.tracker_with_that_name_exists), errors.contains(AddTrackerViewModel.AddTrackerError.NameAlreadyExists))
+        FormError(stringResource(id = R.string.tracker_name_cannot_be_null), errors.contains(AddTrackerViewModel.AddTrackerError.NoName))
+        FormError(stringResource(id = R.string.tracker_with_that_name_exists), errors.contains(AddTrackerViewModel.AddTrackerError.NameAlreadyExists))
 
-    SpacingLarge()
-
-    FormLabelOptional(text = stringResource(id = R.string.description))
-
-    DescriptionInput(viewModel)
-
-    SpacingLarge()
-
-    DurationCheckbox(isDuration.value, viewModel)
-
-    val shouldShowConversionSpinner =
-        viewModel.shouldShowDurationConversionModeSpinner.observeAsState(false)
-    val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
-
-    if (shouldShowConversionSpinner.value) {
         SpacingLarge()
-        DurationConversionModeInput(
-            isDuration.value,
-            durationConversionMode.value,
-            viewModel
+
+        FormLabelOptional(text = stringResource(id = R.string.description))
+
+        DescriptionInput(viewModel)
+
+        SpacingLarge()
+
+        DurationCheckbox(isDuration.value, viewModel)
+
+        val shouldShowConversionSpinner =
+            viewModel.shouldShowDurationConversionModeSpinner.observeAsState(false)
+        val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
+
+        if (shouldShowConversionSpinner.value) {
+            SpacingLarge()
+            DurationConversionModeInput(
+                isDuration.value,
+                durationConversionMode.value,
+                viewModel
+            )
+        }
+
+        SpacingLarge()
+
+        AdvancedOptions(viewModel)
+
+        val isInErrorState = errors.isNotEmpty()
+
+        FormSaveButton(
+            isInErrorState = isInErrorState,
+            isInUpdateMode = isInUpdateMode,
+            onCreateUpdateClicked = viewModel::onCreateUpdateClicked,
         )
     }
-
-    SpacingLarge()
-
-    AdvancedOptions(viewModel)
-
-    val isInErrorState = errors.isNotEmpty()
-
-    FormSaveButton(
-        isInErrorState = isInErrorState,
-        isInUpdateMode = isInUpdateMode,
-        onCreateUpdateClicked = viewModel::onCreateUpdateClicked,
-    )
 }
 
 @Composable
