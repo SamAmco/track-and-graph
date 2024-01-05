@@ -37,6 +37,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.R
 
@@ -53,19 +54,24 @@ fun FormTextInput(
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
     keyboardController: SoftwareKeyboardController? = null,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    isNumeric: Boolean = false
 ) {
     val keyboardActions =
         if (focusManager != null) KeyboardActions(onNext = {
             focusManager.moveFocus(FocusDirection.Down)
         }) else KeyboardActions.Default
 
+    val keyboardType = if (isNumeric) KeyboardType.Decimal else KeyboardType.Text
+
     val keyboardOptions =
         if (singleLine) KeyboardOptions(
             imeAction = ImeAction.Next,
-            capitalization = KeyboardCapitalization.Sentences
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = keyboardType
         ) else KeyboardOptions.Default.copy(
-            capitalization = KeyboardCapitalization.Sentences
+            capitalization = KeyboardCapitalization.Sentences,
+            keyboardType = keyboardType
         )
 
     var isFocused by remember { mutableStateOf(false) }

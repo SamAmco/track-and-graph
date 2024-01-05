@@ -277,6 +277,7 @@ private fun RowScope.Divider() {
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
     val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(false)
@@ -293,13 +294,20 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
                 FormLabel(text = stringResource(id = R.string.value))
 
                 if (isDuration.value) DurationInputRow(viewModel)
-                else ValueInputRow(viewModel, focusManager)
-
-                SpacingSmall()
+                else {
+                    FormTextInput(
+                        textFieldValue = viewModel.defaultValue,
+                        onValueChange = viewModel::onDefaultValueChanged,
+                        focusManager = focusManager,
+                        isNumeric = true)
+                }
 
                 FormLabel(text = stringResource(id = R.string.label))
 
-                LabelInputRow(viewModel)
+                FormTextInput(
+                    textFieldValue = viewModel.defaultLabel,
+                    onValueChange = viewModel::onDefaultLabelChanged
+                )
             }
         }
     }
@@ -331,28 +339,6 @@ private fun DurationConversionModeInput(
             onItemSelected = viewModel::onDurationNumericConversionModeChanged
         )
     }
-}
-
-@Composable
-private fun LabelInputRow(viewModel: AddTrackerViewModel) {
-    LabelInputTextField(
-        textFieldValue = viewModel.defaultLabel,
-        onValueChange = viewModel::onDefaultLabelChanged,
-        showLabel = false
-    )
-}
-
-@Composable
-private fun ValueInputRow(
-    viewModel: AddTrackerViewModel,
-    focusManager: FocusManager
-) {
-    ValueInputTextField(
-        textFieldValue = viewModel.defaultValue,
-        onValueChange = viewModel::onDefaultValueChanged,
-        focusManager = focusManager,
-        showLabel = false
-    )
 }
 
 @Composable
