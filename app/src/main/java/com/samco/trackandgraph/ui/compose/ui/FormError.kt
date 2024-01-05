@@ -16,8 +16,11 @@
  */
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.colorResource
+import com.samco.trackandgraph.R
 
 @Composable
 fun FormError(
@@ -25,6 +28,10 @@ fun FormError(
     isEnabled: Boolean
 ) {
     if (isEnabled) {
-        Text(text = text)
+        Text(
+            text = text,
+            fontSize = MaterialTheme.typography.body2.fontSize,
+            fontWeight = MaterialTheme.typography.body2.fontWeight,
+            color = colorResource(id = R.color.form_text_error))
     }
 }

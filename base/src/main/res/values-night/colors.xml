@@ -22,4 +22,7 @@
     <color name="form_input_bg">#000000</color>
     <color name="form_input_border">#2c3a42</color>
     <color name="form_input_text">#858585</color>
+    <color name="form_text">#d6d6d6</color>
+    <color name="form_text_note">#737373</color>
+    <color name="form_text_error">#f93838</color>
 </resources>

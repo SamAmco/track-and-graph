@@ -68,4 +68,7 @@
     <color name="form_input_bg">#ffffff</color>
     <color name="form_input_border">#e8d7d0</color>
     <color name="form_input_text">#6e6e6e</color>
+    <color name="form_text">#383838</color>
+    <color name="form_text_note">#8d8d8d</color>
+    <color name="form_text_error">#db3838</color>
 </resources>

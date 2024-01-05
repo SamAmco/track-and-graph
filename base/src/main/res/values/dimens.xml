@@ -55,4 +55,6 @@
     <dimen name="form_input_corner">15dp</dimen>
     <dimen name="form_input_border">1dp</dimen>
     <dimen name="form_input_border_focus">2dp</dimen>
+    <dimen name="form_label_padding_top">20dp</dimen>
+    <dimen name="form_label_padding_bottom">5dp</dimen>
 </resources>

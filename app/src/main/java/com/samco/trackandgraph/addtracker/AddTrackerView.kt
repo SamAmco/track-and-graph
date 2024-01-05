@@ -105,8 +105,6 @@ private fun AddTrackerInputForm(
 
         val isDuration = viewModel.isDuration.observeAsState(false)
 
-        SpacingSmall()
-
         FormLabel(text = stringResource(id = R.string.tracker_name))
 
         NameInput(
@@ -119,9 +117,10 @@ private fun AddTrackerInputForm(
         FormError(stringResource(id = R.string.tracker_name_cannot_be_null), errors.contains(AddTrackerViewModel.AddTrackerError.NoName))
         FormError(stringResource(id = R.string.tracker_with_that_name_exists), errors.contains(AddTrackerViewModel.AddTrackerError.NameAlreadyExists))
 
-        SpacingLarge()
-
-        FormLabelOptional(text = stringResource(id = R.string.description))
+        FormLabel(
+            text = stringResource(id = R.string.description),
+            isOptional = true
+        )
 
         DescriptionInput(viewModel)
 
