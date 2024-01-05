@@ -202,7 +202,7 @@ fun SuggestionType(viewModel: AddTrackerViewModel) {
         TrackerSuggestionType.NONE to stringResource(R.string.none)
     )
 
-    TextMapSpinner(
+    FormSpinner(
         strings = suggestionTypeMap,
         selectedItem = selectedSuggestionType,
         onItemSelected = { viewModel.onSuggestionTypeChanged(it) }
@@ -229,7 +229,7 @@ fun SuggestionOrder(viewModel: AddTrackerViewModel) {
             TrackerSuggestionOrder.OLDEST to stringResource(R.string.oldest)
         )
 
-        TextMapSpinner(
+        FormSpinner(
             strings = suggestionOrderMap,
             selectedItem = selectedSuggestionOrder,
             onItemSelected = { viewModel.onSuggestionOrderChanged(it) }
@@ -319,7 +319,7 @@ private fun DurationConversionModeInput(
 
         FormLabel(text = name)
 
-        TextMapSpinner(
+        FormSpinner(
             strings = strings,
             selectedItem = durationConversionMode
                 ?: TrackerHelper.DurationNumericConversionMode.HOURS,

@@ -16,12 +16,7 @@
  */
 package com.samco.trackandgraph.ui.compose.ui
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -39,7 +34,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.SoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -74,8 +68,6 @@ fun FormTextInput(
             capitalization = KeyboardCapitalization.Sentences
         )
 
-    val boxShape = RoundedCornerShape(dimensionResource(id = R.dimen.form_input_corner))
-
     var isFocused by remember { mutableStateOf(false) }
 
     BasicTextField(
@@ -86,22 +78,7 @@ fun FormTextInput(
         textStyle = TextStyle(color = colorResource(id = R.color.form_input_text)),
         // This is a function because we tell to BasicTextField how to decorate the field
         decorationBox = { textField ->
-            val borderStroke = if (isFocused) R.dimen.form_input_border_focus else R.dimen.form_input_border
-            val borderColor = if (isFocused) R.color.form_primary else R.color.form_input_border
-
-            Box(modifier = Modifier
-                .background(
-                    colorResource(id = R.color.form_input_bg),
-                    shape = boxShape)
-                .border(
-                    dimensionResource(id = borderStroke),
-                    colorResource(id = borderColor),
-                    shape = boxShape
-                )
-                .padding(dimensionResource(id = R.dimen.form_input_padding))
-            ) {
-                textField()  // Placeholder, requested by decorationBox attribute
-            }
+            FormInputDecoration(isFocused = isFocused) { textField() }
         },
         modifier = modifier
             .fillMaxWidth()
