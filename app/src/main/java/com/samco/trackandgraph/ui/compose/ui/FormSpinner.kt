@@ -43,6 +43,10 @@ fun <T> FormSpinner(
     strings: Map<T, String>,
     selectedItem: T,
     onItemSelected: (T) -> Unit,
+    // Once selected from the list, an item can be displayed differently.
+    selectedItemTransform: (T) -> String? = { currentElement: T ->
+        strings[currentElement]
+    },
     enabled: Boolean = true
 ) {
     var expanded: Boolean by remember { mutableStateOf(false) }
@@ -62,7 +66,7 @@ fun <T> FormSpinner(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 modifier = Modifier.weight(1f),
-                text = strings[selectedItem] ?: "",
+                text = selectedItemTransform(selectedItem) ?: "",
                 fontSize = MaterialTheme.typography.body1.fontSize,
                 fontWeight = MaterialTheme.typography.body1.fontWeight,
             )

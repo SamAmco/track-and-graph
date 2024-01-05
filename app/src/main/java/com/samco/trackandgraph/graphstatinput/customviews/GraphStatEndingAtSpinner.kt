@@ -16,8 +16,6 @@
  */
 package com.samco.trackandgraph.graphstatinput.customviews
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,7 +25,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
-import com.samco.trackandgraph.ui.compose.ui.Spinner
+import com.samco.trackandgraph.ui.compose.ui.FormSpinner
 import com.samco.trackandgraph.ui.compose.ui.showDateDialog
 import org.threeten.bp.OffsetDateTime
 
@@ -74,9 +72,9 @@ fun GraphStatEndingAtSpinner(
     val context = LocalContext.current
     val firstDayOfWeek = LocalSettings.current.firstDayOfWeek
 
-    Spinner(
+    FormSpinner(
         modifier = modifier,
-        items = spinnerItems.keys.toList(),
+        strings = spinnerItems,
         selectedItem = sampleEndingAt.option,
         onItemSelected = { option ->
             when (option) {
@@ -90,28 +88,14 @@ fun GraphStatEndingAtSpinner(
                 )
             }
         },
-        selectedItemFactory = { modifier, item, expanded ->
-            val text = when (item) {
+        selectedItemTransform = { item ->
+            when (item) {
                 SampleEndingAtOption.LATEST -> strings[0]
                 SampleEndingAtOption.CUSTOM -> {
                     val dateTime = (sampleEndingAt as SampleEndingAt.Custom).dateTime
                     dateTime?.let { formatDayMonthYear(context, it) } ?: strings[1]
                 }
             }
-
-            Text(
-                modifier = modifier.weight(1f),
-                text = text,
-                fontSize = MaterialTheme.typography.body1.fontSize,
-                fontWeight = MaterialTheme.typography.body1.fontWeight,
-            )
-        },
-        dropdownItemFactory = { item, _ ->
-            Text(
-                text = spinnerItems[item] ?: "",
-                fontSize = MaterialTheme.typography.body1.fontSize,
-                fontWeight = MaterialTheme.typography.body1.fontWeight
-            )
         }
     )
 }

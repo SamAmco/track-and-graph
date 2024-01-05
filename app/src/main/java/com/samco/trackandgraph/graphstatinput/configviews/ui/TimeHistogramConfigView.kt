@@ -18,15 +18,10 @@ package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,14 +72,12 @@ fun TimeHistogramConfigView(
     val featureMap = viewModel.featureMap
 
     if (featureId != null && featureMap != null) {
-        TextMapSpinner(
+        FormSpinner(
             strings = featureMap,
             selectedItem = featureId,
             onItemSelected = { viewModel.updateFeatureId(it) }
         )
     }
-
-    SpacingSmall()
 
     FormLabel(text = stringResource(id = R.string.time_window_size))
 
@@ -99,7 +92,7 @@ fun TimeHistogramConfigView(
         TimeHistogramWindow.YEAR to stringArray[6]
     )
 
-    TextMapSpinner(
+    FormSpinner(
         strings = timeWindows,
         selectedItem = viewModel.selectedWindow,
         onItemSelected = { viewModel.updateWindow(it) }

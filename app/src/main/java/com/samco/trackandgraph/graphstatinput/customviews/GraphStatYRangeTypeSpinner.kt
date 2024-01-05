@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
-import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.FormSpinner
 
 @Composable
 fun GraphStatYRangeTypeSpinner(
@@ -38,7 +38,7 @@ fun GraphStatYRangeTypeSpinner(
         YRangeType.FIXED to strings[1]
     )
 
-    TextMapSpinner(
+    FormSpinner(
         strings = spinnerItems,
         selectedItem = yRangeType,
         onItemSelected = onYRangeTypeSelected

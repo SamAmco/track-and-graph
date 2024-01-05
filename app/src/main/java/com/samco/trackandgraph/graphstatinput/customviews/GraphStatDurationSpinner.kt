@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,8 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
+import com.samco.trackandgraph.ui.compose.ui.FormSpinner
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
-import com.samco.trackandgraph.ui.compose.ui.Spinner
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import org.threeten.bp.Duration
 import org.threeten.bp.Period
@@ -189,8 +188,8 @@ fun GraphStatDurationSpinner(
         GraphStatSampleSizeOption.CUSTOM to stringResource(id = R.string.custom)
     )
 
-    Spinner(
-        items = spinnerItems.keys.toList(),
+    FormSpinner(
+        strings = spinnerItems,
         selectedItem = selectedDuration.option,
         onItemSelected = {
             if (it == GraphStatSampleSizeOption.CUSTOM) {
@@ -199,30 +198,16 @@ fun GraphStatDurationSpinner(
                 onDurationSelected(GraphStatSampleSize.fromOption(it))
             }
         },
-        selectedItemFactory = { modifier, item, _ ->
-            val text = when (item) {
+        selectedItemTransform = { item ->
+            when (item) {
                 GraphStatSampleSizeOption.CUSTOM -> {
                     selectedDuration.temporalAmount?.let {
                         formatTemporalAmountAsSampleSize(context, it)
-                    } ?: spinnerItems[item] ?: ""//should never be empty
+                    } ?: spinnerItems[item]
                 }
 
-                else -> spinnerItems[item] ?: ""//should never be empty
+                else -> spinnerItems[item]
             }
-
-            Text(
-                modifier = modifier.weight(1f),
-                text = text,
-                fontSize = MaterialTheme.typography.body1.fontSize,
-                fontWeight = MaterialTheme.typography.body1.fontWeight,
-            )
-        },
-        dropdownItemFactory = { item, _ ->
-            Text(
-                text = spinnerItems[item] ?: "",
-                fontSize = MaterialTheme.typography.body1.fontSize,
-                fontWeight = MaterialTheme.typography.body1.fontWeight
-            )
         }
     )
 }

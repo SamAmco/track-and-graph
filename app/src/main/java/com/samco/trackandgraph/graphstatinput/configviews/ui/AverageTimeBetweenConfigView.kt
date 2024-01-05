@@ -36,6 +36,7 @@ import com.samco.trackandgraph.graphstatinput.customviews.FilterByValueSection
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
+import com.samco.trackandgraph.ui.compose.ui.FormSpinner
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
@@ -78,7 +79,7 @@ fun AverageTimeBetweenConfigView(
     val featureMap = viewModel.featureMap
 
     if (featureId != null && featureMap != null) {
-        TextMapSpinner(
+        FormSpinner(
             strings = featureMap,
             selectedItem = featureId,
             onItemSelected = { viewModel.updateFeatureId(it) }

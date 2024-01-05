@@ -37,6 +37,7 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
+import com.samco.trackandgraph.ui.compose.ui.FormSpinner
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.RowSwitch
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
@@ -89,7 +90,7 @@ fun BarChartConfigView(
     val featureMap = viewModel.featureMap
 
     if (featureId != null && featureMap != null) {
-        TextMapSpinner(
+        FormSpinner(
             strings = featureMap,
             selectedItem = featureId,
             onItemSelected = { viewModel.updateFeatureId(it) }
@@ -111,7 +112,7 @@ fun BarChartConfigView(
 
     FormLabel(text = stringResource(id = R.string.bar_interval))
 
-    TextMapSpinner(
+    FormSpinner(
         strings = barIntervalNames,
         selectedItem = viewModel.selectedBarPeriod,
         onItemSelected = viewModel::updateBarPeriod

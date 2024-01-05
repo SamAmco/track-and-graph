@@ -35,12 +35,10 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.graphstatinput.configviews.ui.*
-import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -183,52 +181,45 @@ private fun GraphStatInputViewForm(
     scrollState: ScrollState = rememberScrollState(),
     isInErrorState: Boolean,
     isInUpdateMode: Boolean
-) = Column(
-    modifier = modifier
-        .padding(
-            top = dimensionResource(id = R.dimen.card_padding),
-            start = dimensionResource(id = R.dimen.card_padding),
-            end = dimensionResource(id = R.dimen.card_padding)
+) = FormSurface (scrollState = scrollState) {
+    Column {
+        FormLabel(text = stringResource(id = R.string.graph_or_stat_name))
+
+        FormTextInput(
+            textFieldValue = viewModel.graphName,
+            onValueChange = { viewModel.setGraphStatName(it) }
         )
-        .verticalScroll(state = scrollState)
-) {
 
-    FormLabel(text = stringResource(id = R.string.graph_or_stat_name))
+        SpacingSmall()
 
-    FullWidthTextField(
-        textFieldValue = viewModel.graphName,
-        onValueChange = { viewModel.setGraphStatName(it) }
-    )
+        val updateMode = viewModel.updateMode.observeAsState(false)
+        if (!updateMode.value) {
+            FormLabel(text = stringResource(id = R.string.graph_type_label))
 
-    SpacingSmall()
+            val selectedGraphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
+            GraphStatTypeSelector(
+                selectedItem = selectedGraphType,
+                setGraphType = { viewModel.setGraphType(it) }
+            )
+        }
 
-    val updateMode = viewModel.updateMode.observeAsState(false)
-    if (!updateMode.value) {
-        FormLabel(text = stringResource(id = R.string.graph_type_label))
+        SpacingSmall()
+        Divider()
+        SpacingSmall()
 
-        val selectedGraphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
-        GraphStatTypeSelector(
-            selectedItem = selectedGraphType,
-            setGraphType = { viewModel.setGraphType(it) }
+        ConfigInputView(
+            viewModelStoreOwner = viewModelStoreOwner,
+            viewModel = viewModel,
+            graphStatId = graphStatId,
+            scrollState = scrollState
+        )
+
+        FormSaveButton(
+            isInErrorState = isInErrorState,
+            isInUpdateMode = isInUpdateMode,
+            onCreateUpdateClicked = viewModel::createGraphOrStat
         )
     }
-
-    SpacingSmall()
-    Divider()
-    SpacingSmall()
-
-    ConfigInputView(
-        viewModelStoreOwner = viewModelStoreOwner,
-        viewModel = viewModel,
-        graphStatId = graphStatId,
-        scrollState = scrollState
-    )
-
-    FormSaveButton(
-        isInErrorState = isInErrorState,
-        isInUpdateMode = isInUpdateMode,
-        onCreateUpdateClicked = viewModel::createGraphOrStat
-    )
 }
 
 @Composable
@@ -245,7 +236,7 @@ fun GraphStatTypeSelector(
         GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value),
     )
 
-    TextMapSpinner(
+    FormSpinner(
         strings = spinnerItems,
         selectedItem = selectedItem,
         onItemSelected = { setGraphType(it) },

@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
@@ -29,12 +30,15 @@ import androidx.compose.ui.res.dimensionResource
 import com.samco.trackandgraph.R
 
 @Composable
-fun FormSurface(content: @Composable () -> Unit) {
+fun FormSurface(
+    scrollState: ScrollState = rememberScrollState(),
+    content: @Composable () -> Unit
+) {
     Surface(
         color = colorResource(id = R.color.form_background),
         modifier = Modifier
             .fillMaxHeight()
-            .verticalScroll(state = rememberScrollState())
+            .verticalScroll(state = scrollState)
     ) {
         Box(
             modifier = Modifier
