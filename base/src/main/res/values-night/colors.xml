@@ -19,6 +19,7 @@
     <!-- Forms -->
     <color name="form_background">#03121b</color>
     <color name="form_primary">#2789f4</color>
+    <color name="form_section_bg">#1e2f40</color>
     <color name="form_input_bg">#000000</color>
     <color name="form_input_border">#2c3a42</color>
     <color name="form_input_text">#858585</color>

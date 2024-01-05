@@ -172,18 +172,22 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
 
             SpacingLarge()
 
-            Text(
-                text = stringResource(id = R.string.suggestions),
-                style = MaterialTheme.typography.subtitle2
-            )
+            FormSection {
+                Column {
+                    Text(
+                        text = stringResource(id = R.string.suggestions),
+                        style = MaterialTheme.typography.subtitle2
+                    )
 
-            FormLabel(text = stringResource(id = R.string.suggestions_type))
+                    FormLabel(text = stringResource(id = R.string.suggestions_type))
 
-            SuggestionType(viewModel)
+                    SuggestionType(viewModel)
 
-            FormLabel(text = stringResource(id = R.string.suggestions_order))
+                    FormLabel(text = stringResource(id = R.string.suggestions_order))
 
-            SuggestionOrder(viewModel)
+                    SuggestionOrder(viewModel)
+                }
+            }
         }
     }
 }
@@ -277,24 +281,26 @@ private fun RowScope.Divider() {
 private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
     val hasDefaultValue = viewModel.hasDefaultValue.observeAsState(false)
     val isDuration = viewModel.isDuration.observeAsState(false)
-
     val focusManager = LocalFocusManager.current
-    DefaultValueCheckbox(hasDefaultValue.value, viewModel)
 
-    if (hasDefaultValue.value) {
+    FormSection {
         Column(
             modifier = Modifier.fillMaxWidth()
         ) {
-            FormLabel(text = stringResource(id = R.string.value))
+            DefaultValueCheckbox(hasDefaultValue.value, viewModel)
 
-            if (isDuration.value) DurationInputRow(viewModel)
-            else ValueInputRow(viewModel, focusManager)
+            if (hasDefaultValue.value) {
+                FormLabel(text = stringResource(id = R.string.value))
 
-            SpacingSmall()
+                if (isDuration.value) DurationInputRow(viewModel)
+                else ValueInputRow(viewModel, focusManager)
 
-            FormLabel(text = stringResource(id = R.string.label))
+                SpacingSmall()
 
-            LabelInputRow(viewModel)
+                FormLabel(text = stringResource(id = R.string.label))
+
+                LabelInputRow(viewModel)
+            }
         }
     }
 }

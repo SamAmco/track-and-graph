@@ -65,6 +65,7 @@
     <!-- Forms -->
     <color name="form_background">#fffbfa</color>
     <color name="form_primary">#f46d43</color>
+    <color name="form_section_bg">#ffe8e1</color>
     <color name="form_input_bg">#ffffff</color>
     <color name="form_input_border">#e8d7d0</color>
     <color name="form_input_text">#6e6e6e</color>

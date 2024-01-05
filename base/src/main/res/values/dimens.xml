@@ -51,6 +51,8 @@
 
     <!-- Forms -->
     <dimen name="form_padding">30dp</dimen>
+    <dimen name="form_section_padding">20dp</dimen>
+    <dimen name="form_section_corner">20dp</dimen>
     <dimen name="form_input_padding">15dp</dimen>
     <dimen name="form_input_corner">15dp</dimen>
     <dimen name="form_input_border">1dp</dimen>
