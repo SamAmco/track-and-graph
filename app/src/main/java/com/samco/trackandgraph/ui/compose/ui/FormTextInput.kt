@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 
 /**
@@ -54,6 +55,7 @@ fun FormTextInput(
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
     keyboardController: SoftwareKeyboardController? = null,
+    textAlign: TextAlign = TextAlign.Start,
     singleLine: Boolean = true,
     isNumeric: Boolean = false
 ) {
@@ -81,7 +83,10 @@ fun FormTextInput(
         onValueChange,
         keyboardActions = keyboardActions,
         keyboardOptions = keyboardOptions,
-        textStyle = TextStyle(color = colorResource(id = R.color.form_input_text)),
+        textStyle = TextStyle(
+            color = colorResource(id = R.color.form_input_text),
+            textAlign = textAlign,
+        ),
         // This is a function because we tell to BasicTextField how to decorate the field
         decorationBox = { textField ->
             FormInputDecoration(isFocused = isFocused) { textField() }

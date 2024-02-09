@@ -293,7 +293,16 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
             if (hasDefaultValue.value) {
                 FormLabel(text = stringResource(id = R.string.value))
 
-                if (isDuration.value) DurationInputRow(viewModel)
+                if (isDuration.value) {
+                    FormDurationInput(
+                        hoursFieldValue = viewModel.hours,
+                        minutesFieldValue = viewModel.minutes,
+                        secondsFieldValue = viewModel.seconds,
+                        onHoursValueChange = viewModel::setHoursText,
+                        onMinutesValueChange = viewModel::setMinutesText,
+                        onSecondsValueChange = viewModel::setSecondsText
+                    )
+                }
                 else {
                     FormTextInput(
                         textFieldValue = viewModel.defaultValue,
@@ -339,11 +348,6 @@ private fun DurationConversionModeInput(
             onItemSelected = viewModel::onDurationNumericConversionModeChanged
         )
     }
-}
-
-@Composable
-private fun DurationInputRow(viewModel: AddTrackerViewModel) {
-    DurationInput(viewModel = viewModel)
 }
 
 @Composable
