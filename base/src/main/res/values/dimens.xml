@@ -59,4 +59,6 @@
     <dimen name="form_input_border_focus">2dp</dimen>
     <dimen name="form_label_padding_top">18dp</dimen>
     <dimen name="form_label_padding_bottom">5dp</dimen>
+    <dimen name="form_button_margin_top">20dp</dimen>
+    <dimen name="form_button_padding">2dp</dimen>
 </resources>
