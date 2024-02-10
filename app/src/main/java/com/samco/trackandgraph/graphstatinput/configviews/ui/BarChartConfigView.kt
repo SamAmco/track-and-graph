@@ -39,9 +39,8 @@ import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
 import com.samco.trackandgraph.ui.compose.ui.FormSpinner
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
-import com.samco.trackandgraph.ui.compose.ui.RowSwitch
+import com.samco.trackandgraph.ui.compose.ui.FormSwitchInput
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
-import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
 fun BarChartConfigView(
@@ -120,7 +119,7 @@ fun BarChartConfigView(
 
     SpacingSmall()
 
-    RowSwitch(
+    FormSwitchInput(
         checked = viewModel.sumByCount,
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)

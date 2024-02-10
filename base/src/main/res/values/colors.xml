@@ -73,4 +73,6 @@
     <color name="form_text">#383838</color>
     <color name="form_text_note">#8d8d8d</color>
     <color name="form_text_error">#db3838</color>
+    <color name="form_disabled_bg">#ded1cb</color>
+    <color name="form_disabled_border">#8d8d8d</color>
 </resources>

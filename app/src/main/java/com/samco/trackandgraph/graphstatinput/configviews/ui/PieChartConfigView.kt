@@ -32,7 +32,7 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
 import com.samco.trackandgraph.ui.compose.ui.FormSpinner
-import com.samco.trackandgraph.ui.compose.ui.RowSwitch
+import com.samco.trackandgraph.ui.compose.ui.FormSwitchInput
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 
@@ -84,7 +84,7 @@ fun PieChartConfigView(
 
     SpacingSmall()
 
-    RowSwitch(
+    FormSwitchInput(
         checked = viewModel.sumByCount,
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)

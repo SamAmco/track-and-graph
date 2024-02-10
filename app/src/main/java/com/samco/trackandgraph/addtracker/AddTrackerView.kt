@@ -21,8 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -39,7 +38,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -291,6 +289,8 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
             DefaultValueCheckbox(hasDefaultValue.value, viewModel)
 
             if (hasDefaultValue.value) {
+                Divider()
+
                 FormLabel(text = stringResource(id = R.string.value))
 
                 if (isDuration.value) {
@@ -355,7 +355,7 @@ private fun DefaultValueCheckbox(
     hasDefaultValue: Boolean,
     viewModel: AddTrackerViewModel
 ) {
-    RowSwitch(
+    FormSwitchInput(
         checked = hasDefaultValue,
         onCheckedChange = { viewModel.onHasDefaultValueChanged(it) },
         text = stringResource(id = R.string.use_default_value)
@@ -367,7 +367,7 @@ private fun DurationCheckbox(
     isDuration: Boolean,
     viewModel: AddTrackerViewModel
 ) {
-    RowSwitch(
+    FormSwitchInput(
         checked = isDuration,
         onCheckedChange = { viewModel.onIsDurationCheckChanged(it) },
         text = stringResource(id = R.string.tracker_type)

@@ -100,7 +100,7 @@ fun TimeHistogramConfigView(
 
     SpacingSmall()
 
-    RowSwitch(
+    FormSwitchInput(
         checked = viewModel.sumByCount,
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
