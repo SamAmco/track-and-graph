@@ -17,14 +17,10 @@
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
@@ -35,11 +31,10 @@ import com.samco.trackandgraph.graphstatinput.customviews.FilterByLabelSection
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByValueSection
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.ui.compose.ui.FormFieldSeparator
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
+import com.samco.trackandgraph.ui.compose.ui.FormSection
 import com.samco.trackandgraph.ui.compose.ui.FormSpinner
-import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
-import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
 fun AverageTimeBetweenConfigView(
@@ -56,22 +51,24 @@ fun AverageTimeBetweenConfigView(
         viewModel.getConfigFlow().collect { onConfigEvent(it) }
     }
 
-    GraphStatDurationSpinner(
-        modifier = Modifier,
-        selectedDuration = viewModel.selectedDuration,
-        onDurationSelected = { viewModel.updateDuration(it) }
-    )
+    FormSection {
+        Column {
+            GraphStatDurationSpinner(
+                modifier = Modifier,
+                selectedDuration = viewModel.selectedDuration,
+                onDurationSelected = { viewModel.updateDuration(it) }
+            )
 
-    GraphStatEndingAtSpinner(
-        modifier = Modifier,
-        sampleEndingAt = viewModel.sampleEndingAt
-    ) { viewModel.updateSampleEndingAt(it) }
+            FormFieldSeparator()
 
-    SpacingSmall()
+            GraphStatEndingAtSpinner(
+                modifier = Modifier,
+                sampleEndingAt = viewModel.sampleEndingAt
+            ) { viewModel.updateSampleEndingAt(it) }
+        }
+    }
 
-    Divider()
-
-    SpacingLarge()
+    FormFieldSeparator()
 
     FormLabel(text = stringResource(id = R.string.select_a_feature))
 
@@ -86,13 +83,11 @@ fun AverageTimeBetweenConfigView(
         )
     }
 
-    SpacingLarge()
+    FormFieldSeparator()
 
     FilterByLabelSection(viewModel)
 
-    SpacingLarge()
+    FormFieldSeparator()
 
     FilterByValueSection(viewModel)
-
-    SpacingSmall()
 }

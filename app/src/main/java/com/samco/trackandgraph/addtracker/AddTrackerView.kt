@@ -104,25 +104,24 @@ private fun AddTrackerInputForm(
         val isDuration = viewModel.isDuration.observeAsState(false)
 
         FormLabel(text = stringResource(id = R.string.tracker_name))
-
         NameInput(
             viewModel,
             focusManager,
             focusRequester,
             keyboardController
         )
-
         FormError(stringResource(id = R.string.tracker_name_cannot_be_null), errors.contains(AddTrackerViewModel.AddTrackerError.NoName))
         FormError(stringResource(id = R.string.tracker_with_that_name_exists), errors.contains(AddTrackerViewModel.AddTrackerError.NameAlreadyExists))
+
+        FormFieldSeparator()
 
         FormLabel(
             text = stringResource(id = R.string.description),
             isOptional = true
         )
-
         DescriptionInput(viewModel)
 
-        SpacingLarge()
+        FormFieldSeparator()
 
         DurationCheckbox(isDuration.value, viewModel)
 
@@ -131,7 +130,8 @@ private fun AddTrackerInputForm(
         val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
 
         if (shouldShowConversionSpinner.value) {
-            SpacingLarge()
+            FormFieldSeparator()
+
             DurationConversionModeInput(
                 isDuration.value,
                 durationConversionMode.value,
@@ -139,11 +139,13 @@ private fun AddTrackerInputForm(
             )
         }
 
-        SpacingLarge()
+        FormFieldSeparator()
 
         AdvancedOptions(viewModel)
 
         val isInErrorState = errors.isNotEmpty()
+
+        FormFieldSeparator()
 
         FormSaveButton(
             isInErrorState = isInErrorState,
@@ -164,11 +166,11 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
 
     AnimatedVisibility(visible = advancedOptionsExpanded) {
         Column {
-            SpacingSmall()
+            FormFieldSeparator()
 
             DefaultValueOptions(viewModel)
 
-            SpacingLarge()
+            FormFieldSeparator()
 
             FormSection {
                 Column {
@@ -177,12 +179,14 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
                         style = MaterialTheme.typography.subtitle2
                     )
 
-                    FormLabel(text = stringResource(id = R.string.suggestions_type))
+                    FormFieldSeparator()
 
+                    FormLabel(text = stringResource(id = R.string.suggestions_type))
                     SuggestionType(viewModel)
 
-                    FormLabel(text = stringResource(id = R.string.suggestions_order))
+                    FormFieldSeparator()
 
+                    FormLabel(text = stringResource(id = R.string.suggestions_order))
                     SuggestionOrder(viewModel)
                 }
             }
@@ -311,8 +315,9 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
                         isNumeric = true)
                 }
 
-                FormLabel(text = stringResource(id = R.string.label))
+                FormFieldSeparator()
 
+                FormLabel(text = stringResource(id = R.string.label))
                 FormTextInput(
                     textFieldValue = viewModel.defaultLabel,
                     onValueChange = viewModel::onDefaultLabelChanged
@@ -340,7 +345,6 @@ private fun DurationConversionModeInput(
             else stringResource(id = R.string.duration_to_numeric_mode_header)
 
         FormLabel(text = name)
-
         FormSpinner(
             strings = strings,
             selectedItem = durationConversionMode

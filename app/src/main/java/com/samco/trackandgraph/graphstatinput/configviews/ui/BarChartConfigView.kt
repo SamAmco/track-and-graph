@@ -17,7 +17,7 @@
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.material.Divider
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -36,11 +36,12 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
+import com.samco.trackandgraph.ui.compose.ui.FormFieldSeparator
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
+import com.samco.trackandgraph.ui.compose.ui.FormSection
 import com.samco.trackandgraph.ui.compose.ui.FormSpinner
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.FormSwitchInput
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 
 @Composable
 fun BarChartConfigView(
@@ -57,31 +58,37 @@ fun BarChartConfigView(
         viewModel.getConfigFlow().collect { onConfigEvent(it) }
     }
 
-    GraphStatDurationSpinner(
-        modifier = Modifier,
-        selectedDuration = viewModel.selectedDuration,
-        onDurationSelected = { viewModel.updateDuration(it) }
-    )
+    FormSection {
+        Column {
+            GraphStatDurationSpinner(
+                modifier = Modifier,
+                selectedDuration = viewModel.selectedDuration,
+                onDurationSelected = { viewModel.updateDuration(it) }
+            )
 
-    GraphStatEndingAtSpinner(
-        modifier = Modifier,
-        sampleEndingAt = viewModel.sampleEndingAt
-    ) { viewModel.updateSampleEndingAt(it) }
+            FormFieldSeparator()
 
-    GraphStatYRangeTypeSpinner(
-        yRangeType = viewModel.yRangeType,
-        onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
-    )
+            GraphStatEndingAtSpinner(
+                modifier = Modifier,
+                sampleEndingAt = viewModel.sampleEndingAt
+            ) { viewModel.updateSampleEndingAt(it) }
 
-    if (viewModel.yRangeType == YRangeType.FIXED) {
-        YRangeFromToInputs(viewModel = viewModel, fromEnabled = false)
+            FormFieldSeparator()
+
+            GraphStatYRangeTypeSpinner(
+                yRangeType = viewModel.yRangeType,
+                onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
+            )
+
+            if (viewModel.yRangeType == YRangeType.FIXED) {
+                FormFieldSeparator()
+
+                YRangeFromToInputs(viewModel = viewModel, fromEnabled = false)
+            }
+        }
     }
 
-    SpacingSmall()
-
-    Divider()
-
-    SpacingSmall()
+    FormFieldSeparator()
 
     FormLabel(text = stringResource(id = R.string.select_a_feature))
 
@@ -95,6 +102,8 @@ fun BarChartConfigView(
             onItemSelected = { viewModel.updateFeatureId(it) }
         )
     }
+
+    FormFieldSeparator()
 
     val strings = stringArrayResource(id = R.array.time_histogram_windows)
     val barIntervalNames = remember {
@@ -110,14 +119,13 @@ fun BarChartConfigView(
     }
 
     FormLabel(text = stringResource(id = R.string.bar_interval))
-
     FormSpinner(
         strings = barIntervalNames,
         selectedItem = viewModel.selectedBarPeriod,
         onItemSelected = viewModel::updateBarPeriod
     )
 
-    SpacingSmall()
+    FormFieldSeparator()
 
     FormSwitchInput(
         checked = viewModel.sumByCount,
@@ -125,15 +133,12 @@ fun BarChartConfigView(
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
     )
 
-    SpacingSmall()
+    FormFieldSeparator()
 
     FormLabel(text = stringResource(id = R.string.scale))
-
     MiniNumericTextField(
         textAlign = TextAlign.Center,
         textFieldValue = viewModel.scale,
         onValueChange = { viewModel.updateScale(it) }
     )
-
-    SpacingSmall()
 }

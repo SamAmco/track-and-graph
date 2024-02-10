@@ -52,38 +52,40 @@ fun LineGraphConfigView(
     val viewModel = hiltViewModel<LineGraphConfigViewModel>(viewModelStoreOwner).apply {
         initFromGraphStatId(graphStatId)
     }
-
     LaunchedEffect(viewModel) {
         viewModel.getConfigFlow().collect { onConfigEvent(it) }
     }
 
-    GraphStatDurationSpinner(
-        modifier = Modifier,
-        selectedDuration = viewModel.selectedDuration,
-        onDurationSelected = { viewModel.updateDuration(it) }
-    )
+    FormSection {
+        Column {
 
-    GraphStatEndingAtSpinner(
-        modifier = Modifier,
-        sampleEndingAt = viewModel.sampleEndingAt
-    ) { viewModel.updateSampleEndingAt(it) }
+            GraphStatDurationSpinner(
+                modifier = Modifier,
+                selectedDuration = viewModel.selectedDuration,
+                onDurationSelected = { viewModel.updateDuration(it) }
+            )
 
-    GraphStatYRangeTypeSpinner(
-        yRangeType = viewModel.yRangeType,
-        onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
-    )
+            FormFieldSeparator()
 
-    if (viewModel.yRangeType == YRangeType.FIXED) YRangeFromToInputs(viewModel)
+            GraphStatEndingAtSpinner(
+                modifier = Modifier,
+                sampleEndingAt = viewModel.sampleEndingAt
+            ) { viewModel.updateSampleEndingAt(it) }
 
-    SpacingSmall()
+            FormFieldSeparator()
 
-    Divider()
+            GraphStatYRangeTypeSpinner(
+                yRangeType = viewModel.yRangeType,
+                onYRangeTypeSelected = { viewModel.updateYRangeType(it) }
+            )
 
-    SpacingSmall()
+            if (viewModel.yRangeType == YRangeType.FIXED) YRangeFromToInputs(viewModel)
+        }
+    }
+
+    FormFieldSeparator()
 
     LineGraphFeaturesInputView(scrollState, viewModel)
-
-    SpacingSmall()
 }
 
 @Composable

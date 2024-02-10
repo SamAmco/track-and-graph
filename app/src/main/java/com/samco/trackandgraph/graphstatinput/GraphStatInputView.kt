@@ -184,16 +184,15 @@ private fun GraphStatInputViewForm(
 ) = FormSurface (scrollState = scrollState) {
     Column {
         FormLabel(text = stringResource(id = R.string.graph_or_stat_name))
-
         FormTextInput(
             textFieldValue = viewModel.graphName,
             onValueChange = { viewModel.setGraphStatName(it) }
         )
 
-        SpacingSmall()
-
         val updateMode = viewModel.updateMode.observeAsState(false)
         if (!updateMode.value) {
+            FormFieldSeparator()
+
             FormLabel(text = stringResource(id = R.string.graph_type_label))
 
             val selectedGraphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
@@ -203,9 +202,7 @@ private fun GraphStatInputViewForm(
             )
         }
 
-        SpacingSmall()
-        Divider()
-        SpacingSmall()
+        FormFieldSeparator()
 
         ConfigInputView(
             viewModelStoreOwner = viewModelStoreOwner,
@@ -213,6 +210,8 @@ private fun GraphStatInputViewForm(
             graphStatId = graphStatId,
             scrollState = scrollState
         )
+
+        FormFieldSeparator()
 
         FormSaveButton(
             isInErrorState = isInErrorState,
@@ -294,6 +293,5 @@ fun ConfigInputView(
             graphStatId = graphStatId,
             onConfigEvent = { viewModel.onConfigEvent(it) },
         )
-
     }
 }

@@ -49,22 +49,24 @@ fun TimeHistogramConfigView(
         viewModel.getConfigFlow().collect { onConfigEvent(it) }
     }
 
-    GraphStatDurationSpinner(
-        modifier = Modifier,
-        selectedDuration = viewModel.selectedDuration,
-        onDurationSelected = { viewModel.updateDuration(it) }
-    )
+    FormSection {
+        Column {
+            GraphStatDurationSpinner(
+                modifier = Modifier,
+                selectedDuration = viewModel.selectedDuration,
+                onDurationSelected = { viewModel.updateDuration(it) }
+            )
 
-    GraphStatEndingAtSpinner(
-        modifier = Modifier,
-        sampleEndingAt = viewModel.sampleEndingAt
-    ) { viewModel.updateSampleEndingAt(it) }
+            FormFieldSeparator()
 
-    SpacingSmall()
+            GraphStatEndingAtSpinner(
+                modifier = Modifier,
+                sampleEndingAt = viewModel.sampleEndingAt
+            ) { viewModel.updateSampleEndingAt(it) }
+        }
+    }
 
-    Divider()
-
-    SpacingLarge()
+    FormFieldSeparator()
 
     FormLabel(text = stringResource(id = R.string.select_a_feature))
 
@@ -78,6 +80,8 @@ fun TimeHistogramConfigView(
             onItemSelected = { viewModel.updateFeatureId(it) }
         )
     }
+
+    FormFieldSeparator()
 
     FormLabel(text = stringResource(id = R.string.time_window_size))
 
@@ -98,13 +102,11 @@ fun TimeHistogramConfigView(
         onItemSelected = { viewModel.updateWindow(it) }
     )
 
-    SpacingSmall()
+    FormFieldSeparator()
 
     FormSwitchInput(
         checked = viewModel.sumByCount,
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
     )
-
-    SpacingSmall()
 }

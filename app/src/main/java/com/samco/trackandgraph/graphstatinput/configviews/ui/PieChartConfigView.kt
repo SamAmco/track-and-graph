@@ -30,7 +30,9 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.PieChartConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.ui.compose.ui.FormFieldSeparator
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
+import com.samco.trackandgraph.ui.compose.ui.FormSection
 import com.samco.trackandgraph.ui.compose.ui.FormSpinner
 import com.samco.trackandgraph.ui.compose.ui.FormSwitchInput
 import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
@@ -51,23 +53,24 @@ fun PieChartConfigView(
         viewModel.getConfigFlow().collect { onConfigEvent(it) }
     }
 
+    FormSection {
+        Column {
+            GraphStatDurationSpinner(
+                modifier = Modifier,
+                selectedDuration = viewModel.selectedDuration,
+                onDurationSelected = { viewModel.updateDuration(it) }
+            )
 
-    GraphStatDurationSpinner(
-        modifier = Modifier,
-        selectedDuration = viewModel.selectedDuration,
-        onDurationSelected = { viewModel.updateDuration(it) }
-    )
+            FormFieldSeparator()
 
-    GraphStatEndingAtSpinner(
-        modifier = Modifier,
-        sampleEndingAt = viewModel.sampleEndingAt
-    ) { viewModel.updateSampleEndingAt(it) }
+            GraphStatEndingAtSpinner(
+                modifier = Modifier,
+                sampleEndingAt = viewModel.sampleEndingAt
+            ) { viewModel.updateSampleEndingAt(it) }
+        }
+    }
 
-    SpacingSmall()
-
-    Divider()
-
-    SpacingLarge()
+    FormFieldSeparator()
 
     FormLabel(text = stringResource(id = R.string.select_a_discrete_feature))
 
@@ -82,13 +85,11 @@ fun PieChartConfigView(
         )
     }
 
-    SpacingSmall()
+    FormFieldSeparator()
 
     FormSwitchInput(
         checked = viewModel.sumByCount,
         onCheckedChange = { viewModel.updateSumByCount(it) },
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
     )
-
-    SpacingSmall()
 }

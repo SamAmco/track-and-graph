@@ -17,7 +17,7 @@
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.material.Divider
+import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -30,10 +30,10 @@ import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LastValueCon
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByLabelSection
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByValueSection
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
+import com.samco.trackandgraph.ui.compose.ui.FormFieldSeparator
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
+import com.samco.trackandgraph.ui.compose.ui.FormSection
 import com.samco.trackandgraph.ui.compose.ui.FormSpinner
-import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
 
 @Composable
 fun LastValueConfigView(
@@ -50,16 +50,17 @@ fun LastValueConfigView(
         viewModel.getConfigFlow().collect { onConfigEvent(it) }
     }
 
-    GraphStatEndingAtSpinner(
-        modifier = Modifier,
-        sampleEndingAt = viewModel.sampleEndingAt
-    ) { viewModel.updateSampleEndingAt(it) }
+    FormSection {
+        Column {
+            GraphStatEndingAtSpinner(
+                modifier = Modifier,
+                sampleEndingAt = viewModel.sampleEndingAt
+            ) { viewModel.updateSampleEndingAt(it) }
 
-    SpacingSmall()
+        }
+    }
 
-    Divider()
-
-    SpacingLarge()
+    FormFieldSeparator()
 
     FormLabel(text = stringResource(id = R.string.select_a_feature))
 
@@ -74,13 +75,11 @@ fun LastValueConfigView(
         )
     }
 
-    SpacingLarge()
+    FormFieldSeparator()
 
     FilterByLabelSection(viewModel)
 
-    SpacingLarge()
+    FormFieldSeparator()
 
     FilterByValueSection(viewModel)
-
-    SpacingSmall()
 }
