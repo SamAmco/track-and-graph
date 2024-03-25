@@ -181,6 +181,8 @@
     <string name="backup_error_failed_to_copy_database">Beim Kopieren der Datenbankdatei ging etwas schief.</string>
     <string name="restore_failed">Wiederherstellung fehlgeschlagen. %1$s</string>
     <string name="add_a_longer_description_optional">Eine längere Beschreibung hinzufügen (optional)</string>
+    <string name="add_a_longer_description">Eine längere Beschreibung hinzufügen</string>
+    <string name="optional_parenthesis">(optional)</string>
     <string name="no_data_points_history_fragment_hint">Ihr Tracking-Verlauf wird hier angezeigt, wenn Sie einige Daten eingegeben haben.</string>
     <string name="info">Info</string>
     <string name="no_description">Keine Beschreibung</string>
@@ -254,8 +256,8 @@
     <string name="help">Hilfe</string>
     
     <string name="advanced_options">Erweiterte Optionen</string>
-    <string name="type_colon">\"Typ: \"</string>
-    <string name="order_colon">\"Reihenfolge: \"</string>
+    <string name="suggestions_type">Typ</string>
+    <string name="suggestions_order">Reihenfolge</string>
     <string name="value_and_label">Wert und Label</string>
     <string name="value_only">Nur Wert</string>
     <string name="label_only">Nur Label</string>
