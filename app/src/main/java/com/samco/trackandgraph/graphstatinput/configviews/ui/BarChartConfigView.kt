@@ -21,10 +21,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
@@ -40,9 +40,10 @@ import com.samco.trackandgraph.ui.compose.ui.FormFieldSeparator
 import com.samco.trackandgraph.ui.compose.ui.FormLabel
 import com.samco.trackandgraph.ui.compose.ui.FormSection
 import com.samco.trackandgraph.ui.compose.ui.FormSpinner
-import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.FormSwitchInput
+import com.samco.trackandgraph.ui.compose.ui.FormTextInput
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun BarChartConfigView(
     scrollState: ScrollState,
@@ -136,9 +137,9 @@ fun BarChartConfigView(
     FormFieldSeparator()
 
     FormLabel(text = stringResource(id = R.string.scale))
-    MiniNumericTextField(
-        textAlign = TextAlign.Center,
+    FormTextInput(
         textFieldValue = viewModel.scale,
-        onValueChange = { viewModel.updateScale(it) }
+        onValueChange = { viewModel.updateScale(it) },
+        isNumeric = true
     )
 }
