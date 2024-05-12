@@ -23,9 +23,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.database.dto.GraphEndDate
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
@@ -34,27 +34,37 @@ import com.samco.trackandgraph.ui.compose.ui.showDateDialog
 import org.threeten.bp.OffsetDateTime
 
 enum class SampleEndingAtOption {
-    LATEST, CUSTOM
+    NOW, LATEST, CUSTOM
 }
 
 sealed interface SampleEndingAt {
     val option: SampleEndingAtOption
 
-    companion object {
-        fun fromDateTime(dateTime: OffsetDateTime?) =
-            if (dateTime == null) Latest else Custom(dateTime)
-    }
+    fun asGraphEndDate(): GraphEndDate
 
-    fun asDateTime(): OffsetDateTime?
+    companion object {
+        fun fromGraphEndDate(endDate: GraphEndDate): SampleEndingAt {
+            return when (endDate) {
+                is GraphEndDate.Latest -> Latest
+                is GraphEndDate.Now -> Now
+                is GraphEndDate.Date -> Custom(endDate.date)
+            }
+        }
+    }
 
     object Latest : SampleEndingAt {
         override val option = SampleEndingAtOption.LATEST
-        override fun asDateTime() = null
+        override fun asGraphEndDate() = GraphEndDate.Latest
     }
 
-    data class Custom(val dateTime: OffsetDateTime?) : SampleEndingAt {
+    object Now : SampleEndingAt {
+        override val option = SampleEndingAtOption.NOW
+        override fun asGraphEndDate() = GraphEndDate.Now
+    }
+
+    data class Custom(val dateTime: OffsetDateTime) : SampleEndingAt {
         override val option = SampleEndingAtOption.CUSTOM
-        override fun asDateTime() = dateTime
+        override fun asGraphEndDate() = GraphEndDate.Date(dateTime)
     }
 }
 
@@ -64,15 +74,19 @@ fun GraphStatEndingAtSpinner(
     sampleEndingAt: SampleEndingAt,
     onSampleEndingAtChanged: (SampleEndingAt) -> Unit
 ) {
+
+    val strLatest = stringResource(id = R.string.ending_at_latest)
+    val strCustom = stringResource(id = R.string.ending_at_custom_date)
+    val strNow = stringResource(id = R.string.ending_at_now)
+
     LabeledRow(
         label = stringResource(id = R.string.ending_at_colon),
         paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
     ) {
-        val strings = stringArrayResource(id = R.array.ending_at_values)
-
         val spinnerItems = mapOf(
-            SampleEndingAtOption.LATEST to strings[0],
-            SampleEndingAtOption.CUSTOM to strings[1]
+            SampleEndingAtOption.LATEST to strLatest,
+            SampleEndingAtOption.NOW to strNow,
+            SampleEndingAtOption.CUSTOM to strCustom
         )
 
         val context = LocalContext.current
@@ -85,6 +99,7 @@ fun GraphStatEndingAtSpinner(
             onItemSelected = { option ->
                 when (option) {
                     SampleEndingAtOption.LATEST -> onSampleEndingAtChanged(SampleEndingAt.Latest)
+                    SampleEndingAtOption.NOW -> onSampleEndingAtChanged(SampleEndingAt.Now)
                     SampleEndingAtOption.CUSTOM -> showDateDialog(
                         context = context,
                         firstDayOfWeek = firstDayOfWeek,
@@ -96,10 +111,12 @@ fun GraphStatEndingAtSpinner(
             },
             selectedItemFactory = { modifier, item, expanded ->
                 val text = when (item) {
-                    SampleEndingAtOption.LATEST -> strings[0]
+                    SampleEndingAtOption.LATEST -> strLatest
+                    SampleEndingAtOption.NOW -> strNow
                     SampleEndingAtOption.CUSTOM -> {
-                        val dateTime = (sampleEndingAt as SampleEndingAt.Custom).dateTime
-                        dateTime?.let { formatDayMonthYear(context, it) } ?: strings[1]
+                        if (sampleEndingAt is SampleEndingAt.Custom)
+                            formatDayMonthYear(context, sampleEndingAt.dateTime)
+                        else strCustom
                     }
                 }
 
