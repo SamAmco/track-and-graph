@@ -116,6 +116,9 @@
 
 
     <string name="custom">Costumbre</string>
+    <string name="ending_at_latest">Último punto de datos</string>
+    <string name="ending_at_now">Ahora</string>
+    <string name="ending_at_custom_date">Fecha personalizada…</string>
     <string name="import_exception_unknown">Error de importación: Se ha producido un error desconocido</string>
     <string name="import_exception_bad_headers">Error de importación: Las cabeceras no coinciden con las esperadas: %1$s</string>
     <string name="import_exception_inconsistent_record">Error de importación: Lq traza de la línea %1$s no es consistente con las cabeceras requeridas</string>
