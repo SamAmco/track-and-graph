@@ -21,11 +21,12 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun FormInputDecoration(
@@ -35,16 +36,16 @@ fun FormInputDecoration(
 ) {
     val boxShape = RoundedCornerShape(dimensionResource(id = R.dimen.form_input_corner))
     val borderStroke = if (isFocused) R.dimen.form_input_border_focus else R.dimen.form_input_border
-    val borderColor = if (isFocused) R.color.form_primary else R.color.form_input_border
+    val borderColor = if (isFocused) MaterialTheme.tngColors.primary else MaterialTheme.tngColors.inputBorderColor
 
     Box(modifier = modifier
         .background(
-            colorResource(id = R.color.form_input_bg),
+            MaterialTheme.tngColors.inputBackgroundColor,
             shape = boxShape
         )
         .border(
             dimensionResource(id = borderStroke),
-            colorResource(id = borderColor),
+            borderColor,
             shape = boxShape
         )
         .padding(dimensionResource(id = R.dimen.form_input_padding))

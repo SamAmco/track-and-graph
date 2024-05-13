@@ -21,15 +21,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Switch
 import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun FormSwitchInput(
@@ -49,7 +50,6 @@ fun FormSwitchInput(
 ) {
     Text(
         text = text,
-        color = colorResource(id = R.color.form_text),
         modifier = Modifier.weight(1f)
     )
 
@@ -59,16 +59,16 @@ fun FormSwitchInput(
         checked = checked,
         onCheckedChange = onCheckedChange,
         colors = SwitchDefaults.colors(
-            checkedThumbColor = colorResource(id = R.color.form_primary),
-            checkedTrackColor = colorResource(id = R.color.form_primary),
+            checkedThumbColor = MaterialTheme.tngColors.primary,
+            checkedTrackColor = MaterialTheme.tngColors.primary,
             checkedTrackAlpha = 0.2F,
-            uncheckedThumbColor = colorResource(id = R.color.form_disabled_border),
-            uncheckedTrackColor = colorResource(id = R.color.form_disabled_border),
+            uncheckedThumbColor = MaterialTheme.tngColors.disabledBorderColor,
+            uncheckedTrackColor = MaterialTheme.tngColors.disabledBorderColor,
             uncheckedTrackAlpha = 0.2F,
-            disabledCheckedThumbColor = colorResource(id = R.color.form_disabled_bg),
-            disabledCheckedTrackColor = colorResource(id = R.color.form_disabled_bg),
-            disabledUncheckedThumbColor = colorResource(id = R.color.form_disabled_bg),
-            disabledUncheckedTrackColor = colorResource(id = R.color.form_disabled_bg)
+            disabledCheckedThumbColor = MaterialTheme.tngColors.disabledBackgroundColor,
+            disabledCheckedTrackColor = MaterialTheme.tngColors.disabledBackgroundColor,
+            disabledUncheckedThumbColor = MaterialTheme.tngColors.disabledBackgroundColor,
+            disabledUncheckedTrackColor = MaterialTheme.tngColors.disabledBackgroundColor
         )
     )
 }

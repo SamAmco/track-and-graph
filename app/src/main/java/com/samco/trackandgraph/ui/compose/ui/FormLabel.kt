@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme
@@ -28,6 +27,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun FormLabel(
@@ -45,7 +45,6 @@ fun FormLabel(
 ) {
     Text(
         text = text,
-        color = colorResource(id = R.color.form_text),
         modifier = Modifier.weight(1f)
     )
 
@@ -54,7 +53,7 @@ fun FormLabel(
             text = stringResource(id = R.string.optional_parenthesis),
             fontSize = MaterialTheme.typography.body2.fontSize,
             fontWeight = MaterialTheme.typography.body2.fontWeight,
-            color = colorResource(id = R.color.form_text_note)
+            color = MaterialTheme.tngColors.textNoteColor
         )
     }
 }

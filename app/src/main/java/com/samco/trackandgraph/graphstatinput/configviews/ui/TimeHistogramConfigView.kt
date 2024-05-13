@@ -18,9 +18,9 @@ package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -86,7 +86,7 @@ fun TimeHistogramConfigView(
     FormLabel(text = stringResource(id = R.string.time_window_size))
 
     val stringArray = stringArrayResource(id = R.array.time_histogram_windows)
-    val timeWindows = mapOf(
+    val timeWindows = remember { mapOf(
         TimeHistogramWindow.HOUR to stringArray[0],
         TimeHistogramWindow.DAY to stringArray[1],
         TimeHistogramWindow.WEEK to stringArray[2],
@@ -94,7 +94,7 @@ fun TimeHistogramConfigView(
         TimeHistogramWindow.THREE_MONTHS to stringArray[4],
         TimeHistogramWindow.SIX_MONTHS to stringArray[5],
         TimeHistogramWindow.YEAR to stringArray[6]
-    )
+    )}
 
     FormSpinner(
         strings = timeWindows,

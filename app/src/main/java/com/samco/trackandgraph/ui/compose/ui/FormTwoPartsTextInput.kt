@@ -29,11 +29,11 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -66,7 +66,7 @@ fun FormTwoPartsTextPart(
             text = description,
             fontSize = MaterialTheme.typography.body2.fontSize,
             fontWeight = MaterialTheme.typography.body2.fontWeight,
-            color = colorResource(id = R.color.form_text_note)
+            color = MaterialTheme.tngColors.textNoteColor
         )
     }
 }

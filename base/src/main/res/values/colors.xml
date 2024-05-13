@@ -61,18 +61,4 @@
     <color name="visColor10">#313695</color>
     <color name="visColor11">#54D931</color>
     <color name="visColor12">#1B8200</color>
-
-    <!-- Forms -->
-    <color name="form_background">#fffbfa</color>
-    <color name="form_primary">#f46d43</color>
-    <color name="form_primary_text">#fdf4f1</color>
-    <color name="form_section_bg">#ffe8e1</color>
-    <color name="form_input_bg">#ffffff</color>
-    <color name="form_input_border">#e8d7d0</color>
-    <color name="form_input_text">#6e6e6e</color>
-    <color name="form_text">#383838</color>
-    <color name="form_text_note">#8d8d8d</color>
-    <color name="form_text_error">#db3838</color>
-    <color name="form_disabled_bg">#ded1cb</color>
-    <color name="form_disabled_border">#8d8d8d</color>
 </resources>

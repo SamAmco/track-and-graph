@@ -20,11 +20,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun FormSection(
@@ -34,7 +35,7 @@ fun FormSection(
     Box(
         modifier = modifier
             .background(
-                colorResource(id = R.color.form_section_bg),
+                MaterialTheme.tngColors.surface,
                 shape = RoundedCornerShape(dimensionResource(id = R.dimen.form_section_corner))
             )
             .padding(dimensionResource(id = R.dimen.form_section_padding))

@@ -25,11 +25,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
 fun FormSaveButton(
@@ -46,18 +46,14 @@ fun FormSaveButton(
             .padding(0.dp, dimensionResource(id = R.dimen.form_button_margin_top), 0.dp, 0.dp),
         onClick = onCreateUpdateClicked,
         enabled = !isInErrorState,
-        shape = CircleShape,
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = colorResource(id = R.color.form_primary),
-            contentColor = colorResource(id = R.color.form_primary_text)
-        )
+        shape = CircleShape
     ) {
         Text(
             modifier = Modifier.padding(dimensionResource(id = R.dimen.form_button_padding)),
             text = text,
             style = MaterialTheme.typography.body1,
             fontWeight = MaterialTheme.typography.button.fontWeight,
-            color = colorResource(id = R.color.form_primary_text)
+            color = MaterialTheme.tngColors.onPrimary
         )
     }
 }

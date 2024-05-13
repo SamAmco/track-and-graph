@@ -143,7 +143,7 @@ private fun AddTrackerInputForm(
 
         AdvancedOptions(viewModel)
 
-        val isInErrorState = errors.isNotEmpty()
+        val isInErrorState = remember(errors) { errors.isNotEmpty() }
 
         FormFieldSeparator()
 
