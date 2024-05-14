@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatinput.customviews
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
@@ -33,10 +34,10 @@ fun GraphStatYRangeTypeSpinner(
 
     val strings = stringArrayResource(id = R.array.y_range_styles)
 
-    val spinnerItems = mapOf(
+    val spinnerItems = remember { mapOf(
         YRangeType.DYNAMIC to strings[0],
         YRangeType.FIXED to strings[1]
-    )
+    )}
 
     FormSpinner(
         strings = spinnerItems,

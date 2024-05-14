@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatinput.customviews
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringArrayResource
@@ -64,10 +65,10 @@ fun GraphStatEndingAtSpinner(
 
     val strings = stringArrayResource(id = R.array.ending_at_values)
 
-    val spinnerItems = mapOf(
+    val spinnerItems = remember { mapOf(
         SampleEndingAtOption.LATEST to strings[0],
         SampleEndingAtOption.CUSTOM to strings[1]
-    )
+    )}
 
     val context = LocalContext.current
     val firstDayOfWeek = LocalSettings.current.firstDayOfWeek

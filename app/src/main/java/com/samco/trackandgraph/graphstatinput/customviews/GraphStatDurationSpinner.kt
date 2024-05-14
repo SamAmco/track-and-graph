@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
@@ -177,16 +178,18 @@ fun GraphStatDurationSpinner(
 
     FormLabel(text = label)
 
-    val spinnerItems = mapOf(
-        GraphStatSampleSizeOption.ALL_DATA to stringResource(id = R.string.graph_time_durations_all_data),
-        GraphStatSampleSizeOption.A_DAY to stringResource(id = R.string.graph_time_durations_a_day),
-        GraphStatSampleSizeOption.A_WEEK to stringResource(id = R.string.graph_time_durations_a_week),
-        GraphStatSampleSizeOption.A_MONTH to stringResource(id = R.string.graph_time_durations_a_month),
-        GraphStatSampleSizeOption.THREE_MONTHS to stringResource(id = R.string.graph_time_durations_three_months),
-        GraphStatSampleSizeOption.SIX_MONTHS to stringResource(id = R.string.graph_time_durations_six_months),
-        GraphStatSampleSizeOption.A_YEAR to stringResource(id = R.string.graph_time_durations_a_year),
-        GraphStatSampleSizeOption.CUSTOM to stringResource(id = R.string.custom)
-    )
+    val strings = stringArrayResource(id = R.array.graph_time_durations)
+
+    val spinnerItems = remember { mapOf(
+        GraphStatSampleSizeOption.ALL_DATA to strings[0],
+        GraphStatSampleSizeOption.A_DAY to strings[1],
+        GraphStatSampleSizeOption.A_WEEK to strings[2],
+        GraphStatSampleSizeOption.A_MONTH to strings[3],
+        GraphStatSampleSizeOption.THREE_MONTHS to strings[4],
+        GraphStatSampleSizeOption.SIX_MONTHS to strings[5],
+        GraphStatSampleSizeOption.A_YEAR to strings[6],
+        GraphStatSampleSizeOption.CUSTOM to strings[7]
+    )}
 
     FormSpinner(
         strings = spinnerItems,

@@ -98,13 +98,16 @@
         <item>Gesamtanzahl jährlich</item>
     </string-array>
     <string name="graph_type_last_value">Zuletzt verfolgt/Zeit seitdem</string>
-    <string name="graph_time_durations_all_data">Alle Daten</string>
-    <string name="graph_time_durations_a_day">Einen Tag</string>
-    <string name="graph_time_durations_a_week">Eine Woche</string>
-    <string name="graph_time_durations_a_month">Einen Monat</string>
-    <string name="graph_time_durations_three_months">Drei Monate</string>
-    <string name="graph_time_durations_six_months">Sechs Monate</string>
-    <string name="graph_time_durations_a_year">Ein Jahr</string>
+    <string-array name="graph_time_durations">
+        <item>Alle Daten</item>
+        <item>Einen Tag</item>
+        <item>Eine Woche</item>
+        <item>Einen Monat</item>
+        <item>Drei Monate</item>
+        <item>Sechs Monate</item>
+        <item>Ein Jahr</item>
+        <item>Brauch</item>
+    </string-array>
     <string-array name="y_range_styles">
         <item>Dynamisch</item>
         <item>Fixiert</item>
@@ -114,8 +117,6 @@
         <item>Benutzerdefiniertes Datum…</item>
     </string-array>
 
-
-    <string name="custom">Brauch</string>
     <string name="import_exception_unknown">Import fehlgeschlagen: Ein unbekannter Fehler ist aufgetreten</string>
     <string name="import_exception_bad_headers">Import fehlgeschlagen: Kopfzeilen stimmten nicht mit den erwarteten Kopfzeilen überein: %1$s</string>
     <string name="import_exception_inconsistent_record">Import fehlgeschlagen: Datensatz in Zeile %1$s stimmt nicht mit den erforderlichen Kopfzeilen überein: %1$s</string>
