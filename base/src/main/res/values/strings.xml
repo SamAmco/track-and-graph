@@ -130,6 +130,7 @@
     <string name="ending_at_now">Now</string>
     <string name="ending_at_custom_date">Custom date…</string>
 
+    <string name="hours_and_minutes_ago">%1$dh %2$dm ago</string>
 
     <string name="import_exception_unknown">Import failed: An unknown error occurred</string>
     <string name="import_exception_bad_headers">Import failed: Headers did not match the expected headers: %1$s</string>
