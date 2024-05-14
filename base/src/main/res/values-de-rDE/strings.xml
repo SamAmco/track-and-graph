@@ -109,16 +109,15 @@
         <item>Dynamisch</item>
         <item>Fixiert</item>
     </string-array>
-    <string-array name="ending_at_values">
-        <item>Aktuellste</item>
-        <item>Benutzerdefiniertes Datum…</item>
-    </string-array>
 
 
     <string name="custom">Brauch</string>
     <string name="ending_at_latest">Letzter Datenpunkt</string>
     <string name="ending_at_now">Jetzt</string>
     <string name="ending_at_custom_date">Benutzerdefiniertes Datum…</string>
+
+    <string name="hours_and_minutes_ago">vor %1$d Std. %2$d Min.</string>
+
     <string name="import_exception_unknown">Import fehlgeschlagen: Ein unbekannter Fehler ist aufgetreten</string>
     <string name="import_exception_bad_headers">Import fehlgeschlagen: Kopfzeilen stimmten nicht mit den erwarteten Kopfzeilen überein: %1$s</string>
     <string name="import_exception_inconsistent_record">Import fehlgeschlagen: Datensatz in Zeile %1$s stimmt nicht mit den erforderlichen Kopfzeilen überein: %1$s</string>
