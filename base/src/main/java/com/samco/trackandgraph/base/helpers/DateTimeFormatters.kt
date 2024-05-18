@@ -27,7 +27,6 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.Temporal
 import java.text.DecimalFormat
-import kotlin.math.absoluteValue
 
 
 //TODO should really refactor all this stuff into classes and interfaces
