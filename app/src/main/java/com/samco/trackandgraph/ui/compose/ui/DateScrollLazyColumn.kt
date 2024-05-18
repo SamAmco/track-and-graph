@@ -35,7 +35,6 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,9 +46,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
@@ -107,19 +104,8 @@ fun <T : Datable> DateScrollLazyColumn(
 
     LazyColumn(state = scrollState) { items(data.items) { content(it) } }
 
-    val currentDateText = remember(scrollState, data) {
-        derivedStateOf {
-            if (data.items.isEmpty() || scrollState.firstVisibleItemIndex !in data.items.indices)
-                return@derivedStateOf null
-            val date = data.items[scrollState.firstVisibleItemIndex].date
-            when (data.dateDisplayResolution) {
-                DateDisplayResolution.MONTH_DAY -> date.format(monthDayFormatter)
-                DateDisplayResolution.MONTH_YEAR -> date.format(monthYearFormatter)
-            }
-        }
-    }
-
     val isDragging = remember { mutableStateOf(false) }
+    val scrolledToIndex = remember { mutableStateOf(0) }
     var isScrollBarVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(scrollState.isScrollInProgress, isDragging.value) {
@@ -128,6 +114,18 @@ fun <T : Datable> DateScrollLazyColumn(
         } else {
             delay(2000)
             isScrollBarVisible = false
+        }
+    }
+
+    val currentDateText = remember(scrollState, data) {
+        derivedStateOf {
+            if (data.items.isEmpty() || scrolledToIndex.value !in data.items.indices)
+                return@derivedStateOf null
+            val date = data.items[scrolledToIndex.value].date
+            when (data.dateDisplayResolution) {
+                DateDisplayResolution.MONTH_DAY -> date.format(monthDayFormatter)
+                DateDisplayResolution.MONTH_YEAR -> date.format(monthYearFormatter)
+            }
         }
     }
 
@@ -179,7 +177,8 @@ fun <T : Datable> DateScrollLazyColumn(
         ScrollBarCanvas(
             data = data,
             scrollState = scrollState,
-            isDragging = isDragging
+            isDragging = isDragging,
+            scrolledToIndex = scrolledToIndex
         )
     }
 }
@@ -188,15 +187,16 @@ fun <T : Datable> DateScrollLazyColumn(
 private fun <T : Datable> ScrollBarCanvas(
     data: DateScrollData<T>,
     scrollState: LazyListState,
-    isDragging: MutableState<Boolean>
+    isDragging: MutableState<Boolean>,
+    scrolledToIndex: MutableState<Int>
 ) {
     // Scrollbar properties
     var scrollbarOffsetY by remember { mutableStateOf(0f) }
     val scrollGrabberColor = MaterialTheme.colors.primary
-    val scrollGrabberRadiusDp = 50.dp
-    val scrollGrabberHalfRadiusDp = remember { scrollGrabberRadiusDp / 2 }
-    val scrollGrabberRadius = with(LocalDensity.current) { scrollGrabberRadiusDp.toPx() }
-    val scrollGrabberHalfRadius = remember { scrollGrabberRadius / 2 }
+    val scrollGrabberDiamDp = 50.dp
+    val scrollGrabberRadDp = remember { scrollGrabberDiamDp / 2 }
+    val scrollGrabberDiamPx = with(LocalDensity.current) { scrollGrabberDiamDp.toPx() }
+    val scrollGrabberRadPx = remember { scrollGrabberDiamPx / 2 }
     val coroutineScope = rememberCoroutineScope()
     var canvasHeight by remember { mutableStateOf(0) }
 
@@ -206,7 +206,7 @@ private fun <T : Datable> ScrollBarCanvas(
     val startAngle = remember { -90f + extraSweep }
     val sweepAngle = remember { -180f - (2 * extraSweep) }
     val fullWidth = remember {
-        scrollGrabberHalfRadiusDp.value + (sin(Math.toRadians(extraSweep.toDouble())) * scrollGrabberHalfRadiusDp.value)
+        scrollGrabberRadDp.value + (sin(Math.toRadians(extraSweep.toDouble())) * scrollGrabberRadDp.value)
     }
 
     Canvas(modifier = Modifier
@@ -217,21 +217,19 @@ private fun <T : Datable> ScrollBarCanvas(
             detectDragGestures(
                 onDragStart = { offset ->
                     isDragging.value = true
-                    val columnHeight = size.height
-                    scrollbarOffsetY = (offset.y - scrollGrabberHalfRadius)
-                        .coerceIn(0f, columnHeight - scrollGrabberRadius)
-                    val proportion = scrollbarOffsetY / (columnHeight - scrollGrabberRadius)
+                    val columnHeight = size.height - scrollGrabberDiamPx
+                    scrollbarOffsetY = (offset.y - scrollGrabberRadPx).coerceIn(0f, columnHeight)
+                    val proportion = scrollbarOffsetY / columnHeight
                     val targetScrollOffset = (data.items.size * proportion).roundToInt()
-                    coroutineScope.launch { scrollState.scrollToItem(targetScrollOffset) }
+                    scrolledToIndex.value = targetScrollOffset
                 },
                 onDrag = { change, dragAmount ->
-                    if (!isDragging.value) return@detectDragGestures
                     change.consume()
-                    val columnHeight = size.height
-                    scrollbarOffsetY = (scrollbarOffsetY + dragAmount.y)
-                        .coerceIn(0f, columnHeight - scrollGrabberRadius)
-                    val proportion = scrollbarOffsetY / (columnHeight - scrollGrabberRadius)
+                    val columnHeight = size.height - scrollGrabberDiamPx
+                    scrollbarOffsetY = (scrollbarOffsetY + dragAmount.y).coerceIn(0f, columnHeight)
+                    val proportion = scrollbarOffsetY / columnHeight
                     val targetScrollOffset = (data.items.size * proportion).roundToInt()
+                    scrolledToIndex.value = targetScrollOffset
                     coroutineScope.launch { scrollState.scrollToItem(targetScrollOffset) }
                 },
                 onDragEnd = { isDragging.value = false },
@@ -245,26 +243,39 @@ private fun <T : Datable> ScrollBarCanvas(
             startAngle = startAngle,
             sweepAngle = sweepAngle,
             useCenter = false,
-            size = Size(scrollGrabberRadius, scrollGrabberRadius)
+            size = Size(scrollGrabberDiamPx, scrollGrabberDiamPx)
         )
     }
 
-    val firstVisibleItemIndex by remember(scrollState) {
-        derivedStateOf { scrollState.firstVisibleItemIndex }
-    }
-    val firstVisibleItemScrollOffset by remember(scrollState) {
-        derivedStateOf { scrollState.firstVisibleItemScrollOffset }
+    val offset by remember {
+        derivedStateOf {
+            val canvasScalar = canvasHeight.toFloat() - scrollGrabberDiamPx
+
+            val totalItems = data.items.size
+            val firstVisibleItem = scrollState.firstVisibleItemIndex
+            val visibleItemCount = scrollState.layoutInfo.visibleItemsInfo.size
+            val visibleItemsSize = scrollState.layoutInfo.visibleItemsInfo.sumOf { it.size } +
+                    (scrollState.layoutInfo.mainAxisItemSpacing * (visibleItemCount - 1))
+            if (visibleItemsSize <= 0 || visibleItemCount <= 0) return@derivedStateOf 0f
+
+            val averageItemSize = visibleItemsSize / visibleItemCount.toFloat()
+
+            val scrollOffset = scrollState.firstVisibleItemScrollOffset
+            val viewportHeight = scrollState.layoutInfo.viewportSize.height
+            val estimatedAboveItemsSize = (firstVisibleItem * averageItemSize) + scrollOffset
+            val clippedAmountOfBottomItem = visibleItemsSize - scrollOffset - viewportHeight
+            val estimatedBelowItemsSize =
+                ((totalItems - firstVisibleItem - visibleItemCount) * averageItemSize) + clippedAmountOfBottomItem
+            val estimatedTotalHiddenContentSize = estimatedAboveItemsSize + estimatedBelowItemsSize
+
+            val estimatedRatioInsideTotalContent =
+                estimatedAboveItemsSize / estimatedTotalHiddenContentSize
+
+            canvasScalar * estimatedRatioInsideTotalContent
+        }
     }
 
-    LaunchedEffect(isDragging.value, firstVisibleItemIndex) {
-        if (!isDragging.value) {
-            val totalItems = data.items.size
-            val totalItemHeight = totalItems * canvasHeight
-            val visibleProportion = firstVisibleItemIndex.toFloat() / totalItems.toFloat()
-            val visibleItemOffsetProportion =
-                firstVisibleItemScrollOffset.toFloat() / totalItemHeight.toFloat()
-            scrollbarOffsetY =
-                (visibleProportion + visibleItemOffsetProportion) * (canvasHeight - scrollGrabberRadius)
-        }
+    LaunchedEffect(isDragging.value, offset) {
+        if (!isDragging.value) scrollbarOffsetY = offset
     }
 }
