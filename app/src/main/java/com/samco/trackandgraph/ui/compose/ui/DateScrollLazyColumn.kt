@@ -114,6 +114,7 @@ fun <T : Datable> DateScrollLazyColumn(
 
     LazyColumn(state = scrollState) { items(data.items) { content(it) } }
 
+    val minItemsMet = remember (data.items) { data.items.size >= 50 }
     val isDragging = remember { mutableStateOf(false) }
     val scrollToIndex = remember { mutableStateOf(0) }
     var isScrollBarVisible by remember { mutableStateOf(false) }
@@ -134,7 +135,7 @@ fun <T : Datable> DateScrollLazyColumn(
             .collect { scrollState.scrollToItem(it) }
     }
 
-    val currentDateText = remember(scrollState, data) {
+    val currentDateText = remember(scrollToIndex.value, data) {
         derivedStateOf {
             if (data.items.isEmpty() || scrollToIndex.value !in data.items.indices)
                 return@derivedStateOf null
@@ -146,9 +147,9 @@ fun <T : Datable> DateScrollLazyColumn(
         }
     }
 
-    val textOverlayVisible by remember(isDragging, currentDateText) {
+    val textOverlayVisible by remember(minItemsMet, isDragging, currentDateText) {
         derivedStateOf {
-            isDragging.value && currentDateText.value != null
+            minItemsMet && isDragging.value && currentDateText.value != null
         }
     }
 
@@ -181,7 +182,7 @@ fun <T : Datable> DateScrollLazyColumn(
         modifier = Modifier
             .fillMaxHeight()
             .align(Alignment.CenterEnd),
-        visible = isScrollBarVisible,
+        visible = minItemsMet && isScrollBarVisible,
         enter = slideInHorizontally(
             initialOffsetX = { it },
             animationSpec = scrollBarAnimationSpec
