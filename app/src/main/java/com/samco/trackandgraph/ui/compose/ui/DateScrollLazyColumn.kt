@@ -43,6 +43,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -66,6 +67,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.format.DateTimeFormatterBuilder
 import org.threeten.bp.format.TextStyle
@@ -114,7 +116,7 @@ fun <T : Datable> DateScrollLazyColumn(
 
     LazyColumn(state = scrollState) { items(data.items) { content(it) } }
 
-    val minItemsMet = remember (data.items) { data.items.size >= 50 }
+    val minItemsMet = remember(data.items) { data.items.size >= 50 }
     val isDragging = remember { mutableStateOf(false) }
     val scrollToIndex = remember { mutableStateOf(0) }
     var isScrollBarVisible by remember { mutableStateOf(false) }
@@ -231,6 +233,8 @@ private fun <T : Datable> ScrollBarCanvas(
     val grabberIconColorFilter = remember { ColorFilter.tint(grabberIconColor) }
     val grabberSize = remember { Size(scrollGrabberDiamPx, scrollGrabberDiamPx) }
 
+    val coroutineScope = rememberCoroutineScope()
+
     Canvas(modifier = Modifier
         .width(fullWidth.dp)
         .fillMaxHeight()
@@ -253,8 +257,18 @@ private fun <T : Datable> ScrollBarCanvas(
                     val targetScrollOffset = (data.items.size * proportion).roundToInt()
                     scrollToIndex.value = targetScrollOffset
                 },
-                onDragEnd = { isDragging.value = false },
-                onDragCancel = { isDragging.value = false }
+                onDragEnd = {
+                    //Fixes a small glitch where the scroll bar pings back to the old position
+                    // before the scroll to item gets chance to run, as it is throttled
+                    coroutineScope.launch { scrollState.scrollToItem(scrollToIndex.value) }
+                    isDragging.value = false
+                },
+                onDragCancel = {
+                    //Fixes a small glitch where the scroll bar pings back to the old position
+                    // before the scroll to item gets chance to run, as it is throttled
+                    coroutineScope.launch { scrollState.scrollToItem(scrollToIndex.value) }
+                    isDragging.value = false
+                }
             )
         }
     ) {
