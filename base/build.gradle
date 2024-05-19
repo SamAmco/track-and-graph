@@ -19,16 +19,16 @@
 plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.android.library'
-    id 'kotlin-kapt'
+    id 'com.google.devtools.ksp'
     id "dagger.hilt.android.plugin"
 }
 
 android {
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         minSdk 23
-        targetSdk 33
+        targetSdk 34
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -43,10 +43,8 @@ android {
             androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
         }
 
-        kapt {
-            arguments {
-                arg("room.schemaLocation", "$projectDir/schemas".toString())
-            }
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas".toString())
         }
     }
 
@@ -85,14 +83,14 @@ dependencies {
 
     //Dependency Injection
     implementation libs.hilt.android
-    kapt libs.hilt.compiler
+    ksp libs.hilt.compiler
 
     //Database
-    kapt libs.room.compiler
+    ksp libs.room.compiler
     api libs.room.runtime
     api libs.room.ktx
     api libs.moshi.kotlin
-    kapt libs.moshi.kotlin.codegen
+    ksp libs.moshi.kotlin.codegen
 
     //CSV
     implementation libs.commons.csv

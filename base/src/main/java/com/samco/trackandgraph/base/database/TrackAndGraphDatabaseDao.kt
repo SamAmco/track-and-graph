@@ -95,13 +95,13 @@ internal interface TrackAndGraphDatabaseDao {
     fun updateGroups(groups: List<Group>)
 
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
-    fun getAllReminders(): LiveData<List<Reminder>>
+    fun getAllReminders(): Flow<List<Reminder>>
 
     @Query("""SELECT * FROM reminders_table ORDER BY display_index ASC, id DESC""")
     fun getAllRemindersSync(): List<Reminder>
 
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
-    fun getAllGroups(): LiveData<List<Group>>
+    fun getAllGroups(): Flow<List<Group>>
 
     @Query("""SELECT groups_table.* FROM groups_table ORDER BY display_index ASC, id DESC""")
     fun getAllGroupsSync(): List<Group>

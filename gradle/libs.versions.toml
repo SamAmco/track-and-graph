@@ -13,7 +13,6 @@ espressoCore = "3.5.1"
 flexbox = "3.0.0"
 fragmentKtx = "1.7.1"
 hilt = "2.51.1"
-hiltAndroidGradlePlugin = "2.44"
 hiltNavigationCompose = "1.2.0"
 hiltWork = "1.2.0"
 junitKtx = "1.1.5"
@@ -42,11 +41,15 @@ timber = "5.0.1"
 workRuntimeKtx = "2.9.0"
 kotlin = "1.9.24"
 android = "8.4.0"
+ksp = "1.9.24-1.0.20"
+hiltAndroidGradlePlugin = "2.51.1"
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 com-android-library = { id = "com.android.library", version.ref = "android" }
 com-android-application = { id = "com.android.application", version.ref = "android" }
+com-google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt-android-gradle-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroidGradlePlugin" }
 
 [libraries]
 accompanist-pager = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanistPager" }
@@ -56,7 +59,6 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
-hilt-android-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", version.ref = "hiltAndroidGradlePlugin" }
 hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "composeMaterial" }
 compose-ui-viewbinding = { module = "androidx.compose.ui:ui-viewbinding", version.ref = "compose" }

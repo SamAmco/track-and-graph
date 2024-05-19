@@ -17,6 +17,8 @@
 
 package com.samco.trackandgraph.navigation
 
+import android.app.ActivityOptions
+import android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -38,7 +40,15 @@ class PendingIntentProviderImpl @Inject constructor(
     override fun getMainActivityPendingIntent(): PendingIntent {
         return Intent(context, MainActivity::class.java)
             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            .let { PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_IMMUTABLE) }
+            .let {
+                PendingIntent.getActivity(
+                    context,
+                    0,
+                    it,
+                    PendingIntent.FLAG_IMMUTABLE,
+                    getStartActivityOptionsBundle()
+                )
+            }
     }
 
     override fun getDurationInputActivityIntent(trackerId: Long, startInstant: String): Intent {
@@ -48,6 +58,14 @@ class PendingIntentProviderImpl @Inject constructor(
             .putExtra(AddDataPointFromTimerActivity.START_TIME_KEY, startInstant)
     }
 
+    private fun getStartActivityOptionsBundle() =
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            ActivityOptions.makeBasic()
+                .setPendingIntentBackgroundActivityStartMode(
+                    MODE_BACKGROUND_ACTIVITY_START_ALLOWED
+                )
+                .toBundle()
+        } else null
 
     override fun getDurationInputActivityPendingIntent(
         trackerId: Long,
@@ -59,7 +77,8 @@ class PendingIntentProviderImpl @Inject constructor(
                 //A key unique to this request to allow updating notification
                 startInstant.hashCode() + trackerId.toInt(),
                 it,
-                PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_IMMUTABLE,
+                getStartActivityOptionsBundle()
             )
         }
     }
@@ -73,7 +92,8 @@ class PendingIntentProviderImpl @Inject constructor(
                 context,
                 appWidgetId,
                 it,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                getStartActivityOptionsBundle()
             )
         }
     }
