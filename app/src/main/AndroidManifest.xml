@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
 
     <!--dataExtractionRules is only used for android 12 and up, otherwise fullBackupContent will be used-->
     <application
@@ -34,7 +35,7 @@
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
-            tools:node="remove"/>
+            tools:node="remove" />
 
         <activity
             android:name="com.samco.trackandgraph.MainActivity"
@@ -70,7 +71,10 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".base.service.AlarmReceiver" />
+        <receiver
+            android:name=".base.service.AlarmReceiver"
+            android:exported="false" />
+
         <receiver
             android:name=".base.service.RecreateAlarms"
             android:enabled="true"
@@ -100,11 +104,13 @@
         -->
         <service
             android:name=".base.service.TrackWidgetJobIntentService"
+            android:foregroundServiceType="shortService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
             android:name=".base.service.TimerNotificationService"
-            android:enabled="true" />
+            android:enabled="true"
+            android:foregroundServiceType="dataSync" />
     </application>
 
 </manifest>

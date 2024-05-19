@@ -18,7 +18,8 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'kotlin-kapt'
+    id 'org.jetbrains.kotlin.kapt'
+    id 'com.google.devtools.ksp'
     id "androidx.navigation.safeargs.kotlin"
     id "dagger.hilt.android.plugin"
 }
@@ -39,7 +40,7 @@ android {
     defaultConfig {
         applicationId "com.samco.trackandgraph"
         minSdkVersion 23
-        targetSdkVersion 33
+        targetSdkVersion 34
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
         versionCode 400000
         versionName "4.0.0"
@@ -99,7 +100,7 @@ dependencies {
 
     //Dependency Injection
     implementation libs.hilt.android
-    kapt libs.hilt.compiler
+    ksp libs.hilt.compiler
     implementation libs.hilt.navigation.compose
 
     //UI
@@ -141,7 +142,7 @@ dependencies {
 
     //Work manager
     implementation libs.hilt.work
-    kapt libs.hilt.compiler
+    ksp libs.hilt.compiler
     implementation libs.androidx.work.runtime.ktx
 
     //Testing

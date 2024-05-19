@@ -4,7 +4,6 @@ buildscript {
     dependencies {
         classpath libs.kotlin.gradle.plugin
         classpath libs.navigation.safe.args.gradle.plugin
-        classpath libs.hilt.android.gradle.plugin
     }
 }
 
@@ -12,6 +11,8 @@ plugins {
     alias libs.plugins.org.jetbrains.kotlin.android apply false
     alias libs.plugins.com.android.library apply false
     alias libs.plugins.com.android.application apply false
+    alias libs.plugins.com.google.ksp apply false
+    alias libs.plugins.hilt.android.gradle.plugin apply false
 }
 
 tasks.register('clean', Delete) {

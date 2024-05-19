@@ -64,7 +64,7 @@ class PieChartDataFactoryTest {
         graphStatId = graphStatId,
         featureId = featureId,
         sampleSize = null,
-        endDate = null,
+        endDate = GraphEndDate.Latest,
         sumByCount = false
     )
 

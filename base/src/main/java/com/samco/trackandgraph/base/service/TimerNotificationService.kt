@@ -19,6 +19,7 @@ package com.samco.trackandgraph.base.service
 
 import android.app.*
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.os.Build
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
@@ -91,7 +92,7 @@ class TimerNotificationService : Service() {
                     builder.setContentText(formatTimeDuration(durationSecs))
                     val notification = builder.build()
                     if (isPrimary) {
-                        startForeground(id, notification)
+                        startForegroundService(id, notification)
                         calledStartForeGround = true
                     } else notificationManager.notify(id, notification)
                     delay(1000)
@@ -113,8 +114,9 @@ class TimerNotificationService : Service() {
                 // service starting.
                 if (!calledStartForeGround && notifications?.isEmpty() != false) {
                     notifications = listOf(123)
-                    startForeground(
-                        123, NotificationCompat
+                    startForegroundService(
+                        123,
+                        NotificationCompat
                             .Builder(this@TimerNotificationService, CHANNEL_ID)
                             .setSmallIcon(R.drawable.timer_notification_icon)
                             .setOnlyAlertOnce(true)
@@ -130,6 +132,14 @@ class TimerNotificationService : Service() {
                     .mapIndexed { index, feature -> createUpdateJob(feature, index == 0) }
                     .filterNotNull()
             }
+    }
+
+    private fun startForegroundService(id: Int, notification: Notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(id, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            startForeground(id, notification)
+        }
     }
 
     private val notificationUpdater = NotificationUpdater()

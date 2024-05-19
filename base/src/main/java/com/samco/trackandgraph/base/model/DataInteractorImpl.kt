@@ -17,8 +17,6 @@
 
 package com.samco.trackandgraph.base.model
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.room.withTransaction
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
@@ -88,20 +86,12 @@ internal class DataInteractorImpl @Inject constructor(
             .also { dataUpdateEvents.emit(DataUpdateType.GroupUpdated) }
     }
 
-    override fun getAllGroups(): LiveData<List<Group>> {
-        return Transformations.map(dao.getAllGroups()) { groups -> groups.map { it.toDto() } }
-    }
-
     override suspend fun getAllGroupsSync(): List<Group> = withContext(io) {
         dao.getAllGroupsSync().map { it.toDto() }
     }
 
     override suspend fun getGroupById(id: Long): Group = withContext(io) {
         dao.getGroupById(id).toDto()
-    }
-
-    override fun getAllReminders(): LiveData<List<Reminder>> {
-        return Transformations.map(dao.getAllReminders()) { reminders -> reminders.map { it.toDto() } }
     }
 
     override suspend fun getAllRemindersSync(): List<Reminder> = withContext(io) {

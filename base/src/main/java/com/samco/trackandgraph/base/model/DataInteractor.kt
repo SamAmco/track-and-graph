@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.base.model
 
-import androidx.lifecycle.LiveData
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import kotlinx.coroutines.flow.Flow
@@ -34,11 +33,7 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun updateGroup(group: Group)
 
-    fun getAllReminders(): LiveData<List<Reminder>>
-
     suspend fun getAllRemindersSync(): List<Reminder>
-
-    fun getAllGroups(): LiveData<List<Group>>
 
     suspend fun getAllGroupsSync(): List<Group>
 
