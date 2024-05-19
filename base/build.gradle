@@ -77,35 +77,35 @@ android {
 }
 
 dependencies {
-    api 'com.jakewharton.threetenabp:threetenabp:1.2.1'
+    api libs.threetenabp
 
-    api 'androidx.core:core-ktx:1.10.0'
+    api libs.core.ktx
     //Apparently we need material for the instrumented tests to build. idk why
-    api 'com.google.android.material:material:1.9.0'
+    api libs.material
 
     //Dependency Injection
-    implementation "com.google.dagger:hilt-android:2.44"
-    kapt "com.google.dagger:hilt-compiler:2.44"
+    implementation libs.hilt.android
+    kapt libs.hilt.compiler
 
     //Database
-    kapt "androidx.room:room-compiler:2.5.1"
-    api "androidx.room:room-runtime:2.5.1"
-    api "androidx.room:room-ktx:2.5.1"
-    api "com.squareup.moshi:moshi-kotlin:1.14.0"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.14.0"
+    kapt libs.room.compiler
+    api libs.room.runtime
+    api libs.room.ktx
+    api libs.moshi.kotlin
+    kapt libs.moshi.kotlin.codegen
 
     //CSV
-    implementation 'org.apache.commons:commons-csv:1.7'
+    implementation libs.commons.csv
 
     //Timber
-    api 'com.jakewharton.timber:timber:5.0.1'
+    api libs.timber
 
-    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.1'
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation libs.mockito.kotlin
+    testImplementation libs.kotlinx.coroutines.test
+    testImplementation libs.junit
 
-    androidTestImplementation 'androidx.room:room-testing:2.5.1'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test.ext:junit-ktx:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation libs.room.testing
+    androidTestImplementation libs.runner
+    androidTestImplementation libs.junit.ktx
+    androidTestImplementation libs.espresso.core
 }
