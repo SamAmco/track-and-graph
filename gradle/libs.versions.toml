@@ -40,7 +40,7 @@ junit = "4.13.2"
 timber = "5.0.1"
 workRuntimeKtx = "2.9.0"
 kotlin = "1.9.24"
-android = "8.4.0"
+android = "8.4.1"
 ksp = "1.9.24-1.0.20"
 hiltAndroidGradlePlugin = "2.51.1"
 
