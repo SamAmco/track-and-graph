@@ -69,7 +69,11 @@ android {
     kotlinOptions {
         jvmTarget = "17"
         //Using experimental kotlin co-routines api's
-        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+        freeCompilerArgs += [
+                "-opt-in=kotlin.RequiresOptIn",
+                // The below option is here because of this issue: https://github.com/Kotlin/kotlinx.serialization/issues/2145
+                "-Xstring-concat=inline"
+        ]
     }
     namespace 'com.samco.trackandgraph.base'
 }
