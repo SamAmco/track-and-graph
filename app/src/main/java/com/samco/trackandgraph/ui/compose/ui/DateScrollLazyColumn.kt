@@ -176,6 +176,7 @@ fun <T : Datable> DateScrollLazyColumn(
                 modifier = Modifier.align(Alignment.TopCenter),
                 text = currentDateText.value ?: "",
                 style = MaterialTheme.typography.h3,
+                color = MaterialTheme.colors.onBackground
             )
         }
     }
