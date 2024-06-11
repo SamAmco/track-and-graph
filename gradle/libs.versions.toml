@@ -13,8 +13,7 @@ espressoCore = "3.5.1"
 flexbox = "3.0.0"
 fragmentKtx = "1.7.1"
 hilt = "2.51.1"
-hiltNavigationCompose = "1.2.0"
-hiltWork = "1.2.0"
+androidxHilt = "1.2.0"
 junitKtx = "1.1.5"
 kotlinGradlePlugin = "1.8.10"
 kotlinReflect = "1.9.20"
@@ -56,7 +55,7 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "coreTesting" }
 androidx-legacy-support-v4 = { module = "androidx.legacy:legacy-support-v4", version.ref = "legacySupportV4" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
+hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "androidxHilt" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose" }
 compose-ui-viewbinding = { module = "androidx.compose.ui:ui-viewbinding", version.ref = "compose" }
 compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose" }
@@ -79,9 +78,10 @@ commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "common
 core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCore" }
 flexbox = { module = "com.google.android.flexbox:flexbox", version.ref = "flexbox" }
-hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "hiltWork" }
+hilt-work = { module = "androidx.hilt:hilt-work", version.ref = "androidxHilt" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "androidxHilt" }
 junit-ktx = { module = "androidx.test.ext:junit-ktx", version.ref = "junitKtx" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinReflect" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
