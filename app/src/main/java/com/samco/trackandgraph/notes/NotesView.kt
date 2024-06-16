@@ -56,7 +56,7 @@ import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DateScrollLazyColumn
 import com.samco.trackandgraph.ui.compose.ui.EmptyScreenText
-import com.samco.trackandgraph.ui.compose.ui.SpacingExtraSmall
+import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.showNoteDialog
 
 @Composable
@@ -191,14 +191,14 @@ private fun Note(
             style = MaterialTheme.typography.subtitle2,
             text = dateText,
         )
-        SpacingExtraSmall()
+        HalfDialogInputSpacing()
         if (noteInfo.featurePath.isNotBlank()) {
             Text(
                 style = MaterialTheme.typography.body1,
                 text = noteInfo.featurePath,
                 color = MaterialTheme.tngColors.onSurface.copy(alpha = 0.5f)
             )
-            SpacingExtraSmall()
+            HalfDialogInputSpacing()
         }
         Text(
             style = MaterialTheme.typography.body1,

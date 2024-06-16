@@ -80,8 +80,8 @@ import com.samco.trackandgraph.base.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
-import com.samco.trackandgraph.ui.compose.ui.SpacingExtraSmall
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -247,7 +247,7 @@ private fun BarChartDataOverlayExtraDetails(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     Row(
         modifier = Modifier
@@ -270,7 +270,7 @@ private fun BarChartDataOverlayExtraDetails(
     }
 
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     extraDetails.forEachIndexed { index, labelInfo ->
         AnimatedVisibility(
@@ -284,7 +284,7 @@ private fun BarChartDataOverlayExtraDetails(
                     color = dataVisColorList[colorIndex],
                     size = 16.dp
                 )
-                SpacingExtraSmall()
+                HalfDialogInputSpacing()
                 Text(
                     text = labelInfo,
                     style = MaterialTheme.typography.body1,
@@ -384,7 +384,7 @@ private fun BarChartBodyView(
             xyPlot.redraw()
         })
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     if (bars.size > 1) {
         GraphLegend(

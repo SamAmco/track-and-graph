@@ -107,7 +107,7 @@ private fun AddTrackerInputForm(
 
     val isDuration = viewModel.isDuration.observeAsState(false)
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     NameInput(
         viewModel,
@@ -116,11 +116,11 @@ private fun AddTrackerInputForm(
         keyboardController
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     DescriptionInput(viewModel)
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     DurationCheckbox(isDuration.value, viewModel)
 
@@ -129,7 +129,7 @@ private fun AddTrackerInputForm(
     val durationConversionMode = viewModel.durationNumericConversionMode.observeAsState()
 
     if (shouldShowConversionSpinner.value) {
-        SpacingLarge()
+        InputSpacingLarge()
         DurationConversionModeInput(
             isDuration.value,
             durationConversionMode.value,
@@ -137,7 +137,7 @@ private fun AddTrackerInputForm(
         )
     }
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     AdvancedOptions(viewModel)
 }
@@ -153,11 +153,11 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
 
     AnimatedVisibility(visible = advancedOptionsExpanded) {
         Column {
-            SpacingSmall()
+            DialogInputSpacing()
 
             DefaultValueOptions(viewModel)
 
-            SpacingLarge()
+            InputSpacingLarge()
 
             Text(
                 text = stringResource(id = R.string.suggestions),
@@ -236,7 +236,7 @@ private fun AdvancedSectionHeader(
     verticalAlignment = Alignment.CenterVertically
 ) {
     Divider()
-    SpacingSmall()
+    DialogInputSpacing()
     Text(
         text = stringResource(id = R.string.advanced_options),
         style = MaterialTheme.typography.subtitle1
@@ -246,7 +246,7 @@ private fun AdvancedSectionHeader(
         painter = painterResource(id = R.drawable.down_arrow),
         contentDescription = null
     )
-    SpacingSmall()
+    DialogInputSpacing()
     Divider()
 }
 
@@ -276,7 +276,7 @@ private fun DefaultValueOptions(viewModel: AddTrackerViewModel) {
             if (isDuration.value) DurationInputRow(viewModel)
             else ValueInputRow(viewModel, focusManager)
 
-            SpacingSmall()
+            DialogInputSpacing()
 
             LabelInputRow(viewModel)
         }

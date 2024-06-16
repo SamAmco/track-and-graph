@@ -143,19 +143,19 @@ private fun UpdateDialog(
         fontSize = MaterialTheme.typography.h4.fontSize,
         fontWeight = MaterialTheme.typography.h4.fontWeight,
     )
-    SpacingLarge()
+    InputSpacingLarge()
 
     Text(
         stringResource(R.string.where_colon),
         fontSize = MaterialTheme.typography.subtitle1.fontSize,
         fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
     )
-    SpacingSmall()
+    DialogInputSpacing()
     WhereValueInput(viewModel)
-    SpacingSmall()
+    DialogInputSpacing()
     WhereLabelInput(viewModel)
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     Text(
         stringResource(R.string.to_colon),
@@ -163,9 +163,9 @@ private fun UpdateDialog(
         fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
     )
 
-    SpacingSmall()
+    DialogInputSpacing()
     ToValueInput(viewModel)
-    SpacingSmall()
+    DialogInputSpacing()
     ToLabelInput(viewModel)
 }
 
@@ -287,7 +287,7 @@ private fun DataPoint(
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.body2,
         )
-        SpacingSmall()
+        DialogInputSpacing()
         DataPointValueAndDescription(
             modifier = Modifier.weight(1f),
             dataPoint = dataPoint.toDataPoint(),

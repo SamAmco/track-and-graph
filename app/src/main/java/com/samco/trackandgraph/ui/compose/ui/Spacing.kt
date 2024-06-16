@@ -17,37 +17,51 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 
-@Composable
-fun SpacingExtraSmall() = Spacer(
-    modifier = Modifier
-        .height(dimensionResource(id = R.dimen.half_dialog_input_spacing))
-        .width(dimensionResource(id = R.dimen.half_dialog_input_spacing))
-)
+val cardMarginSmall: Dp
+    @Composable
+    get() = dimensionResource(id = R.dimen.card_margin_small)
+
+val halfDialogInputSpacing: Dp
+    @Composable
+    get() = dimensionResource(id = R.dimen.half_dialog_input_spacing)
+
+val cardPadding: Dp
+    @Composable
+    get() = dimensionResource(id = R.dimen.card_padding)
+
+val dialogInputSpacing: Dp
+    @Composable
+    get() = dimensionResource(id = R.dimen.dialog_input_spacing)
+
+val inputSpacingLarge: Dp
+    @Composable
+    get() = dimensionResource(id = R.dimen.input_spacing_large)
+
+val inputSpacingXLarge = 50.dp
+
 
 @Composable
-fun SpacingCard() = Spacer(
-    modifier = Modifier
-        .height(dimensionResource(id = R.dimen.card_padding))
-        .width(dimensionResource(id = R.dimen.card_padding))
-)
+fun CardMarginSmall() = Spacer(modifier = Modifier.size(cardMarginSmall))
 
 @Composable
-fun SpacingSmall() = Spacer(
-    modifier = Modifier
-        .height(dimensionResource(id = R.dimen.dialog_input_spacing))
-        .width(dimensionResource(id = R.dimen.dialog_input_spacing))
-)
+fun HalfDialogInputSpacing() = Spacer(modifier = Modifier.size(halfDialogInputSpacing))
 
 @Composable
-fun SpacingLarge() = Spacer(
-    modifier = Modifier
-        .height(dimensionResource(id = R.dimen.input_spacing_large))
-        .width(dimensionResource(id = R.dimen.input_spacing_large))
-)
+fun CardPadding() = Spacer(modifier = Modifier.size(cardPadding))
+
+@Composable
+fun DialogInputSpacing() = Spacer(modifier = Modifier.size(dialogInputSpacing))
+
+@Composable
+fun InputSpacingLarge() = Spacer(modifier = Modifier.size(inputSpacingLarge))
+
+@Composable
+fun InputSpacingXLarge() = Spacer(modifier = Modifier.size(inputSpacingXLarge))

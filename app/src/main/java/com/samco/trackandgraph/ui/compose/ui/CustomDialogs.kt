@@ -90,7 +90,7 @@ fun CustomConfirmCancelDialog(
     ) {
         content()
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         Row(
             modifier = Modifier.fillMaxWidth(),

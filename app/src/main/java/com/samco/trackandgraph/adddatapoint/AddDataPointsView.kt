@@ -216,7 +216,7 @@ private fun TrackerPage(
 
         TrackerNameHeadline(name = viewModel.name.observeAsState("").value)
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         val selectedDateTime by viewModel.timestamp.observeAsState(OffsetDateTime.now())
 
@@ -226,7 +226,7 @@ private fun TrackerPage(
             onDateTimeSelected = viewModel::updateTimestamp
         )
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         val suggestedValues by viewModel.suggestedValues.observeAsState(emptyList())
         val selectedSuggestedValue by viewModel.currentValueAsSuggestion.observeAsState()
@@ -238,7 +238,7 @@ private fun TrackerPage(
                 viewModel::onSuggestedValueSelected,
                 viewModel::onSuggestedValueLongPress
             )
-            SpacingSmall()
+            DialogInputSpacing()
         }
 
         LaunchedEffect(valueFocusRequester) {
@@ -335,7 +335,7 @@ private fun LabelAndNoteInputs(
     val noteInputFocusRequester = remember { FocusRequester() }
     val labelInputFocusRequester = remember { FocusRequester() }
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
 
@@ -362,7 +362,7 @@ private fun LabelAndNoteInputs(
     }
 
     if (noteAdded) {
-        if (labelAdded) SpacingSmall()
+        if (labelAdded) DialogInputSpacing()
         FullWidthTextField(
             modifier = Modifier
                 .heightIn(max = 200.dp)
@@ -378,7 +378,7 @@ private fun LabelAndNoteInputs(
         )
     }
 
-    if (labelAdded xor noteAdded) SpacingSmall()
+    if (labelAdded xor noteAdded) DialogInputSpacing()
 
     FlowRow(
         modifier = Modifier

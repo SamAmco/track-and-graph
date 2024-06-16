@@ -102,7 +102,7 @@ fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = Column(
 
 @Composable
 fun TutorialPage2() {
-    SpacingLarge()
+    InputSpacingLarge()
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
@@ -112,7 +112,7 @@ fun TutorialPage2() {
         fontWeight = MaterialTheme.typography.h5.fontWeight
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     //A vector drawing of a graph
     Icon(
@@ -124,7 +124,7 @@ fun TutorialPage2() {
         tint = Color.Unspecified
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
@@ -155,14 +155,14 @@ fun TutorialPage2() {
         fontWeight = MaterialTheme.typography.body2.fontWeight
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
 }
 
 @Composable
 fun TutorialPage1() = Column(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-    SpacingLarge()
+    InputSpacingLarge()
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
@@ -172,7 +172,7 @@ fun TutorialPage1() = Column(
         fontWeight = MaterialTheme.typography.h5.fontWeight
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     //A vector drawing of a graph
     Icon(
@@ -184,7 +184,7 @@ fun TutorialPage1() = Column(
         contentDescription = null
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
@@ -194,7 +194,7 @@ fun TutorialPage1() = Column(
         fontWeight = MaterialTheme.typography.body2.fontWeight
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
 }
 
 @Composable
@@ -203,7 +203,7 @@ private fun TutorialPage0() {
         modifier = Modifier.fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        SpacingSmall()
+        DialogInputSpacing()
 
         Text(
             text = stringResource(R.string.adding_your_first_data_point),
@@ -212,7 +212,7 @@ private fun TutorialPage0() {
             fontWeight = MaterialTheme.typography.h4.fontWeight
         )
 
-        SpacingLarge()
+        InputSpacingLarge()
 
         Text(
             text = stringResource(R.string.each_data_point_has_a_timestamp_and_value),
@@ -221,7 +221,7 @@ private fun TutorialPage0() {
             fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
         )
 
-        SpacingLarge()
+        InputSpacingLarge()
 
         Box(
             modifier = Modifier
@@ -235,7 +235,7 @@ private fun TutorialPage0() {
                     onDateTimeSelected = {}
                 )
 
-                SpacingSmall()
+                DialogInputSpacing()
 
                 ValueInputTextField(
                     textFieldValue = TextFieldValue(""),
@@ -252,7 +252,7 @@ private fun TutorialPage0() {
             )
         }
 
-        SpacingLarge()
+        InputSpacingLarge()
 
         Text(
             text = stringResource(R.string.it_can_also_optionally_have_a_label_and_a_note),
@@ -261,7 +261,7 @@ private fun TutorialPage0() {
             fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
         )
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         Box(
             modifier = Modifier
@@ -287,6 +287,6 @@ private fun TutorialPage0() {
             )
         }
 
-        SpacingLarge()
+        InputSpacingLarge()
     }
 }
