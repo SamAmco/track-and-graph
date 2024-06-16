@@ -3,6 +3,7 @@ package com.samco.trackandgraph.backupandrestore
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -36,9 +37,9 @@ class PeriodicBackupWorker @AssistedInject constructor(
             //TODO I don't actually recall seeing this work in a long time. Might not work on later
             // versions of Android?
             setForeground(createForegroundInfo())
-        } catch (e: Exception) {
+        } catch (t: Throwable) {
             //This can happen sometimes when the app is in the background
-            Timber.e(e, "setForeground failed")
+            Timber.e(t, "setForeground failed")
         }
 
         return when (val result = interactor.performAutoBackup()) {
@@ -124,6 +125,10 @@ class PeriodicBackupWorker @AssistedInject constructor(
             .setSmallIcon(R.drawable.notification_icon)
             .build()
 
-        return ForegroundInfo(AUTO_BACKUP_NOTIFICATION_ID, notification)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            ForegroundInfo(AUTO_BACKUP_NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        } else {
+            ForegroundInfo(AUTO_BACKUP_NOTIFICATION_ID, notification)
+        }
     }
 }
