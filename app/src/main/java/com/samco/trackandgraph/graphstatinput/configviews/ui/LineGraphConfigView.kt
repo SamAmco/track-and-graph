@@ -75,15 +75,15 @@ fun LineGraphConfigView(
 
     if (viewModel.yRangeType == YRangeType.FIXED) YRangeFromToInputs(viewModel)
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     Divider()
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     LineGraphFeaturesInputView(scrollState, viewModel)
 
-    SpacingSmall()
+    DialogInputSpacing()
 }
 
 @Composable
@@ -106,7 +106,7 @@ private fun LineGraphFeaturesInputView(
             onRemove = { viewModel.removeLineGraphFeature(index) },
             onUpdate = { viewModel.updateLineGraphFeature(index, it) }
         )
-        SpacingSmall()
+        DialogInputSpacing()
     }
 
     val coroutineScope = rememberCoroutineScope()
@@ -146,7 +146,7 @@ private fun LineGraphFeatureInputView(
                 )
             }
         }
-        SpacingExtraSmall()
+        HalfDialogInputSpacing()
         Row(modifier = Modifier.height(IntrinsicSize.Max)) {
             Column(
                 modifier = Modifier.fillMaxHeight(),
@@ -249,7 +249,7 @@ private fun LineGraphFeatureInputView(
                         onValueChange = { textFields.updateOffset(it) }
                     )
 
-                    SpacingSmall()
+                    DialogInputSpacing()
 
                     Text(
                         modifier = Modifier.alignByBaseline(),

@@ -76,7 +76,7 @@ private fun GlobalNoteDialogViewContent(viewModel: GlobalNoteInputViewModel) = S
 
         val focusRequester = remember { FocusRequester() }
 
-        SpacingLarge()
+        InputSpacingLarge()
 
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -85,7 +85,7 @@ private fun GlobalNoteDialogViewContent(viewModel: GlobalNoteInputViewModel) = S
             textAlign = TextAlign.Center
         )
 
-        SpacingLarge()
+        InputSpacingLarge()
 
         DateTimeButtonRow(
             modifier = Modifier.fillMaxWidth(),
@@ -93,7 +93,7 @@ private fun GlobalNoteDialogViewContent(viewModel: GlobalNoteInputViewModel) = S
             onDateTimeSelected = { viewModel.updateTimeStamp(it) }
         )
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         FullWidthTextField(
             modifier = Modifier.heightIn(max = 200.dp),
@@ -104,7 +104,7 @@ private fun GlobalNoteDialogViewContent(viewModel: GlobalNoteInputViewModel) = S
             singleLine = false
         )
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         AddCancelBottomButtons(
             updateMode = viewModel.updateMode.observeAsState(false).value,

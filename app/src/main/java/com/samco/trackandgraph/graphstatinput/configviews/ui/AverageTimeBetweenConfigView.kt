@@ -35,8 +35,8 @@ import com.samco.trackandgraph.graphstatinput.customviews.FilterByLabelSection
 import com.samco.trackandgraph.graphstatinput.customviews.FilterByValueSection
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
-import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
@@ -65,11 +65,11 @@ fun AverageTimeBetweenConfigView(
         sampleEndingAt = viewModel.sampleEndingAt
     ) { viewModel.updateSampleEndingAt(it) }
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     Divider()
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
@@ -88,13 +88,13 @@ fun AverageTimeBetweenConfigView(
         )
     }
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     FilterByLabelSection(viewModel)
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     FilterByValueSection(viewModel)
 
-    SpacingSmall()
+    DialogInputSpacing()
 }

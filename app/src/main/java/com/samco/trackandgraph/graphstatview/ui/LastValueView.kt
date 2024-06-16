@@ -38,8 +38,8 @@ import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
-import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import org.threeten.bp.Duration
@@ -106,7 +106,7 @@ private fun LastValueStatViewBody(
         textAlign = TextAlign.Center
     )
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     Box(
         modifier = Modifier
@@ -132,7 +132,7 @@ private fun LastValueStatViewBody(
                 textAlign = TextAlign.Center,
             )
 
-            SpacingLarge()
+            InputSpacingLarge()
 
             DataPointValueAndDescription(
                 modifier = Modifier.weight(1f),

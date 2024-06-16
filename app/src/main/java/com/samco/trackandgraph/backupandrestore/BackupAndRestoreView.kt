@@ -83,8 +83,8 @@ import com.samco.trackandgraph.ui.compose.ui.ConfirmDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DateButton
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
-import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TimeButton
 import kotlinx.coroutines.flow.filter
@@ -105,7 +105,7 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     BackupCard(viewModel = viewModel)
 
@@ -194,7 +194,7 @@ private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
             color = MaterialTheme.colors.onSurface
         )
 
-        SpacingLarge()
+        InputSpacingLarge()
 
         val autoBackupInfo = viewModel.autoBackupInfo.collectAsStateWithLifecycle().value
 
@@ -205,7 +205,7 @@ private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
             viewModel
         )
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         BackupButton(
             Modifier.align(Alignment.CenterHorizontally),
@@ -220,7 +220,7 @@ private fun ColumnScope.AutoBackupInfo(autoBackupInfo: BackupAndRestoreViewModel
     val context = LocalContext.current
 
     CenterGradientDivider()
-    SpacingLarge()
+    InputSpacingLarge()
     val lastSuccessful = autoBackupInfo.lastSuccessful?.let {
         formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), it)
     } ?: stringResource(id = R.string.none)
@@ -239,7 +239,7 @@ private fun ColumnScope.AutoBackupInfo(autoBackupInfo: BackupAndRestoreViewModel
         color = MaterialTheme.colors.onSurface,
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     val nextScheduled = autoBackupInfo.nextScheduled?.let {
         formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), it)
@@ -259,9 +259,9 @@ private fun ColumnScope.AutoBackupInfo(autoBackupInfo: BackupAndRestoreViewModel
         color = MaterialTheme.colors.onSurface,
     )
 
-    SpacingLarge()
+    InputSpacingLarge()
     CenterGradientDivider()
-    SpacingLarge()
+    InputSpacingLarge()
 }
 
 @Composable
@@ -312,7 +312,7 @@ private fun AutoBackupControls(modifier: Modifier, viewModel: BackupAndRestoreVi
         style = MaterialTheme.typography.button
     )
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     var showConfigureAutoBackupDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -502,7 +502,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
             style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
         )
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         if (location != null) {
             Text(
@@ -512,7 +512,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
                 overflow = TextOverflow.Ellipsis,
             )
 
-            SpacingSmall()
+            DialogInputSpacing()
         }
 
         Button(
@@ -530,9 +530,9 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
             )
         }
 
-        SpacingLarge()
+        InputSpacingLarge()
         Divider()
-        SpacingLarge()
+        InputSpacingLarge()
 
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -540,7 +540,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
             style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
         )
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -557,7 +557,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
                 textAlign = TextAlign.Center
             )
 
-            SpacingSmall()
+            DialogInputSpacing()
 
             val strings = mapOf(
                 ChronoUnit.HOURS to stringResource(id = R.string.hours_generic),
@@ -575,9 +575,9 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
             Spacer(modifier = Modifier.weight(1f))
         }
 
-        SpacingLarge()
+        InputSpacingLarge()
         Divider()
-        SpacingLarge()
+        InputSpacingLarge()
 
         Text(
             modifier = Modifier.fillMaxWidth(),
@@ -585,7 +585,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
             style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
         )
 
-        SpacingSmall()
+        DialogInputSpacing()
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -598,7 +598,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
                 allowPastDates = false
             )
 
-            SpacingSmall()
+            DialogInputSpacing()
 
             TimeButton(
                 dateTime = viewModel.autoBackupFirstDate.collectAsStateWithLifecycle().value,

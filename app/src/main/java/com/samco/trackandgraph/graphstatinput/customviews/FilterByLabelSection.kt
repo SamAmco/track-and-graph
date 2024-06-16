@@ -26,13 +26,13 @@ fun FilterByLabelSection(viewModel: FilterableFeatureConfigBehaviour) {
         label = stringResource(id = R.string.filter_by_label),
         focusRequester = focusRequester
     ) {
-        SpacingSmall()
+        DialogInputSpacing()
         when {
             viewModel.loadingLabels -> LoadingIndicator(it)
             viewModel.availableLabels.isEmpty() -> NoLabelsIndicator(it)
             else -> LabelsFadingLazyRow(it, viewModel)
         }
-        SpacingCard()
+        CardPadding()
     }
 }
 

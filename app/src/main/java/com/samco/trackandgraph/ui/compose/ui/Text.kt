@@ -15,6 +15,7 @@ package com.samco.trackandgraph.ui.compose.ui/*
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Preview
 @Composable
@@ -50,3 +52,48 @@ fun TrackerNameHeadline(
     )
 }
 
+@Composable
+fun TextBody1(
+    modifier: Modifier = Modifier,
+    text: String,
+    textAlign: TextAlign? = null,
+    maxLines: Int = Int.MAX_VALUE
+) = Text(
+    modifier = modifier,
+    text = text,
+    color = MaterialTheme.tngColors.textColorSecondary,
+    textAlign = textAlign,
+    style = MaterialTheme.typography.body1,
+    maxLines = maxLines
+)
+
+@Composable
+fun TextSubtitle2(
+    modifier: Modifier = Modifier,
+    text: String,
+    textAlign: TextAlign? = null,
+    maxLines: Int = Int.MAX_VALUE
+) = Text(
+    modifier = modifier,
+    text = text,
+    textAlign = textAlign,
+    style = MaterialTheme.typography.subtitle2,
+    color = MaterialTheme.colors.onSurface,
+    maxLines = maxLines
+)
+
+@Composable
+fun TextLink(
+    modifier: Modifier = Modifier,
+    text: String,
+    textAlign: TextAlign? = null,
+    maxLines: Int = Int.MAX_VALUE,
+    onClick: () -> Unit
+) = Text(
+    modifier = modifier.clickable(onClick = onClick),
+    text = text,
+    textAlign = textAlign,
+    style = MaterialTheme.typography.body1,
+    color = MaterialTheme.colors.secondaryVariant,
+    maxLines = maxLines
+)

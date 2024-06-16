@@ -43,7 +43,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.Spinner
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import org.threeten.bp.Duration
@@ -358,7 +358,7 @@ private fun CustomDurationDialog(
                 }
             )
 
-            SpacingSmall()
+            DialogInputSpacing()
 
             TextMapSpinner(
                 modifier = Modifier.weight(1f),

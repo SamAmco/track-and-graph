@@ -65,11 +65,11 @@ fun TimeHistogramConfigView(
         sampleEndingAt = viewModel.sampleEndingAt
     ) { viewModel.updateSampleEndingAt(it) }
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     Divider()
 
-    SpacingLarge()
+    InputSpacingLarge()
 
     Text(
         modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
@@ -88,7 +88,7 @@ fun TimeHistogramConfigView(
         )
     }
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     LabeledRow(
         label = stringResource(id = R.string.time_window_size),
@@ -112,7 +112,7 @@ fun TimeHistogramConfigView(
         )
     }
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     RowCheckbox(
         checked = viewModel.sumByCount,
@@ -120,5 +120,5 @@ fun TimeHistogramConfigView(
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
     )
 
-    SpacingSmall()
+    DialogInputSpacing()
 }

@@ -35,7 +35,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.ui.ColorSpinner
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.SpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 
 @Composable
 fun AddGroupDialog(viewModel: AddGroupDialogViewModel, onDismissRequest: () -> Unit = {}) {
@@ -73,7 +73,7 @@ private fun AddGroupView(modifier: Modifier, viewModel: AddGroupDialogViewModel)
             style = MaterialTheme.typography.h6
         )
 
-        SpacingLarge()
+        InputSpacingLarge()
 
         val focusRequester = remember { FocusRequester() }
 

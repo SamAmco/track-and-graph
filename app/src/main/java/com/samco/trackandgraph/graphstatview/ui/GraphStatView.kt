@@ -39,7 +39,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewDat
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -58,7 +58,7 @@ fun GraphStatView(
         style = MaterialTheme.typography.h6,
         textAlign = TextAlign.Center
     )
-    SpacingSmall()
+    DialogInputSpacing()
     when (graphStatViewData.state) {
         IGraphStatViewData.State.LOADING -> {
             Box(

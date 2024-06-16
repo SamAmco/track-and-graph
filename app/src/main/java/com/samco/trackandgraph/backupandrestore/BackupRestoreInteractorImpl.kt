@@ -30,9 +30,9 @@ import org.threeten.bp.ZoneId
 import org.threeten.bp.temporal.ChronoUnit
 import timber.log.Timber
 import java.io.File
-import java.lang.Long
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.math.max
 
 class BackupRestoreInteractorImpl @Inject constructor(
     private val database: TrackAndGraphDatabase,
@@ -199,7 +199,7 @@ class BackupRestoreInteractorImpl @Inject constructor(
             else -> throw IllegalArgumentException("Invalid unit")
         }
 
-        val secondsDelay = Long.max(
+        val secondsDelay = max(
             10L,
             backupConfig.firstDate.toEpochSecond() - OffsetDateTime.now().toEpochSecond()
         )

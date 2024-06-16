@@ -51,7 +51,7 @@ fun CheckboxLabeledExpandingSection(
             checked = checked,
             onCheckedChange = { onCheckedChanged(it) }
         )
-        SpacingLarge()
+        InputSpacingLarge()
         Text(text = label)
     }
     if (checked) {

@@ -18,12 +18,10 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
-import android.view.LayoutInflater
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
@@ -33,7 +31,7 @@ import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
@@ -121,7 +119,7 @@ private fun TimeHistogramBodyView(
             xyPlot.requestLayout()
         })
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     if (barValues.size > 1) {
         GraphLegend(

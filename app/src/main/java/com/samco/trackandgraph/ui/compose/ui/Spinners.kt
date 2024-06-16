@@ -126,9 +126,9 @@ fun CircleSpinner(
         )
     },
     dropdownItemFactory = { index, _ ->
-        SpacingExtraSmall()
+        HalfDialogInputSpacing()
         Circle(content = { circleContent(index) })
-        SpacingExtraSmall()
+        HalfDialogInputSpacing()
     },
     enableTrailingIcon = false,
     dropdownContentAlignment = Alignment.CenterHorizontally

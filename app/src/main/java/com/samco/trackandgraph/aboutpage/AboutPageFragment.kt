@@ -16,35 +16,55 @@
 */
 package com.samco.trackandgraph.aboutpage
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.samco.trackandgraph.databinding.AboutPageBinding
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.ui.platform.ComposeView
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import timber.log.Timber
 
 class AboutPageFragment : Fragment() {
-    //We can set text from code here because it's language independent
-    @SuppressLint("SetTextI18n")
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val binding = AboutPageBinding.inflate(inflater, container, false)
-        val url = getString(R.string.github_link)
-        binding.githubLinkButton.setOnClickListener {
-            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            startActivity(browserIntent)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val versionText = getVersionText()
+
+        return ComposeView(requireContext()).apply {
+            setContent {
+                TnGComposeTheme {
+                    AboutPageView(
+                        versionText = versionText,
+                        onRepoLinkClicked = { onRepoLinkClicked() }
+                    )
+                }
+            }
         }
-        try {
-            val pInfo = requireContext().packageManager.getPackageInfo(requireActivity().packageName, 0)
-            binding.versionText.text = "v${pInfo.versionName}"
-        } catch (e: Exception) { Timber.d("Could not get package version name: ${e.message}") }
-        return binding.root
+    }
+
+    private fun onRepoLinkClicked() {
+        val url = getString(R.string.github_link)
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(browserIntent)
+    }
+
+    private fun getVersionText(): String {
+        return try {
+            val pInfo = requireContext().packageManager
+                .getPackageInfo(requireActivity().packageName, 0)
+            "v${pInfo.versionName}"
+        } catch (e: Exception) {
+            Timber.d("Could not get package version name: ${e.message}")
+            ""
+        }
     }
 
     override fun onResume() {

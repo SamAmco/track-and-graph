@@ -64,7 +64,7 @@ fun AddChipButton(
         style = MaterialTheme.typography.body1,
         color = MaterialTheme.tngColors.onSurface
     )
-    SpacingSmall()
+    DialogInputSpacing()
 }
 
 @Composable

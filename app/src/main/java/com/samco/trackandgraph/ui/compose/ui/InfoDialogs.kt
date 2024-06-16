@@ -45,7 +45,7 @@ fun DataPointInfoDialog(
         fontSize = MaterialTheme.typography.h5.fontSize,
         fontWeight = MaterialTheme.typography.h5.fontWeight
     )
-    SpacingSmall()
+    DialogInputSpacing()
     Text(dataPoint.getDisplayValue(isDuration))
     Text(dataPoint.note)
 }
@@ -63,7 +63,7 @@ fun DataPointValueAndDescription(
         fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
     )
     if (dataPoint.note.isNotEmpty()) {
-        SpacingSmall()
+        DialogInputSpacing()
         if (restrictNoteText) {
             Text(
                 text = dataPoint.note,
@@ -90,7 +90,7 @@ fun FeatureInfoDialog(
         fontSize = MaterialTheme.typography.h5.fontSize,
         fontWeight = MaterialTheme.typography.h5.fontWeight
     )
-    SpacingSmall()
+    DialogInputSpacing()
     Text(feature.description)
 }
 

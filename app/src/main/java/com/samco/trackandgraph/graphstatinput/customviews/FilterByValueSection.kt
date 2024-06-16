@@ -15,7 +15,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.CheckboxLabeledExpandingSection
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.FilterableFeatureConfigBehaviour
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
-import com.samco.trackandgraph.ui.compose.ui.SpacingSmall
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 
 @Composable
 fun FilterByValueSection(viewModel: FilterableFeatureConfigBehaviour) {
@@ -27,7 +27,7 @@ fun FilterByValueSection(viewModel: FilterableFeatureConfigBehaviour) {
         label = stringResource(id = R.string.filter_by_value),
         focusRequester = focusRequester
     ) {
-        SpacingSmall()
+        DialogInputSpacing()
         Row(Modifier.padding(dimensionResource(id = R.dimen.card_padding))) {
             Text(
                 modifier = Modifier.alignByBaseline(),
@@ -44,7 +44,7 @@ fun FilterByValueSection(viewModel: FilterableFeatureConfigBehaviour) {
                 onValueChange = { viewModel.updateFromValue(it) }
             )
 
-            SpacingSmall()
+            DialogInputSpacing()
 
             Text(
                 modifier = Modifier.alignByBaseline(),

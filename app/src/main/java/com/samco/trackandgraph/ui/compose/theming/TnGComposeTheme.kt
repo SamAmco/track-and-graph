@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import com.google.android.material.composethemeadapter.createMdcTheme
+import com.samco.trackandgraph.ui.compose.ui.shapes
 
 private val lightGray = Color(0xFFE0E0E0)
 private val darkGray = Color(0xFF4C4C4C)
@@ -33,7 +34,8 @@ private val midCharcoal = Color(0xFF222222)
 
 data class TngColors(
     val material: Colors,
-    val selectorButtonColor: Color
+    val selectorButtonColor: Color,
+    val textColorSecondary: Color
 ) {
     val primary get() = material.primary
     val primaryVariant get() = material.primaryVariant
@@ -53,12 +55,14 @@ data class TngColors(
 
 private val LightColorPalette = TngColors(
     material = lightColors(),
-    selectorButtonColor = lightGray
+    selectorButtonColor = lightGray,
+    textColorSecondary = darkGray
 )
 
 private val DarkColorPalette = TngColors(
     material = darkColors(),
-    selectorButtonColor = darkGray
+    selectorButtonColor = darkGray,
+    textColorSecondary = lightGray
 )
 
 val TngColors.disabledAlpha get() = 0.4f
@@ -75,7 +79,7 @@ fun TnGComposeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     block: @Composable () -> Unit
 ) {
-    val (materialColors, typography, shapes) = createMdcTheme(
+    val (materialColors, typography, _) = createMdcTheme(
         context = LocalContext.current,
         layoutDirection = LocalLayoutDirection.current
     )
@@ -86,7 +90,7 @@ fun TnGComposeTheme(
         MaterialTheme(
             colors = colors.material,
             typography = typography ?: MaterialTheme.typography,
-            shapes = shapes ?: MaterialTheme.shapes,
+            shapes = shapes,
             content = block
         )
     }

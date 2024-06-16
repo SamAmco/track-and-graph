@@ -35,12 +35,10 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.graphstatinput.configviews.ui.*
-import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.ui.compose.theming.tngColors
@@ -196,7 +194,7 @@ private fun GraphStatInputViewForm(
         label = stringResource(id = R.string.graph_or_stat_name)
     )
 
-    SpacingSmall()
+    DialogInputSpacing()
 
     val updateMode = viewModel.updateMode.observeAsState(false)
     if (!updateMode.value) {
@@ -207,9 +205,9 @@ private fun GraphStatInputViewForm(
         )
     }
 
-    SpacingSmall()
+    DialogInputSpacing()
     Divider()
-    SpacingSmall()
+    DialogInputSpacing()
 
     ConfigInputView(
         viewModelStoreOwner = viewModelStoreOwner,
