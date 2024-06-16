@@ -30,18 +30,18 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-internal interface ServiceManager {
+internal interface TimerServiceInteractor {
     fun startTimerNotificationService()
     fun requestWidgetUpdatesForFeatureId(featureId: Long)
     fun requestWidgetsDisabledForFeatureId(featureId: Long)
 }
 
-internal class ServiceManagerImpl @Inject constructor(
+internal class TimerServiceInteractorImpl @Inject constructor(
     @ApplicationContext private val context: Context,
     private val pendingIntentProvider: PendingIntentProvider,
     @IODispatcher private val io: CoroutineDispatcher,
     private val dao: TrackAndGraphDatabaseDao
-) : ServiceManager {
+) : TimerServiceInteractor {
 
     private val ioJob = CoroutineScope(Job() + io)
 

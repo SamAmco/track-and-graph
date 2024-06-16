@@ -25,8 +25,8 @@ import com.samco.trackandgraph.base.database.sampling.DataSamplerImpl
 import com.samco.trackandgraph.base.model.*
 import com.samco.trackandgraph.base.model.DataInteractorImpl
 import com.samco.trackandgraph.base.model.TrackerHelperImpl
-import com.samco.trackandgraph.base.service.ServiceManager
-import com.samco.trackandgraph.base.service.ServiceManagerImpl
+import com.samco.trackandgraph.base.service.TimerServiceInteractor
+import com.samco.trackandgraph.base.service.TimerServiceInteractorImpl
 import com.samco.trackandgraph.base.system.*
 import com.samco.trackandgraph.base.system.AlarmManagerWrapper
 import com.samco.trackandgraph.base.system.AlarmManagerWrapperImpl
@@ -69,7 +69,7 @@ class ModelModule {
     internal fun getAlarmInteractor(impl: RemindersHelper): AlarmInteractor = impl
 
     @Provides
-    internal fun getServiceManager(impl: ServiceManagerImpl): ServiceManager = impl
+    internal fun getServiceManager(impl: TimerServiceInteractorImpl): TimerServiceInteractor = impl
 
     @Provides
     internal fun getDataSampler(impl: DataSamplerImpl): DataSampler = impl

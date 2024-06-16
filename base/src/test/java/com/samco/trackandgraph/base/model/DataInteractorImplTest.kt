@@ -24,7 +24,7 @@ import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
 import com.samco.trackandgraph.base.database.sampling.DataSampler
-import com.samco.trackandgraph.base.service.ServiceManager
+import com.samco.trackandgraph.base.service.TimerServiceInteractor
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.*
 import org.junit.Assert.assertEquals
@@ -43,7 +43,7 @@ class DataInteractorImplTest {
     private val trackerHelper: TrackerHelper = mock()
     private val csvReadWriter: CSVReadWriter = mock()
     private val alarmInteractor: AlarmInteractor = mock()
-    private val serviceManager: ServiceManager = mock()
+    private val timerServiceInteractor: TimerServiceInteractor = mock()
     private val dataSampler: DataSampler = mock()
 
     @Before
@@ -57,7 +57,7 @@ class DataInteractorImplTest {
             trackerHelper = trackerHelper,
             csvReadWriter = csvReadWriter,
             alarmInteractor = alarmInteractor,
-            serviceManager = serviceManager,
+            timerServiceInteractor = timerServiceInteractor,
             dataSampler = dataSampler
         )
     }
