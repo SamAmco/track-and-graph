@@ -37,6 +37,12 @@
             android:authorities="${applicationId}.androidx-startup"
             tools:node="remove" />
 
+        <!-- This is also for the benefit of the work manager. See here: https://developer.android.com/develop/background-work/background-tasks/persistent/how-to/long-running#foreground-service-type -->
+        <service
+            android:name="androidx.work.impl.foreground.SystemForegroundService"
+            android:foregroundServiceType="dataSync"
+            tools:node="merge" />
+
         <activity
             android:name="com.samco.trackandgraph.MainActivity"
             android:exported="true"
