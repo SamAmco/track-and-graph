@@ -23,7 +23,7 @@ import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.database.sampling.DataSampler
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.service.ServiceManager
+import com.samco.trackandgraph.base.service.TimerServiceInteractor
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +43,7 @@ internal class DataInteractorImpl @Inject constructor(
     private val trackerHelper: TrackerHelper,
     private val csvReadWriter: CSVReadWriter,
     private val alarmInteractor: AlarmInteractor,
-    private val serviceManager: ServiceManager,
+    private val timerServiceInteractor: TimerServiceInteractor,
     private val dataSampler: DataSampler
 ) : DataInteractor, TrackerHelper by trackerHelper, DataSampler by dataSampler {
 
@@ -66,7 +66,7 @@ internal class DataInteractorImpl @Inject constructor(
         val allFeatureIdsAfterDelete = dao.getAllFeaturesSync().map { it.id }.toSet()
         val deletedFeatureIds = allFeatureIdsBeforeDelete.minus(allFeatureIdsAfterDelete)
         //Trigger a feature delete request for all deleted features
-        deletedFeatureIds.forEach { serviceManager.requestWidgetsDisabledForFeatureId(it) }
+        deletedFeatureIds.forEach { timerServiceInteractor.requestWidgetsDisabledForFeatureId(it) }
         //Emit a data update event
         dataUpdateEvents.emit(DataUpdateType.GroupDeleted)
     }
@@ -115,7 +115,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun updateTracker(tracker: Tracker) = withContext(io) {
         trackerHelper.updateTracker(tracker)
         dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
-        serviceManager.requestWidgetUpdatesForFeatureId(featureId = tracker.featureId)
+        timerServiceInteractor.requestWidgetUpdatesForFeatureId(featureId = tracker.featureId)
     }
 
     override suspend fun updateTracker(
@@ -142,7 +142,7 @@ internal class DataInteractorImpl @Inject constructor(
             suggestionType = suggestionType,
             suggestionOrder = suggestionOrder
         ).also {
-            serviceManager.requestWidgetUpdatesForFeatureId(featureId = oldTracker.featureId)
+            timerServiceInteractor.requestWidgetUpdatesForFeatureId(featureId = oldTracker.featureId)
             dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
         }
     }
@@ -170,7 +170,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun deleteFeature(featureId: Long) = withContext(io) {
         val isTracker = dao.getTrackerByFeatureId(featureId) != null
         dao.deleteFeature(featureId)
-        serviceManager.requestWidgetsDisabledForFeatureId(featureId = featureId)
+        timerServiceInteractor.requestWidgetsDisabledForFeatureId(featureId = featureId)
         if (isTracker) dataUpdateEvents.emit(DataUpdateType.TrackerDeleted)
         else dataUpdateEvents.emit(DataUpdateType.Function)
     }
@@ -563,8 +563,8 @@ internal class DataInteractorImpl @Inject constructor(
 
     override suspend fun playTimerForTracker(trackerId: Long): Long? {
         return trackerHelper.playTimerForTracker(trackerId)?.also {
-            serviceManager.startTimerNotificationService()
-            serviceManager.requestWidgetUpdatesForFeatureId(it)
+            timerServiceInteractor.startTimerNotificationService()
+            timerServiceInteractor.requestWidgetUpdatesForFeatureId(it)
             dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
         }
     }
@@ -572,7 +572,7 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun stopTimerForTracker(trackerId: Long): Duration? =
         trackerHelper.getTrackerById(trackerId)?.let { tracker ->
             trackerHelper.stopTimerForTracker(trackerId).also {
-                serviceManager.requestWidgetUpdatesForFeatureId(tracker.featureId)
+                timerServiceInteractor.requestWidgetUpdatesForFeatureId(tracker.featureId)
                 dataUpdateEvents.emit(DataUpdateType.TrackerUpdated)
             }
         }
