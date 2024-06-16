@@ -38,7 +38,7 @@ import com.samco.trackandgraph.base.model.DataPointUpdateHelperImpl
 import com.samco.trackandgraph.base.model.DatabaseTransactionHelperImpl
 import com.samco.trackandgraph.base.model.RemindersHelperImpl
 import com.samco.trackandgraph.base.model.TrackerHelperImpl
-import com.samco.trackandgraph.base.service.ServiceManager
+import com.samco.trackandgraph.base.service.TimerServiceInteractor
 import com.samco.trackandgraph.base.system.AlarmManagerWrapperImpl
 import com.samco.trackandgraph.base.system.ReminderPrefWrapperImpl
 import com.samco.trackandgraph.base.system.SystemInfoProviderImpl
@@ -60,7 +60,7 @@ class DemoDBGenerator {
     companion object {
     }
 
-    private val mockServiceManager = object : ServiceManager {
+    private val mockServiceManager = object : TimerServiceInteractor {
         override fun startTimerNotificationService() {
             //Do nothing
         }
@@ -110,7 +110,7 @@ class DemoDBGenerator {
             dao = database.trackAndGraphDatabaseDao,
             io = Dispatchers.IO
         ),
-        serviceManager = mockServiceManager,
+        timerServiceInteractor = mockServiceManager,
         dataSampler = DataSamplerImpl(dao = database.trackAndGraphDatabaseDao)
     )
 
