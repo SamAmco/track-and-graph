@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ This file is part of Track & Graph
+  ~ 
+  ~ Track & Graph is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~ 
+  ~ Track & Graph is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ 
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<resources>
+
+    <style name="AppThemeBase" parent="Theme.MaterialComponents.DayNight">
+        <item name="android:actionOverflowButtonStyle">@style/Style.OverflowButtonStyle</item>
+        <item name="actionOverflowMenuStyle">@style/Style.OverflowMenuStyle</item>
+        <item name="editTextStyle">@style/Style.EditTextStyle</item>
+        <item name="cardViewStyle">@style/Style.CardViewStyle</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="buttonStyle">@style/Style.ButtonStyle</item>
+
+        <item name="textAppearanceHeadline2">@style/TextAppearance.Headline2</item>
+        <item name="textAppearanceHeadline4">@style/TextAppearance.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.Headline5</item>
+        <item name="textAppearanceHeadline6">@style/TextAppearance.Headline6</item>
+        <item name="textAppearanceSubtitle1">@style/TextAppearance.Subtitle1</item>
+        <item name="textAppearanceSubtitle2">@style/TextAppearance.Subtitle2</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.Body</item>
+    </style>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="AppThemeBase">
+        <!--COLORS-->
+        <item name="android:colorBackground">@color/chalky_white</item>
+        <item name="colorAccent">@color/orange</item>
+        <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
+        <item name="colorContainer">@color/white</item>
+        <item name="colorSurfaceVariant">@color/white</item>
+        <item name="colorOutline">@color/light_gray</item>
+        <item name="selectorButtonColor">@color/light_gray</item>
+        <item name="colorSecondaryContainer">@color/orange</item>
+        <item name="colorOnSecondaryContainer">@color/white</item>
+        <item name="colorPrimary">@color/orange</item>
+        <item name="colorOnPrimary">@color/blue_black</item>
+        <item name="colorPrimaryDark">@color/dark_orange</item>
+        <item name="colorSecondary">@color/light_blue</item>
+        <item name="colorPrimaryContainer">@color/orange</item>
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnSecondary">@color/blue_black</item>
+        <item name="colorPrimaryVariant">@color/dark_orange</item>
+        <item name="colorSecondaryVariant">@color/dark_blue</item>
+        <item name="errorTextColor">@color/dark_orange</item>
+        <item name="colorOnError">@color/faded_green</item>
+        <item name="colorError">@color/dark_orange</item>
+        <item name="colorControlNormal">@color/blue_black</item>
+        <item name="colorControlHighlight">@color/light_gray</item>
+        <item name="toolbarBackgroundColor">@color/blue_white_pastel</item>
+        <item name="android:textColorPrimary">@color/blue_black</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/blue_black</item>
+        <item name="android:textColorSecondary">@color/dark_gray</item>
+        <item name="android:textColorHint">@color/mid_gray</item>
+        <item name="android:windowBackground">@color/chalky_white</item>
+    </style>
+
+    <style name="TransparentTheme" parent="AppTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+
+    <style name="AppTheme.AlertDialogTheme" parent="Theme.MaterialComponents.DayNight.Dialog.Alert">
+        <item name="android:background">@color/white</item>
+        <item name="colorAccent">@color/orange</item>
+        <item name="android:textColorPrimary">@color/blue_black</item>
+        <item name="android:textColorPrimaryDisableOnly">@color/blue_black</item>
+        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="colorPrimary">@color/blue_black</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
+    </style>
+
+    <style name="ShapeAppearance.TnG.Corner.Small" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/card_corner_radius</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
+    </style>
+
+    <style name="NeutralButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/orange</item>
+        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
+    </style>
+</resources>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ This file is part of Track & Graph
+  ~ 
+  ~ Track & Graph is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~ 
+  ~ Track & Graph is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~ 
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+  -->
+<resources>
+    <!--Primarily light theme colors-->
+    <color name="light_blue">#74add1</color>
+    <color name="dark_blue">#427ea0</color>
+    <color name="orange">#f46d43</color>
+    <color name="dark_orange">#bb3d18</color>
+    <color name="blue_black">#2B3B45</color>
+
+    <!--Primarily dark theme colors-->
+    <color name="dark_charcoal">#121212</color>
+    <color name="mid_charcoal">#222222</color>
+    <color name="light_charcoal">#373737</color>
+    <color name="faded_light_blue">#88aabf</color>
+    <color name="faded_dark_blue">#54788c</color>
+
+    <color name="faded_orange">#e17656</color>
+    <color name="faded_dark_orange">#a24a2f</color>
+    <color name="faded_green">#4abf50</color>
+
+    <!--Generic colors-->
+    <color name="blue_white_pastel">#d3dade</color>
+    <color name="chalky_white">#f3f3f3</color>
+    <color name="black">#000000</color>
+    <color name="dark_gray">#4C4C4C</color>
+    <color name="mid_gray">#7C7C7C</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Data visualisation colors
+    Some useful tools for finding color blind safe color palettes:
+    For checking how safe the palette is: https://projects.susielu.com/viz-palette
+    For generating palette's: http://paletton.com/#uid=12K0Q0kw0w0jyC+oRxVy4oIDfjr
+    The source for the original scheme: https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=10
+    -->
+    <color name="visColor1">#a50026</color>
+    <color name="visColor2">#d73027</color>
+    <color name="visColor3">#f46d43</color>
+    <color name="visColor4">#fdae61</color>
+    <color name="visColor5">#fee090</color>
+    <color name="visColor6">#e0f3f8</color>
+    <color name="visColor7">#abd9e9</color>
+    <color name="visColor8">#74add1</color>
+    <color name="visColor9">#4575b4</color>
+    <color name="visColor10">#313695</color>
+    <color name="visColor11">#54D931</color>
+    <color name="visColor12">#1B8200</color>
+</resources>
