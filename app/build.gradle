@@ -102,6 +102,10 @@ dependencies {
     implementation libs.androidx.constraintlayout
     implementation libs.androidx.legacy.support.v4
 
+    //lua
+    implementation 'com.soywiz.korlibs.luak:luak-jvm:3.4.0'
+
+
     //Dependency Injection
     implementation libs.hilt.android
     ksp libs.hilt.compiler

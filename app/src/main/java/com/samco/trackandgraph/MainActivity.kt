@@ -1,19 +1,19 @@
-/* 
-* This file is part of Track & Graph
-* 
-* Track & Graph is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Track & Graph is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-*/
+/*
+ * This file is part of Track & Graph
+ *
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Track & Graph is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph
 
 import android.content.res.Configuration
@@ -49,11 +49,16 @@ import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import org.luaj.vm2.LuaValue
+import org.luaj.vm2.lib.jse.JsePlatform
 
-enum class NavButtonStyle { UP, MENU }
+enum class NavButtonStyle {
+    UP,
+    MENU
+}
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -84,14 +89,83 @@ class MainActivity : AppCompatActivity() {
         onDrawerHideKeyboard()
         initDrawerSpinners()
         viewModel.syncAlarms()
-        if (prefHelper.isFirstRun()) showTutorial()
-        else destroyTutorial()
+        if (prefHelper.isFirstRun()) showTutorial() else destroyTutorial()
+
+        val iterations = 1000000
+        val warmUpIterations = 10000
+        val benchmarkRuns = 10
+
+        // Warm-up phase
+        testLua(warmUpIterations)
+        testKotlin(warmUpIterations)
+
+        // Benchmark phase
+        val luaTimes = LongArray(benchmarkRuns)
+        val kotlinTimes = LongArray(benchmarkRuns)
+
+        for (i in 0 until benchmarkRuns) {
+            luaTimes[i] = testLua(iterations)
+            kotlinTimes[i] = testKotlin(iterations)
+        }
+
+        val luaAverageTime = luaTimes.average()
+        val kotlinAverageTime = kotlinTimes.average()
+
+        println("samsam Lua average execution time: ${luaAverageTime / 1_000_000} ms")
+        println("samsam Kotlin average execution time: ${kotlinAverageTime / 1_000_000} ms")
+        println("samsam Lua is ${(luaAverageTime / kotlinAverageTime) / 1_000_000} times slower than Kotlin")
+    }
+
+    private fun testLua(iterations: Int): Long {
+        val startTime = System.nanoTime()
+        val globals = JsePlatform.standardGlobals()
+        val luaScript =
+            """
+        local sum = 0
+        function createObject(number)
+            sum = sum + number
+            return {id = number, number = sum}
+        end
+    """
+        globals.load(luaScript).call()
+        val createObject = globals["createObject"]
+
+        val dataList = mutableListOf<DataObject>()
+
+        for (i in 1..iterations) {
+            val luaTable = createObject.call(LuaValue.valueOf(i)).checktable()!!
+            val dataObject = DataObject(luaTable["id"].toString(), luaTable["number"].toint())
+            dataList.add(dataObject)
+        }
+
+        println("samsam Last Lua DataObject: ${dataList.last()}")
+        val endTime = System.nanoTime()
+        return endTime - startTime
+    }
+
+    data class DataObject(val name: String, val number: Int)
+
+    private fun testKotlin(iterations: Int): Long {
+        var sum = 0
+        val startTime = System.nanoTime()
+
+        val dataList = mutableListOf<DataObject>()
+
+        for (i in 1..iterations) {
+            sum += i
+            val dataObject = DataObject(i.toString(), sum)
+            dataList.add(dataObject)
+        }
+
+        println("samsam Last Lua DataObject: ${dataList.last()}")
+        val endTime = System.nanoTime()
+        return endTime - startTime
     }
 
     private fun initializeNav() {
         drawerLayout = findViewById(R.id.drawer_layout)
-        navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_fragment)!! as NavHostFragment
+        navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.nav_fragment)!! as NavHostFragment
         navController = navHostFragment.navController
         navView = findViewById(R.id.nav_view)
         navView.setupWithNavController(navController)
@@ -100,33 +174,40 @@ class MainActivity : AppCompatActivity() {
     private fun initializeAppBar() {
         setSupportActionBar(toolbar)
         supportActionBar?.let {
-            //The ActionBarDrawerToggle draws the navigation button/back button in the top left of
-            //the action bar
-            actionBarDrawerToggle = ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.open, R.string.close
-            )
-            //This click listener is called only when the button is "disabled" (i.e. the back button
+            // The ActionBarDrawerToggle draws the navigation button/back button in the top left of
+            // the action bar
+            actionBarDrawerToggle =
+                ActionBarDrawerToggle(
+                    this,
+                    drawerLayout,
+                    toolbar,
+                    R.string.open,
+                    R.string.close
+                )
+            // This click listener is called only when the button is "disabled" (i.e. the back
+            // button
             // is showing rather than the hamburger icon)
             actionBarDrawerToggle.setToolbarNavigationClickListener { onBackPressed() }
-            //This notifies the button of when the drawer is open or closed
+            // This notifies the button of when the drawer is open or closed
             drawerLayout.addDrawerListener(actionBarDrawerToggle)
-            //This function should be called to synchronise the button with the drawers current state
+            // This function should be called to synchronise the button with the drawers current
+            // state
             actionBarDrawerToggle.syncState()
         }
-        //supportActionBar?.setHomeButtonEnabled(true)
-        //supportActionBar?.setDisplayShowHomeEnabled(true)
+        // supportActionBar?.setHomeButtonEnabled(true)
+        // supportActionBar?.setDisplayShowHomeEnabled(true)
         setActionBarConfig(NavBarConfig(NavButtonStyle.MENU))
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onPostCreate(savedInstanceState, persistentState)
-        //See the documentation of syncState for the eplanation of why this is done here
+        // See the documentation of syncState for the eplanation of why this is done here
         actionBarDrawerToggle.syncState()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        //Doing this here was reccomended on stack overflow. See the documentation of syncState
+        // Doing this here was reccomended on stack overflow. See the documentation of syncState
         actionBarDrawerToggle.syncState()
     }
 
@@ -141,10 +222,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Set the title in the action bar and whether to show the menu button or the back button
-     * in the top left. Every fragment should call this.
+     * Set the title in the action bar and whether to show the menu button or the back button in the
+     * top left. Every fragment should call this.
      */
-    fun setActionBarConfig(buttonStyle: NavButtonStyle, title: String? = null, clearSubtitle: Boolean = false) {
+    fun setActionBarConfig(
+        buttonStyle: NavButtonStyle,
+        title: String? = null,
+        clearSubtitle: Boolean = false
+    ) {
         setActionBarConfig(NavBarConfig(buttonStyle, title, clearSubtitle))
     }
 
@@ -153,8 +238,7 @@ class MainActivity : AppCompatActivity() {
         val title = config.title ?: getString(R.string.app_name)
         supportActionBar?.title = title
 
-        if (!config.clearSubtitle)
-        {
+        if (!config.clearSubtitle) {
             supportActionBar?.subtitle = null
         }
 
@@ -163,6 +247,7 @@ class MainActivity : AppCompatActivity() {
                 actionBarDrawerToggle.isDrawerIndicatorEnabled = true
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
             }
+
             NavButtonStyle.UP -> {
                 actionBarDrawerToggle.isDrawerIndicatorEnabled = false
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -179,29 +264,28 @@ class MainActivity : AppCompatActivity() {
     private fun setUpDateFormatSpinner() {
         val spinner = navView.menu.findItem(R.id.dateFormatSpinner).actionView as AppCompatSpinner
         val formatNames = resources.getStringArray(R.array.date_formats)
-        spinner.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            formatNames
-        )
+        spinner.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, formatNames)
         spinner.setSelection(prefHelper.getDateFormatValue())
-        spinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
-                prefHelper.setDateTimeFormatIndex(position)
-            }
+        spinner.onItemSelectedListener =
+            object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    av: AdapterView<*>?,
+                    v: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    prefHelper.setDateTimeFormatIndex(position)
+                }
 
-            override fun onNothingSelected(p0: AdapterView<*>?) {
+                override fun onNothingSelected(p0: AdapterView<*>?) {}
             }
-        }
     }
 
     private fun setUpThemeSpinner() {
         val spinner = navView.menu.findItem(R.id.themeSpinner).actionView as AppCompatSpinner
-        spinner.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            getThemeNames()
-        )
+        spinner.adapter =
+            ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, getThemeNames())
         val currentTheme = getThemeValue()
         updateStatusBarColor()
         when (currentTheme) {
@@ -209,14 +293,20 @@ class MainActivity : AppCompatActivity() {
             AppCompatDelegate.MODE_NIGHT_YES -> spinner.setSelection(2)
             else -> spinner.setSelection(0)
         }
-        spinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
-                onThemeSelected(position)
-                updateStatusBarColor()
-            }
+        spinner.onItemSelectedListener =
+            object : OnItemSelectedListener {
+                override fun onItemSelected(
+                    av: AdapterView<*>?,
+                    v: View?,
+                    position: Int,
+                    id: Long
+                ) {
+                    onThemeSelected(position)
+                    updateStatusBarColor()
+                }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
     }
 
     private fun updateStatusBarColor() {
@@ -254,17 +344,19 @@ class MainActivity : AppCompatActivity() {
         else resources.getStringArray(R.array.theme_names_pre_Q)
 
     private fun onDrawerHideKeyboard() {
-        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
-            override fun onDrawerStateChanged(newState: Int) {}
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-                window.hideKeyboard()
-            }
+        drawerLayout.addDrawerListener(
+            object : DrawerLayout.DrawerListener {
+                override fun onDrawerStateChanged(newState: Int) {}
+                override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+                    window.hideKeyboard()
+                }
 
-            override fun onDrawerClosed(drawerView: View) {}
-            override fun onDrawerOpened(drawerView: View) {
-                window.hideKeyboard()
+                override fun onDrawerClosed(drawerView: View) {}
+                override fun onDrawerOpened(drawerView: View) {
+                    window.hideKeyboard()
+                }
             }
-        })
+        )
     }
 
     private fun destroyTutorial() {
@@ -274,11 +366,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showTutorial() {
-        val pips = listOf(
-            findViewById<ImageView>(R.id.pip1),
-            findViewById(R.id.pip2),
-            findViewById(R.id.pip3)
-        )
+        val pips =
+            listOf(
+                findViewById<ImageView>(R.id.pip1),
+                findViewById(R.id.pip2),
+                findViewById(R.id.pip3)
+            )
         val viewPager = findViewById<ViewPager>(R.id.tutorialViewPager)
         val refreshPips = { position: Int ->
             pips.forEachIndexed { i, p -> p.alpha = if (i == position) 1f else 0.5f }
@@ -286,21 +379,22 @@ class MainActivity : AppCompatActivity() {
         refreshPips.invoke(0)
         viewPager.visibility = View.VISIBLE
         viewPager.adapter = TutorialPagerAdapter(applicationContext, this::destroyTutorial)
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) {}
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-            }
+        viewPager.addOnPageChangeListener(
+            object : ViewPager.OnPageChangeListener {
+                override fun onPageScrollStateChanged(state: Int) {}
+                override fun onPageScrolled(
+                    position: Int,
+                    positionOffset: Float,
+                    positionOffsetPixels: Int
+                ) {
+                }
 
-            override fun onPageSelected(position: Int) {
-                refreshPips.invoke(position)
+                override fun onPageSelected(position: Int) {
+                    refreshPips.invoke(position)
+                }
             }
-        })
+        )
     }
-
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(drawerLayout) || super.onNavigateUp()
@@ -316,13 +410,13 @@ class MainActivity : AppCompatActivity() {
 }
 
 @HiltViewModel
-class MainActivityViewModel @Inject constructor(
+class MainActivityViewModel
+@Inject
+constructor(
     private val alarmInteractor: AlarmInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
     fun syncAlarms() {
-        viewModelScope.launch(io) {
-            alarmInteractor.syncAlarms()
-        }
+        viewModelScope.launch(io) { alarmInteractor.syncAlarms() }
     }
 }
