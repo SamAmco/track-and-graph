@@ -62,7 +62,6 @@ fun WideButton(
     enabled = enabled
 )
 
-
 @Composable
 fun SmallTextButton(
     @StringRes stringRes: Int,
@@ -122,3 +121,19 @@ fun AddBarButton(
         contentDescription = stringResource(id = R.string.add)
     )
 }
+
+@Composable
+fun TextButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    text: String,
+) =
+    Button(
+        modifier = modifier,
+        onClick = onClick,
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.button
+        )
+    }

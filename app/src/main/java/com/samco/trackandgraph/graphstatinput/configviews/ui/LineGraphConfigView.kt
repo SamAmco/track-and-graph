@@ -14,7 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalComposeUiApi::class)
 
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
@@ -24,7 +23,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.*
 import androidx.compose.ui.text.style.TextAlign

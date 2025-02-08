@@ -58,11 +58,11 @@ class LineGraphConfigViewModel @Inject constructor(
     private val timeRangeConfigBehaviour: TimeRangeConfigBehaviourImpl = TimeRangeConfigBehaviourImpl(),
     private val yRangeConfigBehaviour: YRangeConfigBehaviourImpl = YRangeConfigBehaviourImpl()
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LineGraphConfigData>(
-    io,
-    default,
-    ui,
-    gsiProvider,
-    dataInteractor
+    io = io,
+    default = default,
+    ui = ui,
+    gsiProvider = gsiProvider,
+    dataInteractor = dataInteractor
 ), TimeRangeConfigBehaviour by timeRangeConfigBehaviour,
     YRangeConfigBehaviour by yRangeConfigBehaviour {
 
@@ -110,6 +110,7 @@ class LineGraphConfigViewModel @Inject constructor(
     )
 
     var featurePaths: List<FeaturePathViewData> by mutableStateOf(emptyList())
+        private set
 
     var lineGraphFeatures by mutableStateOf(emptyList<LineGraphFeature>())
         private set
@@ -155,7 +156,6 @@ class LineGraphConfigViewModel @Inject constructor(
     private fun getYTo(): Double =
         if (isTimeBasedRange.value) yRangeToDurationViewModel.getDurationAsDouble()
         else yRangeTo.text.toDoubleOrNull() ?: 1.0
-
 
     override fun getConfig(): GraphStatConfigEvent.ConfigData.LineGraphConfigData {
         return GraphStatConfigEvent.ConfigData.LineGraphConfigData(lineGraph)

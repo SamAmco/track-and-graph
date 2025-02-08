@@ -94,17 +94,6 @@ class DataInteractorImplTest {
             note = "hi hi"
         )
 
-        val testFunction = FunctionDto(
-            id = 0L,
-            name = "name",
-            featureId = 0L,
-            dataSources = emptyList(),
-            script = "",
-            groupId = 0L,
-            displayIndex = 0,
-            description = "",
-        )
-
         var count = 0
         val collectJob = launch(testDispatcher) {
             uut.getDataUpdateEvents().collect { count++ }
@@ -143,11 +132,9 @@ class DataInteractorImplTest {
         uut.removeNote(noteTime, 0L)
         uut.deleteGlobalNote(testGlobalNote)
         uut.insertGlobalNote(testGlobalNote)
-        uut.insertFunction(testFunction)
-        uut.updateFunction(testFunction)
 
         //VERIFY
-        assertEquals(12, count)
+        assertEquals(10, count)
         collectJob.cancel()
         verify(trackerHelper, times(1)).insertTracker(eq(testTracker))
         verify(trackerHelper, times(1)).updateTracker(eq(testTracker))

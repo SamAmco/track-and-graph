@@ -17,12 +17,18 @@
 
 package com.samco.trackandgraph.base.database.dto
 
-enum class GraphStatType {
-    LINE_GRAPH,
-    PIE_CHART,
-    AVERAGE_TIME_BETWEEN,
-    LAST_VALUE,
-    TIME_HISTOGRAM,
-    BAR_CHART,
-    LUA_SCRIPT,
+import com.samco.trackandgraph.base.database.entity.LuaGraphFeature
+
+data class LuaGraphFeature(
+    val id: Long,
+    val luaGraphId: Long,
+    val featureId: Long,
+    val name: String
+) {
+    internal fun toEntity() = LuaGraphFeature(
+        id,
+        luaGraphId,
+        featureId,
+        name
+    )
 }

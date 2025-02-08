@@ -108,6 +108,9 @@ dependencies {
     ksp(libs.androidx.hilt.compiler)
     implementation libs.hilt.navigation.compose
 
+    //Lua
+    implementation 'com.soywiz.korlibs.luak:luak-jvm:3.4.0'
+
     //UI
     implementation libs.androidx.cardview
     implementation libs.androidx.recyclerview

@@ -14,15 +14,22 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
+package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-package com.samco.trackandgraph.base.database.dto
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
 
-enum class GraphStatType {
-    LINE_GRAPH,
-    PIE_CHART,
-    AVERAGE_TIME_BETWEEN,
-    LAST_VALUE,
-    TIME_HISTOGRAM,
-    BAR_CHART,
-    LUA_SCRIPT,
+interface ILuaGraphViewData : IGraphStatViewData {
+
+    val wrapped: IGraphStatViewData?
+
+    companion object {
+        fun loading(graphOrStat: GraphOrStat) = object : ILuaGraphViewData {
+            override val state: IGraphStatViewData.State
+                get() = IGraphStatViewData.State.LOADING
+            override val graphOrStat: GraphOrStat
+                get() = graphOrStat
+            override val wrapped: IGraphStatViewData?
+                get() = null
+        }
+    }
 }
