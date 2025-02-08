@@ -216,6 +216,7 @@
     <string name="tracked_data_menu_button_content_description">Tracked data menu button</string>
     <string name="tracked_data_history_button_content_description">Tracked data history button</string>
     <string name="delete_line_button_content_description">Delete line button</string>
+    <string name="delete_input_button_content_description">Delete input button</string>
     <string name="delete_data_point_button_content_description">Delete data point button</string>
     <string name="edit_data_point_button_content_description">Edit data point button</string>
     <string name="add_multiple_choice_answer_button_content_description">Add multiple choice answer button</string>
@@ -363,4 +364,7 @@
     <string name="last_successful_backup">Last Successful Backup</string>
     <string name="next_scheduled_backup">Next Scheduled Backup</string>
     <string name="notification_permission_prompt">You should enable notifications for Track &amp; Graph to be notified if Auto-Backup fails for any reason.</string>
+    <string name="lua_script_empty">Please add a Lua script</string>
+    <string name="lua_script_input_hint">Enter a Lua script...</string>
+    <string name="load_file">Load file</string>
 </resources>

@@ -148,11 +148,13 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun readFeaturesFromCSV(inputStream: InputStream, trackGroupId: Long)
 
-    suspend fun getFunctionById(functionId: Long): FunctionDto?
-
-    suspend fun updateFunction(function: FunctionDto)
-
-    suspend fun insertFunction(function: FunctionDto)
-
     suspend fun getAllFeaturesSync(): List<Feature>
+
+    suspend fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures?
+
+    suspend fun duplicateLuaGraph(graphOrStat: GraphOrStat): Long?
+
+    suspend fun insertLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures): Long
+
+    suspend fun updateLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures)
 }

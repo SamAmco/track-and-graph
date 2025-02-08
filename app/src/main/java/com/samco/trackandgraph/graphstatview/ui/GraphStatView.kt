@@ -37,6 +37,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
@@ -76,7 +77,7 @@ fun GraphStatView(
             )
         }
 
-        else -> GraphStatInnerView(
+        else -> GraphStatInnerViewOrLuaGraph(
             graphStatViewData = graphStatViewData,
             listMode = listMode,
             timeMarker = timeMarker,
@@ -88,8 +89,33 @@ fun GraphStatView(
 private fun guessHeight(graphStatViewData: IGraphStatViewData): Dp {
     return when (graphStatViewData.graphOrStat.type) {
         GraphStatType.AVERAGE_TIME_BETWEEN, GraphStatType.LAST_VALUE -> 125.dp
-        GraphStatType.LINE_GRAPH, GraphStatType.PIE_CHART, GraphStatType.TIME_HISTOGRAM, GraphStatType.BAR_CHART -> 240.dp
+        GraphStatType.LINE_GRAPH,
+        GraphStatType.PIE_CHART,
+        GraphStatType.TIME_HISTOGRAM,
+        GraphStatType.LUA_SCRIPT,
+        GraphStatType.BAR_CHART -> 240.dp
     }
+}
+
+@Composable
+private fun GraphStatInnerViewOrLuaGraph(
+    graphStatViewData: IGraphStatViewData,
+    listMode: Boolean,
+    timeMarker: OffsetDateTime? = null,
+    graphHeight: Int? = null
+) {
+    val viewData = if (graphStatViewData.graphOrStat.type == GraphStatType.LUA_SCRIPT) {
+        (graphStatViewData as ILuaGraphViewData).wrapped ?: return
+    } else {
+        graphStatViewData
+    }
+
+    GraphStatInnerView(
+        graphStatViewData = viewData,
+        listMode = listMode,
+        timeMarker = timeMarker,
+        graphHeight = graphHeight
+    )
 }
 
 @Composable
@@ -139,4 +165,8 @@ private fun GraphStatInnerView(
             listMode = listMode,
             graphHeight = graphHeight
         )
+
+    GraphStatType.LUA_SCRIPT -> {
+        // This should never happen, unwrap the lua graph before calling this function
+    }
 }

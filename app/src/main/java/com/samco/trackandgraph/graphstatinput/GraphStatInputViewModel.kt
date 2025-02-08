@@ -68,6 +68,10 @@ sealed interface GraphStatConfigEvent {
         data class BarChartConfigData(
             override val config: BarChart
         ) : ConfigData<BarChart>
+
+        data class LuaConfigData(
+            override val config: LuaGraphWithFeatures
+        ) : ConfigData<LuaGraphWithFeatures>
     }
 }
 

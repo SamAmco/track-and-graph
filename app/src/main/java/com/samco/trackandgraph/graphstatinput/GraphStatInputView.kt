@@ -236,6 +236,7 @@ fun GraphStatTypeSelector(
             GraphStatType.AVERAGE_TIME_BETWEEN to stringResource(id = R.string.graph_type_average_time_between),
             GraphStatType.TIME_HISTOGRAM to stringResource(id = R.string.graph_type_time_histogram),
             GraphStatType.LAST_VALUE to stringResource(id = R.string.graph_type_last_value),
+            GraphStatType.LUA_SCRIPT to stringResource(id = R.string.graph_stat_type_lua_graph),
         )
 
         TextMapSpinner(
@@ -298,5 +299,11 @@ fun ConfigInputView(
             onConfigEvent = { viewModel.onConfigEvent(it) },
         )
 
+        GraphStatType.LUA_SCRIPT -> LuaGraphConfigView(
+            scrollState = scrollState,
+            viewModelStoreOwner = viewModelStoreOwner,
+            graphStatId = graphStatId,
+            onConfigEvent = { viewModel.onConfigEvent(it) },
+        )
     }
 }

@@ -23,6 +23,7 @@ import com.samco.trackandgraph.base.database.entity.*
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayTracker
 import com.samco.trackandgraph.base.database.entity.queryresponse.DisplayNote
 import com.samco.trackandgraph.base.database.entity.queryresponse.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.entity.queryresponse.LuaGraphWithFeatures
 import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
 import kotlinx.coroutines.flow.Flow
 
@@ -213,6 +214,10 @@ internal interface TrackAndGraphDatabaseDao {
     @Transaction
     fun getLineGraphByGraphStatId(graphStatId: Long): LineGraphWithFeatures?
 
+    @Query("SELECT * FROM lua_graphs_table WHERE graph_stat_id = :graphStatId LIMIT 1")
+    @Transaction
+    fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures?
+
     @Query("SELECT * FROM pie_charts_table2 WHERE graph_stat_id = :graphStatId LIMIT 1")
     fun getPieChartByGraphStatId(graphStatId: Long): PieChart?
 
@@ -335,18 +340,6 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("$getDisplayTrackersQuery WHERE trackers_table.feature_id=:featureId LIMIT 1")
     fun getDisplayTrackerByFeatureIdSync(featureId: Long): DisplayTracker?
 
-    @Query("SELECT * FROM functions_table WHERE id = :functionId LIMIT 1")
-    fun getFunctionById(functionId: Long): FunctionEntity?
-
-    @Update
-    fun updateFunction(function: FunctionEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun createFunction(function: FunctionEntity)
-
-    @Query("SELECT * FROM functions_table")
-    fun getAllFunctionsSync(): List<FunctionEntity>
-
     @Query(getTrackersQuery)
     fun getAllTrackersSync(): List<TrackerWithFeature>
 
@@ -380,4 +373,16 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query(" SELECT EXISTS ( SELECT 1 FROM data_points_table LIMIT 1 ) ")
     fun hasAtLeastOneDataPoint(): Boolean
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertLuaGraph(luaGraph: LuaGraph): Long
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertLuaGraphFeatures(map: List<LuaGraphFeature>)
+
+    @Update
+    fun updateLuaGraph(luaGraph: LuaGraph)
+
+    @Query("DELETE FROM lua_graphs_table WHERE id = :id")
+    fun deleteFeaturesForLuaGraph(id: Long)
 }

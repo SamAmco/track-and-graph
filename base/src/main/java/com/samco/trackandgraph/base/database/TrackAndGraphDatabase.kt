@@ -24,7 +24,6 @@ import com.samco.trackandgraph.base.database.entity.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.entity.Feature
 import com.samco.trackandgraph.base.database.entity.FeatureTimer
-import com.samco.trackandgraph.base.database.entity.FunctionEntity
 import com.samco.trackandgraph.base.database.entity.GlobalNote
 import com.samco.trackandgraph.base.database.entity.GraphOrStat
 import com.samco.trackandgraph.base.database.entity.Group
@@ -35,6 +34,8 @@ import com.samco.trackandgraph.base.database.entity.Reminder
 import com.samco.trackandgraph.base.database.entity.TimeHistogram
 import com.samco.trackandgraph.base.database.entity.BarChart
 import com.samco.trackandgraph.base.database.entity.LastValueStat
+import com.samco.trackandgraph.base.database.entity.LuaGraph
+import com.samco.trackandgraph.base.database.entity.LuaGraphFeature
 import com.samco.trackandgraph.base.database.entity.Tracker
 import com.samco.trackandgraph.base.database.migrations.allMigrations
 import com.squareup.moshi.JsonAdapter
@@ -51,7 +52,7 @@ import java.lang.Exception
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 
-const val TNG_DATABASE_VERSION = 55
+const val TNG_DATABASE_VERSION = 56
 
 @Database(
     entities = [
@@ -68,9 +69,10 @@ const val TNG_DATABASE_VERSION = 55
         LineGraphFeature::class,
         TimeHistogram::class,
         FeatureTimer::class,
-        FunctionEntity::class,
         LastValueStat::class,
         BarChart::class,
+        LuaGraph::class,
+        LuaGraphFeature::class,
     ],
     version = TNG_DATABASE_VERSION
 )

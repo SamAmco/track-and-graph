@@ -39,7 +39,9 @@ class GraphStatInteractorProviderImpl @Inject constructor(
     private val lastValueDataFactory: LastValueDataFactory,
     private val lastValueDataSourceAdapter: LastValueDataSourceAdapter,
     private val barChartDataFactory: BarChartDataFactory,
-    private val barChartDataSourceAdapter: BarChartDataSourceAdapter
+    private val barChartDataSourceAdapter: BarChartDataSourceAdapter,
+    private val luaGraphDataFactory: LuaGraphDataFactory,
+    private val luaGraphDataSourceAdapter: LuaGraphDataSourceAdapter,
 ) : GraphStatInteractorProvider {
 
     override fun getDataFactory(type: GraphStatType): ViewDataFactory<*, *> {
@@ -50,6 +52,7 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.AVERAGE_TIME_BETWEEN -> averageTimeBetweenDataFactory
             GraphStatType.LAST_VALUE -> lastValueDataFactory
             GraphStatType.BAR_CHART -> barChartDataFactory
+            GraphStatType.LUA_SCRIPT -> luaGraphDataFactory
         }
     }
 
@@ -61,6 +64,7 @@ class GraphStatInteractorProviderImpl @Inject constructor(
             GraphStatType.TIME_HISTOGRAM -> timeHistogramDataSourceAdapter
             GraphStatType.LAST_VALUE -> lastValueDataSourceAdapter
             GraphStatType.BAR_CHART -> barChartDataSourceAdapter
+            GraphStatType.LUA_SCRIPT -> luaGraphDataSourceAdapter
         }
     }
 }

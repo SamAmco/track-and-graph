@@ -577,26 +577,48 @@ internal class DataInteractorImpl @Inject constructor(
             }
         }
 
-    override suspend fun getFunctionById(functionId: Long): FunctionDto? = withContext(io) {
-        dao.getFunctionById(functionId)?.let { functionEntity ->
-            dao.getFeatureById(functionEntity.featureId)?.let { feature ->
-                FunctionDto.fromEntities(functionEntity, feature)
-            }
-        }
-    }
-
-    override suspend fun updateFunction(function: FunctionDto) = withContext(io) {
-        dao.updateFunction(function.toEntity()).also {
-            dataUpdateEvents.emit(DataUpdateType.Function)
-        }
-    }
-
-    override suspend fun insertFunction(function: FunctionDto) = withContext(io) {
-        dao.createFunction(function.toEntity())
-            .also { dataUpdateEvents.emit(DataUpdateType.Function) }
-    }
-
     override suspend fun getAllFeaturesSync(): List<Feature> = withContext(io) {
         dao.getAllFeaturesSync().map { it.toDto() }
     }
+
+    override suspend fun getLuaGraphByGraphStatId(graphStatId: Long): LuaGraphWithFeatures? =
+        withContext(io) {
+            dao.getLuaGraphByGraphStatId(graphStatId)?.toDto()
+        }
+
+    override suspend fun duplicateLuaGraph(graphOrStat: GraphOrStat): Long? =
+        performAtomicUpdate {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val newGraphStat = duplicateGraphOrStat(graphOrStat)
+            dao.getLuaGraphByGraphStatId(graphOrStat.id)?.let {
+                val copy = dao.insertLuaGraph(
+                    it.toLuaGraph().copy(id = 0L, graphStatId = newGraphStat)
+                )
+                dao.insertLuaGraphFeatures(it.features.map { f ->
+                    f.copy(id = 0L, luaGraphId = copy)
+                })
+                copy
+            }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStat)) }
+        }
+
+    override suspend fun insertLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures): Long =
+        performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
+            shiftUpGroupChildIndexes(graphOrStat.groupId)
+            val id = insertGraphStat(graphOrStat)
+            val luaGraphId =
+                dao.insertLuaGraph(luaGraph.toLuaGraph().copy(graphStatId = id).toEntity())
+            val features = luaGraph.features.map { it.copy(luaGraphId = luaGraphId).toEntity() }
+            dao.insertLuaGraphFeatures(features)
+            luaGraphId
+        }
+
+    override suspend fun updateLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures) =
+        performAtomicUpdate(DataUpdateType.GraphOrStatUpdated(graphOrStat.id)) {
+            dao.updateGraphOrStat(graphOrStat.toEntity())
+            dao.updateLuaGraph(luaGraph.toLuaGraph().toEntity())
+            dao.deleteFeaturesForLuaGraph(luaGraph.id)
+            dao.insertLuaGraphFeatures(luaGraph.features.map {
+                it.copy(luaGraphId = luaGraph.id).toEntity()
+            })
+        }
 }
