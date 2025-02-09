@@ -109,7 +109,7 @@ dependencies {
     implementation libs.hilt.navigation.compose
 
     //Lua
-    implementation 'com.soywiz.korlibs.luak:luak-jvm:3.4.0'
+    implementation libs.luak.jvm
 
     //UI
     implementation libs.androidx.cardview

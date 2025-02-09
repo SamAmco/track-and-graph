@@ -22,7 +22,6 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.*
 import androidx.compose.ui.platform.SoftwareKeyboardController
@@ -30,7 +29,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FullWidthTextField(
     modifier: Modifier = Modifier,
@@ -40,27 +38,32 @@ fun FullWidthTextField(
     focusManager: FocusManager? = null,
     focusRequester: FocusRequester? = null,
     keyboardController: SoftwareKeyboardController? = null,
-    singleLine: Boolean = true
+    singleLine: Boolean = true,
+    keyboardOptions: KeyboardOptions? = null,
 ) {
     val keyboardActions =
         if (focusManager != null) KeyboardActions(onNext = {
             focusManager.moveFocus(FocusDirection.Down)
         }) else KeyboardActions.Default
 
-    val keyboardOptions =
-        if (singleLine) KeyboardOptions(
+    val keyboardOptions1 = when {
+        keyboardOptions != null -> keyboardOptions
+        singleLine -> KeyboardOptions.Default.copy(
             imeAction = ImeAction.Next,
             capitalization = KeyboardCapitalization.Sentences
-        ) else KeyboardOptions.Default.copy(
+        )
+
+        else -> KeyboardOptions.Default.copy(
             capitalization = KeyboardCapitalization.Sentences
         )
+    }
 
     SlimOutlinedTextField(
         value = textFieldValue,
         label = { Text(text = label) },
         onValueChange = { onValueChange(it) },
         keyboardActions = keyboardActions,
-        keyboardOptions = keyboardOptions,
+        keyboardOptions = keyboardOptions1,
         singleLine = singleLine,
         modifier = modifier
             .fillMaxWidth()

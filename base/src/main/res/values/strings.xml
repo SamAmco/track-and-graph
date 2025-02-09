@@ -250,7 +250,7 @@
     <string name="add_function">Add a Function</string>
     <string name="name_your_function">Name your function: </string>
     <string name="write_your_function_here"># Write your function here</string>
-    <string name="add_some_data_sources">Add some data sources</string>
+    <string name="add_some_data_sources">Add data sources</string>
     <string name="value">Value</string>
     <string name="label">Label</string>
     <string name="continue_word">Continue</string>
@@ -367,4 +367,5 @@
     <string name="lua_script_empty">Please add a Lua script</string>
     <string name="lua_script_input_hint">Enter a Lua script...</string>
     <string name="load_file">Load file</string>
+    <string name="lua_feature_names_not_unique">Script inputs must have unique names</string>
 </resources>

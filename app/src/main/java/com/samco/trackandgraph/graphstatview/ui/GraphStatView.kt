@@ -26,6 +26,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -68,20 +69,34 @@ fun GraphStatView(
             ) { CircularProgressIndicator() }
         }
 
-        IGraphStatViewData.State.ERROR -> {
-            GraphErrorView(
-                modifier = modifier,
-                error = (graphStatViewData.error as? GraphStatInitException)
-                    ?.errorTextId
-                    ?: R.string.graph_stat_validation_unknown
-            )
-        }
+        IGraphStatViewData.State.ERROR -> GraphError(modifier, graphStatViewData)
 
         else -> GraphStatInnerViewOrLuaGraph(
             graphStatViewData = graphStatViewData,
             listMode = listMode,
             timeMarker = timeMarker,
             graphHeight = graphHeight
+        )
+    }
+}
+
+@Composable
+private fun GraphError(
+    modifier: Modifier,
+    graphStatViewData: IGraphStatViewData,
+) {
+    if (graphStatViewData.graphOrStat.type == GraphStatType.LUA_SCRIPT) {
+        GraphErrorView(
+            modifier = modifier,
+            error = graphStatViewData.error?.message
+                ?: stringResource(R.string.graph_stat_validation_unknown)
+        )
+    } else {
+        GraphErrorView(
+            modifier = modifier,
+            error = (graphStatViewData.error as? GraphStatInitException)
+                ?.errorTextId
+                ?: R.string.graph_stat_validation_unknown
         )
     }
 }

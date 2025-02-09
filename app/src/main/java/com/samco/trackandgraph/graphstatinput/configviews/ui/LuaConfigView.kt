@@ -20,11 +20,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
@@ -39,6 +41,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,6 +55,7 @@ import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.compose.ui.TextButton
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.TextSubtitle2
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -74,9 +78,15 @@ fun LuaGraphConfigView(
 
     Divider()
 
+    DialogInputSpacing()
+
     ScriptTextInput(viewModel)
 
+    DialogInputSpacing()
+
     BottomButtons(viewModel)
+
+    DialogInputSpacing()
 }
 
 @Composable
@@ -89,6 +99,10 @@ private fun LuaGraphFeaturesInputView(
         .animateContentSize(),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
+    TextSubtitle2(text = stringResource(id = R.string.add_some_data_sources))
+
+    DialogInputSpacing()
+
     for (index in viewModel.selectedFeatures.indices) {
         val lgf = viewModel.selectedFeatures[index]
         LuaGraphFeatureInputView(
@@ -113,6 +127,8 @@ private fun LuaGraphFeaturesInputView(
             }
         },
     )
+
+    DialogInputSpacing()
 }
 
 @Composable
@@ -162,14 +178,21 @@ private fun ScriptTextInput(
         onValueChange = { viewModel.setScriptText(it) },
         focusRequester = focusRequester,
         label = stringResource(id = R.string.lua_script_input_hint),
-        singleLine = false
+        singleLine = false,
+        keyboardOptions = KeyboardOptions(
+            capitalization = KeyboardCapitalization.None,
+            autoCorrectEnabled = false,
+        )
     )
 }
 
 @Composable
 private fun BottomButtons(
     viewModel: LuaGraphConfigViewModel
-) {
+) = Row(
+    modifier = Modifier.fillMaxWidth(),
+    horizontalArrangement = Arrangement.End,
+){
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { viewModel.readFile(it) }
