@@ -4,7 +4,6 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 
 interface LuaEngine {
-
     companion object {
         const val TNG = "Tng"
         const val GRAPH = "graph"
