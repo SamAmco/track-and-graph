@@ -605,9 +605,15 @@ internal class DataInteractorImpl @Inject constructor(
         performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
             shiftUpGroupChildIndexes(graphOrStat.groupId)
             val id = insertGraphStat(graphOrStat)
-            val luaGraphId =
-                dao.insertLuaGraph(luaGraph.toLuaGraph().copy(graphStatId = id).toEntity())
-            val features = luaGraph.features.map { it.copy(luaGraphId = luaGraphId).toEntity() }
+            val luaGraphId = dao.insertLuaGraph(
+                luaGraph.toLuaGraph().copy(
+                    id = 0L,
+                    graphStatId = id,
+                ).toEntity()
+            )
+            val features = luaGraph.features.map {
+                it.copy(id = 0L, luaGraphId = luaGraphId).toEntity()
+            }
             dao.insertLuaGraphFeatures(features)
             luaGraphId
         }
@@ -619,7 +625,7 @@ internal class DataInteractorImpl @Inject constructor(
             dao.deleteFeaturesForLuaGraph(luaGraph.id)
             dao.insertLuaGraphFeatures(luaGraph.features.mapIndexed { idx, it ->
                 it.copy(
-                    id = idx.toLong(),
+                    id = 0L,
                     luaGraphId = luaGraph.id
                 ).toEntity()
             })
