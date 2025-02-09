@@ -34,7 +34,7 @@ class DataPointCursorSequenceTest {
         whenever(cursor.getString(eq(4))).thenReturn("")
         whenever(cursor.getString(eq(5))).thenReturn("")
 
-        val sequence = DataPointCursorSequence(cursor)
+        val sequence = DataPointCursorSequence(cursor).asIDataPointSequence()
 
         //EXECUTE
         val iterator1 = sequence.iterator()
