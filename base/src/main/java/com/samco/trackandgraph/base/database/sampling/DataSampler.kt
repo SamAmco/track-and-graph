@@ -22,6 +22,8 @@ import com.samco.trackandgraph.base.database.dto.DataType
 import javax.inject.Inject
 
 interface DataSampler {
+    fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample?
+
     fun getDataSampleForFeatureId(featureId: Long): DataSample
 
     suspend fun getLabelsForFeatureId(featureId: Long): List<String>
@@ -32,31 +34,42 @@ interface DataSampler {
 internal class DataSamplerImpl @Inject constructor(
     private val dao: TrackAndGraphDatabaseDao
 ) : DataSampler {
+
+    override fun getRawDataSampleForFeatureId(featureId: Long): RawDataSample? {
+        val tracker = dao.getTrackerByFeatureId(featureId)
+        return tracker?.let {
+            val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
+            RawDataSample.fromSequence(
+                data = cursorSequence.asRawDataPointSequence(),
+                dataSampleProperties = DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION),
+                getRawDataPoints = cursorSequence::getRawDataPoints,
+                onDispose = cursorSequence::dispose
+            )
+        }
+    }
+
     override fun getDataSampleForFeatureId(featureId: Long): DataSample {
         val tracker = dao.getTrackerByFeatureId(featureId)
         return tracker?.let {
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
             DataSample.fromSequence(
-                data = cursorSequence,
+                data = cursorSequence.asIDataPointSequence(),
                 dataSampleProperties = DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION),
                 getRawDataPoints = cursorSequence::getRawDataPoints,
                 onDispose = cursorSequence::dispose
             )
         } ?: DataSample.fromSequence(emptySequence(), onDispose = {})
-        //TODO if there is a function for the feature ID we need to return a data sample for the function
     }
 
     override suspend fun getDataSamplePropertiesForFeatureId(featureId: Long) =
         dao.getTrackerByFeatureId(featureId)?.let {
             DataSampleProperties(isDuration = it.dataType == DataType.DURATION)
         }
-    //TODO if there is a function for the feature ID we need to return a data sample properties for the function
 
     override suspend fun getLabelsForFeatureId(featureId: Long): List<String> {
         val tracker = dao.getTrackerByFeatureId(featureId)
         return tracker?.let {
             dao.getLabelsForTracker(tracker.id)
         } ?: emptyList()
-        //TODO implement collecting labels for a function data source
     }
 }

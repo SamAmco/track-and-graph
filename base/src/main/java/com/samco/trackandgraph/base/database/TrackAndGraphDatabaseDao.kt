@@ -383,6 +383,6 @@ internal interface TrackAndGraphDatabaseDao {
     @Update
     fun updateLuaGraph(luaGraph: LuaGraph)
 
-    @Query("DELETE FROM lua_graphs_table WHERE id = :id")
-    fun deleteFeaturesForLuaGraph(id: Long)
+    @Query("DELETE FROM lua_graph_features_table WHERE lua_graph_id = :luaGraphId")
+    fun deleteFeaturesForLuaGraph(luaGraphId: Long)
 }

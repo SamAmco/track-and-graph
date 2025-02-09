@@ -26,6 +26,8 @@ import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractorImpl
 import com.samco.trackandgraph.base.helpers.PrefHelper
 import com.samco.trackandgraph.base.helpers.PrefHelperImpl
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
+import com.samco.trackandgraph.lua.LuaEngine
+import com.samco.trackandgraph.lua.LuaEngineImpl
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.settings.TngSettingsImpl
@@ -62,5 +64,8 @@ class AppModule {
     @Singleton
     //Must be singleton because it is a dependency of work manager worker
     fun getBackupRestoreInteractor(impl: BackupRestoreInteractorImpl): BackupRestoreInteractor = impl
+
+    @Provides
+    fun getLuaEngine(impl: LuaEngineImpl): LuaEngine = impl
 
 }

@@ -117,12 +117,21 @@ fun setUpXYPlotYAxis(
 @Composable
 fun GraphErrorView(
     modifier: Modifier = Modifier,
-    @StringRes error: Int
+    @StringRes error: Int,
+) = GraphErrorView(
+    modifier = modifier,
+    error = stringResource(error)
+)
+
+@Composable
+fun GraphErrorView(
+    modifier: Modifier = Modifier,
+    error: String,
 ) = Column(modifier = modifier) {
     Text(
         modifier = modifier
             .padding(vertical = dimensionResource(id = R.dimen.input_spacing_large)),
-        text = stringResource(error),
+        text = error,
         style = MaterialTheme.typography.body1,
         textAlign = TextAlign.Center
     )

@@ -363,7 +363,6 @@ private fun DurationCheckbox(
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun DescriptionInput(
     viewModel: AddTrackerViewModel
@@ -374,7 +373,6 @@ private fun DescriptionInput(
     singleLine = false
 )
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun NameInput(
     viewModel: AddTrackerViewModel,

@@ -19,12 +19,6 @@ package com.samco.trackandgraph.base.database.sampling
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import org.threeten.bp.temporal.TemporalAmount
-
-data class DataSampleProperties(
-    val regularity: TemporalAmount? = null,
-    val isDuration: Boolean = false
-)
 
 /**
  * A sequence of data points in order from newest to oldest. When you are done iterating the

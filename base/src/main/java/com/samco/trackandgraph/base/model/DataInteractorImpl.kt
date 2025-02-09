@@ -617,8 +617,11 @@ internal class DataInteractorImpl @Inject constructor(
             dao.updateGraphOrStat(graphOrStat.toEntity())
             dao.updateLuaGraph(luaGraph.toLuaGraph().toEntity())
             dao.deleteFeaturesForLuaGraph(luaGraph.id)
-            dao.insertLuaGraphFeatures(luaGraph.features.map {
-                it.copy(luaGraphId = luaGraph.id).toEntity()
+            dao.insertLuaGraphFeatures(luaGraph.features.mapIndexed { idx, it ->
+                it.copy(
+                    id = idx.toLong(),
+                    luaGraphId = luaGraph.id
+                ).toEntity()
             })
         }
 }

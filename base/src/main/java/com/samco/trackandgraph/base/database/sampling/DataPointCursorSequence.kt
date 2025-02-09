@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.base.database.sampling
 
 import android.database.Cursor
+import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
@@ -26,57 +27,63 @@ import java.util.*
 
 internal class DataPointCursorSequence(
     private val cursor: Cursor
-) : Sequence<IDataPoint> {
+) {
     private val visited =
-        Collections.synchronizedList(mutableListOf<com.samco.trackandgraph.base.database.dto.DataPoint>())
+        Collections.synchronizedList(mutableListOf<DataPoint>())
 
     private val count = cursor.count
 
     private val lock = Any()
 
-    fun getRawDataPoints(): List<com.samco.trackandgraph.base.database.dto.DataPoint> = visited
+    fun getRawDataPoints(): List<DataPoint> = visited
 
     fun dispose() = synchronized(lock) { cursor.close() }
 
-    override fun iterator(): Iterator<IDataPoint> = object : Iterator<IDataPoint> {
-        private var position = 0
+    fun asIDataPointSequence(): Sequence<IDataPoint> = asRawDataPointSequence().map {
+        object : IDataPoint() {
+            override val timestamp = it.timestamp
+            override val value = it.value
+            override val label = it.label
+        }
+    }
 
-        override fun hasNext(): Boolean = synchronized(lock) { position < count }
+    fun asRawDataPointSequence(): Sequence<DataPoint> = object : Sequence<DataPoint> {
+        override fun iterator(): Iterator<DataPoint> = object : Iterator<DataPoint> {
+            private var position = 0
 
-        override fun next(): IDataPoint = synchronized(lock) {
-            val dataPoint =
-                if (position in visited.indices) visited[position]
-                else {
-                    cursor.moveToNext()
-                    val rawDataPoint = getCursorDataPoint()
-                    visited.add(rawDataPoint)
-                    rawDataPoint
-                }
-            position++
-            return object : IDataPoint() {
-                override val timestamp = dataPoint.timestamp
-                override val value = dataPoint.value
-                override val label = dataPoint.label
+            override fun hasNext(): Boolean = synchronized(lock) { position < count }
+
+            override fun next(): DataPoint = synchronized(lock) {
+                val dataPoint =
+                    if (position in visited.indices) visited[position]
+                    else {
+                        cursor.moveToNext()
+                        val rawDataPoint = getCursorDataPoint()
+                        visited.add(rawDataPoint)
+                        rawDataPoint
+                    }
+                position++
+                return dataPoint
             }
         }
+    }
 
-        private fun getCursorDataPoint(): com.samco.trackandgraph.base.database.dto.DataPoint {
-            val epochMilli = cursor.getLong(0)
-            val featureId = cursor.getLong(1)
-            val utcOffsetSec = cursor.getInt(2)
-            val value = cursor.getDouble(3)
-            val label = cursor.getString(4)
-            val note = cursor.getString(5)
-            return com.samco.trackandgraph.base.database.dto.DataPoint(
-                timestamp = OffsetDateTime.ofInstant(
-                    Instant.ofEpochMilli(epochMilli),
-                    ZoneOffset.ofTotalSeconds(utcOffsetSec)
-                ),
-                featureId = featureId,
-                value = value,
-                label = label,
-                note = note
-            )
-        }
+    private fun getCursorDataPoint(): DataPoint {
+        val epochMilli = cursor.getLong(0)
+        val featureId = cursor.getLong(1)
+        val utcOffsetSec = cursor.getInt(2)
+        val value = cursor.getDouble(3)
+        val label = cursor.getString(4)
+        val note = cursor.getString(5)
+        return DataPoint(
+            timestamp = OffsetDateTime.ofInstant(
+                Instant.ofEpochMilli(epochMilli),
+                ZoneOffset.ofTotalSeconds(utcOffsetSec)
+            ),
+            featureId = featureId,
+            value = value,
+            label = label,
+            note = note
+        )
     }
 }
