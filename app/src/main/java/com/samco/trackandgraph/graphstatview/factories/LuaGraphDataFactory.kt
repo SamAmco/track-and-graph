@@ -32,9 +32,10 @@ import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
+import javax.inject.Provider
 
 class LuaGraphDataFactory @Inject constructor(
-    private val luaEngine: LuaEngine,
+    private val luaEngine: Provider<LuaEngine>,
     dataInteractor: DataInteractor,
     @IODispatcher ioDispatcher: CoroutineDispatcher
 ) : ViewDataFactory<LuaGraphWithFeatures, ILuaGraphViewData>(dataInteractor, ioDispatcher) {
@@ -87,7 +88,7 @@ class LuaGraphDataFactory @Inject constructor(
         val sampledData = mutableListOf<DataPoint>()
         val iterators = dataSamples.mapValues { it.value.iterator() }
 
-        val luaGraphResult = luaEngine.runLuaGraphScript(config.script) { name, count ->
+        val luaGraphResult = luaEngine.get().runLuaGraphScript(config.script) { name, count ->
             val iterator = iterators[name] ?: throw IllegalArgumentException("No data sample found for $name")
             val batchSample = mutableListOf<DataPoint>()
             while (batchSample.size < count && iterator.hasNext()) {
