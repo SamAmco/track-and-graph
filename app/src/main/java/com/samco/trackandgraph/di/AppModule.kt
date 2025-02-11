@@ -28,6 +28,8 @@ import com.samco.trackandgraph.base.helpers.PrefHelperImpl
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.LuaEngineImpl
+import com.samco.trackandgraph.assetreader.AssetReaderImpl
+import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.settings.TngSettingsImpl
@@ -67,5 +69,8 @@ class AppModule {
 
     @Provides
     fun getLuaEngine(impl: LuaEngineImpl): LuaEngine = impl
+
+    @Provides
+    fun getAssetReader(impl: AssetReaderImpl): AssetReader = impl
 
 }

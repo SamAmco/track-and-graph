@@ -6,9 +6,7 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
  * A sequence of data points in order from newest to oldest. When you are done iterating the
  * sample you must call [dispose] to release any resources being used.
  */
-abstract class RawDataSample(
-    val dataSampleProperties: DataSampleProperties = DataSampleProperties()
-) : Sequence<DataPoint> {
+abstract class RawDataSample : Sequence<DataPoint> {
     companion object {
         /**
          * Return a DataSample from a sequence with the given properties and the given function
@@ -16,11 +14,10 @@ abstract class RawDataSample(
          */
         fun fromSequence(
             data: Sequence<DataPoint>,
-            dataSampleProperties: DataSampleProperties = DataSampleProperties(),
             getRawDataPoints: () -> List<DataPoint>,
             onDispose: () -> Unit
         ): RawDataSample {
-            return object : RawDataSample(dataSampleProperties) {
+            return object : RawDataSample() {
                 override fun getRawDataPoints() = getRawDataPoints()
                 override fun iterator(): Iterator<DataPoint> = data.iterator()
                 override fun dispose() = onDispose()

@@ -41,7 +41,6 @@ internal class DataSamplerImpl @Inject constructor(
             val cursorSequence = DataPointCursorSequence(dao.getDataPointsCursor(featureId))
             RawDataSample.fromSequence(
                 data = cursorSequence.asRawDataPointSequence(),
-                dataSampleProperties = DataSampleProperties(isDuration = tracker.dataType == DataType.DURATION),
                 getRawDataPoints = cursorSequence::getRawDataPoints,
                 onDispose = cursorSequence::dispose
             )

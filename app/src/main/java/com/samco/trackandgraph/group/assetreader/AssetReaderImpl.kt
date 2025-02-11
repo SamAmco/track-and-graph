@@ -14,9 +14,16 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.lua.dto
+package com.samco.trackandgraph.assetreader
 
-data class LuaGraphResult(
-    val data: LuaGraphResultData? = null,
-    val error: Throwable? = null,
-)
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
+
+class AssetReaderImpl @Inject constructor(
+  @ApplicationContext private val context: Context
+) : AssetReader {
+    override fun readAssetToString(assetPath: String): String {
+        return context.assets.open(assetPath).bufferedReader().use { it.readText() }
+    }
+}
