@@ -159,3 +159,46 @@ dependencies {
     testImplementation libs.kotlinx.coroutines.test
     testImplementation libs.androidx.core.testing
 }
+
+def luaSourceDir = rootProject.file("lua") // Top-level lua directory
+def luaFile = new File(luaSourceDir, "tng.lua") // Adjust filename as needed
+
+// Function to add a warning comment before copying
+static def prepareGeneratedFile(File source, File target) {
+    def content = source.getText('UTF-8')
+    def warningComment = "-- GENERATED FILE: DO NOT EDIT MANUALLY\n\n"
+    target.text = warningComment + content
+}
+
+// Task to copy the Lua file to the generated assets directory
+tasks.register('copyLuaToAssets') {
+    doLast {
+        def destinationDir = file("src/main/assets/generated/lua/")
+        destinationDir.deleteDir() // Clear out old files
+        destinationDir.mkdirs() // Ensure directory exists
+        def destinationFile = new File(destinationDir, luaFile.name)
+        prepareGeneratedFile(luaFile, destinationFile)
+    }
+}
+
+// Ensure the assets copy runs before every build
+tasks.matching { it.name.startsWith("assemble") }.configureEach {
+    dependsOn(copyLuaToAssets)
+}
+
+// Task to copy the Lua file to the generated test directory
+tasks.register('copyLuaForTests') {
+    doLast {
+        def destinationDir = file("src/test/resources/generated/lua/")
+        destinationDir.deleteDir() // Clear out old files
+        destinationDir.mkdirs() // Ensure directory exists
+        def destinationFile = new File(destinationDir, luaFile.name)
+        prepareGeneratedFile(luaFile, destinationFile)
+    }
+}
+
+// Ensure this runs before any unit test task
+tasks.matching { it.name.startsWith("test") }.configureEach {
+    dependsOn(copyLuaForTests)
+}
+

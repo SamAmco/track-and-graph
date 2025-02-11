@@ -14,9 +14,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.lua.dto
+package com.samco.trackandgraph.assetreader
 
-data class LuaGraphResult(
-    val data: LuaGraphResultData? = null,
-    val error: Throwable? = null,
-)
+interface AssetReader {
+    fun readAssetToString(assetPath: String): String
+}

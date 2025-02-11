@@ -1,3 +1,19 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.lua
 
 import com.samco.trackandgraph.base.database.dto.DataPoint
@@ -10,20 +26,26 @@ import org.luaj.vm2.lib.OneArgFunction
 import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.jse.JsePlatform
 import javax.inject.Inject
+import com.samco.trackandgraph.assetreader.AssetReader
 
 class LuaEngineImpl @Inject constructor(
-    private val dataPointLuaGraphAdapter: DataPointLuaGraphAdapter
+    private val dataPointLuaGraphAdapter: DataPointLuaGraphAdapter,
+    private val assetReader: AssetReader,
 ) : LuaEngine {
-
-    // Create the Tng and graph tables
-    private val tngTable = tableOf()
-    private val graphTable = tableOf()
 
     private val globals by lazy {
         val globals = JsePlatform.standardGlobals()
-        tngTable[LuaEngine.GRAPH] = graphTable
-        globals[LuaEngine.TNG] = tngTable
+        val tngScript = assetReader.readAssetToString("generated/lua/tng.lua")
+        globals[LuaEngine.TNG] = globals.load(tngScript).call()
         globals
+    }
+
+    private val tngTable: LuaValue by lazy {
+        globals[LuaEngine.TNG].opttable(tableOf()) ?: tableOf()
+    }
+
+    private val graphTable: LuaValue by lazy {
+        tngTable[LuaEngine.GRAPH].opttable(tableOf()) ?: tableOf()
     }
 
     override fun runLuaGraphScript(
@@ -31,8 +53,8 @@ class LuaEngineImpl @Inject constructor(
         next: (String, Int) -> List<DataPoint>
     ): LuaGraphResult {
         try {
-            graphTable[LuaEngine.NEXT] = getNextLuaFunction(next)
-            graphTable[LuaEngine.NEXT_BATCH] = getNextBatchLuaFunction(next)
+            graphTable[LuaEngine.NEXT_DP] = getNextLuaFunction(next)
+            graphTable[LuaEngine.NEXT_DP_BATCH] = getNextBatchLuaFunction(next)
             return processLuaGraph(globals.load(script).call())
         } catch (t: Throwable) {
             return LuaGraphResult(error = t)
@@ -42,9 +64,10 @@ class LuaEngineImpl @Inject constructor(
     private fun processLuaGraph(scriptResult: LuaValue): LuaGraphResult {
         val type = scriptResult[LuaEngine.TYPE].checkjstring()
             ?: throw IllegalArgumentException("No valid type found")
+        val dataLua = scriptResult[LuaEngine.DATA]
 
         val data = when (type) {
-            LuaEngine.DATAPOINT -> dataPointLuaGraphAdapter.process(scriptResult)
+            LuaEngine.DATAPOINT -> dataPointLuaGraphAdapter.process(dataLua)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 
