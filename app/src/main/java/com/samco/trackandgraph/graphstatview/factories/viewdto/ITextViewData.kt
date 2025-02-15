@@ -9,11 +9,18 @@ interface ITextViewData : IGraphStatViewData {
         SMALL, MEDIUM, LARGE
     }
 
+    enum class TextAlignment {
+        START, CENTER, END
+    }
+
     val text: String?
         get() = null
 
     val textSize: TextSize
         get() = TextSize.MEDIUM
+
+    val textAlignment: TextAlignment
+        get() = TextAlignment.CENTER
 
     companion object {
         fun loading(graphOrStat: GraphOrStat) = object : ITextViewData {
@@ -22,13 +29,5 @@ interface ITextViewData : IGraphStatViewData {
             override val graphOrStat: GraphOrStat
                 get() = graphOrStat
         }
-
-        fun default(graphOrStat: GraphOrStat) = object : ITextViewData {
-            override val state: State
-                get() = State.READY
-            override val graphOrStat: GraphOrStat
-                get() = graphOrStat
-        }
     }
-
 }

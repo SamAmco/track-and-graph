@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
+import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.GraphStatType
@@ -30,6 +31,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.lua.dto.TextAlignment
 import com.samco.trackandgraph.lua.dto.TextSize
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
@@ -126,6 +128,7 @@ class LuaGraphDataFactory @Inject constructor(
             override val graphOrStat: GraphOrStat = graphOrStat
             override val text: String? = textData.text
             override val textSize: ITextViewData.TextSize = textData.size.toTextSize()
+            override val textAlignment: ITextViewData.TextAlignment = textData.alignment.toTextAlignment()
         }
         override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
         override val graphOrStat: GraphOrStat = graphOrStat
@@ -151,5 +154,11 @@ class LuaGraphDataFactory @Inject constructor(
         TextSize.SMALL -> ITextViewData.TextSize.SMALL
         TextSize.MEDIUM -> ITextViewData.TextSize.MEDIUM
         TextSize.LARGE -> ITextViewData.TextSize.LARGE
+    }
+
+    private fun TextAlignment.toTextAlignment(): ITextViewData.TextAlignment = when (this) {
+        TextAlignment.START -> ITextViewData.TextAlignment.START
+        TextAlignment.CENTER -> ITextViewData.TextAlignment.CENTER
+        TextAlignment.END -> ITextViewData.TextAlignment.END
     }
 }

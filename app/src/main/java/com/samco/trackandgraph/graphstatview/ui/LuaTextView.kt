@@ -1,6 +1,7 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -18,17 +19,22 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 fun LuaTextView(
     modifier: Modifier = Modifier,
     textData: ITextViewData
-) = Column(modifier = modifier) {
+) = Column(modifier = modifier.fillMaxWidth()) {
     Text(
         modifier = modifier
-            .padding(vertical = dimensionResource(id = R.dimen.input_spacing_large)),
+            .fillMaxWidth()
+            .padding(dimensionResource(id = R.dimen.input_spacing_large)),
         text = textData.text ?: "",
         style = when (textData.textSize) {
             ITextViewData.TextSize.SMALL -> MaterialTheme.typography.body1
             ITextViewData.TextSize.MEDIUM -> MaterialTheme.typography.h4
             ITextViewData.TextSize.LARGE -> MaterialTheme.typography.h2
         },
-        textAlign = TextAlign.Center
+        textAlign = when (textData.textAlignment) {
+            ITextViewData.TextAlignment.START -> TextAlign.Start
+            ITextViewData.TextAlignment.CENTER -> TextAlign.Center
+            ITextViewData.TextAlignment.END -> TextAlign.End
+        }
     )
 }
 
