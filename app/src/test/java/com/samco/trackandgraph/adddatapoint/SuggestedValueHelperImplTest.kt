@@ -16,13 +16,24 @@
  */
 package com.samco.trackandgraph.adddatapoint
 
-import com.nhaarman.mockitokotlin2.*
-import com.samco.trackandgraph.base.database.dto.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import com.samco.trackandgraph.base.database.dto.DataType
+import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.dto.Tracker
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionOrder
+import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.DataInteractor
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before

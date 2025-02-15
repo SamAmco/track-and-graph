@@ -1,0 +1,366 @@
+package com.samco.trackandgraph.lua
+
+import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import junit.framework.TestCase.assertEquals
+import org.junit.Test
+import org.threeten.bp.Instant
+import org.threeten.bp.ZonedDateTime
+
+class TimeLuaApiTests : LuaEngineImplTest() {
+
+    //1743202801000 is the timestamp for 2025-03-29T00:00:01 in the Europe/Berlin timezone. the UTC offset is +1.
+    // This is one day before daylight savings time starts. It's a Saturday.
+    //1743372001000 is the timestamp if you add 2 days. The UTC offset will now be +2
+
+    @Test
+    fun `shift timestamp forward by duration`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000 }
+            local shifted = tng.time.shift(timestamp, tng.time.D_DAY)
+            return {
+                type = tng.graph.TEXT,
+                data = shifted.timestamp
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = 1743202801000 + MILLIS_IN_DAY
+        val actual = (result.data as LuaGraphResultData.TextData).text!!.toLong()
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `shift date forward by duration and amount`() = testLuaEngine(
+        emptyMap(),
+        """
+            local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
+            local shifted = tng.time.shift(date, tng.time.D_DAY, 2)
+            return {
+                type = tng.graph.TEXT,
+                data = shifted.timestamp
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = (1743202801000 + 2 * MILLIS_IN_DAY).toString()
+        val actual = (result.data as LuaGraphResultData.TextData).text
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `shift timestamp backward by duration and amount`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000 }
+            local shifted = tng.time.shift(timestamp, tng.time.D_DAY, -2)
+            return {
+                type = tng.graph.TEXT,
+                data = shifted.timestamp
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = (1743202801000 - 2 * MILLIS_IN_DAY).toString()
+        val actual = (result.data as LuaGraphResultData.TextData).text
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `shift date backward by duration`() = testLuaEngine(
+        emptyMap(),
+        """
+            local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
+            local shifted = tng.time.shift(date, tng.time.D_DAY, -1)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ shifted.timestamp, shifted.offset }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = (1743202801000 - MILLIS_IN_DAY).toString() + " " + SECONDS_IN_HOUR
+        val actual = (result.data as LuaGraphResultData.TextData).text
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `shift timestamp forward by period`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000, offset = (60 * 60) }
+            local shifted = tng.time.shift(timestamp, tng.time.P_DAY, 2)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ shifted.timestamp, shifted.offset }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        //When shifting by a period of 2 days we actually add an extra hour because
+        // the timezone changes from +1 to +2 so to get to the same hour 2 days later we need to add an extra hour
+        // of time.
+        val expected = "1743375601000 3600"
+        val actual = (result.data as LuaGraphResultData.TextData).text
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `shift date backward by period and amount`() = testLuaEngine(
+        emptyMap(),
+        """
+            local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
+            local shifted = tng.time.shift(date, tng.time.P_DAY, -2)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ shifted.timestamp, shifted.offset }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = (1743202801000 - 2 * MILLIS_IN_DAY).toString() + " " + SECONDS_IN_HOUR
+        val actual = (result.data as LuaGraphResultData.TextData).text
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `shift timestamp backward by period and amount`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000 }
+            local shifted = tng.time.shift(timestamp, tng.time.P_DAY, -2)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ shifted.timestamp, shifted.offset }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = (1743202801000 - 2 * MILLIS_IN_DAY).toString() + " 0"
+        val actual = (result.data as LuaGraphResultData.TextData).text
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `shift date forward by period and amount`() = testLuaEngine(
+        emptyMap(),
+        """
+            local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
+            local shifted = tng.time.shift(date, tng.time.P_DAY, 2)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ shifted.timestamp, shifted.offset, shifted.zone }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val twoHours = 2 * SECONDS_IN_HOUR
+        val expected = "1743372001000 $twoHours Europe/Berlin"
+        val actual = (result.data as LuaGraphResultData.TextData).text
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `shift using date, offset, and zone uses zone over offset`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin", extra = "extra" }
+            local shifted = tng.time.shift(timestamp, tng.time.P_DAY, 2)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        //Supplying a zone overrides the offset
+        val twoHours = 2 * SECONDS_IN_HOUR
+        val expected = "1743372001000 $twoHours Europe/Berlin extra"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `shift using date and offset uses offset`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000, offset = 3600, extra = "extra" }
+            local shifted = tng.time.shift(timestamp, tng.time.P_DAY, 2)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        //Kinda odd that we've added an extra hour to the timestamp. Clearly java time thinks that if you had an offset
+        // of 1 hour, you must have crossed daylight savings here. So offset doesn't change, but the timestamp gets an
+        // extra hour.
+        val expected = "1743375601000 $SECONDS_IN_HOUR +01:00 extra"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+
+    @Test
+    fun `shift doesnt lose any fields from the input table`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin", extra = "extra" }
+            local shifted = tng.time.shift(timestamp, tng.time.P_DAY, 2)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        //Supplying a zone overrides the offset
+        val twoHours = 2 * SECONDS_IN_HOUR
+        val expected = "1743372001000 $twoHours Europe/Berlin extra"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `time with no args returns current time`() = testLuaEngine(
+        emptyMap(),
+        """
+            local time = tng.time.time()
+            return {
+                type = tng.graph.TEXT,
+                data = time.timestamp
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = Instant.now().toEpochMilli()
+        val actual = (result.data as LuaGraphResultData.TextData).text!!.toLong()
+        val diff = actual - expected
+        assert(diff < 10)
+    }
+
+    @Test
+    fun `time with date returns time at that date`() = testLuaEngine(
+        emptyMap(),
+        """
+            local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
+            local time = tng.time.time(date)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ time.timestamp, time.offset, time.zone }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = "1743202801000 $SECONDS_IN_HOUR Europe/Berlin"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `date with no args returns current date`() = testLuaEngine(
+        emptyMap(),
+        """
+            local date = tng.time.date()
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ date.year, date.month, date.day, date.hour, date.min, date.sec, date.yday, date.wday }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val now = ZonedDateTime.now()
+        val expected = "${now.year} ${now.monthValue} ${now.dayOfMonth} ${now.hour} ${now.minute} ${now.second} ${now.dayOfYear} ${now.dayOfWeek.value}"
+        val actual = (result.data as LuaGraphResultData.TextData).text
+        assertEquals(expected, actual)
+    }
+
+    @Test
+    fun `date with timestamp returns date at that timestamp`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin" }
+            local date = tng.time.date(timestamp)
+            return {
+                type = tng.graph.TEXT,
+                data = table.concat({ date.year, date.month, date.day, date.hour, date.min, date.sec, date.yday, date.wday }, " ")
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = "2025 3 29 0 0 1 88 6"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `format given a timestamp number and a format string returns the formatted date`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = 1743202801000
+            local result = tng.time.format(timestamp, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = tng.graph.TEXT,
+                data = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        //It's the night before in UTC
+        val expected = "2025-03-28 23:00:01"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `format given a timestamp and a format string returns the formatted date`() = testLuaEngine(
+        emptyMap(),
+        """
+            local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin" }
+            local result = tng.time.format(timestamp, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = tng.graph.TEXT,
+                data = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = "2025-03-29 00:00:01"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `format given a date and a format string returns the formatted date`() = testLuaEngine(
+        emptyMap(),
+        """
+            local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
+            local result = tng.time.format(date, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = tng.graph.TEXT,
+                data = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = "2025-03-29 00:00:01"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    companion object {
+        const val MILLIS_IN_DAY = 24 * 60 * 60 * 1000
+        const val SECONDS_IN_HOUR = 60 * 60
+    }
+}

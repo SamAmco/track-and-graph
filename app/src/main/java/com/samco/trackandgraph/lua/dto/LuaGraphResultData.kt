@@ -7,4 +7,9 @@ sealed interface LuaGraphResultData {
         val dataPoint: DataPoint?,
         val isDuration: Boolean
     ) : LuaGraphResultData
+
+    data class TextData(
+        val text: String?,
+        val size: TextSize
+    ) : LuaGraphResultData
 }

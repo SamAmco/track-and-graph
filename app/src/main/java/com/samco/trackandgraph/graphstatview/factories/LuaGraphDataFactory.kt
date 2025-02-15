@@ -27,8 +27,10 @@ import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.lua.dto.TextSize
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
@@ -86,43 +88,44 @@ class LuaGraphDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILuaGraphViewData {
         val sampledData = mutableListOf<DataPoint>()
-        val iterators = dataSamples.mapValues { it.value.iterator() }
+        val luaEngineParams = LuaEngine.LuaGraphEngineParams(dataSources = dataSamples)
 
-        val luaGraphResult = luaEngine.get().runLuaGraphScript(config.script) { name, count ->
-            val iterator = iterators[name] ?: throw IllegalArgumentException("No data sample found for $name")
-            val batchSample = mutableListOf<DataPoint>()
-            while (batchSample.size < count && iterator.hasNext()) {
-                batchSample.add(iterator.next())
-            }
-            sampledData.addAll(batchSample)
-            batchSample
-        }
+        val luaGraphResult = luaEngine.get().runLuaGraphScript(config.script, luaEngineParams)
 
         if (luaGraphResult.error != null) return luaEngineError(graphOrStat, luaGraphResult.error)
 
         onDataSampled(sampledData)
 
         return when (luaGraphResult.data) {
-            is LuaGraphResultData.DataPointData -> lastValueData(
-                luaGraphResult.data.dataPoint,
-                luaGraphResult.data.isDuration,
-                graphOrStat
-            )
-
+            is LuaGraphResultData.DataPointData -> lastValueData(luaGraphResult.data, graphOrStat)
+            is LuaGraphResultData.TextData -> luaTextData(luaGraphResult.data, graphOrStat)
             null -> luaEngineError(graphOrStat, IllegalArgumentException("No data returned"))
         }
     }
 
     private fun lastValueData(
-        dataPoint: DataPoint?,
-        isDuration: Boolean,
+        dataPointData: LuaGraphResultData.DataPointData,
         graphOrStat: GraphOrStat,
     ): ILuaGraphViewData = object : ILuaGraphViewData {
         override val wrapped: IGraphStatViewData = object : ILastValueViewData {
-            override val isDuration: Boolean = isDuration
+            override val isDuration: Boolean = dataPointData.isDuration
             override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
             override val graphOrStat: GraphOrStat = graphOrStat.copy(type = GraphStatType.LAST_VALUE)
-            override val lastDataPoint: DataPoint? = dataPoint
+            override val lastDataPoint: DataPoint? = dataPointData.dataPoint
+        }
+        override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
+        override val graphOrStat: GraphOrStat = graphOrStat
+    }
+
+    private fun luaTextData(
+        textData: LuaGraphResultData.TextData,
+        graphOrStat: GraphOrStat
+    ): ILuaGraphViewData = object : ILuaGraphViewData {
+        override val wrapped: IGraphStatViewData = object : ITextViewData {
+            override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
+            override val graphOrStat: GraphOrStat = graphOrStat
+            override val text: String? = textData.text
+            override val textSize: ITextViewData.TextSize = textData.size.toTextSize()
         }
         override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
         override val graphOrStat: GraphOrStat = graphOrStat
@@ -143,4 +146,10 @@ class LuaGraphDataFactory @Inject constructor(
             override val graphOrStat = graphOrStat
             override val error = GraphNotFoundException()
         }
+
+    private fun TextSize.toTextSize(): ITextViewData.TextSize = when (this) {
+        TextSize.SMALL -> ITextViewData.TextSize.SMALL
+        TextSize.MEDIUM -> ITextViewData.TextSize.MEDIUM
+        TextSize.LARGE -> ITextViewData.TextSize.LARGE
+    }
 }

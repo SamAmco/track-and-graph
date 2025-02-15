@@ -19,12 +19,16 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
-import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.junit.Assert
 import org.junit.Test
-import org.threeten.bp.*
+import org.threeten.bp.DayOfWeek
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZoneOffset
 
 class TimeHistogramDataHelperTests {
     private val timeHelper = TimeHelper(

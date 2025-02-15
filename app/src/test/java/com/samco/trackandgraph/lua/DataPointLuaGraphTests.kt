@@ -3,6 +3,7 @@ package com.samco.trackandgraph.lua
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import org.luaj.vm2.LuaError
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
@@ -10,11 +11,11 @@ import org.threeten.bp.ZoneOffset
 class DataPointLuaGraphTests : LuaEngineImplTest() {
 
     @Test
-    fun `Datapoint type gives next data point with sensible defaults`() = testLuaEngine(
+    fun `Datapoint type gives data point with sensible defaults`() = testLuaEngine(
         emptyMap(),
         """
             return {
-                 type = Tng.graph.DATAPOINT,
+                 type = tng.graph.DATAPOINT,
                  data = { timestamp = 0 }
              }
         """.trimIndent()
@@ -40,7 +41,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = Tng.graph.DATAPOINT,
+              type = tng.graph.DATAPOINT,
               data = {
                 timestamp = 0,
                 offset = 1000,
@@ -73,10 +74,10 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = Tng.graph.DATAPOINT,
+              type = tng.graph.DATAPOINT,
               data = {
                 timestamp = 0,
-                isDuration = true
+                isduration = true
               }
             }
         """.trimIndent()
@@ -104,7 +105,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = Tng.graph.DATAPOINT,
+              type = tng.graph.DATAPOINT,
               data = {
                 timestamp = 123,
                 offset = 1234
@@ -135,7 +136,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = Tng.graph.DATAPOINT,
+              type = tng.graph.DATAPOINT,
               data = nil
             }
         """.trimIndent()
@@ -147,4 +148,18 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         assertEquals(false, data.isDuration)
     }
 
+    @Test
+    fun `Datapoint without a timestamp is an error`() = testLuaEngine(
+        emptyMap(),
+        """
+            return {
+              type = tng.graph.DATAPOINT,
+              data = {}
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assertEquals(null, result.data)
+        assert(result.error is LuaError)
+    }
 }

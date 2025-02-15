@@ -21,7 +21,12 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
-import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.GraphEndDate
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphStatType
+import com.samco.trackandgraph.base.database.dto.IDataPoint
+import com.samco.trackandgraph.base.database.dto.PieChart
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.DataInteractor
 import kotlinx.coroutines.ExperimentalCoroutinesApi

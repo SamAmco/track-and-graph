@@ -1,0 +1,197 @@
+package com.samco.trackandgraph.lua
+
+import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import junit.framework.TestCase.assertEquals
+import org.junit.Test
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
+
+class GraphApiLuaGraphTests : LuaEngineImplTest() {
+
+    @Test
+    fun `Sources returns full list of sources`() = testLuaEngine(
+        mapOf(
+            "source1" to sequenceOf(
+                TestDP(timestamp = OffsetDateTime.now(), value = 1.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 2.0),
+            ),
+            "source2" to emptySequence(),
+        ),
+        """
+            return {
+                 type = tng.graph.TEXT,
+                 data = table.concat(tng.graph.sources(), ", ")
+             }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        assertEquals("source1, source2", (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `dp returns next data point`() = testLuaEngine(
+        mapOf(
+            "source1" to sequenceOf(
+                TestDP(timestamp = OffsetDateTime.now(), value = 1.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 2.0),
+            ),
+        ),
+        """
+            return {
+                 type = tng.graph.TEXT,
+                 data = tng.graph.dp("source1").value
+             }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        assertEquals("1", (result.data as LuaGraphResultData.TextData).text)
+        assertEquals(1, sampledData["source1"]?.size)
+    }
+
+    @Test
+    fun `dpbatch returns n data points`() = testLuaEngine(
+        mapOf(
+            "source1" to sequenceOf(
+                TestDP(timestamp = OffsetDateTime.now(), value = 1.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 2.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 3.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 4.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 5.0),
+            ),
+        ),
+        """
+            local datapoints = tng.graph.dpbatch("source1", 3)
+            for k, v in pairs(datapoints) do
+                datapoints[k] = v.value
+            end
+            return {
+                 type = tng.graph.TEXT,
+                 data = table.concat(datapoints, ", ")
+             }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        assertEquals("1, 2, 3", (result.data as LuaGraphResultData.TextData).text)
+        assertEquals(3, sampledData["source1"]?.size)
+    }
+
+    @Test
+    fun `dpall returns all data points`() = testLuaEngine(
+        mapOf(
+            "source1" to sequenceOf(
+                TestDP(timestamp = OffsetDateTime.now(), value = 1.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 2.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 3.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 4.0),
+                TestDP(timestamp = OffsetDateTime.now(), value = 5.0),
+            ),
+        ),
+        """
+            local datapoints = tng.graph.dpall("source1")
+            for k, v in pairs(datapoints) do
+                datapoints[k] = v.value
+            end
+            return {
+                 type = tng.graph.TEXT,
+                 data = table.concat(datapoints, ", ")
+             }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        assertEquals("1, 2, 3, 4, 5", (result.data as LuaGraphResultData.TextData).text)
+        assertEquals(5, sampledData["source1"]?.size)
+    }
+
+    @Test
+    fun `dpafter returns all data points after timestamp`() = testLuaEngine(
+        mapOf(
+            "source1" to sequenceOf(
+                TestDP(
+                    timestamp = OffsetDateTime.of(
+                        2021, 3, 2, 0, 0, 0, 0, ZoneOffset.UTC
+                    ), value = 1.0
+                ),
+                TestDP(
+                    timestamp = OffsetDateTime.of(
+                        2021, 3, 1, 8, 9, 7, 3, ZoneOffset.UTC
+                    ), value = 2.0
+                ),
+                TestDP(
+                    timestamp = OffsetDateTime.of(
+                        2021, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC
+                    ), value = 3.0
+                ),
+                TestDP(
+                    timestamp = OffsetDateTime.of(
+                        2020, 12, 29, 0, 0, 0, 0, ZoneOffset.UTC
+                    ), value = 3.0
+                ),
+            ),
+        ),
+        """
+            local cutoff = tng.time.time({year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC"})
+            local datapoints = tng.graph.dpafter("source1", cutoff)
+            for k, v in pairs(datapoints) do
+                datapoints[k] = v.value
+            end
+            return {
+                 type = tng.graph.TEXT,
+                 data = table.concat(datapoints, ", ")
+             }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        assertEquals("1, 2", (result.data as LuaGraphResultData.TextData).text)
+        //We had to get the third data point to check the cutoff even though it wasn't returned
+        assertEquals(3, sampledData["source1"]?.size)
+    }
+
+    @Test
+    fun `dpafter returns all datapoints after a date`() = testLuaEngine(
+        mapOf(
+            "source1" to sequenceOf(
+                TestDP(
+                    timestamp = OffsetDateTime.of(
+                        2021, 3, 2, 0, 0, 0, 0, ZoneOffset.UTC
+                    ), value = 1.0
+                ),
+                TestDP(
+                    timestamp = OffsetDateTime.of(
+                        2021, 3, 1, 8, 9, 7, 3, ZoneOffset.UTC
+                    ), value = 2.0
+                ),
+                TestDP(
+                    timestamp = OffsetDateTime.of(
+                        2021, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC
+                    ), value = 3.0
+                ),
+                TestDP(
+                    timestamp = OffsetDateTime.of(
+                        2020, 12, 29, 0, 0, 0, 0, ZoneOffset.UTC
+                    ), value = 3.0
+                ),
+            ),
+        ),
+        """
+            local cutoff = { year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC" }
+            local datapoints = tng.graph.dpafter("source1", cutoff)
+            for k, v in pairs(datapoints) do
+                datapoints[k] = v.value
+            end
+            return {
+                 type = tng.graph.TEXT,
+                 data = table.concat(datapoints, ", ")
+             }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        assertEquals("1, 2", (result.data as LuaGraphResultData.TextData).text)
+        assertEquals(3, sampledData["source1"]?.size)
+    }
+}
