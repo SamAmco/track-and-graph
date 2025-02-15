@@ -17,11 +17,11 @@
 
 package com.samco.trackandgraph.graphstatview.ui
 
-import android.graphics.Color
-import androidx.annotation.ColorRes
+import android.graphics.Color as GColor
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
@@ -32,12 +32,13 @@ import com.androidplot.pie.Segment
 import com.androidplot.pie.SegmentFormatter
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.databinding.GraphPieChartBinding
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
 
 private data class SegmentInfo(
-    @ColorRes val color: Int,
+    val color: Color,
     val segment: Segment,
     val label: String
 )
@@ -48,39 +49,68 @@ fun PieChartView(
     viewData: IPieChartViewData,
     graphHeight: Int? = null
 ) {
-    if (viewData.segments.isNullOrEmpty()) {
+    val segments = viewData.segments
+    if (segments.isNullOrEmpty()) {
         GraphErrorView(
             modifier = modifier,
             error = R.string.graph_stat_view_not_enough_data_graph
         )
     } else {
-        val segCount = viewData.segments!!.size
-        val segments = viewData.segments!!.mapIndexed { i, s ->
-            val index = (dataVisColorGenerator * i) % dataVisColorList.size
-            val color = dataVisColorList[index]
-            val percentage = "%.1f".format(s.value.toDouble())
-            val title = s.title.ifEmpty { stringResource(R.string.no_label) }
-            var label = "$title ($percentage%)"
+        val segmentInfos = mutableListOf<SegmentInfo>()
+        var lastColorIndex: Int? = null
 
-            if (segCount > dataVisColorList.size) {
-                label = "$i: $title ($percentage%)"
-                s.title = i.toString()
+        for (index in segments.indices) {
+            val segment = segments[index]
+
+            val color = when (segment.color) {
+                is ColorSpec.ColorIndex -> {
+                    lastColorIndex = segment.color.index
+                    colorResource(dataVisColorList[segment.color.index])
+                }
+
+                is ColorSpec.ColorValue -> Color(segment.color.value)
+
+                null -> {
+                    if (lastColorIndex != null) {
+                        val colorIndex = (dataVisColorGenerator * ++lastColorIndex) % dataVisColorList.size
+                        colorResource(dataVisColorList[colorIndex])
+                    } else {
+                        lastColorIndex = index
+                        colorResource(dataVisColorList[index])
+                    }
+                }
             }
 
-            SegmentInfo(
-                color = color,
-                segment = s,
-                label = label
+            val percentage = "%.1f".format(segment.value)
+            val title = segment.title.ifEmpty { stringResource(R.string.no_label) }
+
+            val label = when {
+                segments.size > dataVisColorList.size -> "$index: $title ($percentage%)"
+                else -> "$title ($percentage%)"
+            }
+
+            val segmentTitle = when {
+                segments.size > dataVisColorList.size -> index.toString()
+                else -> title
+            }
+
+            val androidPlotSegment = Segment(segmentTitle, segment.value)
+
+            segmentInfos.add(
+                SegmentInfo(
+                    color = color,
+                    segment = androidPlotSegment,
+                    label = label
+                )
             )
         }
 
         PieChartViewBody(
             modifier = modifier,
-            segments = segments,
+            segments = segmentInfos,
             graphHeight = graphHeight
         )
     }
-
 }
 
 @Composable
@@ -99,16 +129,16 @@ private fun PieChartViewBody(
         val binding = GraphPieChartBinding.inflate(inflater, parent, attachToParent)
 
         binding.pieChart.clear()
-        binding.pieChart.backgroundPaint.color = Color.TRANSPARENT
+        binding.pieChart.backgroundPaint.color = GColor.TRANSPARENT
 
         segments.forEachIndexed { i, s ->
 
-            val segForm = SegmentFormatter(context.getColor(s.color))
+            val segForm = SegmentFormatter(s.color.toArgb())
             if (segments.size > dataVisColorList.size) {
                 segForm.labelPaint.textSize = smallLabelSize
                 segForm.labelPaint.color = labelColor
             } else {
-                segForm.labelPaint.color = Color.TRANSPARENT
+                segForm.labelPaint.color = GColor.TRANSPARENT
             }
 
             binding.pieChart.addSegment(s.segment, segForm)

@@ -150,7 +150,7 @@ fun LineGraphBodyView(
     GraphLegend(
         items = viewData.plottableData.map {
             GraphLegendItem(
-                color = dataVisColorList[it.key.colorIndex],
+                color = toLegendColor(dataVisColorList[it.key.colorIndex]),
                 label = it.key.name
             )
         }

@@ -25,6 +25,7 @@ interface LuaEngine {
         const val DATA = "data"
         const val TNG = "tng"
         const val TEXT = "text"
+        const val PIE_CHART = "piechart"
         const val TYPE = "type"
         const val DATAPOINT = "datapoint"
         const val IS_DURATION = "isduration"

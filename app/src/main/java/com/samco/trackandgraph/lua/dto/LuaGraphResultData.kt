@@ -13,4 +13,8 @@ sealed interface LuaGraphResultData {
         val size: TextSize,
         val alignment: TextAlignment,
     ) : LuaGraphResultData
+
+    data class PieChartData(
+        val segments: List<PieChartSegment>?
+    ) : LuaGraphResultData
 }

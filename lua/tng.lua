@@ -81,6 +81,20 @@ tng.time.format = function(datetime, format) end
 
 tng.graph = {}
 
+--- Graph colors
+tng.graph.color1 = 1   -- #A50026
+tng.graph.color2 = 2   -- #D73027
+tng.graph.color3 = 3   -- #F46D43
+tng.graph.color4 = 4   -- #FDAE61
+tng.graph.color5 = 5   -- #FEE090
+tng.graph.color6 = 6   -- #E0F3F8
+tng.graph.color7 = 7   -- #ABD9E9
+tng.graph.color8 = 8   -- #74ADD1
+tng.graph.color9 = 9   -- #4575B4
+tng.graph.color10 = 10 -- #313695
+tng.graph.color11 = 11 -- #54D931
+tng.graph.color12 = 12 -- #1B8200
+
 --- Graph types
 tng.graph.DATAPOINT = "datapoint"
 --- @class datapoint_graphtype_data
@@ -96,6 +110,13 @@ tng.graph.TEXT = "text"
 --- @field text string: The text to display.
 --- @field size integer (optional): 1-3 The size of the text small, medium or large. Defaults to large.
 --- @field align string (optional): start, centre, or end The alignment of the text. Defaults to centre.
+
+tng.graph.PIECHART = "piechart"
+--- Pie chart data is just a table of piechart_segment.
+--- @class piechart_segment
+--- @field label string: The label of the segment.
+--- @field value number: The value of the segment. This does not need to be normalised in any way.
+--- @field color (integer|string) (optional): Can be a color from tng.graph.color1 to tng.graph.color12 or a hex string e.g. "#00FF00"
 
 --- Returns a list of all the data sources available to this graph.
 --- @return table: A table of strings containing the names of all the data sources.

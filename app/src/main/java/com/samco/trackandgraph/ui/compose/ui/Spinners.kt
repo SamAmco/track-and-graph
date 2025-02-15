@@ -18,6 +18,7 @@
 
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -138,12 +139,24 @@ fun CircleSpinner(
 fun ColorCircle(
     modifier: Modifier = Modifier,
     size: Dp = 54.dp,
-    @ColorRes color: Int
+    color: Color,
 ) = Circle(
     modifier = modifier,
     size = size,
-    backgroundColor = colorResource(id = color)
+    backgroundColor = color
 ) {}
+
+
+@Composable
+fun ColorCircle(
+    modifier: Modifier = Modifier,
+    size: Dp = 54.dp,
+    @ColorRes color: Int,
+) = ColorCircle(
+    modifier = modifier,
+    size = size,
+    color = colorResource(color)
+)
 
 @Composable
 fun Circle(

@@ -16,6 +16,8 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
@@ -27,12 +29,19 @@ import com.samco.trackandgraph.base.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.base.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.graphstatview.factories.helpers.DataPointLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.ErrorLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.PieChartLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.TextLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.lua.LuaEngine
+import com.samco.trackandgraph.lua.dto.ColorSpec
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.lua.dto.PieChartSegment
 import com.samco.trackandgraph.lua.dto.TextAlignment
 import com.samco.trackandgraph.lua.dto.TextSize
 import junit.framework.TestCase.assertEquals
@@ -43,6 +52,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.threeten.bp.OffsetDateTime
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec as ViewColorSpec
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LuaGraphDataFactoryTest {
@@ -55,6 +65,10 @@ class LuaGraphDataFactoryTest {
 
     private fun uut() = LuaGraphDataFactory(
         luaEngine = { luaEngine },
+        pieChartLuaHelper = PieChartLuaHelper(),
+        textLuaHelper = TextLuaHelper(),
+        dataPointLuaHelper = DataPointLuaHelper(),
+        errorLuaHelper = ErrorLuaHelper(),
         dataInteractor = dataInteractor,
         ioDispatcher = ioDispatcher
     )
@@ -193,6 +207,43 @@ class LuaGraphDataFactoryTest {
         assertEquals("text", text.text)
         assertEquals(ITextViewData.TextSize.MEDIUM, text.textSize)
         assertEquals(ITextViewData.TextAlignment.START, text.textAlignment)
+        assertEquals(null, result.error)
+    }
+
+    @Test
+    fun `pie chart returns pie chart`() = runTest {
+        whenever(luaEngine.runLuaGraphScript(any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.PieChartData(
+                    segments = listOf(
+                        PieChartSegment(100.0, "A", null),
+                        PieChartSegment(150.0, "B", ColorSpec.HexColor("#00FF00")),
+                        PieChartSegment(250.0, "C", ColorSpec.ColorIndex(8)),
+                        PieChartSegment(100.0, "D", ColorSpec.HexColor("#FFFF00")),
+                        PieChartSegment(150.0, "E", ColorSpec.HexColor("#0000FF")),
+                        PieChartSegment(250.0, "F", ColorSpec.HexColor("#FF00FF")),
+                    )
+                )
+            )
+        )
+
+        val result = callGetViewData()
+
+        assert(result.wrapped is IPieChartViewData)
+        val pieChart = result.wrapped as IPieChartViewData
+        assert(pieChart.graphOrStat.type == GraphStatType.PIE_CHART)
+
+        assertEquals(
+            listOf(
+                IPieChartViewData.Segment(10.0, "A", null),
+                IPieChartViewData.Segment(15.0, "B", ViewColorSpec.ColorValue(Color.Green.toArgb())),
+                IPieChartViewData.Segment(25.0, "C", ViewColorSpec.ColorIndex(8)),
+                IPieChartViewData.Segment(10.0, "D", ViewColorSpec.ColorValue(Color.Yellow.toArgb())),
+                IPieChartViewData.Segment(15.0, "E", ViewColorSpec.ColorValue(Color.Blue.toArgb())),
+                IPieChartViewData.Segment(25.0, "F", ViewColorSpec.ColorValue(Color.Magenta.toArgb())),
+            ),
+            pieChart.segments
+        )
         assertEquals(null, result.error)
     }
 
