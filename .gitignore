@@ -79,3 +79,7 @@ local-scripts/
 
 todo.txt
 kls_database.db
+
+# Lua generated files
+app/src/main/assets/generated/lua/tng.lua
+app/src/test/resources/generated/lua/tng.lua

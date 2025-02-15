@@ -33,6 +33,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.lua.dto.TextAlignment
 import com.samco.trackandgraph.lua.dto.TextSize
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
@@ -179,7 +180,8 @@ class LuaGraphDataFactoryTest {
             LuaGraphResult(
                 data = LuaGraphResultData.TextData(
                     text = "text",
-                    size = TextSize.MEDIUM
+                    size = TextSize.MEDIUM,
+                    alignment = TextAlignment.START,
                 )
             )
         )
@@ -190,6 +192,7 @@ class LuaGraphDataFactoryTest {
         val text = result.wrapped as ITextViewData
         assertEquals("text", text.text)
         assertEquals(ITextViewData.TextSize.MEDIUM, text.textSize)
+        assertEquals(ITextViewData.TextAlignment.START, text.textAlignment)
         assertEquals(null, result.error)
     }
 

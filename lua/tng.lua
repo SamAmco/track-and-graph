@@ -83,8 +83,6 @@ tng.graph = {}
 
 --- Graph types
 tng.graph.DATAPOINT = "datapoint"
-tng.graph.TEXT = "text"
-
 --- @class datapoint_graphtype_data
 --- @field timestamp timestamp: The timestamp of the data point.
 --- @field featureId string: The database ID of the feature (aka data source).
@@ -93,11 +91,11 @@ tng.graph.TEXT = "text"
 --- @field note string: The note of the data point.
 --- @field isduration boolean: Whether the data point is a duration.
 
+tng.graph.TEXT = "text"
 --- @class text_graphtype_data (you can also just return a string or number for this graph type)
 --- @field text string: The text to display.
 --- @field size integer (optional): 1-3 The size of the text small, medium or large. Defaults to large.
-
-tng.graph.TEXT = "text"
+--- @field align string (optional): start, centre, or end The alignment of the text. Defaults to centre.
 
 --- Returns a list of all the data sources available to this graph.
 --- @return table: A table of strings containing the names of all the data sources.
