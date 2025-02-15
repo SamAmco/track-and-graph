@@ -22,6 +22,13 @@ interface ITextViewData : IGraphStatViewData {
             override val graphOrStat: GraphOrStat
                 get() = graphOrStat
         }
+
+        fun default(graphOrStat: GraphOrStat) = object : ITextViewData {
+            override val state: State
+                get() = State.READY
+            override val graphOrStat: GraphOrStat
+                get() = graphOrStat
+        }
     }
 
 }
