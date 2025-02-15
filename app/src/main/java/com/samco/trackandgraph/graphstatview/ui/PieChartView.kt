@@ -20,13 +20,11 @@ package com.samco.trackandgraph.graphstatview.ui
 import android.graphics.Color
 import androidx.annotation.ColorRes
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.androidplot.pie.PieRenderer

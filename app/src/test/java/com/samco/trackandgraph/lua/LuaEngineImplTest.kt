@@ -4,9 +4,9 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
+import com.samco.trackandgraph.util.rawDataSampleFromSequence
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -44,39 +44,21 @@ abstract class LuaEngineImplTest {
         script: String,
         assertionBlock: AssertionScope.() -> Unit
     ) {
-        val data = dataSources.mapValues { (_, data) ->
-            object : RawDataSample() {
-                private val iterator = data.iterator()
-                private val sampled = mutableListOf<DataPoint>()
-                override fun getRawDataPoints() = sampled
-                override fun iterator() = object : Iterator<DataPoint> {
-                    override fun hasNext() = iterator.hasNext()
-                    override fun next() = iterator.next().toDataPoint().also { sampled.add(it) }
-                }
-
-                override fun dispose() = Unit
-            }
-        }
-
-        val iterators = data.mapValues { (_, sample) -> sample.iterator() }
-
         val uut = uut()
+
+        val sources = dataSources.mapValues { (_, source) ->
+            val asDataPoints = source.map { it.toDataPoint() }
+            rawDataSampleFromSequence(asDataPoints) {}
+        }
 
         val result = uut.runLuaGraphScript(
             script,
-            next = { source, count ->
-                val iterator = iterators[source] ?: throw IllegalArgumentException("No data sample found for $source")
-                val batchSample = mutableListOf<DataPoint>()
-                while (batchSample.size < count && iterator.hasNext()) {
-                    batchSample.add(iterator.next())
-                }
-                batchSample
-            }
+            LuaEngine.LuaGraphEngineParams(sources)
         )
 
         AssertionScope(
             result = result,
-            sampledData = data.mapValues { (_, sample) -> sample.getRawDataPoints() }
+            sampledData = sources.mapValues { (_, sample) -> sample.getRawDataPoints() }
         ).assertionBlock()
     }
 

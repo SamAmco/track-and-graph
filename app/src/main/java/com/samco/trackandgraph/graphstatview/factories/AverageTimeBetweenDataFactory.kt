@@ -17,16 +17,16 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.AverageTimeBetweenStat
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
+import com.samco.trackandgraph.functions.functions.DataSampleFunction
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException

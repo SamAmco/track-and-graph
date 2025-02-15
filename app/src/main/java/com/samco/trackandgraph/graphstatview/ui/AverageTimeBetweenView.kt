@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatTimeToDaysHoursMinutesSeconds
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 
 @Composable
 fun AverageTimeBetweenView(

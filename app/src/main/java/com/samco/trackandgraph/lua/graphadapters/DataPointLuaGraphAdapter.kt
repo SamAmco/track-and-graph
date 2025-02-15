@@ -18,31 +18,25 @@ package com.samco.trackandgraph.lua.graphadapters
 
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.lua.LuaEngine
+import com.samco.trackandgraph.lua.apiimpl.DateTimeParser
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import org.luaj.vm2.LuaValue
-import org.threeten.bp.Instant
-import org.threeten.bp.OffsetDateTime
-import org.threeten.bp.ZoneOffset
 import javax.inject.Inject
 
-class DataPointLuaGraphAdapter @Inject constructor() : LuaGraphAdaptor<LuaGraphResultData.DataPointData> {
+class DataPointLuaGraphAdapter @Inject constructor(
+    private val dateTimeParser: DateTimeParser,
+) : LuaGraphAdaptor<LuaGraphResultData.DataPointData> {
     override fun process(data: LuaValue): LuaGraphResultData.DataPointData {
         if (data == LuaValue.NIL) return LuaGraphResultData.DataPointData(
             dataPoint = null,
             isDuration = false
         )
 
-        val timestamp = data[LuaEngine.TIMESTAMP].checklong().let {
-            Instant.ofEpochMilli(it)
-        }
-        val offset = data[LuaEngine.OFFSET].let {
-            if (it.isint()) ZoneOffset.ofTotalSeconds(it.optint(0))
-            else OffsetDateTime.now().offset
-        }
+        val timestamp = dateTimeParser.parseDateTime(data)
 
         return LuaGraphResultData.DataPointData(
             dataPoint = DataPoint(
-                timestamp = OffsetDateTime.ofInstant(timestamp, offset),
+                timestamp = timestamp.toOffsetDateTime(),
                 featureId = data[LuaEngine.FEATURE_ID].optlong(0L),
                 value = data[LuaEngine.VALUE].optdouble(0.0),
                 label = data[LuaEngine.LABEL].optjstring("") ?: "",

@@ -16,30 +16,30 @@
  */
 package com.samco.trackandgraph.lua
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 
 interface LuaEngine {
     companion object {
         const val OFFSET = "offset"
         const val DATA = "data"
-        const val TNG = "Tng"
-        const val GRAPH = "graph"
-        const val NEXT_DP = "nextdp"
-        const val NEXT_DP_BATCH = "nextdpbatch"
+        const val TNG = "tng"
+        const val TEXT = "text"
         const val TYPE = "type"
         const val DATAPOINT = "datapoint"
-        const val IS_DURATION = "isDuration"
-        const val TIMESTAMP = "timestamp"
+        const val IS_DURATION = "isduration"
         const val FEATURE_ID = "featureId"
         const val VALUE = "value"
         const val LABEL = "label"
         const val NOTE = "note"
     }
 
+    data class LuaGraphEngineParams(
+        val dataSources: Map<String, RawDataSample>
+    )
 
     fun runLuaGraphScript(
         script: String,
-        next: (String, Int) -> List<DataPoint>
+        params: LuaGraphEngineParams
     ): LuaGraphResult
 }

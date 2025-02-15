@@ -1,0 +1,155 @@
+package com.samco.trackandgraph.lua.apiimpl
+
+import org.luaj.vm2.LuaTable
+import org.luaj.vm2.LuaValue
+import org.luaj.vm2.LuaValue.Companion.tableOf
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.temporal.TemporalAmount
+import javax.inject.Inject
+
+class DateTimeParser @Inject constructor() {
+
+    companion object {
+        const val TIMESTAMP = "timestamp"
+        const val OFFSET = "offset"
+        const val ZONE = "zone"
+        const val YEAR = "year"
+        const val MONTH = "month"
+        const val DAY = "day"
+        const val HOUR = "hour"
+        const val MINUTE = "min"
+        const val SECOND = "sec"
+        const val W_DAY = "wday"
+        const val Y_DAY = "yday"
+    }
+
+    private val defaultZone by lazy {
+        ZonedDateTime.now().zone
+    }
+
+    /**
+     * Parses a datetime
+     *
+     * A datetime can mean either
+     * -- @class date
+     * -- @class timestamp
+     * in tng.lua
+     */
+    fun parseDateTime(dateTime: LuaValue): ZonedDateTime = when {
+        dateTime.isnumber() -> ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(dateTime.tolong()),
+            ZoneOffset.UTC,
+        )
+
+        dateTime.istable() -> {
+            parseDateTimeTable(dateTime)
+        }
+
+        else -> ZonedDateTime.now()
+    }
+
+    fun parseDateOrNow(date: LuaValue): ZonedDateTime = when {
+        date.istable() -> parseDateOrThrow(date)
+        else -> ZonedDateTime.now()
+    }
+
+    fun parseTimestampOrNow(arg: LuaValue): ZonedDateTime = when {
+        arg.isnumber() -> ZonedDateTime.ofInstant(
+            Instant.ofEpochMilli(arg.tolong()),
+            ZoneOffset.UTC,
+        )
+
+        arg.istable() -> parseTimestamp(arg)
+
+        else -> ZonedDateTime.now()
+    }
+
+    fun overrideOffsetDateTime(table: LuaValue, offsetDateTime: OffsetDateTime) {
+        table[TIMESTAMP] = offsetDateTime.toInstant().toEpochMilli().toDouble()
+        table[OFFSET] = offsetDateTime.offset.totalSeconds
+    }
+
+    fun zonedDateTimeToLuaTimestamp(zonedDateTime: ZonedDateTime): LuaTable {
+        val table = tableOf()
+        table[TIMESTAMP] = zonedDateTime.toInstant().toEpochMilli().toDouble()
+        table[OFFSET] = zonedDateTime.offset.totalSeconds
+        table[ZONE] = zonedDateTime.zone.id
+        return table
+    }
+
+    fun zonedDateTimeToLuaDate(zonedDateTime: ZonedDateTime): LuaTable {
+        val table = tableOf()
+        table[YEAR] = zonedDateTime.year
+        table[MONTH] = zonedDateTime.monthValue
+        table[DAY] = zonedDateTime.dayOfMonth
+        table[HOUR] = zonedDateTime.hour
+        table[MINUTE] = zonedDateTime.minute
+        table[SECOND] = zonedDateTime.second
+        table[W_DAY] = zonedDateTime.dayOfWeek.value
+        table[Y_DAY] = zonedDateTime.dayOfYear
+        table[ZONE] = zonedDateTime.zone.id
+        return table
+    }
+
+    fun parseDurationOrPeriod(unit: LuaValue, multiple: LuaValue): TemporalAmount = when {
+        unit.isnumber() -> Duration.ofMillis(unit.tolong()).multipliedBy(multiple.optlong(1))
+        unit.isstring() -> Period.parse(unit.tojstring()).multipliedBy(multiple.optint(1))
+        else -> throw IllegalArgumentException("Expected a number or string, got ${unit.typename()}")
+    }
+
+    private fun parseDateTimeTable(dateTime: LuaValue): ZonedDateTime {
+        val timestamp = dateTime[TIMESTAMP]
+        return when {
+            timestamp.isnumber() -> parseTimestamp(dateTime, timestamp.tolong())
+            else -> parseDateOrThrow(dateTime)
+        }
+    }
+
+    private fun parseTimestamp(dateTime: LuaValue): ZonedDateTime =
+        parseTimestamp(dateTime, dateTime[TIMESTAMP].checklong())
+
+    private fun parseTimestamp(dateTime: LuaValue, timestamp: Long): ZonedDateTime {
+        val zone = dateTime[ZONE]
+
+        if (zone.isstring()) {
+            val instant = Instant.ofEpochMilli(timestamp)
+            return ZonedDateTime.ofInstant(instant, ZoneId.of(zone.tojstring()))
+        }
+
+        val offset = dateTime[OFFSET]
+
+        if (offset.isnumber()) {
+            val instant = Instant.ofEpochMilli(timestamp)
+            return ZonedDateTime.ofInstant(
+                instant,
+                ZoneOffset.ofTotalSeconds(offset.toint()).normalized()
+            )
+        }
+
+        val instant = Instant.ofEpochMilli(timestamp)
+        return ZonedDateTime.ofInstant(instant, ZoneOffset.UTC)
+    }
+
+    private fun parseDateOrThrow(dateTime: LuaValue): ZonedDateTime {
+        val year = dateTime[YEAR].checkint()
+        val month = dateTime[MONTH].checkint()
+        val day = dateTime[DAY].checkint()
+        return parseDateOrThrow(dateTime, year, month, day)
+    }
+
+    private fun parseDateOrThrow(dateTime: LuaValue, year: Int, month: Int, day: Int): ZonedDateTime {
+        val hour = dateTime[HOUR].optint(0)
+        val minute = dateTime[MINUTE].optint(0)
+        val second = dateTime[SECOND].optint(0)
+        val zone = parseZone(dateTime) ?: defaultZone
+        return ZonedDateTime.of(year, month, day, hour, minute, second, 0, zone)
+    }
+
+    private fun parseZone(dateTime: LuaValue): ZoneId? = ZoneId.of(dateTime[ZONE].tojstring())
+}

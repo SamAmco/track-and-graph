@@ -16,16 +16,16 @@
  */
 package com.samco.trackandgraph.lua
 
-import com.samco.trackandgraph.graphstatview.factories.LuaGraphDataFactory
+import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.base.model.DataInteractor
-import dagger.Component
-import dagger.Module
+import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.graphstatview.factories.LuaGraphDataFactory
 import dagger.Binds
 import dagger.BindsInstance
-import kotlinx.coroutines.CoroutineDispatcher
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.assetreader.AssetReader
+import dagger.Component
+import dagger.Module
 import dagger.hilt.migration.DisableInstallInCheck
+import kotlinx.coroutines.CoroutineDispatcher
 
 @Module
 @DisableInstallInCheck

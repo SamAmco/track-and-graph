@@ -25,7 +25,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
-import com.androidplot.xy.*
+import com.androidplot.xy.BarFormatter
+import com.androidplot.xy.BarRenderer
+import com.androidplot.xy.BoundaryMode
+import com.androidplot.xy.SimpleXYSeries
+import com.androidplot.xy.StepMode
+import com.androidplot.xy.XYGraphWidget
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.TimeHistogramWindowData
 import com.samco.trackandgraph.base.database.dto.TimeHistogramWindow
@@ -40,7 +45,7 @@ import org.threeten.bp.temporal.WeekFields
 import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
-import java.util.*
+import java.util.Locale
 import kotlin.math.max
 import kotlin.math.roundToInt
 

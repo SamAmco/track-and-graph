@@ -27,14 +27,22 @@ import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning
-import com.androidplot.xy.*
+import com.androidplot.xy.BoundaryMode
+import com.androidplot.xy.FastLineAndPointRenderer
+import com.androidplot.xy.FastXYSeries
+import com.androidplot.xy.LineAndPointFormatter
+import com.androidplot.xy.PanZoom
+import com.androidplot.xy.PointLabelFormatter
+import com.androidplot.xy.RectRegion
+import com.androidplot.xy.StepMode
+import com.androidplot.xy.XValueMarker
+import com.androidplot.xy.XYGraphWidget
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.LineGraphFeature
 import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.helpers.formatDayMonth
 import com.samco.trackandgraph.base.helpers.formatMonthYear
-import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.ui.dataVisColorList
@@ -51,7 +59,6 @@ import java.text.ParsePosition
 import kotlin.math.abs
 import kotlin.math.log10
 import kotlin.math.max
-import kotlin.math.roundToLong
 
 @Composable
 fun LineGraphView(

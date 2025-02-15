@@ -18,10 +18,8 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.GraphStatType
@@ -31,10 +29,11 @@ import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
-import com.samco.trackandgraph.lua.DaggerLuaDataFactoryTestComponent
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
+import com.samco.trackandgraph.lua.dto.TextSize
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,10 +41,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.luaj.vm2.cli.lua
-import org.mockito.Mock
 import org.threeten.bp.OffsetDateTime
-import javax.inject.Provider
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LuaGraphDataFactoryTest {
@@ -174,6 +170,26 @@ class LuaGraphDataFactoryTest {
         val lastValue = result.wrapped as ILastValueViewData
         assertEquals(dataPoint, lastValue.lastDataPoint)
         assertEquals(true, lastValue.isDuration)
+        assertEquals(null, result.error)
+    }
+
+    @Test
+    fun `test return text`() = runTest {
+        whenever(luaEngine.runLuaGraphScript(any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.TextData(
+                    text = "text",
+                    size = TextSize.MEDIUM
+                )
+            )
+        )
+
+        val result = callGetViewData()
+
+        assert(result.wrapped is ITextViewData)
+        val text = result.wrapped as ITextViewData
+        assertEquals("text", text.text)
+        assertEquals(ITextViewData.TextSize.MEDIUM, text.textSize)
         assertEquals(null, result.error)
     }
 

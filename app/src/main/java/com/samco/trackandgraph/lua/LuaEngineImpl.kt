@@ -16,21 +16,23 @@
  */
 package com.samco.trackandgraph.lua
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.assetreader.AssetReader
+import com.samco.trackandgraph.lua.apiimpl.GraphApiImpl
+import com.samco.trackandgraph.lua.apiimpl.TimeApiImpl
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.lua.graphadapters.DataPointLuaGraphAdapter
+import com.samco.trackandgraph.lua.graphadapters.TextLuaGraphAdapter
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.LuaValue.Companion.tableOf
-import org.luaj.vm2.LuaValue.Companion.valueOf
-import org.luaj.vm2.lib.OneArgFunction
-import org.luaj.vm2.lib.TwoArgFunction
 import org.luaj.vm2.lib.jse.JsePlatform
 import javax.inject.Inject
-import com.samco.trackandgraph.assetreader.AssetReader
 
 class LuaEngineImpl @Inject constructor(
-    private val dataPointLuaGraphAdapter: DataPointLuaGraphAdapter,
     private val assetReader: AssetReader,
+    private val dataPointLuaGraphAdapter: DataPointLuaGraphAdapter,
+    private val textLuaGraphAdapter: TextLuaGraphAdapter,
+    private val graphApiImpl: GraphApiImpl,
+    private val timeApiImpl: TimeApiImpl,
 ) : LuaEngine {
 
     private val globals by lazy {
@@ -40,21 +42,18 @@ class LuaEngineImpl @Inject constructor(
         globals
     }
 
-    private val tngTable: LuaValue by lazy {
-        globals[LuaEngine.TNG].opttable(tableOf()) ?: tableOf()
-    }
-
-    private val graphTable: LuaValue by lazy {
-        tngTable[LuaEngine.GRAPH].opttable(tableOf()) ?: tableOf()
+    private val tngTable: LuaTable by lazy {
+        //Fail hard if this is not defined to make sure tests fail
+        globals[LuaEngine.TNG].checktable()!!
     }
 
     override fun runLuaGraphScript(
         script: String,
-        next: (String, Int) -> List<DataPoint>
+        params: LuaEngine.LuaGraphEngineParams
     ): LuaGraphResult {
         try {
-            graphTable[LuaEngine.NEXT_DP] = getNextLuaFunction(next)
-            graphTable[LuaEngine.NEXT_DP_BATCH] = getNextBatchLuaFunction(next)
+            graphApiImpl.installIn(tngTable, params)
+            timeApiImpl.installIn(tngTable)
             return processLuaGraph(globals.load(script).call())
         } catch (t: Throwable) {
             return LuaGraphResult(error = t)
@@ -68,55 +67,10 @@ class LuaEngineImpl @Inject constructor(
 
         val data = when (type) {
             LuaEngine.DATAPOINT -> dataPointLuaGraphAdapter.process(dataLua)
+            LuaEngine.TEXT -> textLuaGraphAdapter.process(dataLua)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 
         return LuaGraphResult(data = data)
-    }
-
-    private fun getNextBatchLuaFunction(next: (String, Int) -> List<DataPoint>): LuaValue {
-        return object : TwoArgFunction() {
-            override fun call(arg1: LuaValue, arg2: LuaValue): LuaValue {
-                val name = arg1.checkjstring()
-                    ?: throw IllegalArgumentException("Name must be provided and be a string")
-                val count = arg2.optint(1)
-                val dataPoints = next(name, count)
-
-                // Convert the List<DataPoint> to a Lua table
-                val luaTable = tableOf()
-                dataPoints.forEachIndexed { index, dataPoint ->
-                    val luaDataPoint = tableOf()
-                    val epochMilli = dataPoint.timestamp.toInstant().toEpochMilli().toDouble()
-                    luaDataPoint[LuaEngine.TIMESTAMP] = valueOf(epochMilli)
-                    luaDataPoint[LuaEngine.FEATURE_ID] = valueOf(dataPoint.featureId.toString())
-                    luaDataPoint[LuaEngine.VALUE] = valueOf(dataPoint.value)
-                    luaDataPoint[LuaEngine.LABEL] = valueOf(dataPoint.label)
-                    luaDataPoint[LuaEngine.NOTE] = valueOf(dataPoint.note)
-                    luaTable[index + 1] = luaDataPoint
-                }
-                return luaTable
-            }
-        }
-    }
-
-    private fun getNextLuaFunction(next: (String, Int) -> List<DataPoint>): LuaValue {
-        return object : OneArgFunction() {
-            override fun call(arg: LuaValue): LuaValue {
-                val name = arg.checkjstring()
-                    ?: throw IllegalArgumentException("Name must be provided and be a string")
-                return next(name, 1).firstOrNull()?.toLuaValue() ?: NIL
-            }
-        }
-    }
-
-    private fun DataPoint.toLuaValue(): LuaValue {
-        val luaDataPoint = tableOf()
-        val epochMilli = timestamp.toInstant().toEpochMilli().toDouble()
-        luaDataPoint[LuaEngine.TIMESTAMP] = valueOf(epochMilli)
-        luaDataPoint[LuaEngine.FEATURE_ID] = valueOf(featureId.toString())
-        luaDataPoint[LuaEngine.VALUE] = valueOf(value)
-        luaDataPoint[LuaEngine.LABEL] = valueOf(label)
-        luaDataPoint[LuaEngine.NOTE] = valueOf(note)
-        return luaDataPoint
     }
 }

@@ -17,23 +17,6 @@
 
 package com.samco.trackandgraph.group
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.asLiveData
-import com.nhaarman.mockitokotlin2.*
-import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.model.DataInteractor
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.yield
-import org.junit.Before
-import org.junit.Rule
-import org.junit.Test
-
 //TODO I would like to have a working test for this but right now the view model is tightly
 // coupled with too many dependencies and the test would be too complicated. I need to inject
 // the graph stat data factories
