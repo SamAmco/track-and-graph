@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.androidplot.pie.Segment
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
@@ -68,9 +67,14 @@ class PieChartDataFactory @Inject constructor(
                     override val graphOrStat = graphOrStat
                 }
             val segments = getPieChartSegments(plottingData, config.sumByCount)
-            val total = segments.sumOf { s -> s.value.toDouble() }
+            val total = segments.sumOf { s -> s.second }
             val percentages = segments.map {
-                Segment(it.title, (it.value.toDouble() / total) * 100f)
+                IPieChartViewData.Segment(
+                    title = it.first,
+                    value = (it.second / total) * 100.0,
+                    //Just use the default color behaviour for now
+                    color = null
+                )
             }
 
             object : IPieChartViewData {
@@ -102,17 +106,19 @@ class PieChartDataFactory @Inject constructor(
         return dataPoints.ifEmpty { null }
     }
 
-    private fun getPieChartSegments(dataSample: List<IDataPoint>, sumByCount: Boolean) =
-        dataSample
-            .groupingBy { dp -> dp.label }
-            .aggregate<IDataPoint, String, Double> { _, accumulator, element, first ->
-                when {
-                    first && sumByCount -> 1.0
-                    first && !sumByCount -> element.value
-                    !first && sumByCount -> accumulator!! + 1.0
-                    else -> accumulator!! + element.value
-                }
+    private fun getPieChartSegments(
+        dataSample: List<IDataPoint>,
+        sumByCount: Boolean
+    ): List<Pair<String, Double>> = dataSample
+        .groupingBy { dp -> dp.label }
+        .aggregate<IDataPoint, String, Double> { _, accumulator, element, first ->
+            when {
+                first && sumByCount -> 1.0
+                first && !sumByCount -> element.value
+                !first && sumByCount -> accumulator!! + 1.0
+                else -> accumulator!! + element.value
             }
-            .map { b -> Segment(b.key, b.value) }
-            .sortedBy { s -> s.title }
+        }
+        .map { b -> Pair(b.key, b.value) }
+        .sortedBy { s -> s.first }
 }

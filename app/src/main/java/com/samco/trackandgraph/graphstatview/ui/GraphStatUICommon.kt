@@ -1,7 +1,7 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
-import android.graphics.Color
+import android.graphics.Color as GColor
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
@@ -19,6 +19,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -85,9 +87,9 @@ fun xyPlotSetup(
     // I discovered it here: https://groups.google.com/g/androidplot/c/5QnJXD0uIIU
     xyPlot.setLayerType(View.LAYER_TYPE_SOFTWARE, null)
 
-    xyPlot.graph.gridBackgroundPaint.color = Color.TRANSPARENT
-    xyPlot.backgroundPaint.color = Color.TRANSPARENT
-    xyPlot.graph.backgroundPaint.color = Color.TRANSPARENT
+    xyPlot.graph.gridBackgroundPaint.color = GColor.TRANSPARENT
+    xyPlot.backgroundPaint.color = GColor.TRANSPARENT
+    xyPlot.graph.backgroundPaint.color = GColor.TRANSPARENT
 
     xyPlot.graph.paddingLeft = 0f
     xyPlot.graph.paddingBottom = 0f
@@ -145,8 +147,13 @@ fun GraphErrorView(
     )
 }
 
+//Hopefully we can just remove this function once everything has been transitioned to use Color.
+//Legend items should use Color because Lua will allow the flexibility to specify your own colors.
+@Composable
+fun toLegendColor(@ColorRes color: Int): Color = colorResource(color)
+
 data class GraphLegendItem(
-    @ColorRes val color: Int,
+    val color: Color,
     val label: String
 )
 

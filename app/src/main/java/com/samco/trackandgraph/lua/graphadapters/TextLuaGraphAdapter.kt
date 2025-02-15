@@ -18,11 +18,9 @@ class TextLuaGraphAdapter @Inject constructor() : LuaGraphAdaptor<LuaGraphResult
         const val CENTER_ALT = "centre"
     }
 
-    private fun parseSize(data: LuaValue): TextSize {
-        return when {
-            data.isint() -> TextSize.entries[data.optint(1) - 1]
-            else -> TextSize.LARGE
-        }
+    private fun parseSize(data: LuaValue): TextSize = when {
+        data.isint() -> TextSize.entries[data.optint(1) - 1]
+        else -> TextSize.LARGE
     }
 
     private fun parseAlignment(data: LuaValue): TextAlignment {

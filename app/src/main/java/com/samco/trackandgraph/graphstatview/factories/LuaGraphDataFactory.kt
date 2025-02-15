@@ -16,23 +16,21 @@
  */
 package com.samco.trackandgraph.graphstatview.factories
 
-import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
-import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.base.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
+import com.samco.trackandgraph.graphstatview.factories.helpers.DataPointLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.ErrorLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.PieChartLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
+import com.samco.trackandgraph.graphstatview.factories.helpers.TextLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
-import com.samco.trackandgraph.lua.dto.TextAlignment
-import com.samco.trackandgraph.lua.dto.TextSize
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
@@ -40,6 +38,10 @@ import javax.inject.Provider
 
 class LuaGraphDataFactory @Inject constructor(
     private val luaEngine: Provider<LuaEngine>,
+    private val pieChartLuaHelper: PieChartLuaHelper,
+    private val textLuaHelper: TextLuaHelper,
+    private val dataPointLuaHelper: DataPointLuaHelper,
+    private val errorLuaHelper: ErrorLuaHelper,
     dataInteractor: DataInteractor,
     @IODispatcher ioDispatcher: CoroutineDispatcher
 ) : ViewDataFactory<LuaGraphWithFeatures, ILuaGraphViewData>(dataInteractor, ioDispatcher) {
@@ -77,7 +79,7 @@ class LuaGraphDataFactory @Inject constructor(
                 onDataSampled = onDataSampled
             )
         } catch (t: Throwable) {
-            luaEngineError(graphOrStat, t)
+            errorLuaHelper(graphOrStat, t)
         } finally {
             dataSamples.values.forEach { it.dispose() }
         }
@@ -94,53 +96,17 @@ class LuaGraphDataFactory @Inject constructor(
 
         val luaGraphResult = luaEngine.get().runLuaGraphScript(config.script, luaEngineParams)
 
-        if (luaGraphResult.error != null) return luaEngineError(graphOrStat, luaGraphResult.error)
+        if (luaGraphResult.error != null) return errorLuaHelper(graphOrStat, luaGraphResult.error)
 
         onDataSampled(sampledData)
 
         return when (luaGraphResult.data) {
-            is LuaGraphResultData.DataPointData -> lastValueData(luaGraphResult.data, graphOrStat)
-            is LuaGraphResultData.TextData -> luaTextData(luaGraphResult.data, graphOrStat)
-            null -> luaEngineError(graphOrStat, IllegalArgumentException("No data returned"))
+            is LuaGraphResultData.DataPointData -> dataPointLuaHelper(luaGraphResult.data, graphOrStat)
+            is LuaGraphResultData.TextData -> textLuaHelper(luaGraphResult.data, graphOrStat)
+            is LuaGraphResultData.PieChartData -> pieChartLuaHelper(luaGraphResult.data, graphOrStat)
+            null -> errorLuaHelper(graphOrStat, IllegalArgumentException("No data returned"))
         }
     }
-
-    private fun lastValueData(
-        dataPointData: LuaGraphResultData.DataPointData,
-        graphOrStat: GraphOrStat,
-    ): ILuaGraphViewData = object : ILuaGraphViewData {
-        override val wrapped: IGraphStatViewData = object : ILastValueViewData {
-            override val isDuration: Boolean = dataPointData.isDuration
-            override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
-            override val graphOrStat: GraphOrStat = graphOrStat.copy(type = GraphStatType.LAST_VALUE)
-            override val lastDataPoint: DataPoint? = dataPointData.dataPoint
-        }
-        override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
-        override val graphOrStat: GraphOrStat = graphOrStat
-    }
-
-    private fun luaTextData(
-        textData: LuaGraphResultData.TextData,
-        graphOrStat: GraphOrStat
-    ): ILuaGraphViewData = object : ILuaGraphViewData {
-        override val wrapped: IGraphStatViewData = object : ITextViewData {
-            override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
-            override val graphOrStat: GraphOrStat = graphOrStat
-            override val text: String? = textData.text
-            override val textSize: ITextViewData.TextSize = textData.size.toTextSize()
-            override val textAlignment: ITextViewData.TextAlignment = textData.alignment.toTextAlignment()
-        }
-        override val state: IGraphStatViewData.State = IGraphStatViewData.State.READY
-        override val graphOrStat: GraphOrStat = graphOrStat
-    }
-
-    private fun luaEngineError(graphOrStat: GraphOrStat, throwable: Throwable) =
-        object : ILuaGraphViewData {
-            override val wrapped: IGraphStatViewData? = null
-            override val state = IGraphStatViewData.State.ERROR
-            override val graphOrStat = graphOrStat
-            override val error = throwable
-        }
 
     private fun graphNotFound(graphOrStat: GraphOrStat) =
         object : ILuaGraphViewData {
@@ -149,16 +115,4 @@ class LuaGraphDataFactory @Inject constructor(
             override val graphOrStat = graphOrStat
             override val error = GraphNotFoundException()
         }
-
-    private fun TextSize.toTextSize(): ITextViewData.TextSize = when (this) {
-        TextSize.SMALL -> ITextViewData.TextSize.SMALL
-        TextSize.MEDIUM -> ITextViewData.TextSize.MEDIUM
-        TextSize.LARGE -> ITextViewData.TextSize.LARGE
-    }
-
-    private fun TextAlignment.toTextAlignment(): ITextViewData.TextAlignment = when (this) {
-        TextAlignment.START -> ITextViewData.TextAlignment.START
-        TextAlignment.CENTER -> ITextViewData.TextAlignment.CENTER
-        TextAlignment.END -> ITextViewData.TextAlignment.END
-    }
 }

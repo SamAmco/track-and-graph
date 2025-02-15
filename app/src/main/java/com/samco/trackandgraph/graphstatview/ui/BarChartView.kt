@@ -60,6 +60,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
+import androidx.core.graphics.toColor
 import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.util.PixelUtils
@@ -393,7 +394,7 @@ private fun BarChartBodyView(
                 val label = bar.title
                     .ifEmpty { context.getString(R.string.no_label) }
                 GraphLegendItem(
-                    color = dataVisColorList[colorIndex],
+                    color = toLegendColor(dataVisColorList[colorIndex]),
                     label = label
                 )
             }

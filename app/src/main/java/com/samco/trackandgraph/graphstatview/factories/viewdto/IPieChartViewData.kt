@@ -17,10 +17,20 @@
 
 package com.samco.trackandgraph.graphstatview.factories.viewdto
 
-import com.androidplot.pie.Segment
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 
 interface IPieChartViewData : IGraphStatViewData {
+
+    data class Segment(
+        val value: Double,
+        val title: String,
+        //Color is optional. If not provided, the color will be determined by the order of the segments.
+        val color: ColorSpec?
+    )
+
+    /**
+     * The segments should already represent percentages because the numbers will be displayed to the user.
+     */
     val segments: List<Segment>?
         get() = null
 

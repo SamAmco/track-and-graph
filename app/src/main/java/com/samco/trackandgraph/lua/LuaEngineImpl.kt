@@ -21,6 +21,7 @@ import com.samco.trackandgraph.lua.apiimpl.GraphApiImpl
 import com.samco.trackandgraph.lua.apiimpl.TimeApiImpl
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.lua.graphadapters.DataPointLuaGraphAdapter
+import com.samco.trackandgraph.lua.graphadapters.PieChartLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.TextLuaGraphAdapter
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
@@ -31,6 +32,7 @@ class LuaEngineImpl @Inject constructor(
     private val assetReader: AssetReader,
     private val dataPointLuaGraphAdapter: DataPointLuaGraphAdapter,
     private val textLuaGraphAdapter: TextLuaGraphAdapter,
+    private val pieChartLuaGraphAdapter: PieChartLuaGraphAdapter,
     private val graphApiImpl: GraphApiImpl,
     private val timeApiImpl: TimeApiImpl,
 ) : LuaEngine {
@@ -54,7 +56,8 @@ class LuaEngineImpl @Inject constructor(
         try {
             graphApiImpl.installIn(tngTable, params)
             timeApiImpl.installIn(tngTable)
-            return processLuaGraph(globals.load(script).call())
+            val cleanedScript = script.cleanLuaScript()
+            return processLuaGraph(globals.load(cleanedScript).call())
         } catch (t: Throwable) {
             return LuaGraphResult(error = t)
         }
@@ -68,9 +71,16 @@ class LuaEngineImpl @Inject constructor(
         val data = when (type) {
             LuaEngine.DATAPOINT -> dataPointLuaGraphAdapter.process(dataLua)
             LuaEngine.TEXT -> textLuaGraphAdapter.process(dataLua)
+            LuaEngine.PIE_CHART -> pieChartLuaGraphAdapter.process(dataLua)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 
         return LuaGraphResult(data = data)
+    }
+
+    private fun String.cleanLuaScript(): String {
+        return this.replace(Regex("\\u00A0"), " ") // Replace NBSP with space
+            .replace(Regex("[\\u200B\\uFEFF]"), "") // Remove zero-width space and BOM
+            .trim()
     }
 }
