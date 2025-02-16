@@ -80,7 +80,6 @@ class LuaGraphDataFactoryTest {
         rawDataSamples.clear()
         whenever(dataInteractor.getRawDataSampleForFeatureId(any())).thenAnswer {
             val featureId = it.getArgument<Long>(0)
-            rawDataSamples[featureId] = mock()
             rawDataSamples[featureId]
         }
     }
@@ -245,6 +244,54 @@ class LuaGraphDataFactoryTest {
             pieChart.segments
         )
         assertEquals(null, result.error)
+    }
+
+    @Test
+    fun `calls onDataSampled with all sampled data points after generating graph`() = runTest {
+        val dataPoints = listOf(
+            DataPoint(
+                timestamp = OffsetDateTime.now(),
+                featureId = 1,
+                value = 1.0,
+                label = "label",
+                note = "note"
+            ),
+            DataPoint(
+                timestamp = OffsetDateTime.now(),
+                featureId = 2,
+                value = 2.0,
+                label = "label",
+                note = "note"
+            )
+        )
+
+        rawDataSamples[1] = RawDataSample.fromSequence(
+            data = dataPoints.asSequence(),
+            getRawDataPoints = { dataPoints },
+            onDispose = { }
+        )
+        rawDataSamples[2] = RawDataSample.fromSequence(
+            data = dataPoints.asSequence(),
+            getRawDataPoints = { dataPoints },
+            onDispose = { }
+        )
+        whenever(luaEngine.runLuaGraphScript(any(), any())).thenAnswer {
+            LuaGraphResult(
+                data = LuaGraphResultData.DataPointData(
+                    dataPoint = null,
+                    isDuration = false
+                )
+            )
+        }
+
+        callGetViewData(
+            features = mapOf(
+                "feature1" to 1,
+                "feature2" to 2
+            )
+        )
+
+        verify(onDataSampled).invoke(dataPoints + dataPoints)
     }
 
     @Test

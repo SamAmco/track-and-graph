@@ -16,33 +16,29 @@
  */
 package com.samco.trackandgraph.lua.graphadapters
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.lua.LuaEngine
+import com.samco.trackandgraph.lua.apiimpl.DataPointParser
 import com.samco.trackandgraph.lua.apiimpl.DateTimeParser
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
 class DataPointLuaGraphAdapter @Inject constructor(
-    private val dateTimeParser: DateTimeParser,
+    private val dataPointParser: DataPointParser,
 ) : LuaGraphAdaptor<LuaGraphResultData.DataPointData> {
+
+    companion object {
+        const val IS_DURATION = "isduration"
+    }
+
     override fun process(data: LuaValue): LuaGraphResultData.DataPointData {
         if (data == LuaValue.NIL) return LuaGraphResultData.DataPointData(
             dataPoint = null,
             isDuration = false
         )
 
-        val timestamp = dateTimeParser.parseDateTime(data)
-
         return LuaGraphResultData.DataPointData(
-            dataPoint = DataPoint(
-                timestamp = timestamp.toOffsetDateTime(),
-                featureId = data[LuaEngine.FEATURE_ID].optlong(0L),
-                value = data[LuaEngine.VALUE].optdouble(0.0),
-                label = data[LuaEngine.LABEL].optjstring("") ?: "",
-                note = data[LuaEngine.NOTE].optjstring("") ?: ""
-            ),
-            isDuration = data[LuaEngine.IS_DURATION].optboolean(false),
+            dataPoint = dataPointParser.parseDataPoint(data),
+            isDuration = data[IS_DURATION].optboolean(false),
         )
     }
 }

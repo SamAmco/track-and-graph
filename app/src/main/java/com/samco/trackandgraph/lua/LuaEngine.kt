@@ -21,18 +21,12 @@ import com.samco.trackandgraph.lua.dto.LuaGraphResult
 
 interface LuaEngine {
     companion object {
-        const val OFFSET = "offset"
         const val DATA = "data"
         const val TNG = "tng"
         const val TEXT = "text"
         const val PIE_CHART = "piechart"
         const val TYPE = "type"
         const val DATAPOINT = "datapoint"
-        const val IS_DURATION = "isduration"
-        const val FEATURE_ID = "featureId"
-        const val VALUE = "value"
-        const val LABEL = "label"
-        const val NOTE = "note"
     }
 
     data class LuaGraphEngineParams(
