@@ -91,14 +91,13 @@ class LuaGraphDataFactory @Inject constructor(
         config: LuaGraphWithFeatures,
         onDataSampled: (List<DataPoint>) -> Unit
     ): ILuaGraphViewData {
-        val sampledData = mutableListOf<DataPoint>()
         val luaEngineParams = LuaEngine.LuaGraphEngineParams(dataSources = dataSamples)
 
         val luaGraphResult = luaEngine.get().runLuaGraphScript(config.script, luaEngineParams)
 
         if (luaGraphResult.error != null) return errorLuaHelper(graphOrStat, luaGraphResult.error)
 
-        onDataSampled(sampledData)
+        onDataSampled(dataSamples.flatMap { it.value.getRawDataPoints() })
 
         return when (luaGraphResult.data) {
             is LuaGraphResultData.DataPointData -> dataPointLuaHelper(luaGraphResult.data, graphOrStat)

@@ -1,16 +1,15 @@
 package com.samco.trackandgraph.lua.apiimpl
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.lua.LuaEngine
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.NIL
-import org.luaj.vm2.LuaValue.Companion.tableOf
 import org.luaj.vm2.LuaValue.Companion.valueOf
 import javax.inject.Inject
 
 class GraphApiImpl @Inject constructor(
-    private val dateTimeParser: DateTimeParser
+    private val dateTimeParser: DateTimeParser,
+    private val dataPointParser: DataPointParser,
 ) {
 
     companion object {
@@ -36,7 +35,7 @@ class GraphApiImpl @Inject constructor(
         val zonedDateTime = dateTimeParser.parseDateTime(arg2)
         val batch = sources.dataSources[name]
             ?.takeWhile {  it.timestamp > zonedDateTime.toOffsetDateTime()  }
-            ?.map { it.toLuaValue() }
+            ?.map { dataPointParser.toLuaValueNullable(it) }
             ?.toList()
             ?.toTypedArray()
         return@twoArgFunction batch?.let { LuaValue.listOf(batch) } ?: NIL
@@ -45,7 +44,7 @@ class GraphApiImpl @Inject constructor(
     private fun getDpAllLuaFunction(sources: LuaEngine.LuaGraphEngineParams): LuaValue = oneArgFunction { arg: LuaValue ->
         val name = arg.checkjstring()
             ?: throw IllegalArgumentException("Name must be provided and be a string")
-        val batch = sources.dataSources[name]?.map { it.toLuaValue() }?.toList()
+        val batch = sources.dataSources[name]?.map { dataPointParser.toLuaValueNullable(it) }?.toList()
         return@oneArgFunction batch?.let { LuaValue.listOf(it.toTypedArray()) } ?: NIL
     }
 
@@ -57,23 +56,14 @@ class GraphApiImpl @Inject constructor(
         val name = arg1.checkjstring()
             ?: throw IllegalArgumentException("Name must be provided and be a string")
         val count = arg2.optint(1)
-        val batch = sources.dataSources[name]?.take(count)?.map { it.toLuaValue() }?.toList()
+        val batch = sources.dataSources[name]?.take(count)?.map { dataPointParser.toLuaValueNullable(it) }?.toList()
         return@twoArgFunction batch?.let { LuaValue.listOf(it.toTypedArray()) } ?: NIL
     }
 
     private fun getDpLuaFunction(sources: LuaEngine.LuaGraphEngineParams): LuaValue = oneArgFunction { arg ->
         val name = arg.checkjstring()
             ?: throw IllegalArgumentException("Name must be provided and be a string")
-        return@oneArgFunction sources.dataSources[name]?.first()?.toLuaValue() ?: NIL
+        return@oneArgFunction dataPointParser.toLuaValueNullable(sources.dataSources[name]?.first())
     }
 
-    private fun DataPoint.toLuaValue(): LuaValue {
-        val luaDataPoint = tableOf()
-        luaDataPoint[LuaEngine.FEATURE_ID] = valueOf(featureId.toString())
-        luaDataPoint[LuaEngine.VALUE] = valueOf(value)
-        luaDataPoint[LuaEngine.LABEL] = valueOf(label)
-        luaDataPoint[LuaEngine.NOTE] = valueOf(note)
-        dateTimeParser.overrideOffsetDateTime(luaDataPoint, timestamp)
-        return luaDataPoint
-    }
 }
