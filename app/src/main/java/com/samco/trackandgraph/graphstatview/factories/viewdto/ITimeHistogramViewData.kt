@@ -25,8 +25,10 @@ interface ITimeHistogramViewData : IGraphStatViewData {
 
     val window: TimeHistogramWindowData
         get() = TimeHistogramWindowData.getWindowData(TimeHistogramWindow.WEEK)
+
     val barValues: List<BarValue>?
         get() = null
+
     val maxDisplayHeight: Double
         get() = 0.0
 }

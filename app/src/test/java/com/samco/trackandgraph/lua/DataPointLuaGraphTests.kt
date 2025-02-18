@@ -15,7 +15,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                 type = tng.graph.DATAPOINT,
+                 type = tng.GRAPH_TYPE.DATAPOINT,
                  data = { timestamp = 0 }
              }
         """.trimIndent()
@@ -41,7 +41,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.graph.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATAPOINT,
               data = {
                 timestamp = 0,
                 offset = 1000,
@@ -74,7 +74,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.graph.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATAPOINT,
               data = {
                 timestamp = 0,
                 isduration = true
@@ -105,7 +105,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.graph.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATAPOINT,
               data = {
                 timestamp = 123,
                 offset = 1234
@@ -136,7 +136,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.graph.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATAPOINT,
               data = nil
             }
         """.trimIndent()
@@ -153,7 +153,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.graph.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATAPOINT,
               data = {}
             }
         """.trimIndent()

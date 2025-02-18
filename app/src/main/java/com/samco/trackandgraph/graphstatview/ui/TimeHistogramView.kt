@@ -184,16 +184,11 @@ private fun setUpYAxis(
                 pos: FieldPosition
             ): StringBuffer {
                 val percent = (obj as Number).toDouble()
-                return toAppendTo.append(atMost1dp(percent) + "%")
+                return toAppendTo.append(String.format("%.0f", percent))
             }
 
             override fun parseObject(source: String, pos: ParsePosition) = null
         }
-}
-
-private fun atMost1dp(value: Double): String {
-    return if (value % 1 == 0.0) String.format("%.0f", value)
-    else String.format("%.1f", value)
 }
 
 private fun setUpXAxis(

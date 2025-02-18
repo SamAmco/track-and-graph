@@ -25,19 +25,50 @@ import com.samco.trackandgraph.base.database.dto.YRangeType
 import org.threeten.bp.OffsetDateTime
 
 interface ILineGraphViewData : IGraphStatViewData {
+    /**
+     * Whether to show the Y values as durations or not. If they are durations, the Y values
+     * represent a number of seconds.
+     */
     val durationBasedRange: Boolean
         get() = false
+
+    /**
+     * The type of y range to use. If it is fixed, the y axis will use the bounds. If it is dynamic,
+     * the y axis may adjust the y axis to fit the data dynamically, or use the bounds still if the
+     * graph is being viewed in list mode.
+     */
     val yRangeType: YRangeType
         get() = YRangeType.DYNAMIC
+
+    /**
+     * The bounds expect the x max to be 0, and the x min to be a negative number of milliseconds
+     * representing the full duration of the graph. Sorry, I don't know what I was thinking.
+     */
     val bounds: RectRegion
         get() = RectRegion()
+
+    /**
+     * If the graph has no plottable data a message will be shown to the user instead of the graph.
+     */
     val hasPlottableData: Boolean
         get() = false
+
+    /**
+     * The end time of the graph. The far right point on the graph.
+     */
     val endTime: OffsetDateTime
         get() = OffsetDateTime.MIN
+
+    /**
+     * The x co-ordinate of each point is a negative number of milliseconds representing the
+     * time between it and the end time.
+     */
     val plottableData: Map<LineGraphFeature, FastXYSeries?>
         get() = emptyMap()
+
+    /**
+     * Android plot parameters for they y axis divisions.
+     */
     val yAxisRangeParameters: Pair<StepMode, Double>
         get() = Pair(StepMode.SUBDIVIDE, 11.0)
-
 }
