@@ -12,7 +12,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = NIL
             }
         """.trimIndent()
@@ -31,7 +31,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = "text" 
             }
         """.trimIndent()
@@ -49,7 +49,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = {
                     text = "text",
                     size = 1
@@ -70,7 +70,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = {
                     text = "text",
                     size = 2
@@ -91,7 +91,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = {
                     text = "text",
                     size = 3
@@ -112,7 +112,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = {
                     text = "text",
                 }
@@ -132,7 +132,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = {
                     text = "text",
                     align = "start"
@@ -153,7 +153,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = {
                     text = "text",
                     align = "center"
@@ -174,7 +174,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = {
                     text = "text",
                     align = "centre"
@@ -195,7 +195,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.TEXT,
+                type = tng.GRAPH_TYPE.TEXT,
                 data = {
                     text = "text",
                     align = "end"

@@ -3,10 +3,27 @@ package com.samco.trackandgraph.lua
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import org.luaj.vm2.LuaError
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 
 class GraphApiLuaGraphTests : LuaEngineImplTest() {
+
+    @Test
+    fun `Data source not found gives error`() = testLuaEngine(
+        mapOf(),
+        """
+            return {
+                 type = tng.GRAPH_TYPE.TEXT,
+                 data = tng.graph.dp("source1").value
+             }
+        """.trimIndent()
+    ) {
+        println(result)
+        assertEquals(null, result.data)
+        assert(result.error != null)
+        assert(result.error is LuaError)
+    }
 
     @Test
     fun `Sources returns full list of sources`() = testLuaEngine(
@@ -19,7 +36,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         ),
         """
             return {
-                 type = tng.graph.TEXT,
+                 type = tng.GRAPH_TYPE.TEXT,
                  data = table.concat(tng.graph.sources(), ", ")
              }
         """.trimIndent()
@@ -39,7 +56,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         ),
         """
             return {
-                 type = tng.graph.TEXT,
+                 type = tng.GRAPH_TYPE.TEXT,
                  data = tng.graph.dp("source1").value
              }
         """.trimIndent()
@@ -67,7 +84,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
                 datapoints[k] = v.value
             end
             return {
-                 type = tng.graph.TEXT,
+                 type = tng.GRAPH_TYPE.TEXT,
                  data = table.concat(datapoints, ", ")
              }
         """.trimIndent()
@@ -95,7 +112,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
                 datapoints[k] = v.value
             end
             return {
-                 type = tng.graph.TEXT,
+                 type = tng.GRAPH_TYPE.TEXT,
                  data = table.concat(datapoints, ", ")
              }
         """.trimIndent()
@@ -139,7 +156,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
                 datapoints[k] = v.value
             end
             return {
-                 type = tng.graph.TEXT,
+                 type = tng.GRAPH_TYPE.TEXT,
                  data = table.concat(datapoints, ", ")
              }
         """.trimIndent()
@@ -184,7 +201,7 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
                 datapoints[k] = v.value
             end
             return {
-                 type = tng.graph.TEXT,
+                 type = tng.GRAPH_TYPE.TEXT,
                  data = table.concat(datapoints, ", ")
              }
         """.trimIndent()

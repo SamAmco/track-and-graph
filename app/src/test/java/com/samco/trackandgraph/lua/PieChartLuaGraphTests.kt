@@ -14,7 +14,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.PIECHART,
+                type = tng.GRAPH_TYPE.PIECHART,
                 data = NIL
             }
         """.trimIndent()
@@ -30,7 +30,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.PIECHART,
+                type = tng.GRAPH_TYPE.PIECHART,
                 data = {
                     { value = 10, label = "A" },
                     { value = 20, label = "B" }
@@ -55,9 +55,9 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.PIECHART,
+                type = tng.GRAPH_TYPE.PIECHART,
                 data = {
-                    { value = 10, label = "A", color = tng.graph.color12 },
+                    { value = 10, label = "A", color = tng.COLOR.GREEN_DARK },
                     { value = 20, label = "B", color = "#00FF00" }
                 }
             }
@@ -80,7 +80,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.PIECHART,
+                type = tng.GRAPH_TYPE.PIECHART,
                 data = {
                     { value = 1, label = "A" }
                     { label = "A" }
@@ -98,7 +98,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                type = tng.graph.PIECHART,
+                type = tng.GRAPH_TYPE.PIECHART,
                 data = {
                     { value = 10 }
                     { value = 10, label = "B" }
