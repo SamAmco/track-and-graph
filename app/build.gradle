@@ -60,6 +60,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             applicationIdSuffix = ".debug"
             resValue "string", "app_name", "Debug Track & Graph"
+            manifestPlaceholders = [
+                    ALLOW_CLEAR_TEXT     : "false",
+                    NETWORK_SECURITY_CONFIG: "@xml/debug_network_security_config"
+            ]
         }
         debugMinify {
             minifyEnabled true
@@ -68,6 +72,10 @@ android {
             applicationIdSuffix = ".debug.minify"
             resValue "string", "app_name", "Debug Minify Track & Graph"
             signingConfig signingConfigs.debug
+            manifestPlaceholders = [
+                    ALLOW_CLEAR_TEXT     : "false",
+                    NETWORK_SECURITY_CONFIG: ""
+            ]
         }
         release {
             minifyEnabled true
@@ -75,6 +83,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             resValue "string", "app_name", "Track & Graph"
             ndk.debugSymbolLevel = "SYMBOL_TABLE"
+            manifestPlaceholders = [
+                    ALLOW_CLEAR_TEXT     : "false",
+                    NETWORK_SECURITY_CONFIG: ""
+            ]
         }
     }
 

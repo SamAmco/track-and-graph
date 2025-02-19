@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
+    <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -20,9 +23,13 @@
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:networkSecurityConfig="${NETWORK_SECURITY_CONFIG}"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="${ALLOW_CLEAR_TEXT}"
+        tools:targetApi="n"
+        >
 
         <!--This provider declaration is to enable hilt work manager compatibility it is documented here:
             https://developer.android.com/guide/background/persistent/configuration/custom-configuration#remove-default
@@ -35,22 +42,39 @@
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
-            tools:node="remove" />
+            tools:node="remove"
+            />
 
         <!-- This is also for the benefit of the work manager. See here: https://developer.android.com/develop/background-work/background-tasks/persistent/how-to/long-running#foreground-service-type -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
-            tools:node="merge" />
+            tools:node="merge"
+            />
 
         <activity
             android:name="com.samco.trackandgraph.MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Deep link for downloading and injecting Lua scripts -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="lua_inject"
+                    android:scheme="trackandgraph"
+                    />
             </intent-filter>
         </activity>
 
@@ -58,19 +82,22 @@
             android:name=".timers.AddDataPointFromTimerActivity"
             android:excludeFromRecents="true"
             android:noHistory="true"
-            android:theme="@style/TransparentTheme" />
+            android:theme="@style/TransparentTheme"
+            />
 
         <activity
             android:name=".widgets.TrackWidgetInputDataPointActivity"
             android:excludeFromRecents="true"
             android:noHistory="true"
-            android:theme="@style/TransparentTheme" />
+            android:theme="@style/TransparentTheme"
+            />
 
         <activity
             android:name=".widgets.TrackWidgetConfigureActivity"
             android:exported="true"
             android:label="Configure widget"
-            android:theme="@style/TransparentTheme">
+            android:theme="@style/TransparentTheme"
+            >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
                 <action android:name="android.appwidget.action.ACTION_APPWIDGET_DELETED" />
@@ -79,12 +106,14 @@
 
         <receiver
             android:name=".base.service.AlarmReceiver"
-            android:exported="false" />
+            android:exported="false"
+            />
 
         <receiver
             android:name=".base.service.RecreateAlarms"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.DATE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />
@@ -96,13 +125,15 @@
         </receiver>
         <receiver
             android:name=".base.service.TrackWidgetProvider"
-            android:exported="false">
+            android:exported="false"
+            >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/track_widget_info" />
+                android:resource="@xml/track_widget_info"
+                />
         </receiver>
 
         <!--TODO you'll need to follow this guide when you target android 14
@@ -111,12 +142,14 @@
         <service
             android:name=".base.service.TrackWidgetJobIntentService"
             android:foregroundServiceType="shortService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            />
 
         <service
             android:name=".base.service.TimerNotificationService"
             android:enabled="true"
-            android:foregroundServiceType="dataSync" />
+            android:foregroundServiceType="dataSync"
+            />
     </application>
 
 </manifest>
