@@ -16,7 +16,9 @@
 */
 package com.samco.trackandgraph
 
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
@@ -45,6 +47,7 @@ import com.samco.trackandgraph.base.helpers.*
 import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,6 +74,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var prefHelper: PrefHelper
 
+    @Inject
+    lateinit var deepLinkHandler: DeepLinkHandler
+
     private val viewModel by viewModels<MainActivityViewModel>()
 
     val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
@@ -86,7 +92,15 @@ class MainActivity : AppCompatActivity() {
         viewModel.syncAlarms()
         if (prefHelper.isFirstRun()) showTutorial()
         else destroyTutorial()
+        intent?.data?.let { handleDeepLink(it) }
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent.data?.let { handleDeepLink(it) }
+    }
+
+    private fun handleDeepLink(uri: Uri) = deepLinkHandler.handleUri(uri.toString())
 
     private fun initializeNav() {
         drawerLayout = findViewById(R.id.drawer_layout)

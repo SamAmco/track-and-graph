@@ -30,6 +30,10 @@ import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.LuaEngineImpl
 import com.samco.trackandgraph.assetreader.AssetReaderImpl
 import com.samco.trackandgraph.assetreader.AssetReader
+import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
+import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandlerImpl
+import com.samco.trackandgraph.downloader.FileDownloader
+import com.samco.trackandgraph.downloader.FileDownloaderImpl
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.settings.TngSettingsImpl
@@ -73,4 +77,10 @@ class AppModule {
     @Provides
     fun getAssetReader(impl: AssetReaderImpl): AssetReader = impl
 
+    @Provides
+    @Singleton
+    fun provideDeepLinkHandler(impl: DeepLinkHandlerImpl): DeepLinkHandler = impl
+
+    @Provides
+    fun provideFileDownloader(impl: FileDownloaderImpl): FileDownloader = impl
 }

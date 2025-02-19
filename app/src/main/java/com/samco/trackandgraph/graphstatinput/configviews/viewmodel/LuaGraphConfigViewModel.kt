@@ -33,6 +33,8 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
+import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,6 +51,8 @@ class LuaGraphConfigViewModel @Inject constructor(
     @IODispatcher private val io: CoroutineDispatcher,
     @DefaultDispatcher private val default: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher,
+    private val deepLinkHandler: DeepLinkHandler,
+    private val fileDownloader: FileDownloader,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LuaConfigData>(
@@ -76,6 +80,19 @@ class LuaGraphConfigViewModel @Inject constructor(
         script = "",
         features = emptyList()
     )
+
+    init {
+        viewModelScope.launch { observeDeepLinks() }
+    }
+
+    private suspend fun observeDeepLinks() {
+        deepLinkHandler.onLuaDeepLink.collect {
+            fileDownloader.downloadFileToString(it)?.let { scriptText ->
+                script = TextFieldValue(scriptText)
+                onUpdate()
+            }
+        }
+    }
 
     override fun updateConfig() {
         luaGraph = luaGraph.copy(
