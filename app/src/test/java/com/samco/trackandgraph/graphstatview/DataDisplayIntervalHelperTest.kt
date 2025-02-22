@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.graphstatview
 
 import com.androidplot.xy.StepMode
-import com.samco.trackandgraph.graphstatview.factories.DataDisplayIntervalHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue
 import kotlinx.coroutines.runBlocking
@@ -92,7 +92,7 @@ class DataDisplayIntervalHelperTest {
                     fixedBounds = false
                 )
 
-                if (interval.percentage_range_used > RANGE_USED_BELOW) continue
+                if (interval.percentageRangeUsed > RANGE_USED_BELOW) continue
 
                 printExampleTime(start, end)
                 break
@@ -112,13 +112,13 @@ class DataDisplayIntervalHelperTest {
                 val end = start + length
 
                 val interval = uut.getYParameters(
-                    y_min = start,
-                    y_max = end,
-                    time_data = false,
+                    yMin = start,
+                    yMax = end,
+                    isDurationBasedRange = false,
                     fixedBounds = false
                 )
 
-                val range_used = length / (interval.bounds_max - interval.bounds_min)
+                val range_used = length / (interval.boundsMax - interval.boundsMin)
                 if (range_used > RANGE_USED_BELOW) continue
 
                 printExampleNumerical(start, end)
@@ -161,8 +161,8 @@ class DataDisplayIntervalHelperTest {
                 )
 
                 if (interval != null) {
-                    val range_used = length / (interval.bounds_max - interval.bounds_min)
-                    assert(range_used - interval.percentage_range_used < 0.001)
+                    val range_used = length / (interval.boundsMax - interval.boundsMin)
+                    assert(range_used - interval.percentageRangeUsed < 0.001)
                     intervalList.add(interval)
                 } else {
                     no_solution_vals.add(Pair(start, start + length))
@@ -172,7 +172,7 @@ class DataDisplayIntervalHelperTest {
 
             }
         }
-        val range_used_list = intervalList.map { it.percentage_range_used }
+        val range_used_list = intervalList.map { it.percentageRangeUsed }
         val nRuns = range_used_list.count()
 
         println("Tested $nRuns combinations.")
@@ -195,7 +195,7 @@ class DataDisplayIntervalHelperTest {
 
         println("How many lines are drawn how often:")
         intervalList
-            .map { it.n_lines }.groupingBy { it }
+            .map { it.nLines }.groupingBy { it }
             .eachCount().mapValues { 100 * it.value.toDouble() / nRuns }
             .entries.sortedBy { it.key }
             .forEach {
@@ -224,18 +224,17 @@ class DataDisplayIntervalHelperTest {
     @Test
     fun `test prefer whole number divisions`() {
         val answer = uut.getYParameters(
-            y_min = 0.0,
-            y_max = 12.0,
-            time_data = false,
+            yMin = 0.0,
+            yMax = 12.0,
+            isDurationBasedRange = false,
             fixedBounds = true
         )
 
         assertEquals(
             DataDisplayIntervalHelper.YAxisParameters(
-                step_mode = StepMode.SUBDIVIDE,
-                n_intervals = 7.0,
-                bounds_min = 0.0,
-                bounds_max = 12.0
+                subdivides = 7,
+                boundsMin = 0.0,
+                boundsMax = 12.0
             ),
             answer
         )
@@ -327,16 +326,16 @@ private fun printExampleNumerical(start:Double, end: Double) {
 }
 */
     private fun printExampleNumerical(start: Double, end: Double) {
-        val parameters = uut.getYParameters(start, end, time_data = false, fixedBounds = false)
-        val boundsRange = parameters.bounds_max - parameters.bounds_min
-        val interval = boundsRange / (parameters.n_intervals - 1)
+        val parameters = uut.getYParameters(start, end, isDurationBasedRange = false, fixedBounds = false)
+        val boundsRange = parameters.boundsMax - parameters.boundsMin
+        val interval = boundsRange / (parameters.subdivides - 1)
         println("----------------------------")
-        for (i in 0 until parameters.n_intervals.toInt()) {
-            val label = parameters.bounds_max - i * interval
+        for (i in 0 until parameters.subdivides.toInt()) {
+            val label = parameters.boundsMax - i * interval
             println("$label")
         }
         print("Data range: [$start -> $end] ")
-        print("interval: ${interval} x ${parameters.n_intervals.toInt() - 1} | ")
+        print("interval: ${interval} x ${parameters.subdivides.toInt() - 1} | ")
         println("range used = %.1f".format(100 * (end - start) / boundsRange))
         //return interval
     }
@@ -346,21 +345,21 @@ private fun printExampleNumerical(start:Double, end: Double) {
         end: Double
     ): DataDisplayIntervalHelper.YAxisParameters {
         val parameters = uut.getYParameters(
-            y_min = start,
-            y_max = end,
-            time_data = true,
+            yMin = start,
+            yMax = end,
+            isDurationBasedRange = true,
             fixedBounds = false
         )
-        val boundsRange = parameters.bounds_max - parameters.bounds_min
-        val interval = boundsRange / (parameters.n_intervals - 1)
+        val boundsRange = parameters.boundsMax - parameters.boundsMin
+        val interval = boundsRange / (parameters.subdivides - 1)
         println("----------------------------")
-        for (i in 0 until parameters.n_intervals.toInt()) {
-            val label_seconds = parameters.bounds_max - i * interval
+        for (i in 0 until parameters.subdivides.toInt()) {
+            val label_seconds = parameters.boundsMax - i * interval
             val label = duration2string(label_seconds.seconds)
             println(label)
         }
         print("Data range: [${duration2string(start.seconds)} -> ${duration2string(end.seconds)}] ")
-        print("interval: ${duration2string(interval.seconds)} x ${parameters.n_intervals.toInt() - 1} | ")
+        print("interval: ${duration2string(interval.seconds)} x ${parameters.subdivides.toInt() - 1} | ")
         println("range used = ${round(100 * (end - start) / boundsRange)}%")
         return parameters
     }

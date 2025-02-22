@@ -144,7 +144,7 @@ fun BarChartView(
             durationBasedRange = viewData.durationBasedRange,
             endTime = viewData.endTime,
             bounds = viewData.bounds,
-            yAxisRangeParameters = viewData.yAxisRangeParameters,
+            yAxisSubdivides = viewData.yAxisSubdivides,
             listMode = listMode,
             barMarkerStore = barMarkerStore,
             graphHeight = graphHeight
@@ -304,7 +304,7 @@ private fun BarChartBodyView(
     durationBasedRange: Boolean,
     endTime: ZonedDateTime,
     bounds: RectRegion,
-    yAxisRangeParameters: Pair<StepMode, Double>,
+    yAxisSubdivides: Int,
     listMode: Boolean,
     barMarkerStore: BarMarkerStore,
     graphHeight: Int? = null
@@ -348,8 +348,8 @@ private fun BarChartBodyView(
 
             setUpXYPlotYAxis(
                 binding = binding,
-                yAxisRangeParameters = yAxisRangeParameters,
-                durationBasedRange = durationBasedRange
+                yAxisSubdivides = yAxisSubdivides,
+                durationBasedRange = durationBasedRange,
             )
             drawBars(
                 context = context,

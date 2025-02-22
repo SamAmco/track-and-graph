@@ -14,7 +14,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift timestamp forward by duration`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000 }
             local shifted = tng.time.shift(timestamp, tng.DURATION.DAY)
@@ -33,7 +32,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift date forward by duration and amount`() = testLuaEngine(
-        emptyMap(),
         """
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
             local shifted = tng.time.shift(date, tng.DURATION.DAY, 2)
@@ -52,7 +50,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift timestamp backward by duration and amount`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000 }
             local shifted = tng.time.shift(timestamp, tng.DURATION.DAY, -2)
@@ -71,7 +68,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift date backward by duration`() = testLuaEngine(
-        emptyMap(),
         """
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
             local shifted = tng.time.shift(date, tng.DURATION.DAY, -1)
@@ -90,7 +86,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift timestamp forward by period`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000, offset = (60 * 60) }
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
@@ -112,7 +107,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift date backward by period and amount`() = testLuaEngine(
-        emptyMap(),
         """
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
             local shifted = tng.time.shift(date, tng.PERIOD.DAY, -2)
@@ -131,7 +125,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift timestamp backward by period and amount`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000 }
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, -2)
@@ -150,7 +143,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift date forward by period and amount`() = testLuaEngine(
-        emptyMap(),
         """
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
             local shifted = tng.time.shift(date, tng.PERIOD.DAY, 2)
@@ -170,7 +162,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift using date, offset, and zone uses zone over offset`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin", extra = "extra" }
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
@@ -190,7 +181,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift using date and offset uses offset`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000, offset = 3600, extra = "extra" }
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
@@ -212,7 +202,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `shift doesnt lose any fields from the input table`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin", extra = "extra" }
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
@@ -232,7 +221,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `time with no args returns current time`() = testLuaEngine(
-        emptyMap(),
         """
             local time = tng.time.time()
             return {
@@ -251,7 +239,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `time with date returns time at that date`() = testLuaEngine(
-        emptyMap(),
         """
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
             local time = tng.time.time(date)
@@ -269,7 +256,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `date with no args returns current date`() = testLuaEngine(
-        emptyMap(),
         """
             local date = tng.time.date()
             return {
@@ -288,7 +274,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `date with timestamp returns date at that timestamp`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin" }
             local date = tng.time.date(timestamp)
@@ -306,7 +291,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `format given a timestamp number and a format string returns the formatted date`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = 1743202801000
             local result = tng.time.format(timestamp, "yyyy-MM-dd HH:mm:ss")
@@ -325,7 +309,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `format given a timestamp and a format string returns the formatted date`() = testLuaEngine(
-        emptyMap(),
         """
             local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin" }
             local result = tng.time.format(timestamp, "yyyy-MM-dd HH:mm:ss")
@@ -343,7 +326,6 @@ class TimeLuaApiTests : LuaEngineImplTest() {
 
     @Test
     fun `format given a date and a format string returns the formatted date`() = testLuaEngine(
-        emptyMap(),
         """
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
             local result = tng.time.format(date, "yyyy-MM-dd HH:mm:ss")

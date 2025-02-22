@@ -25,6 +25,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.exceptions.GraphNotFoundException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataPointLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.ErrorLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.LineGraphLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.PieChartLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.helpers.TextLuaHelper
@@ -42,6 +43,7 @@ class LuaGraphDataFactory @Inject constructor(
     private val textLuaHelper: TextLuaHelper,
     private val dataPointLuaHelper: DataPointLuaHelper,
     private val errorLuaHelper: ErrorLuaHelper,
+    private val lineGraphLuaHelper: LineGraphLuaHelper,
     dataInteractor: DataInteractor,
     @IODispatcher ioDispatcher: CoroutineDispatcher
 ) : ViewDataFactory<LuaGraphWithFeatures, ILuaGraphViewData>(dataInteractor, ioDispatcher) {
@@ -103,9 +105,20 @@ class LuaGraphDataFactory @Inject constructor(
             is LuaGraphResultData.DataPointData -> dataPointLuaHelper(luaGraphResult.data, graphOrStat)
             is LuaGraphResultData.TextData -> textLuaHelper(luaGraphResult.data, graphOrStat)
             is LuaGraphResultData.PieChartData -> pieChartLuaHelper(luaGraphResult.data, graphOrStat)
-            null -> errorLuaHelper(graphOrStat, IllegalArgumentException("No data returned"))
+            is LuaGraphResultData.LineGraphData ->
+                lineGraphLuaHelper(luaGraphResult.data, graphOrStat) ?: noData(graphOrStat)
+            null -> noData(graphOrStat)
         }
     }
+
+    private fun noData(graphOrStat: GraphOrStat) =
+        object : ILuaGraphViewData {
+            override val wrapped: IGraphStatViewData? = null
+            override val hasData: Boolean = false
+            override val state = IGraphStatViewData.State.READY
+            override val graphOrStat = graphOrStat
+            override val error = null
+        }
 
     private fun graphNotFound(graphOrStat: GraphOrStat) =
         object : ILuaGraphViewData {

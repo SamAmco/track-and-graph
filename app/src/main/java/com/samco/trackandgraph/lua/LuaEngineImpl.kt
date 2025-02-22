@@ -18,9 +18,11 @@ package com.samco.trackandgraph.lua
 
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.lua.apiimpl.GraphApiImpl
+import com.samco.trackandgraph.lua.apiimpl.RequireApiImpl
 import com.samco.trackandgraph.lua.apiimpl.TimeApiImpl
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.lua.graphadapters.DataPointLuaGraphAdapter
+import com.samco.trackandgraph.lua.graphadapters.LineGraphLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.PieChartLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.TextLuaGraphAdapter
 import org.luaj.vm2.LuaTable
@@ -33,6 +35,8 @@ class LuaEngineImpl @Inject constructor(
     private val dataPointLuaGraphAdapter: DataPointLuaGraphAdapter,
     private val textLuaGraphAdapter: TextLuaGraphAdapter,
     private val pieChartLuaGraphAdapter: PieChartLuaGraphAdapter,
+    private val lineGraphLuaGraphAdapter: LineGraphLuaGraphAdapter,
+    private val requireApi: RequireApiImpl,
     private val graphApiImpl: GraphApiImpl,
     private val timeApiImpl: TimeApiImpl,
 ) : LuaEngine {
@@ -54,6 +58,7 @@ class LuaEngineImpl @Inject constructor(
         params: LuaEngine.LuaGraphEngineParams
     ): LuaGraphResult {
         try {
+            requireApi.installIn(globals, mapOf( LuaEngine.TNG to tngTable ))
             graphApiImpl.installIn(tngTable, params)
             timeApiImpl.installIn(tngTable)
             val cleanedScript = script.cleanLuaScript()
@@ -68,10 +73,13 @@ class LuaEngineImpl @Inject constructor(
             ?: throw IllegalArgumentException("No valid type found")
         val dataLua = scriptResult[LuaEngine.DATA]
 
+        if (dataLua.isnil()) return LuaGraphResult(data = null)
+
         val data = when (type) {
             LuaEngine.DATAPOINT -> dataPointLuaGraphAdapter.process(dataLua)
             LuaEngine.TEXT -> textLuaGraphAdapter.process(dataLua)
             LuaEngine.PIE_CHART -> pieChartLuaGraphAdapter.process(dataLua)
+            LuaEngine.LINE_GRAPH -> lineGraphLuaGraphAdapter.process(dataLua)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 

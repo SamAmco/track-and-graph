@@ -19,9 +19,11 @@ package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
 import android.graphics.Paint
+import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
@@ -29,7 +31,6 @@ import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.BoundaryMode
 import com.androidplot.xy.FastLineAndPointRenderer
-import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.LineAndPointFormatter
 import com.androidplot.xy.PanZoom
 import com.androidplot.xy.PointLabelFormatter
@@ -38,13 +39,14 @@ import com.androidplot.xy.StepMode
 import com.androidplot.xy.XValueMarker
 import com.androidplot.xy.XYGraphWidget
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.LineGraphFeature
 import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.helpers.formatDayMonth
 import com.samco.trackandgraph.base.helpers.formatMonthYear
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
 import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.Duration
@@ -108,7 +110,7 @@ fun LineGraphBodyView(
         drawLineGraphFeatures(
             context = context,
             binding = binding,
-            plottableData = viewData.plottableData,
+            plottableData = viewData.lines,
             listMode = listMode,
         )
         setUpLineGraphXAxis(
@@ -118,7 +120,7 @@ fun LineGraphBodyView(
         )
         setUpXYPlotYAxis(
             binding = binding,
-            yAxisRangeParameters = viewData.yAxisRangeParameters,
+            yAxisSubdivides = viewData.yAxisSubdivides,
             durationBasedRange = viewData.durationBasedRange,
         )
         setLineGraphBounds(
@@ -148,10 +150,10 @@ fun LineGraphBodyView(
     })
 
     GraphLegend(
-        items = viewData.plottableData.map {
+        items = viewData.lines.map {
             GraphLegendItem(
-                color = toLegendColor(dataVisColorList[it.key.colorIndex]),
-                label = it.key.name
+                color = Color(getPaintColor(context, it)),
+                label = it.name
             )
         }
     )
@@ -264,52 +266,48 @@ private fun getDateTimeFormattedForDuration(
 private fun drawLineGraphFeatures(
     context: Context,
     binding: GraphXyPlotBinding,
-    plottableData: Map<LineGraphFeature, FastXYSeries?>,
+    plottableData: List<Line>,
     listMode: Boolean
 ) {
-    for (kvp in plottableData) {
-        kvp.value?.let {
-            addSeries(
-                context = context,
-                binding = binding,
-                series = it,
-                lineGraphFeature = kvp.key,
-                listMode = listMode
-            )
-        }
+    for (line in plottableData) {
+        addSeries(
+            context = context,
+            binding = binding,
+            line = line,
+            listMode = listMode
+        )
     }
 }
 
 private fun addSeries(
     context: Context,
     binding: GraphXyPlotBinding,
-    series: FastXYSeries,
-    lineGraphFeature: LineGraphFeature,
+    line: Line,
     listMode: Boolean
 ) {
     val seriesFormat =
-        if (listMode && lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
-            getFastLineAndPointFormatter(context, lineGraphFeature)
-        else getLineAndPointFormatter(context, lineGraphFeature)
-    binding.xyPlot.addSeries(series, seriesFormat)
+        if (listMode && line.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS)
+            getFastLineAndPointFormatter(context, line)
+        else getLineAndPointFormatter(context, line)
+    binding.xyPlot.addSeries(line.line, seriesFormat)
 }
 
 private fun getLineAndPointFormatter(
     context: Context,
-    lineGraphFeature: LineGraphFeature
+    line: Line,
 ): LineAndPointFormatter {
     val formatter = LineAndPointFormatter()
     formatter.linePaint.apply {
-        color = getLinePaintColor(context, lineGraphFeature)
+        color = getPaintColor(context, line)
         strokeWidth = getLinePaintWidth(context)
     }
-    getVertexPaintColor(context, lineGraphFeature)?.let {
+    getVertexPaintColor(context, line)?.let {
         formatter.vertexPaint.color = it
         formatter.vertexPaint.strokeWidth = getVertexPaintWidth(context)
     } ?: run {
         formatter.vertexPaint = null
     }
-    getPointLabelFormatter(context, lineGraphFeature)?.let {
+    getPointLabelFormatter(context, line)?.let {
         formatter.pointLabelFormatter = it
         formatter.setPointLabeler { series, index ->
             DecimalFormat("#.#").format(series.getY(index))
@@ -323,12 +321,12 @@ private fun getLineAndPointFormatter(
 
 private fun getFastLineAndPointFormatter(
     context: Context,
-    lineGraphFeature: LineGraphFeature
+    line: Line,
 ): LineAndPointFormatter {
     val formatter = FastLineAndPointRenderer.Formatter(
-        getLinePaintColor(context, lineGraphFeature),
-        getVertexPaintColor(context, lineGraphFeature),
-        getPointLabelFormatter(context, lineGraphFeature)
+        getPaintColor(context, line),
+        getVertexPaintColor(context, line),
+        getPointLabelFormatter(context, line)
     )
     formatter.linePaint?.apply { isAntiAlias = false }
     formatter.linePaint?.apply { strokeWidth = getLinePaintWidth(context) }
@@ -344,20 +342,16 @@ private fun getVertexPaintWidth(
     context: Context
 ) = context.resources.getDimension(R.dimen.line_graph_vertex_thickness)
 
-private fun getLinePaintColor(context: Context, lineGraphFeature: LineGraphFeature): Int {
-    return getPaintColor(context, lineGraphFeature)
-}
-
-private fun getVertexPaintColor(context: Context, lineGraphFeature: LineGraphFeature): Int? {
-    return if (lineGraphFeature.pointStyle == LineGraphPointStyle.NONE) null
-    else getPaintColor(context, lineGraphFeature)
+private fun getVertexPaintColor(context: Context, line: Line): Int? {
+    return if (line.pointStyle == LineGraphPointStyle.NONE) null
+    else getPaintColor(context, line)
 }
 
 private fun getPointLabelFormatter(
     context: Context,
-    lineGraphFeature: LineGraphFeature
+    line: Line,
 ): PointLabelFormatter? {
-    if (lineGraphFeature.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS) return null
+    if (line.pointStyle != LineGraphPointStyle.CIRCLES_AND_NUMBERS) return null
     val color = context.getColorFromAttr(android.R.attr.textColorPrimary)
     val pointLabelFormatter = PointLabelFormatter(
         color,
@@ -368,10 +362,14 @@ private fun getPointLabelFormatter(
     return pointLabelFormatter
 }
 
+@ColorInt
 private fun getPaintColor(
     context: Context,
-    lineGraphFeature: LineGraphFeature
-) = getColor(context, dataVisColorList[lineGraphFeature.colorIndex])
+    line: Line,
+) = when (line.color) {
+    is ColorSpec.ColorIndex -> getColor(context, dataVisColorList[line.color.index])
+    is ColorSpec.ColorValue -> line.color.value
+}
 
 private fun getMarkerPaint(
     context: Context
