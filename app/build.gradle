@@ -22,6 +22,7 @@ plugins {
     id 'com.google.devtools.ksp'
     id "androidx.navigation.safeargs.kotlin"
     id "dagger.hilt.android.plugin"
+    alias libs.plugins.compose.compiler
 }
 
 android {
@@ -95,13 +96,6 @@ android {
         compose true
     }
 
-    //If you get an error about compose not supporting your kotlin compiler version
-    // you might need to look into this:
-    //https://developer.android.com/jetpack/androidx/releases/compose-kotlin
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
-
     namespace 'com.samco.trackandgraph'
 }
 
@@ -129,6 +123,7 @@ dependencies {
 
     implementation libs.compose.ui
     implementation libs.compose.ui.tooling
+    implementation libs.compose.material.icons
     implementation libs.compose.foundation
     implementation libs.compose.ui.viewbinding
     implementation libs.androidx.activity.compose
