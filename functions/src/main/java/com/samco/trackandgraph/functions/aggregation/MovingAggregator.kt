@@ -70,7 +70,7 @@ internal class MovingAggregator(
                     }
                 )
 
-                currentList.removeFirst()
+                currentList.removeAt(0)
 
                 if (currentList.isEmpty()) {
                     currentStart = next.timestamp
