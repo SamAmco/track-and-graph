@@ -26,7 +26,7 @@ abstract class LuaEngineImplTest {
     protected fun uut(): LuaEngineImpl {
         whenever(assetReader.readAssetToString("generated/lua/tng.lua"))
             .thenReturn(luaTng)
-        return DaggerLuaDataFactoryTestComponent.builder()
+        return DaggerLuaEngineTestComponent.builder()
             .dataInteractor(dataInteractor)
             .assetReader(assetReader)
             .ioDispatcher(ioDispatcher)
@@ -38,6 +38,11 @@ abstract class LuaEngineImplTest {
         val result: LuaGraphResult,
         val sampledData: Map<String, List<DataPoint>>,
     )
+
+    protected fun testLuaEngine(
+        script: String,
+        assertionBlock: AssertionScope.() -> Unit
+    ) = testLuaEngine(emptyMap(), script, assertionBlock)
 
     protected fun testLuaEngine(
         dataSources: Map<String, Sequence<TestDP>>,

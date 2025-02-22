@@ -20,9 +20,16 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.StepMode
-import com.samco.trackandgraph.base.database.dto.LineGraphFeature
+import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import org.threeten.bp.OffsetDateTime
+
+data class Line(
+    val name: String,
+    val color: ColorSpec,
+    val pointStyle: LineGraphPointStyle,
+    val line: FastXYSeries?,
+)
 
 interface ILineGraphViewData : IGraphStatViewData {
     /**
@@ -63,12 +70,12 @@ interface ILineGraphViewData : IGraphStatViewData {
      * The x co-ordinate of each point is a negative number of milliseconds representing the
      * time between it and the end time.
      */
-    val plottableData: Map<LineGraphFeature, FastXYSeries?>
-        get() = emptyMap()
+    val lines: List<Line>
+        get() = emptyList()
 
     /**
      * Android plot parameters for they y axis divisions.
      */
-    val yAxisRangeParameters: Pair<StepMode, Double>
-        get() = Pair(StepMode.SUBDIVIDE, 11.0)
+    val yAxisSubdivides: Int
+        get() = 11
 }

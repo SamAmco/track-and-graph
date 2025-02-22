@@ -20,7 +20,16 @@ import com.samco.trackandgraph.base.database.dto.GraphOrStat
 
 interface ILuaGraphViewData : IGraphStatViewData {
 
+    /**
+     * The inner graph data. Some implementation of IGraphStatViewData that is not a Lua graph, but an actual graph.
+     */
     val wrapped: IGraphStatViewData?
+
+    /**
+     * If the graph has no data we will show a message to the user instead of the graph.
+     */
+    val hasData: Boolean
+        get() = true
 
     companion object {
         fun loading(graphOrStat: GraphOrStat) = object : ILuaGraphViewData {

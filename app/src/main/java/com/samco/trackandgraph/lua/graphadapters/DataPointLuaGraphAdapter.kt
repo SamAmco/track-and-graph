@@ -31,11 +31,6 @@ class DataPointLuaGraphAdapter @Inject constructor(
     }
 
     override fun process(data: LuaValue): LuaGraphResultData.DataPointData {
-        if (data == LuaValue.NIL) return LuaGraphResultData.DataPointData(
-            dataPoint = null,
-            isDuration = false
-        )
-
         return LuaGraphResultData.DataPointData(
             dataPoint = dataPointParser.parseDataPoint(data),
             isDuration = data[IS_DURATION].optboolean(false),

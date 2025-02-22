@@ -47,11 +47,21 @@ class DateTimeParser @Inject constructor() {
             ZoneOffset.UTC,
         )
 
-        dateTime.istable() -> {
-            parseDateTimeTable(dateTime)
-        }
+        dateTime.istable() -> parseDateTimeTable(dateTime)
 
         else -> ZonedDateTime.now()
+    }
+
+    fun parseOffsetDateTimeOrThrow(dateTime: LuaValue): OffsetDateTime {
+        val timestamp = dateTime[TIMESTAMP].checklong()
+        if (dateTime[OFFSET].isnil()) {
+            return OffsetDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC)
+        }
+        val offset = dateTime[OFFSET].checklong()
+        return OffsetDateTime.ofInstant(
+            Instant.ofEpochMilli(timestamp),
+            ZoneOffset.ofTotalSeconds(offset.toInt()).normalized()
+        )
     }
 
     fun parseDateOrNow(date: LuaValue): ZonedDateTime = when {

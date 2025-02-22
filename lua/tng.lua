@@ -1,7 +1,7 @@
 local tng = {}
 
 --- Duration enum: All timestamps are in milliseconds.
---- @enum tng.DURATION
+--- @enum duration
 tng.DURATION = {
     SECOND = 1000, -- One second in milliseconds
     MINUTE = 60 * 1000, -- One minute in milliseconds
@@ -11,7 +11,7 @@ tng.DURATION = {
 }
 
 --- Period enum: Constants for use with addperiod function.
---- @enum tng.PERIOD
+--- @enum period
 tng.PERIOD = {
     DAY = "P1D", -- One day period
     WEEK = "P1W", -- One week period
@@ -61,7 +61,7 @@ tng.time.date = function(timestamp) end
 --- Using periods will respect daylight savings time and other time zone changes. Where as using a duration will just move the timestamp by that amount of milliseconds.
 ---
 --- @param datetime (timestamp|date): Any table with at least the field timestamp. Offset, and zone are optional.
---- @param unit (tng.DURATION|tng.PERIOD): The units to shift by. Can be a duration in milliseconds (e.g. tng.DURATION.DAY) or a period string (e.g. tng.PERIOD.DAY).
+--- @param unit (duration|period): The units to shift by. Can be a duration in milliseconds (e.g. tng.DURATION.DAY) or a period string (e.g. tng.PERIOD.DAY).
 --- @param amount integer (optional): Multiplier for the units. Defaults to 1. Useful if you are passing a period string.
 --- @return table: A table with the same data as the input table but with the timestamp and offset shifted.
 --- If zone and offset are not in the input table they will be added to the output table.
@@ -85,7 +85,7 @@ tng.time.format = function(datetime, format) end
 tng.graph = {}
 
 --- Graph colors enum
---- @enum tng.COLOR
+--- @enum tng_color
 tng.COLOR = {
     RED_DARK = 1,    -- #A50026
     RED = 2,         -- #D73027
@@ -101,17 +101,17 @@ tng.COLOR = {
     GREEN_DARK = 12  -- #1B8200
 }
 
---- @alias color (tng.COLOR|string): Can be a value from tng.COLOR enum or a hex string e.g. "#00FF00"
+--- @alias color (tng_color|string): Can be a value from tng.COLOR enum or a hex string e.g. "#00FF00"
 
 --- Graph types enum
 --- @enum tng.GRAPH_TYPE
 tng.GRAPH_TYPE = {
-    DATAPOINT = "datapoint",
+    DATA_POINT = "datapoint",
     TEXT = "text",
-    PIECHART = "piechart",
+    PIE_CHART = "piechart",
     TIME_BARCHART = "time_barchart",
-    LINEGRAPH = "linegraph",
-    BARCHART = "barchart"
+    LINE_GRAPH = "linegraph",
+    BAR_CHART = "barchart"
 }
 
 --- Data class for tng.GRAPH_TYPE.DATAPOINT
@@ -156,22 +156,33 @@ tng.GRAPH_TYPE = {
 
 --- Data class for tng.GRAPH_TYPE.LINEGRAPH
 --- @class linegraph_graphtype_data
---- @field duration_based_range boolean: Whether the range is based on duration.
---- @field y_min integer (optional): The minimum y-value.
---- @field y_max integer (optional): The maximum y-value.
+--- @field duration_based_range boolean (optional): Whether the range is based on duration.
+--- @field range_bounds range_bounds (optional): The range of the y-axis.
 --- @field lines line[]: A table of line items.
+
+---@class range_bounds
+---@field min number: The minimum value of the range.
+---@field max number: The maximum value of the range.
 
 --- @class line
 --- @field line_color color (optional): The color of the line.
---- @field point_style string (optional): The style of the points on the line.
---- @field line_points line_point[]: A table of line_point items.
+--- @field point_style line_point_style (optional): The style of the points on the line.
+--- @field line_points line_point[]: A table of line_point items. Line points should be sorted in reverse chronological order by timestamp.
+--- @field label string (optional): The label of the line. Will be displayed in the legend.
+
+--- @enum line_point_style
+tng.LINE_POINT_STYLE = {
+    NONE = "none",
+    CIRCLE = "circle",
+    CIRCLE_VALUE = "circle_value",
+}
 
 --- @class line_point
 --- @field timestamp integer: The timestamp of the line point.
 --- @field value number: The Y value of the line point.
 
 --- @class barchart_graphtype_data
---- @field bars barchar_bat[]: A table of barchart_bar items.
+--- @field bars barchart_bar[]: A table of barchart_bar items.
 --- @field y_max number (optional): The maximum value of the y-axis. If not provided, the maximum value of the bars will be used.
 --- @field y_labels string[] (optional): A table of strings to use as labels on the y-axis. If provided the Y axis will be equally sub-divided by the given number of items and labelled in order from bottom to top. If not provided, the y-axis will be automatically divided and labelled. 
 --- @field time_based_range boolean (optional): If true, and y_labels are not provided, the y-axis represents time in milliseconds, and will use time based labels.

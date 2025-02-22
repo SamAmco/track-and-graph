@@ -25,20 +25,23 @@ import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.GraphOrStat
 import com.samco.trackandgraph.base.database.dto.GraphStatType
+import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.base.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.base.database.dto.LuaGraphWithFeatures
+import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.graphstatview.factories.helpers.DataPointLuaHelper
-import com.samco.trackandgraph.graphstatview.factories.helpers.ErrorLuaHelper
-import com.samco.trackandgraph.graphstatview.factories.helpers.PieChartLuaHelper
-import com.samco.trackandgraph.graphstatview.factories.helpers.TextLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.dto.ColorSpec
+import com.samco.trackandgraph.lua.dto.Line
+import com.samco.trackandgraph.lua.dto.LinePoint
+import com.samco.trackandgraph.lua.dto.LinePointStyle
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.lua.dto.PieChartSegment
@@ -53,6 +56,7 @@ import org.junit.Before
 import org.junit.Test
 import org.threeten.bp.OffsetDateTime
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec as ViewColorSpec
+import com.samco.trackandgraph.graphstatview.factories.viewdto.Line as LineViewData
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LuaGraphDataFactoryTest {
@@ -63,15 +67,12 @@ class LuaGraphDataFactoryTest {
 
     private val onDataSampled: (List<DataPoint>) -> Unit = mock()
 
-    private fun uut() = LuaGraphDataFactory(
-        luaEngine = { luaEngine },
-        pieChartLuaHelper = PieChartLuaHelper(),
-        textLuaHelper = TextLuaHelper(),
-        dataPointLuaHelper = DataPointLuaHelper(),
-        errorLuaHelper = ErrorLuaHelper(),
-        dataInteractor = dataInteractor,
-        ioDispatcher = ioDispatcher
-    )
+    private fun uut() = DaggerLuaDataFactoryTestComponent.builder()
+        .dataInteractor(dataInteractor)
+        .ioDispatcher(ioDispatcher)
+        .luaEngine(luaEngine)
+        .build()
+        .provideLuaDataFactory()
 
     private val rawDataSamples = mutableMapOf<Long, RawDataSample>()
 
@@ -244,6 +245,85 @@ class LuaGraphDataFactoryTest {
             pieChart.segments
         )
         assertEquals(null, result.error)
+    }
+
+    @Test
+    fun `line graph returns line graph`() = runTest {
+        whenever(luaEngine.runLuaGraphScript(any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.LineGraphData(
+                    lines = listOf(
+                        Line(
+                            label = "line1",
+                            lineColor = ColorSpec.HexColor("#FF0000"),
+                            pointStyle = null,
+                            linePoints = listOf(
+                                LinePoint(OffsetDateTime.now(), 1.0),
+                                LinePoint(OffsetDateTime.now(), 2.0),
+                                LinePoint(OffsetDateTime.now(), 3.0),
+                            )
+                        ),
+                        Line(
+                            label = "line2",
+                            lineColor = ColorSpec.ColorIndex(2),
+                            pointStyle = LinePointStyle.CIRCLE_VALUE,
+                            linePoints = listOf(
+                                LinePoint(OffsetDateTime.now(), 4.0),
+                                LinePoint(OffsetDateTime.now(), 5.0),
+                                LinePoint(OffsetDateTime.now(), 6.0),
+                            )
+                        ),
+                    ),
+                    yMin = 1.0,
+                    yMax = 10.0,
+                    durationBasedRange = false
+                )
+            )
+        )
+
+        val result = callGetViewData()
+
+        assert(result.wrapped is ILineGraphViewData)
+        val lineGraph = result.wrapped as ILineGraphViewData
+        assert(lineGraph.graphOrStat.type == GraphStatType.LINE_GRAPH)
+
+        assertEquals("line1", lineGraph.lines[0].name)
+        assertEquals(ViewColorSpec.ColorValue(Color.Red.toArgb()), lineGraph.lines[0].color)
+        assertEquals(LineGraphPointStyle.NONE, lineGraph.lines[0].pointStyle)
+
+        assertEquals("line2", lineGraph.lines[1].name)
+        assertEquals(ViewColorSpec.ColorIndex(2), lineGraph.lines[1].color)
+        assertEquals(LineGraphPointStyle.CIRCLES_AND_NUMBERS, lineGraph.lines[1].pointStyle)
+
+        assertEquals(1.0, lineGraph.lines[0].line?.getY(0))
+        assertEquals(2.0, lineGraph.lines[0].line?.getY(1))
+        assertEquals(3.0, lineGraph.lines[0].line?.getY(2))
+
+        assertEquals(4.0, lineGraph.lines[1].line?.getY(0))
+        assertEquals(5.0, lineGraph.lines[1].line?.getY(1))
+        assertEquals(6.0, lineGraph.lines[1].line?.getY(2))
+
+        assertEquals(false, lineGraph.durationBasedRange)
+        assertEquals(1.0, lineGraph.bounds.minY.toDouble())
+        assertEquals(10.0, lineGraph.bounds.maxY.toDouble())
+        assertEquals(YRangeType.FIXED, lineGraph.yRangeType)
+    }
+
+    @Test
+    fun `null data and error shows no data`() = runTest {
+        whenever(luaEngine.runLuaGraphScript(any(), any())).thenReturn(
+            LuaGraphResult(
+                data = null,
+                error = null,
+            )
+        )
+
+        val result = callGetViewData()
+
+        assertEquals(null, result.wrapped)
+        assertEquals(null, result.error)
+        assertEquals(false, result.hasData)
+        assertEquals(IGraphStatViewData.State.READY, result.state)
     }
 
     @Test

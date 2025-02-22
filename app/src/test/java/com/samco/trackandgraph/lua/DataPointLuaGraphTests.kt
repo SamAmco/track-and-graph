@@ -15,7 +15,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-                 type = tng.GRAPH_TYPE.DATAPOINT,
+                 type = tng.GRAPH_TYPE.DATA_POINT,
                  data = { timestamp = 0 }
              }
         """.trimIndent()
@@ -41,7 +41,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.GRAPH_TYPE.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATA_POINT,
               data = {
                 timestamp = 0,
                 offset = 1000,
@@ -74,7 +74,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.GRAPH_TYPE.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATA_POINT,
               data = {
                 timestamp = 0,
                 isduration = true
@@ -105,7 +105,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.GRAPH_TYPE.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATA_POINT,
               data = {
                 timestamp = 123,
                 offset = 1234
@@ -136,16 +136,14 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.GRAPH_TYPE.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATA_POINT,
               data = nil
             }
         """.trimIndent()
     ) {
         println(result)
-        assert(result.data is LuaGraphResultData.DataPointData)
-        val data = result.data as LuaGraphResultData.DataPointData
-        assertEquals(null, data.dataPoint)
-        assertEquals(false, data.isDuration)
+        assertEquals(null, result.data)
+        assertEquals(null, result.error)
     }
 
     @Test
@@ -153,7 +151,7 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.GRAPH_TYPE.DATAPOINT,
+              type = tng.GRAPH_TYPE.DATA_POINT,
               data = {}
             }
         """.trimIndent()

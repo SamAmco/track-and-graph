@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatview.factories
 import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.SimpleXYSeries
-import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.BarChart
 import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
@@ -32,6 +31,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import kotlinx.coroutines.CoroutineDispatcher
@@ -223,7 +223,7 @@ class BarChartDataFactory @Inject constructor(
         val bars: List<SimpleXYSeries>,
         val dates: List<ZonedDateTime>,
         val bounds: RectRegion,
-        val yAxisParameters: Pair<StepMode, Double>,
+        val yAxisSubdivides: Int,
     )
 
     private fun getBarDataWithYAxisParams(
@@ -252,13 +252,11 @@ class BarChartDataFactory @Inject constructor(
             config.yRangeType == YRangeType.FIXED
         )
 
-        val yAxisParameterPair = Pair(yAxisParameters.step_mode, yAxisParameters.n_intervals)
-
         return BarDataWithYAxisParams(
             bars = barData.bars,
             dates = barData.dates,
             bounds = barData.bounds,
-            yAxisParameters = yAxisParameterPair
+            yAxisSubdivides = yAxisParameters.subdivides,
         )
     }
 
@@ -297,7 +295,7 @@ class BarChartDataFactory @Inject constructor(
                 override val durationBasedRange = dataSample.dataSampleProperties.isDuration
                 override val endTime = endTime ?: barData.dates.last()
                 override val bounds = barData.bounds
-                override val yAxisRangeParameters = barData.yAxisParameters
+                override val yAxisSubdivides = barData.yAxisSubdivides
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
                 override val barPeriod = config.barPeriod.asTemporalAmount()

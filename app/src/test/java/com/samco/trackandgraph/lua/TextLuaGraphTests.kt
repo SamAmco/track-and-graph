@@ -9,7 +9,6 @@ import org.junit.Test
 class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type returns NIL`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -18,17 +17,13 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """.trimIndent()
     ) {
         println(result)
-        assert(result.data is LuaGraphResultData.TextData)
-        val textData = result.data as LuaGraphResultData.TextData
-        assertEquals(null, textData.text)
-        assertEquals(TextSize.LARGE, textData.size)
-        assertEquals(TextAlignment.CENTER, textData.alignment)
+        assertEquals(null, result.data)
+        assertEquals(null, result.error)
     }
 
 
     @Test
     fun `Text type with just text`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -46,7 +41,6 @@ class TextLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Text type with text and size small`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -67,7 +61,6 @@ class TextLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Text type with text and size medium`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -88,7 +81,6 @@ class TextLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Text type with text and size large`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -109,7 +101,6 @@ class TextLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Text type with nested text and no size`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -129,7 +120,6 @@ class TextLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Text type with alignment start`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -150,7 +140,6 @@ class TextLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Text type with text and alignment center`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -171,7 +160,6 @@ class TextLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Text type with text and alignment centre`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
@@ -192,7 +180,6 @@ class TextLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `Text type with text and alignment end`() = testLuaEngine(
-        emptyMap(),
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,

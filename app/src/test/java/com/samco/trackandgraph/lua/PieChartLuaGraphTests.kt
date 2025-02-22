@@ -1,3 +1,19 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.lua
 
 import com.samco.trackandgraph.lua.dto.ColorSpec
@@ -11,26 +27,23 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `pie chart type returns NIL`() = testLuaEngine(
-        emptyMap(),
         """
             return {
-                type = tng.GRAPH_TYPE.PIECHART,
+                type = tng.GRAPH_TYPE.PIE_CHART,
                 data = NIL
             }
         """.trimIndent()
     ) {
         println(result)
-        assert(result.data is LuaGraphResultData.PieChartData)
-        val pieChartData = result.data as LuaGraphResultData.PieChartData
-        assertEquals(null, pieChartData.segments)
+        assertEquals(null, result.data)
+        assertEquals(null, result.error)
     }
 
     @Test
     fun `pie chart returns segments without colours`() = testLuaEngine(
-        emptyMap(),
         """
             return {
-                type = tng.GRAPH_TYPE.PIECHART,
+                type = tng.GRAPH_TYPE.PIE_CHART,
                 data = {
                     { value = 10, label = "A" },
                     { value = 20, label = "B" }
@@ -52,10 +65,9 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `pie chart returns segments with colours`() = testLuaEngine(
-        emptyMap(),
         """
             return {
-                type = tng.GRAPH_TYPE.PIECHART,
+                type = tng.GRAPH_TYPE.PIE_CHART,
                 data = {
                     { value = 10, label = "A", color = tng.COLOR.GREEN_DARK },
                     { value = 20, label = "B", color = "#00FF00" }
@@ -77,10 +89,9 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `pie chart returns invalid segment no value`() = testLuaEngine(
-        emptyMap(),
         """
             return {
-                type = tng.GRAPH_TYPE.PIECHART,
+                type = tng.GRAPH_TYPE.PIE_CHART,
                 data = {
                     { value = 1, label = "A" }
                     { label = "A" }
@@ -95,10 +106,9 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
 
     @Test
     fun `pie chart returns invalid segment no label`() = testLuaEngine(
-        emptyMap(),
         """
             return {
-                type = tng.GRAPH_TYPE.PIECHART,
+                type = tng.GRAPH_TYPE.PIE_CHART,
                 data = {
                     { value = 10 }
                     { value = 10, label = "B" }

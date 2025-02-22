@@ -57,8 +57,8 @@ interface IBarChartViewData : IGraphStatViewData {
     /**
      * The y axis range parameters used by android plot library
      */
-    val yAxisRangeParameters: Pair<StepMode, Double>
-        get() = Pair(StepMode.SUBDIVIDE, 11.0)
+    val yAxisSubdivides: Int
+        get() = 11
 
     /**
      * The period/duration of a single bar

@@ -74,7 +74,7 @@ android {
             signingConfig signingConfigs.debug
             manifestPlaceholders = [
                     ALLOW_CLEAR_TEXT     : "false",
-                    NETWORK_SECURITY_CONFIG: ""
+                    NETWORK_SECURITY_CONFIG: "@xml/production_network_security_config"
             ]
         }
         release {
@@ -85,7 +85,7 @@ android {
             ndk.debugSymbolLevel = "SYMBOL_TABLE"
             manifestPlaceholders = [
                     ALLOW_CLEAR_TEXT     : "false",
-                    NETWORK_SECURITY_CONFIG: ""
+                    NETWORK_SECURITY_CONFIG: "@xml/production_network_security_config"
             ]
         }
     }

@@ -19,7 +19,6 @@ package com.samco.trackandgraph.lua
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.graphstatview.factories.LuaGraphDataFactory
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
@@ -37,9 +36,7 @@ interface LuaBindingModule {
 @Component(
     modules = [LuaBindingModule::class]
 )
-interface LuaDataFactoryTestComponent {
-
-    fun provideLuaDataFactory(): LuaGraphDataFactory
+interface LuaEngineTestComponent {
 
     fun provideLuaEngine(): LuaEngineImpl
 
@@ -55,6 +52,6 @@ interface LuaDataFactoryTestComponent {
         @BindsInstance
         fun ioDispatcher(@IODispatcher ioDispatcher: CoroutineDispatcher): Builder
 
-        fun build(): LuaDataFactoryTestComponent
+        fun build(): LuaEngineTestComponent
     }
 }

@@ -17,8 +17,6 @@
 
 package com.samco.trackandgraph.graphstatview.factories
 
-import com.androidplot.Region
-import com.androidplot.util.SeriesUtils
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.StepMode
@@ -45,8 +43,12 @@ import com.samco.trackandgraph.functions.functions.IdentityFunction
 import com.samco.trackandgraph.functions.functions.MovingAverageFunction
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
+import com.samco.trackandgraph.graphstatview.factories.helpers.AndroidPlotSeriesHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
 import com.samco.trackandgraph.movingAverageDurations
 import com.samco.trackandgraph.plottingModePeriods
 import kotlinx.coroutines.CoroutineDispatcher
@@ -57,10 +59,11 @@ import kotlinx.coroutines.withContext
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
-import kotlin.math.abs
 
 class LineGraphDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
+    private val androidPlotSeriesHelper: AndroidPlotSeriesHelper,
+    private val dataDisplayIntervalHelper: DataDisplayIntervalHelper,
     @IODispatcher ioDispatcher: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
 ) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(dataInteractor, ioDispatcher) {
@@ -72,15 +75,13 @@ class LineGraphDataFactory @Inject constructor(
     ): ILineGraphViewData {
         try {
             val plottableData = generatePlottingData(config, onDataSampled)
-            val hasPlottableData = plottableData
-                .seriesPerFeature
-                .any { kvp -> kvp.value != null }
+            val hasPlottableData = plottableData.lines.any { it.line != null }
 
             val durationBasedRange = config.features
                 .any { f -> f.durationPlottingMode == DurationPlottingMode.DURATION_IF_POSSIBLE }
             val (bounds, yAxisParameters) = getYAxisParameters(
                 config,
-                plottableData.seriesPerFeature.values,
+                plottableData.lines.map { it.line },
                 durationBasedRange
             )
 
@@ -90,10 +91,10 @@ class LineGraphDataFactory @Inject constructor(
                 override val bounds = bounds
                 override val hasPlottableData = hasPlottableData
                 override val endTime = plottableData.endTime
-                override val plottableData = plottableData.seriesPerFeature
+                override val lines = plottableData.lines
                 override val state = IGraphStatViewData.State.READY
                 override val graphOrStat = graphOrStat
-                override val yAxisRangeParameters = yAxisParameters
+                override val yAxisSubdivides = yAxisParameters
             }
         } catch (throwable: Throwable) {
             throwable.printStackTrace()
@@ -124,7 +125,7 @@ class LineGraphDataFactory @Inject constructor(
     }
 
     private data class PlottingData(
-        val seriesPerFeature: Map<LineGraphFeature, FastXYSeries?>,
+        val lines: List<Line>,
         val endTime: OffsetDateTime
     )
 
@@ -143,12 +144,13 @@ class LineGraphDataFactory @Inject constructor(
             val endTime = lineGraph.endDate.toOffsetDateTime() ?: dataSamples
                 .mapNotNull { it.second.firstOrNull() }
                 .maxOfOrNull { it.timestamp }
-                ?: OffsetDateTime.now()
+            ?: OffsetDateTime.now()
 
             //Generate the actual plotting data for each sample. This is the part that will take longer
             // hence the parallelization
             val features = dataSamples.map { pair ->
                 async {
+                    val feature = pair.first
                     val clippedSample = DataClippingFunction(endTime, lineGraph.sampleSize)
                         .mapSample(pair.second)
 
@@ -159,9 +161,15 @@ class LineGraphDataFactory @Inject constructor(
                     val series = if (dataPoints.size >= 2) {
                         getXYSeriesFromDataPoints(dataPoints, endTime, pair.first)
                     } else null
-                    pair.first to series
+
+                    Line(
+                        name = feature.name,
+                        color = ColorSpec.ColorIndex(feature.colorIndex),
+                        pointStyle = feature.pointStyle,
+                        line = series
+                    )
                 }
-            }.awaitAll().toMap()
+            }.awaitAll()
 
             val rawDataPoints = dataSamples
                 .map { it.second.getRawDataPoints() }
@@ -222,48 +230,40 @@ class LineGraphDataFactory @Inject constructor(
             Duration.between(endTime, dp.timestamp).toMillis()
         }
 
-        var yRegion = SeriesUtils.minMax(yValues)
-        if (abs(yRegion.min.toDouble() - yRegion.max.toDouble()) < 0.1)
-            yRegion = Region(yRegion.min, yRegion.min.toDouble() + 0.1)
-        val xRegion = SeriesUtils.minMax(xValues)
-        val rectRegion = RectRegion(xRegion.min, xRegion.max, yRegion.min, yRegion.max)
-
-        return object : FastXYSeries {
-            override fun minMax() = rectRegion
-            override fun getX(index: Int): Number = xValues[index]
-            override fun getY(index: Int): Number = yValues[index]
-            override fun getTitle() = lineGraphFeature.name
-            override fun size() = xValues.size
-        }
+        return androidPlotSeriesHelper.getFastXYSeries(
+            name = lineGraphFeature.name,
+            xValues = xValues,
+            yValues = yValues,
+        )
     }
+
+    private data class YAxisParams(
+        val bounds: RectRegion,
+        val subdivides: Int,
+    )
 
     private fun getYAxisParameters(
         lineGraph: LineGraphWithFeatures,
         series: Collection<FastXYSeries?>,
         timeBasedRange: Boolean
-    ): Pair<RectRegion, Pair<StepMode, Double>> {
+    ): YAxisParams {
         val fixed = lineGraph.yRangeType == YRangeType.FIXED
 
         val bounds = RectRegion()
         series.forEach { it?.let { bounds.union(it.minMax()) } }
 
-        val (y_min, y_max) =
+        val (yMin, yMax) =
             if (fixed) Pair(lineGraph.yFrom, lineGraph.yTo)
             else Pair(bounds.minY, bounds.maxY)
 
-        if (y_min == null || y_max == null) {
-            return Pair(bounds, Pair(StepMode.SUBDIVIDE, 11.0))
-        }
+        if (yMin == null || yMax == null) return YAxisParams(bounds, 11)
 
-        val parameters = DataDisplayIntervalHelper()
-            .getYParameters(y_min.toDouble(), y_max.toDouble(), timeBasedRange, fixed)
+        val parameters = dataDisplayIntervalHelper
+            .getYParameters(yMin.toDouble(), yMax.toDouble(), timeBasedRange, fixed)
 
-        bounds.minY = parameters.bounds_min
-        bounds.maxY = parameters.bounds_max
+        bounds.minY = parameters.boundsMin
+        bounds.maxY = parameters.boundsMax
 
-        val intervalParameters = Pair(parameters.step_mode, parameters.n_intervals)
-
-        return Pair(bounds, intervalParameters)
+        return YAxisParams(bounds, parameters.subdivides)
     }
-
 }
