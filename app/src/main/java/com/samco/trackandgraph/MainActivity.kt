@@ -27,6 +27,7 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -93,7 +94,19 @@ class MainActivity : AppCompatActivity() {
         if (prefHelper.isFirstRun()) showTutorial()
         else destroyTutorial()
         intent?.data?.let { handleDeepLink(it) }
+        addOnBackPressedCallback()
     }
+
+    private fun addOnBackPressedCallback() = onBackPressedDispatcher.addCallback(this,
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                } else {
+                    navController.navigateUp()
+                }
+            }
+        })
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
@@ -167,8 +180,7 @@ class MainActivity : AppCompatActivity() {
         val title = config.title ?: getString(R.string.app_name)
         supportActionBar?.title = title
 
-        if (!config.clearSubtitle)
-        {
+        if (!config.clearSubtitle) {
             supportActionBar?.subtitle = null
         }
 
@@ -177,6 +189,7 @@ class MainActivity : AppCompatActivity() {
                 actionBarDrawerToggle.isDrawerIndicatorEnabled = true
                 supportActionBar?.setDisplayHomeAsUpEnabled(false)
             }
+
             NavButtonStyle.UP -> {
                 actionBarDrawerToggle.isDrawerIndicatorEnabled = false
                 supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -315,17 +328,8 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(drawerLayout) || super.onNavigateUp()
-    }
-
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawer(GravityCompat.START)
-        } else {
-            onBackPressedDispatcher.onBackPressed()
-        }
     }
 }
 

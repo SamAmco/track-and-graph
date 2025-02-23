@@ -15,7 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@file:OptIn(FlowPreview::class)
+@file:OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 
 package com.samco.trackandgraph.group
 

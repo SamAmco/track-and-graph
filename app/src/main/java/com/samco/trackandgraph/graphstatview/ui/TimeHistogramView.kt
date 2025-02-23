@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
+import android.util.TypedValue
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -175,7 +176,12 @@ private fun setUpYAxis(
 ) {
     val divisions = (maxDisplayHeight / 10) + 1
     binding.xyPlot.setRangeStep(StepMode.SUBDIVIDE, max(2.0, divisions))
-    binding.xyPlot.graph.paddingLeft = context.resources.displayMetrics.scaledDensity * 8f
+    binding.xyPlot.graph.paddingLeft = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        8f,
+        context.resources.displayMetrics
+    )
+
     binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.LEFT).format =
         object : Format() {
             override fun format(

@@ -189,6 +189,7 @@ class TimerNotificationService : Service() {
         return super.onStartCommand(intent, flags, startId)
     }
 
+    @Suppress("DEPRECATION")
     private fun stopForeground() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             stopForeground(STOP_FOREGROUND_REMOVE)

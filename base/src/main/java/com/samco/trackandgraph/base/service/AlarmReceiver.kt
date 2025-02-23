@@ -72,7 +72,7 @@ class AlarmReceiver : BroadcastReceiver() {
 
         createNotificationChannel(context)
 
-        val message = (intent?.extras?.get(ALARM_MESSAGE_KEY) as String?) ?: return
+        val message = intent?.extras?.getString(ALARM_MESSAGE_KEY) ?: return
 
         val pendingIntent = pendingIntentProvider.getMainActivityPendingIntent()
 
