@@ -78,7 +78,7 @@ internal class FixedBinAggregator(
         )
     }
 
-    private inline fun getDataPoint(
+    private fun getDataPoint(
         timestamp: OffsetDateTime,
         points: List<IDataPoint>,
     ) = object : IDataPoint() {

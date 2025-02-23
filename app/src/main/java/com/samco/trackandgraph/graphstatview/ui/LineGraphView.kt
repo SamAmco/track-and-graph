@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
 import android.graphics.Paint
+import android.util.TypedValue
 import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
@@ -199,8 +200,11 @@ private fun setLineGraphPaddingFromBounds(
     val maxY = bounds.maxY.toDouble()
     val maxBound = max(abs(minY), abs(maxY))
     val numDigits = log10(maxBound).toFloat() + 3
-    binding.xyPlot.graph.paddingLeft =
-        (numDigits - 1) * (context.resources.displayMetrics.scaledDensity) * 3.5f
+    binding.xyPlot.graph.paddingLeft = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        (numDigits - 1) * 3.5f,
+        context.resources.displayMetrics
+    )
 
     //Set up X padding
     val formattedTimestamp = getDateTimeFormattedForDuration(
@@ -208,8 +212,11 @@ private fun setLineGraphPaddingFromBounds(
         binding = binding,
         endTime = endTime,
     )
-    binding.xyPlot.graph.paddingBottom =
-        formattedTimestamp.length * (context.resources.displayMetrics.scaledDensity)
+    binding.xyPlot.graph.paddingBottom = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        formattedTimestamp.length * 1f,
+        context.resources.displayMetrics
+    )
 }
 
 private fun setUpLineGraphXAxis(

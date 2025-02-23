@@ -22,7 +22,7 @@ import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
-import junit.framework.Assert.assertEquals
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.threeten.bp.OffsetDateTime

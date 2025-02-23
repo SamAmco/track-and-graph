@@ -7,7 +7,7 @@ import com.samco.trackandgraph.base.database.entity.DataPoint
 import com.samco.trackandgraph.base.database.entity.TrackerSuggestionOrder
 import com.samco.trackandgraph.base.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.base.database.entity.queryresponse.TrackerWithFeature
-import junit.framework.Assert.assertEquals
+import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
@@ -15,7 +15,6 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
-import org.threeten.bp.OffsetDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TrackerHelperImpl_UpdateDataPoints_Test {
