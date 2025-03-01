@@ -76,6 +76,18 @@
                     android:scheme="trackandgraph"
                     />
             </intent-filter>
+
+            <meta-data android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+
+            <!-- Custom launcher action to run the app with Lua engine disabled -->
+            <intent-filter>
+                <action android:name="com.samco.trackandgraph.action.DISABLE_LUA_ENGINE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
         </activity>
 
         <activity
