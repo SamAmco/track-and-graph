@@ -630,4 +630,6 @@ internal class DataInteractorImpl @Inject constructor(
                 ).toEntity()
             })
         }
+
+    override suspend fun hasAnyLuaGraphs(): Boolean = withContext(io) { dao.hasAnyLuaGraphs() }
 }

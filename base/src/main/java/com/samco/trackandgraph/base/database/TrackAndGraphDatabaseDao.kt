@@ -385,4 +385,7 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("DELETE FROM lua_graph_features_table WHERE lua_graph_id = :luaGraphId")
     fun deleteFeaturesForLuaGraph(luaGraphId: Long)
+
+    @Query("SELECT EXISTS (SELECT 1 FROM lua_graphs_table LIMIT 1)")
+    fun hasAnyLuaGraphs(): Boolean
 }

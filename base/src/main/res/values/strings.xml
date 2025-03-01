@@ -151,9 +151,6 @@
     <string name="graph_stat_view_not_enough_data_graph">This graph will show when enough data has been tracked to generate it.</string>
     <string name="finish">Finish</string>
     <string name="about_description"><![CDATA[Track & Graph is free and open source software under the GPL 3.0 License.]]></string>
-    <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
-    <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
-    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">The following open source libraries were used:</string>
     <string name="androidplot" translatable="false">Androidplot</string>
     <string name="apache_2_0" translatable="false">Apache 2.0</string>
@@ -268,8 +265,12 @@
     <string name="data_point_tutorial_page_3_description">Use labels if you want to group the data points</string>
     <string name="data_point_tutorial_page_3_hint">(Hint: If you want to add more context or description use the note instead of the label field)</string>
     <string name="help">Help</string>
+    <string name="github_link" translatable="false">https://github.com/SamAmco/track-and-graph</string>
+    <string name="github_lua_docs_path" translatable="false">/tree/master/docs/faq/faq_3_6.md</string>
     <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v5.0.0/docs/faq/index.md#faq</string>
     <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v5.0.0/docs/faq/faq_1.md#how-do-i-start-tracking-something</string>
+    <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
+    <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="advanced_options">Advanced options</string>
     <string name="type_colon">"Type: "</string>
     <string name="order_colon">"Order: "</string>
@@ -372,4 +373,7 @@
     <string name="launch_lua_disabled">Launch Lua disabled</string>
     <string name="no_lua">No Lua</string>
     <string name="lua_engine_disabled">Lua engine disabled</string>
+    <string name="lua_graph_first_time_user_title">Lua script graphs</string>
+    <string name="lua_graph_first_time_user_message">Create custom graphs with Lua scripts! You can load your own, or pick one from the GitHub collection. Selecting a script from GitHub will return you to the app with the script ready to use.</string>
+    <string name="learn_more">Learn more</string>
 </resources>

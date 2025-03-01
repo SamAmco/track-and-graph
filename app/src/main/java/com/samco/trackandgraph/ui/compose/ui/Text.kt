@@ -84,8 +84,8 @@ fun TextSubtitle2(
 
 @Composable
 fun TextLink(
-    modifier: Modifier = Modifier,
     text: String,
+    modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
     onClick: () -> Unit
