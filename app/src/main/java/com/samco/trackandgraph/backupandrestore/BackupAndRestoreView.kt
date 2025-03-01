@@ -15,8 +15,6 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@file:OptIn(ExperimentalLayoutApi::class)
-
 package com.samco.trackandgraph.backupandrestore
 
 import android.annotation.SuppressLint

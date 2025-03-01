@@ -82,6 +82,7 @@ interface GraphStatInputViewModel {
     val loading: LiveData<Boolean>
     val validationException: LiveData<GraphStatConfigEvent.ValidationException?>
     val demoViewData: LiveData<IGraphStatViewData?>
+    val showLuaFirstTimeUserDialog: LiveData<Boolean>
     val complete: LiveData<Boolean>
 
     fun initViewModel(graphStatGroupId: Long, graphStatId: Long)
@@ -90,6 +91,7 @@ interface GraphStatInputViewModel {
 
     fun onConfigEvent(configData: GraphStatConfigEvent?)
     fun createGraphOrStat()
+    fun onLuaFirstTimeUserDialogDismiss()
 }
 
 @HiltViewModel
@@ -113,6 +115,9 @@ class GraphStatInputViewModelImpl @Inject constructor(
         MutableLiveData<GraphStatConfigEvent.ValidationException?>(null)
     override val demoViewData = MutableLiveData<IGraphStatViewData?>(null)
     override val complete = MutableLiveData(false)
+
+    private val _showLuaFirstTimeUserDialog = MutableLiveData(false)
+    override val showLuaFirstTimeUserDialog: LiveData<Boolean> = _showLuaFirstTimeUserDialog
 
     private var updateJob: Job? = null
     private var configData: GraphStatConfigEvent.ConfigData<*>? = null
@@ -161,6 +166,14 @@ class GraphStatInputViewModelImpl @Inject constructor(
     override fun setGraphType(type: GraphStatType) {
         configData = null
         this.graphStatType.value = type
+
+        if (type == GraphStatType.LUA_SCRIPT) {
+            viewModelScope.launch {
+                if (!dataInteractor.hasAnyLuaGraphs()) {
+                    _showLuaFirstTimeUserDialog.value = true
+                }
+            }
+        }
     }
 
     override fun onConfigEvent(configData: GraphStatConfigEvent?) {
@@ -190,6 +203,10 @@ class GraphStatInputViewModelImpl @Inject constructor(
                 withContext(ui) { complete.value = true }
             }
         }
+    }
+
+    override fun onLuaFirstTimeUserDialogDismiss() {
+        _showLuaFirstTimeUserDialog.value = false
     }
 
     private fun onValidationException(exception: GraphStatConfigEvent.ValidationException?) {

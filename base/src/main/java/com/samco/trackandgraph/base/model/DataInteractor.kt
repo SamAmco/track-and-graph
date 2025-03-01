@@ -157,4 +157,6 @@ interface DataInteractor : TrackerHelper, DataSampler {
     suspend fun insertLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures): Long
 
     suspend fun updateLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures)
+
+    suspend fun hasAnyLuaGraphs(): Boolean
 }

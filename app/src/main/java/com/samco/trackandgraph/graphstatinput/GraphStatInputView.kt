@@ -32,8 +32,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
@@ -58,7 +61,7 @@ internal fun GraphStatInputView(
             val demoViewData by viewModel.demoViewData.observeAsState()
 
             Column {
-                var demoYOffset by remember { mutableStateOf(0f) }
+                var demoYOffset by remember { mutableFloatStateOf(0f) }
                 var demoVisible by remember { mutableStateOf(false) }
 
                 Box(modifier = Modifier.weight(1f)) {
@@ -124,7 +127,6 @@ private fun DemoOverlay(
         )
     }
 }
-
 
 @Composable
 private fun DemoButton(
@@ -205,6 +207,12 @@ private fun GraphStatInputViewForm(
         )
     }
 
+    if (viewModel.showLuaFirstTimeUserDialog.observeAsState().value == true) {
+        LuaFirstTimeUserDialog(
+            onDismiss = { viewModel.onLuaFirstTimeUserDialogDismiss() }
+        )
+    }
+
     DialogInputSpacing()
     Divider()
     DialogInputSpacing()
@@ -215,6 +223,46 @@ private fun GraphStatInputViewForm(
         graphStatId = graphStatId,
         scrollState = scrollState
     )
+}
+
+@Composable
+private fun LuaFirstTimeUserDialog(onDismiss: () -> Unit) {
+    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+
+    ConfirmDialog(
+        onDismissRequest = onDismiss,
+        onConfirm = onDismiss,
+        content = {
+            Column {
+                Text(
+                    stringResource(id = R.string.lua_graph_first_time_user_title),
+                    style = MaterialTheme.typography.h5,
+                )
+                InputSpacingLarge()
+                Text(
+                    stringResource(id = R.string.lua_graph_first_time_user_message),
+                    style = MaterialTheme.typography.body1,
+                )
+                InputSpacingLarge()
+                TextLink(
+                    stringResource(id = R.string.learn_more),
+                ) {
+                    val url = context.getString(R.string.github_link) +
+                        context.getString(R.string.github_lua_docs_path)
+                    uriHandler.openUri(url)
+                    onDismiss()
+                }
+            }
+        },
+        continueText = R.string.ok,
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun LuaFirstTimeUserDialogPreview() {
+    LuaFirstTimeUserDialog(onDismiss = {})
 }
 
 @Composable
