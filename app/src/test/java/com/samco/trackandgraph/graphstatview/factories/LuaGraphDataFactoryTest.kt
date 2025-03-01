@@ -31,6 +31,7 @@ import com.samco.trackandgraph.base.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
@@ -47,6 +48,8 @@ import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.lua.dto.PieChartSegment
 import com.samco.trackandgraph.lua.dto.TextAlignment
 import com.samco.trackandgraph.lua.dto.TextSize
+import com.samco.trackandgraph.lua.dto.TimeBar
+import com.samco.trackandgraph.lua.dto.TimeBarSegment
 import junit.framework.TestCase.assertEquals
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -55,8 +58,10 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Test
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
+import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec as ViewColorSpec
-import com.samco.trackandgraph.graphstatview.factories.viewdto.Line as LineViewData
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LuaGraphDataFactoryTest {
@@ -307,6 +312,159 @@ class LuaGraphDataFactoryTest {
         assertEquals(1.0, lineGraph.bounds.minY.toDouble())
         assertEquals(10.0, lineGraph.bounds.maxY.toDouble())
         assertEquals(YRangeType.FIXED, lineGraph.yRangeType)
+    }
+
+    @Test
+    fun `bar chart returns bar chart`() = runTest {
+        val endTime = ZonedDateTime.of(2021, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
+
+        whenever(luaEngine.runLuaGraphScript(any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.TimeBarChartData(
+                    barDuration = Period.ofDays(2),
+                    endTime = endTime,
+                    durationBasedRange = false,
+                    bars = listOf(
+                        TimeBar(listOf(TimeBarSegment(1.0))),
+                        TimeBar(
+                            listOf(TimeBarSegment(2.0, "A", ColorSpec.HexColor("#FF0000"))),
+                        ),
+                    ),
+                    yMax = 10.0
+                )
+            )
+        )
+
+        val result = callGetViewData()
+
+        assert(result.wrapped is IBarChartViewData)
+        val barChart = result.wrapped as IBarChartViewData
+        assert(barChart.graphOrStat.type == GraphStatType.BAR_CHART)
+
+        assertEquals(endTime, barChart.endTime)
+        assertEquals(2, barChart.bars.size)
+        assertEquals(2, barChart.bars[0].segmentSeries.size())
+        assertEquals("A", barChart.bars[0].segmentSeries.title)
+        assertEquals(2.0, barChart.bars[0].segmentSeries.getY(0))
+        assertEquals(0.0, barChart.bars[0].segmentSeries.getY(1))
+        assertEquals(ViewColorSpec.ColorValue(Color.Red.toArgb()), barChart.bars[0].color)
+        assertEquals(2, barChart.bars[1].segmentSeries.size())
+        assertEquals("", barChart.bars[1].segmentSeries.title)
+        assertEquals(0.0, barChart.bars[1].segmentSeries.getY(0))
+        assertEquals(1.0, barChart.bars[1].segmentSeries.getY(1))
+        assertEquals(ViewColorSpec.ColorIndex(7), barChart.bars[1].color)
+        assertEquals(2, barChart.xDates.size)
+        assertEquals(-0.5, barChart.bounds.minX.toDouble())
+        assertEquals(1.5, barChart.bounds.maxX.toDouble())
+        assertEquals(0.0, barChart.bounds.minY.toDouble())
+        assertEquals(10.0, barChart.bounds.maxY.toDouble())
+        assertEquals(6, barChart.yAxisSubdivides)
+        assertEquals(Period.ofDays(2), barChart.barPeriod)
+        assertEquals(false, barChart.durationBasedRange)
+    }
+
+    @Test
+    fun `bar chart with non-unique labels`() = runTest {
+        whenever(luaEngine.runLuaGraphScript(any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.TimeBarChartData(
+                    barDuration = Period.ofDays(1),
+                    endTime = ZonedDateTime.now(),
+                    durationBasedRange = false,
+                    bars = listOf(
+                        TimeBar(listOf(TimeBarSegment(1.0))),
+                        TimeBar(
+                            listOf(TimeBarSegment(2.0, "A")),
+                        ),
+                        TimeBar(
+                            listOf(TimeBarSegment(3.0, "B", ColorSpec.ColorIndex(1))),
+                        ),
+                        TimeBar(
+                            listOf(TimeBarSegment(4.0, "C", ColorSpec.HexColor("#00FF00"))),
+                        ),
+                        TimeBar(
+                            listOf(TimeBarSegment(5.0, "C", ColorSpec.HexColor("#00FFF0"))),
+                        ),
+                    ),
+                    yMax = 10.0
+                )
+            )
+        )
+
+        val result = callGetViewData()
+
+        assert(result.wrapped is IBarChartViewData)
+        val barChart = result.wrapped as IBarChartViewData
+        assert(barChart.graphOrStat.type == GraphStatType.BAR_CHART)
+
+        assertEquals(5, barChart.bars.size)
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[0].segmentSeries.getxVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[1].segmentSeries.getxVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[2].segmentSeries.getxVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[3].segmentSeries.getxVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 1.0, 2.0, 3.0, 4.0), barChart.bars[4].segmentSeries.getxVals().map { it.toDouble() })
+
+        assertEquals(listOf(5.0, 0.0, 0.0, 0.0, 0.0), barChart.bars[0].segmentSeries.getyVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 4.0, 0.0, 0.0, 0.0), barChart.bars[1].segmentSeries.getyVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 0.0, 3.0, 0.0, 0.0), barChart.bars[2].segmentSeries.getyVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 0.0, 0.0, 2.0, 0.0), barChart.bars[3].segmentSeries.getyVals().map { it.toDouble() })
+        assertEquals(listOf(0.0, 0.0, 0.0, 0.0, 1.0), barChart.bars[4].segmentSeries.getyVals().map { it.toDouble() })
+
+        assertEquals(listOf("C", "C", "B", "A", ""), barChart.bars.map { it.segmentSeries.title })
+
+        assertEquals(
+            listOf(
+                ViewColorSpec.ColorValue(Color(0, 255, 240).toArgb()),
+                ViewColorSpec.ColorValue(Color.Green.toArgb()),
+                ViewColorSpec.ColorIndex(1),
+                ViewColorSpec.ColorIndex(9),
+                ViewColorSpec.ColorIndex(4),
+            ),
+            barChart.bars.map { it.color }
+        )
+    }
+
+    @Test
+    fun `bar chart preserves first seen segment order`() = runTest {
+        whenever(luaEngine.runLuaGraphScript(any(), any())).thenReturn(
+            LuaGraphResult(
+                data = LuaGraphResultData.TimeBarChartData(
+                    barDuration = Period.ofDays(1),
+                    endTime = ZonedDateTime.now(),
+                    durationBasedRange = false,
+                    bars = listOf(
+                        TimeBar(
+                            listOf(
+                                TimeBarSegment(1.0, "A"),
+                                TimeBarSegment(1.0, "B")
+                            ),
+                        ),
+                        TimeBar(
+                            listOf(
+                                TimeBarSegment(1.0, "B"),
+                                TimeBarSegment(1.0, "A")
+                            ),
+                        ),
+                    ),
+                    yMax = 10.0
+                )
+            )
+        )
+
+        val result = callGetViewData()
+
+        assert(result.wrapped is IBarChartViewData)
+        val barChart = result.wrapped as IBarChartViewData
+
+        // The order chosen is the first order seen in the data when the bars are drawn from left to right.
+        // Given that the bars arrive reversed, the order should be the order of the last segments in the list.
+        // The decision to use the order of the first seen segments is arbitrary, however it should be predictable.
+        // The really important thing here is that if all segments are always passed in the same order, that order should
+        // be respected. If you jumble the orders behaviour is un-defined but deterministic.
+        assertEquals(
+            listOf("B", "A"),
+            listOf(barChart.bars[0].segmentSeries.title, barChart.bars[1].segmentSeries.title),
+        )
     }
 
     @Test

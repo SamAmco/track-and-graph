@@ -18,22 +18,28 @@ package com.samco.trackandgraph.graphstatview.factories.viewdto
 
 import com.androidplot.xy.RectRegion
 import com.androidplot.xy.SimpleXYSeries
-import com.androidplot.xy.StepMode
 import org.threeten.bp.Period
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
+data class TimeBarSegmentSeries(
+    val segmentSeries: SimpleXYSeries,
+    val color: ColorSpec,
+)
+
 interface IBarChartViewData : IGraphStatViewData {
     /**
-     * One x date for every bar in the list. You don't necessarily draw all of them on the x axis
+     * One x date for every bar in the list. Sorted from oldest to newest. You don't necessarily draw all of them on the x axis.
+     * Should be the same length as the bars list.
      */
     val xDates: List<ZonedDateTime>
         get() = emptyList()
 
     /**
-     * One bar list for each label in the data set
+     * One bar list for each label in the data set. The x value of the SimpleXYSeries is the 0 based index in the xDates list.
+     * The xDates list should be of the same length.
      */
-    val bars: List<SimpleXYSeries>
+    val bars: List<TimeBarSegmentSeries>
         get() = emptyList()
 
     /**

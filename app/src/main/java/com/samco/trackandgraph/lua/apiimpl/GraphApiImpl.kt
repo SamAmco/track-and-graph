@@ -32,7 +32,7 @@ class GraphApiImpl @Inject constructor(
     private fun getDpAfterLuaFunction(sources: LuaEngine.LuaGraphEngineParams) = twoArgFunction { arg1, arg2 ->
         val name = arg1.checkjstring()
             ?: throw IllegalArgumentException("Name must be provided and be a string")
-        val zonedDateTime = dateTimeParser.parseDateTime(arg2)
+        val zonedDateTime = dateTimeParser.parseDateTimeOrNow(arg2)
         val batch = sources.dataSources[name]
             ?.takeWhile {  it.timestamp > zonedDateTime.toOffsetDateTime()  }
             ?.map { dataPointParser.toLuaValueNullable(it) }

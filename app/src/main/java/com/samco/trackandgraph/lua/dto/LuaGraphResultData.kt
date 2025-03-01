@@ -17,6 +17,8 @@
 package com.samco.trackandgraph.lua.dto
 
 import com.samco.trackandgraph.base.database.dto.DataPoint
+import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.temporal.TemporalAmount
 
 sealed interface LuaGraphResultData {
     data class DataPointData(
@@ -39,5 +41,13 @@ sealed interface LuaGraphResultData {
         val yMin: Double?,
         val yMax: Double?,
         val durationBasedRange: Boolean
+    ) : LuaGraphResultData
+
+    data class TimeBarChartData(
+        val barDuration: TemporalAmount,
+        val endTime: ZonedDateTime,
+        val durationBasedRange: Boolean,
+        val bars: List<TimeBar>,
+        val yMax: Double?
     ) : LuaGraphResultData
 }

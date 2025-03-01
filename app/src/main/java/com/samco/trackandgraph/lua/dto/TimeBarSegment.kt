@@ -16,6 +16,8 @@
  */
 package com.samco.trackandgraph.lua.dto
 
-enum class TextAlignment {
-    START, CENTER, END
-}
+data class TimeBarSegment(
+    val value: Double,
+    val label: String? = null,
+    val color: ColorSpec? = null,
+)

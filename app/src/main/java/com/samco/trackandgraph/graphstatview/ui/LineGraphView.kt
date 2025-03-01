@@ -153,7 +153,7 @@ fun LineGraphBodyView(
     GraphLegend(
         items = viewData.lines.map {
             GraphLegendItem(
-                color = Color(getPaintColor(context, it)),
+                color = Color(getColorInt(context, it.color)),
                 label = it.name
             )
         }
@@ -305,7 +305,7 @@ private fun getLineAndPointFormatter(
 ): LineAndPointFormatter {
     val formatter = LineAndPointFormatter()
     formatter.linePaint.apply {
-        color = getPaintColor(context, line)
+        color = getColorInt(context, line.color)
         strokeWidth = getLinePaintWidth(context)
     }
     getVertexPaintColor(context, line)?.let {
@@ -331,7 +331,7 @@ private fun getFastLineAndPointFormatter(
     line: Line,
 ): LineAndPointFormatter {
     val formatter = FastLineAndPointRenderer.Formatter(
-        getPaintColor(context, line),
+        getColorInt(context, line.color),
         getVertexPaintColor(context, line),
         getPointLabelFormatter(context, line)
     )
@@ -351,7 +351,7 @@ private fun getVertexPaintWidth(
 
 private fun getVertexPaintColor(context: Context, line: Line): Int? {
     return if (line.pointStyle == LineGraphPointStyle.NONE) null
-    else getPaintColor(context, line)
+    else getColorInt(context, line.color)
 }
 
 private fun getPointLabelFormatter(
@@ -367,15 +367,6 @@ private fun getPointLabelFormatter(
     )
     pointLabelFormatter.textPaint.textAlign = Paint.Align.RIGHT
     return pointLabelFormatter
-}
-
-@ColorInt
-private fun getPaintColor(
-    context: Context,
-    line: Line,
-) = when (line.color) {
-    is ColorSpec.ColorIndex -> getColor(context, dataVisColorList[line.color.index])
-    is ColorSpec.ColorValue -> line.color.value
 }
 
 private fun getMarkerPaint(

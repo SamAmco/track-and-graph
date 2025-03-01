@@ -20,16 +20,6 @@ import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 
 interface LuaEngine {
-    companion object {
-        const val DATA = "data"
-        const val TNG = "tng"
-        const val TEXT = "text"
-        const val PIE_CHART = "piechart"
-        const val LINE_GRAPH = "linegraph"
-        const val TYPE = "type"
-        const val DATAPOINT = "datapoint"
-    }
-
     data class LuaGraphEngineParams(
         val dataSources: Map<String, RawDataSample>
     )
