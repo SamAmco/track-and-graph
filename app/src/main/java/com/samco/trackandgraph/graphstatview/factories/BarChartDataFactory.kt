@@ -32,8 +32,10 @@ import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreference
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSeries
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
@@ -47,14 +49,15 @@ import kotlin.math.abs
 
 class BarChartDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
-    @IODispatcher ioDispatcher: CoroutineDispatcher
+    private val dataDisplayIntervalHelper: DataDisplayIntervalHelper,
+    @IODispatcher ioDispatcher: CoroutineDispatcher,
 ) : ViewDataFactory<BarChart, IBarChartViewData>(dataInteractor, ioDispatcher) {
 
     companion object {
 
         @VisibleForTesting
         data class BarData(
-            val bars: List<SimpleXYSeries>,
+            val segmentSeries: List<TimeBarSegmentSeries>,
             val dates: List<ZonedDateTime>,
             val bounds: RectRegion
         )
@@ -168,19 +171,22 @@ class BarChartDataFactory @Inject constructor(
                 .toList()
                 .sortedByDescending { (_, value) -> value }
 
+            var colorIndex = 0
             val bars = barValuesByLabel
                 .map { (label, values) ->
                     //Reverse the order because the values are added from newest to
                     // oldest but should be displayed from oldest to newest
-                    SimpleXYSeries(
+                    val series = SimpleXYSeries(
                         values.asReversed(),
                         SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,
                         label
                     )
+                    val color = ColorSpec.ColorIndex(colorIndex++)
+                    TimeBarSegmentSeries(series, color)
                 }
                 //Sort the layers from largest to smallest so the label with the largest total of
                 // values is on the bottom
-                .sortedBy { label -> barSumsByLabel.indexOfFirst { it.first == label.title } }
+                .sortedBy { timeBarSet -> barSumsByLabel.indexOfFirst { it.first == timeBarSet.segmentSeries.title } }
 
             // reverse the order because the values are added from newest to
             // oldest but should be displayed from oldest to newest
@@ -220,7 +226,7 @@ class BarChartDataFactory @Inject constructor(
     }
 
     private data class BarDataWithYAxisParams(
-        val bars: List<SimpleXYSeries>,
+        val bars: List<TimeBarSegmentSeries>,
         val dates: List<ZonedDateTime>,
         val bounds: RectRegion,
         val yAxisSubdivides: Int,
@@ -245,15 +251,18 @@ class BarChartDataFactory @Inject constructor(
             scale = config.scale
         )
 
-        val yAxisParameters = DataDisplayIntervalHelper().getYParameters(
+        val yAxisParameters = dataDisplayIntervalHelper.getYParameters(
             barData.bounds.minY.toDouble(),
             barData.bounds.maxY.toDouble(),
             dataSample.dataSampleProperties.isDuration,
             config.yRangeType == YRangeType.FIXED
         )
 
+        barData.bounds.union(0, yAxisParameters.boundsMin)
+        barData.bounds.union(0, yAxisParameters.boundsMax)
+
         return BarDataWithYAxisParams(
-            bars = barData.bars,
+            bars = barData.segmentSeries,
             dates = barData.dates,
             bounds = barData.bounds,
             yAxisSubdivides = yAxisParameters.subdivides,

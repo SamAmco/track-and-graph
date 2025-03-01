@@ -1,3 +1,19 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.lua.apiimpl
 
 import org.luaj.vm2.LuaTable
@@ -41,7 +57,10 @@ class DateTimeParser @Inject constructor() {
      * -- @class timestamp
      * in tng.lua
      */
-    fun parseDateTime(dateTime: LuaValue): ZonedDateTime = when {
+    fun parseDateTimeOrNow(dateTime: LuaValue): ZonedDateTime = parseDateTimeOrNull(dateTime)
+        ?: ZonedDateTime.now()
+
+    private fun parseDateTimeOrNull(dateTime: LuaValue): ZonedDateTime? = when {
         dateTime.isnumber() -> ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(dateTime.tolong()),
             ZoneOffset.UTC,
@@ -49,7 +68,7 @@ class DateTimeParser @Inject constructor() {
 
         dateTime.istable() -> parseDateTimeTable(dateTime)
 
-        else -> ZonedDateTime.now()
+        else -> null
     }
 
     fun parseOffsetDateTimeOrThrow(dateTime: LuaValue): OffsetDateTime {
@@ -69,7 +88,13 @@ class DateTimeParser @Inject constructor() {
         else -> ZonedDateTime.now()
     }
 
-    fun parseTimestampOrNow(arg: LuaValue): ZonedDateTime = when {
+    fun parseTimestampOrNow(arg: LuaValue): ZonedDateTime = parseTimestampOrNull(arg)
+        ?: ZonedDateTime.now()
+
+    fun parseTimestampOrThrow(arg: LuaValue): ZonedDateTime = parseTimestampOrNull(arg)
+        ?: throw IllegalArgumentException("Expected a timestamp or a table, got ${arg.typename()}")
+
+    private fun parseTimestampOrNull(arg: LuaValue): ZonedDateTime? = when {
         arg.isnumber() -> ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(arg.tolong()),
             ZoneOffset.UTC,
@@ -77,7 +102,7 @@ class DateTimeParser @Inject constructor() {
 
         arg.istable() -> parseTimestamp(arg)
 
-        else -> ZonedDateTime.now()
+        else -> null
     }
 
     fun overrideOffsetDateTime(table: LuaValue, offsetDateTime: OffsetDateTime) {

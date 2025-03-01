@@ -39,7 +39,7 @@ private fun getDateTimePref(context: Context): DateFormatSetting {
     val datePrefIndex = getPrefs(context).getInt(
         DATE_FORMAT_SETTING_PREF_KEY, DateFormatSetting.DMY.ordinal
     )
-    return DateFormatSetting.values()[datePrefIndex]
+    return DateFormatSetting.entries[datePrefIndex]
 }
 
 private fun formatDate(formatter: DateTimeFormatter, date: Temporal): String =

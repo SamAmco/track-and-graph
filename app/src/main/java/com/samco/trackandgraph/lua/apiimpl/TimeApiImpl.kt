@@ -34,7 +34,7 @@ class TimeApiImpl @Inject constructor(
     }
 
     private fun getShiftLuaFunction(): LuaValue = threeArgFunction { arg1, arg2, arg3 ->
-        val dateTime = dateTimeParser.parseDateTime(arg1)
+        val dateTime = dateTimeParser.parseDateTimeOrNow(arg1)
         val shift = dateTimeParser.parseDurationOrPeriod(arg2, arg3)
         val shiftedDateTime = dateTime + shift
         val shiftedTimeTable = dateTimeParser.zonedDateTimeToLuaTimestamp(shiftedDateTime)
@@ -45,7 +45,7 @@ class TimeApiImpl @Inject constructor(
     }
 
     private fun getFormatLuaFunction(): LuaValue = twoArgFunction { arg1, arg2 ->
-        val dateTime = dateTimeParser.parseDateTime(arg1)
+        val dateTime = dateTimeParser.parseDateTimeOrNow(arg1)
         val format = arg2.tojstring()
         val formatter = DateTimeFormatter.ofPattern(format)
         return@twoArgFunction LuaValue.valueOf(dateTime.format(formatter))

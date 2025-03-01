@@ -94,7 +94,7 @@ internal class MovingAggregator(
                     override val label: String = calculateLabel(currentList)
                 }
             )
-            currentList.removeFirst()
+            currentList.removeAt(0)
         }
     }
 }

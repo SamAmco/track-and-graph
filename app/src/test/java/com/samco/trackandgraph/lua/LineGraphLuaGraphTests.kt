@@ -108,7 +108,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         assertEquals(
             listOf(
                 Line(
-                    lineColor = ColorSpec.ColorIndex(2),
+                    lineColor = ColorSpec.ColorIndex(1),
                     pointStyle = null,
                     label = null,
                     linePoints = listOf(
@@ -295,7 +295,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         assertEquals(
             listOf(
                 Line(
-                    lineColor = ColorSpec.ColorIndex(2),
+                    lineColor = ColorSpec.ColorIndex(1),
                     pointStyle = LinePointStyle.CIRCLE,
                     label = null,
                     linePoints = listOf(

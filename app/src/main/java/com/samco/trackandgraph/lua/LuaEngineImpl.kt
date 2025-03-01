@@ -25,6 +25,7 @@ import com.samco.trackandgraph.lua.graphadapters.DataPointLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.LineGraphLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.PieChartLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.TextLuaGraphAdapter
+import com.samco.trackandgraph.lua.graphadapters.TimeBarChartLuaGraphAdapter
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.jse.JsePlatform
@@ -36,6 +37,7 @@ class LuaEngineImpl @Inject constructor(
     private val textLuaGraphAdapter: TextLuaGraphAdapter,
     private val pieChartLuaGraphAdapter: PieChartLuaGraphAdapter,
     private val lineGraphLuaGraphAdapter: LineGraphLuaGraphAdapter,
+    private val timeBarChartLuaGraphAdapter: TimeBarChartLuaGraphAdapter,
     private val requireApi: RequireApiImpl,
     private val graphApiImpl: GraphApiImpl,
     private val timeApiImpl: TimeApiImpl,
@@ -44,13 +46,13 @@ class LuaEngineImpl @Inject constructor(
     private val globals by lazy {
         val globals = JsePlatform.standardGlobals()
         val tngScript = assetReader.readAssetToString("generated/lua/tng.lua")
-        globals[LuaEngine.TNG] = globals.load(tngScript).call()
+        globals[TNG] = globals.load(tngScript).call()
         globals
     }
 
     private val tngTable: LuaTable by lazy {
         //Fail hard if this is not defined to make sure tests fail
-        globals[LuaEngine.TNG].checktable()!!
+        globals[TNG].checktable()!!
     }
 
     override fun runLuaGraphScript(
@@ -58,7 +60,7 @@ class LuaEngineImpl @Inject constructor(
         params: LuaEngine.LuaGraphEngineParams
     ): LuaGraphResult {
         try {
-            requireApi.installIn(globals, mapOf( LuaEngine.TNG to tngTable ))
+            requireApi.installIn(globals, mapOf( TNG to tngTable ))
             graphApiImpl.installIn(tngTable, params)
             timeApiImpl.installIn(tngTable)
             val cleanedScript = script.cleanLuaScript()
@@ -69,17 +71,18 @@ class LuaEngineImpl @Inject constructor(
     }
 
     private fun processLuaGraph(scriptResult: LuaValue): LuaGraphResult {
-        val type = scriptResult[LuaEngine.TYPE].checkjstring()
+        val type = scriptResult[TYPE].checkjstring()
             ?: throw IllegalArgumentException("No valid type found")
-        val dataLua = scriptResult[LuaEngine.DATA]
+        val dataLua = scriptResult[DATA]
 
         if (dataLua.isnil()) return LuaGraphResult(data = null)
 
         val data = when (type) {
-            LuaEngine.DATAPOINT -> dataPointLuaGraphAdapter.process(dataLua)
-            LuaEngine.TEXT -> textLuaGraphAdapter.process(dataLua)
-            LuaEngine.PIE_CHART -> pieChartLuaGraphAdapter.process(dataLua)
-            LuaEngine.LINE_GRAPH -> lineGraphLuaGraphAdapter.process(dataLua)
+            DATA_POINT -> dataPointLuaGraphAdapter.process(dataLua)
+            TEXT -> textLuaGraphAdapter.process(dataLua)
+            PIE_CHART -> pieChartLuaGraphAdapter.process(dataLua)
+            LINE_GRAPH -> lineGraphLuaGraphAdapter.process(dataLua)
+            TIME_BARCHART -> timeBarChartLuaGraphAdapter.process(dataLua)
             else -> throw IllegalArgumentException("Unknown lua graph type: $type")
         }
 
@@ -90,5 +93,16 @@ class LuaEngineImpl @Inject constructor(
         return this.replace(Regex("\\u00A0"), " ") // Replace NBSP with space
             .replace(Regex("[\\u200B\\uFEFF]"), "") // Remove zero-width space and BOM
             .trim()
+    }
+
+    companion object {
+        const val DATA = "data"
+        const val TNG = "tng"
+        const val TEXT = "TEXT"
+        const val PIE_CHART = "PIE_CHART"
+        const val LINE_GRAPH = "LINE_GRAPH"
+        const val TIME_BARCHART = "TIME_BARCHART"
+        const val TYPE = "type"
+        const val DATA_POINT = "DATA_POINT"
     }
 }

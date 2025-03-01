@@ -60,8 +60,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.core.content.ContextCompat.getColor
-import androidx.core.graphics.toColor
 import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.util.PixelUtils
@@ -70,7 +68,6 @@ import com.androidplot.xy.BarRenderer
 import com.androidplot.xy.BoundaryMode
 import com.androidplot.xy.PanZoom
 import com.androidplot.xy.RectRegion
-import com.androidplot.xy.SimpleXYSeries
 import com.androidplot.xy.StepMode
 import com.androidplot.xy.XValueMarker
 import com.androidplot.xy.XYGraphWidget
@@ -80,12 +77,12 @@ import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.helpers.getDayMonthFormatter
 import com.samco.trackandgraph.base.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
+import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSeries
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
-import com.samco.trackandgraph.ui.dataVisColorGenerator
-import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -178,7 +175,7 @@ private fun BarChartDataOverlay(
     context: Context,
     highlightedIndex: Int,
     xDates: List<ZonedDateTime>,
-    bars: List<SimpleXYSeries>,
+    bars: List<TimeBarSegmentSeries>,
     barPeriod: TemporalAmount,
     durationBasedRange: Boolean
 ) = Surface(
@@ -188,7 +185,7 @@ private fun BarChartDataOverlay(
 ) {
 
     val total = remember(highlightedIndex, bars) {
-        val totalVal = bars.sumOf { it.getyVals()[highlightedIndex].toDouble() }
+        val totalVal = bars.sumOf { it.segmentSeries.getyVals()[highlightedIndex].toDouble() }
         if (durationBasedRange) formatTimeDuration(totalVal.toLong())
         else doubleToString(totalVal)
     }
@@ -205,19 +202,22 @@ private fun BarChartDataOverlay(
     //a list of label: value (percentage) strings for each label for the current bar
     val extraDetails = remember(highlightedIndex, xDates, bars) {
         val values = bars.associate {
-            it.title to it.getyVals()[highlightedIndex].toDouble()
+            it.segmentSeries.title to it.segmentSeries.getyVals()[highlightedIndex].toDouble()
         }
         val sum = values.values.sum()
 
         if (sum < 1e-6) emptyList()
         else bars.map {
-            val value = values[it.title] ?: 0.0
+            val value = values[it.segmentSeries.title] ?: 0.0
             val percentage = (value / sum) * 100.0
             val percentageStr = doubleToString(percentage, 1)
             val str =
                 if (durationBasedRange) formatTimeDuration(value.toLong())
                 else doubleToString(value)
-            return@map "${it.title}: $str ($percentageStr%)"
+            return@map ExtraDetails(
+                color = it.color,
+                label = "${it.segmentSeries.title}: $str ($percentageStr%)"
+            )
         }
     }
 
@@ -243,9 +243,14 @@ private fun BarChartDataOverlay(
     }
 }
 
+private data class ExtraDetails(
+    val color: ColorSpec,
+    val label: String
+)
+
 @Composable
 private fun BarChartDataOverlayExtraDetails(
-    extraDetails: List<String>
+    extraDetails: List<ExtraDetails>
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -281,14 +286,13 @@ private fun BarChartDataOverlayExtraDetails(
             exit = fadeOut() + shrinkVertically()
         ) {
             Row {
-                val colorIndex = (index * dataVisColorGenerator) % dataVisColorList.size
                 ColorCircle(
-                    color = dataVisColorList[colorIndex],
+                    color = getColorInt(LocalContext.current, labelInfo.color),
                     size = 16.dp
                 )
                 HalfDialogInputSpacing()
                 Text(
-                    text = labelInfo,
+                    text = labelInfo.label,
                     style = MaterialTheme.typography.body1,
                     modifier = Modifier.padding(start = 8.dp)
                 )
@@ -301,7 +305,7 @@ private fun BarChartDataOverlayExtraDetails(
 private fun BarChartBodyView(
     modifier: Modifier = Modifier,
     xDates: List<ZonedDateTime>,
-    bars: List<SimpleXYSeries>,
+    bars: List<TimeBarSegmentSeries>,
     durationBasedRange: Boolean,
     endTime: ZonedDateTime,
     bounds: RectRegion,
@@ -391,11 +395,10 @@ private fun BarChartBodyView(
     if (bars.size > 1) {
         GraphLegend(
             items = bars.mapIndexed { i, bar ->
-                val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
-                val label = bar.title
+                val label = bar.segmentSeries.title
                     .ifEmpty { context.getString(R.string.no_label) }
                 GraphLegendItem(
-                    color = toLegendColor(dataVisColorList[colorIndex]),
+                    color = getColor(context, bar.color),
                     label = label
                 )
             }
@@ -583,22 +586,21 @@ private fun getXAxisFormatter(
 private fun drawBars(
     context: Context,
     binding: GraphXyPlotBinding,
-    bars: List<SimpleXYSeries>
+    bars: List<TimeBarSegmentSeries>
 ) {
     val outlineColor = context.getColorFromAttr(R.attr.colorOnSurface)
 
     // if there are more than 60 bars, we don't want to draw the borders
     // I chose 60 simply because it's the first round number after the number of weeks in a year
     val xfermode =
-        if (bars.isNotEmpty() && bars[0].getyVals().size < 60) null
+        if (bars.isNotEmpty() && bars[0].segmentSeries.getyVals().size < 60) null
         else PorterDuffXfermode(PorterDuff.Mode.DST)
 
     bars.forEachIndexed { i, bv ->
-        val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
-        val color = getColor(context, dataVisColorList[colorIndex])
+        val color = getColorInt(context, bv.color)
         val seriesFormatter = BarFormatter(color, outlineColor)
         seriesFormatter.borderPaint.xfermode = xfermode
-        binding.xyPlot.addSeries(bv, seriesFormatter)
+        binding.xyPlot.addSeries(bv.segmentSeries, seriesFormatter)
     }
 
     val renderer = binding.xyPlot.getRenderer(BarRenderer::class.java)

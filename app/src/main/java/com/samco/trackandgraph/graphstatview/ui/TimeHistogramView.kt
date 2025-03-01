@@ -134,7 +134,7 @@ private fun TimeHistogramBodyView(
                 val label = bar.label
                     .ifEmpty { context.getString(R.string.no_label) }
                 GraphLegendItem(
-                    color = toLegendColor(dataVisColorList[colorIndex]),
+                    color = getResColor(dataVisColorList[colorIndex]),
                     label = label
                 )
             }

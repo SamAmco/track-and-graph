@@ -19,6 +19,7 @@ package com.samco.trackandgraph.graphstatview.ui
 import android.content.Context
 import android.graphics.Color as GColor
 import android.view.View
+import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +42,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat.getColor
 import com.androidplot.Plot
 import com.androidplot.ui.Anchor
 import com.androidplot.ui.HorizontalPositioning
@@ -52,8 +54,10 @@ import com.androidplot.xy.XYPlot
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
+import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
 import java.text.DecimalFormat
 import java.text.FieldPosition
@@ -163,15 +167,27 @@ fun GraphErrorView(
     )
 }
 
-//Hopefully we can just remove this function once everything has been transitioned to use Color.
-//Legend items should use Color because Lua will allow the flexibility to specify your own colors.
 @Composable
-fun toLegendColor(@ColorRes color: Int): Color = colorResource(color)
+fun getResColor(@ColorRes color: Int): Color = colorResource(color)
 
 data class GraphLegendItem(
     val color: Color,
     val label: String
 )
+
+@ColorInt
+fun getColorInt(
+    context: Context,
+    colorSpec: ColorSpec,
+) = when (colorSpec) {
+    is ColorSpec.ColorIndex -> getColor(context, dataVisColorList[colorSpec.index])
+    is ColorSpec.ColorValue -> colorSpec.value
+}
+
+fun getColor(
+    context: Context,
+    colorSpec: ColorSpec,
+) = Color(getColorInt(context, colorSpec))
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable

@@ -1,11 +1,39 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.graphstatview.factories
 
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.whenever
+import com.samco.trackandgraph.base.database.dto.BarChart
 import com.samco.trackandgraph.base.database.dto.BarChartBarPeriod
+import com.samco.trackandgraph.base.database.dto.DataPoint
+import com.samco.trackandgraph.base.database.dto.GraphEndDate
+import com.samco.trackandgraph.base.database.dto.GraphOrStat
+import com.samco.trackandgraph.base.database.dto.GraphStatType
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.database.sampling.DataSample
+import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.threeten.bp.DayOfWeek
@@ -14,6 +42,7 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZonedDateTime
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class BarChartDataFactoryTest {
 
     private val defaultTimeHelper = TimeHelper(
@@ -23,6 +52,60 @@ class BarChartDataFactoryTest {
         },
         ZoneId.systemDefault()
     )
+
+    private val dataInteractor = mock<DataInteractor>()
+    private val testCoroutineDispatcher = UnconfinedTestDispatcher()
+
+    private fun uut() = BarChartDataFactory(
+        dataInteractor = dataInteractor,
+        dataDisplayIntervalHelper = DataDisplayIntervalHelper(),
+        ioDispatcher = testCoroutineDispatcher
+    )
+
+    @Test
+    fun `test bar chart respects data interval helper upper Y bound, if range is not fixed`() = runTest {
+        //PREPARE
+        val end = ZonedDateTime.now().withHour(22)
+
+        val dataSample = DataSample.fromSequence(
+            listOf(
+                dp(end),
+                dp(end.minusDays(1), value = 1.435),
+            ).asSequence()
+        ) {}
+
+        var dataSampledCalled = false
+        val onDataSampled: (List<DataPoint>) -> Unit = {
+            dataSampledCalled = true
+        }
+
+        whenever(dataInteractor.getDataSampleForFeatureId(1))
+            .thenReturn(dataSample)
+
+        //EXECUTE
+        val uut = uut()
+        val viewData = uut.getViewData(
+            graphOrStat = dummyGraphOrStat(),
+            config = BarChart(
+                id = 1,
+                graphStatId = 1,
+                featureId = 1,
+                endDate = GraphEndDate.Latest,
+                sampleSize = null,
+                yRangeType = YRangeType.DYNAMIC,
+                yTo = 0.0,
+                scale = 1.0,
+                barPeriod = BarChartBarPeriod.DAY,
+                sumByCount = false
+            ),
+            onDataSampled = onDataSampled
+        )
+
+        //VERIFY
+        assertEquals(1, viewData.bars.size)
+        assertEquals(1.5, viewData.bounds.maxY.toDouble(), 0.0001)
+        assertEquals(true, dataSampledCalled)
+    }
 
     @Test
     fun `test should not return a range of 0 to 0 if theres no data`() {
@@ -54,9 +137,9 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(1, barData.bars.size)
+        assertEquals(1, barData.segmentSeries.size)
         assertEquals(listOf(endOfDay), barData.dates)
-        assertEquals(listOf(0.0), barData.bars[0].getyVals())
+        assertEquals(listOf(0.0), barData.segmentSeries[0].segmentSeries.getyVals())
 
         assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
         assertEquals(0.5, barData.bounds.maxX.toDouble(), 0.1)
@@ -101,8 +184,8 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(1, barData.bars.size)
-        assertEquals(listOf(3.0, 1.0, 2.0), barData.bars[0].getyVals())
+        assertEquals(1, barData.segmentSeries.size)
+        assertEquals(listOf(3.0, 1.0, 2.0), barData.segmentSeries[0].segmentSeries.getyVals())
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
         assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
         assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
@@ -150,11 +233,11 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(2, barData.bars.size)
+        assertEquals(2, barData.segmentSeries.size)
 
         //b comes first because the sum of all b values is larger than the sum of all a values
-        assertEquals(listOf(0.0, 1.0, 2.0), barData.bars[1].getyVals())
-        assertEquals(listOf(5.0, 1.0, 4.0), barData.bars[0].getyVals())
+        assertEquals(listOf(0.0, 1.0, 2.0), barData.segmentSeries[1].segmentSeries.getyVals())
+        assertEquals(listOf(5.0, 1.0, 4.0), barData.segmentSeries[0].segmentSeries.getyVals())
 
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
         assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
@@ -212,14 +295,14 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(2, barData.bars.size)
+        assertEquals(2, barData.segmentSeries.size)
         assertEquals(
             listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
-            barData.bars.first { it.title == "a" }.getyVals()
+            barData.segmentSeries.first { it.segmentSeries.title == "a" }.segmentSeries.getyVals()
         )
         assertEquals(
             listOf(1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0),
-            barData.bars.first { it.title == "b" }.getyVals()
+            barData.segmentSeries.first { it.segmentSeries.title == "b" }.segmentSeries.getyVals()
         )
         assertEquals(
             listOf(
@@ -274,8 +357,8 @@ class BarChartDataFactoryTest {
         )
 
         //VERIFY
-        assertEquals(1, barData.bars.size)
-        assertEquals(listOf(1.0, 1.0), barData.bars[0].getyVals())
+        assertEquals(1, barData.segmentSeries.size)
+        assertEquals(listOf(1.0, 1.0), barData.segmentSeries[0].segmentSeries.getyVals())
         assertEquals(
             listOf(
                 ZonedDateTime.parse("2023-03-25T14:59:59.999999999Z[Europe/London]"),
@@ -320,8 +403,8 @@ class BarChartDataFactoryTest {
         )
 
         //VERIFY
-        assertEquals(1, barData.bars.size)
-        assertEquals(listOf(3.0, 1.0, 2.0), barData.bars[0].getyVals())
+        assertEquals(1, barData.segmentSeries.size)
+        assertEquals(listOf(3.0, 1.0, 2.0), barData.segmentSeries[0].segmentSeries.getyVals())
         assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
         assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
         assertEquals(0, barData.bounds.minY.toInt())
@@ -361,11 +444,11 @@ class BarChartDataFactoryTest {
         )
 
         //VERIFY
-        assertEquals(2, barData.bars.size)
+        assertEquals(2, barData.segmentSeries.size)
 
         //b comes first because the sum of all b values is larger than the sum of all a values
-        assertEquals(listOf(0.0, 3.0, 6.0), barData.bars[1].getyVals())
-        assertEquals(listOf(15.0, 3.0, 12.0), barData.bars[0].getyVals())
+        assertEquals(listOf(0.0, 3.0, 6.0), barData.segmentSeries[1].segmentSeries.getyVals())
+        assertEquals(listOf(15.0, 3.0, 12.0), barData.segmentSeries[0].segmentSeries.getyVals())
         assertEquals(-0.5, barData.bounds.minX.toDouble(), 0.1)
         assertEquals(2.5, barData.bounds.maxX.toDouble(), 0.1)
         assertEquals(0, barData.bounds.minY.toInt())
@@ -408,8 +491,8 @@ class BarChartDataFactoryTest {
             .withSecond(0)
             .withNano(0)
             .minusNanos(1)
-        assertEquals(1, barData.bars.size)
-        assertEquals(listOf(3.0, 1.0, 1.0), barData.bars[0].getyVals())
+        assertEquals(1, barData.segmentSeries.size)
+        assertEquals(listOf(3.0, 1.0, 1.0), barData.segmentSeries[0].segmentSeries.getyVals())
         assertEquals(listOf(endOfDay.minusDays(2), endOfDay.minusDays(1), endOfDay), barData.dates)
     }
 
@@ -422,4 +505,12 @@ class BarChartDataFactoryTest {
         override val value: Double = value
         override val label: String = label
     }
+
+    private fun dummyGraphOrStat() = GraphOrStat(
+        id = 1,
+        groupId = 1,
+        name = "name",
+        type = GraphStatType.BAR_CHART,
+        displayIndex = 1
+    )
 }

@@ -29,6 +29,7 @@ import com.samco.trackandgraph.graphstatview.factories.helpers.LineGraphLuaHelpe
 import com.samco.trackandgraph.graphstatview.factories.helpers.PieChartLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.helpers.TextLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.helpers.TimeBarchartLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
@@ -44,6 +45,7 @@ class LuaGraphDataFactory @Inject constructor(
     private val dataPointLuaHelper: DataPointLuaHelper,
     private val errorLuaHelper: ErrorLuaHelper,
     private val lineGraphLuaHelper: LineGraphLuaHelper,
+    private val timeBarChartLuaHelper: TimeBarchartLuaHelper,
     dataInteractor: DataInteractor,
     @IODispatcher ioDispatcher: CoroutineDispatcher
 ) : ViewDataFactory<LuaGraphWithFeatures, ILuaGraphViewData>(dataInteractor, ioDispatcher) {
@@ -105,8 +107,10 @@ class LuaGraphDataFactory @Inject constructor(
             is LuaGraphResultData.DataPointData -> dataPointLuaHelper(luaGraphResult.data, graphOrStat)
             is LuaGraphResultData.TextData -> textLuaHelper(luaGraphResult.data, graphOrStat)
             is LuaGraphResultData.PieChartData -> pieChartLuaHelper(luaGraphResult.data, graphOrStat)
+            is LuaGraphResultData.TimeBarChartData -> timeBarChartLuaHelper(luaGraphResult.data, graphOrStat)
             is LuaGraphResultData.LineGraphData ->
                 lineGraphLuaHelper(luaGraphResult.data, graphOrStat) ?: noData(graphOrStat)
+
             null -> noData(graphOrStat)
         }
     }

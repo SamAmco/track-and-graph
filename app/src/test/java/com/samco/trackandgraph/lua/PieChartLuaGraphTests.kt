@@ -80,7 +80,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         val pieChartData = (result.data as LuaGraphResultData.PieChartData).segments!!
         assertEquals(
             listOf(
-                PieChartSegment(10.0, "A", ColorSpec.ColorIndex(12)),
+                PieChartSegment(10.0, "A", ColorSpec.ColorIndex(11)),
                 PieChartSegment(20.0, "B", ColorSpec.HexColor("#00FF00"))
             ),
             pieChartData

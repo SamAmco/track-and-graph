@@ -28,7 +28,7 @@ class DataPointParser @Inject constructor(
     }
 
     fun parseDataPoint(data: LuaValue): DataPoint = DataPoint(
-        timestamp = dateTimeParser.parseDateTime(data).toOffsetDateTime(),
+        timestamp = dateTimeParser.parseDateTimeOrNow(data).toOffsetDateTime(),
         featureId = data[FEATURE_ID].optlong(0L),
         value = data[VALUE].optdouble(0.0),
         label = data[LABEL].optjstring("") ?: "",
