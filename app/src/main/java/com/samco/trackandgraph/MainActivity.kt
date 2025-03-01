@@ -49,6 +49,7 @@ import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
+import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -78,12 +79,16 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var deepLinkHandler: DeepLinkHandler
 
+    @Inject
+    lateinit var luaEngineSettingsProvider: LuaEngineSettingsProvider
+
     private val viewModel by viewModels<MainActivityViewModel>()
 
     val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        checkDisableLuaEngine()
         readThemeValue()
         setContentView(R.layout.activity_main)
         initializeNav()
@@ -95,6 +100,16 @@ class MainActivity : AppCompatActivity() {
         else destroyTutorial()
         intent?.data?.let { handleDeepLink(it) }
         addOnBackPressedCallback()
+    }
+
+    private fun checkDisableLuaEngine() {
+        // Check if the activity was launched with the custom action
+        if (intent != null && intent.action == IntentActions.DISABLE_LUA_ENGINE) {
+            // Disable the Lua engine
+            luaEngineSettingsProvider.settings = luaEngineSettingsProvider.settings.copy(
+                enabled = false
+            )
+        }
     }
 
     private fun addOnBackPressedCallback() = onBackPressedDispatcher.addCallback(this,

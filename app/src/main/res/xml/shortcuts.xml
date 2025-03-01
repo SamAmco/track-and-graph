@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@drawable/app_icon"
+        android:shortcutId="disable_lua"
+        android:shortcutLongLabel="@string/launch_lua_disabled"
+        android:shortcutShortLabel="@string/launch_lua_disabled">
+        <intent
+            android:action="com.samco.trackandgraph.action.DISABLE_LUA_ENGINE"
+            android:targetClass="com.samco.trackandgraph.MainActivity"
+            android:targetPackage="com.samco.trackandgraph.debug" />
+    </shortcut>
+</shortcuts>

@@ -87,19 +87,22 @@ private fun GraphError(
     modifier: Modifier,
     graphStatViewData: IGraphStatViewData,
 ) {
-    if (graphStatViewData.graphOrStat.type == GraphStatType.LUA_SCRIPT) {
-        GraphErrorView(
-            modifier = modifier,
-            error = graphStatViewData.error?.message
-                ?: stringResource(R.string.graph_stat_validation_unknown)
-        )
-    } else {
-        GraphErrorView(
-            modifier = modifier,
-            error = (graphStatViewData.error as? GraphStatInitException)
-                ?.errorTextId
-                ?: R.string.graph_stat_validation_unknown
-        )
+    when (graphStatViewData.error) {
+        is GraphStatInitException -> {
+            GraphErrorView(
+                modifier = modifier,
+                error = (graphStatViewData.error as? GraphStatInitException)
+                    ?.errorTextId
+                    ?: R.string.graph_stat_validation_unknown
+            )
+        }
+        else -> {
+            GraphErrorView(
+                modifier = modifier,
+                error = graphStatViewData.error?.message
+                    ?: stringResource(R.string.graph_stat_validation_unknown)
+            )
+        }
     }
 }
 

@@ -369,4 +369,7 @@
     <string name="load_file">Load file</string>
     <string name="lua_feature_names_not_unique">Script inputs must have unique names</string>
     <string name="graph_stat_type_lua_graph">Lua Script</string>
+    <string name="launch_lua_disabled">Launch Lua disabled</string>
+    <string name="no_lua">No Lua</string>
+    <string name="lua_engine_disabled">Lua engine disabled</string>
 </resources>
