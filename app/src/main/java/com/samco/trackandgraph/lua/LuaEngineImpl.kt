@@ -26,9 +26,18 @@ import com.samco.trackandgraph.lua.graphadapters.LineGraphLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.PieChartLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.TextLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.TimeBarChartLuaGraphAdapter
+import org.luaj.vm2.Globals
+import org.luaj.vm2.LoadState
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.lib.jse.JsePlatform
+import org.luaj.vm2.compiler.LuaC
+import org.luaj.vm2.lib.Bit32Lib
+import org.luaj.vm2.lib.CoroutineLib
+import org.luaj.vm2.lib.PackageLib
+import org.luaj.vm2.lib.StringLib
+import org.luaj.vm2.lib.TableLib
+import org.luaj.vm2.lib.jse.JseBaseLib
+import org.luaj.vm2.lib.jse.JseMathLib
 import javax.inject.Inject
 
 class LuaEngineImpl @Inject constructor(
@@ -44,7 +53,26 @@ class LuaEngineImpl @Inject constructor(
 ) : LuaEngine {
 
     private val globals by lazy {
-        val globals = JsePlatform.standardGlobals()
+        val globals = Globals()
+        // Only install libraries that are useful and not dangerous
+        globals.load(JseBaseLib())
+        globals.load(PackageLib())
+        globals.load(Bit32Lib())
+        globals.load(TableLib())
+        globals.load(StringLib())
+        globals.load(CoroutineLib())
+        globals.load(JseMathLib())
+        // Remove potentially dangerous functions from BaseLib
+        globals["dofile"] = LuaValue.NIL
+        globals["loadfile"] = LuaValue.NIL
+        globals["pcall"] = LuaValue.NIL
+        globals["xpcall"] = LuaValue.NIL
+        globals["package"] = LuaValue.NIL
+        // Print isn't dangerous but it won't work so I would rather throw than
+        // fail silently as it may be confusing
+        globals["print"] = LuaValue.NIL
+        LoadState.install(globals)
+        LuaC.install(globals)
         val tngScript = assetReader.readAssetToString("generated/lua/tng.lua")
         globals[TNG] = globals.load(tngScript).call()
         globals
