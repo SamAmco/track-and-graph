@@ -86,18 +86,20 @@ class LineGraphLuaHelper @Inject constructor(
         }
     }
 
-    private fun getLineViewData(lines: List<Line>, endTime: OffsetDateTime): List<LineViewData> = lines.mapIndexed { index, line ->
-        LineViewData(
-            name = line.label ?: "",
-            color = (line.lineColor ?: indexColorSpec(index)).toColorSpec(),
-            pointStyle = line.pointStyle.toViewPointStyle(),
-            line = androidPlotSeriesHelper.getFastXYSeries(
+    private fun getLineViewData(lines: List<Line>, endTime: OffsetDateTime): List<LineViewData> = lines
+        .mapIndexed { index, line ->
+            val pointsReversed = line.linePoints.asReversed()
+            LineViewData(
                 name = line.label ?: "",
-                xValues = line.linePoints.map { Duration.between(it.timestamp, endTime).toMillis() },
-                yValues = line.linePoints.map { it.value },
+                color = (line.lineColor ?: indexColorSpec(index)).toColorSpec(),
+                pointStyle = line.pointStyle.toViewPointStyle(),
+                line = androidPlotSeriesHelper.getFastXYSeries(
+                    name = line.label ?: "",
+                    xValues = pointsReversed.map { Duration.between(endTime, it.timestamp).toMillis() },
+                    yValues = pointsReversed.map { it.value },
+                )
             )
-        )
-    }
+        }
 
     private fun LinePointStyle?.toViewPointStyle() = when (this) {
         LinePointStyle.NONE -> LineGraphPointStyle.NONE
