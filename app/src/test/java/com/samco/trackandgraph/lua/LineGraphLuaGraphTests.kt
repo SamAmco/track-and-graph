@@ -32,17 +32,16 @@ import org.threeten.bp.ZoneOffset
 class LineGraphLuaGraphTests : LuaEngineImplTest() {
 
     @Test
-    fun `line graph type returns NIL`() = testLuaEngine(
+    fun `line graph without lines is an error`() = testLuaEngine(
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = NIL
             }
         """.trimIndent()
     ) {
         println(result)
         assertEquals(null, result.data)
-        assertEquals(null, result.error)
+        assert(result.error is LuaError)
     }
 
     @Test
@@ -50,14 +49,12 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_points = { 
-                                { timestamp = 2, value = 10 }, 
-                                { timestamp = 1, value = 20 } 
-                            } 
-                        }
+                lines = {
+                    { 
+                        line_points = { 
+                            { timestamp = 2, value = 10 }, 
+                            { timestamp = 1, value = 20 } 
+                        } 
                     }
                 }
             }
@@ -88,15 +85,13 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_color = tng.COLOR.RED, 
-                            line_points = { 
-                                { timestamp = 2, value = 10 }, 
-                                { timestamp = 1, value = 20 } 
-                            } 
-                        }
+                lines = {
+                    { 
+                        line_color = tng.COLOR.RED, 
+                        line_points = { 
+                            { timestamp = 2, value = 10 }, 
+                            { timestamp = 1, value = 20 } 
+                        } 
                     }
                 }
             }
@@ -126,10 +121,8 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { line_color = tng.COLOR.RED }
-                    }
+                lines = {
+                    { line_color = tng.COLOR.RED }
                 }
             }
         """.trimIndent()
@@ -144,11 +137,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_points = { { value = 10 } } 
-                        }
+                lines = {
+                    { 
+                        line_points = { { value = 10 } } 
                     }
                 }
             }
@@ -164,17 +155,15 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_points = { 
-                                { timestamp = 2, value = 10 }, 
-                                { timestamp = 1, value = 20 } 
-                            } 
-                        }
-                    },
-                    range_bounds = { min = 1, max = 2 },
-                }
+                lines = {
+                    { 
+                        line_points = { 
+                            { timestamp = 2, value = 10 }, 
+                            { timestamp = 1, value = 20 } 
+                        } 
+                    }
+                },
+                range_bounds = { min = 1, max = 2 },
             }
         """.trimIndent()
     ) {
@@ -191,17 +180,15 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_points = { 
-                                { timestamp = 2, value = 10 }, 
-                                { timestamp = 1, value = 20 } 
-                            } 
-                        }
-                    },
-                    range_bounds = { min = 1 },
-                }
+                lines = {
+                    { 
+                        line_points = { 
+                            { timestamp = 2, value = 10 }, 
+                            { timestamp = 1, value = 20 } 
+                        } 
+                    }
+                },
+                range_bounds = { min = 1 },
             }
         """.trimIndent()
     ) {
@@ -218,17 +205,15 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_points = { 
-                                { timestamp = 2, value = 10 }, 
-                                { timestamp = 1, value = 20 } 
-                            } 
-                        }
-                    },
-                    range_bounds = 5,
-                }
+                lines = {
+                    { 
+                        line_points = { 
+                            { timestamp = 2, value = 10 }, 
+                            { timestamp = 1, value = 20 } 
+                        } 
+                    }
+                },
+                range_bounds = 5,
             }
         """.trimIndent()
     ) {
@@ -242,16 +227,14 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_points = { 
-                                { timestamp = 1, value = 20 } 
-                            } 
-                        }
-                    },
-                    duration_based_range = true,
-                }
+                lines = {
+                    { 
+                        line_points = { 
+                            { timestamp = 1, value = 20 } 
+                        } 
+                    }
+                },
+                duration_based_range = true,
             }
         """.trimIndent()
     ) {
@@ -266,24 +249,22 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_color = tng.COLOR.RED, 
-                            point_style = tng.LINE_POINT_STYLE.CIRCLE,
-                            line_points = { 
-                                { timestamp = 2, value = 10 }, 
-                                { timestamp = 1, value = 20 } 
-                            } 
-                        },
-                        { 
-                            line_color = "#00FF00",
-                            point_style = tng.LINE_POINT_STYLE.CIRCLE_VALUE,
-                            line_points = { 
-                                { timestamp = 3, value = 30 }, 
-                                { timestamp = 1, value = 40 } 
-                            } 
-                        }
+                lines = {
+                    { 
+                        line_color = tng.COLOR.RED, 
+                        point_style = tng.LINE_POINT_STYLE.CIRCLE,
+                        line_points = { 
+                            { timestamp = 2, value = 10 }, 
+                            { timestamp = 1, value = 20 } 
+                        } 
+                    },
+                    { 
+                        line_color = "#00FF00",
+                        point_style = tng.LINE_POINT_STYLE.CIRCLE_VALUE,
+                        line_points = { 
+                            { timestamp = 3, value = 30 }, 
+                            { timestamp = 1, value = 40 } 
+                        } 
                     }
                 }
             }
@@ -322,14 +303,12 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.LINE_GRAPH,
-                data = {
-                    lines = {
-                        { 
-                            line_points = { 
-                                { timestamp = 1, value = 20 } 
-                            },
-                            label = "label"
-                        }
+                lines = {
+                    { 
+                        line_points = { 
+                            { timestamp = 1, value = 20 } 
+                        },
+                        label = "label"
                     }
                 }
             }

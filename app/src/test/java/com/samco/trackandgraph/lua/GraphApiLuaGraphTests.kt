@@ -13,10 +13,12 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
     fun `Data source not found gives error`() = testLuaEngine(
         mapOf(),
         """
-            return {
-                 type = tng.GRAPH_TYPE.TEXT,
-                 data = tng.graph.dp("source1").value
-             }
+            return function(sources)
+                return {
+                    type = tng.GRAPH_TYPE.TEXT,
+                    data = sources["source1"].dp().value
+                }
+            end
         """.trimIndent()
     ) {
         println(result)
@@ -35,10 +37,20 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
             "source2" to emptySequence(),
         ),
         """
-            return {
-                 type = tng.GRAPH_TYPE.TEXT,
-                 data = table.concat(tng.graph.sources(), ", ")
-             }
+            function getTableKeys(tab)
+              local keyset = {}
+              for k,v in pairs(tab) do
+                keyset[#keyset + 1] = k
+              end
+              return keyset
+            end
+            
+            return function(sources) 
+                return {
+                    type = tng.GRAPH_TYPE.TEXT,
+                    text = table.concat(getTableKeys(sources), ", ")
+                }
+            end
         """.trimIndent()
     ) {
         println(result)
@@ -55,10 +67,12 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
             ),
         ),
         """
-            return {
-                 type = tng.GRAPH_TYPE.TEXT,
-                 data = tng.graph.dp("source1").value
-             }
+            return function(sources) 
+                return {
+                    type = tng.GRAPH_TYPE.TEXT,
+                    text = sources["source1"].dp().value
+                }
+            end
         """.trimIndent()
     ) {
         println(result)
@@ -79,14 +93,17 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
             ),
         ),
         """
-            local datapoints = tng.graph.dpbatch("source1", 3)
-            for k, v in pairs(datapoints) do
-                datapoints[k] = v.value
+            return function(sources) 
+                local datapoints = sources["source1"].dpbatch(3)
+                for k, v in pairs(datapoints) do
+                    datapoints[k] = v.value
+                end
+            
+                return {
+                    type = tng.GRAPH_TYPE.TEXT,
+                    text = table.concat(datapoints, ", ")
+                 }
             end
-            return {
-                 type = tng.GRAPH_TYPE.TEXT,
-                 data = table.concat(datapoints, ", ")
-             }
         """.trimIndent()
     ) {
         println(result)
@@ -107,14 +124,17 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
             ),
         ),
         """
-            local datapoints = tng.graph.dpall("source1")
-            for k, v in pairs(datapoints) do
-                datapoints[k] = v.value
+            return function(sources) 
+                local datapoints = sources["source1"].dpall()
+                for k, v in pairs(datapoints) do
+                    datapoints[k] = v.value
+                end
+            
+                return {
+                    type = tng.GRAPH_TYPE.TEXT,
+                    text = table.concat(datapoints, ", ")
+                 }
             end
-            return {
-                 type = tng.GRAPH_TYPE.TEXT,
-                 data = table.concat(datapoints, ", ")
-             }
         """.trimIndent()
     ) {
         println(result)
@@ -150,15 +170,18 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
             ),
         ),
         """
-            local cutoff = tng.time.time({year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC"})
-            local datapoints = tng.graph.dpafter("source1", cutoff)
-            for k, v in pairs(datapoints) do
-                datapoints[k] = v.value
+            return function(sources) 
+                local cutoff = tng.time.time({year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC"})
+                local datapoints = sources["source1"].dpafter(cutoff)
+                for k, v in pairs(datapoints) do
+                    datapoints[k] = v.value
+                end
+            
+                return {
+                    type = tng.GRAPH_TYPE.TEXT,
+                    text = table.concat(datapoints, ", ")
+                 }
             end
-            return {
-                 type = tng.GRAPH_TYPE.TEXT,
-                 data = table.concat(datapoints, ", ")
-             }
         """.trimIndent()
     ) {
         println(result)
@@ -195,15 +218,18 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
             ),
         ),
         """
-            local cutoff = { year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC" }
-            local datapoints = tng.graph.dpafter("source1", cutoff)
-            for k, v in pairs(datapoints) do
-                datapoints[k] = v.value
+            return function(sources) 
+                local cutoff = tng.time.time({year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC"})
+                local datapoints = sources["source1"].dpafter(cutoff)
+                for k, v in pairs(datapoints) do
+                    datapoints[k] = v.value
+                end
+            
+                return {
+                    type = tng.GRAPH_TYPE.TEXT,
+                    text = table.concat(datapoints, ", ")
+                 }
             end
-            return {
-                 type = tng.GRAPH_TYPE.TEXT,
-                 data = table.concat(datapoints, ", ")
-             }
         """.trimIndent()
     ) {
         println(result)

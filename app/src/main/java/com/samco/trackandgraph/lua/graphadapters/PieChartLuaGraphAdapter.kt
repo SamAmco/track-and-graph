@@ -19,6 +19,7 @@ package com.samco.trackandgraph.lua.graphadapters
 import com.samco.trackandgraph.lua.apiimpl.ColorParser
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.lua.dto.PieChartSegment
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
@@ -31,11 +32,15 @@ class PieChartLuaGraphAdapter @Inject constructor(
         const val VALUE = "value"
         const val LABEL = "label"
         const val COLOR = "color"
+        const val SEGMENTS = "segments"
     }
 
-    override fun process(data: LuaValue): LuaGraphResultData.PieChartData = when {
-        data.istable() -> parseSegments(data.checktable()!!)
-        else -> throw IllegalArgumentException("Invalid data type for pie chart")
+    override fun process(data: LuaValue): LuaGraphResultData.PieChartData {
+        val segments = data[SEGMENTS]
+        return when {
+            segments.istable() -> parseSegments(segments.checktable()!!)
+            else -> throw LuaError("Invalid data type for pie chart")
+        }
     }
 
     private fun parseSegments(data: LuaTable): LuaGraphResultData.PieChartData {
