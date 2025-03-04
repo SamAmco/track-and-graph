@@ -5,6 +5,7 @@ import java.net.URI
 
 interface DeepLinkHandler {
     val onLuaDeepLink: SharedFlow<URI>
+    val onLuaScript: SharedFlow<String>
 
     fun handleUri(uri: String)
 }

@@ -72,8 +72,13 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="lua_inject"
+                    android:host="lua_inject_url"
                     android:scheme="trackandgraph"
+                    />
+
+                <data
+                    android:host="lua_inject_file"
+                    android:scheme="http"
                     />
             </intent-filter>
 

@@ -82,15 +82,23 @@ class LuaGraphConfigViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch { observeDeepLinks() }
+        viewModelScope.launch { observeDeepLinksUrls() }
+        viewModelScope.launch { observeDeepLinkScripts() }
     }
 
-    private suspend fun observeDeepLinks() {
+    private suspend fun observeDeepLinksUrls() {
         deepLinkHandler.onLuaDeepLink.collect {
             fileDownloader.downloadFileToString(it)?.let { scriptText ->
                 script = TextFieldValue(scriptText)
                 onUpdate()
             }
+        }
+    }
+
+    private suspend fun observeDeepLinkScripts() {
+        deepLinkHandler.onLuaScript.collect {
+            script = TextFieldValue(it)
+            onUpdate()
         }
     }
 

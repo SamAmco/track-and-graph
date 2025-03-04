@@ -47,7 +47,7 @@ def send_deep_link():
         # First check if adb is available
         subprocess.run(["adb", "devices"], check=True, capture_output=True)
         
-        deep_link = "trackandgraph://lua_inject?url=http://10.0.2.2:8000/file.lua"
+        deep_link = "trackandgraph://lua_inject_url?url=http://10.0.2.2:8000/file.lua"
         result = subprocess.run(
             ["adb", "shell", "am", "start", "-a",
              "android.intent.action.VIEW", "-d", deep_link],
