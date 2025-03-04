@@ -17,7 +17,6 @@
 package com.samco.trackandgraph.lua.graphadapters
 
 import com.samco.trackandgraph.lua.apiimpl.DataPointParser
-import com.samco.trackandgraph.lua.apiimpl.DateTimeParser
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
@@ -28,11 +27,12 @@ class DataPointLuaGraphAdapter @Inject constructor(
 
     companion object {
         const val IS_DURATION = "isduration"
+        const val DATAPOINT = "datapoint"
     }
 
     override fun process(data: LuaValue): LuaGraphResultData.DataPointData {
         return LuaGraphResultData.DataPointData(
-            dataPoint = dataPointParser.parseDataPoint(data),
+            dataPoint = dataPointParser.parseDataPoint(data[DATAPOINT]),
             isDuration = data[IS_DURATION].optboolean(false),
         )
     }

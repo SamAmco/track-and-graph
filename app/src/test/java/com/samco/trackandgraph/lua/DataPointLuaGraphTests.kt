@@ -16,7 +16,9 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                  type = tng.GRAPH_TYPE.DATA_POINT,
-                 data = { timestamp = 0 }
+                 datapoint = {
+                     timestamp = 0 
+                 }
              }
         """.trimIndent()
     ) {
@@ -41,15 +43,15 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.GRAPH_TYPE.DATA_POINT,
-              data = {
-                timestamp = 0,
-                offset = 1000,
-                featureId = 1,
-                value = 1.0,
-                label = "label",
-                note = "note"
-              }
+                type = tng.GRAPH_TYPE.DATA_POINT,
+                datapoint = { 
+                    timestamp = 0,
+                    offset = 1000,
+                    featureId = 1,
+                    value = 1.0,
+                    label = "label",
+                    note = "note"
+                }
             }
         """.trimIndent()
     ) {
@@ -74,11 +76,9 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
         emptyMap(),
         """
             return {
-              type = tng.GRAPH_TYPE.DATA_POINT,
-              data = {
-                timestamp = 0,
+                type = tng.GRAPH_TYPE.DATA_POINT,
+                datapoint = { timestamp = 0 },
                 isduration = true
-              }
             }
         """.trimIndent()
     ) {
@@ -101,14 +101,29 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
+    fun `Datapoint type with nil data is an error`() = testLuaEngine(
+        emptyMap(),
+        """
+            return {
+              type = tng.GRAPH_TYPE.DATA_POINT,
+              datapoint = nil
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assertEquals(null, result.data)
+        assert(result.error is LuaError)
+    }
+
+    @Test
     fun `Datapoint timestamp is in milliseconds and offset is in seconds`() = testLuaEngine(
         emptyMap(),
         """
             return {
               type = tng.GRAPH_TYPE.DATA_POINT,
-              data = {
-                timestamp = 123,
-                offset = 1234
+              datapoint = {
+                  timestamp = 123,
+                  offset = 1234
               }
             }
         """.trimIndent()
@@ -132,27 +147,11 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
     }
 
     @Test
-    fun `Datapoint type can return nil`() = testLuaEngine(
+    fun `Datapoint without data is an error`() = testLuaEngine(
         emptyMap(),
         """
             return {
               type = tng.GRAPH_TYPE.DATA_POINT,
-              data = nil
-            }
-        """.trimIndent()
-    ) {
-        println(result)
-        assertEquals(null, result.data)
-        assertEquals(null, result.error)
-    }
-
-    @Test
-    fun `Datapoint without a timestamp is an error`() = testLuaEngine(
-        emptyMap(),
-        """
-            return {
-              type = tng.GRAPH_TYPE.DATA_POINT,
-              data = {}
             }
         """.trimIndent()
     ) {

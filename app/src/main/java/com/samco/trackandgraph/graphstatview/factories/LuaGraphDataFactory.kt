@@ -39,10 +39,9 @@ import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
-import javax.inject.Provider
 
 class LuaGraphDataFactory @Inject constructor(
-    private val luaEngine: Provider<LuaEngine>,
+    private val luaEngine: LuaEngine,
     private val pieChartLuaHelper: PieChartLuaHelper,
     private val textLuaHelper: TextLuaHelper,
     private val dataPointLuaHelper: DataPointLuaHelper,
@@ -105,7 +104,7 @@ class LuaGraphDataFactory @Inject constructor(
     ): ILuaGraphViewData {
         val luaEngineParams = LuaEngine.LuaGraphEngineParams(dataSources = dataSamples)
 
-        val luaGraphResult = luaEngine.get().runLuaGraphScript(config.script, luaEngineParams)
+        val luaGraphResult = luaEngine.runLuaGraphScript(config.script, luaEngineParams)
 
         if (luaGraphResult.error != null) return errorLuaHelper(graphOrStat, luaGraphResult.error)
 

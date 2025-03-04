@@ -8,26 +8,31 @@ import org.junit.Test
 
 class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
-    fun `Text type returns NIL`() = testLuaEngine(
+    fun `Text type can return NIL`() = testLuaEngine(
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = NIL
+                text = NIL
             }
         """.trimIndent()
     ) {
         println(result)
-        assertEquals(null, result.data)
+        assertEquals(
+            LuaGraphResultData.TextData(
+                text = null,
+                size = TextSize.LARGE,
+                alignment = TextAlignment.CENTER
+            ), result.data
+        )
         assertEquals(null, result.error)
     }
-
 
     @Test
     fun `Text type with just text`() = testLuaEngine(
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = "text" 
+                text = "text" 
             }
         """.trimIndent()
     ) {
@@ -44,10 +49,8 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = {
-                    text = "text",
-                    size = 1
-                }
+                text = "text",
+                size = 1
             }
         """.trimIndent()
     ) {
@@ -64,10 +67,8 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = {
-                    text = "text",
-                    size = 2
-                }
+                text = "text",
+                size = 2
             }
         """.trimIndent()
     ) {
@@ -84,10 +85,8 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = {
-                    text = "text",
-                    size = 3
-                }
+                text = "text",
+                size = 3
             }
         """.trimIndent()
     ) {
@@ -104,9 +103,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = {
-                    text = "text",
-                }
+                text = "text",
             }
         """.trimIndent()
     ) {
@@ -123,10 +120,8 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = {
-                    text = "text",
-                    align = "start"
-                }
+                text = "text",
+                align = "start"
             }
         """.trimIndent()
     ) {
@@ -143,10 +138,8 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = {
-                    text = "text",
-                    align = "center"
-                }
+                text = "text",
+                align = "center"
             }
         """.trimIndent()
     ) {
@@ -163,10 +156,8 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = {
-                    text = "text",
-                    align = "centre"
-                }
+                text = "text",
+                align = "centre"
             }
         """.trimIndent()
     ) {
@@ -183,10 +174,8 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = {
-                    text = "text",
-                    align = "end"
-                }
+                text = "text",
+                align = "end"
             }
         """.trimIndent()
     ) {

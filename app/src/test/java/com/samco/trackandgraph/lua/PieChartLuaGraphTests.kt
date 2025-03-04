@@ -26,17 +26,16 @@ import org.luaj.vm2.LuaError
 class PieChartLuaGraphTests : LuaEngineImplTest() {
 
     @Test
-    fun `pie chart type returns NIL`() = testLuaEngine(
+    fun `pie chart without segments is an error`() = testLuaEngine(
         """
             return {
                 type = tng.GRAPH_TYPE.PIE_CHART,
-                data = NIL
             }
         """.trimIndent()
     ) {
         println(result)
         assertEquals(null, result.data)
-        assertEquals(null, result.error)
+        assert(result.error is LuaError)
     }
 
     @Test
@@ -44,7 +43,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.PIE_CHART,
-                data = {
+                segments = {
                     { value = 10, label = "A" },
                     { value = 20, label = "B" }
                 }
@@ -68,7 +67,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.PIE_CHART,
-                data = {
+                segments = {
                     { value = 10, label = "A", color = tng.COLOR.GREEN_DARK },
                     { value = 20, label = "B", color = "#00FF00" }
                 }
@@ -92,7 +91,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.PIE_CHART,
-                data = {
+                segments = {
                     { value = 1, label = "A" }
                     { label = "A" }
                 }
@@ -109,7 +108,7 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
                 type = tng.GRAPH_TYPE.PIE_CHART,
-                data = {
+                segments = {
                     { value = 10 }
                     { value = 10, label = "B" }
                 }

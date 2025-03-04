@@ -24,6 +24,7 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,6 +44,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import org.luaj.vm2.LuaError
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -87,7 +89,7 @@ private fun GraphError(
     modifier: Modifier,
     graphStatViewData: IGraphStatViewData,
 ) {
-    when (graphStatViewData.error) {
+    when (val error = graphStatViewData.error) {
         is GraphStatInitException -> {
             GraphErrorView(
                 modifier = modifier,
@@ -96,6 +98,17 @@ private fun GraphError(
                     ?: R.string.graph_stat_validation_unknown
             )
         }
+
+        is LuaError -> {
+            val message = remember(error) {
+                error.message + "\n" + (error.luaCause?.stackTraceToString() ?: "")
+            }
+            GraphErrorView(
+                modifier = modifier,
+                error = message
+            )
+        }
+
         else -> {
             GraphErrorView(
                 modifier = modifier,

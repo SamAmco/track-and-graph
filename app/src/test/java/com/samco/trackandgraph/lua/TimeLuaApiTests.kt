@@ -19,7 +19,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(timestamp, tng.DURATION.DAY)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = shifted.timestamp
+                text = shifted.timestamp
             }
         """.trimIndent()
     ) {
@@ -37,7 +37,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(date, tng.DURATION.DAY, 2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = shifted.timestamp
+                text = shifted.timestamp
             }
         """.trimIndent()
     ) {
@@ -55,7 +55,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(timestamp, tng.DURATION.DAY, -2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = shifted.timestamp
+                text = shifted.timestamp
             }
         """.trimIndent()
     ) {
@@ -73,7 +73,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(date, tng.DURATION.DAY, -1)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ shifted.timestamp, shifted.offset }, " ")
+                text = table.concat({ shifted.timestamp, shifted.offset }, " ")
             }
         """.trimIndent()
     ) {
@@ -91,7 +91,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ shifted.timestamp, shifted.offset }, " ")
+                text = table.concat({ shifted.timestamp, shifted.offset }, " ")
             }
         """.trimIndent()
     ) {
@@ -112,7 +112,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(date, tng.PERIOD.DAY, -2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ shifted.timestamp, shifted.offset }, " ")
+                text = table.concat({ shifted.timestamp, shifted.offset }, " ")
             }
         """.trimIndent()
     ) {
@@ -130,7 +130,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, -2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ shifted.timestamp, shifted.offset }, " ")
+                text = table.concat({ shifted.timestamp, shifted.offset }, " ")
             }
         """.trimIndent()
     ) {
@@ -148,7 +148,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(date, tng.PERIOD.DAY, 2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ shifted.timestamp, shifted.offset, shifted.zone }, " ")
+                text = table.concat({ shifted.timestamp, shifted.offset, shifted.zone }, " ")
             }
         """.trimIndent()
     ) {
@@ -167,7 +167,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
+                text = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
             }
         """.trimIndent()
     ) {
@@ -186,7 +186,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
+                text = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
             }
         """.trimIndent()
     ) {
@@ -207,7 +207,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
+                text = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
             }
         """.trimIndent()
     ) {
@@ -225,7 +225,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local time = tng.time.time()
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = time.timestamp
+                text = time.timestamp
             }
         """.trimIndent()
     ) {
@@ -244,7 +244,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local time = tng.time.time(date)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ time.timestamp, time.offset, time.zone }, " ")
+                text = table.concat({ time.timestamp, time.offset, time.zone }, " ")
             }
         """.trimIndent()
     ) {
@@ -260,7 +260,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local date = tng.time.date()
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ date.year, date.month, date.day, date.hour, date.min, date.sec, date.yday, date.wday }, " ")
+                text = table.concat({ date.year, date.month, date.day, date.hour, date.min, date.sec, date.yday, date.wday }, " ")
             }
         """.trimIndent()
     ) {
@@ -279,7 +279,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local date = tng.time.date(timestamp)
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = table.concat({ date.year, date.month, date.day, date.hour, date.min, date.sec, date.yday, date.wday }, " ")
+                text = table.concat({ date.year, date.month, date.day, date.hour, date.min, date.sec, date.yday, date.wday }, " ")
             }
         """.trimIndent()
     ) {
@@ -296,7 +296,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local result = tng.time.format(timestamp, "yyyy-MM-dd HH:mm:ss")
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = result
+                text = result
             }
         """.trimIndent()
     ) {
@@ -314,7 +314,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local result = tng.time.format(timestamp, "yyyy-MM-dd HH:mm:ss")
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = result
+                text = result
             }
         """.trimIndent()
     ) {
@@ -331,7 +331,7 @@ class TimeLuaApiTests : LuaEngineImplTest() {
             local result = tng.time.format(date, "yyyy-MM-dd HH:mm:ss")
             return {
                 type = tng.GRAPH_TYPE.TEXT,
-                data = result
+                text = result
             }
         """.trimIndent()
     ) {

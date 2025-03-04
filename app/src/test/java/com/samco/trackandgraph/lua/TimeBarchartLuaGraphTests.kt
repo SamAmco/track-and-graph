@@ -15,38 +15,36 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `time bars support 3 variants`() = testLuaEngine(
         """
-            return {
-              type = tng.GRAPH_TYPE.TIME_BARCHART,
-              data = {
-                bar_period = tng.PERIOD.DAY,
-                end_time = tng.time.time(),
-                bars = {
-                  5,
-                  {
+        return {
+            type = tng.GRAPH_TYPE.TIME_BARCHART,
+            bar_period = tng.PERIOD.DAY,
+            end_time = tng.time.time(),
+            bars = {
+                5,
+                {
                     value = 6,
                     color = "#FF0000",
                     label = "A",
-                  },
-                  {
-                    {
-                      label = "A",
-                      value = 1,
-                      color = "#FF0000",
-                    },
-                    {
-                      label = "B",
-                      value = 2,
-                      color = "#00FF00",
-                    },
-                    {
-                      label = "C",
-                      value = 3,
-                      color = "#0000FF",
-                    },
-                  },
                 },
-              },
-            }
+                {
+                    {
+                        label = "A",
+                        value = 1,
+                        color = "#FF0000",
+                    },
+                    {
+                        label = "B",
+                        value = 2,
+                        color = "#00FF00",
+                    },
+                    {
+                        label = "C",
+                        value = 3,
+                        color = "#0000FF",
+                    },
+                },
+            },
+        }
         """.trimIndent()
     ) {
         println(result)
@@ -76,13 +74,11 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
               type = tng.GRAPH_TYPE.TIME_BARCHART,
-              data = {
-                bar_duration = 86400000,
-                bar_period = tng.PERIOD.DAY,
-                bar_period_multiple = 2,
-                end_time = tng.time.time(),
-                bars = { 1, 2, 3 },
-              },
+              bar_duration = 86400000,
+              bar_period = tng.PERIOD.DAY,
+              bar_period_multiple = 2,
+              end_time = tng.time.time(),
+              bars = { 1, 2, 3 },
             }
         """.trimIndent()
     ) {
@@ -110,12 +106,10 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
               type = tng.GRAPH_TYPE.TIME_BARCHART,
-              data = {
-                bar_period = tng.PERIOD.DAY,
-                bar_period_multiple = 2,
-                end_time = tng.time.time(),
-                bars = { 1, 2, 3 },
-              },
+              bar_period = tng.PERIOD.DAY,
+              bar_period_multiple = 2,
+              end_time = tng.time.time(),
+              bars = { 1, 2, 3 },
             }
         """.trimIndent()
     ) {
@@ -143,11 +137,9 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
               type = tng.GRAPH_TYPE.TIME_BARCHART,
-              data = {
-                bar_duration = 86400000,
-                end_time = 1630000000000,
-                bars = { 1, 2, 3 },
-              },
+              bar_duration = 86400000,
+              end_time = 1630000000000,
+              bars = { 1, 2, 3 },
             }
         """.trimIndent()
     ) {
@@ -174,15 +166,13 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
               type = tng.GRAPH_TYPE.TIME_BARCHART,
-              data = {
-                bar_duration = 86400000,
-                end_time = {
-                  timestamp = 1630000000000,
-                  zone = "Europe/London",
-                  offset = "+01:00",
-                },
-                bars = { 1, 2, 3 },
+              bar_duration = 86400000,
+              end_time = {
+                timestamp = 1630000000000,
+                zone = "Europe/London",
+                offset = "+01:00",
               },
+              bars = { 1, 2, 3 },
             }
         """.trimIndent()
     ) {
@@ -211,12 +201,10 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
               type = tng.GRAPH_TYPE.TIME_BARCHART,
-              data = {
-                bar_duration = 86400000,
-                end_time = 1630000000000,
-                bars = { 1, 2, 3 },
-                y_max = 10,
-              },
+              bar_duration = 86400000,
+              end_time = 1630000000000,
+              bars = { 1, 2, 3 },
+              y_max = 10,
             }
         """.trimIndent()
     ) {
@@ -242,12 +230,10 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
         """
             return {
               type = tng.GRAPH_TYPE.TIME_BARCHART,
-              data = {
-                bar_duration = 86400000,
-                end_time = 1630000000000,
-                bars = { 1, 2, 3 },
-                duration_based_range = true,
-              },
+              bar_duration = 86400000,
+              end_time = 1630000000000,
+              bars = { 1, 2, 3 },
+              duration_based_range = true,
             }
         """.trimIndent()
     ) {

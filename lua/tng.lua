@@ -3,20 +3,20 @@ local tng = {}
 --- Duration enum: All timestamps are in milliseconds.
 --- @enum duration
 tng.DURATION = {
-    SECOND = 1000,               -- One second in milliseconds
-    MINUTE = 60 * 1000,          -- One minute in milliseconds
-    HOUR = 60 * 60 * 1000,       -- One hour in milliseconds
-    DAY = 24 * 60 * 60 * 1000,   -- One day in milliseconds
-    WEEK = 7 * 24 * 60 * 60 * 1000, -- One week in milliseconds
+	SECOND = 1000, -- One second in milliseconds
+	MINUTE = 60 * 1000, -- One minute in milliseconds
+	HOUR = 60 * 60 * 1000, -- One hour in milliseconds
+	DAY = 24 * 60 * 60 * 1000, -- One day in milliseconds
+	WEEK = 7 * 24 * 60 * 60 * 1000, -- One week in milliseconds
 }
 
 --- Period enum: Constants for use with addperiod function.
 --- @enum period
 tng.PERIOD = {
-    DAY = "P1D", -- One day period
-    WEEK = "P1W", -- One week period
-    MONTH = "P1M", -- One month period
-    YEAR = "P1Y", -- One year period
+	DAY = "P1D", -- One day period
+	WEEK = "P1W", -- One week period
+	MONTH = "P1M", -- One month period
+	YEAR = "P1Y", -- One year period
 }
 
 tng.time = {}
@@ -87,18 +87,18 @@ tng.graph = {}
 --- Graph colors enum
 --- @enum tng_color
 tng.COLOR = {
-    RED_DARK = 0,  -- #A50026
-    RED = 1,       -- #D73027
-    ORANGE_DARK = 2, -- #F46D43
-    ORANGE = 3,    -- #FDAE61
-    YELLOW = 4,    -- #FEE090
-    BLUE_LIGHT = 5, -- #E0F3F8
-    BLUE_SKY = 6,  -- #ABD9E9
-    BLUE = 7,      -- #74ADD1
-    BLUE_DARK = 8, -- #4575B4
-    BLUE_NAVY = 9, -- #313695
-    GREEN_LIGHT = 10, -- #54D931
-    GREEN_DARK = 11, -- #1B8200
+	RED_DARK = 0, -- #A50026
+	RED = 1, -- #D73027
+	ORANGE_DARK = 2, -- #F46D43
+	ORANGE = 3, -- #FDAE61
+	YELLOW = 4, -- #FEE090
+	BLUE_LIGHT = 5, -- #E0F3F8
+	BLUE_SKY = 6, -- #ABD9E9
+	BLUE = 7, -- #74ADD1
+	BLUE_DARK = 8, -- #4575B4
+	BLUE_NAVY = 9, -- #313695
+	GREEN_LIGHT = 10, -- #54D931
+	GREEN_DARK = 11, -- #1B8200
 }
 
 --- @alias color (tng_color|string): Can be a value from tng.COLOR enum or a hex string e.g. "#00FF00"
@@ -106,38 +106,36 @@ tng.COLOR = {
 --- Graph types enum
 --- @enum tng.GRAPH_TYPE
 tng.GRAPH_TYPE = {
-    DATA_POINT = "DATA_POINT",
-    TEXT = "TEXT",
-    PIE_CHART = "PIE_CHART",
-    TIME_BARCHART = "TIME_BARCHART",
-    LINE_GRAPH = "LINE_GRAPH",
-    BAR_CHART = "BAR_CHART",
+	DATA_POINT = "DATA_POINT",
+	TEXT = "TEXT",
+	PIE_CHART = "PIE_CHART",
+	TIME_BARCHART = "TIME_BARCHART",
+	LINE_GRAPH = "LINE_GRAPH",
 }
 
---- Data class for tng.GRAPH_TYPE.DATAPOINT
 --- @class datapoint_graphtype_data
---- @field timestamp timestamp: The timestamp of the data point.
---- @field featureId string: The database ID of the feature (aka data source).
---- @field value number: The value of the data point.
---- @field label string: The label of the data point.
---- @field note string: The note of the data point.
+--- @field type tng.GRAPH_TYPE.DATA_POINT: The type of the graph.
+--- @field datapoint datapoint: The data point to display.
 --- @field isduration boolean: Whether the data point is a duration.
 
---- Data class for tng.GRAPH_TYPE.TEXT
 --- @class text_graphtype_data (you can also just return a string or number for this graph type)
+--- @field type tng.GRAPH_TYPE.TEXT
 --- @field text string: The text to display.
 --- @field size? integer: 1-3 The size of the text small, medium or large. Defaults to large.
 --- @field align? string: start, centre, or end The alignment of the text. Defaults to centre.
 
---- Data class for tng.GRAPH_TYPE.PIECHART
---- Pie chart data is just a table of piechart_segment.
---- @class piechart_segment
---- @field label string: The label of the segment.
---- @field value number: The value of the segment. This does not need to be normalised in any way.
---- @field color? color: The color of the segment. If not provided, a color will be chosen from the default palette.
+--- @class piechart_graphtype_data
+--- @field type tng.GRAPH_TYPE.PIE_CHART
+--- @field segments piechart_segment[]: A table of piechart_segment items.
 
---- Data class for tng.GRAPH_TYPE.TIME_BARCHART
+--- @class linegraph_graphtype_data
+--- @field type tng.GRAPH_TYPE.LINE_GRAPH
+--- @field duration_based_range? boolean: Whether the range is based on duration.
+--- @field range_bounds? range_bounds: The range of the y-axis.
+--- @field lines line[]: A table of line items.
+
 --- @class time_barchart_graphtype_data
+--- @field type tng.GRAPH_TYPE.TIME_BARCHART
 --- @field bar_duration? integer: The duration of each bar in milliseconds. You must provide either this or the bar_period.
 --- @field bar_period? string: The period of each bar e.g. tng.PERIOD.DAY. You must provide either this or the bar_duration.
 --- @field bar_period_multiple? integer: The number of the given bar_period units one bar represents. Defaults to 1.
@@ -146,6 +144,11 @@ tng.GRAPH_TYPE = {
 --- @field bars time_bar[]: A table of time_bar sorted in reverse chronological order. Each bar is bar_duration or bar_period in length and ends that amount of time before the previous bar.
 --- @field y_max? integer: The top extent of the y-axis. If not provided, the maximum value of the bars will be used.
 
+--- @class piechart_segment
+--- @field label string: The label of the segment.
+--- @field value number: The value of the segment. This does not need to be normalised in any way.
+--- @field color? color: The color of the segment. If not provided, a color will be chosen from the default palette.
+
 --- @alias time_bar (number|time_barchart_bar_segment|time_barchart_bar_segment[]): A table of bar_segment items.
 --- @alias time_barchart_bar_segment (number|time_barchart_segment)
 
@@ -153,12 +156,6 @@ tng.GRAPH_TYPE = {
 --- @field value number: The value of the bar segment.
 --- @field label? string: The label of the bar segment (shown in the legend).
 --- @field color? color: The color of the bar segment. If not provided, a color will be chosen from the default palette.
-
---- Data class for tng.GRAPH_TYPE.LINEGRAPH
---- @class linegraph_graphtype_data
---- @field duration_based_range? boolean: Whether the range is based on duration.
---- @field range_bounds? range_bounds: The range of the y-axis.
---- @field lines line[]: A table of line items.
 
 ---@class range_bounds
 ---@field min number: The minimum value of the range.
@@ -172,66 +169,40 @@ tng.GRAPH_TYPE = {
 
 --- @enum line_point_style
 tng.LINE_POINT_STYLE = {
-    NONE = "none",
-    CIRCLE = "circle",
-    CIRCLE_VALUE = "circle_value",
+	NONE = "none",
+	CIRCLE = "circle",
+	CIRCLE_VALUE = "circle_value",
 }
 
 --- @class line_point
 --- @field timestamp integer: The timestamp of the line point.
 --- @field value number: The Y value of the line point.
 
---- Data class for tng.GRAPH_TYPE.BARCHART
---- @class barchart_graphtype_data
---- @field bars barchart_bar[]: A table of barchart_bar items.
---- @field y_max? number: The maximum value of the y-axis. If not provided, the maximum value of the bars will be used.
---- @field y_labels? string[]: A table of strings to use as labels on the y-axis. If provided the Y axis will be equally sub-divided by the given number of items and labelled in order from bottom to top. If not provided, the y-axis will be automatically divided and labelled.
---- @field time_based_range? boolean: If true, and y_labels are not provided, the y-axis represents time in milliseconds, and will use time based labels.
---- @field legend? legend[]: A table of legend items.
-
---- @class barchart_bar
---- @field segments barchart_bar_segment[]: A table of barchart_bar_segment items.
---- @field label? string: The X-axis label of the bar.
-
---- @alias barchart_bar_segment (number|barchart_segment)
-
---- @class barchart_segment
---- @field value number: The value of the bar segment.
---- @field color? color: The color of the bar segment. If not provided, a color will be chosen from the default palette.
-
---- @class legend
---- @field label string: The label of the legend item.
---- @field color color: The color of the legend item.
-
---- Returns a list of all the data sources available to this graph.
---- @return string[]: A table of strings containing the names of all the data sources.
-tng.graph.sources = function() end
+--- @class datasource
+--- @field name string: The name of the data source.
+local datasource = {}
 
 --- Fetches the next data point from the data source.
 --- Data points are iterated in reverse chronological order.
---- @param name string: The name of the data source.
 --- @return datapoint
-tng.graph.dp = function(name) end
+function datasource:dp() end
 
 --- Fetches the next group of data points from the data source.
 --- Data points are iterated in reverse chronological order.
---- @param name string: The name of the data source.
 --- @param count integer: The number of data points to retrieve.
 --- @return datapoint[]: A table containing the requested data points.
-tng.graph.dpbatch = function(name, count) end
+function datasource:dpbatch(count) end
 
 --- Fetches all data points from the data source.
 --- Data points are iterated in reverse chronological order.
---- @param name string: The name of the data source.
 --- @return datapoint[]: A table containing all data points.
-tng.graph.dpall = function(name) end
+function datasource:dpall() end
 
 --- Fetches all data points from the data source that are newer than the given timestamp.
 --- Data points are iterated in reverse chronological order.
 --- After this operation the data source will contain only datapoints that are before the given timestamp
---- @param name string: The name of the data source.
 --- @param datetime (timestamp|date): The timestamp to compare against.
 --- @return datapoint[]: A table containing all data points that are newer than the given timestamp.
-tng.graph.dpafter = function(name, datetime) end
+function datasource:dpafter() end
 
 return tng

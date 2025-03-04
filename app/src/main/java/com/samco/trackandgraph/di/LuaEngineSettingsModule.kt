@@ -14,8 +14,20 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-package com.samco.trackandgraph.lua
+package com.samco.trackandgraph.di
 
-class LuaEngineSettingsProvider {
-    var settings: LuaEngineSettings = LuaEngineSettings(enabled = true)
+import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+import javax.inject.Singleton
+
+@Module
+@InstallIn(SingletonComponent::class)
+class LuaEngineSettingsModule {
+    @Provides
+    @Singleton
+    fun provideLuaEngineSettingsProvider(): LuaEngineSettingsProvider = LuaEngineSettingsProvider()
 }
+
