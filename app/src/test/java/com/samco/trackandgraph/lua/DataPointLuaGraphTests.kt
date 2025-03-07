@@ -14,8 +14,9 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
     fun `Datapoint type gives data point with sensible defaults`() = testLuaEngine(
         emptyMap(),
         """
+            local graph = require("tng.graph")
             return {
-                 type = tng.GRAPH_TYPE.DATA_POINT,
+                 type = graph.GRAPH_TYPE.DATA_POINT,
                  datapoint = {
                      timestamp = 0 
                  }
@@ -42,8 +43,9 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
     fun `Datapoint type respects all returned values`() = testLuaEngine(
         emptyMap(),
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.DATA_POINT,
+                type = graph.GRAPH_TYPE.DATA_POINT,
                 datapoint = { 
                     timestamp = 0,
                     offset = 1000,
@@ -75,8 +77,9 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
     fun `Datapoint type respects isDuration`() = testLuaEngine(
         emptyMap(),
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.DATA_POINT,
+                type = graph.GRAPH_TYPE.DATA_POINT,
                 datapoint = { timestamp = 0 },
                 isduration = true
             }
@@ -104,8 +107,9 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
     fun `Datapoint type with nil data is an error`() = testLuaEngine(
         emptyMap(),
         """
+            local graph = require("tng.graph")
             return {
-              type = tng.GRAPH_TYPE.DATA_POINT,
+              type = graph.GRAPH_TYPE.DATA_POINT,
               datapoint = nil
             }
         """.trimIndent()
@@ -119,8 +123,9 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
     fun `Datapoint timestamp is in milliseconds and offset is in seconds`() = testLuaEngine(
         emptyMap(),
         """
+            local graph = require("tng.graph")
             return {
-              type = tng.GRAPH_TYPE.DATA_POINT,
+              type = graph.GRAPH_TYPE.DATA_POINT,
               datapoint = {
                   timestamp = 123,
                   offset = 1234
@@ -150,8 +155,9 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
     fun `Datapoint without data is an error`() = testLuaEngine(
         emptyMap(),
         """
+            local graph = require("tng.graph")
             return {
-              type = tng.GRAPH_TYPE.DATA_POINT,
+              type = graph.GRAPH_TYPE.DATA_POINT,
             }
         """.trimIndent()
     ) {

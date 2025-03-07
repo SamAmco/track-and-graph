@@ -34,8 +34,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `line graph without lines is an error`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
             }
         """.trimIndent()
     ) {
@@ -47,8 +48,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `line graph returns lines without colors`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
                         line_points = { 
@@ -83,11 +85,13 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `line graph returns lines with colors`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
-                        line_color = tng.COLOR.RED, 
+                        line_color = core.COLOR.RED, 
                         line_points = { 
                             { timestamp = 2, value = 10 }, 
                             { timestamp = 1, value = 20 } 
@@ -119,8 +123,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `line graph returns invalid line no points`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { line_color = tng.COLOR.RED }
                 }
@@ -135,8 +140,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `line graph returns invalid line no timestamp`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
                         line_points = { { value = 10 } } 
@@ -153,8 +159,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `range_bounds are parsed correctly`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
                         line_points = { 
@@ -178,8 +185,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `range bounds only provides one value`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
                         line_points = { 
@@ -203,8 +211,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `range bounds invalid`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
                         line_points = { 
@@ -225,8 +234,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `duration_based_range is parsed correctly`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
                         line_points = { 
@@ -247,12 +257,14 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `lines with colours and point styles`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
-                        line_color = tng.COLOR.RED, 
-                        point_style = tng.LINE_POINT_STYLE.CIRCLE,
+                        line_color = core.COLOR.RED, 
+                        point_style = graph.LINE_POINT_STYLE.CIRCLE,
                         line_points = { 
                             { timestamp = 2, value = 10 }, 
                             { timestamp = 1, value = 20 } 
@@ -260,7 +272,7 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
                     },
                     { 
                         line_color = "#00FF00",
-                        point_style = tng.LINE_POINT_STYLE.CIRCLE_VALUE,
+                        point_style = graph.LINE_POINT_STYLE.CIRCLE_VALUE,
                         line_points = { 
                             { timestamp = 3, value = 30 }, 
                             { timestamp = 1, value = 40 } 
@@ -301,8 +313,9 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `line with label parses correctly`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.LINE_GRAPH,
+                type = graph.GRAPH_TYPE.LINE_GRAPH,
                 lines = {
                     { 
                         line_points = { 

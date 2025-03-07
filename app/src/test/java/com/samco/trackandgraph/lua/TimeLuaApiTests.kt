@@ -15,10 +15,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift timestamp forward by duration`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = { timestamp = 1743202801000 }
-            local shifted = tng.time.shift(timestamp, tng.DURATION.DAY)
+            local shifted = core.shift(timestamp, core.DURATION.DAY)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = shifted.timestamp
             }
         """.trimIndent()
@@ -33,10 +35,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift date forward by duration and amount`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
-            local shifted = tng.time.shift(date, tng.DURATION.DAY, 2)
+            local shifted = core.shift(date, core.DURATION.DAY, 2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = shifted.timestamp
             }
         """.trimIndent()
@@ -51,10 +55,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift timestamp backward by duration and amount`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = { timestamp = 1743202801000 }
-            local shifted = tng.time.shift(timestamp, tng.DURATION.DAY, -2)
+            local shifted = core.shift(timestamp, core.DURATION.DAY, -2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = shifted.timestamp
             }
         """.trimIndent()
@@ -69,10 +75,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift date backward by duration`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
-            local shifted = tng.time.shift(date, tng.DURATION.DAY, -1)
+            local shifted = core.shift(date, core.DURATION.DAY, -1)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ shifted.timestamp, shifted.offset }, " ")
             }
         """.trimIndent()
@@ -87,10 +95,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift timestamp forward by period`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
+            local core = require("tng.core")
             local timestamp = { timestamp = 1743202801000, offset = (60 * 60) }
-            local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
+            local shifted = core.shift(timestamp, core.PERIOD.DAY, 2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ shifted.timestamp, shifted.offset }, " ")
             }
         """.trimIndent()
@@ -108,10 +118,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift date backward by period and amount`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
+            local core = require("tng.core")
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
-            local shifted = tng.time.shift(date, tng.PERIOD.DAY, -2)
+            local shifted = core.shift(date, core.PERIOD.DAY, -2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ shifted.timestamp, shifted.offset }, " ")
             }
         """.trimIndent()
@@ -126,10 +138,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift timestamp backward by period and amount`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = { timestamp = 1743202801000 }
-            local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, -2)
+            local shifted = core.shift(timestamp, core.PERIOD.DAY, -2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ shifted.timestamp, shifted.offset }, " ")
             }
         """.trimIndent()
@@ -144,10 +158,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift date forward by period and amount`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
+            local core = require("tng.core")
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
-            local shifted = tng.time.shift(date, tng.PERIOD.DAY, 2)
+            local shifted = core.shift(date, core.PERIOD.DAY, 2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ shifted.timestamp, shifted.offset, shifted.zone }, " ")
             }
         """.trimIndent()
@@ -163,10 +179,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift using date, offset, and zone uses zone over offset`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin", extra = "extra" }
-            local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
+            local shifted = core.shift(timestamp, core.PERIOD.DAY, 2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
             }
         """.trimIndent()
@@ -182,10 +200,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift using date and offset uses offset`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = { timestamp = 1743202801000, offset = 3600, extra = "extra" }
-            local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
+            local shifted = core.shift(timestamp, core.PERIOD.DAY, 2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
             }
         """.trimIndent()
@@ -203,10 +223,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `shift doesnt lose any fields from the input table`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin", extra = "extra" }
-            local shifted = tng.time.shift(timestamp, tng.PERIOD.DAY, 2)
+            local shifted = core.shift(timestamp, core.PERIOD.DAY, 2)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ shifted.timestamp, shifted.offset, shifted.zone, shifted.extra }, " ")
             }
         """.trimIndent()
@@ -222,9 +244,11 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `time with no args returns current time`() = testLuaEngine(
         """
-            local time = tng.time.time()
+            local core = require("tng.core")
+            local graph = require("tng.graph")
+            local time = core.time()
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = time.timestamp
             }
         """.trimIndent()
@@ -240,10 +264,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `time with date returns time at that date`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
-            local time = tng.time.time(date)
+            local time = core.time(date)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ time.timestamp, time.offset, time.zone }, " ")
             }
         """.trimIndent()
@@ -257,9 +283,11 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `date with no args returns current date`() = testLuaEngine(
         """
-            local date = tng.time.date()
+            local core = require("tng.core")
+            local graph = require("tng.graph")
+            local date = core.date()
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ date.year, date.month, date.day, date.hour, date.min, date.sec, date.yday, date.wday }, " ")
             }
         """.trimIndent()
@@ -275,10 +303,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `date with timestamp returns date at that timestamp`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin" }
-            local date = tng.time.date(timestamp)
+            local date = core.date(timestamp)
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = table.concat({ date.year, date.month, date.day, date.hour, date.min, date.sec, date.yday, date.wday }, " ")
             }
         """.trimIndent()
@@ -292,10 +322,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `format given a timestamp number and a format string returns the formatted date`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = 1743202801000
-            local result = tng.time.format(timestamp, "yyyy-MM-dd HH:mm:ss")
+            local result = core.format(timestamp, "yyyy-MM-dd HH:mm:ss")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = result
             }
         """.trimIndent()
@@ -310,10 +342,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `format given a timestamp and a format string returns the formatted date`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local timestamp = { timestamp = 1743202801000, offset = 3600, zone = "Europe/Berlin" }
-            local result = tng.time.format(timestamp, "yyyy-MM-dd HH:mm:ss")
+            local result = core.format(timestamp, "yyyy-MM-dd HH:mm:ss")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = result
             }
         """.trimIndent()
@@ -327,10 +361,12 @@ class TimeLuaApiTests : LuaEngineImplTest() {
     @Test
     fun `format given a date and a format string returns the formatted date`() = testLuaEngine(
         """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
             local date = { year = 2025, month = 3, day = 29, sec = 1, zone = "Europe/Berlin" }
-            local result = tng.time.format(date, "yyyy-MM-dd HH:mm:ss")
+            local result = core.format(date, "yyyy-MM-dd HH:mm:ss")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = result
             }
         """.trimIndent()

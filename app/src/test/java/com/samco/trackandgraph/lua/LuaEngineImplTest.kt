@@ -26,6 +26,7 @@ import com.samco.trackandgraph.util.rawDataSampleFromSequence
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import org.mockito.ArgumentMatchers.anyString
 import org.threeten.bp.OffsetDateTime
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -35,13 +36,13 @@ abstract class LuaEngineImplTest {
     protected val assetReader: AssetReader = mock()
     protected val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
-    protected val luaTng = javaClass.getClassLoader()
-        ?.getResourceAsStream("generated/lua/tng.lua")
-        .use { it?.bufferedReader()?.readText() }
-
     protected fun uut(): LuaEngineImpl {
-        whenever(assetReader.readAssetToString("generated/lua/tng.lua"))
-            .thenReturn(luaTng)
+        whenever(assetReader.readAssetToString(anyString())).thenAnswer {
+            val path = it.getArgument<String>(0)
+            javaClass.getClassLoader()
+                ?.getResourceAsStream(path)
+                .use { it?.bufferedReader()?.readText() }
+        }
         return DaggerLuaEngineTestComponent.builder()
             .dataInteractor(dataInteractor)
             .assetReader(assetReader)

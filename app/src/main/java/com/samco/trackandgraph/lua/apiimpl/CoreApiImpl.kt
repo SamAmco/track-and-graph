@@ -5,8 +5,7 @@ import org.luaj.vm2.LuaValue
 import org.threeten.bp.format.DateTimeFormatter
 import javax.inject.Inject
 
-
-class TimeApiImpl @Inject constructor(
+class CoreApiImpl @Inject constructor(
     private val dateTimeParser: DateTimeParser
 ) {
     companion object {
@@ -16,7 +15,7 @@ class TimeApiImpl @Inject constructor(
         const val FORMAT = "format"
     }
 
-    fun installIn(table: LuaTable) = table[TIME].apply {
+    fun installIn(table: LuaTable) = table.apply {
         overrideOrThrow(TIME, getTimeLuaFunction())
         overrideOrThrow(DATE, getDateLuaFunction())
         overrideOrThrow(SHIFT, getShiftLuaFunction())

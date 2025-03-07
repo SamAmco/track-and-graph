@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.assetreader
 
 import android.content.Context
+import com.samco.trackandgraph.assetreader.AssetReader
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

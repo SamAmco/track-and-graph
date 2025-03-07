@@ -15,10 +15,12 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `time bars support 3 variants`() = testLuaEngine(
         """
+        local graph = require("tng.graph")
+        local core = require("tng.core")
         return {
-            type = tng.GRAPH_TYPE.TIME_BARCHART,
-            bar_period = tng.PERIOD.DAY,
-            end_time = tng.time.time(),
+            type = graph.GRAPH_TYPE.TIME_BARCHART,
+            bar_period = core.PERIOD.DAY,
+            end_time = core.time(),
             bars = {
                 5,
                 {
@@ -72,12 +74,14 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `bar duration takes priority over bar period`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
+            local core = require("tng.core")
             return {
-              type = tng.GRAPH_TYPE.TIME_BARCHART,
+              type = graph.GRAPH_TYPE.TIME_BARCHART,
               bar_duration = 86400000,
-              bar_period = tng.PERIOD.DAY,
+              bar_period = core.PERIOD.DAY,
               bar_period_multiple = 2,
-              end_time = tng.time.time(),
+              end_time = core.time(),
               bars = { 1, 2, 3 },
             }
         """.trimIndent()
@@ -104,11 +108,13 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `fall back to period if bar duration is not provided`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
+            local core = require("tng.core")
             return {
-              type = tng.GRAPH_TYPE.TIME_BARCHART,
-              bar_period = tng.PERIOD.DAY,
+              type = graph.GRAPH_TYPE.TIME_BARCHART,
+              bar_period = core.PERIOD.DAY,
               bar_period_multiple = 2,
-              end_time = tng.time.time(),
+              end_time = core.time(),
               bars = { 1, 2, 3 },
             }
         """.trimIndent()
@@ -135,8 +141,9 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `end_time supports integers`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-              type = tng.GRAPH_TYPE.TIME_BARCHART,
+              type = graph.GRAPH_TYPE.TIME_BARCHART,
               bar_duration = 86400000,
               end_time = 1630000000000,
               bars = { 1, 2, 3 },
@@ -164,8 +171,9 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `end_time supports zone and offset`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-              type = tng.GRAPH_TYPE.TIME_BARCHART,
+              type = graph.GRAPH_TYPE.TIME_BARCHART,
               bar_duration = 86400000,
               end_time = {
                 timestamp = 1630000000000,
@@ -199,8 +207,9 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `y_max is parsed correctly`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-              type = tng.GRAPH_TYPE.TIME_BARCHART,
+              type = graph.GRAPH_TYPE.TIME_BARCHART,
               bar_duration = 86400000,
               end_time = 1630000000000,
               bars = { 1, 2, 3 },
@@ -228,8 +237,9 @@ class TimeBarchartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `duration_based_range is parsed correctly`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-              type = tng.GRAPH_TYPE.TIME_BARCHART,
+              type = graph.GRAPH_TYPE.TIME_BARCHART,
               bar_duration = 86400000,
               end_time = 1630000000000,
               bars = { 1, 2, 3 },
