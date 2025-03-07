@@ -21,7 +21,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         assertEquals(
             LuaGraphResultData.TextData(
                 text = null,
-                size = TextSize.LARGE,
+                size = TextSize.MEDIUM,
                 alignment = TextAlignment.CENTER
             ), result.data
         )
@@ -42,7 +42,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         assert(result.data is LuaGraphResultData.TextData)
         val textData = result.data as LuaGraphResultData.TextData
         assertEquals("text", textData.text)
-        assertEquals(TextSize.LARGE, textData.size)
+        assertEquals(TextSize.MEDIUM, textData.size)
         assertEquals(TextAlignment.CENTER, textData.alignment)
     }
 
@@ -117,7 +117,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         assert(result.data is LuaGraphResultData.TextData)
         val textData = result.data as LuaGraphResultData.TextData
         assertEquals("text", textData.text)
-        assertEquals(TextSize.LARGE, textData.size)
+        assertEquals(TextSize.MEDIUM, textData.size)
         assertEquals(TextAlignment.CENTER, textData.alignment)
     }
 
@@ -136,7 +136,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         assert(result.data is LuaGraphResultData.TextData)
         val textData = result.data as LuaGraphResultData.TextData
         assertEquals("text", textData.text)
-        assertEquals(TextSize.LARGE, textData.size)
+        assertEquals(TextSize.MEDIUM, textData.size)
         assertEquals(TextAlignment.START, textData.alignment)
     }
 
@@ -155,7 +155,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         assert(result.data is LuaGraphResultData.TextData)
         val textData = result.data as LuaGraphResultData.TextData
         assertEquals("text", textData.text)
-        assertEquals(TextSize.LARGE, textData.size)
+        assertEquals(TextSize.MEDIUM, textData.size)
         assertEquals(TextAlignment.CENTER, textData.alignment)
     }
 
@@ -174,7 +174,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         assert(result.data is LuaGraphResultData.TextData)
         val textData = result.data as LuaGraphResultData.TextData
         assertEquals("text", textData.text)
-        assertEquals(TextSize.LARGE, textData.size)
+        assertEquals(TextSize.MEDIUM, textData.size)
         assertEquals(TextAlignment.CENTER, textData.alignment)
     }
 
@@ -193,7 +193,7 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         assert(result.data is LuaGraphResultData.TextData)
         val textData = result.data as LuaGraphResultData.TextData
         assertEquals("text", textData.text)
-        assertEquals(TextSize.LARGE, textData.size)
+        assertEquals(TextSize.MEDIUM, textData.size)
         assertEquals(TextAlignment.END, textData.alignment)
     }
 }

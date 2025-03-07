@@ -19,8 +19,8 @@ class TextLuaGraphAdapter @Inject constructor() : LuaGraphAdaptor<LuaGraphResult
     }
 
     private fun parseSize(data: LuaValue): TextSize = when {
-        data.isint() -> TextSize.entries[data.optint(1) - 1]
-        else -> TextSize.LARGE
+        data.isint() -> TextSize.entries[data.checkint(1) - 1]
+        else -> TextSize.MEDIUM
     }
 
     private fun parseAlignment(data: LuaValue): TextAlignment {
