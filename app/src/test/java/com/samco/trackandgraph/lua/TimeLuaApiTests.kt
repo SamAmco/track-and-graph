@@ -3,8 +3,11 @@ package com.samco.trackandgraph.lua
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Instant
 import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.temporal.TemporalAdjusters
 
 class TimeLuaApiTests : LuaEngineImplTest() {
 
@@ -374,6 +377,143 @@ class TimeLuaApiTests : LuaEngineImplTest() {
         println(result)
         assert(result.data is LuaGraphResultData.TextData)
         val expected = "2025-03-29 00:00:01"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `you can override the day of week on a date`() = testLuaEngine(
+        """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
+            local date = { year = 2025, month = 3, day = 29, hour = 1, min = 2, sec = 3, zone = "Europe/London" }
+            date.wday = 1
+            local time = core.time(date)
+            local result = core.format(time, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = graph.GRAPH_TYPE.TEXT,
+                text = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = "2025-03-24 01:02:03"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `you can override the day of month on a date`() = testLuaEngine(
+        """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
+            local date = { year = 2025, month = 3, day = 29, hour = 1, min = 2, sec = 3, zone = "Europe/London" }
+            date.day = 1
+            local time = core.time(date)
+            local result = core.format(time, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = graph.GRAPH_TYPE.TEXT,
+                text = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = "2025-03-01 01:02:03"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `you can override the day of year on a date`() = testLuaEngine(
+        """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
+            local date = { year = 2025, month = 3, day = 29, hour = 1, min = 2, sec = 3, zone = "Europe/London" }
+            date.yday = 1
+            local time = core.time(date)
+            local result = core.format(time, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = graph.GRAPH_TYPE.TEXT,
+                text = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val expected = "2025-01-01 01:02:03"
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `realistic overriding day of month`() = testLuaEngine(
+        // Realistically you have to remove yday and wday from the table to override the day of month
+        // if you are trying to adjust the current date otherwise they will take precedence.
+        """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
+            local date = core.date()
+            date.yday = NIL
+            date.wday = NIL
+            date.day = 1
+            local time = core.time(date)
+            local result = core.format(time, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = graph.GRAPH_TYPE.TEXT,
+                text = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val now = ZonedDateTime.now()
+        val expected = DateTimeFormatter.ofPattern("yyyy-MM-01 HH:mm:ss").format(now)
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `realistic overriding day of year`() = testLuaEngine(
+        // Realistically you have to remove wday from the table to override the day of year
+        // if you are trying to adjust the current date otherwise it will take precedence.
+        """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
+            local date = core.date()
+            date.yday = 1
+            date.wday = NIL
+            local time = core.time(date)
+            local result = core.format(time, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = graph.GRAPH_TYPE.TEXT,
+                text = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val now = ZonedDateTime.now().withDayOfYear(1)
+        val expected = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now)
+        assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
+    }
+
+    @Test
+    fun `realistic overriding day of week`() = testLuaEngine(
+        // wday takes highest precedence so you have to remove yday and day from the table to override the day of week
+        """
+            local core = require("tng.core")
+            local graph = require("tng.graph")
+            local date = core.date()
+            date.wday = 1
+            local time = core.time(date)
+            local result = core.format(time, "yyyy-MM-dd HH:mm:ss")
+            return {
+                type = graph.GRAPH_TYPE.TEXT,
+                text = result
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val now = ZonedDateTime.now().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
+        val expected = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(now)
         assertEquals(expected, (result.data as LuaGraphResultData.TextData).text)
     }
 

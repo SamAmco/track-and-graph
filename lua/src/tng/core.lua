@@ -64,16 +64,16 @@ M.format = function(datetime, format) end
 --- Colors enum
 --- @enum COLOR
 M.COLOR = {
-	RED_DARK = 0, -- #A50026
-	RED = 1, -- #D73027
+	RED_DARK = 0,    -- #A50026
+	RED = 1,         -- #D73027
 	ORANGE_DARK = 2, -- #F46D43
-	ORANGE = 3, -- #FDAE61
-	YELLOW = 4, -- #FEE090
-	BLUE_LIGHT = 5, -- #E0F3F8
-	BLUE_SKY = 6, -- #ABD9E9
-	BLUE = 7, -- #74ADD1
-	BLUE_DARK = 8, -- #4575B4
-	BLUE_NAVY = 9, -- #313695
+	ORANGE = 3,      -- #FDAE61
+	YELLOW = 4,      -- #FEE090
+	BLUE_LIGHT = 5,  -- #E0F3F8
+	BLUE_SKY = 6,    -- #ABD9E9
+	BLUE = 7,        -- #74ADD1
+	BLUE_DARK = 8,   -- #4575B4
+	BLUE_NAVY = 9,   -- #313695
 	GREEN_LIGHT = 10, -- #54D931
 	GREEN_DARK = 11, -- #1B8200
 }
@@ -82,16 +82,16 @@ M.COLOR = {
 
 --- @enum DURATION All durations are in milliseconds.
 M.DURATION = {
-	SECOND = 1000, -- One second in milliseconds
-	MINUTE = 60 * 1000, -- One minute in milliseconds
-	HOUR = 60 * 60 * 1000, -- One hour in milliseconds
-	DAY = 24 * 60 * 60 * 1000, -- One day in milliseconds
+	SECOND = 1000,                 -- One second in milliseconds
+	MINUTE = 60 * 1000,            -- One minute in milliseconds
+	HOUR = 60 * 60 * 1000,         -- One hour in milliseconds
+	DAY = 24 * 60 * 60 * 1000,     -- One day in milliseconds
 	WEEK = 7 * 24 * 60 * 60 * 1000, -- One week in milliseconds
 }
 
 --- @enum PERIOD
 M.PERIOD = {
-	DAY = "P1D", -- One day period
+	DAY = "P1D",  -- One day period
 	WEEK = "P1W", -- One week period
 	MONTH = "P1M", -- One month period
 	YEAR = "P1Y", -- One year period
