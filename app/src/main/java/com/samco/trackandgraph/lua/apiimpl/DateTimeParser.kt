@@ -16,9 +16,11 @@
  */
 package com.samco.trackandgraph.lua.apiimpl
 
+import org.luaj.vm2.LuaError
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.LuaValue.Companion.tableOf
+import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
@@ -26,6 +28,7 @@ import org.threeten.bp.Period
 import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 import org.threeten.bp.ZonedDateTime
+import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount
 import javax.inject.Inject
 
@@ -175,15 +178,28 @@ class DateTimeParser @Inject constructor() {
         val year = dateTime[YEAR].checkint()
         val month = dateTime[MONTH].checkint()
         val day = dateTime[DAY].checkint()
-        return parseDateOrThrow(dateTime, year, month, day)
-    }
-
-    private fun parseDateOrThrow(dateTime: LuaValue, year: Int, month: Int, day: Int): ZonedDateTime {
         val hour = dateTime[HOUR].optint(0)
         val minute = dateTime[MINUTE].optint(0)
         val second = dateTime[SECOND].optint(0)
+        val dayOfWeek = dateTime[W_DAY].optinteger(null)?.v
+        val dayOfYear = dateTime[Y_DAY].optinteger(null)?.v
         val zone = parseZone(dateTime) ?: defaultZone
-        return ZonedDateTime.of(year, month, day, hour, minute, second, 0, zone)
+        return ZonedDateTime.of(year, month, day, hour, minute, second, 0, zone).let {
+            if (dayOfWeek != null) it.with(TemporalAdjusters.previousOrSame(dayOfWeek.toDayOfWeek()))
+            else if (dayOfYear != null) it.withDayOfYear(dayOfYear)
+            else it
+        }
+    }
+
+    private fun Int.toDayOfWeek(): DayOfWeek = when (this) {
+        1 -> DayOfWeek.MONDAY
+        2 -> DayOfWeek.TUESDAY
+        3 -> DayOfWeek.WEDNESDAY
+        4 -> DayOfWeek.THURSDAY
+        5 -> DayOfWeek.FRIDAY
+        6 -> DayOfWeek.SATURDAY
+        7 -> DayOfWeek.SUNDAY
+        else -> throw LuaError("Invalid day of week: $this")
     }
 
     private fun parseZone(dateTime: LuaValue): ZoneId? = ZoneId.of(dateTime[ZONE].tojstring())
