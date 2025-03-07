@@ -14,8 +14,9 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         mapOf(),
         """
             return function(sources)
+                local graph = require("tng.graph")
                 return {
-                    type = tng.GRAPH_TYPE.TEXT,
+                    type = graph.GRAPH_TYPE.TEXT,
                     data = sources["source1"].dp().value
                 }
             end
@@ -46,8 +47,9 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
             end
             
             return function(sources) 
+                local graph = require("tng.graph")
                 return {
-                    type = tng.GRAPH_TYPE.TEXT,
+                    type = graph.GRAPH_TYPE.TEXT,
                     text = table.concat(getTableKeys(sources), ", ")
                 }
             end
@@ -68,8 +70,9 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         ),
         """
             return function(sources) 
+                local graph = require("tng.graph")
                 return {
-                    type = tng.GRAPH_TYPE.TEXT,
+                    type = graph.GRAPH_TYPE.TEXT,
                     text = sources["source1"].dp().value
                 }
             end
@@ -99,8 +102,9 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
                     datapoints[k] = v.value
                 end
             
+                local graph = require("tng.graph")
                 return {
-                    type = tng.GRAPH_TYPE.TEXT,
+                    type = graph.GRAPH_TYPE.TEXT,
                     text = table.concat(datapoints, ", ")
                  }
             end
@@ -130,8 +134,9 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
                     datapoints[k] = v.value
                 end
             
+                local graph = require("tng.graph")
                 return {
-                    type = tng.GRAPH_TYPE.TEXT,
+                    type = graph.GRAPH_TYPE.TEXT,
                     text = table.concat(datapoints, ", ")
                  }
             end
@@ -171,14 +176,16 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         ),
         """
             return function(sources) 
-                local cutoff = tng.time.time({year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC"})
+                local graph = require("tng.graph")
+                local core = require("tng.core")
+                local cutoff = core.time({year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC"})
                 local datapoints = sources["source1"].dpafter(cutoff)
                 for k, v in pairs(datapoints) do
                     datapoints[k] = v.value
                 end
             
                 return {
-                    type = tng.GRAPH_TYPE.TEXT,
+                    type = graph.GRAPH_TYPE.TEXT,
                     text = table.concat(datapoints, ", ")
                  }
             end
@@ -219,14 +226,16 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         ),
         """
             return function(sources) 
-                local cutoff = tng.time.time({year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC"})
+                local graph = require("tng.graph")
+                local core = require("tng.core")
+                local cutoff = core.time({year=2021, month=1, day=1, hour=0, min=0, sec=0, zone="UTC"})
                 local datapoints = sources["source1"].dpafter(cutoff)
                 for k, v in pairs(datapoints) do
                     datapoints[k] = v.value
                 end
             
                 return {
-                    type = tng.GRAPH_TYPE.TEXT,
+                    type = graph.GRAPH_TYPE.TEXT,
                     text = table.concat(datapoints, ", ")
                  }
             end

@@ -10,8 +10,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type can return NIL`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = NIL
             }
         """.trimIndent()
@@ -30,8 +31,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with just text`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text" 
             }
         """.trimIndent()
@@ -47,8 +49,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with text and size small`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text",
                 size = 1
             }
@@ -65,8 +68,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with text and size medium`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text",
                 size = 2
             }
@@ -83,8 +87,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with text and size large`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text",
                 size = 3
             }
@@ -101,8 +106,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with nested text and no size`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text",
             }
         """.trimIndent()
@@ -118,8 +124,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with alignment start`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text",
                 align = "start"
             }
@@ -136,8 +143,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with text and alignment center`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text",
                 align = "center"
             }
@@ -154,8 +162,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with text and alignment centre`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text",
                 align = "centre"
             }
@@ -172,8 +181,9 @@ class TextLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `Text type with text and alignment end`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.TEXT,
+                type = graph.GRAPH_TYPE.TEXT,
                 text = "text",
                 align = "end"
             }

@@ -16,11 +16,9 @@
  */
 package com.samco.trackandgraph.lua
 
-import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.base.database.sampling.RawDataSample
 import com.samco.trackandgraph.lua.apiimpl.LuaDataSourceProviderImpl
 import com.samco.trackandgraph.lua.apiimpl.RequireApiImpl
-import com.samco.trackandgraph.lua.apiimpl.TimeApiImpl
 import com.samco.trackandgraph.lua.dto.LuaGraphResult
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.lua.graphadapters.DataPointLuaGraphAdapter
@@ -30,7 +28,6 @@ import com.samco.trackandgraph.lua.graphadapters.TextLuaGraphAdapter
 import com.samco.trackandgraph.lua.graphadapters.TimeBarChartLuaGraphAdapter
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
-import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.Bit32Lib
@@ -43,7 +40,6 @@ import org.luaj.vm2.lib.jse.JseMathLib
 import javax.inject.Inject
 
 class LuaEngineImpl @Inject constructor(
-    private val assetReader: AssetReader,
     private val dataPointLuaGraphAdapter: DataPointLuaGraphAdapter,
     private val textLuaGraphAdapter: TextLuaGraphAdapter,
     private val pieChartLuaGraphAdapter: PieChartLuaGraphAdapter,
@@ -51,7 +47,6 @@ class LuaEngineImpl @Inject constructor(
     private val timeBarChartLuaGraphAdapter: TimeBarChartLuaGraphAdapter,
     private val requireApi: RequireApiImpl,
     private val luaDataSourceProviderImpl: LuaDataSourceProviderImpl,
-    private val timeApiImpl: TimeApiImpl,
 ) : LuaEngine {
 
     private val globals by lazy {
@@ -75,14 +70,8 @@ class LuaEngineImpl @Inject constructor(
         globals["print"] = LuaValue.NIL
         LoadState.install(globals)
         LuaC.install(globals)
-        val tngScript = assetReader.readAssetToString("generated/lua/tng.lua")
-        globals[TNG] = globals.load(tngScript).call()
+        requireApi.installIn(globals)
         globals
-    }
-
-    private val tngTable: LuaTable by lazy {
-        //Fail hard if this is not defined to make sure tests fail
-        globals[TNG].checktable()!!
     }
 
     override fun runLuaGraphScript(
@@ -90,8 +79,6 @@ class LuaEngineImpl @Inject constructor(
         params: LuaEngine.LuaGraphEngineParams
     ): LuaGraphResult {
         try {
-            requireApi.installIn(globals, mapOf(TNG to tngTable))
-            timeApiImpl.installIn(tngTable)
             val cleanedScript = script.cleanLuaScript()
             return processLuaGraph(
                 scriptResult = globals.load(cleanedScript).call(),

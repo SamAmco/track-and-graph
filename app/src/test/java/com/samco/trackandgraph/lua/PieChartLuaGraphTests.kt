@@ -28,8 +28,9 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `pie chart without segments is an error`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.PIE_CHART,
+                type = graph.GRAPH_TYPE.PIE_CHART,
             }
         """.trimIndent()
     ) {
@@ -41,8 +42,9 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `pie chart returns segments without colours`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.PIE_CHART,
+                type = graph.GRAPH_TYPE.PIE_CHART,
                 segments = {
                     { value = 10, label = "A" },
                     { value = 20, label = "B" }
@@ -65,10 +67,12 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `pie chart returns segments with colours`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
+            local core = require("tng.core")
             return {
-                type = tng.GRAPH_TYPE.PIE_CHART,
+                type = graph.GRAPH_TYPE.PIE_CHART,
                 segments = {
-                    { value = 10, label = "A", color = tng.COLOR.GREEN_DARK },
+                    { value = 10, label = "A", color = core.COLOR.GREEN_DARK },
                     { value = 20, label = "B", color = "#00FF00" }
                 }
             }
@@ -89,8 +93,9 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `pie chart returns invalid segment no value`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.PIE_CHART,
+                type = graph.GRAPH_TYPE.PIE_CHART,
                 segments = {
                     { value = 1, label = "A" }
                     { label = "A" }
@@ -106,8 +111,9 @@ class PieChartLuaGraphTests : LuaEngineImplTest() {
     @Test
     fun `pie chart returns invalid segment no label`() = testLuaEngine(
         """
+            local graph = require("tng.graph")
             return {
-                type = tng.GRAPH_TYPE.PIE_CHART,
+                type = graph.GRAPH_TYPE.PIE_CHART,
                 segments = {
                     { value = 10 }
                     { value = 10, label = "B" }
