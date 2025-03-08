@@ -33,7 +33,7 @@ private val OutlinedTextFieldContentPadding = 12.dp
 @Composable
 fun SlimOutlinedTextField(
     value: TextFieldValue,
-    onValueChange: (TextFieldValue) -> Unit,
+    onValueChange: ((TextFieldValue) -> Unit)?,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     readOnly: Boolean = false,
@@ -76,7 +76,7 @@ fun SlimOutlinedTextField(
                 minWidth = TextFieldDefaults.MinWidth,
                 minHeight = 20.dp
             ),
-        onValueChange = onValueChange,
+        onValueChange = onValueChange ?: {},
         enabled = enabled,
         readOnly = readOnly,
         textStyle = mergedTextStyle,

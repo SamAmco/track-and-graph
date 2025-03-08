@@ -1,4 +1,4 @@
-package com.samco.trackandgraph.ui.compose.ui/*
+/*
 * This file is part of Track & Graph
 *
 * Track & Graph is free software: you can redistribute it and/or modify
@@ -14,6 +14,8 @@ package com.samco.trackandgraph.ui.compose.ui/*
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
+package com.samco.trackandgraph.ui.compose.ui
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

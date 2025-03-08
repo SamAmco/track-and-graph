@@ -21,11 +21,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,23 +34,32 @@ import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.base.R
+import com.samco.trackandgraph.R as AppR
 import com.samco.trackandgraph.base.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
@@ -57,9 +67,13 @@ import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.AddBarButton
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
-import com.samco.trackandgraph.ui.compose.ui.TextButton
+import com.samco.trackandgraph.ui.compose.ui.IconTextButton
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
+import com.samco.trackandgraph.ui.compose.ui.SlimOutlinedTextField
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TextSubtitle2
+import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -82,6 +96,7 @@ fun LuaGraphConfigView(
         scrollState = scrollState,
         featureMap = viewModel.featureMap,
         script = viewModel.script,
+        scriptPreview = viewModel.scriptPreview.value,
         selectedFeatures = viewModel.selectedFeatures,
         getTextFieldFor = viewModel::getTextFieldFor,
         onUpdateFeatureName = viewModel::onUpdateFeatureName,
@@ -89,7 +104,8 @@ fun LuaGraphConfigView(
         onSelectFeatureClicked = viewModel::onSelectFeatureClicked,
         onAddFeatureClicked = viewModel::onAddFeatureClicked,
         setScriptText = viewModel::setScriptText,
-        readFile = viewModel::readFile
+        onReadFile = viewModel::readFile,
+        onUpdateScriptFromClipboard = viewModel::updateScriptFromClipboard,
     )
 }
 
@@ -98,6 +114,7 @@ private fun LuaGraphConfigView(
     scrollState: ScrollState,
     featureMap: Map<Long, String>?,
     script: TextFieldValue,
+    scriptPreview: TextFieldValue,
     selectedFeatures: List<LuaGraphFeature>,
     getTextFieldFor: (Int) -> TextFieldValue,
     onUpdateFeatureName: (Int, TextFieldValue) -> Unit,
@@ -105,8 +122,39 @@ private fun LuaGraphConfigView(
     onSelectFeatureClicked: (Int, Long) -> Unit,
     onAddFeatureClicked: () -> Unit,
     setScriptText: (TextFieldValue) -> Unit,
-    readFile: (Uri?) -> Unit
+    onReadFile: (Uri?) -> Unit,
+    onUpdateScriptFromClipboard: (String) -> Unit,
 ) {
+    DialogInputSpacing()
+
+    Buttons(
+        onReadFile = onReadFile,
+        onUpdateScriptFromClipboard = onUpdateScriptFromClipboard
+    )
+
+    InputSpacingLarge()
+
+    var showEditScriptDialog by rememberSaveable { mutableStateOf(false) }
+
+    ScriptTextInput(
+        scriptPreview = scriptPreview,
+        onScriptPreviewClicked = { showEditScriptDialog = true }
+    )
+
+    if (showEditScriptDialog) {
+        LuaScriptEditDialog(
+            script = script,
+            onDismiss = { showEditScriptDialog = false },
+            onValueChanged = { setScriptText(it) }
+        )
+    }
+
+    InputSpacingLarge()
+
+    Divider()
+
+    InputSpacingLarge()
+
     LuaGraphFeaturesInputView(
         scrollState = scrollState,
         selectedFeatures = selectedFeatures,
@@ -117,23 +165,6 @@ private fun LuaGraphConfigView(
         onSelectFeatureClicked = onSelectFeatureClicked,
         onAddFeatureClicked = onAddFeatureClicked,
     )
-
-    Divider()
-
-    DialogInputSpacing()
-
-    ScriptTextInput(
-        script = script,
-        setScriptText = setScriptText
-    )
-
-    DialogInputSpacing()
-
-    BottomButtons(
-        readFile = readFile
-    )
-
-    DialogInputSpacing()
 }
 
 @Composable
@@ -222,16 +253,40 @@ private fun LuaGraphFeatureInputView(
 
 @Composable
 private fun ScriptTextInput(
-    script: TextFieldValue,
-    setScriptText: (TextFieldValue) -> Unit
+    scriptPreview: TextFieldValue,
+    onScriptPreviewClicked: () -> Unit,
 ) {
-    val focusRequester = remember { FocusRequester() }
-    FullWidthTextField(
-        modifier = Modifier.heightIn(max = 400.dp),
-        textFieldValue = script,
-        onValueChange = { setScriptText(it) },
-        focusRequester = focusRequester,
-        label = stringResource(id = R.string.lua_script_input_hint),
+    val interactionSource = remember { MutableInteractionSource() }
+
+    LaunchedEffect(interactionSource) {
+        var down = false
+        interactionSource.interactions.collect {
+            if (it is PressInteraction.Release && down) {
+                onScriptPreviewClicked()
+                down = false
+            } else if (it is PressInteraction.Press) {
+                down = true
+            }
+        }
+    }
+
+    SlimOutlinedTextField(
+        modifier = Modifier.fillMaxWidth(),
+        interactionSource = interactionSource,
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            backgroundColor = MaterialTheme.colors.surface
+        ),
+        value = scriptPreview,
+        onValueChange = { onScriptPreviewClicked() },
+        placeholder = {
+            Text(
+                text = stringResource(R.string.lua_script_input_hint),
+                style = MaterialTheme.typography.body1,
+            )
+        },
+        visualTransformation = luaCodeVisualTransformation(),
+        textStyle = MaterialTheme.typography.body1,
+        readOnly = true,
         singleLine = false,
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.None,
@@ -241,19 +296,50 @@ private fun ScriptTextInput(
 }
 
 @Composable
-private fun BottomButtons(
-    readFile: (Uri?) -> Unit
+private fun Buttons(
+    onReadFile: (Uri?) -> Unit,
+    onUpdateScriptFromClipboard: (String) -> Unit
 ) = Row(
     modifier = Modifier.fillMaxWidth(),
-    horizontalArrangement = Arrangement.End,
+    horizontalArrangement = Arrangement.SpaceEvenly,
 ) {
+
+    val clipboardManager = LocalClipboardManager.current
+    IconTextButton(
+        onClick = {
+            val text = clipboardManager.getText()?.text
+                ?: return@IconTextButton
+            onUpdateScriptFromClipboard(text)
+        },
+        icon = AppR.drawable.content_paste,
+        text = stringResource(R.string.paste)
+    )
+
+    DialogInputSpacing()
+
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { readFile(it) }
+    ) { onReadFile(it) }
 
-    TextButton(
+    IconTextButton(
         onClick = { launcher.launch("*/*") },
-        text = stringResource(R.string.load_file).uppercase()
+        icon = AppR.drawable.folder_open,
+        text = stringResource(R.string.file)
+    )
+
+    DialogInputSpacing()
+
+    val uriHandler = LocalUriHandler.current
+    val context = LocalContext.current
+
+    IconTextButton(
+        onClick = {
+            val url = context.getString(AppR.string.github_link) +
+                context.getString(AppR.string.github_lua_community_path)
+            uriHandler.openUri(url)
+        },
+        icon = AppR.drawable.github_mark,
+        text = stringResource(R.string.github)
     )
 }
 
@@ -264,7 +350,12 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
         LuaGraphConfigView(
             scrollState = rememberScrollState(),
             featureMap = mapOf(1L to "Feature 1", 2L to "Feature 2"),
-            script = TextFieldValue("Sample Script"),
+            script = TextFieldValue(),
+            scriptPreview = TextFieldValue("""
+                function main()
+                    print("Hello, World!")
+                end
+            """.trimIndent()),
             selectedFeatures = listOf(
                 LuaGraphFeature(id = 1, luaGraphId = 1, featureId = 1, name = "Feature 1"),
                 LuaGraphFeature(id = 2, luaGraphId = 1, featureId = 2, name = "Feature 2")
@@ -275,7 +366,8 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
             onSelectFeatureClicked = { _, _ -> },
             onAddFeatureClicked = {},
             setScriptText = {},
-            readFile = {}
+            onReadFile = {},
+            onUpdateScriptFromClipboard = {},
         )
     }
 }
