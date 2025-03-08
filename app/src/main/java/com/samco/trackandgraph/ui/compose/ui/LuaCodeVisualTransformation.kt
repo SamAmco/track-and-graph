@@ -107,7 +107,7 @@ private fun IntRange.overlaps(other: IntRange): Boolean {
 private fun getColorHighlightMap(): Map<String, Color> {
     val midGray = colorResource(R.color.mid_gray)
     val orange = colorResource(R.color.orange)
-    val darkBlue = colorResource(R.color.dark_blue)
+    val darkBlue = colorResource(R.color.light_blue)
     val darkOrange = colorResource(R.color.dark_orange)
     val blueBlack = colorResource(R.color.blue_black)
     val lightBlue = colorResource(R.color.light_blue)

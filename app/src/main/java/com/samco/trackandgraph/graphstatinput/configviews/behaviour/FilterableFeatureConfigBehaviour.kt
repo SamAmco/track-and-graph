@@ -24,7 +24,11 @@ import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.ui.viewmodels.asTextFieldValue
 import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface FilterableFeatureConfigBehaviour {

@@ -24,7 +24,14 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.dto.DurationPlottingMode
+import com.samco.trackandgraph.base.database.dto.GraphEndDate
+import com.samco.trackandgraph.base.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.base.database.dto.LineGraphFeature
+import com.samco.trackandgraph.base.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.base.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.base.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher

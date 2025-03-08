@@ -41,10 +41,10 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
