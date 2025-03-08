@@ -20,6 +20,8 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -68,6 +70,14 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     var script: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
+
+    val scriptPreview: State<TextFieldValue> = derivedStateOf {
+        val preview = script.text
+            .split("\n")
+            .takeWhile { it.isNotBlank() }
+            .joinToString("\n")
+        return@derivedStateOf script.copy(text = preview)
+    }
 
     var selectedFeatures: List<LuaGraphFeature> by mutableStateOf(emptyList())
         private set
@@ -202,6 +212,11 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     fun onUpdateFeatureName(index: Int, text: TextFieldValue) {
         featureTextFields[index].value = text
+        onUpdate()
+    }
+
+    fun updateScriptFromClipboard(text: String) {
+        script = TextFieldValue(text, TextRange(text.length))
         onUpdate()
     }
 

@@ -17,19 +17,27 @@
 
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
@@ -127,13 +135,79 @@ fun TextButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     text: String,
-) =
-    Button(
-        modifier = modifier,
-        onClick = onClick,
+) = Button(
+    modifier = modifier,
+    onClick = onClick,
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.button
+    )
+}
+
+@Composable
+fun IconTextButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit,
+    @DrawableRes icon: Int,
+    text: String,
+) = Button(
+    modifier = modifier,
+    onClick = onClick,
+) {
+    Icon(
+        modifier = Modifier.size(24.dp),
+        painter = painterResource(id = icon),
+        contentDescription = text,
+        tint = MaterialTheme.colors.onPrimary,
+    )
+    HalfDialogInputSpacing()
+    Text(
+        text = text,
+        style = MaterialTheme.typography.button
+    )
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ButtonPreview() = TnGComposeTheme(
+    darkTheme = false
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.button
+        FilledButton(
+            text = "Filled Button",
+            onClick = {}
+        )
+        WideButton(
+            text = "Wide Button",
+            onClick = {}
+        )
+        SmallTextButton(
+            stringRes = R.string.continue_word,
+            onClick = {}
+        )
+        SelectorTextButton(
+            modifier = Modifier,
+            text = "Selector Text Button",
+            onClick = {}
+        )
+        AddBarButton(
+            onClick = {}
+        )
+        TextButton(
+            text = "Text Button",
+            onClick = {}
+        )
+        IconTextButton(
+            icon = R.drawable.add_icon,
+            text = "Some Text",
+            onClick = {}
         )
     }
+}

@@ -266,7 +266,8 @@
     <string name="data_point_tutorial_page_3_hint">(Hint: If you want to add more context or description use the note instead of the label field)</string>
     <string name="help">Help</string>
     <string name="github_link" translatable="false">https://github.com/SamAmco/track-and-graph</string>
-    <string name="github_lua_docs_path" translatable="false">/tree/master/docs/faq/faq_3_6.md</string>
+    <string name="github_lua_docs_path" translatable="false">/tree/master/docs/lua/index.md</string>
+    <string name="github_lua_community_path" translatable="false">/tree/master/lua/community/index.md</string>
     <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v5.0.0/docs/faq/index.md#faq</string>
     <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v5.0.0/docs/faq/faq_1.md#how-do-i-start-tracking-something</string>
     <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
@@ -367,7 +368,7 @@
     <string name="notification_permission_prompt">You should enable notifications for Track &amp; Graph to be notified if Auto-Backup fails for any reason.</string>
     <string name="lua_script_empty">Please add a Lua script</string>
     <string name="lua_script_input_hint">Enter a Lua script...</string>
-    <string name="load_file">Load file</string>
+    <string name="file">File</string>
     <string name="lua_feature_names_not_unique">Script inputs must have unique names</string>
     <string name="graph_stat_type_lua_graph">Lua Script</string>
     <string name="launch_lua_disabled">Launch Lua disabled</string>
@@ -376,4 +377,6 @@
     <string name="lua_graph_first_time_user_title">Lua script graphs</string>
     <string name="lua_graph_first_time_user_message">Create custom graphs with Lua scripts! You can load your own, or pick one from the GitHub collection. Selecting a script from GitHub will return you to the app with the script ready to use.</string>
     <string name="learn_more">Learn more</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Paste</string>
 </resources>
