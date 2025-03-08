@@ -144,7 +144,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         viewModelScope.launch(io) {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 val scriptText = BufferedReader(InputStreamReader(inputStream)).readText()
-                script = TextFieldValue(scriptText, TextRange(scriptText.length))
+                script = TextFieldValue(scriptText)
                 onUpdate()
             }
         }
@@ -216,7 +216,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     fun updateScriptFromClipboard(text: String) {
-        script = TextFieldValue(text, TextRange(text.length))
+        script = TextFieldValue(text)
         onUpdate()
     }
 
@@ -224,7 +224,7 @@ class LuaGraphConfigViewModel @Inject constructor(
         val lgConfig = config as? LuaGraphWithFeatures
         featureMap = featurePathProvider.sortedFeatureMap()
         lgConfig?.let { luaGraph = it }
-        lgConfig?.script?.let { script = TextFieldValue(it, TextRange(it.length)) }
+        lgConfig?.script?.let { script = TextFieldValue(it) }
         lgConfig?.features?.let { features ->
             selectedFeatures = features
             featureTextFields.clear()

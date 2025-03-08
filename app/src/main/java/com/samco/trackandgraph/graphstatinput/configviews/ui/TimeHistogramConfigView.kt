@@ -37,7 +37,11 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.TimeHistogramConfigViewModel
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
-import com.samco.trackandgraph.ui.compose.ui.*
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.LabeledRow
+import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
+import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
 fun TimeHistogramConfigView(

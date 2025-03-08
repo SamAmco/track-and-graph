@@ -24,6 +24,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -56,14 +57,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.base.R
-import com.samco.trackandgraph.R as AppR
 import com.samco.trackandgraph.base.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.tngTypography
 import com.samco.trackandgraph.ui.compose.ui.AddBarButton
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
@@ -76,6 +78,7 @@ import com.samco.trackandgraph.ui.compose.ui.TextSubtitle2
 import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.samco.trackandgraph.R as AppR
 
 @Composable
 fun LuaGraphConfigView(
@@ -136,8 +139,9 @@ private fun LuaGraphConfigView(
 
     var showEditScriptDialog by rememberSaveable { mutableStateOf(false) }
 
-    ScriptTextInput(
+    ScriptTextInputPreview(
         scriptPreview = scriptPreview,
+        script = script,
         onScriptPreviewClicked = { showEditScriptDialog = true }
     )
 
@@ -252,10 +256,11 @@ private fun LuaGraphFeatureInputView(
 }
 
 @Composable
-private fun ScriptTextInput(
+private fun ScriptTextInputPreview(
     scriptPreview: TextFieldValue,
+    script: TextFieldValue,
     onScriptPreviewClicked: () -> Unit,
-) {
+) = Box {
     val interactionSource = remember { MutableInteractionSource() }
 
     LaunchedEffect(interactionSource) {
@@ -270,13 +275,23 @@ private fun ScriptTextInput(
         }
     }
 
+    val showEllipsis = scriptPreview.text.length != script.text.length
+
+    val scriptPreviewText = remember(showEllipsis) {
+        if (showEllipsis) {
+            scriptPreview.copy(text = scriptPreview.text + "\n")
+        } else {
+            scriptPreview
+        }
+    }
+
     SlimOutlinedTextField(
         modifier = Modifier.fillMaxWidth(),
         interactionSource = interactionSource,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             backgroundColor = MaterialTheme.colors.surface
         ),
-        value = scriptPreview,
+        value = scriptPreviewText,
         onValueChange = { onScriptPreviewClicked() },
         placeholder = {
             Text(
@@ -285,7 +300,7 @@ private fun ScriptTextInput(
             )
         },
         visualTransformation = luaCodeVisualTransformation(),
-        textStyle = MaterialTheme.typography.body1,
+        textStyle = MaterialTheme.tngTypography.code,
         readOnly = true,
         singleLine = false,
         keyboardOptions = KeyboardOptions(
@@ -293,6 +308,17 @@ private fun ScriptTextInput(
             autoCorrectEnabled = false,
         )
     )
+
+    if (showEllipsis) {
+        Text(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 12.dp, bottom = 12.dp),
+            text = "...",
+            style = MaterialTheme.typography.h5,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.4f)
+        )
+    }
 }
 
 @Composable
@@ -351,11 +377,13 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
             scrollState = rememberScrollState(),
             featureMap = mapOf(1L to "Feature 1", 2L to "Feature 2"),
             script = TextFieldValue(),
-            scriptPreview = TextFieldValue("""
+            scriptPreview = TextFieldValue(
+                """
                 function main()
                     print("Hello, World!")
                 end
-            """.trimIndent()),
+            """.trimIndent()
+            ),
             selectedFeatures = listOf(
                 LuaGraphFeature(id = 1, luaGraphId = 1, featureId = 1, name = "Feature 1"),
                 LuaGraphFeature(id = 2, luaGraphId = 1, featureId = 2, name = "Feature 2")

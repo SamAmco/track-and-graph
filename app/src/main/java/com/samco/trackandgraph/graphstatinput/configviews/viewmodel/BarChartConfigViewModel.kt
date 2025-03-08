@@ -32,7 +32,12 @@ import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
-import com.samco.trackandgraph.graphstatinput.configviews.behaviour.*
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.SingleFeatureConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.SingleFeatureConfigBehaviourImpl
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.TimeRangeConfigBehaviourImpl
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.YRangeConfigBehaviour
+import com.samco.trackandgraph.graphstatinput.configviews.behaviour.YRangeConfigBehaviourImpl
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher

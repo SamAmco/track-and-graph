@@ -16,7 +16,6 @@
  */
 package com.samco.trackandgraph.ui.compose.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,54 +26,63 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
+import com.samco.trackandgraph.ui.compose.theming.tngTypography
 
 @Composable
 fun LuaScriptEditDialog(
     script: TextFieldValue,
     onDismiss: () -> Unit,
     onValueChanged: (TextFieldValue) -> Unit
-) = Dialog(
-    onDismissRequest = onDismiss,
-    properties = DialogProperties(
-        decorFitsSystemWindows = false,
-        usePlatformDefaultWidth = false
-    ),
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(dialogInputSpacing)
-            .imePadding()
-            .background(MaterialTheme.colors.surface),
-        shape = MaterialTheme.shapes.medium
+) = DialogTheme {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            decorFitsSystemWindows = false,
+            usePlatformDefaultWidth = false
+        ),
     ) {
-        CodeEditor(
+        Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .imePadding()
-                .padding(8.dp),
-            script = script,
-            onValueChanged = onValueChanged
-        )
+                .fillMaxSize()
+                .padding(dialogInputSpacing)
+                .imePadding(),
+            shape = MaterialTheme.shapes.medium,
+        ) {
+            CodeEditor(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .imePadding()
+                    .padding(8.dp),
+                script = script,
+                onValueChanged = onValueChanged
+            )
+        }
     }
 }
 
@@ -85,7 +93,32 @@ private fun CodeEditor(
     onValueChanged: (TextFieldValue) -> Unit
 ) {
     val verticalScrollState = rememberScrollState()
+    val horizontalScrollState = rememberScrollState()
     val lineHeight = 22.sp
+
+    //Set up auto scrolling when adding text past the bottom of the screen
+    val lastMaxVerticalScroll = remember { mutableIntStateOf(0) }
+    LaunchedEffect(verticalScrollState.maxValue) {
+        if (lastMaxVerticalScroll.intValue != 0 &&
+            verticalScrollState.value == lastMaxVerticalScroll.intValue
+        ) {
+            verticalScrollState.scrollTo(verticalScrollState.maxValue)
+        }
+        lastMaxVerticalScroll.intValue = verticalScrollState.maxValue
+    }
+
+    //Set up auto scrolling when adding text past the end of the screen
+    val lastMaxHorizontalScroll = remember { mutableIntStateOf(0) }
+    LaunchedEffect(horizontalScrollState.maxValue) {
+        //Check if it == 0 to skip the first one
+        if (lastMaxHorizontalScroll.intValue != 0 &&
+            horizontalScrollState.value == lastMaxHorizontalScroll.intValue
+        ) {
+            horizontalScrollState.scrollTo(horizontalScrollState.maxValue)
+        }
+        lastMaxHorizontalScroll.intValue = horizontalScrollState.maxValue
+    }
+
     Row(
         modifier = modifier
             .imePadding()
@@ -109,19 +142,30 @@ private fun CodeEditor(
             }
         }
 
+        val focusRequester = remember { FocusRequester() }
+
+        LaunchedEffect(focusRequester) {
+            focusRequester.requestFocus()
+        }
+
         // Scrollable Text Field
         BasicTextField(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .horizontalScroll(rememberScrollState())
+                .focusRequester(focusRequester)
+                .horizontalScroll(horizontalScrollState)
                 .verticalScroll(verticalScrollState),
             value = script,
+            keyboardOptions = KeyboardOptions(
+                autoCorrectEnabled = false,
+                capitalization = KeyboardCapitalization.None,
+                keyboardType = KeyboardType.Password,
+            ),
             onValueChange = { onValueChanged(it) },
             visualTransformation = luaCodeVisualTransformation(),
-            textStyle = MaterialTheme.typography.body1.copy(
-                lineHeight = lineHeight,
-                color = MaterialTheme.colors.onSurface,
+            textStyle = MaterialTheme.tngTypography.code.copy(
+                color = MaterialTheme.tngColors.onSurface,
             ),
             cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
         )
@@ -130,14 +174,11 @@ private fun CodeEditor(
 
 @Preview(showBackground = true)
 @Composable
-private fun LuaScriptEditDialogPreview() =
-    TnGComposeTheme(darkTheme = true) {
-        LuaScriptEditDialog(
-            script = TextFieldValue(exampleScript),
-            onDismiss = {},
-            onValueChanged = {}
-        )
-    }
+private fun LuaScriptEditDialogPreview() = LuaScriptEditDialog(
+    script = TextFieldValue(exampleScript),
+    onDismiss = {},
+    onValueChanged = {}
+)
 
 private val exampleScript = """
 --- A Lua script

@@ -19,12 +19,16 @@ package com.samco.trackandgraph.ui.compose.theming
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Typography
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import com.google.android.material.composethemeadapter.createMdcTheme
 import com.samco.trackandgraph.ui.compose.ui.shapes
 
@@ -52,6 +56,29 @@ data class TngColors(
     val isLight get() = material.isLight
 }
 
+data class TngTypography(
+    val materialTypography: Typography,
+    val code: TextStyle = TextStyle(
+        fontFamily = materialTypography.body1.fontFamily,
+        fontWeight = FontWeight(750),
+        fontSize = materialTypography.body1.fontSize,
+        lineHeight = 22.sp,
+    )
+) {
+    val h1 get() = materialTypography.h1
+    val h2 get() = materialTypography.h2
+    val h3 get() = materialTypography.h3
+    val h4 get() = materialTypography.h4
+    val h5 get() = materialTypography.h5
+    val h6 get() = materialTypography.h6
+    val subtitle1 get() = materialTypography.subtitle1
+    val subtitle2 get() = materialTypography.subtitle2
+    val body1 get() = materialTypography.body1
+    val body2 get() = materialTypography.body2
+    val button get() = materialTypography.button
+    val caption get() = materialTypography.caption
+    val overline get() = materialTypography.overline
+}
 
 private val LightColorPalette = TngColors(
     material = lightColors(),
@@ -69,10 +96,19 @@ val TngColors.disabledAlpha get() = 0.4f
 
 private val LocalColors = staticCompositionLocalOf { LightColorPalette }
 
+private val LocalTypography = staticCompositionLocalOf<TngTypography> {
+    error("No typography provided")
+}
+
 val MaterialTheme.tngColors: TngColors
     @Composable
     @ReadOnlyComposable
     get() = LocalColors.current
+
+val MaterialTheme.tngTypography: TngTypography
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalTypography.current
 
 @Composable
 fun TnGComposeTheme(
@@ -85,14 +121,17 @@ fun TnGComposeTheme(
     )
 
     val colors = tngColors(darkTheme, materialColors)
+    val tngTypography = TngTypography(typography ?: Typography())
 
     CompositionLocalProvider(LocalColors provides colors) {
-        MaterialTheme(
-            colors = colors.material,
-            typography = typography ?: MaterialTheme.typography,
-            shapes = shapes,
-            content = block
-        )
+        CompositionLocalProvider(LocalTypography provides tngTypography) {
+            MaterialTheme(
+                colors = colors.material,
+                typography = typography ?: MaterialTheme.typography,
+                shapes = shapes,
+                content = block
+            )
+        }
     }
 }
 
@@ -112,7 +151,6 @@ fun DialogTheme(
             )
         } else it
     }
-
 
     CompositionLocalProvider(LocalColors provides colors) {
         MaterialTheme(
