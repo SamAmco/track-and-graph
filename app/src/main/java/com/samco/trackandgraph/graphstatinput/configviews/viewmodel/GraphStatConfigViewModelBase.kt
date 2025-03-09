@@ -101,6 +101,20 @@ abstract class GraphStatConfigViewModelBase<T : GraphStatConfigEvent.ConfigData<
     }
 
     /**
+     * Call this to show loading while you perform some work. Once the work is done validate, and getConfig will
+     * be called.
+     */
+    protected fun withUpdate(block: suspend CoroutineScope.() -> Unit) {
+        updateJob?.cancel()
+        updateJob = viewModelScope.launch(default) {
+            withContext(io) { initJob?.join() }
+            configFlow.emit(GraphStatConfigEvent.Loading)
+            block()
+            configFlow.emit(validate() ?: getConfig())
+        }
+    }
+
+    /**
      * Should update the config data for the graph or stat. This will be validated when [validate]
      * is called and returned when [getConfig] is called.
      */

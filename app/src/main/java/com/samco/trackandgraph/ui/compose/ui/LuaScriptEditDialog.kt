@@ -33,8 +33,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,12 +45,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
+import kotlin.math.log10
 
 @Composable
 fun LuaScriptEditDialog(
@@ -94,7 +92,6 @@ private fun CodeEditor(
 ) {
     val verticalScrollState = rememberScrollState()
     val horizontalScrollState = rememberScrollState()
-    val lineHeight = 22.sp
 
     //Set up auto scrolling when adding text past the bottom of the screen
     val lastMaxVerticalScroll = remember { mutableIntStateOf(0) }
@@ -124,22 +121,18 @@ private fun CodeEditor(
             .imePadding()
             .padding(4.dp)
     ) {
-        val numberOfLines by remember { derivedStateOf { script.text.lines().size } }
         Column(
             modifier = Modifier
                 .verticalScroll(verticalScrollState)
                 .padding(end = 8.dp),
             horizontalAlignment = Alignment.End
         ) {
-            for (index in 1..numberOfLines) {
-                Text(
-                    text = "$index",
-                    style = MaterialTheme.typography.body1,
-                    lineHeight = lineHeight,
-                    color = MaterialTheme.tngColors.textColorSecondary,
-                    modifier = Modifier
-                )
-            }
+            val lineNumbersText = remember(script.text) { getLinesText(script.text.lines().size) }
+            Text(
+                text = lineNumbersText,
+                style = MaterialTheme.tngTypography.code,
+                color = MaterialTheme.tngColors.textColorSecondary,
+            )
         }
 
         val focusRequester = remember { FocusRequester() }
@@ -169,6 +162,13 @@ private fun CodeEditor(
             ),
             cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
         )
+    }
+}
+
+private fun getLinesText(numLines: Int): String {
+    val widthPerLine = log10(numLines.toDouble()).toInt() + 1
+    return (1..numLines).joinToString("\n") {
+        it.toString().padStart(widthPerLine, ' ')
     }
 }
 

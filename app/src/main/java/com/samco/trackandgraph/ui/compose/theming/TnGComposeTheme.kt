@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.google.android.material.composethemeadapter.createMdcTheme
@@ -59,7 +60,7 @@ data class TngColors(
 data class TngTypography(
     val materialTypography: Typography,
     val code: TextStyle = TextStyle(
-        fontFamily = materialTypography.body1.fontFamily,
+        fontFamily = FontFamily.Monospace,
         fontWeight = FontWeight(750),
         fontSize = materialTypography.body1.fontSize,
         lineHeight = 22.sp,
