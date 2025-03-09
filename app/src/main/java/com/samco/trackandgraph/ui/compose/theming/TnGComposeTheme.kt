@@ -27,10 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.google.android.material.composethemeadapter.createMdcTheme
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.shapes
 
 private val lightGray = Color(0xFFE0E0E0)
@@ -60,8 +62,9 @@ data class TngColors(
 data class TngTypography(
     val materialTypography: Typography,
     val code: TextStyle = TextStyle(
-        fontFamily = FontFamily.Monospace,
-        fontWeight = FontWeight(750),
+        fontFamily = FontFamily(
+            Font(resId = R.font.roboto_mono, weight = FontWeight(750))
+        ),
         fontSize = materialTypography.body1.fontSize,
         lineHeight = 22.sp,
     )
