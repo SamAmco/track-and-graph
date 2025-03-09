@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -40,14 +41,15 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -60,6 +62,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.base.R
 import com.samco.trackandgraph.base.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
@@ -67,6 +70,7 @@ import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConf
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
 import com.samco.trackandgraph.ui.compose.ui.AddBarButton
+import com.samco.trackandgraph.ui.compose.ui.ConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.compose.ui.IconTextButton
@@ -95,11 +99,22 @@ fun LuaGraphConfigView(
         viewModel.getConfigFlow().collect { onConfigEvent(it) }
     }
 
+    val context = LocalContext.current
+    LaunchedEffect(viewModel) {
+        for (uri in viewModel.failedDownloadToastEvents) {
+            val text = context.getString(R.string.failed_to_download_file, uri)
+            Toast.makeText(context, text, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    val showEditScriptDialog = rememberSaveable { mutableStateOf(false) }
+
     LuaGraphConfigView(
         scrollState = scrollState,
         featureMap = viewModel.featureMap,
         script = viewModel.script,
-        scriptPreview = viewModel.scriptPreview.value,
+        scriptPreview = viewModel.scriptPreview
+            .collectAsStateWithLifecycle().value,
         selectedFeatures = viewModel.selectedFeatures,
         getTextFieldFor = viewModel::getTextFieldFor,
         onUpdateFeatureName = viewModel::onUpdateFeatureName,
@@ -109,6 +124,11 @@ fun LuaGraphConfigView(
         setScriptText = viewModel::setScriptText,
         onReadFile = viewModel::readFile,
         onUpdateScriptFromClipboard = viewModel::updateScriptFromClipboard,
+        onUserConfirmDeepLink = viewModel::onUserConfirmDeepLink,
+        onUserCancelDeepLink = viewModel::onUserCancelDeepLink,
+        showEditScriptDialog = showEditScriptDialog,
+        showUserConfirmDeepLinkDialog = viewModel.showUserConfirmDeepLink
+            .collectAsStateWithLifecycle(),
     )
 }
 
@@ -127,7 +147,20 @@ private fun LuaGraphConfigView(
     setScriptText: (TextFieldValue) -> Unit,
     onReadFile: (Uri?) -> Unit,
     onUpdateScriptFromClipboard: (String) -> Unit,
+    onUserConfirmDeepLink: () -> Unit,
+    onUserCancelDeepLink: () -> Unit,
+    showEditScriptDialog: MutableState<Boolean>,
+    showUserConfirmDeepLinkDialog: State<Boolean>,
 ) {
+    Dialogs(
+        showEditScriptDialog = showEditScriptDialog,
+        script = script,
+        setScriptText = setScriptText,
+        showUserConfirmDeepLink = showUserConfirmDeepLinkDialog.value,
+        onUserConfirmDeepLink = onUserConfirmDeepLink,
+        onUserCancelDeepLink = onUserCancelDeepLink,
+    )
+
     DialogInputSpacing()
 
     Buttons(
@@ -137,21 +170,11 @@ private fun LuaGraphConfigView(
 
     InputSpacingLarge()
 
-    var showEditScriptDialog by rememberSaveable { mutableStateOf(false) }
-
     ScriptTextInputPreview(
         scriptPreview = scriptPreview,
         script = script,
-        onScriptPreviewClicked = { showEditScriptDialog = true }
+        onScriptPreviewClicked = { showEditScriptDialog.value = true }
     )
-
-    if (showEditScriptDialog) {
-        LuaScriptEditDialog(
-            script = script,
-            onDismiss = { showEditScriptDialog = false },
-            onValueChanged = { setScriptText(it) }
-        )
-    }
 
     InputSpacingLarge()
 
@@ -170,6 +193,43 @@ private fun LuaGraphConfigView(
         onAddFeatureClicked = onAddFeatureClicked,
     )
 }
+
+@Composable
+private fun Dialogs(
+    showEditScriptDialog: MutableState<Boolean>,
+    script: TextFieldValue,
+    setScriptText: (TextFieldValue) -> Unit,
+    showUserConfirmDeepLink: Boolean,
+    onUserConfirmDeepLink: () -> Unit,
+    onUserCancelDeepLink: () -> Unit,
+) {
+    if (showEditScriptDialog.value) {
+        LuaScriptEditDialog(
+            script = script,
+            onDismiss = { showEditScriptDialog.value = false },
+            onValueChanged = { setScriptText(it) }
+        )
+    }
+
+    if (showUserConfirmDeepLink) {
+        LuaUserConfirmDeepLinkDialog(
+            onConfirm = onUserConfirmDeepLink,
+            onCancel = onUserCancelDeepLink
+        )
+    }
+}
+
+@Composable
+private fun LuaUserConfirmDeepLinkDialog(
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit
+) = ConfirmCancelDialog(
+    body = R.string.confirm_deep_link,
+    onDismissRequest = onCancel,
+    onConfirm = onConfirm,
+    continueText = R.string.yes,
+    dismissText = R.string.cancel,
+)
 
 @Composable
 private fun LuaGraphFeaturesInputView(
@@ -277,7 +337,7 @@ private fun ScriptTextInputPreview(
 
     val showEllipsis = scriptPreview.text.length != script.text.length
 
-    val scriptPreviewText = remember(showEllipsis) {
+    val scriptPreviewText = remember(showEllipsis, scriptPreview.text) {
         if (showEllipsis) {
             scriptPreview.copy(text = scriptPreview.text + "\n")
         } else {
@@ -285,8 +345,15 @@ private fun ScriptTextInputPreview(
         }
     }
 
+    val surfaceColor = MaterialTheme.colors.surface
+
     SlimOutlinedTextField(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .drawWithContent {
+                drawContent()
+                drawRect(color = surfaceColor.copy(alpha = 0.3f))
+            },
         interactionSource = interactionSource,
         colors = TextFieldDefaults.outlinedTextFieldColors(
             backgroundColor = MaterialTheme.colors.surface
@@ -396,6 +463,10 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
             setScriptText = {},
             onReadFile = {},
             onUpdateScriptFromClipboard = {},
+            onUserConfirmDeepLink = {},
+            onUserCancelDeepLink = {},
+            showEditScriptDialog = remember { mutableStateOf(false) },
+            showUserConfirmDeepLinkDialog = remember { mutableStateOf(false) },
         )
     }
 }

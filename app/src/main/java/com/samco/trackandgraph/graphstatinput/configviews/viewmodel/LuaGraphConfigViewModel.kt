@@ -20,11 +20,10 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
@@ -42,9 +41,17 @@ import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.net.URI
 import javax.inject.Inject
 
 @HiltViewModel
@@ -71,13 +78,13 @@ class LuaGraphConfigViewModel @Inject constructor(
     var script: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
 
-    val scriptPreview: State<TextFieldValue> = derivedStateOf {
+    val scriptPreview: StateFlow<TextFieldValue> = snapshotFlow {
         val preview = script.text
             .split("\n")
             .takeWhile { it.isNotBlank() }
             .joinToString("\n")
-        return@derivedStateOf script.copy(text = preview)
-    }
+        script.copy(text = preview)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, TextFieldValue(""))
 
     var selectedFeatures: List<LuaGraphFeature> by mutableStateOf(emptyList())
         private set
@@ -91,6 +98,18 @@ class LuaGraphConfigViewModel @Inject constructor(
         features = emptyList()
     )
 
+    private val pendingScriptUriDownload = MutableStateFlow<URI?>(null)
+    private val pendingScriptInstall = MutableStateFlow<String?>(null)
+
+    val showUserConfirmDeepLink = combine(
+        pendingScriptUriDownload,
+        pendingScriptInstall,
+    ) { uri, script -> uri != null || script != null }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    private val _onShowFailedDownload = Channel<String>()
+    val failedDownloadToastEvents: ReceiveChannel<String> = _onShowFailedDownload
+
     init {
         viewModelScope.launch { observeDeepLinksUrls() }
         viewModelScope.launch { observeDeepLinkScripts() }
@@ -98,17 +117,33 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     private suspend fun observeDeepLinksUrls() {
         deepLinkHandler.onLuaDeepLink.collect {
-            fileDownloader.downloadFileToString(it)?.let { scriptText ->
-                script = TextFieldValue(scriptText)
-                onUpdate()
-            }
+            onReceivedDeepLink(it)
         }
     }
 
     private suspend fun observeDeepLinkScripts() {
         deepLinkHandler.onLuaScript.collect {
-            script = TextFieldValue(it)
-            onUpdate()
+            pendingScriptInstall.emit(it)
+        }
+    }
+
+    private suspend fun onReceivedDeepLink(uri: URI) {
+        if (uri.scheme != "https" ||
+            uri.host != "github.com" ||
+            !uri.path.startsWith("/SamAmco/track-and-graph")
+        ) {
+            pendingScriptUriDownload.emit(uri)
+            return
+        }
+        downloadAndInstallScriptFromUri(uri)
+    }
+
+    private fun downloadAndInstallScriptFromUri(uri: URI) = withUpdate {
+        val scriptText = fileDownloader.downloadFileToString(uri)
+        if (scriptText == null) {
+            _onShowFailedDownload.send(uri.toString())
+        } else {
+            script = TextFieldValue(scriptText)
         }
     }
 
@@ -218,6 +253,29 @@ class LuaGraphConfigViewModel @Inject constructor(
     fun updateScriptFromClipboard(text: String) {
         script = TextFieldValue(text)
         onUpdate()
+    }
+
+    fun onUserConfirmDeepLink() {
+        viewModelScope.launch {
+            pendingScriptUriDownload.value?.let {
+                pendingScriptUriDownload.emit(null)
+                downloadAndInstallScriptFromUri(it)
+                return@launch
+            }
+
+            pendingScriptInstall.value?.let {
+                pendingScriptInstall.emit(null)
+                script = TextFieldValue(it)
+                onUpdate()
+                return@launch
+            }
+        }
+    }
+
+    fun onUserCancelDeepLink() {
+        viewModelScope.launch {
+            pendingScriptUriDownload.emit(null)
+        }
     }
 
     override fun onDataLoaded(config: Any?) {
