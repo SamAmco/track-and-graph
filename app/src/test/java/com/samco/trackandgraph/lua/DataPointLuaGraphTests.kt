@@ -33,7 +33,6 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
             ),
             dataPoint.timestamp
         )
-        assertEquals(0, dataPoint.featureId)
         assertEquals(0.0, dataPoint.value)
         assertEquals("", dataPoint.label)
         assertEquals("", dataPoint.note)
@@ -49,7 +48,6 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
                 datapoint = { 
                     timestamp = 0,
                     offset = 1000,
-                    featureId = 1,
                     value = 1.0,
                     label = "label",
                     note = "note"
@@ -67,7 +65,6 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
             ),
             dataPoint.timestamp
         )
-        assertEquals(1, dataPoint.featureId)
         assertEquals(1.0, dataPoint.value)
         assertEquals("label", dataPoint.label)
         assertEquals("note", dataPoint.note)
@@ -96,7 +93,6 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
             ),
             dataPoint.timestamp
         )
-        assertEquals(0, dataPoint.featureId)
         assertEquals(0.0, dataPoint.value)
         assertEquals("", dataPoint.label)
         assertEquals("", dataPoint.note)
@@ -144,7 +140,6 @@ class DataPointLuaGraphTests : LuaEngineImplTest() {
             ),
             dataPoint.timestamp
         )
-        assertEquals(0, dataPoint.featureId)
         assertEquals(0.0, dataPoint.value)
         assertEquals("", dataPoint.label)
         assertEquals("", dataPoint.note)

@@ -132,7 +132,6 @@ class LuaEngineImpl @Inject constructor(
     }
 
     companion object {
-        const val TNG = "tng"
         const val TEXT = "TEXT"
         const val PIE_CHART = "PIE_CHART"
         const val LINE_GRAPH = "LINE_GRAPH"

@@ -21,7 +21,6 @@ local M = {}
 --- @class datapoint
 --- @field timestamp integer: The Unix epoch millisecond timestamp of the data point.
 --- @field offset integer: The offset from UTC in seconds. This allows you to know what the local time was when the data point was recorded.
---- @field featureId string: The database ID of the feature (aka data source).
 --- @field value number: The value of the data point.
 --- @field label string: The label of the data point.
 --- @field note string: The note of the data point.
@@ -51,8 +50,7 @@ M.date = function(timestamp) end
 --- @param datetime (timestamp|date): Any table with at least the field timestamp. Offset, and zone are optional.
 --- @param unit (DURATION|PERIOD): The units to shift by. Can be a duration in milliseconds (e.g. DURATION.DAY) or a period string (e.g. PERIOD.DAY).
 --- @param amount? integer: Multiplier for the units. Defaults to 1. Useful if you are passing a period string.
---- @return table: A table with the same data as the input table but with the timestamp and offset shifted.
---- If zone and offset are not in the input table they will be added to the output table.
+--- @return timestamp: The shifted timestamp.
 M.shift = function(datetime, unit, amount) end
 
 --- Formats the given datetime using the given format string.
