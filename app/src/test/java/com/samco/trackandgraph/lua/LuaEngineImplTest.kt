@@ -27,7 +27,9 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.mockito.ArgumentMatchers.anyString
+import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class LuaEngineImplTest {
@@ -86,11 +88,25 @@ abstract class LuaEngineImplTest {
 
     protected data class TestDP(
         val timestamp: OffsetDateTime = OffsetDateTime.now(),
-        val featureId: Long = 1,
         val value: Double = 1.0,
         val label: String = "",
-        val note: String = ""
+        val note: String = "",
+        val featureId: Long = 1,
     ) {
+        constructor(
+            timestamp: Long,
+            value: Double = 1.0,
+            label: String = "",
+            note: String = "",
+            featureId: Long = 1,
+        ) : this(
+            timestamp = OffsetDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneOffset.UTC),
+            value = value,
+            label = label,
+            note = note,
+            featureId = featureId
+        )
+
         fun toDataPoint() = DataPoint(
             timestamp = timestamp,
             featureId = featureId,

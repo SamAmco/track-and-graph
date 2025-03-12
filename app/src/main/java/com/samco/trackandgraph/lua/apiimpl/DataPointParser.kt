@@ -10,7 +10,6 @@ class DataPointParser @Inject constructor(
     private val dateTimeParser: DateTimeParser
 ) {
     companion object {
-        const val FEATURE_ID = "featureId"
         const val VALUE = "value"
         const val LABEL = "label"
         const val NOTE = "note"
@@ -19,7 +18,6 @@ class DataPointParser @Inject constructor(
     fun toLuaValueNullable(dataPoint: DataPoint?): LuaValue {
         if (dataPoint == null) return LuaValue.NIL
         val luaDataPoint = tableOf()
-        luaDataPoint[FEATURE_ID] = valueOf(dataPoint.featureId.toString())
         luaDataPoint[VALUE] = valueOf(dataPoint.value)
         luaDataPoint[LABEL] = valueOf(dataPoint.label)
         luaDataPoint[NOTE] = valueOf(dataPoint.note)
@@ -29,7 +27,7 @@ class DataPointParser @Inject constructor(
 
     fun parseDataPoint(data: LuaValue): DataPoint = DataPoint(
         timestamp = dateTimeParser.parseDateTimeOrNow(data).toOffsetDateTime(),
-        featureId = data[FEATURE_ID].optlong(0L),
+        featureId = -1L,
         value = data[VALUE].optdouble(0.0),
         label = data[LABEL].optjstring("") ?: "",
         note = data[NOTE].optjstring("") ?: ""

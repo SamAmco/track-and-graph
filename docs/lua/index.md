@@ -4,7 +4,7 @@
 ├── lua/
 │   ├── src/
 │   │   └── tng/                          # Lua API code
-│   └── community-scripts/                # Community Lua scripts
+│   └── community/                # Community Lua scripts
 │       ├── bar-charts/                   # Category folder (e.g. bar charts)
 │       │   ├── example-script/           # Each script in its own directory
 │       │   │   ├── example-script.lua    # The Lua code
@@ -12,7 +12,7 @@
 │       │   │   └── images/               # Images/assets used in the docs
 │       │   │       └── screenshot.png
 │       │   └── another-script/           # Additional scripts in this category
-│       └── line-charts/                  # Another category, etc.
+│       └── line-graphs/                  # Another category, etc.
 │           └── sample-script/
 │               ├── sample-script.lua
 │               ├── sample-script.md
