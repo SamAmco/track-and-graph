@@ -7,7 +7,7 @@ local period_multiplier = 8
 -- If from_now is false the end of the graph will be the last datapoint, otherwise it's the current date/time
 local from_now = false
 -- Optional color, e.g. "#FF00FF" or core.COLOR.BLUE_SKY
-local line_color = "#FF00FF" 
+local line_color = "#FF00FF"
 -- Optional point style e.g. graph.LINE_POINT_STYLE.CIRCLE
 local line_point_style = nil
 -- Optional string label for the line in the legend, e.g. "Data"
@@ -43,17 +43,17 @@ local get_line_data = function(sources)
 		last_data_points[key] = source.dp() or nil
 	end
 
+	local latest_data_point, latest_key = find_latest_data_point(last_data_points)
+
 	local cutoff_params = {
 		period = period,
 		period_multiplier = period_multiplier,
 		from_now = from_now,
-		timestamp = last_data_points.timestamp,
+		timestamp = (latest_data_point and latest_data_point.timestamp) or nil,
 	}
 	local cutoff = graph.get_cutoff(cutoff_params)
 
 	while true do
-		local latest_data_point, latest_key = find_latest_data_point(last_data_points)
-
 		-- If no latest data point is found, break the loop
 		if not latest_data_point or not latest_key then
 			break
@@ -68,6 +68,8 @@ local get_line_data = function(sources)
 
 		-- Fetch the next data point from the source that provided the latest data point
 		last_data_points[latest_key] = sources[latest_key].dp() or nil
+
+		latest_data_point, latest_key = find_latest_data_point(last_data_points)
 	end
 
 	return all_data
