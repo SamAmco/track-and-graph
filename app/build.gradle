@@ -174,11 +174,9 @@ static def prepareGeneratedFile(File source, File target) {
     target.text = warningComment + content
 }
 
-// Function to copy all Lua files to a specified destination directory
-def copyLuaFilesToDestination(File destinationDir) {
-    destinationDir.deleteDir()
+// Function to copy all Lua api files to a specified destination directory
+def copyLuaApiToDestination(File destinationDir) {
     destinationDir.mkdirs()
-
     rootProject.file("lua/src/tng").eachFile { file ->
         if (file.isFile()) {
             def destinationFile = new File(destinationDir, file.name)
@@ -191,7 +189,7 @@ def copyLuaFilesToDestination(File destinationDir) {
 tasks.register('copyLuaToAssets') {
     doLast {
         def destinationDir = file("src/main/assets/generated/lua-api/")
-        copyLuaFilesToDestination(destinationDir)
+        copyLuaApiToDestination(destinationDir)
     }
 }
 
@@ -200,15 +198,34 @@ tasks.matching { it.name.startsWith("assemble") }.configureEach {
     dependsOn(copyLuaToAssets)
 }
 
-// Task to copy all Lua files to the generated test directory
-tasks.register('copyLuaForTests') {
+// TEST TASKS
+
+// Task to copy Lua API scripts
+tasks.register('copyLuaScriptsForTests') {
     doLast {
-        def destinationDir = file("src/test/resources/generated/lua-api/")
-        copyLuaFilesToDestination(destinationDir)
+        copy {
+            from "${rootProject.projectDir}/lua/community"
+            into "${projectDir}/src/test/resources/generated/lua-community"
+        }
+
+        copyLuaApiToDestination(file("src/test/resources/generated/lua-api/"))
     }
 }
 
-// Ensure this runs before any unit test task
+// Ensure all Lua scripts are copied before any unit test task
 tasks.matching { it.name.startsWith("test") }.configureEach {
-    dependsOn(copyLuaForTests)
+    dependsOn('copyLuaScriptsForTests')
+}
+
+// CLEAN UP TASKS
+
+tasks.register('cleanUpLuaFiles') {
+    doLast {
+        file("src/main/assets/generated/").deleteDir()
+        file("src/test/resources/generated/").deleteDir()
+    }
+}
+
+tasks.named('clean').configure {
+    dependsOn(cleanUpLuaFiles)
 }

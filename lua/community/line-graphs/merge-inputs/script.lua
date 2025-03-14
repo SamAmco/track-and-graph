@@ -1,19 +1,19 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
--- You can use e.g. core.PERIOD.WEEK to only show 1 week of data
-local period = core.PERIOD.MONTH
+-- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
+local period = nil
 -- Optional integer value used with period e.g. 5
 local period_multiplier = 8
 -- If from_now is false the end of the graph will be the last datapoint, otherwise it's the current date/time
 local from_now = false
 -- Optional color, e.g. "#FF00FF" or core.COLOR.BLUE_SKY
-local line_color = "#FF00FF"
+local line_color = nil
 -- Optional point style e.g. graph.LINE_POINT_STYLE.CIRCLE
 local line_point_style = nil
 -- Optional string label for the line in the legend, e.g. "Data"
-local line_label = "merged inputs"
+local line_label = nil
 -- Optional integer value used to average data points over a certain duration e.g. core.DURATION.DAY * 30 for a 30 day moving average
-local averaging_duration = 30 * core.DURATION.DAY
+local averaging_duration = nil
 -- Optional totalling period used to calculate 'plot totals' e.g. core.PERIOD.WEEK
 local totalling_period = nil
 -- Optional totalling period multiplier used to calculate 'plot totals' e.g. 2
