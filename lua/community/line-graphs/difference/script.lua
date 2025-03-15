@@ -10,8 +10,6 @@ local from_now = false
 local line_colors = nil
 -- Optional point style e.g. graph.LINE_POINT_STYLE.CIRCLE
 local line_point_style = nil
--- Optional string labels for the lines in the legend, e.g. ["My data 1", "My data 2"]
-local line_labels = nil
 -- Optional integer value used to average data points over a certain duration e.g. core.DURATION.DAY * 30 for a 30 day moving average
 local averaging_duration = nil
 -- Optional totalling period used to calculate 'plot totals' e.g. core.PERIOD.WEEK
@@ -72,7 +70,7 @@ local function get_line_data(source)
 		line_points = difference,
 		line_color = line_color,
 		point_style = line_point_style or graph.LINE_POINT_STYLE.NONE,
-		label = line_labels and line_labels[source.index] or source.name,
+		label = source.name,
 	}
 end
 

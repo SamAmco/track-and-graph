@@ -5,3 +5,6 @@
 - [Cumulative](./line-graphs/cumulative/README.md): Generates a cumulative line graph from the provided data sources.
 - [Difference](./line-graphs/difference/README.md): Generates a line graph that shows the difference between each tracked value from the previous value for each provided data source.
 
+## Bar Charts
+- [Cumulative](./bar-charts/cumulative/README.md): Generates a cumulative bar chart from the provided data source.
+

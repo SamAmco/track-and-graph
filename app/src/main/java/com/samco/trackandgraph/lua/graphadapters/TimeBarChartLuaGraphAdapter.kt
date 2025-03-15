@@ -39,7 +39,6 @@ class TimeBarChartLuaGraphAdapter @Inject constructor(
         const val DURATION_BASED_RANGE = "duration_based_range"
         const val BARS = "bars"
         const val Y_MAX = "y_max"
-        const val SEGMENTS = "segments"
         const val VALUE = "value"
         const val LABEL = "label"
         const val COLOR = "color"

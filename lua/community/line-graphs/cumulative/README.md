@@ -1,6 +1,6 @@
 # Cumulative Line Graph Script
 
-This script generates a cumulative line graph from the provided data source.
+This script generates a cumulative line graph for each of the provided data sources.
 
 <div style="text-align: center;">
     <img src="image.jpg" alt="Cumulative Line Graph" style="width: 400px; height: auto;">
