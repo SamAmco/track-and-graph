@@ -1,0 +1,92 @@
+local core = require("tng.core")
+local graph = require("tng.graph")
+-- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
+local period = nil
+-- Optional integer value used with period e.g. 5
+local period_multiplier = 8
+-- If from_now is false the end of the graph will be the last datapoint, otherwise it's the current date/time
+local from_now = false
+-- Optional colors list, e.g. {"#FF00FF", "#0000FF", core.COLOR.BLUE_SKY}
+local line_colors = nil
+-- Optional point style e.g. graph.LINE_POINT_STYLE.CIRCLE
+local line_point_style = nil
+-- Optional string labels for the lines in the legend, e.g. ["My data 1", "My data 2"]
+local line_labels = nil
+-- Optional integer value used to average data points over a certain duration e.g. core.DURATION.DAY * 30 for a 30 day moving average
+local averaging_duration = nil
+-- Optional totalling period used to calculate 'plot totals' e.g. core.PERIOD.WEEK
+local totalling_period = nil
+-- Optional totalling period multiplier used to calculate 'plot totals' e.g. 2
+local totalling_period_multiplier = nil
+-- Optional if the y axis represents time
+local duration_based_range = false
+-- Optional bounds for the y axis e.g. { min = 0, max = 100 }
+local range_bounds = nil
+
+local apply_accumulation = function(data_points)
+	local total = 0
+	for i = #data_points, 1, -1 do
+		local data_point = data_points[i]
+		total = total + data_point.value
+		data_point.value = total
+	end
+end
+
+local function get_line_data(source)
+	local latest_data_point = source.dp()
+
+	if not latest_data_point then
+		return nil
+	end
+
+	local cutoff_params = {
+		period = period,
+		period_multiplier = period_multiplier,
+		from_now = from_now,
+		timestamp = latest_data_point.timestamp or nil,
+	}
+	local cutoff = graph.get_cutoff(cutoff_params)
+
+	local datapoints = source.dpafter(cutoff)
+	table.insert(datapoints, 1, latest_data_point)
+
+	local all_data = {}
+	if totalling_period == nil then
+		all_data = datapoints
+	elseif totalling_period ~= nil then
+		all_data = graph.calculate_period_totals(datapoints, totalling_period, totalling_period_multiplier)
+	end
+
+	apply_accumulation(all_data)
+	graph.apply_moving_averaging(all_data, averaging_duration)
+
+	local line_color = line_colors and line_colors[source.index] or nil
+
+	return {
+		line_points = all_data,
+		line_color = line_color,
+		point_style = line_point_style or graph.LINE_POINT_STYLE.NONE,
+		label = line_labels and line_labels[source.index] or source.name,
+	}
+end
+
+return function(sources)
+	table.sort(sources, function(a, b)
+		return a.index < b.index
+	end)
+
+	local lines = {}
+	for _, source in pairs(sources) do
+		local line_data = get_line_data(source)
+		if line_data then
+			table.insert(lines, line_data)
+		end
+	end
+
+	return {
+		type = graph.GRAPH_TYPE.LINE_GRAPH,
+		lines = lines,
+		duration_based_range = duration_based_range,
+		range_bounds = range_bounds,
+	}
+end

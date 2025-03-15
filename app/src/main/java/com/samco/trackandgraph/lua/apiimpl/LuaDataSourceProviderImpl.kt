@@ -18,17 +18,18 @@ class LuaDataSourceProviderImpl @Inject constructor(
         const val DP_BATCH = "dpbatch"
         const val DP_ALL = "dpall"
         const val DP_AFTER = "dpafter"
+        const val INDEX = "index"
     }
 
     fun createDataSourceTable(dataSources: Map<String, RawDataSample>): LuaValue {
         val dataSourceTable = LuaTable()
-        dataSources.forEach { (key, value) ->
-            dataSourceTable[key] = createLuaDataSource(key, value)
+        dataSources.entries.forEachIndexed { index, entry ->
+            dataSourceTable[entry.key] = createLuaDataSource(index, entry.key, entry.value)
         }
         return dataSourceTable
     }
 
-    private fun createLuaDataSource(name: String, dataSample: RawDataSample): LuaValue {
+    private fun createLuaDataSource(index: Int, name: String, dataSample: RawDataSample): LuaValue {
         val luaTable = LuaTable()
         val iterator = dataSample.iterator()
         luaTable[NAME] = name
@@ -36,16 +37,23 @@ class LuaDataSourceProviderImpl @Inject constructor(
         luaTable[DP_BATCH] = getDpBatchLuaFunction(iterator)
         luaTable[DP_ALL] = getDpAllLuaFunction(iterator)
         luaTable[DP_AFTER] = getDpAfterLuaFunction(iterator)
+        luaTable[INDEX] = index + 1 // Lua is 1 indexed
         return luaTable
     }
 
     private fun getDpAfterLuaFunction(dataSource: Iterator<DataPoint>) = oneArgFunction { arg1 ->
-        val zonedDateTime = dateTimeParser.parseDateTimeOrNow(arg1)
+        val zonedDateTime = dateTimeParser.parseDateTimeOrNull(arg1)
         val batch = mutableListOf<LuaValue>()
-        while (dataSource.hasNext()) {
-            val dataPoint = dataSource.next()
-            if (dataPoint.timestamp <= zonedDateTime.toOffsetDateTime()) break
-            batch.add(dataPointParser.toLuaValueNullable(dataPoint))
+        if (zonedDateTime == null) {
+            while (dataSource.hasNext()) {
+                batch.add(dataPointParser.toLuaValueNullable(dataSource.next()))
+            }
+        } else {
+            while (dataSource.hasNext()) {
+                val dataPoint = dataSource.next()
+                if (dataPoint.timestamp <= zonedDateTime.toOffsetDateTime()) break
+                batch.add(dataPointParser.toLuaValueNullable(dataPoint))
+            }
         }
         return@oneArgFunction LuaValue.listOf(batch.toTypedArray())
     }

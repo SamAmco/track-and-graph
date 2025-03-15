@@ -78,11 +78,11 @@ end
 return function(sources)
 	local all_data = get_line_data(sources)
 
-	graph.apply_moving_averaging(all_data, averaging_duration)
-	local totalled_date = graph.calculate_period_totals(all_data, totalling_period, totalling_period_multiplier)
+	local totalled_data = graph.calculate_period_totals(all_data, totalling_period, totalling_period_multiplier)
+	graph.apply_moving_averaging(totalled_data, averaging_duration)
 
 	local line = {
-		line_points = totalled_date,
+		line_points = totalled_data,
 		line_color = line_color,
 		point_style = line_point_style or graph.LINE_POINT_STYLE.NONE,
 		label = line_label,
