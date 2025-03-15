@@ -97,6 +97,7 @@ M.PERIOD = {
 
 --- @class datasource
 --- @field name string: The name of the data source.
+--- @field index integer: The index of the data source in the list of datasources configured by the user.
 local datasource = {}
 
 --- Fetches the next data point from the data source.

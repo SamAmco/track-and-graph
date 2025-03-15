@@ -63,7 +63,7 @@ class DateTimeParser @Inject constructor() {
     fun parseDateTimeOrNow(dateTime: LuaValue): ZonedDateTime = parseDateTimeOrNull(dateTime)
         ?: ZonedDateTime.now()
 
-    private fun parseDateTimeOrNull(dateTime: LuaValue): ZonedDateTime? = when {
+    fun parseDateTimeOrNull(dateTime: LuaValue): ZonedDateTime? = when {
         dateTime.isnumber() -> ZonedDateTime.ofInstant(
             Instant.ofEpochMilli(dateTime.tolong()),
             ZoneOffset.UTC,
