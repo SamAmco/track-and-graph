@@ -83,7 +83,7 @@ M.LINE_POINT_STYLE = {
 --- @field timestamp? integer: The starting timestamp for the cutoff.
 
 --- @param params cutoff_params: The parameters for calculating the cutoff.
---- @return integer|nil: The cutoff timestamp obtained by subtracting the given period from the specified end time or the current time, or nil if the period is not provided.
+--- @return integer|nil: The cutoff timestamp obtained by subtracting the given period from the specified end time (as a Unix epoch millisecond) or the current time, or nil if the period is not provided.
 M.get_cutoff = function(params)
 	if not params.period then
 		return nil

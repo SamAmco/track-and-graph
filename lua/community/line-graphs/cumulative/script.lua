@@ -3,15 +3,13 @@ local graph = require("tng.graph")
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
 local period = nil
 -- Optional integer value used with period e.g. 5
-local period_multiplier = 8
+local period_multiplier = nil
 -- If from_now is false the end of the graph will be the last datapoint, otherwise it's the current date/time
 local from_now = false
 -- Optional colors list, e.g. {"#FF00FF", "#0000FF", core.COLOR.BLUE_SKY}
 local line_colors = nil
 -- Optional point style e.g. graph.LINE_POINT_STYLE.CIRCLE
 local line_point_style = nil
--- Optional string labels for the lines in the legend, e.g. ["My data 1", "My data 2"]
-local line_labels = nil
 -- Optional integer value used to average data points over a certain duration e.g. core.DURATION.DAY * 30 for a 30 day moving average
 local averaging_duration = nil
 -- Optional totalling period used to calculate 'plot totals' e.g. core.PERIOD.WEEK
@@ -66,7 +64,7 @@ local function get_line_data(source)
 		line_points = all_data,
 		line_color = line_color,
 		point_style = line_point_style or graph.LINE_POINT_STYLE.NONE,
-		label = line_labels and line_labels[source.index] or source.name,
+		label = source.name,
 	}
 end
 
