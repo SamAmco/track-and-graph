@@ -79,24 +79,19 @@ M.LINE_POINT_STYLE = {
 --- @class cutoff_params
 --- @field period string?: The period for the cutoff.
 --- @field period_multiplier? integer: The multiplier for the period.
---- @field from_now boolean: Whether the cutoff is from the current time.
---- @field timestamp? integer: The starting timestamp for the cutoff.
 
 --- @param params cutoff_params: The parameters for calculating the cutoff.
+--- @param end_time (timestamp|date)?: The end time for the cutoff. If not provided, the current time will be used.
 --- @return integer|nil: The cutoff timestamp obtained by subtracting the given period from the specified end time (as a Unix epoch millisecond) or the current time, or nil if the period is not provided.
-M.get_cutoff = function(params)
+M.get_cutoff = function(params, end_time)
 	if not params.period then
 		return nil
 	end
 
 	local multiplier = params.period_multiplier or 1
 
-	if params.from_now then
-		return core.shift(core.time(), params.period, -multiplier).timestamp
-	end
-
-	local start_time = params.timestamp or core.time()
-	return core.shift(start_time, params.period, -multiplier).timestamp
+	local end_or_now = end_time or core.time()
+	return core.shift(end_or_now, params.period, -multiplier).timestamp
 end
 
 --- Applies a moving average to a series of data points in place.
@@ -155,7 +150,6 @@ M.apply_moving_averaging = function(datapoints, averaging_duration)
 		datapoints[i].value = sum / count
 	end
 end
-
 
 --- Calculates the end of a given period for a specific timestamp.
 ---
@@ -237,6 +231,148 @@ M.calculate_period_totals = function(datapoints, period, multiplier, zone_overri
 	})
 
 	return period_totals
+end
+
+--- Finds the most recent data point in a table of data points.
+---
+--- This function iterates through a table of data points and returns the one with the highest timestamp
+--- along with its corresponding key in the table.
+---
+--- @param data_points table: A table of data points, where each data point should have a timestamp field.
+--- @return datapoint|nil: The data point with the highest timestamp, or nil if no valid data points were found.
+--- @return any|nil: The key of the data point with the highest timestamp, or nil if no valid data points were found.
+M.find_latest_data_point = function(data_points)
+	local latest_data_point = nil
+	local latest_key = nil
+
+	for key, data_point in pairs(data_points) do
+		local valid = data_point and data_point.timestamp
+		if valid and (not latest_data_point or data_point.timestamp > latest_data_point.timestamp) then
+			latest_data_point = data_point
+			latest_key = key
+		end
+	end
+
+	return latest_data_point, latest_key
+end
+
+--- Merges data points from multiple sources in chronological order.
+---
+--- This function collects data points from multiple sources and organizes them in chronological order
+--- (most recent first) until a specified cutoff time is reached.
+---
+--- @param sources table: A table of sources, where each source has a dp() method that returns a data point.
+--- @param cutoff_params cutoff_params: Parameters for calculating the cutoff time.
+--- @param from_now boolean: If true, uses the current time as the end time; otherwise uses the most recent data point's time.
+--- @return datapoint[]: A table of data points merged from all sources, sorted by timestamp in descending order.
+M.merge_sources = function(sources, cutoff_params, from_now)
+	local all_data = {}
+	local last_data_points = {}
+
+	-- Initialize the last data points table
+	for key, source in pairs(sources) do
+		last_data_points[key] = source.dp() or nil
+	end
+
+	local latest_data_point, latest_key = M.find_latest_data_point(last_data_points)
+
+	local end_time = from_now and core.time() or latest_data_point
+	local cutoff = M.get_cutoff(cutoff_params, end_time)
+
+	while true do
+		-- If no latest data point is found, break the loop
+		if not latest_data_point or not latest_key then
+			break
+		end
+
+		if cutoff and latest_data_point.timestamp < cutoff then
+			break
+		end
+
+		-- Add the latest data point to all_data
+		table.insert(all_data, latest_data_point)
+
+		-- Fetch the next data point from the source that provided the latest data point
+		last_data_points[latest_key] = sources[latest_key].dp() or nil
+
+		latest_data_point, latest_key = M.find_latest_data_point(last_data_points)
+	end
+
+	return all_data
+end
+
+--- Collects all given data points into time period bars for drawing on a time bar chart.
+---
+--- This function takes a table of data points and groups them into time_bar segments,
+--- calculating one segment corresponding to the sum of each label within each period.
+---
+--- The input datapoints should be in reverse chronological order. The resultant bars will also be in reverse chronological order. The segments in each bar will be sorted such that the segment with the greatest total value over the time period is alway first (at the bottom of the graph).
+---
+--- @param datapoints datapoint[]: The data points to process (in reverse chronological order).
+--- @param totalling_period string: The period to group by (e.g., core.PERIOD.DAY).
+--- @param totalling_period_multiplier? integer: Optional multiplier for the period.
+--- @param count_by_label boolean?: If true, counts occurrences of labels instead of summing values. Defaults to false
+--- @param end_time integer?: The end time of the graph. An integer representing the Unix epoch millisecond timestamp. If not provided then the timestamp of the last datapoint in the datapoints is used.
+--- @param label_colors color?: A table of colors for each label. The keys are the labels and the values are core.color values.
+--- @return time_bar[]: A table of bars, each containing segments for the period.
+M.collect_to_bars = function(
+		datapoints,
+		totalling_period,
+		totalling_period_multiplier,
+		count_by_label,
+		end_time,
+		label_colors
+)
+	local bars = {}
+
+	if not datapoints or #datapoints == 0 then
+		return bars
+	end
+
+	local index = 1
+	local multiplier = totalling_period_multiplier or 1
+	local resolved_end_time = end_time or datapoints[index].timestamp
+	local current_bar_start = core.time(M.get_end_of_period(totalling_period, resolved_end_time))
+	current_bar_start = core.shift(current_bar_start, totalling_period, -multiplier).timestamp
+
+	local running_totals = {}
+
+	while index <= #datapoints do
+		local period_totals = {}
+
+		-- Process all data points that belong to the current period
+		while index <= #datapoints and datapoints[index].timestamp > current_bar_start do
+			local dp = datapoints[index]
+			local key = dp.label or ""
+			local value = count_by_label and 1 or dp.value
+			period_totals[key] = (period_totals[key] or 0) + value
+			index = index + 1
+		end
+
+		-- Create segments for the current period
+		local segments = {}
+		for label, value in pairs(period_totals) do
+			running_totals[label] = (running_totals[label] or 0) + value
+			table.insert(segments, {
+				label = label,
+				value = value,
+				color = label_colors and label_colors[label] or nil,
+			})
+		end
+
+		table.insert(bars, segments)
+
+		-- Move to the next period
+		current_bar_start = core.shift(current_bar_start, totalling_period, -multiplier).timestamp
+	end
+
+	for _, bar in ipairs(bars) do
+		table.sort(bar, function(a, b)
+			return running_totals[a.label] > running_totals[b.label]
+		end)
+	end
+
+	return bars
 end
 
 return M

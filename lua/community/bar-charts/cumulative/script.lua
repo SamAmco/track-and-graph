@@ -61,17 +61,23 @@ local get_accumulation = function(datapoints, cutoff)
 			})
 		end
 
-		table.sort(segments, function(a, b)
-			return a.label < b.label
-		end)
-
-		table.insert(bars, 1, segments)
+		table.insert(bars, segments)
 
 		current_bar_start = current_bar_end
 		current_bar_end = core.shift(current_bar_end, totalling_period, 1).timestamp
 	end
 
-	return bars
+	local bars_sorted_reversed = {}
+
+	for i = #bars, 1, -1 do
+		local segments = bars[i]
+		table.sort(segments, function(a, b)
+			return current_totals[a.label] > current_totals[b.label]
+		end)
+		table.insert(bars_sorted_reversed, segments)
+	end
+
+	return bars_sorted_reversed
 end
 
 return function(sources)

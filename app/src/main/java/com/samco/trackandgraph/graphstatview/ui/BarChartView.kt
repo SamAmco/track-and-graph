@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -287,7 +288,7 @@ private fun BarChartDataOverlayExtraDetails(
         ) {
             Row {
                 ColorCircle(
-                    color = getColorInt(LocalContext.current, labelInfo.color),
+                    color = Color(getColorInt(LocalContext.current, labelInfo.color)),
                     size = 16.dp
                 )
                 HalfDialogInputSpacing()
@@ -367,11 +368,7 @@ private fun BarChartBodyView(
         },
         update = {
 
-            setXAxisNumLabels(
-                context = context,
-                binding = this,
-                xDates = xDates,
-            )
+            setXAxisLabelSpacingAndOrigin(binding = this)
 
             if (!listMode) {
                 attachPanZoomClickListener(
@@ -427,11 +424,13 @@ private fun attachPanZoomClickListener(
         override fun zoom(motionEvent: MotionEvent?) {
             super.zoom(motionEvent)
             redrawMarkers(binding, barMarkerStore)
+            setXAxisLabelSpacingAndOrigin(binding)
         }
 
         override fun pan(motionEvent: MotionEvent?) {
             super.pan(motionEvent)
             redrawMarkers(binding, barMarkerStore)
+            setXAxisLabelSpacingAndOrigin(binding)
         }
 
         override fun onTouch(view: View, event: MotionEvent): Boolean {
@@ -483,6 +482,7 @@ fun setXAxisFormatter(
     xDates: List<ZonedDateTime>,
     xAxisFormatter: DateTimeFormatter
 ) {
+    binding.xyPlot.graph.domainOriginLinePaint.strokeWidth = binding.xyPlot.graph.domainGridLinePaint.strokeWidth
     binding.xyPlot.graph.getLineLabelStyle(XYGraphWidget.Edge.BOTTOM).format =
         object : Format() {
             override fun format(
@@ -500,37 +500,24 @@ fun setXAxisFormatter(
                     else if (rounded < 0) xDates.first()
                     else xDates.last()
 
-                return toAppendTo.append(
-                    if (number < 0) ""
-                    else date.format(xAxisFormatter)
-                )
+                return toAppendTo.append(date.format(xAxisFormatter))
             }
 
             override fun parseObject(source: String, pos: ParsePosition) = null
         }
 }
 
-private fun setXAxisNumLabels(
-    context: Context,
-    binding: GraphXyPlotBinding,
-    xDates: List<ZonedDateTime>,
-) {
-    val displayMetrics = context.resources.displayMetrics
-    val dpWidth = binding.xyPlot.width / displayMetrics.density
-
-    if (dpWidth < 0.1f) return
-
-    val maxLabels = (dpWidth / 30.0).toInt().toDouble()
-
-    var xStep = xDates.size
-    for (i in 1 until (xDates.size / 2)) {
-        if (xDates.size / i <= maxLabels && xDates.size % i == 0) {
-            xStep = xDates.size / i
-            break
-        }
+private fun setXAxisLabelSpacingAndOrigin(binding: GraphXyPlotBinding) {
+    val range = binding.xyPlot.bounds.maxX.toDouble() - binding.xyPlot.bounds.minX.toDouble()
+    var step = 1
+    val maxLabels = 10
+    while (range / step > maxLabels) {
+        step *= 2
     }
 
-    binding.xyPlot.setDomainStep(StepMode.SUBDIVIDE, min((xStep + 1).toDouble(), maxLabels))
+    binding.xyPlot.setDomainStep(StepMode.INCREMENT_BY_VAL, step.toDouble())
+    binding.xyPlot.graph.domainOriginLinePaint
+    binding.xyPlot.setUserDomainOrigin((range / 2.0).toInt())
 }
 
 private fun setBarChartBounds(binding: GraphXyPlotBinding, bounds: RectRegion) {

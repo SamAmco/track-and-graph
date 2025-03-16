@@ -7,4 +7,5 @@
 
 ## Bar Charts
 - [Cumulative](./bar-charts/cumulative/README.md): Generates a cumulative bar chart from the provided data source.
+- [Merge Inputs](./bar-charts/merge-inputs/README.md): Plots all provided data sources in a single bar chart where all data points are sorted by their timestamp.
 
