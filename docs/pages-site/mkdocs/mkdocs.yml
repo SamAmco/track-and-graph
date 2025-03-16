@@ -1,2 +1,45 @@
 site_name: Track & Graph Docs
-theme: readthedocs
+theme: 
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.path
+  palette: 
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - attr_list
+  - md_in_html
+  - pymdownx.blocks.caption
+  - toc: 
+      permalink: "#"
+
+nav:
+  - Tutorial:
+    - tutorial/tracking.md
+    - tutorial/import-export.md
+    - 'Creating graphs':
+      - tutorial/graphs/line.md
+      - tutorial/graphs/pie.md
+      - tutorial/graphs/statistics.md
+      - tutorial/graphs/histograms.md
+      - tutorial/graphs/bar-charts.md
+      - tutorial/graphs/lua-graphs.md
+    - tutorial/notes.md
+    - tutorial/timestamps.md
