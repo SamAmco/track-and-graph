@@ -53,14 +53,14 @@ class CumulativeBarChartTest : LuaEngineImplTest() {
         ),
         dataSources = mapOf(
             "source1" to sequenceOf(
-                0 to TestDP(0, 11.0, "l1"),
-                1 to TestDP(0, 10.0, "l2"),
-                1 to TestDP(0, 8.0, "l1"),
-                2 to TestDP(0, 5.0, "l2"),
-                2 to TestDP(0, 3.0, "l2"),
-                2 to TestDP(0, 1.0, "l1"),
-                3 to TestDP(0, 2.0, "l1"),
-                3 to TestDP(0, 1.0, "l1"),
+                0 to TestDP(0, 11.0, "l2"),
+                1 to TestDP(0, 10.0, "l1"),
+                1 to TestDP(0, 8.0, "l2"),
+                2 to TestDP(0, 5.0, "l1"),
+                2 to TestDP(0, 3.0, "l1"),
+                2 to TestDP(0, 1.0, "l2"),
+                3 to TestDP(0, 2.0, "l2"),
+                3 to TestDP(0, 1.0, "l2"),
             ).map { (days, dp) ->
                 return@map TestDP(
                     ZonedDateTime.now().minusDays(days.toLong()).toOffsetDateTime(),
@@ -75,31 +75,31 @@ class CumulativeBarChartTest : LuaEngineImplTest() {
         assert(result.data is LuaGraphResultData.TimeBarChartData)
         val data = result.data as LuaGraphResultData.TimeBarChartData
 
-        // The labels must be sorted alphabetically to be consistent across the whole graph
+        // The segments are sorted such that the largest segment at the end of the chart is always first
         assertEquals(
             listOf(
                 TimeBar(
                     listOf(
-                        TimeBarSegment(23.0, "l1"),
-                        TimeBarSegment(18.0, "l2")
+                        TimeBarSegment(23.0, "l2"),
+                        TimeBarSegment(18.0, "l1"),
                     )
                 ),
                 TimeBar(
                     listOf(
-                        TimeBarSegment(12.0, "l1"),
-                        TimeBarSegment(18.0, "l2"),
+                        TimeBarSegment(12.0, "l2"),
+                        TimeBarSegment(18.0, "l1"),
                     )
                 ),
                 TimeBar(
                     listOf(
-                        TimeBarSegment(4.0, "l1"),
-                        TimeBarSegment(8.0, "l2"),
+                        TimeBarSegment(4.0, "l2"),
+                        TimeBarSegment(8.0, "l1"),
                     )
                 ),
                 TimeBar(
                     listOf(
-                        TimeBarSegment(3.0, "l1"),
-                        TimeBarSegment(0.0, "l2"),
+                        TimeBarSegment(3.0, "l2"),
+                        TimeBarSegment(0.0, "l1"),
                     )
                 ),
             ),

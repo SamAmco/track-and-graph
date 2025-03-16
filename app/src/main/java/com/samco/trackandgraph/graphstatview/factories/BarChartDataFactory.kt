@@ -36,6 +36,8 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSeries
+import com.samco.trackandgraph.ui.dataVisColorGenerator
+import com.samco.trackandgraph.ui.dataVisColorList
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.jetbrains.annotations.VisibleForTesting
@@ -171,22 +173,23 @@ class BarChartDataFactory @Inject constructor(
                 .toList()
                 .sortedByDescending { (_, value) -> value }
 
-            var colorIndex = 0
             val bars = barValuesByLabel
                 .map { (label, values) ->
                     //Reverse the order because the values are added from newest to
                     // oldest but should be displayed from oldest to newest
-                    val series = SimpleXYSeries(
+                    SimpleXYSeries(
                         values.asReversed(),
                         SimpleXYSeries.ArrayFormat.Y_VALS_ONLY,
                         label
                     )
-                    val color = ColorSpec.ColorIndex(colorIndex++)
-                    TimeBarSegmentSeries(series, color)
                 }
                 //Sort the layers from largest to smallest so the label with the largest total of
                 // values is on the bottom
-                .sortedBy { timeBarSet -> barSumsByLabel.indexOfFirst { it.first == timeBarSet.segmentSeries.title } }
+                .sortedBy { series -> barSumsByLabel.indexOfFirst { it.first == series.title } }
+                .mapIndexed { i, series ->
+                    val color = ColorSpec.ColorIndex((i * dataVisColorGenerator) % dataVisColorList.size)
+                    TimeBarSegmentSeries(series, color)
+                }
 
             // reverse the order because the values are added from newest to
             // oldest but should be displayed from oldest to newest
