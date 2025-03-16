@@ -1,0 +1,20 @@
+# Ignore Python virtual environment
+venv/
+lib/
+pyvenv.cfg
+.env/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+
+# Ignore common Python environment files
+pip-log.txt
+pip-delete-this-directory.txt
+*.log
+
+# Ignore environment-related files
+.envrc
+.venv/
+
+# Ignore mkdocs build directory
+mkdocs/site/
