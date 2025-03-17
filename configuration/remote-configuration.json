@@ -1,0 +1,10 @@
+{
+  "endpoints": {
+    "github": "https://github.com/SamAmco/track-and-graph",
+    "tutorial-root": "https://samamco.github.io/track-and-graph/tutorial/",
+    "tutorial-tracking": "https://samamco.github.io/track-and-graph/tutorial/tracking.md",
+    "tutorial-lua": "https://samamco.github.io/track-and-graph/tutorial/graphs/lua-graphs.md",
+    "lua-community-scripts-root": "https://samamco.github.io/track-and-graph/lua-scripts",
+    "play-store-page": "https://play.google.com/store/apps/details?id=com.samco.trackandgraph"
+  }
+}

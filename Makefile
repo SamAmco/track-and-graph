@@ -21,3 +21,5 @@ endif
 	adb push $(FILE) /data/local/tmp/tmp.lua
 	adb shell am start -a android.intent.action.VIEW -d  "trackandgraph://lua_inject_file?path=/data/local/tmp/tmp.lua"
 
+validate-remote-config:
+	cd ./configuration; source bin/activate; python3 ./validate-config.py; deactivate

@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Remote Configuration Schema",
+  "description": "Schema for remote configuration endpoints",
+  "type": "object",
+  "required": ["endpoints"],
+  "properties": {
+    "endpoints": {
+      "type": "object",
+      "description": "Collection of endpoint configurations",
+      "required": [
+        "github",
+        "tutorial-root",
+        "tutorial-tracking",
+        "tutorial-lua",
+        "lua-community-scripts-root",
+        "play-store-page"
+      ],
+      "properties": {
+        "github": {
+          "type": "string",
+          "format": "uri"
+        },
+        "tutorial-root": {
+          "type": "string",
+          "format": "uri"
+        },
+        "tutorial-tracking": {
+          "type": "string",
+          "format": "uri"
+        },
+        "tutorial-lua": {
+          "type": "string",
+          "format": "uri"
+        },
+        "lua-community-scripts-root": {
+          "type": "string",
+          "format": "uri"
+        },
+        "play-store-page": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
