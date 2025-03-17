@@ -17,4 +17,4 @@ pip-delete-this-directory.txt
 .venv/
 
 # Ignore mkdocs build directory
-mkdocs/site/
+site/
