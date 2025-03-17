@@ -87,7 +87,8 @@ fun LibraryNames() = Column {
         R.string.apache_commons_csv,
         R.string.three_ten_android_backport,
         R.string.timber,
-        R.string.moshi
+        R.string.moshi,
+        R.string.luak,
     )
 
     for (library in libraries) {
@@ -99,13 +100,16 @@ fun LibraryNames() = Column {
 }
 
 @Composable
-fun LibraryVersions() = Column {
+fun LibraryVersions() = Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+) {
     val versions = listOf(
         R.string.apache_2_0,
         R.string.apache_2_0,
         R.string.apache_2_0,
         R.string.apache_2_0,
         R.string.apache_2_0,
+        R.string.mit,
     )
 
     for (version in versions) {

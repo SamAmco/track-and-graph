@@ -381,4 +381,6 @@
     <string name="paste">Paste</string>
     <string name="failed_to_download_file">Failed to download file: %s</string>
     <string name="confirm_deep_link">You have received a script link from an unknown source. Only install scripts from sources you trust. Would you like to install this script?</string>
+    <string name="luak" translatable="false">LuaK</string>
+    <string name="mit" translatable="false">MIT</string>
 </resources>
