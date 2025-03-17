@@ -1,6 +1,6 @@
 # Tutorial
 
-The tutorials in this section will guide you on how to use Track & Graph step by step.
+The tutorials will guide you on how to use Track & Graph step by step.
 
 - [Get started with tracking](tracking.md)
 - [Importing and exporting data](import-export.md)

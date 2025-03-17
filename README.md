@@ -28,7 +28,11 @@ An android app for tracking personal data and creating custom graphs
 This app does not record any of your personal information, anything you track or anything you do in the app. Nothing is recorded or stored anywhere online by this app or any third party library used by this app. You can however easily backup your data at any time to your own device or cloud storage service from within the app.
 
 # Contributing
-Contributers are welcome. Please raise an issue through GitHub for bug fix or feature requests.
+Small contributions are welcome but I would prefer if you could raise an issue first to discuss the changes you would like to make. 
+
+Please be aware my time to work on this project is limited so I may not be able to respond to your issue or pull request immediately.
+
+Please be aware I have no intention of supporting other languages at this time. Even if you have translated all the current copy, supporting multiple languages adds significant overhead to developing and maintaining the project going forwards.
 
 # License
     Copyright (C) 2019-2020 SamAmco <samuel.amco@gmail.com>
@@ -85,7 +89,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification.
 
 # Donate crypto to the creator
 

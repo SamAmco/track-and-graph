@@ -1,17 +1,6 @@
-# Welcome to MkDocs
+# Track & Graph
+Welcome to the Track & Graph docs site. 
 
-For full documentation visit [mkdocs.org](https://www.mkdocs.org).
+To get started learning about Track & Graph take a look at the [tutorial](./tutorial/index.md).
 
-## Commands
-
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
-
-## Project layout
-
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+You can also check out the project on [GitHub](https://www.github.com/SamAmco/track-and-graph) or the [Google Play Store](https://play.google.com/store/apps/details?id=com.samco.trackandgraph).
