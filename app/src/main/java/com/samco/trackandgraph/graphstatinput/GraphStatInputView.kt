@@ -15,8 +15,6 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-@file:OptIn(ExperimentalComposeUiApi::class)
-
 package com.samco.trackandgraph.graphstatinput
 
 import androidx.compose.foundation.*
@@ -26,14 +24,11 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -209,7 +204,8 @@ private fun GraphStatInputViewForm(
 
     if (viewModel.showLuaFirstTimeUserDialog.observeAsState().value == true) {
         LuaFirstTimeUserDialog(
-            onDismiss = { viewModel.onLuaFirstTimeUserDialogDismiss() }
+            onDismiss = { viewModel.onLuaFirstTimeUserDialogDismiss() },
+            onOpenLuaTutorialPath = { viewModel.onOpenLuaTutorialPath() }
         )
     }
 
@@ -226,10 +222,10 @@ private fun GraphStatInputViewForm(
 }
 
 @Composable
-private fun LuaFirstTimeUserDialog(onDismiss: () -> Unit) {
-    val uriHandler = LocalUriHandler.current
-    val context = LocalContext.current
-
+private fun LuaFirstTimeUserDialog(
+    onDismiss: () -> Unit,
+    onOpenLuaTutorialPath: () -> Unit,
+) {
     ConfirmDialog(
         onDismissRequest = onDismiss,
         onConfirm = onDismiss,
@@ -248,9 +244,7 @@ private fun LuaFirstTimeUserDialog(onDismiss: () -> Unit) {
                 TextLink(
                     stringResource(id = R.string.learn_more),
                 ) {
-                    val url = context.getString(R.string.github_link) +
-                        context.getString(R.string.github_lua_docs_path)
-                    uriHandler.openUri(url)
+                    onOpenLuaTutorialPath()
                     onDismiss()
                 }
             }
@@ -262,7 +256,7 @@ private fun LuaFirstTimeUserDialog(onDismiss: () -> Unit) {
 @Preview(showBackground = true)
 @Composable
 private fun LuaFirstTimeUserDialogPreview() {
-    LuaFirstTimeUserDialog(onDismiss = {})
+    LuaFirstTimeUserDialog(onDismiss = {}, onOpenLuaTutorialPath = {})
 }
 
 @Composable

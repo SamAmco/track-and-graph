@@ -14,10 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-@file:OptIn(
-    ExperimentalPagerApi::class, ExperimentalComposeUiApi::class,
-    ExperimentalLayoutApi::class, ExperimentalFoundationApi::class
-)
+@file:OptIn(ExperimentalPagerApi::class, ExperimentalLayoutApi::class, ExperimentalFoundationApi::class)
 
 package com.samco.trackandgraph.adddatapoint
 
@@ -31,7 +28,6 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester

@@ -38,6 +38,7 @@ import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
@@ -62,6 +63,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher,
     private val deepLinkHandler: DeepLinkHandler,
     private val fileDownloader: FileDownloader,
+    private val urlNavigator: UrlNavigator,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LuaConfigData>(
@@ -292,5 +294,9 @@ class LuaGraphConfigViewModel @Inject constructor(
                 )
             })
         }
+    }
+
+    fun openCommunityScripts() {
+        viewModelScope.launch { urlNavigator.navigateTo(context, UrlNavigator.Location.LUA_COMMUNITY_SCRIPTS_ROOT) }
     }
 }

@@ -66,7 +66,7 @@ fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = Column(
             when (page) {
                 0 -> TutorialPage0()
                 1 -> TutorialPage1()
-                2 -> TutorialPage2()
+                2 -> TutorialPage2 { viewModel.onNavigateToFaqClicked() }
             }
         }
     }
@@ -101,7 +101,7 @@ fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = Column(
 }
 
 @Composable
-fun TutorialPage2() {
+private fun TutorialPage2(onFaqClicked: () -> Unit) {
     InputSpacingLarge()
 
     Text(
@@ -134,8 +134,6 @@ fun TutorialPage2() {
         fontWeight = MaterialTheme.typography.body2.fontWeight
     )
 
-    val context = LocalContext.current
-    val url = stringResource(R.string.faq_page_link_1)
     Text(
         modifier = Modifier
             .padding(
@@ -143,10 +141,7 @@ fun TutorialPage2() {
                 vertical = dimensionResource(id = R.dimen.card_padding)
             )
             .fillMaxWidth()
-            .clickable {
-                val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-                context.startActivity(browserIntent)
-            },
+            .clickable { onFaqClicked() },
         text = stringResource(R.string.more_details),
         color = MaterialTheme.tngColors.secondary,
         textDecoration = TextDecoration.Underline,
@@ -159,7 +154,7 @@ fun TutorialPage2() {
 }
 
 @Composable
-fun TutorialPage1() = Column(
+private fun TutorialPage1() = Column(
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
     InputSpacingLarge()

@@ -18,6 +18,7 @@
 
 package com.samco.trackandgraph.adddatapoint
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -33,10 +34,12 @@ import com.samco.trackandgraph.base.helpers.doubleFormatter
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import com.samco.trackandgraph.util.getDoubleFromTextOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -123,10 +126,12 @@ interface AddDataPointsNavigationViewModel : AddDataPointsViewModel {
 
 @HiltViewModel
 class AddDataPointsViewModelImpl @Inject constructor(
+    @ApplicationContext private val applicationContext: Context,
     private val dataInteractor: DataInteractor,
     private val suggestedValueHelper: SuggestedValueHelper,
     @IODispatcher private val io: CoroutineDispatcher,
-    private val prefHelper: PrefHelper
+    private val prefHelper: PrefHelper,
+    private val urlNavigator: UrlNavigator,
 ) : ViewModel(), AddDataPointsNavigationViewModel {
 
     private interface AddDataPointViewModelInner : AddDataPointViewModel {
@@ -149,7 +154,14 @@ class AddDataPointsViewModelImpl @Inject constructor(
     override val dismissEvents = MutableSharedFlow<Unit>()
     private val tutorialButtonPresses = MutableSharedFlow<Unit>()
 
-    override val tutorialViewModel = AddDataPointTutorialViewModelImpl()
+    override val tutorialViewModel = AddDataPointTutorialViewModelImpl {
+        viewModelScope.launch {
+            urlNavigator.navigateTo(
+                applicationContext,
+                UrlNavigator.Location.TUTORIAL_TRACKING
+            )
+        }
+    }
 
     override val showCancelConfirmDialog = MutableLiveData(false)
 
@@ -262,11 +274,13 @@ class AddDataPointsViewModelImpl @Inject constructor(
                     valueStr = null,
                     label = label
                 )
+
                 TrackerSuggestionType.VALUE_ONLY -> SuggestedValueViewData(
                     value = value,
                     valueStr = getValueString(value, config.tracker.dataType.isDuration()),
                     label = null
                 )
+
                 TrackerSuggestionType.VALUE_AND_LABEL -> SuggestedValueViewData(
                     value = value,
                     valueStr = getValueString(value, config.tracker.dataType.isDuration()),

@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.graphstatinput
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,7 +32,9 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -92,12 +95,15 @@ interface GraphStatInputViewModel {
     fun onConfigEvent(configData: GraphStatConfigEvent?)
     fun createGraphOrStat()
     fun onLuaFirstTimeUserDialogDismiss()
+    fun onOpenLuaTutorialPath()
 }
 
 @HiltViewModel
 class GraphStatInputViewModelImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val dataInteractor: DataInteractor,
     private val gsiProvider: GraphStatInteractorProvider,
+    private val urlNavigator: UrlNavigator,
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher,
     @DefaultDispatcher private val worker: CoroutineDispatcher
@@ -207,6 +213,12 @@ class GraphStatInputViewModelImpl @Inject constructor(
 
     override fun onLuaFirstTimeUserDialogDismiss() {
         _showLuaFirstTimeUserDialog.value = false
+    }
+
+    override fun onOpenLuaTutorialPath() {
+        viewModelScope.launch {
+            urlNavigator.navigateTo(context, UrlNavigator.Location.TUTORIAL_LUA)
+        }
     }
 
     private fun onValidationException(exception: GraphStatConfigEvent.ValidationException?) {

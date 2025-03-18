@@ -21,16 +21,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import android.content.Intent
-import android.net.Uri
 import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.lifecycleScope
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AboutPageFragment : Fragment() {
+
+    @Inject
+    lateinit var urlNavigator: UrlNavigator
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -51,9 +59,9 @@ class AboutPageFragment : Fragment() {
     }
 
     private fun onRepoLinkClicked() {
-        val url = getString(R.string.github_link)
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        startActivity(browserIntent)
+        lifecycleScope.launch {
+            urlNavigator.navigateTo(requireContext(), UrlNavigator.Location.GITHUB)
+        }
     }
 
     private fun getVersionText(): String {

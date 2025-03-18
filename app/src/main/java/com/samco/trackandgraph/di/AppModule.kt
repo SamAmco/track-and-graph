@@ -35,6 +35,8 @@ import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandlerImpl
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.downloader.FileDownloaderImpl
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import com.samco.trackandgraph.remoteconfig.UrlNavigatorImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.settings.TngSettingsImpl
 import dagger.Module
@@ -83,4 +85,8 @@ class AppModule {
 
     @Provides
     fun provideFileDownloader(impl: FileDownloaderImpl): FileDownloader = impl
+
+    @Provides
+    @Singleton
+    fun provideUrlNavigator(impl: UrlNavigatorImpl): UrlNavigator = impl
 }

@@ -16,22 +16,25 @@
 */
 package com.samco.trackandgraph.faq
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import com.samco.trackandgraph.R
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class FAQRedirectFragment : Fragment() {
+
+    @Inject
+    lateinit var urlNavigator: UrlNavigator
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val navController = container?.findNavController()
-        val url = getString(R.string.faq_page_link)
-        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        startActivity(browserIntent)
+        urlNavigator.triggerNavigation(requireContext(), UrlNavigator.Location.TUTORIAL_ROOT)
         navController?.popBackStack()
         return super.onCreateView(inflater, container, savedInstanceState)
     }
