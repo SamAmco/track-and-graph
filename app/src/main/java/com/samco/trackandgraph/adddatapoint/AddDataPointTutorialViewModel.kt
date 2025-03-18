@@ -36,10 +36,13 @@ interface AddDataPointTutorialViewModel {
 
     fun onButtonClicked()
     fun onSwipeToPage(page: Int)
+    fun onNavigateToFaqClicked()
     fun reset()
 }
 
-class AddDataPointTutorialViewModelImpl :
+class AddDataPointTutorialViewModelImpl(
+    private val onNavigateToFaqClicked: () -> Unit,
+) :
     AddDataPointTutorialViewModel,
     AddDataPointTutorialEvents,
     CoroutineScope {
@@ -92,4 +95,6 @@ class AddDataPointTutorialViewModelImpl :
     override fun reset() {
         launch { pageEvent.emit(PageEvent.Reset) }
     }
+
+    override fun onNavigateToFaqClicked() = onNavigateToFaqClicked.invoke()
 }

@@ -124,6 +124,7 @@ fun LuaGraphConfigView(
         setScriptText = viewModel::setScriptText,
         onReadFile = viewModel::readFile,
         onUpdateScriptFromClipboard = viewModel::updateScriptFromClipboard,
+        onOpenCommunityScripts = viewModel::openCommunityScripts,
         onUserConfirmDeepLink = viewModel::onUserConfirmDeepLink,
         onUserCancelDeepLink = viewModel::onUserCancelDeepLink,
         showEditScriptDialog = showEditScriptDialog,
@@ -147,6 +148,7 @@ private fun LuaGraphConfigView(
     setScriptText: (TextFieldValue) -> Unit,
     onReadFile: (Uri?) -> Unit,
     onUpdateScriptFromClipboard: (String) -> Unit,
+    onOpenCommunityScripts: () -> Unit,
     onUserConfirmDeepLink: () -> Unit,
     onUserCancelDeepLink: () -> Unit,
     showEditScriptDialog: MutableState<Boolean>,
@@ -165,7 +167,8 @@ private fun LuaGraphConfigView(
 
     Buttons(
         onReadFile = onReadFile,
-        onUpdateScriptFromClipboard = onUpdateScriptFromClipboard
+        onUpdateScriptFromClipboard = onUpdateScriptFromClipboard,
+        onOpenCommunityScripts = onOpenCommunityScripts,
     )
 
     InputSpacingLarge()
@@ -391,7 +394,8 @@ private fun ScriptTextInputPreview(
 @Composable
 private fun Buttons(
     onReadFile: (Uri?) -> Unit,
-    onUpdateScriptFromClipboard: (String) -> Unit
+    onUpdateScriptFromClipboard: (String) -> Unit,
+    onOpenCommunityScripts: () -> Unit,
 ) = Row(
     modifier = Modifier.fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceEvenly,
@@ -422,15 +426,8 @@ private fun Buttons(
 
     DialogInputSpacing()
 
-    val uriHandler = LocalUriHandler.current
-    val context = LocalContext.current
-
     IconTextButton(
-        onClick = {
-            val url = context.getString(AppR.string.github_link) +
-                context.getString(AppR.string.github_lua_community_path)
-            uriHandler.openUri(url)
-        },
+        onClick = { onOpenCommunityScripts() },
         icon = AppR.drawable.github_mark,
         text = stringResource(R.string.github)
     )
@@ -463,6 +460,7 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
             setScriptText = {},
             onReadFile = {},
             onUpdateScriptFromClipboard = {},
+            onOpenCommunityScripts = {},
             onUserConfirmDeepLink = {},
             onUserCancelDeepLink = {},
             showEditScriptDialog = remember { mutableStateOf(false) },

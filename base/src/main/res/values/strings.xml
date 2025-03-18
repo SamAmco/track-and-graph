@@ -265,12 +265,6 @@
     <string name="data_point_tutorial_page_3_description">Use labels if you want to group the data points</string>
     <string name="data_point_tutorial_page_3_hint">(Hint: If you want to add more context or description use the note instead of the label field)</string>
     <string name="help">Help</string>
-    <string name="github_link" translatable="false">https://github.com/SamAmco/track-and-graph</string>
-    <string name="github_lua_docs_path" translatable="false">/tree/master/docs/lua/index.md</string>
-    <string name="github_lua_community_path" translatable="false">/tree/master/lua/community/index.md</string>
-    <string name="faq_page_link" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v5.0.0/docs/faq/index.md#faq</string>
-    <string name="faq_page_link_1" translatable="false">https://github.com/SamAmco/track-and-graph/blob/release/v5.0.0/docs/faq/faq_1.md#how-do-i-start-tracking-something</string>
-    <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="advanced_options">Advanced options</string>
     <string name="type_colon">"Type: "</string>
@@ -366,6 +360,8 @@
     <string name="last_successful_backup">Last Successful Backup</string>
     <string name="next_scheduled_backup">Next Scheduled Backup</string>
     <string name="notification_permission_prompt">You should enable notifications for Track &amp; Graph to be notified if Auto-Backup fails for any reason.</string>
+    <string name="luak" translatable="false">LuaK</string>
+    <string name="mit" translatable="false">MIT</string>
     <string name="lua_script_empty">Please add a Lua script</string>
     <string name="lua_script_input_hint">Enter a Lua script...</string>
     <string name="file">File</string>
@@ -381,6 +377,4 @@
     <string name="paste">Paste</string>
     <string name="failed_to_download_file">Failed to download file: %s</string>
     <string name="confirm_deep_link">You have received a script link from an unknown source. Only install scripts from sources you trust. Would you like to install this script?</string>
-    <string name="luak" translatable="false">LuaK</string>
-    <string name="mit" translatable="false">MIT</string>
 </resources>
