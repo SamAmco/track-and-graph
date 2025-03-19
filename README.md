@@ -95,10 +95,10 @@ This project follows the [all-contributors](https://github.com/all-contributors/
 
 <center>
 
-| <img src="./docs/readme/bitcoin.jpeg" width="180px" /> | <img src="./docs/readme/ethereum.jpeg" width="180px" /> |
+| <img src="./image-assets/bitcoin.jpeg" width="180px" /> | <img src="./image-assets/ethereum.jpeg" width="180px" /> |
 |:--:|:--:|
 | bc1q3a74v98lklzqsgrennlveujfwgluusld7hqsvu | 0xf2bae4971f67dfb49a2a4a08449980657abfb965 |
-| <img src="./docs/readme/bitcoin-cash.jpeg" width="180px" /> | <img src="./docs/readme/litecoin.jpeg" width="180px" /> |
+| <img src="./image-assets/bitcoin-cash.jpeg" width="180px" /> | <img src="./image-assets/litecoin.jpeg" width="180px" /> |
 | qr266rwh2t4jajlvekudn89vlh6nd6u4wsj3ngv45m | ltc1q0ayy9ctvnnk7wyqgmh80ujq6wry3saz9a00d28 |
 
 </center>
