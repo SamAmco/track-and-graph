@@ -46,4 +46,5 @@ nav:
     - tutorial/notes.md
     - tutorial/timestamps.md
   - Lua:
-    - community/index.md
+    - lua/community/index.md
+
