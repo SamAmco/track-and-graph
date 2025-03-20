@@ -32,9 +32,9 @@ return function(sources)
 
 	local end_date = nil
 	if from_now then
-		end_date = graph.get_end_of_period(totalling_period, core.time().timestamp)
+		end_date = core.get_end_of_period(totalling_period, core.time().timestamp)
 	else
-		end_date = graph.get_end_of_period(totalling_period, all_data[1].timestamp)
+		end_date = core.get_end_of_period(totalling_period, all_data[1].timestamp)
 	end
 
 	local end_time = core.time(end_date).timestamp-1

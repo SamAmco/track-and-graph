@@ -2,6 +2,7 @@ local core = require("tng.core")
 local M = {}
 
 --- Graph types enum
+--- @since v5.1.0
 --- @enum GRAPH_TYPE
 M.GRAPH_TYPE = {
 	DATA_POINT = "DATA_POINT",
@@ -11,27 +12,32 @@ M.GRAPH_TYPE = {
 	LINE_GRAPH = "LINE_GRAPH",
 }
 
+--- @since v5.1.0
 --- @class datapoint_graphtype_data
 --- @field type GRAPH_TYPE.DATA_POINT: The type of the graph.
 --- @field datapoint datapoint: The data point to display.
 --- @field isduration boolean: Whether the data point is a duration.
 
+--- @since v5.1.0
 --- @class text_graphtype_data (you can also just return a string or number for this graph type)
 --- @field type GRAPH_TYPE.TEXT
 --- @field text string: The text to display.
 --- @field size? integer: 1-3 The size of the text small, medium or large. Defaults to large.
 --- @field align? string: start, centre, or end The alignment of the text. Defaults to centre.
 
+--- @since v5.1.0
 --- @class piechart_graphtype_data
 --- @field type GRAPH_TYPE.PIE_CHART
 --- @field segments piechart_segment[]: A table of piechart_segment items.
 
+--- @since v5.1.0
 --- @class linegraph_graphtype_data
 --- @field type GRAPH_TYPE.LINE_GRAPH
 --- @field lines line[]: A table of line items.
 --- @field duration_based_range? boolean: Whether the range is based on duration.
 --- @field range_bounds? range_bounds: The range of the y-axis.
 
+--- @since v5.1.0
 --- @class time_barchart_graphtype_data
 --- @field type GRAPH_TYPE.TIME_BARCHART
 --- @field bars time_bar[]: A table of time_bar sorted in reverse chronological order. Each bar is bar_duration or bar_period in length and ends that amount of time before the previous bar.
@@ -42,29 +48,37 @@ M.GRAPH_TYPE = {
 --- @field duration_based_range? boolean: If true, the y-axis represents time in milliseconds.
 --- @field y_max? integer: The top extent of the y-axis. If not provided, the maximum value of the bars will be used.
 
+--- @since v5.1.0
 --- @class piechart_segment
 --- @field label string: The label of the segment.
 --- @field value number: The value of the segment. This does not need to be normalised in any way.
 --- @field color? color: The color of the segment. If not provided, a color will be chosen from the default palette.
 
+--- @since v5.1.0
 --- @alias time_bar (number|time_barchart_bar_segment|time_barchart_bar_segment[]): A table of bar_segment items.
+
+--- @since v5.1.0
 --- @alias time_barchart_bar_segment (number|time_barchart_segment)
 
+--- @since v5.1.0
 --- @class time_barchart_segment
 --- @field value number: The value of the bar segment.
 --- @field label? string: The label of the bar segment (shown in the legend).
 --- @field color? color: The color of the bar segment. If not provided, a color will be chosen from the default palette.
 
+--- @since v5.1.0
 ---@class range_bounds
 ---@field min number: The minimum value of the range.
 ---@field max number: The maximum value of the range.
 
+--- @since v5.1.0
 --- @class line
 --- @field line_points line_point[]: A table of line_point items. Line points should be sorted in reverse chronological order by timestamp.
 --- @field line_color? color: The color of the line.
 --- @field point_style? line_point_style: The style of the points on the line.
 --- @field label? string: The label of the line. Will be displayed in the legend.
 
+--- @since v5.1.0
 --- @enum line_point_style
 M.LINE_POINT_STYLE = {
 	NONE = "none",
@@ -72,33 +86,17 @@ M.LINE_POINT_STYLE = {
 	CIRCLE_VALUE = "circle_value",
 }
 
+--- @since v5.1.0
 --- @class line_point
 --- @field timestamp integer: The timestamp of the line point.
 --- @field value number: The Y value of the line point.
-
---- @class cutoff_params
---- @field period string?: The period for the cutoff.
---- @field period_multiplier? integer: The multiplier for the period.
-
---- @param params cutoff_params: The parameters for calculating the cutoff.
---- @param end_time (timestamp|date)?: The end time for the cutoff. If not provided, the current time will be used.
---- @return integer|nil: The cutoff timestamp obtained by subtracting the given period from the specified end time (as a Unix epoch millisecond) or the current time, or nil if the period is not provided.
-M.get_cutoff = function(params, end_time)
-	if not params.period then
-		return nil
-	end
-
-	local multiplier = params.period_multiplier or 1
-
-	local end_or_now = end_time or core.time()
-	return core.shift(end_or_now, params.period, -multiplier).timestamp
-end
 
 --- Applies a moving average to a series of data points in place.
 ---
 --- This function takes a table of data points (each must have at a minimum a timestamp and a value) and applies a moving average over a specified duration.
 --- It updates each datapoint's value in the table to be the average of values within the specified duration preceding it.
 ---
+--- @since v5.1.0
 --- @param datapoints datapoint[]: The data points to apply the moving average to.
 --- @param averaging_duration integer: The duration over which to average the data points, in milliseconds.
 M.apply_moving_averaging = function(datapoints, averaging_duration)
@@ -151,45 +149,12 @@ M.apply_moving_averaging = function(datapoints, averaging_duration)
 	end
 end
 
---- Calculates the end of a given period for a specific timestamp.
----
---- This function determines the end of a specified period (e.g., day, week, month, year) for a given timestamp.
---- It adjusts the date to the start of the next period and sets the time to midnight.
----
---- @param period string: The period to calculate the end for (e.g., core.PERIOD.DAY, core.PERIOD.WEEK).
---- @param timestamp integer: The timestamp to calculate the end of the period for.
---- @param zone_override? string: An optional timezone override. If not provided, the default timezone is used.
---- @return date: A date representing the end of the specified period with the time set to midnight.
-M.get_end_of_period = function(period, timestamp, zone_override)
-	local zone = zone_override or core.date().zone
-	local date = core.date(timestamp)
-	if period == core.PERIOD.DAY then
-		date = core.date(core.shift(date, core.PERIOD.DAY, 1))
-	elseif period == core.PERIOD.WEEK then
-		date = core.date(core.shift(date, core.PERIOD.WEEK, 1))
-		date.wday = 1
-	elseif period == core.PERIOD.MONTH then
-		date = core.date(core.shift(date, core.PERIOD.MONTH, 1))
-		date.day = 1
-		date.wday = nil
-		date.yday = nil
-	elseif period == core.PERIOD.YEAR then
-		date = core.date(core.shift(date, core.PERIOD.YEAR, 1))
-		date.month = 1
-		date.day = 1
-	end
-	date.hour = 0
-	date.min = 0
-	date.sec = 0
-	date.zone = zone
-	return date
-end
-
 --- Calculates the total value of data points for each period starting with the period containing the first data point.
 ---
 --- This function takes a table of data points and calculates the total value for each period defined by the given period and multiplier.
 --- It returns a new table of data points, each representing the total value for a specific period.
 ---
+--- @since v5.1.0
 --- @param datapoints datapoint[]: The data points to calculate totals for.
 --- @param period string: The period to calculate totals over (e.g., core.PERIOD.DAY).
 --- @param multiplier integer: The multiplier for the period. Allowing for periods like 2 days, 3 weeks, etc.
@@ -200,7 +165,7 @@ M.calculate_period_totals = function(datapoints, period, multiplier, zone_overri
 		return datapoints
 	end
 
-	local last_date = M.get_end_of_period(period, datapoints[1].timestamp, zone_override)
+	local last_date = core.get_end_of_period(period, datapoints[1].timestamp, zone_override)
 	local period_totals = {}
 	local period_end = core.time(last_date)
 	local mult = -(multiplier or 1)
@@ -238,6 +203,7 @@ end
 --- This function iterates through a table of data points and returns the one with the highest timestamp
 --- along with its corresponding key in the table.
 ---
+--- @since v5.1.0
 --- @param data_points table: A table of data points, where each data point should have a timestamp field.
 --- @return datapoint|nil: The data point with the highest timestamp, or nil if no valid data points were found.
 --- @return any|nil: The key of the data point with the highest timestamp, or nil if no valid data points were found.
@@ -261,8 +227,9 @@ end
 --- This function collects data points from multiple sources and organizes them in chronological order
 --- (most recent first) until a specified cutoff time is reached.
 ---
+--- @since v5.1.0
 --- @param sources table: A table of sources, where each source has a dp() method that returns a data point.
---- @param cutoff_params cutoff_params: Parameters for calculating the cutoff time.
+--- @param cutoff_params core.cutoff_params: Parameters for calculating the cutoff time.
 --- @param from_now boolean: If true, uses the current time as the end time; otherwise uses the most recent data point's time.
 --- @return datapoint[]: A table of data points merged from all sources, sorted by timestamp in descending order.
 M.merge_sources = function(sources, cutoff_params, from_now)
@@ -277,7 +244,7 @@ M.merge_sources = function(sources, cutoff_params, from_now)
 	local latest_data_point, latest_key = M.find_latest_data_point(last_data_points)
 
 	local end_time = from_now and core.time() or latest_data_point
-	local cutoff = M.get_cutoff(cutoff_params, end_time)
+	local cutoff = core.get_cutoff(cutoff_params, end_time)
 
 	while true do
 		-- If no latest data point is found, break the loop
@@ -308,6 +275,7 @@ end
 ---
 --- The input datapoints should be in reverse chronological order. The resultant bars will also be in reverse chronological order. The segments in each bar will be sorted such that the segment with the greatest total value over the time period is alway first (at the bottom of the graph).
 ---
+--- @since v5.1.0
 --- @param datapoints datapoint[]: The data points to process (in reverse chronological order).
 --- @param totalling_period string: The period to group by (e.g., core.PERIOD.DAY).
 --- @param totalling_period_multiplier? integer: Optional multiplier for the period.
@@ -332,7 +300,7 @@ M.collect_to_bars = function(
 	local index = 1
 	local multiplier = totalling_period_multiplier or 1
 	local resolved_end_time = end_time or datapoints[index].timestamp
-	local current_bar_start = core.time(M.get_end_of_period(totalling_period, resolved_end_time))
+	local current_bar_start = core.time(core.get_end_of_period(totalling_period, resolved_end_time))
 	current_bar_start = core.shift(current_bar_start, totalling_period, -multiplier).timestamp
 
 	local running_totals = {}

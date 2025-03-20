@@ -43,7 +43,7 @@ local function get_line_data(source)
 		from_now = from_now,
 		timestamp = latest_data_point.timestamp or nil,
 	}
-	local cutoff = graph.get_cutoff(cutoff_params)
+	local cutoff = core.get_cutoff(cutoff_params)
 
 	local datapoints = source.dpafter(cutoff)
 	table.insert(datapoints, 1, latest_data_point)
