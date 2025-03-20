@@ -204,7 +204,7 @@ tasks.matching { it.name.startsWith("assemble") }.configureEach {
 tasks.register('copyLuaScriptsForTests') {
     doLast {
         copy {
-            from "${rootProject.projectDir}/lua/community"
+            from "${rootProject.projectDir}/docs/docs/lua/community"
             into "${projectDir}/src/test/resources/generated/lua-community"
         }
 

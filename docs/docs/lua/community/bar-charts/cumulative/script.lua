@@ -34,7 +34,7 @@ local get_accumulation = function(datapoints, cutoff)
 
 	local index = #datapoints
 	local current_bar_start = cutoff or datapoints[#datapoints].timestamp
-	local current_bar_end = core.time(graph.get_end_of_period(totalling_period, current_bar_start)).timestamp
+	local current_bar_end = core.time(core.get_end_of_period(totalling_period, current_bar_start)).timestamp
 	current_bar_start = core.shift(current_bar_start, totalling_period, -1).timestamp
 
 	while index > 0 do
@@ -102,16 +102,16 @@ return function(sources)
 		from_now = from_now,
 		timestamp = latest_data_point.timestamp,
 	}
-	local cutoff = graph.get_cutoff(cutoff_params)
+	local cutoff = core.get_cutoff(cutoff_params)
 
 	local datapoints = source.dpafter(cutoff)
 	table.insert(datapoints, 1, latest_data_point)
 
 	local end_date = nil
 	if from_now then
-		end_date = graph.get_end_of_period(totalling_period, core.time().timestamp)
+		end_date = core.get_end_of_period(totalling_period, core.time().timestamp)
 	else
-		end_date = graph.get_end_of_period(totalling_period, datapoints[1].timestamp)
+		end_date = core.get_end_of_period(totalling_period, datapoints[1].timestamp)
 	end
 
 	end_time = core.time(end_date)
