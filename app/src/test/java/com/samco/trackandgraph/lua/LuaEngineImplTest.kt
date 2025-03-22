@@ -62,25 +62,6 @@ abstract class LuaEngineImplTest {
         val sampledData: Map<String, List<DataPoint>>,
     )
 
-    protected fun testCommunityScript(
-        filePath: String,
-        configOverrides: Map<String, String> = emptyMap(),
-        dataSources: Map<String, Sequence<TestDP>> = emptyMap(),
-        assertionBlock: AssertionScope.() -> Unit
-    ) {
-        val script = readAssetToString(filePath) ?: error("Failed to read asset $filePath")
-        // For each key value pair in the configOverrides map, find the first line matching the pattern
-        // key = something and replace it with key = value
-        // if the pattern is not found throw an error
-        val updatedScript = configOverrides.entries.fold(script) { acc, (key, value) ->
-            val pattern = Regex("local $key =.*")
-            val match = pattern.find(acc) ?: error("Pattern $pattern not found in script")
-            acc.replaceRange(match.range, "local $key = $value")
-        }
-
-        testLuaEngine(dataSources, updatedScript, assertionBlock)
-    }
-
     protected fun testLuaEngine(
         script: String,
         assertionBlock: AssertionScope.() -> Unit
