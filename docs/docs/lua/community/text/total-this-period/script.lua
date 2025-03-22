@@ -27,7 +27,7 @@ local function multi_input_text_output(totals)
 end
 
 return function(sources)
-	local next_end = core.get_end_of_period(core.time(), period)
+	local next_end = core.get_end_of_period(period, core.time().timestamp)
 	local next_start = core.shift(next_end, period, -1)
 
 	local data = {}

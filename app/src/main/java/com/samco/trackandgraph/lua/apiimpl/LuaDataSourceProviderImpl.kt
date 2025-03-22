@@ -24,14 +24,13 @@ class LuaDataSourceProviderImpl @Inject constructor(
     fun createDataSourceTable(dataSources: Map<String, RawDataSample>): LuaValue {
         val dataSourceTable = LuaTable()
         dataSources.entries.forEachIndexed { index, entry ->
-            dataSourceTable[entry.key] = createLuaDataSource(index, entry.key, entry.value)
+            dataSourceTable[entry.key] = createLuaDataSource(index, entry.key, entry.value.iterator())
         }
         return dataSourceTable
     }
 
-    private fun createLuaDataSource(index: Int, name: String, dataSample: RawDataSample): LuaValue {
+    fun createLuaDataSource(index: Int, name: String, iterator: Iterator<DataPoint>): LuaValue {
         val luaTable = LuaTable()
-        val iterator = dataSample.iterator()
         luaTable[NAME] = name
         luaTable[DP] = getDpLuaFunction(iterator)
         luaTable[DP_BATCH] = getDpBatchLuaFunction(iterator)

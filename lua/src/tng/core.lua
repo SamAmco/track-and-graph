@@ -187,6 +187,8 @@ M.get_end_of_period = function(period, timestamp, zone_override)
 		date = M.date(M.shift(date, M.PERIOD.YEAR, 1))
 		date.month = 1
 		date.day = 1
+	else
+		error("Invalid period: " .. period)
 	end
 	date.hour = 0
 	date.min = 0

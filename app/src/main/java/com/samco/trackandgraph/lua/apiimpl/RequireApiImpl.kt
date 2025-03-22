@@ -35,6 +35,7 @@ class RequireApiImpl @Inject constructor(
             mapOf(
                 "tng.core" to lazyCore(globals),
                 "tng.graph" to lazyGraph(globals),
+                "test.core" to lazyTest(globals),
             )
         )
     }
@@ -48,6 +49,11 @@ class RequireApiImpl @Inject constructor(
 
     private fun lazyGraph(globals: Globals) = lazy {
         val fileContents = assetReader.readAssetToString("generated/lua-api/graph.lua")
+        return@lazy globals.load(fileContents).call().checktable()!!
+    }
+
+    private fun lazyTest(globals: Globals) = lazy {
+        val fileContents = assetReader.readAssetToString("generated/lua-test/core.lua")
         return@lazy globals.load(fileContents).call().checktable()!!
     }
 

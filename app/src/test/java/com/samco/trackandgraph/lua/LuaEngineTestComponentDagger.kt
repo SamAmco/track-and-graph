@@ -19,12 +19,15 @@ package com.samco.trackandgraph.lua
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.lua.apiimpl.DataPointParser
+import com.samco.trackandgraph.lua.apiimpl.LuaDataSourceProviderImpl
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.CoroutineDispatcher
+import javax.inject.Singleton
 
 @Module
 @DisableInstallInCheck
@@ -33,12 +36,21 @@ interface LuaBindingModule {
     fun bindLuaEngine(impl: LuaEngineImpl): LuaEngine
 }
 
+@Singleton
 @Component(
     modules = [LuaBindingModule::class]
 )
 interface LuaEngineTestComponent {
 
     fun provideLuaEngine(): LuaEngineImpl
+
+    fun provideGlobalsProvider(): GlobalsProvider
+    
+    fun provideLuaScriptResolver(): LuaScriptResolver
+
+    fun provideDataPointParser(): DataPointParser
+
+    fun provideLuaDataSourceProvider(): LuaDataSourceProviderImpl
 
     @Component.Builder
     interface Builder {
