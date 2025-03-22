@@ -1,26 +1,9 @@
-/*
- *  This file is part of Track & Graph
- *
- *  Track & Graph is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  Track & Graph is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
- */
-package com.samco.trackandgraph.lua.community
+package com.samco.trackandgraph.lua
 
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.lua.DaggerLuaEngineTestComponent
 import com.samco.trackandgraph.lua.apiimpl.oneArgFunction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -29,8 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
-import org.luaj.vm2.LuaValue.Companion.NIL
-import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -47,7 +29,7 @@ class CommunityTestRunner {
     private val ioDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 
     private val daggerComponent by lazy {
-        whenever(assetReader.readAssetToString(anyString())).thenAnswer {
+        whenever(assetReader.readAssetToString(ArgumentMatchers.anyString())).thenAnswer {
             val path = it.getArgument<String>(0)
             readAssetToString(path)
         }
@@ -72,7 +54,7 @@ class CommunityTestRunner {
         val globals = daggerComponent.provideGlobalsProvider().globals.value
         globals["print"] = oneArgFunction {
             println(it.checkjstring())
-            return@oneArgFunction NIL
+            return@oneArgFunction LuaValue.Companion.NIL
         }
     }
 
