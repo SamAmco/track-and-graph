@@ -1,7 +1,10 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+
+--- PREVIEW_START
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
 local period = core.PERIOD.WEEK
+--- PREVIEW_END
 
 local function multi_input_text_output(totals)
 	table.sort(totals, function(a, b)

@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
@@ -80,13 +81,30 @@ class LuaGraphConfigViewModel @Inject constructor(
     var script: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
 
-    val scriptPreview: StateFlow<TextFieldValue> = snapshotFlow {
-        val preview = script.text
-            .split("\n")
-            .takeWhile { it.isNotBlank() }
-            .joinToString("\n")
-        script.copy(text = preview)
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, TextFieldValue(""))
+    private data class ScriptPreviewData(
+        val text: String,
+        val startPosition: Int?
+    )
+
+    private val scriptPreviewData: StateFlow<ScriptPreviewData> = snapshotFlow {
+        val prefix = "--- PREVIEW_START"
+        val suffix = "--- PREVIEW_END"
+
+        val previewStart = script.text.indexOf(prefix)
+        val previewEnd = script.text.indexOf(suffix)
+        if (previewStart == -1 || previewEnd == -1) {
+            return@snapshotFlow ScriptPreviewData(script.text, null)
+        }
+
+        val previewText = script.text.substring(previewStart + prefix.length, previewEnd)
+
+        val startPosition = previewStart + prefix.length
+        ScriptPreviewData(previewText, startPosition)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, ScriptPreviewData("", null))
+
+    val scriptPreview: StateFlow<TextFieldValue> = scriptPreviewData
+        .map { TextFieldValue(it.text) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, TextFieldValue(""))
 
     var selectedFeatures: List<LuaGraphFeature> by mutableStateOf(emptyList())
         private set
@@ -241,6 +259,15 @@ class LuaGraphConfigViewModel @Inject constructor(
             )
         }
         onUpdate()
+    }
+
+    fun onClickInPreview(textFieldValue: TextFieldValue) {
+        val previewStartIndex = scriptPreviewData.value.startPosition ?: return
+        val selection = TextRange(textFieldValue.selection.start + previewStartIndex)
+        script = script.copy(
+            text = script.text,
+            selection = selection
+        )
     }
 
     fun getTextFieldFor(index: Int): TextFieldValue {

@@ -23,7 +23,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,7 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -128,6 +127,7 @@ fun LuaGraphConfigView(
         onUserConfirmDeepLink = viewModel::onUserConfirmDeepLink,
         onUserCancelDeepLink = viewModel::onUserCancelDeepLink,
         showEditScriptDialog = showEditScriptDialog,
+        onClickInPreview = viewModel::onClickInPreview,
         showUserConfirmDeepLinkDialog = viewModel.showUserConfirmDeepLink
             .collectAsStateWithLifecycle(),
     )
@@ -152,6 +152,7 @@ private fun LuaGraphConfigView(
     onUserConfirmDeepLink: () -> Unit,
     onUserCancelDeepLink: () -> Unit,
     showEditScriptDialog: MutableState<Boolean>,
+    onClickInPreview: (TextFieldValue) -> Unit,
     showUserConfirmDeepLinkDialog: State<Boolean>,
 ) {
     Dialogs(
@@ -176,7 +177,10 @@ private fun LuaGraphConfigView(
     ScriptTextInputPreview(
         scriptPreview = scriptPreview,
         script = script,
-        onScriptPreviewClicked = { showEditScriptDialog.value = true }
+        onScriptPreviewClicked = {
+            showEditScriptDialog.value = true
+            onClickInPreview(it)
+        }
     )
 
     InputSpacingLarge()
@@ -322,21 +326,9 @@ private fun LuaGraphFeatureInputView(
 private fun ScriptTextInputPreview(
     scriptPreview: TextFieldValue,
     script: TextFieldValue,
-    onScriptPreviewClicked: () -> Unit,
+    onScriptPreviewClicked: (TextFieldValue) -> Unit,
 ) = Box {
     val interactionSource = remember { MutableInteractionSource() }
-
-    LaunchedEffect(interactionSource) {
-        var down = false
-        interactionSource.interactions.collect {
-            if (it is PressInteraction.Release && down) {
-                onScriptPreviewClicked()
-                down = false
-            } else if (it is PressInteraction.Press) {
-                down = true
-            }
-        }
-    }
 
     val showEllipsis = scriptPreview.text.length != script.text.length
 
@@ -350,6 +342,8 @@ private fun ScriptTextInputPreview(
 
     val surfaceColor = MaterialTheme.colors.surface
 
+    val localFocusManager = LocalFocusManager.current
+
     SlimOutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -362,7 +356,10 @@ private fun ScriptTextInputPreview(
             backgroundColor = MaterialTheme.colors.surface
         ),
         value = scriptPreviewText,
-        onValueChange = { onScriptPreviewClicked() },
+        onValueChange = {
+            onScriptPreviewClicked(it)
+            localFocusManager.clearFocus()
+        },
         placeholder = {
             Text(
                 text = stringResource(R.string.lua_script_input_hint),
@@ -371,7 +368,6 @@ private fun ScriptTextInputPreview(
         },
         visualTransformation = luaCodeVisualTransformation(),
         textStyle = MaterialTheme.tngTypography.code,
-        readOnly = true,
         singleLine = false,
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.None,
@@ -463,6 +459,7 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
             onOpenCommunityScripts = {},
             onUserConfirmDeepLink = {},
             onUserCancelDeepLink = {},
+            onClickInPreview = {},
             showEditScriptDialog = remember { mutableStateOf(false) },
             showUserConfirmDeepLinkDialog = remember { mutableStateOf(false) },
         )
