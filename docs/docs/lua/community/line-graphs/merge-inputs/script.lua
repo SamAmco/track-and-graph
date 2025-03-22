@@ -1,5 +1,7 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+
+--- PREVIEW_START
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
 local period = nil
 -- Optional integer value used with period e.g. 5
@@ -18,6 +20,7 @@ local averaging_duration = nil
 local totalling_period = nil
 -- Optional totalling period multiplier used to calculate 'plot totals' e.g. 2
 local totalling_period_multiplier = nil
+--- PREVIEW_END
 
 return function(sources)
 	local cutoff_params = {

@@ -1,5 +1,7 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+
+--- PREVIEW_START
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
 local period = nil
 -- Optional integer value used with period e.g. 5
@@ -18,6 +20,7 @@ local label_colors = nil
 local duration_based_range = false
 -- Optional max for the y axis e.g. 100
 local y_max = nil
+--- PREVIEW_END
 
 return function(sources)
 	local cutoff_params = {

@@ -1,5 +1,7 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+
+--- PREVIEW_START
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
 local period = nil
 -- Optional integer value used with period e.g. 5
@@ -20,6 +22,7 @@ local totalling_period_multiplier = nil
 local duration_based_range = false
 -- Optional bounds for the y axis e.g. { min = 0, max = 100 }
 local range_bounds = nil
+--- PREVIEW_END
 
 local get_difference = function(datapoints)
 	local difference = {}
