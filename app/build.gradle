@@ -25,6 +25,8 @@ plugins {
     alias libs.plugins.compose.compiler
 }
 
+apply from: 'gradle/lua-tasks.gradle.kts'
+
 android {
     compileSdk 35
 
@@ -165,67 +167,4 @@ dependencies {
     testImplementation libs.mockito.kotlin
     testImplementation libs.kotlinx.coroutines.test
     testImplementation libs.androidx.core.testing
-}
-
-// Function to add a warning comment before copying
-static def prepareGeneratedFile(File source, File target) {
-    def content = source.getText('UTF-8')
-    def warningComment = "-- GENERATED FILE: DO NOT EDIT MANUALLY\n\n"
-    target.text = warningComment + content
-}
-
-// Function to copy all Lua api files to a specified destination directory
-def copyLuaApiToDestination(File destinationDir) {
-    destinationDir.mkdirs()
-    rootProject.file("lua/src/tng").eachFile { file ->
-        if (file.isFile()) {
-            def destinationFile = new File(destinationDir, file.name)
-            prepareGeneratedFile(file, destinationFile)
-        }
-    }
-}
-
-// Task to copy all Lua files to the generated assets directory
-tasks.register('copyLuaToAssets') {
-    doLast {
-        def destinationDir = file("src/main/assets/generated/lua-api/")
-        copyLuaApiToDestination(destinationDir)
-    }
-}
-
-// Ensure the assets copy runs before every build
-tasks.matching { it.name.startsWith("assemble") }.configureEach {
-    dependsOn(copyLuaToAssets)
-}
-
-// TEST TASKS
-
-// Task to copy Lua API scripts
-tasks.register('copyLuaScriptsForTests') {
-    doLast {
-        copy {
-            from "${rootProject.projectDir}/docs/docs/lua/community"
-            into "${projectDir}/src/test/resources/generated/lua-community"
-        }
-
-        copyLuaApiToDestination(file("src/test/resources/generated/lua-api/"))
-    }
-}
-
-// Ensure all Lua scripts are copied before any unit test task
-tasks.matching { it.name.startsWith("test") }.configureEach {
-    dependsOn('copyLuaScriptsForTests')
-}
-
-// CLEAN UP TASKS
-
-tasks.register('cleanUpLuaFiles') {
-    doLast {
-        file("src/main/assets/generated/").deleteDir()
-        file("src/test/resources/generated/").deleteDir()
-    }
-}
-
-tasks.named('clean').configure {
-    dependsOn(cleanUpLuaFiles)
 }
