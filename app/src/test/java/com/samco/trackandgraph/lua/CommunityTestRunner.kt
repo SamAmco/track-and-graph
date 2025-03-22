@@ -10,12 +10,16 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameter
 import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import org.mockito.ArgumentMatchers
 import java.io.File
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@RunWith(Parameterized::class)
 class CommunityTestRunner {
 
     private fun readAssetToString(path: String): String? {
@@ -58,51 +62,84 @@ class CommunityTestRunner {
         }
     }
 
-    private var testFilter: String? = null//"line-graphs/difference"
+    @Parameter(0)
+    lateinit var testName: String
 
-    @Test
-    fun `run all community lua tests`() {
-        val scriptPath = "generated/lua-community/"
-        val classLoader = javaClass.classLoader ?: return
-        val baseUrl = classLoader.getResource(scriptPath) ?: return
-        val basePath = File(baseUrl.toURI())
+    @Parameter(1)
+    lateinit var scriptLuaText: String
 
-        // Use a stack for iterative traversal
-        val directoryStack = ArrayDeque<File>()
-        directoryStack.add(basePath)
+    @Parameter(2)
+    lateinit var testLuaText: String
 
-        while (directoryStack.isNotEmpty()) {
-            val currentDir = directoryStack.removeLast()
-            val files = currentDir.listFiles() ?: continue
-            files.filter { it.isDirectory }.forEach { directoryStack.add(it) }
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "{0}")
+        fun testData(): List<Array<Any>> {
+            val scriptPath = "generated/lua-community/"
+            val testFilter: String? = null//"line-graphs/difference"
+            val classLoader = CommunityTestRunner::class.java.classLoader ?: return emptyList()
+            val baseUrl = classLoader.getResource(scriptPath) ?: return emptyList()
+            val basePath = File(baseUrl.toURI())
 
-            if (testFilter != null && !currentDir.path.contains(testFilter!!)) continue
+            // Find all test files paired with their script files
+            val testCases = mutableListOf<Array<Any>>()
 
-            // Find script.lua in the current directory
-            val scriptFile = files.find { it.name == "script.lua" }
+            // Use a stack for iterative traversal
+            val directoryStack = ArrayDeque<File>()
+            directoryStack.add(basePath)
 
-            // If script.lua exists, find and process all test files
-            if (scriptFile != null) {
-                val scriptLua = scriptFile.readText()
+            while (directoryStack.isNotEmpty()) {
+                val currentDir = directoryStack.removeLast()
+                val files = currentDir.listFiles() ?: continue
+                files.filter { it.isDirectory }.forEach { directoryStack.add(it) }
 
-                // Process all test files in the same directory
-                files.filter { it.isFile && it.name.startsWith("test") && it.name.endsWith(".lua") }
-                    .forEach { testFile ->
-                        runTest(
-                            testFileName = currentDir.relativeTo(basePath).path + "/" + testFile.name,
-                            script = scriptLua,
-                            testFile = testFile,
-                        )
-                    }
+                // Find script.lua in the current directory
+                val scriptFile = files.find { it.name == "script.lua" }
+
+                // If script.lua exists, find and process all test files
+                if (scriptFile != null) {
+                    val scriptLuaText = scriptFile.readText()
+
+                    // Add all test files in the same directory
+                    files.filter { it.isFile && it.name.startsWith("test") && it.name.endsWith(".lua") }
+                        .forEach { testFile ->
+                            val testName = currentDir.relativeTo(basePath).path + "/" + testFile.name
+                            testCases.add(arrayOf(testName, scriptLuaText, testFile.readText()))
+                        }
+                }
             }
+
+            return testCases
         }
     }
 
-    private fun runTest(testFileName: String, script: String, testFile: File) {
+    @Test
+    fun `run community lua test`() {
         try {
-            runTest(testFileName, script, testFile.readText())
+            val globals = daggerComponent.provideGlobalsProvider().globals.value
+            val test = globals.load(testLuaText)
+            val testSet = test.call().checktable()!!
+            for (key in testSet.keys()) {
+                try {
+                    val testStructure = testSet[key].checktable()!!
+                    val testConfig = testStructure["config"].checktable()!!
+                    val overriddenScript = overrideScriptConfig(scriptLuaText, testConfig)
+                    val testDataSources = testStructure["sources"].checkfunction()!!.call()
+                    val scriptResult = daggerComponent.provideLuaScriptResolver()
+                        .resolveLuaGraphScriptResult(
+                            script = overriddenScript,
+                            dataSources = testDataSources.addDataSourceFunctions(),
+                        )
+                    testStructure["assertions"].checkfunction()!!.call(scriptResult)
+                    println("Test passed: $testName.$key")
+                } catch (t: Throwable) {
+                    println("Test failed $testName.$key: ${t.message}")
+                    t.printStackTrace()
+                    throw t
+                }
+            }
         } catch (t: Throwable) {
-            println("Failed to run $testFileName : ${t.message}")
+            println("Failed to run $testName : ${t.message}")
             t.printStackTrace()
             throw t
         }
@@ -120,31 +157,6 @@ class CommunityTestRunner {
                 .createLuaDataSource(index++, key.toString(), iterator)
         }
         return luaTable
-    }
-
-    private fun runTest(testFileName: String, scriptLua: String, testLua: String) {
-        val globals = daggerComponent.provideGlobalsProvider().globals.value
-        val test = globals.load(testLua)
-        val testSet = test.call().checktable()!!
-        for (key in testSet.keys()) {
-            try {
-                val testStructure = testSet[key].checktable()!!
-                val testConfig = testStructure["config"].checktable()!!
-                val overriddenScript = overrideScriptConfig(scriptLua, testConfig)
-                val testDataSources = testStructure["sources"].checkfunction()!!.call()
-                val scriptResult = daggerComponent.provideLuaScriptResolver()
-                    .resolveLuaGraphScriptResult(
-                        script = overriddenScript,
-                        dataSources = testDataSources.addDataSourceFunctions(),
-                    )
-                testStructure["assertions"].checkfunction()!!.call(scriptResult)
-                println("Test passed: $testFileName.$key")
-            } catch (t: Throwable) {
-                println("Test failed $testFileName.$key: ${t.message}")
-                t.printStackTrace()
-                throw t
-            }
-        }
     }
 
     private fun overrideScriptConfig(
