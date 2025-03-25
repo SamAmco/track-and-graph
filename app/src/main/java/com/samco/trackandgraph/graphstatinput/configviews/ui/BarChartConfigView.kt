@@ -41,6 +41,7 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.RowCheckbox
@@ -136,7 +137,7 @@ fun BarChartConfigView(
         text = stringResource(id = R.string.sum_by_count_checkbox_label)
     )
 
-    DialogInputSpacing()
+    InputSpacingLarge()
 
     LabeledRow(
         label = stringResource(id = R.string.scale),

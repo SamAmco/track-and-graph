@@ -276,7 +276,7 @@
     <string name="confirm_cancel_notes_will_be_lost">Voulez-vous vraiment fermer ? Toutes les notes seront perdues.</string>
     <string name="add_a_label">Ajouter une étiquette</string>
     <string name="graph_type_bar_chart">Diagramme à barres</string>
-    <string name="bar_interval">Intervalle de mesure</string>
+    <string name="bar_interval">Intervalle de mesure:</string>
     <string name="y_range_max">Plage Y max</string>
     <string name="total_formatted">Total: %s</string>
     <string name="from_formatted">Depuis: %s</string>
