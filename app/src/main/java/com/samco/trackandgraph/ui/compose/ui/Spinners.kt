@@ -45,6 +45,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
@@ -69,6 +70,7 @@ fun <T> Spinner(
     dropdownContentAlignment: Alignment.Horizontal = Alignment.Start
 ) {
     var expanded: Boolean by remember { mutableStateOf(false) }
+    val focusManager = LocalFocusManager.current
 
     Box(
         modifier = modifier
@@ -78,7 +80,10 @@ fun <T> Spinner(
         Row(
             modifier = modifier
                 .let {
-                    if (enabled) it.clickable { expanded = !expanded }
+                    if (enabled) it.clickable {
+                        if (!expanded) focusManager.clearFocus()
+                        expanded = !expanded
+                    }
                     else it
                 },
             verticalAlignment = Alignment.CenterVertically
