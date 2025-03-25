@@ -23,6 +23,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -62,16 +63,22 @@ fun <T> Spinner(
     dropdownItemFactory: @Composable (T, Int) -> Unit,
     enabled: Boolean = true,
     enableTrailingIcon: Boolean = true,
+    paddingValues: PaddingValues = PaddingValues(
+        horizontal = dimensionResource(id = R.dimen.card_padding)
+    ),
     dropdownContentAlignment: Alignment.Horizontal = Alignment.Start
 ) {
     var expanded: Boolean by remember { mutableStateOf(false) }
 
-    Box(modifier = modifier.wrapContentSize(Alignment.TopStart)) {
+    Box(
+        modifier = modifier
+            .wrapContentSize(Alignment.TopStart)
+            .padding(paddingValues)
+    ) {
         Row(
             modifier = modifier
-                .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
                 .let {
-                    if(enabled) it.clickable { expanded = !expanded }
+                    if (enabled) it.clickable { expanded = !expanded }
                     else it
                 },
             verticalAlignment = Alignment.CenterVertically
@@ -83,25 +90,36 @@ fun <T> Spinner(
                 }
         }
 
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = dropDownModifier
-                .background(color = MaterialTheme.colors.surface)
-        ) {
-            items.forEachIndexed { index, element ->
-                DropdownMenuItem(
-                    enabled = enabled,
-                    onClick = {
-                        onItemSelected(items[index])
-                        expanded = false
-                    }
-                ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalAlignment = dropdownContentAlignment
+        val dropdownPositionAlignment = remember(dropdownContentAlignment) {
+            return@remember when (dropdownContentAlignment) {
+                Alignment.Start -> Alignment.TopStart
+                Alignment.CenterHorizontally -> Alignment.Center
+                Alignment.End -> Alignment.TopEnd
+                else -> Alignment.TopStart
+            }
+        }
+
+        Box(modifier = Modifier.align(dropdownPositionAlignment)) {
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = dropDownModifier
+                    .background(color = MaterialTheme.colors.surface)
+            ) {
+                items.forEachIndexed { index, element ->
+                    DropdownMenuItem(
+                        enabled = enabled,
+                        onClick = {
+                            onItemSelected(items[index])
+                            expanded = false
+                        }
                     ) {
-                        dropdownItemFactory(element, index)
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = dropdownContentAlignment
+                        ) {
+                            dropdownItemFactory(element, index)
+                        }
                     }
                 }
             }
@@ -160,7 +178,6 @@ fun ColorCircle(
     size = size,
     backgroundColor = color
 ) {}
-
 
 @Composable
 fun ColorCircle(

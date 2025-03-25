@@ -31,6 +31,8 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelStoreOwner
@@ -39,6 +41,7 @@ import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.graphstatinput.configviews.ui.*
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import java.lang.Float.max
@@ -59,11 +62,24 @@ internal fun GraphStatInputView(
                 var demoYOffset by remember { mutableFloatStateOf(0f) }
                 var demoVisible by remember { mutableStateOf(false) }
 
+                val selectedGraphType = viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
+
                 Box(modifier = Modifier.weight(1f)) {
                     GraphStatInputViewForm(
-                        viewModelStoreOwner = viewModelStoreOwner,
-                        viewModel = viewModel,
-                        graphStatId = graphStatId
+                        graphName = viewModel.graphName,
+                        selectedGraphType = selectedGraphType,
+                        setGraphType = viewModel::setGraphType,
+                        setGraphStatName = viewModel::setGraphStatName,
+                        updateMode = viewModel.updateMode.observeAsState(false),
+                        configInputView = { scrollState ->
+                            ConfigInputView(
+                                viewModelStoreOwner = viewModelStoreOwner,
+                                onConfigEvent = viewModel::onConfigEvent,
+                                graphType = selectedGraphType,
+                                graphStatId = graphStatId,
+                                scrollState = scrollState
+                            )
+                        },
                     )
 
                     if (demoVisible) demoViewData?.let { DemoOverlay(demoYOffset, it) }
@@ -81,12 +97,76 @@ internal fun GraphStatInputView(
                 AddCreateBar(
                     errorText = viewModel.validationException.observeAsState().value?.errorMessageId,
                     onCreateUpdateClicked = viewModel::createGraphOrStat,
-                    isUpdateMode = viewModel.updateMode.observeAsState().value ?: false
+                    isUpdateMode = viewModel.updateMode.observeAsState().value == true
                 )
             }
 
             if (loading.value) LoadingOverlay()
+
+            val showLuaFirstTimeUserDialog = viewModel.showLuaFirstTimeUserDialog.observeAsState(false)
+            if (showLuaFirstTimeUserDialog.value == true) {
+                LuaFirstTimeUserDialog(
+                    onDismiss = viewModel::onLuaFirstTimeUserDialogDismiss,
+                    onOpenLuaTutorialPath = viewModel::onOpenLuaTutorialPath
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun GraphStatInputViewForm(
+    modifier: Modifier = Modifier,
+    graphName: TextFieldValue,
+    selectedGraphType: State<GraphStatType>,
+    setGraphType: (GraphStatType) -> Unit,
+    setGraphStatName: (TextFieldValue) -> Unit = {},
+    scrollState: ScrollState = rememberScrollState(),
+    updateMode: State<Boolean>,
+    configInputView: @Composable (ScrollState) -> Unit = {},
+) = Column(
+    modifier = modifier
+        .padding(
+            top = dimensionResource(id = R.dimen.card_padding),
+            start = dimensionResource(id = R.dimen.card_padding),
+            end = dimensionResource(id = R.dimen.card_padding)
+        )
+        .verticalScroll(state = scrollState)
+) {
+
+    FullWidthTextField(
+        textFieldValue = graphName,
+        onValueChange = setGraphStatName,
+        label = stringResource(id = R.string.graph_or_stat_name)
+    )
+
+    DialogInputSpacing()
+
+    if (!updateMode.value) {
+        GraphStatTypeSelector(
+            selectedItem = selectedGraphType,
+            setGraphType = setGraphType
+        )
+    }
+
+    DialogInputSpacing()
+    Divider()
+    DialogInputSpacing()
+
+    configInputView(scrollState)
+}
+
+@Preview
+@Composable
+private fun GraphStatInputViewFormPreview() = TnGComposeTheme {
+    Surface {
+        GraphStatInputViewForm(
+            graphName = TextFieldValue("Graph Stat Name"),
+            selectedGraphType = remember { mutableStateOf(GraphStatType.LINE_GRAPH) },
+            setGraphType = {},
+            updateMode = remember { mutableStateOf(false) },
+            configInputView = {}
+        )
     }
 }
 
@@ -169,59 +249,6 @@ private fun DemoButton(
 }
 
 @Composable
-private fun GraphStatInputViewForm(
-    modifier: Modifier = Modifier,
-    viewModelStoreOwner: ViewModelStoreOwner,
-    viewModel: GraphStatInputViewModel,
-    graphStatId: Long,
-    scrollState: ScrollState = rememberScrollState()
-) = Column(
-    modifier = modifier
-        .padding(
-            top = dimensionResource(id = R.dimen.card_padding),
-            start = dimensionResource(id = R.dimen.card_padding),
-            end = dimensionResource(id = R.dimen.card_padding)
-        )
-        .verticalScroll(state = scrollState)
-) {
-
-    FullWidthTextField(
-        textFieldValue = viewModel.graphName,
-        onValueChange = { viewModel.setGraphStatName(it) },
-        label = stringResource(id = R.string.graph_or_stat_name)
-    )
-
-    DialogInputSpacing()
-
-    val updateMode = viewModel.updateMode.observeAsState(false)
-    if (!updateMode.value) {
-        val selectedGraphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
-        GraphStatTypeSelector(
-            selectedItem = selectedGraphType,
-            setGraphType = { viewModel.setGraphType(it) }
-        )
-    }
-
-    if (viewModel.showLuaFirstTimeUserDialog.observeAsState().value == true) {
-        LuaFirstTimeUserDialog(
-            onDismiss = { viewModel.onLuaFirstTimeUserDialogDismiss() },
-            onOpenLuaTutorialPath = { viewModel.onOpenLuaTutorialPath() }
-        )
-    }
-
-    DialogInputSpacing()
-    Divider()
-    DialogInputSpacing()
-
-    ConfigInputView(
-        viewModelStoreOwner = viewModelStoreOwner,
-        viewModel = viewModel,
-        graphStatId = graphStatId,
-        scrollState = scrollState
-    )
-}
-
-@Composable
 private fun LuaFirstTimeUserDialog(
     onDismiss: () -> Unit,
     onOpenLuaTutorialPath: () -> Unit,
@@ -261,7 +288,7 @@ private fun LuaFirstTimeUserDialogPreview() {
 
 @Composable
 fun GraphStatTypeSelector(
-    selectedItem: GraphStatType,
+    selectedItem: State<GraphStatType>,
     setGraphType: (GraphStatType) -> Unit
 ) {
     LabeledRow(
@@ -283,7 +310,8 @@ fun GraphStatTypeSelector(
 
         TextMapSpinner(
             strings = spinnerItems,
-            selectedItem = selectedItem,
+            selectedItem = selectedItem.value,
+            textAlign = TextAlign.End,
             onItemSelected = { setGraphType(it) },
         )
     }
@@ -292,60 +320,54 @@ fun GraphStatTypeSelector(
 @Composable
 fun ConfigInputView(
     viewModelStoreOwner: ViewModelStoreOwner,
-    viewModel: GraphStatInputViewModel,
+    graphType: State<GraphStatType>,
+    onConfigEvent: (GraphStatConfigEvent?) -> Unit,
     graphStatId: Long,
     scrollState: ScrollState
 ) {
-    val graphType by viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
-
-    when (graphType) {
+    when (graphType.value) {
         GraphStatType.LINE_GRAPH -> LineGraphConfigView(
             scrollState = scrollState,
             viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
-            onConfigEvent = { viewModel.onConfigEvent(it) },
+            onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.PIE_CHART -> PieChartConfigView(
-            scrollState = scrollState,
             viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
-            onConfigEvent = { viewModel.onConfigEvent(it) },
+            onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.AVERAGE_TIME_BETWEEN -> AverageTimeBetweenConfigView(
-            scrollState = scrollState,
             viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
-            onConfigEvent = { viewModel.onConfigEvent(it) },
+            onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.TIME_HISTOGRAM -> TimeHistogramConfigView(
-            scrollState = scrollState,
             viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
-            onConfigEvent = { viewModel.onConfigEvent(it) },
+            onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.LAST_VALUE -> LastValueConfigView(
-            scrollState = scrollState,
             viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
-            onConfigEvent = { viewModel.onConfigEvent(it) },
+            onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.BAR_CHART -> BarChartConfigView(
-            scrollState = scrollState,
             viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
-            onConfigEvent = { viewModel.onConfigEvent(it) },
+            onConfigEvent = onConfigEvent,
         )
 
         GraphStatType.LUA_SCRIPT -> LuaGraphConfigView(
             scrollState = scrollState,
             viewModelStoreOwner = viewModelStoreOwner,
             graphStatId = graphStatId,
-            onConfigEvent = { viewModel.onConfigEvent(it) },
+            onConfigEvent = onConfigEvent,
         )
     }
 }

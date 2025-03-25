@@ -20,10 +20,12 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphEndDate
 import com.samco.trackandgraph.base.helpers.formatDayMonthYear
@@ -123,6 +125,7 @@ fun GraphStatEndingAtSpinner(
                 Text(
                     modifier = modifier.weight(1f),
                     text = text,
+                    textAlign = TextAlign.End,
                     fontSize = MaterialTheme.typography.body1.fontSize,
                     fontWeight = MaterialTheme.typography.body1.fontWeight,
                 )
@@ -130,10 +133,12 @@ fun GraphStatEndingAtSpinner(
             dropdownItemFactory = { item, _ ->
                 Text(
                     text = spinnerItems[item] ?: "",
+                    textAlign = TextAlign.End,
                     fontSize = MaterialTheme.typography.body1.fontSize,
                     fontWeight = MaterialTheme.typography.body1.fontWeight
                 )
-            }
+            },
+            dropdownContentAlignment = Alignment.End,
         )
     }
 }

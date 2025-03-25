@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
@@ -49,7 +48,6 @@ import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
 fun BarChartConfigView(
-    scrollState: ScrollState,
     viewModelStoreOwner: ViewModelStoreOwner,
     graphStatId: Long,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
@@ -125,6 +123,7 @@ fun BarChartConfigView(
         TextMapSpinner(
             strings = barIntervalNames,
             selectedItem = viewModel.selectedBarPeriod,
+            textAlign = TextAlign.End,
             onItemSelected = viewModel::updateBarPeriod
         )
     }
