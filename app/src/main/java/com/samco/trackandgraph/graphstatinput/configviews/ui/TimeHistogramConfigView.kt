@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
@@ -45,7 +46,6 @@ import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
 @Composable
 fun TimeHistogramConfigView(
-    scrollState: ScrollState,
     viewModelStoreOwner: ViewModelStoreOwner,
     graphStatId: Long,
     onConfigEvent: (GraphStatConfigEvent?) -> Unit
@@ -112,6 +112,7 @@ fun TimeHistogramConfigView(
         TextMapSpinner(
             strings = timeWindows,
             selectedItem = viewModel.selectedWindow,
+            textAlign = TextAlign.End,
             onItemSelected = { viewModel.updateWindow(it) }
         )
     }

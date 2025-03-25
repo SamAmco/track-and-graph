@@ -17,10 +17,16 @@
 
 package com.samco.trackandgraph.ui.compose.ui
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.style.TextAlign
+import com.samco.trackandgraph.R
 
 @Composable
 fun <T> TextMapSpinner(
@@ -28,8 +34,21 @@ fun <T> TextMapSpinner(
     strings: Map<T, String>,
     selectedItem: T,
     enabled: Boolean = true,
+    textAlign: TextAlign = TextAlign.Start,
+    paddingValues: PaddingValues = PaddingValues(
+        horizontal = dimensionResource(id = R.dimen.card_padding),
+    ),
     onItemSelected: (T) -> Unit
 ) {
+    val dropdownContentAlignment = remember(textAlign) {
+        return@remember when (textAlign) {
+            TextAlign.Start -> Alignment.Start
+            TextAlign.Center -> Alignment.CenterHorizontally
+            TextAlign.End -> Alignment.End
+            else -> Alignment.Start
+        }
+    }
+
     Spinner(
         modifier = modifier,
         items = strings.keys.toList(),
@@ -40,6 +59,7 @@ fun <T> TextMapSpinner(
             Text(
                 modifier = modifier.weight(1f),
                 text = strings[item] ?: "",
+                textAlign = textAlign,
                 fontSize = MaterialTheme.typography.body1.fontSize,
                 fontWeight = MaterialTheme.typography.body1.fontWeight,
             )
@@ -47,10 +67,13 @@ fun <T> TextMapSpinner(
         dropdownItemFactory = { item, _ ->
             Text(
                 text = strings[item] ?: "",
+                textAlign = textAlign,
                 fontSize = MaterialTheme.typography.body1.fontSize,
                 fontWeight = MaterialTheme.typography.body1.fontWeight
             )
-        }
+        },
+        paddingValues = paddingValues,
+        dropdownContentAlignment = dropdownContentAlignment,
     )
 }
 

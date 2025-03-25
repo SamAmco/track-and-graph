@@ -26,6 +26,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -57,6 +58,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -300,7 +302,9 @@ private fun LuaGraphFeatureInputView(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             FullWidthTextField(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .padding(start = dimensionResource(id = R.dimen.card_padding))
+                    .weight(1f),
                 textFieldValue = nameTextField,
                 onValueChange = onUpdateName,
             )
@@ -314,9 +318,12 @@ private fun LuaGraphFeatureInputView(
             }
         }
 
+        DialogInputSpacing()
+
         TextMapSpinner(
             strings = features,
             selectedItem = lgf.featureId,
+            paddingValues = PaddingValues(start = dimensionResource(id = AppR.dimen.card_padding) + 4.dp),
             onItemSelected = onChangeSelectedFeatureId
         )
     }

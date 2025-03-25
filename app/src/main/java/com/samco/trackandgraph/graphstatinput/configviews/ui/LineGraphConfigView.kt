@@ -22,6 +22,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -231,6 +232,7 @@ private fun LineGraphFeatureInputView(
                 TextMapSpinner(
                     strings = featureNames,
                     selectedItem = selectedItem,
+                    paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding)),
                     onItemSelected = {
                         onUpdate(
                             lgf.copy(
@@ -248,6 +250,7 @@ private fun LineGraphFeatureInputView(
 
                 TextMapSpinner(
                     strings = averagingModeNames,
+                    paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding)),
                     selectedItem = lgf.averagingMode,
                     onItemSelected = { onUpdate(lgf.copy(averagingMode = it)) }
                 )
@@ -258,6 +261,7 @@ private fun LineGraphFeatureInputView(
 
                 TextMapSpinner(
                     strings = plotModeNames,
+                    paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding)),
                     selectedItem = lgf.plottingMode,
                     onItemSelected = { onUpdate(lgf.copy(plottingMode = it)) }
                 )
