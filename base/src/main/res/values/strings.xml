@@ -285,7 +285,7 @@
     <string name="no_label">No label</string>
     <string name="confirm_cancel_notes_will_be_lost">Are you sure you want to close? All notes will be lost.</string>
     <string name="add_a_label">Add a label</string>
-    <string name="bar_interval">Bar interval</string>
+    <string name="bar_interval">Bar interval:</string>
 
     <string name="y_range_max">Y range max</string>
     <string name="total_formatted">Total: %s</string>
@@ -370,11 +370,12 @@
     <string name="launch_lua_disabled">Launch Lua disabled</string>
     <string name="no_lua">No Lua</string>
     <string name="lua_engine_disabled">Lua engine disabled</string>
-    <string name="lua_graph_first_time_user_title">Lua script graphs</string>
-    <string name="lua_graph_first_time_user_message">Create custom graphs with Lua scripts! You can load your own, or pick one from the GitHub collection. Selecting a script from GitHub will return you to the app with the script ready to use.</string>
+    <string name="lua_graph_first_time_user_title">Lua script graphs and stats</string>
+    <string name="lua_graph_first_time_user_message">Lua scripts are an advanced feature that let you create custom graphs and stats with the Lua programming language. \n\nYou can load your own, or pick one from the GitHub collection. Installing a script from GitHub will return you to the app with the script ready to use.</string>
     <string name="learn_more">Learn more</string>
     <string name="github">GitHub</string>
     <string name="paste">Paste</string>
     <string name="failed_to_download_file">Failed to download file: %s</string>
     <string name="confirm_deep_link">You have received a script link from an unknown source. Only install scripts from sources you trust. Would you like to install this script?</string>
+    <string name="graph_stat_info_button_description">Graphs and stats tutorials</string>
 </resources>
