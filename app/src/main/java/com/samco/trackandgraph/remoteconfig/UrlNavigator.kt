@@ -24,6 +24,7 @@ interface UrlNavigator {
         TUTORIAL_ROOT("tutorial-root"),
         TUTORIAL_TRACKING("tutorial-tracking"),
         TUTORIAL_LUA("tutorial-lua"),
+        TUTORIAL_GRAPHS("tutorial-graphs"),
         LUA_COMMUNITY_SCRIPTS_ROOT("lua-community-scripts-root"),
         PLAY_STORE_PAGE("play-store-page");
     }

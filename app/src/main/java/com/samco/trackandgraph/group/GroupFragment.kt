@@ -154,15 +154,10 @@ class GroupFragment : Fragment(),
                 R.id.add_group -> onAddGroupClicked()
                 R.id.export_button -> onExportClicked()
                 R.id.import_button -> onImportClicked()
-                //R.id.add_function -> onAddFunctionClicked()
                 else -> return false
             }
             return true
         }
-    }
-
-    private fun onAddFunctionClicked() {
-        navigate(GroupFragmentDirections.actionAddFunction(args.groupId))
     }
 
     /**
