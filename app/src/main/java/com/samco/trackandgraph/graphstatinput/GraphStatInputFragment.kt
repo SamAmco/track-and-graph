@@ -19,10 +19,14 @@ package com.samco.trackandgraph.graphstatinput
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.view.MenuProvider
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.navigation.NavController
@@ -31,6 +35,7 @@ import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.MainActivity
 import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
@@ -47,9 +52,37 @@ class GraphStatInputFragment : Fragment() {
     @Inject
     lateinit var tngSettings: TngSettings
 
+    @Inject
+    lateinit var urlNavigator: UrlNavigator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.initViewModel(args.groupId, args.graphStatId)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        requireActivity().addMenuProvider(
+            GraphStatInputFragmentMenuProvider(),
+            viewLifecycleOwner,
+            Lifecycle.State.RESUMED
+        )
+    }
+
+    private inner class GraphStatInputFragmentMenuProvider : MenuProvider {
+        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+            menuInflater.inflate(R.menu.graph_stat_input_menu, menu)
+        }
+
+        override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+            return when (menuItem.itemId) {
+                R.id.info -> {
+                    urlNavigator.triggerNavigation(requireContext(), UrlNavigator.Location.TUTORIAL_GRAPHS)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     override fun onStart() {

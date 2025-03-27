@@ -41,13 +41,6 @@
             app:popEnterAnim="@anim/slide_in_right"
             app:popExitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/action_add_function"
-            app:destination="@+id/addFunctionFragment"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_right"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
             android:id="@+id/action_feature_history"
             app:destination="@id/featureHistoryFragment"
             app:enterAnim="@anim/slide_in_left"
@@ -75,9 +68,6 @@
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_right"
             app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_groupFragment_to_addFunctionFragment"
-            app:destination="@id/addFunctionFragment" />
     </fragment>
 
     <fragment
@@ -138,16 +128,4 @@
     <fragment
         android:id="@+id/notesFragment"
         android:name="com.samco.trackandgraph.notes.NotesFragment" />
-    <fragment
-        android:id="@+id/addFunctionFragment"
-        android:name="com.samco.trackandgraph.functions.AddFunctionFragment"
-        tools:layout="@layout/fragment_add_function">
-        <argument
-            android:name="groupId"
-            app:argType="long" />
-        <argument
-            android:name="functionId"
-            android:defaultValue="-1L"
-            app:argType="long" />
-    </fragment>
 </navigation>

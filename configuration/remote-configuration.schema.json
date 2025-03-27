@@ -13,6 +13,7 @@
         "tutorial-root",
         "tutorial-tracking",
         "tutorial-lua",
+        "tutorial-graphs",
         "lua-community-scripts-root",
         "play-store-page"
       ],
@@ -30,6 +31,10 @@
           "format": "uri"
         },
         "tutorial-lua": {
+          "type": "string",
+          "format": "uri"
+        },
+        "tutorial-graphs": {
           "type": "string",
           "format": "uri"
         },
