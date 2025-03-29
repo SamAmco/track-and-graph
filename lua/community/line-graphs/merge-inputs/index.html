@@ -647,25 +647,25 @@
 
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <p>This script accepts the following configuration parameters:</p>
-<pre><code class="language-lua">-- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
-local period = nil
--- Optional integer value used with period e.g. 5
-local period_multiplier = 8
--- If from_now is false the end of the graph will be the last datapoint, otherwise it's the current date/time
-local from_now = false
--- Optional color, e.g. &quot;#FF00FF&quot; or core.COLOR.BLUE_SKY
-local line_color = nil
--- Optional point style e.g. graph.LINE_POINT_STYLE.CIRCLE
-local line_point_style = nil
--- Optional string label for the line in the legend, e.g. &quot;Data&quot;
-local line_label = nil
--- Optional integer value used to average data points over a certain duration e.g. core.DURATION.DAY * 30 for a 30 day moving average
-local averaging_duration = nil
--- Optional totalling period used to calculate 'plot totals' e.g. core.PERIOD.WEEK
-local totalling_period = nil
--- Optional totalling period multiplier used to calculate 'plot totals' e.g. 2
-local totalling_period_multiplier = nil
-</code></pre>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="c1">-- Optional integer value used with period e.g. 5</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">period_multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span>
+<span class="c1">-- If from_now is false the end of the graph will be the last datapoint, otherwise it&#39;s the current date/time</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">from_now</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span>
+<span class="c1">-- Optional color, e.g. &quot;#FF00FF&quot; or core.COLOR.BLUE_SKY</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">line_color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="c1">-- Optional point style e.g. graph.LINE_POINT_STYLE.CIRCLE</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">line_point_style</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="c1">-- Optional string label for the line in the legend, e.g. &quot;Data&quot;</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">line_label</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="c1">-- Optional integer value used to average data points over a certain duration e.g. core.DURATION.DAY * 30 for a 30 day moving average</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">averaging_duration</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="c1">-- Optional totalling period used to calculate &#39;plot totals&#39; e.g. core.PERIOD.WEEK</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">totalling_period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+<span class="c1">-- Optional totalling period multiplier used to calculate &#39;plot totals&#39; e.g. 2</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">totalling_period_multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
+</code></pre></div>
 <p><a href="trackandgraph://lua_inject_url?url=https://www.github.com/SamAmco/track-and-graph/tree/master/lua/community/line-graphs/merge-inputs/script.lua">Install via deeplink</a></p>
 <p><a href="script.lua">Read the full script</a></p>
 <p>Author: <a href="https://github.com/SamAmco">SamAmco</a></p>

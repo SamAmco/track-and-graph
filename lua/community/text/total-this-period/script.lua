@@ -2,6 +2,7 @@ local core = require("tng.core")
 local graph = require("tng.graph")
 
 --- PREVIEW_START
+-- Script: Text - Total This Period
 -- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
 local period = core.PERIOD.WEEK
 --- PREVIEW_END

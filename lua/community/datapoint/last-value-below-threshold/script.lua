@@ -1,6 +1,7 @@
 local graph = require("tng.graph")
 
 --- PREVIEW_START
+-- Script: Datapoint - Last Value Below Threshold
 -- The threshold below which the last value is returned
 local threshold = 0
 --- PREVIEW_END

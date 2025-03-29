@@ -2,6 +2,7 @@ local core = require("tng.core")
 local graph = require("tng.graph")
 
 --- PREVIEW_START
+-- Script: Pie Charts - Moving Pie Chart
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
 local period = nil
 -- Optional integer value used with period e.g. 5
