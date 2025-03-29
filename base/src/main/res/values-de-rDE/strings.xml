@@ -197,6 +197,7 @@
     <string name="tracked_data_menu_button_content_description">Button Verfolgte Daten</string>
     <string name="tracked_data_history_button_content_description">Button Verlauf verfolgter Daten</string>
     <string name="delete_line_button_content_description">Linie löschen Button</string>
+    <string name="delete_input_button_content_description">Eingabe löschen Taste</string>
     <string name="delete_data_point_button_content_description">Lösche Datenpunkt Button</string>
     <string name="edit_data_point_button_content_description">Datenpunkt bearbeiten Button</string>
     <string name="add_multiple_choice_answer_button_content_description">Multiple Choice Antwort Button hinzufügen</string>
@@ -347,4 +348,21 @@
     <string name="notification_permission_prompt">Sie sollten Benachrichtigungen für Track &amp; Graph zur Benachrichtigung, wenn die automatische Sicherung aus irgendeinem Grund fehlschlägt.</string>
     <string name="restore_hint_text">ACHTUNG: Bei der Wiederherstellung aus einem Backup werden alle derzeit in der App vorhandenen Daten und Einstellungen gelöscht. Sie sollten zuerst Ihre Daten sichern!</string>
     <string name="default_auto_backup_file_name">SicherungTrackUndGraph.db</string>
+
+    <string name="lua_script_empty">Bitte fügen Sie ein Lua-Skript hinzu</string>
+    <string name="lua_script_input_hint">Geben Sie ein Lua-Skript ein...</string>
+    <string name="file">Datei</string>
+    <string name="lua_feature_names_not_unique">Skripteingaben müssen eindeutige Namen haben</string>
+    <string name="graph_stat_type_lua_graph">Lua-Skript</string>
+    <string name="launch_lua_disabled">Lua-Start deaktiviert</string>
+    <string name="no_lua">Kein Lua</string>
+    <string name="lua_engine_disabled">Lua-Engine deaktiviert</string>
+    <string name="lua_graph_first_time_user_title">Lua-Skript-Grafiken und -Statistiken</string>
+    <string name="lua_graph_first_time_user_message">Lua-Skripte sind eine erweiterte Funktion, mit der Sie benutzerdefinierte Grafiken und Statistiken mit der Programmiersprache Lua erstellen können. \n\nSie können Ihr eigenes laden oder eines aus der GitHub-Sammlung auswählen. Das Installieren eines Skripts von GitHub bringt Sie zurück zur App, mit dem Skript bereit zur Verwendung.</string>
+    <string name="learn_more">Erfahren Sie mehr</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Einfügen</string>
+    <string name="failed_to_download_file">Fehler beim Herunterladen der Datei: %s</string>
+    <string name="confirm_deep_link">Sie haben einen Skriptlink von einer unbekannten Quelle erhalten. Installieren Sie nur Skripte aus vertrauenswürdigen Quellen. Möchten Sie dieses Skript installieren?</string>
+    <string name="graph_stat_info_button_description">Tutorials zu Grafiken und Statistiken</string>
 </resources>

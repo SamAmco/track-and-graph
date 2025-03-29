@@ -196,6 +196,7 @@
     <string name="tracked_data_menu_button_content_description">Botón de menú de datos trazados</string>
     <string name="tracked_data_history_button_content_description">Botón de historial de datos rastreados</string>
     <string name="delete_line_button_content_description">Botón para borrar línea</string>
+    <string name="delete_input_button_content_description">Botón de eliminación de entrada</string>
     <string name="delete_data_point_button_content_description">Botón para borrar punto de datos</string>
     <string name="edit_data_point_button_content_description">Botón para editar punto de datos</string>
     <string name="add_multiple_choice_answer_button_content_description">Añadir botón de respuesta de opción múltiple</string>
@@ -346,4 +347,21 @@
     <string name="notification_permission_prompt">Debes habilitar las notificaciones para Track &amp; Graph para recibir notificaciones si la copia de seguridad automática falla por algún motivo.</string>
     <string name="restore_hint_text">ADVERTENCIA: La restauración desde una copia de seguridad borrará todos los datos y la configuración actual en la aplicación. ¡Primero debes hacer una copia de seguridad de tus datos!</string>
     <string name="default_auto_backup_file_name">RespaldoTrackYGraph.db</string>
+
+    <string name="lua_script_empty">Por favor, añade un script Lua</string>
+    <string name="lua_script_input_hint">Introduce un script Lua...</string>
+    <string name="file">Archivo</string>
+    <string name="lua_feature_names_not_unique">Las entradas del script deben tener nombres únicos</string>
+    <string name="graph_stat_type_lua_graph">Script Lua</string>
+    <string name="launch_lua_disabled">Lanzamiento de Lua deshabilitado</string>
+    <string name="no_lua">Sin Lua</string>
+    <string name="lua_engine_disabled">Motor Lua deshabilitado</string>
+    <string name="lua_graph_first_time_user_title">Gráficos y estadísticas de scripts Lua</string>
+    <string name="lua_graph_first_time_user_message">Los scripts Lua son una función avanzada que te permite crear gráficos y estadísticas personalizados con el lenguaje de programación Lua. \n\nPuedes cargar el tuyo propio, o elegir uno de la colección de GitHub. Instalar un script desde GitHub te devolverá a la aplicación con el script listo para usar.</string>
+    <string name="learn_more">Aprende más</string>
+    <string name="github">GitHub</string>
+    <string name="paste">Pegar</string>
+    <string name="failed_to_download_file">Error al descargar el archivo: %s</string>
+    <string name="confirm_deep_link">Has recibido un enlace a un script de una fuente desconocida. Solo instala scripts de fuentes en las que confíes. ¿Te gustaría instalar este script?</string>
+    <string name="graph_stat_info_button_description">Tutoriales de gráficos y estadísticas</string>
 </resources>
