@@ -103,10 +103,12 @@ return function(sources)
 	local cutoff_params = {
 		period = period,
 		period_multiplier = period_multiplier,
-		from_now = from_now,
-		timestamp = latest_data_point.timestamp,
 	}
-	local cutoff = core.get_cutoff(cutoff_params)
+	local cutoff_end = nil
+	if not from_now then
+		cutoff_end = latest_data_point.timestamp
+	end
+	local cutoff = core.get_cutoff(cutoff_params, cutoff_end)
 
 	local datapoints = source.dpafter(cutoff)
 	table.insert(datapoints, 1, latest_data_point)

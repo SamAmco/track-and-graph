@@ -146,4 +146,36 @@ M.test_cumulative_bar_chart_with_different_labels = {
   end,
 }
 
+M.test_using_from_now = {
+  config = {
+    period = "core.PERIOD.DAY",
+    totalling_period = "core.PERIOD.DAY",
+    from_now = "true",
+  },
+  sources = function()
+    local now = core.time().timestamp
+    return {
+      source1 = {
+        {
+          timestamp = now - (DDAY * 0.5),
+          value = 5.0,
+        },
+        {
+          timestamp = now - (DDAY * 1.3),
+          value = 4.0,
+        },
+      },
+    }
+  end,
+  assertions = function(result)
+    test.assert("result was nil", result)
+    test.assertEquals(graph.GRAPH_TYPE.TIME_BARCHART, result.type)
+
+    local expected_values = { 5.0 }
+    for i, value in ipairs(expected_values) do
+      test.assertEquals(value, result.bars[i][1].value)
+    end
+  end,
+}
+
 return M
