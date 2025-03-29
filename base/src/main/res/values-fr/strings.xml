@@ -138,8 +138,6 @@
     <string name="graph_stat_view_not_enough_data_graph">Ce graphique s\'affichera quand il y aura suffisamment de données.</string>
     <string name="finish">Terminer</string>
     <string name="about_description"><![CDATA[Track & Graph est un logiciel gratuit et open source sous licence GPL 3.0.]]></string>
-    <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
-    <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">Les bibliothèques open source suivantes ont été utilisées : </string>
     <string name="about">À propos</string>
@@ -198,7 +196,7 @@
     <string name="tracked_data_menu_button_content_description">Bouton pour le menu du suivi</string>
     <string name="tracked_data_history_button_content_description">Bouton d\'historique des entrées</string>
     <string name="delete_line_button_content_description">Bouton de suppression de ligne</string>
-    <string name="delete_input_button_content_description">Bouton de suppression de l'entrée</string>
+    <string name="delete_input_button_content_description">Bouton de suppression de l\'entrée</string>
     <string name="delete_data_point_button_content_description">Bouton de suppression de l\'entrée</string>
     <string name="edit_data_point_button_content_description">Bouton de modification de l\'entrée</string>
     <string name="add_multiple_choice_answer_button_content_description">Ajouter un bouton de réponse à choix multiple</string>
@@ -366,11 +364,11 @@
     <string name="no_lua">Pas de Lua</string>
     <string name="lua_engine_disabled">Moteur Lua désactivé</string>
     <string name="lua_graph_first_time_user_title">Graphiques et statistiques des scripts Lua</string>
-    <string name="lua_graph_first_time_user_message">Les scripts Lua sont une fonctionnalité avancée qui vous permet de créer des graphiques et des statistiques personnalisés avec le langage de programmation Lua. \n\nVous pouvez charger le vôtre, ou en choisir un dans la collection GitHub. L'installation d'un script depuis GitHub vous ramènera à l'application avec le script prêt à l'emploi.</string>
+    <string name="lua_graph_first_time_user_message">Les scripts Lua sont une fonctionnalité avancée qui vous permet de créer des graphiques et des statistiques personnalisés avec le langage de programmation Lua. \n\nVous pouvez charger le vôtre, ou en choisir un dans la collection GitHub. L\'installation d\'un script depuis GitHub vous ramènera à l\'application avec le script prêt à l\'emploi.</string>
     <string name="learn_more">En savoir plus</string>
     <string name="github">GitHub</string>
     <string name="paste">Coller</string>
     <string name="failed_to_download_file">Échec du téléchargement du fichier : %s</string>
-    <string name="confirm_deep_link">Vous avez reçu un lien vers un script d'une source inconnue. Installez uniquement des scripts provenant de sources de confiance. Voulez-vous installer ce script ?</string>
+    <string name="confirm_deep_link">Vous avez reçu un lien vers un script d\'une source inconnue. Installez uniquement des scripts provenant de sources de confiance. Voulez-vous installer ce script ?</string>
     <string name="graph_stat_info_button_description">Tutoriels sur les graphiques et les statistiques</string>
 </resources>

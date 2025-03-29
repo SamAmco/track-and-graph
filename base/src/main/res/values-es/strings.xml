@@ -136,8 +136,6 @@
     <string name="graph_stat_view_not_enough_data_graph">Este gráfico mostrará cuando se hayan registrado suficientes datos para generarlo.</string>
     <string name="finish">Finalizar</string>
     <string name="about_description"><![CDATA[Track & Graph es un software libre y de código abierto bajo la licencia GPL 3.0.]]></string>
-    <string name="github_link">https://github.com/SamAmco/track-and-graph</string>
-    <string name="play_store_page_link">https://play.google.com/store/apps/details?id=com.samco.trackandgraph</string>
     <string name="github_link_friendly">github.com/SamAmco/track-and-graph</string>
     <string name="about_libraries_message">Se han utilizado las siguientes bibliotecas de código abierto:</string>
     <string name="about">Acerca de</string>
