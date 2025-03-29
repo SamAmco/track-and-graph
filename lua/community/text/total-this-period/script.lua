@@ -2,7 +2,7 @@ local core = require("tng.core")
 local graph = require("tng.graph")
 
 --- PREVIEW_START
--- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
+-- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
 local period = core.PERIOD.WEEK
 --- PREVIEW_END
 

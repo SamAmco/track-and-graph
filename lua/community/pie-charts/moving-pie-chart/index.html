@@ -16,7 +16,7 @@
     
     
       
-        <title>Merge Inputs - Track & Graph</title>
+        <title>Moving Pie Chart - Track & Graph</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#merge-inputs" class="md-skip">
+        <a href="#moving-pie-chart" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Merge Inputs
+              Moving Pie Chart
             
           </span>
         </div>
@@ -639,34 +639,23 @@
 
 
 
-<h1 id="merge-inputs">Merge Inputs<a class="headerlink" href="#merge-inputs" title="Permanent link">#</a></h1>
-<p>Plots all provided data sources in a single line where all datapoints are sorted by their timestamp.</p>
+<h1 id="moving-pie-chart">Moving Pie Chart<a class="headerlink" href="#moving-pie-chart" title="Permanent link">#</a></h1>
+<p>A pie chart that merges all given data sources into one pie chart including all data, or all data in the given period prior to now.</p>
 <div style="text-align: center;">
-    <img src="merge-inputs.jpg" alt="Merge Inputs" style="width: 400px; height: auto;">
+    <img src="image.jpg" alt="Moving Pie Chart" style="width: 400px; height: auto;">
 </div>
 
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <p>This script accepts the following configuration parameters:</p>
-<pre><code class="language-lua">-- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
-local period = nil
+<pre><code class="language-lua">local period = nil
 -- Optional integer value used with period e.g. 5
-local period_multiplier = 8
--- If from_now is false the end of the graph will be the last datapoint, otherwise it's the current date/time
-local from_now = false
--- Optional color, e.g. &quot;#FF00FF&quot; or core.COLOR.BLUE_SKY
-local line_color = nil
--- Optional point style e.g. graph.LINE_POINT_STYLE.CIRCLE
-local line_point_style = nil
--- Optional string label for the line in the legend, e.g. &quot;Data&quot;
-local line_label = nil
--- Optional integer value used to average data points over a certain duration e.g. core.DURATION.DAY * 30 for a 30 day moving average
-local averaging_duration = nil
--- Optional totalling period used to calculate 'plot totals' e.g. core.PERIOD.WEEK
-local totalling_period = nil
--- Optional totalling period multiplier used to calculate 'plot totals' e.g. 2
-local totalling_period_multiplier = nil
+local period_multiplier = nil
+-- Optional colors list, e.g. { label: &quot;#FF00FF&quot;, label2: &quot;#0000FF&quot;, label3: core.COLOR.BLUE_SKY }
+local label_colors = nil
+-- Boolean to count by label. If true, each datapoint counts as 1, and the value is ignored
+local count_by_label = false
 </code></pre>
-<p><a href="trackandgraph://lua_inject_url?url=https://www.github.com/SamAmco/track-and-graph/tree/master/lua/community/line-graphs/merge-inputs/script.lua">Install via deeplink</a></p>
+<p><a href="trackandgraph://lua_inject_url?url=https://www.github.com/SamAmco/track-and-graph/tree/master/lua/community/pie-charts/moving-pie-chart/script.lua">Install via deeplink</a></p>
 <p><a href="script.lua">Read the full script</a></p>
 <p>Author: <a href="https://github.com/SamAmco">SamAmco</a></p>
 
