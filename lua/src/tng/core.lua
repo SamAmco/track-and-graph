@@ -135,7 +135,7 @@ function datasource:dpall() end
 --- Data points are iterated in reverse chronological order.
 --- After this operation the data source will contain only datapoints that are before the given timestamp
 --- @since v5.1.0
---- @param datetime (timestamp|date): The timestamp to compare against.
+--- @param datetime (timestamp|date)?: The timestamp to compare against. If nil then the behaviour is the same as dpall
 --- @return datapoint[]: A table containing all data points that are newer than the given timestamp.
 function datasource:dpafter(datetime) end
 
