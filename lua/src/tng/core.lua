@@ -141,7 +141,7 @@ function datasource:dpafter(datetime) end
 
 --- @since v5.1.0
 --- @class cutoff_params
---- @field period string?: The period for the cutoff.
+--- @field period (DURATION|PERIOD)?: The period or duration for the cutoff.
 --- @field period_multiplier? integer: The multiplier for the period.
 
 --- Calculates a timestamp by subtracting the given period*multiplier from the specified end time or now.
