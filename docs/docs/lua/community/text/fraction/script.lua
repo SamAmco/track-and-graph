@@ -71,10 +71,15 @@ return function(sources)
 		period = period,
 		period_multiplier = period_multiplier,
 	}
-	local cutoff = core.get_cutoff(cutoff_params)
+	local cutoff = period and core.get_cutoff(cutoff_params)
 
 	for _, source in pairs(sources) do
-		local data_points = source.dpafter(cutoff)
+		local data_points
+		if cutoff then
+			data_points = source.dpafter(cutoff)
+		else
+			data_points = source.dpall()
+		end
 		for _, point in ipairs(data_points) do
 			table.insert(all_data_points, point)
 		end
@@ -84,6 +89,6 @@ return function(sources)
 
 	return fraction_text and {
 		type = graph.GRAPH_TYPE.TEXT,
-		text = fraction_text or "No data",
+		text = fraction_text,
 	}
 end
