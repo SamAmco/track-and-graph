@@ -362,8 +362,9 @@
     <string name="notification_permission_prompt">You should enable notifications for Track &amp; Graph to be notified if Auto-Backup fails for any reason.</string>
     <string name="luak" translatable="false">LuaK</string>
     <string name="mit" translatable="false">MIT</string>
+    
     <string name="lua_script_empty">Please add a Lua script</string>
-    <string name="lua_script_input_hint">Enter a Lua script...</string>
+    <string name="lua_script_input_hint">Enter a Lua script…</string>
     <string name="file">File</string>
     <string name="lua_feature_names_not_unique">Script inputs must have unique names</string>
     <string name="graph_stat_type_lua_graph">Lua Script</string>
@@ -379,3 +380,4 @@
     <string name="confirm_deep_link">You have received a script link from an unknown source. Only install scripts from sources you trust. Would you like to install this script?</string>
     <string name="graph_stat_info_button_description">Graphs and stats tutorials</string>
 </resources>
+
