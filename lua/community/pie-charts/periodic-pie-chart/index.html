@@ -16,7 +16,7 @@
     
     
       
-        <title>Total this period - Track & Graph</title>
+        <title>Periodic Pie Chart - Track & Graph</title>
       
     
     
@@ -70,7 +70,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#total-this-period" class="md-skip">
+        <a href="#periodic-pie-chart" class="md-skip">
           Skip to content
         </a>
       
@@ -105,7 +105,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Total this period
+              Periodic Pie Chart
             
           </span>
         </div>
@@ -639,18 +639,22 @@
 
 
 
-<h1 id="total-this-period">Total this period<a class="headerlink" href="#total-this-period" title="Permanent link">#</a></h1>
-<p>Shows the total of a given input over a specified period of time. For example, the total this week (Monday to Sunday) or the total this month. If multiple data sources are given then the total of each data source is shown separately, as well as the overall total.</p>
+<h1 id="periodic-pie-chart">Periodic Pie Chart<a class="headerlink" href="#periodic-pie-chart" title="Permanent link">#</a></h1>
+<p>A pie chart that displays data for a specific time period such as the current day, week, month, etc. The pie chart resets at the beginning of each new period and accumulates data throughout that period. This script can accept multiple data sources and merges them all into one pie chart.</p>
 <div style="text-align: center;">
-    <img src="image.jpg" alt="Total this period" style="width: 400px; height: auto;">
+    <img src="image.jpg" alt="Periodic Pie Chart" style="width: 400px; height: auto;">
 </div>
 
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
 <p>This script accepts the following configuration parameters:</p>
 <pre><code class="language-lua">-- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
 local period = core.PERIOD.WEEK
+-- Optional colors list, e.g. { label=&quot;#FF00FF&quot;, label2=&quot;#0000FF&quot;, label3=core.COLOR.BLUE_SKY }
+local label_colors = nil
+-- Boolean to count by label. If true, each datapoint counts as 1, and the value is ignored
+local count_by_label = false
 </code></pre>
-<p><a href="trackandgraph://lua_inject_url?url=https://www.github.com/SamAmco/track-and-graph/tree/master/lua/community/text/total-this-period/script.lua">Install via deeplink</a></p>
+<p><a href="trackandgraph://lua_inject_url?url=https://www.github.com/SamAmco/track-and-graph/tree/master/lua/community/pie-charts/periodic-pie-chart/script.lua">Install via deeplink</a></p>
 <p><a href="script.lua">Read the full script</a></p>
 <p>Author: <a href="https://github.com/SamAmco">SamAmco</a></p>
 

@@ -14,7 +14,7 @@ local totalling_period = core.PERIOD.DAY
 local count_by_label = false
 -- Optional totalling period multiplier used to calculate 'plot totals' e.g. 2
 local totalling_period_multiplier = nil
--- Optional colors list, e.g. { label: "#FF00FF", label2: "#0000FF", label3: core.COLOR.BLUE_SKY }
+-- Optional colors list, e.g. { label="#FF00FF", label2="#0000FF", label3=core.COLOR.BLUE_SKY }
 local label_colors = nil
 -- Optional if the y axis represents time
 local duration_based_range = false
