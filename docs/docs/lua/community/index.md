@@ -11,6 +11,7 @@
 
 ## Text
 - [Total this period](./text/total-this-period/README.md): Displays the total value of from the provided data sources in the given period e.g. the total this week.
+- [Fraction](./text/fraction/README.md): Displays a fraction representing the ratio of values with specified labels to total values. 
 
 ## Datapoint
 - [Last Value Above Threshold](./datapoint/last-value-above-threshold/README.md): Returns the last datapoint with a value above a given threshold. It can accept multiple data sources.
