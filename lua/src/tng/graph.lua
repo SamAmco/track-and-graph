@@ -229,8 +229,8 @@ end
 ---
 --- @since v5.1.0
 --- @param sources table: A table of sources, where each source has a dp() method that returns a data point.
---- @param cutoff_params core.cutoff_params: Parameters for calculating the cutoff time.
---- @param from_now boolean: If true, uses the current time as the end time; otherwise uses the most recent data point's time.
+--- @param cutoff_params cutoff_params|number: Parameters for calculating the cutoff time, or the cutoff time itself as a Unix epoch millisecond timestamp.
+--- @param from_now boolean?: If true, uses the current time as the end time; otherwise uses the most recent data point's time. You don't need to provide this if you're using a numeric cutoff.
 --- @return datapoint[]: A table of data points merged from all sources, sorted by timestamp in descending order.
 M.merge_sources = function(sources, cutoff_params, from_now)
 	local all_data = {}
@@ -243,8 +243,13 @@ M.merge_sources = function(sources, cutoff_params, from_now)
 
 	local latest_data_point, latest_key = M.find_latest_data_point(last_data_points)
 
-	local end_time = from_now and core.time() or latest_data_point
-	local cutoff = core.get_cutoff(cutoff_params, end_time)
+	local cutoff
+	if type(cutoff_params) == "number" then
+		cutoff = cutoff_params
+	else
+		local end_time = from_now and core.time() or latest_data_point
+		cutoff = core.get_cutoff(cutoff_params, end_time)
+	end
 
 	while true do
 		-- If no latest data point is found, break the loop
@@ -281,7 +286,7 @@ end
 --- @param totalling_period_multiplier? integer: Optional multiplier for the period.
 --- @param count_by_label boolean?: If true, counts occurrences of labels instead of summing values. Defaults to false
 --- @param end_time integer?: The end time of the graph. An integer representing the Unix epoch millisecond timestamp. If not provided then the timestamp of the last datapoint in the datapoints is used.
---- @param label_colors color?: A table of colors for each label. The keys are the labels and the values are core.color values.
+--- @param label_colors color?: A table of colors for each label. The keys are the labels and the values are color values.
 --- @return time_bar[]: A table of bars, each containing segments for the period.
 M.collect_to_bars = function(
 		datapoints,
@@ -341,6 +346,37 @@ M.collect_to_bars = function(
 	end
 
 	return bars
+end
+
+--- Collects all given data points into pie chart segments by their label
+--- @since v5.1.0
+--- @param datapoints datapoint[]: The data points to process.
+--- @param count_by_label boolean?: If true, counts occurrences of labels instead of summing values. Defaults to false
+--- @param label_colors color?: A table of colors for each label. The keys are the labels and the values are color values.
+--- @return piechart_segment[]
+M.collect_to_segments = function(datapoints, count_by_label, label_colors)
+	local segments = {}
+	local totals = {}
+
+	for _, dp in ipairs(datapoints) do
+		local key = dp.label or ""
+		local value = count_by_label and 1 or dp.value
+		totals[key] = (totals[key] or 0) + value
+	end
+
+	for label, value in pairs(totals) do
+		table.insert(segments, {
+			label = label,
+			value = value,
+			color = label_colors and label_colors[label] or nil,
+		})
+	end
+
+	table.sort(segments, function(a, b)
+		return a.label < b.label
+	end)
+
+	return segments
 end
 
 return M

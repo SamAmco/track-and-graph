@@ -75,7 +75,7 @@ class CommunityTestRunner {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun testData(): List<Array<Any>> {
-            val scriptPath = "generated/lua-community/"
+            val scriptPath = "generated/lua-community"
             val classLoader = CommunityTestRunner::class.java.classLoader ?: return emptyList()
             val baseUrl = classLoader.getResource(scriptPath) ?: return emptyList()
             val basePath = File(baseUrl.toURI())

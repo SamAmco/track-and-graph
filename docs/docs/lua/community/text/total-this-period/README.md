@@ -11,7 +11,7 @@ Shows the total of a given input over a specified period of time. For example, t
 This script accepts the following configuration parameters:
 
 ```lua
--- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
+-- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
 local period = core.PERIOD.WEEK
 ```
 

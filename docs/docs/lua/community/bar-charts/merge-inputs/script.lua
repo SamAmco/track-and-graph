@@ -14,7 +14,7 @@ local totalling_period = core.PERIOD.DAY
 local totalling_period_multiplier = nil
 -- Optional boolean to count by label. If true, each datapoint counts as 1, and the value is ignored
 local count_by_label = false
--- Optional colors list, e.g. { label: "#FF00FF", label2: "#0000FF", label3: core.COLOR.BLUE_SKY }
+-- Optional colors list, e.g. { label="#FF00FF", label2="#0000FF", label3=core.COLOR.BLUE_SKY }
 local label_colors = nil
 -- Optional if the y axis represents time
 local duration_based_range = false
