@@ -98,7 +98,7 @@ M.LINE_POINT_STYLE = {
 ---
 --- @since v5.1.0
 --- @param datapoints datapoint[]: The data points to apply the moving average to.
---- @param averaging_duration integer: The duration over which to average the data points, in milliseconds.
+--- @param averaging_duration integer?: The duration over which to average the data points, in milliseconds.
 M.apply_moving_averaging = function(datapoints, averaging_duration)
 	if averaging_duration == nil then
 		return datapoints
@@ -157,7 +157,7 @@ end
 --- @since v5.1.0
 --- @param datapoints datapoint[]: The data points to calculate totals for.
 --- @param period string: The period to calculate totals over (e.g., core.PERIOD.DAY).
---- @param multiplier integer: The multiplier for the period. Allowing for periods like 2 days, 3 weeks, etc.
+--- @param multiplier integer?: The multiplier for the period. Allowing for periods like 2 days, 3 weeks, etc.
 --- @param zone_override? string: The timezone to use for the period. If not provided, the default timezone is used.
 --- @return datapoint[]: A table of new data points, each representing the total value for a specific period.
 M.calculate_period_totals = function(datapoints, period, multiplier, zone_override)
