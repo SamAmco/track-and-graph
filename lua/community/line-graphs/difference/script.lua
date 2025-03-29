@@ -2,10 +2,11 @@ local core = require("tng.core")
 local graph = require("tng.graph")
 
 --- PREVIEW_START
+-- Script: Line Graphs - Difference
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
 local period = nil
 -- Optional integer value used with period e.g. 5
-local period_multiplier = 8
+local period_multiplier = nil
 -- If from_now is false the end of the graph will be the last datapoint, otherwise it's the current date/time
 local from_now = false
 -- Optional colors list, e.g. {"#FF00FF", "#0000FF", core.COLOR.BLUE_SKY}
@@ -49,10 +50,12 @@ local function get_line_data(source)
 	local cutoff_params = {
 		period = period,
 		period_multiplier = period_multiplier,
-		from_now = from_now,
-		timestamp = latest_data_point.timestamp or nil,
 	}
-	local cutoff = core.get_cutoff(cutoff_params)
+	local cutoff_end = nil
+	if not from_now then
+		cutoff_end = latest_data_point.timestamp
+	end
+	local cutoff = core.get_cutoff(cutoff_params, cutoff_end)
 
 	local datapoints = source.dpafter(cutoff)
 	table.insert(datapoints, 1, latest_data_point)

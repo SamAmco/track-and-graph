@@ -2,6 +2,7 @@ local core = require("tng.core")
 local graph = require("tng.graph")
 
 --- PREVIEW_START
+-- Script: Line Graphs - Cumulative
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
 local period = nil
 -- Optional integer value used with period e.g. 5
@@ -43,10 +44,12 @@ local function get_line_data(source)
 	local cutoff_params = {
 		period = period,
 		period_multiplier = period_multiplier,
-		from_now = from_now,
-		timestamp = latest_data_point.timestamp or nil,
 	}
-	local cutoff = core.get_cutoff(cutoff_params)
+	local cutoff_end = nil
+	if not from_now then
+		cutoff_end = latest_data_point.timestamp
+	end
+	local cutoff = core.get_cutoff(cutoff_params, cutoff_end)
 
 	local datapoints = source.dpafter(cutoff)
 	table.insert(datapoints, 1, latest_data_point)
