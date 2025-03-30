@@ -20,7 +20,7 @@ local label_colors = nil
 local count_by_label = false
 ```
 
-[Install via deeplink](trackandgraph://lua_inject_url?url=https://www.github.com/SamAmco/track-and-graph/tree/master/lua/community/pie-charts/moving-pie-chart/script.lua)
+[Install via deeplink](trackandgraph://lua_inject_url?url=https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/docs/docs/lua/community/pie-charts/moving-pie-chart/script.lua)
 
 [Read the full script](./script.lua)
 

@@ -25,7 +25,7 @@ local numerator_labels = {}
 local ignored_labels = nil
 ```
 
-[Install via deeplink](trackandgraph://lua_inject_url?url=https://www.github.com/SamAmco/track-and-graph/tree/master/lua/community/text/fraction/script.lua)
+[Install via deeplink](trackandgraph://lua_inject_url?url=https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/docs/docs/lua/community/text/fraction/script.lua)
 
 [Read the full script](./script.lua)
 
