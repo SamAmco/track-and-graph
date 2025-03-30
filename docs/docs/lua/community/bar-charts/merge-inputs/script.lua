@@ -2,7 +2,7 @@ local core = require("tng.core")
 local graph = require("tng.graph")
 
 --- PREVIEW_START
--- Script: Datapoint - Merge Inputs
+-- Script: Bar Charts - Merge Inputs
 -- Optional period of data to be displayed e.g. core.PERIOD.WEEK to only show 1 week of data
 local period = nil
 -- Optional integer value used with period e.g. 5
