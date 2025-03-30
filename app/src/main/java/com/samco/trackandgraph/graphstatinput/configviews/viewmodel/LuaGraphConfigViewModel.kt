@@ -149,7 +149,7 @@ class LuaGraphConfigViewModel @Inject constructor(
 
     private suspend fun onReceivedDeepLink(uri: URI) {
         if (uri.scheme != "https" ||
-            uri.host != "github.com" ||
+            uri.host != "raw.githubusercontent.com" ||
             !uri.path.startsWith("/SamAmco/track-and-graph")
         ) {
             pendingScriptUriDownload.emit(uri)
