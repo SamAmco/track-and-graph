@@ -18,22 +18,19 @@ package com.samco.trackandgraph.remoteconfig
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.downloader.FileDownloader
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 import timber.log.Timber
-import java.net.URI
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import androidx.core.net.toUri
 
 class UrlNavigatorImpl @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
-    private val fileDownloader: FileDownloader,
+    private val remoteConfigProvider: RemoteConfigProvider,
 ) : UrlNavigator, CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Job() + ioDispatcher
@@ -58,7 +55,7 @@ class UrlNavigatorImpl @Inject constructor(
     }
 
     private fun navigateToUrl(context: Context, url: String) {
-        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url)).apply {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri()).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }
         context.startActivity(intent)
@@ -72,11 +69,7 @@ class UrlNavigatorImpl @Inject constructor(
     }
 
     private suspend fun loadConfig(): Map<String, String> {
-        val configContent = fileDownloader.downloadFileToString(
-            URI("https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/configuration/remote-configuration.json")
-        ) ?: error("Failed to load remote configuration")
-
-        val endpoints = JSONObject(configContent).getJSONObject("endpoints")
+        val endpoints = remoteConfigProvider.getRemoteConfigObject(RemoteConfigProvider.RemoteConfig.ENDPOINTS)
 
         return endpoints.keys()
             .asSequence()

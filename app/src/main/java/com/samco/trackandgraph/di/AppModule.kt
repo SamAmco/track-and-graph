@@ -21,20 +21,22 @@ import android.content.ContentResolver
 import android.content.Context
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelper
 import com.samco.trackandgraph.adddatapoint.SuggestedValueHelperImpl
+import com.samco.trackandgraph.assetreader.AssetReader
+import com.samco.trackandgraph.assetreader.AssetReaderImpl
 import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractor
 import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractorImpl
 import com.samco.trackandgraph.base.helpers.PrefHelper
 import com.samco.trackandgraph.base.helpers.PrefHelperImpl
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
-import com.samco.trackandgraph.lua.LuaEngine
-import com.samco.trackandgraph.lua.LuaEngineImpl
-import com.samco.trackandgraph.assetreader.AssetReaderImpl
-import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandlerImpl
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.downloader.FileDownloaderImpl
+import com.samco.trackandgraph.lua.LuaEngine
+import com.samco.trackandgraph.lua.LuaEngineImpl
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
+import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
+import com.samco.trackandgraph.remoteconfig.RemoteConfigProviderImpl
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.remoteconfig.UrlNavigatorImpl
 import com.samco.trackandgraph.settings.TngSettings
@@ -89,4 +91,8 @@ class AppModule {
     @Provides
     @Singleton
     fun provideUrlNavigator(impl: UrlNavigatorImpl): UrlNavigator = impl
+
+    @Provides
+    @Singleton
+    fun provideRemoteConfigProvider(impl: RemoteConfigProviderImpl): RemoteConfigProvider = impl
 }
