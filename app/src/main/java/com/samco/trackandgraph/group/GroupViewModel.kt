@@ -181,8 +181,8 @@ class GroupViewModel @Inject constructor(
                 UpdateType.DisplayIndices,
                 UpdateType.GraphDeleted
             )
-                    || it.second is UpdateType.GraphsForFeature
-                    || it.second is UpdateType.Graph
+                || it.second is UpdateType.GraphsForFeature
+                || it.second is UpdateType.Graph
         }
         .debounceBuffer(10)
         //Get any buffered events and only emit the most significant one
@@ -376,13 +376,16 @@ class GroupViewModel @Inject constructor(
 
     val allChildren = allChildrenFlow.asLiveData(viewModelScope.coroutineContext)
 
-    val showEmptyGroupText: LiveData<Boolean> = combine(
-        allChildrenFlow.map { it.isEmpty() },
-        databaseLoading,
-        groupId
-    ) { childrenEmpty, loading, groupId ->
-        childrenEmpty && !loading && groupId == 0L
-    }
+    val showEmptyGroupText: LiveData<Boolean> = databaseLoading
+        .flatMapLatest {
+            if (it) flowOf(false)
+            else combine(
+                allChildrenFlow.map { it.isEmpty() },
+                groupId
+            ) { childrenEmpty, groupId -> childrenEmpty && groupId == 0L }
+                //Give a short delay to give the data a chance to load
+                .onStart { delay(200) }
+        }
         .onStart { emit(false) }
         .distinctUntilChanged()
         .asLiveData(viewModelScope.coroutineContext)
