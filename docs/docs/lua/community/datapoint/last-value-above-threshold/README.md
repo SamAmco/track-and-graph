@@ -15,7 +15,7 @@ This script accepts the following configuration parameters:
 local threshold = 0
 ```
 
-[Install via deeplink](trackandgraph://lua_inject_url?url=https://www.github.com/SamAmco/track-and-graph/tree/master/lua/community/datapoint/last-value-above-threshold/script.lua)
+[Install via deeplink](trackandgraph://lua_inject_url?url=https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/docs/docs/lua/community/datapoint/last-value-above-threshold/script.lua)
 
 [Read the full script](./script.lua)
 
