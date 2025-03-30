@@ -38,6 +38,7 @@ import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
+import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -51,6 +52,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URI
@@ -65,6 +67,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     private val deepLinkHandler: DeepLinkHandler,
     private val fileDownloader: FileDownloader,
     private val urlNavigator: UrlNavigator,
+    private val remoteConfigProvider: RemoteConfigProvider,
     gsiProvider: GraphStatInteractorProvider,
     dataInteractor: DataInteractor,
 ) : GraphStatConfigViewModelBase<GraphStatConfigEvent.ConfigData.LuaConfigData>(
@@ -148,10 +151,23 @@ class LuaGraphConfigViewModel @Inject constructor(
     }
 
     private suspend fun onReceivedDeepLink(uri: URI) {
-        if (uri.scheme != "https" ||
-            uri.host != "raw.githubusercontent.com" ||
-            !uri.path.startsWith("/SamAmco/track-and-graph")
-        ) {
+        val trustedSources = mutableListOf<String>()
+
+        try {
+            val trustedSourcesObj = remoteConfigProvider.getRemoteConfigArray(
+                RemoteConfigProvider.RemoteConfig.TRUSTED_LUA_GRAPH_SOURCES
+            )
+            // Convert JSONObject to JSONArray if needed
+            val jsonArray = trustedSourcesObj
+            for (i in 0 until jsonArray.length()) {
+                trustedSources.add(jsonArray.getString(i))
+            }
+        } catch (e: Exception) {
+            // Handle parsing errors gracefully
+            Timber.e(e, "Failed to parse trusted sources")
+        }
+
+        if (trustedSources.none { uri.toString().startsWith(it) }) {
             pendingScriptUriDownload.emit(uri)
             return
         }
