@@ -3,7 +3,7 @@
   "title": "Remote Configuration Schema",
   "description": "Schema for remote configuration endpoints",
   "type": "object",
-  "required": ["endpoints"],
+  "required": ["endpoints", "trusted-lua-script-sources"],
   "properties": {
     "endpoints": {
       "type": "object",
@@ -48,7 +48,14 @@
         }
       },
       "additionalProperties": false
+    },
+    "trusted-lua-graph-sources": {
+      "type": "array",
+      "description": "List of trusted URLs for Lua script sources",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      }
     }
-  },
-  "additionalProperties": false
+  }
 }
