@@ -1,0 +1,1124 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="../../bar-charts/">
+      
+      
+        <link rel="next" href="../../../notes/">
+      
+      
+      <link rel="icon" href="../../../../img/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
+    
+    
+      
+        <title>Lua Graphs and Statistics - Track & Graph</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.8608ea7d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#lua-graphs-and-statistics" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="Track &amp; Graph" class="md-header__button md-logo" aria-label="Track & Graph" data-md-component="logo">
+      
+  <img src="../../../../img/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Track & Graph
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Lua Graphs and Statistics
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="Track &amp; Graph" class="md-nav__button md-logo" aria-label="Track & Graph" data-md-component="logo">
+      
+  <img src="../../../../img/logo.png" alt="logo">
+
+    </a>
+    Track & Graph
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Tutorial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../tracking/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Get started with tracking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../import-export/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Importing and exporting
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_3" id="__nav_1_3_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Creating graphs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_3">
+            <span class="md-nav__icon md-icon"></span>
+            Creating graphs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../line/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Line graphs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pie/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Pie charts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../statistics/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Statistics
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../histograms/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Time histograms
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../bar-charts/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Bar charts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Lua Graphs and Statistics
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Lua Graphs and Statistics
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#community-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Community Scripts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-data-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Data Types
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic Data Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Numbers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Strings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#booleans" class="md-nav__link">
+    <span class="md-ellipsis">
+      Booleans
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tableslists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tables/Lists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nil" class="md-nav__link">
+    <span class="md-ellipsis">
+      nil
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comments
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#durations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Durations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#periods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Periods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#colors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Colors
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../notes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../timestamps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Timestamps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    Lua
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Lua
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../lua/community/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Community Scripts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#community-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Community Scripts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-data-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Data Types
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic Data Types">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#numbers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Numbers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#strings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Strings
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#booleans" class="md-nav__link">
+    <span class="md-ellipsis">
+      Booleans
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tableslists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tables/Lists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nil" class="md-nav__link">
+    <span class="md-ellipsis">
+      nil
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comments
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#durations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Durations
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#periods" class="md-nav__link">
+    <span class="md-ellipsis">
+      Periods
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#colors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Colors
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="lua-graphs-and-statistics">Lua Graphs and Statistics<a class="headerlink" href="#lua-graphs-and-statistics" title="Permanent link">#</a></h1>
+<p>Lua graphs are more powerful and flexible than the other graph types. A lua graph is a script written in the lua programming language that returns a data structure that Track &amp; Graph can render. The lua graph can be configured with named data sources that the script can read from when it is executed. For example we could re-create the Last Tracked statistic by adding a single data source and then using this script:</p>
+<div class="highlight"><pre><span></span><code><span class="kr">return</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="nv">sources</span><span class="p">)</span>
+<span class="w">  </span><span class="kd">local</span><span class="w"> </span><span class="nv">_</span><span class="p">,</span><span class="w"> </span><span class="nv">first</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">next</span><span class="p">(</span><span class="nv">sources</span><span class="p">)</span>
+<span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">first</span><span class="w"> </span><span class="kr">then</span>
+<span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span>
+<span class="w">  </span><span class="kr">end</span>
+<span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">).</span><span class="nv">GRAPH_TYPE</span><span class="p">.</span><span class="py">DATA_POINT</span><span class="p">,</span>
+<span class="w">    </span><span class="nv">datapoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">first</span><span class="p">.</span><span class="nf">dp</span><span class="p">(),</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="kr">end</span>
+</code></pre></div>
+<p>Don't worry if that seems a bit complicated, there are many scripts already written for you over at <a href="../../../../lua/community/">the community script hub</a>. </p>
+<p>If you would like to learn how to write your own scripts check out <a href="../../../../lua/developer-guide/intro/">the developer guides</a>.</p>
+<h2 id="community-scripts">Community Scripts<a class="headerlink" href="#community-scripts" title="Permanent link">#</a></h2>
+<p>You can get directly there by tapping the "GitHub" button in the app. Once there if you find a script you want to use you can tap the "Install via deeplink" button and you will be returned to the app with the script already installed: </p>
+<p><img alt="&quot;lua_graph_flow&quot;" src="../video.gif" width="300" /></p>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">#</a></h2>
+<p>Most of the scripts have some configuration parameters near the top. Currently you will need to modify these manually to configure the script. Below is a guide for working with the different data types you'll encounter in Lua scripts.</p>
+<h3 id="basic-data-types">Basic Data Types<a class="headerlink" href="#basic-data-types" title="Permanent link">#</a></h3>
+<p>When configuring Lua scripts, you'll need to understand how to provide different types of values:</p>
+<h4 id="numbers">Numbers<a class="headerlink" href="#numbers" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">number</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">42</span><span class="w">           </span><span class="c1">-- integers</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">decimal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">3.14</span><span class="w">        </span><span class="c1">-- floating point numbers</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">negative</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">-</span><span class="mi">10</span><span class="w">        </span><span class="c1">-- negative numbers</span>
+</code></pre></div>
+<h4 id="strings">Strings<a class="headerlink" href="#strings" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">string</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Hello&quot;</span><span class="w">      </span><span class="c1">-- double quotes</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">string2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;World&#39;</span><span class="w">     </span><span class="c1">-- single quotes work too</span>
+</code></pre></div>
+<h4 id="booleans">Booleans<a class="headerlink" href="#booleans" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">truth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">true</span><span class="w">          </span><span class="c1">-- true value</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">falsehood</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">false</span><span class="w">     </span><span class="c1">-- false value</span>
+</code></pre></div>
+<h4 id="tableslists">Tables/Lists<a class="headerlink" href="#tableslists" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">emptyList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{}</span><span class="w">                           </span><span class="c1">-- empty list</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">numberList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">}</span><span class="w">                </span><span class="c1">-- list of numbers</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">stringList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;small&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;medium&quot;</span><span class="p">}</span><span class="w">         </span><span class="c1">-- list of strings</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">colorList</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">{</span><span class="s2">&quot;#FF0000&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">COLOR</span><span class="p">.</span><span class="py">BLUE</span><span class="p">}</span><span class="w"> </span><span class="c1">-- list of colors</span>
+</code></pre></div>
+<h4 id="nil">nil<a class="headerlink" href="#nil" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">nothing</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span><span class="w">         </span><span class="c1">-- represents the absence of a value</span>
+</code></pre></div>
+<h4 id="comments">Comments<a class="headerlink" href="#comments" title="Permanent link">#</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1">-- Anything after -- is a comment and will be ignored by the interpreter</span>
+<span class="cm">--[[</span>
+<span class="cm">  This is a multi-line comment</span>
+<span class="cm">  It can span multiple lines</span>
+<span class="cm">]]</span>
+</code></pre></div>
+<h3 id="durations">Durations<a class="headerlink" href="#durations" title="Permanent link">#</a></h3>
+<p>A duration is just a number of milliseconds. There are constants defined for you for convenience:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">SECOND</span>
+<span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">MINUTE</span>
+<span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">HOUR</span>
+<span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">DAY</span>
+<span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">WEEK</span>
+</code></pre></div>
+<p>It is also valid to perform arithmetic on a duration e.g.</p>
+<div class="highlight"><pre><span></span><code><span class="p">(</span><span class="nv">core</span><span class="p">.</span><span class="py">DURATION</span><span class="p">.</span><span class="py">MINUTE</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">8</span><span class="w"> </span><span class="o">-</span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">3</span>
+</code></pre></div>
+<h3 id="periods">Periods<a class="headerlink" href="#periods" title="Permanent link">#</a></h3>
+<p>A period is slightly different to a duration because it can have a variable number of milliseconds. For example a month does not have a fixed number of days, and a day may have a different number of hours due to daylight savings. The period constants defined are:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">core</span><span class="p">.</span><span class="py">PERIOD</span><span class="p">.</span><span class="py">DAY</span>
+<span class="nv">core</span><span class="p">.</span><span class="py">PERIOD</span><span class="p">.</span><span class="py">WEEK</span>
+<span class="nv">core</span><span class="p">.</span><span class="py">PERIOD</span><span class="p">.</span><span class="py">MONTH</span>
+<span class="nv">core</span><span class="p">.</span><span class="py">PERIOD</span><span class="p">.</span><span class="py">YEAR</span>
+</code></pre></div>
+<p>It is not valid to use arithmetic operations on a period. For example <code>core.PERIOD.MONTH * 5</code> is not valid. For this reason a script that uses a period in the config will often accept a multiplier for that period as a separate parameter. So if you want to represent something like 5 months you might provide the following configuration.</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">PERIOD</span><span class="p">.</span><span class="py">MONTH</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">period_multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
+</code></pre></div>
+<h3 id="colors">Colors<a class="headerlink" href="#colors" title="Permanent link">#</a></h3>
+<p>For colors you can use any hex value such as <code>#FF0000</code> or <code>#00FF00</code> like so:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">local</span><span class="w"> </span><span class="nv">color</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;#FF0000&quot;</span>
+</code></pre></div>
+<p>You can also use the following named colors from Track &amp; Graph's default colour palette:</p>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Hex Value</th>
+<th>Color Sample</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>core.COLOR.RED_DARK</code></td>
+<td><code>#A50026</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#A50026;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.RED</code></td>
+<td><code>#D73027</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#D73027;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.ORANGE_DARK</code></td>
+<td><code>#F46D43</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#F46D43;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.ORANGE</code></td>
+<td><code>#FDAE61</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#FDAE61;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.YELLOW</code></td>
+<td><code>#FEE090</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#FEE090;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.BLUE_LIGHT</code></td>
+<td><code>#E0F3F8</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#E0F3F8;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.BLUE_SKY</code></td>
+<td><code>#ABD9E9</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#ABD9E9;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.BLUE</code></td>
+<td><code>#74ADD1</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#74ADD1;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.BLUE_DARK</code></td>
+<td><code>#4575B4</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#4575B4;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.BLUE_NAVY</code></td>
+<td><code>#313695</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#313695;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.GREEN_LIGHT</code></td>
+<td><code>#54D931</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#54D931;border:1px solid #ccc"></span></td>
+</tr>
+<tr>
+<td><code>core.COLOR.GREEN_DARK</code></td>
+<td><code>#1B8200</code></td>
+<td><span style="display:inline-block;width:60px;height:30px;background-color:#1B8200;border:1px solid #ccc"></span></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.instant", "navigation.tracking", "navigation.path"], "search": "../../../../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.c8b220af.min.js"></script>
+      
+    
+  </body>
+</html>
