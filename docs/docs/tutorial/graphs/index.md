@@ -7,5 +7,5 @@ For help setting graphs please see the tutorial on each graph type below.
 - [Pie Charts](./pie.md)
 - [Average Time Between and Last Tracked/Time Since](./statistics.md)
 - [Time Histograms](./histograms.md)
-- [Lua Scripts](./lua-graphs.md)
+- [Lua Scripts](./lua-graphs/lua-graphs.md)
 

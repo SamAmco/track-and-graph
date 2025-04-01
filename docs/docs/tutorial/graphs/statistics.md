@@ -1,6 +1,6 @@
 # Statistics
 
-Currently there are only a couple of built in supported statistics: "Average time between" and "Last Tracked/Time since". For more powerful statistics see [Lua graphs](./lua-graphs.md)
+Currently there are only a couple of built in supported statistics: "Average time between" and "Last Tracked/Time since". For more powerful statistics see [Lua graphs](./lua-graphs/lua-graphs.md)
 
 ---
 
