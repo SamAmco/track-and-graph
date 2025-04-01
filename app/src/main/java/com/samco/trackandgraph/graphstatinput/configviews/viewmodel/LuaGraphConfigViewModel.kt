@@ -90,7 +90,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     )
 
     private val scriptPreviewData: StateFlow<ScriptPreviewData> = snapshotFlow {
-        val prefix = "--- PREVIEW_START"
+        val prefix = "--- PREVIEW_START\n"
         val suffix = "--- PREVIEW_END"
 
         val previewStart = script.text.indexOf(prefix)
@@ -180,6 +180,7 @@ class LuaGraphConfigViewModel @Inject constructor(
             _onShowFailedDownload.send(uri.toString())
         } else {
             script = TextFieldValue(scriptText)
+            onUpdate()
         }
     }
 

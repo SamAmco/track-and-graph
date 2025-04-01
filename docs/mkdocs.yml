@@ -43,7 +43,7 @@ nav:
       - tutorial/graphs/statistics.md
       - tutorial/graphs/histograms.md
       - tutorial/graphs/bar-charts.md
-      - tutorial/graphs/lua-graphs.md
+      - tutorial/graphs/lua-graphs/lua-graphs.md
     - tutorial/notes.md
     - tutorial/timestamps.md
   - Lua:
