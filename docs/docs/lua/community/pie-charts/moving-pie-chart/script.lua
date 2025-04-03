@@ -1,5 +1,6 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+local graphext = require("tng.graphext")
 
 --- PREVIEW_START
 -- Script: Pie Charts - Moving Pie Chart
@@ -20,12 +21,11 @@ return function(sources)
 		period_multiplier = period_multiplier
 	}
 
-	local datapoints = graph.merge_sources(sources, cutoff_params, true)
+	local datapoints = graphext.merge_sources(sources, cutoff_params, true)
 
-	local segments = graph.collect_to_segments(datapoints, count_by_label, label_colors)
+	local segments = graphext.collect_to_segments(datapoints, count_by_label, label_colors)
 
-	return {
-		type = graph.GRAPH_TYPE.PIE_CHART,
+	return graph.pie_chart({
 		segments = segments
-	}
+	})
 end
