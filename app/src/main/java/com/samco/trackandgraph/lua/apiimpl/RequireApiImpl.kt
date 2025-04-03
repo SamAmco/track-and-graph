@@ -19,6 +19,7 @@ package com.samco.trackandgraph.lua.apiimpl
 import com.samco.trackandgraph.assetreader.AssetReader
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
+import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 
@@ -35,6 +36,7 @@ class RequireApiImpl @Inject constructor(
             mapOf(
                 "tng.core" to lazyCore(globals),
                 "tng.graph" to lazyGraph(globals),
+                "tng.graphext" to lazyGraphExt(globals),
                 "test.core" to lazyTest(globals),
             )
         )
@@ -49,6 +51,11 @@ class RequireApiImpl @Inject constructor(
 
     private fun lazyGraph(globals: Globals) = lazy {
         val fileContents = assetReader.readAssetToString("generated/lua-api/graph.lua")
+        return@lazy globals.load(fileContents).call().checktable()!!
+    }
+
+    private fun lazyGraphExt(globals: Globals) = lazy {
+        val fileContents = assetReader.readAssetToString("generated/lua-api/graphext.lua")
         return@lazy globals.load(fileContents).call().checktable()!!
     }
 

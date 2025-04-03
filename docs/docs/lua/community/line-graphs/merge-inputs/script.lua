@@ -1,5 +1,6 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+local graphext = require("tng.graphext")
 
 --- PREVIEW_START
 -- Script: Line Graphs - Merge Inputs
@@ -28,10 +29,10 @@ return function(sources)
 		period = period,
 		period_multiplier = period_multiplier,
 	}
-	local all_data = graph.merge_sources(sources, cutoff_params, from_now)
+	local all_data = graphext.merge_sources(sources, cutoff_params, from_now)
 
-	local totalled_data = graph.calculate_period_totals(all_data, totalling_period, totalling_period_multiplier)
-	graph.apply_moving_averaging(totalled_data, averaging_duration)
+	local totalled_data = graphext.calculate_period_totals(all_data, totalling_period, totalling_period_multiplier)
+	graphext.apply_moving_averaging(totalled_data, averaging_duration)
 
 	local line = {
 		line_points = totalled_data,
@@ -40,8 +41,7 @@ return function(sources)
 		label = line_label,
 	}
 
-	return {
-		type = graph.GRAPH_TYPE.LINE_GRAPH,
+	return graph.line_graph({
 		lines = { line },
-	}
+	})
 end

@@ -1,5 +1,6 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+local graphext = require("tng.graphext")
 
 --- PREVIEW_START
 -- Script: Bar Charts - Merge Inputs
@@ -28,7 +29,7 @@ return function(sources)
 		period = period,
 		period_multiplier = period_multiplier,
 	}
-	local all_data = graph.merge_sources(sources, cutoff_params, from_now)
+	local all_data = graphext.merge_sources(sources, cutoff_params, from_now)
 
 	if not all_data or #all_data == 0 then
 		return nil
@@ -41,9 +42,9 @@ return function(sources)
 		end_date = core.get_end_of_period(totalling_period, all_data[1].timestamp)
 	end
 
-	local end_time = core.time(end_date).timestamp-1
+	local end_time = core.time(end_date).timestamp - 1
 
-	local bars = graph.collect_to_bars(
+	local bars = graphext.collect_to_bars(
 		all_data,
 		totalling_period,
 		totalling_period_multiplier,
@@ -52,13 +53,12 @@ return function(sources)
 		label_colors
 	)
 
-	return {
-		type = graph.GRAPH_TYPE.TIME_BARCHART,
+	return graph.time_barchart({
 		bars = bars,
 		end_time = end_time,
 		duration_based_range = duration_based_range,
 		bar_period = totalling_period,
 		bar_period_multiple = totalling_period_multiplier or 1,
 		y_max = y_max,
-	}
+	})
 end

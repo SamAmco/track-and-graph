@@ -2,13 +2,13 @@ local M = {}
 
 --- Timestamp structure:
 --- @since v5.1.0
---- @class timestamp
+--- @class Timestamp
 --- @field timestamp integer: The Unix epoch millisecond timestamp.
 --- @field offset? integer: The offset from UTC in seconds.
 --- @field zone? string: A zone id from the IANA time zone database.
 
 --- @since v5.1.0
---- @class date
+--- @class Date
 --- @field year  integer: four digits
 --- @field month integer: 1-12
 --- @field day   integer: 1-31
@@ -21,7 +21,7 @@ local M = {}
 
 --- Data point structure:
 --- @since v5.1.0
---- @class datapoint
+--- @class DataPoint
 --- @field timestamp integer: The Unix epoch millisecond timestamp of the data point.
 --- @field offset integer: The offset from UTC in seconds. This allows you to know what the local time was when the data point was recorded.
 --- @field value number: The value of the data point.
@@ -30,16 +30,16 @@ local M = {}
 
 --- Returns the given date as a timestamp. If no date is provided, the current time will be used.
 --- @since v5.1.0
---- @param date? date: The date to use for the timestamp. If not provided, the current time will be used.
---- @return timestamp: A table containing the time at the given date or the current time.
+--- @param date? Date: The date to use for the timestamp. If not provided, the current time will be used.
+--- @return Timestamp: A table containing the time at the given date or the current time.
 M.time = function(date) end
 
 --- Returns the given timestamp as a date. If no timestamp is provided, the current time will be used.
 --- @since v5.1.0
---- @param timestamp? (timestamp|integer): The timestamp to use for the date.
+--- @param timestamp? (Timestamp|integer): The timestamp to use for the date.
 --- If it is an integer, it will mean the timestamp in milliseconds since the epoch.
 --- If not provided, the current time will be used.
---- @return date: A table containing the current date.
+--- @return Date: A table containing the current date.
 M.date = function(timestamp) end
 
 --- Shifts the given date or time by the given amount of units.
@@ -53,16 +53,16 @@ M.date = function(timestamp) end
 --- Using periods will respect daylight savings time and other time zone changes. Where as using a duration will just move the timestamp by that amount of milliseconds.
 ---
 --- @since v5.1.0
---- @param datetime (timestamp|date|integer): Any table with at least the field timestamp. Offset, and zone are optional.
+--- @param datetime (Timestamp|Date|integer): Any table with at least the field timestamp. Offset, and zone are optional.
 --- @param unit (DURATION|PERIOD): The units to shift by. Can be a duration in milliseconds (e.g. DURATION.DAY) or a period string (e.g. PERIOD.DAY).
 --- @param amount? integer: Multiplier for the units. Defaults to 1. Useful if you are passing a period string.
---- @return timestamp: The shifted timestamp.
+--- @return Timestamp: The shifted timestamp.
 M.shift = function(datetime, unit, amount) end
 
 --- Formats the given datetime using the given format string.
 --- See the ofPattern Java/Kotlin date/time formatting functionality here: https://docs.oracle.com/javase/8/docs/api/java/time/format/DateTimeFormatter.html
 --- @since v5.1.0
---- @param datetime (timestamp|date): The datetime to format.
+--- @param datetime (Timestamp|Date): The datetime to format.
 --- @return string: The formatted datetime.
 M.format = function(datetime, format) end
 
@@ -85,7 +85,7 @@ M.COLOR = {
 }
 
 --- @since v5.1.0
---- @alias color (COLOR|string): Can be a value from COLOR enum or a hex string e.g. "#00FF00"
+--- @alias Color (COLOR|string): Can be a value from COLOR enum or a hex string e.g. "#00FF00"
 
 --- @since v5.1.0
 --- @enum DURATION All durations are in milliseconds.
@@ -107,47 +107,47 @@ M.PERIOD = {
 }
 
 --- @since v5.1.0
---- @class datasource
+--- @class DataSource
 --- @field name string: The name of the data source.
---- @field index integer: The index of the data source in the list of datasources configured by the user.
-local datasource = {}
+--- @field index integer: The index of the data source in the list of data sources configured by the user.
+local DataSource = {}
 
 --- Fetches the next data point from the data source.
 --- Data points are iterated in reverse chronological order.
 --- @since v5.1.0
---- @return datapoint
-function datasource:dp() end
+--- @return DataPoint
+function DataSource:dp() end
 
 --- Fetches the next group of data points from the data source.
 --- Data points are iterated in reverse chronological order.
 --- @since v5.1.0
 --- @param count integer: The number of data points to retrieve.
---- @return datapoint[]: A table containing the requested data points.
-function datasource:dpbatch(count) end
+--- @return DataPoint[]: A table containing the requested data points.
+function DataSource:dpbatch(count) end
 
 --- Fetches all data points from the data source.
 --- Data points are iterated in reverse chronological order.
 --- @since v5.1.0
---- @return datapoint[]: A table containing all data points.
-function datasource:dpall() end
+--- @return DataPoint[]: A table containing all data points.
+function DataSource:dpall() end
 
 --- Fetches all data points from the data source that are newer than the given timestamp.
 --- Data points are iterated in reverse chronological order.
 --- After this operation the data source will contain only datapoints that are before the given timestamp
 --- @since v5.1.0
---- @param datetime (timestamp|date)?: The timestamp to compare against. If nil then the behaviour is the same as dpall
---- @return datapoint[]: A table containing all data points that are newer than the given timestamp.
-function datasource:dpafter(datetime) end
+--- @param datetime (Timestamp|Date)?: The timestamp to compare against. If nil then the behaviour is the same as dpall
+--- @return DataPoint[]: A table containing all data points that are newer than the given timestamp.
+function DataSource:dpafter(datetime) end
 
 --- @since v5.1.0
---- @class cutoff_params
+--- @class CutoffParams
 --- @field period (DURATION|PERIOD)?: The period or duration for the cutoff.
 --- @field period_multiplier? integer: The multiplier for the period.
 
 --- Calculates a timestamp by subtracting the given period*multiplier from the specified end time or now.
 --- @since v5.1.0
---- @param params cutoff_params: The parameters for calculating the cutoff.
---- @param end_time (timestamp|date)?: The end time for the cutoff. If not provided, the current time will be used.
+--- @param params CutoffParams: The parameters for calculating the cutoff.
+--- @param end_time (Timestamp|Date)?: The end time for the cutoff. If not provided, the current time will be used.
 --- @return integer|nil: The cutoff timestamp obtained by subtracting the given period from the specified end time (as a Unix epoch millisecond) or the current time, or nil if the period is not provided.
 M.get_cutoff = function(params, end_time)
 	if not params.period then
@@ -169,7 +169,7 @@ end
 --- @param period string: The period to calculate the end for (e.g., PERIOD.DAY, PERIOD.WEEK).
 --- @param timestamp integer: The timestamp to calculate the end of the period for.
 --- @param zone_override? string: An optional timezone override. If not provided, the default timezone is used.
---- @return date: A date representing the end of the specified period with the time set to midnight.
+--- @return Date: A date representing the end of the specified period with the time set to midnight.
 M.get_end_of_period = function(period, timestamp, zone_override)
 	local zone = zone_override or M.date().zone
 	local date = M.date(timestamp)
