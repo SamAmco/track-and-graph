@@ -96,9 +96,15 @@ end
 
 --- Creates a text graph.
 --- @since v5.1.0
---- @param params TextGraphParams: The parameters for the text graph.
+--- @param params (string|number|TextGraphParams): Either the text to display or the parameters for the text graph.
 --- @return table: A table representing the text graph.
 M.text = function(params)
+	if type(params) ~= "table" then
+		return {
+			type = M.GRAPH_TYPE.TEXT,
+			text = params,
+		}
+	end
 	return {
 		type = M.GRAPH_TYPE.TEXT,
 		text = params.text,

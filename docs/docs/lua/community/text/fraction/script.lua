@@ -87,7 +87,5 @@ return function(sources)
 
 	local fraction_text = calculate_fraction(all_data_points)
 
-	return fraction_text and graph.text({
-		text = fraction_text,
-	})
+	return fraction_text and graph.text(fraction_text)
 end
