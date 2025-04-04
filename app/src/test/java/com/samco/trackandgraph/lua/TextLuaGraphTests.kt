@@ -196,4 +196,86 @@ class TextLuaGraphTests : LuaEngineImplTest() {
         assertEquals(TextSize.MEDIUM, textData.size)
         assertEquals(TextAlignment.END, textData.alignment)
     }
+
+    @Test
+    fun `Text type with numeric text value`() = testLuaEngine(
+        """
+            local graph = require("tng.graph")
+            return {
+                type = graph.GRAPH_TYPE.TEXT,
+                text = 42
+            }
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val textData = result.data as LuaGraphResultData.TextData
+        assertEquals("42", textData.text)
+        assertEquals(TextSize.MEDIUM, textData.size)
+        assertEquals(TextAlignment.CENTER, textData.alignment)
+    }
+
+    @Test
+    fun `text function with string parameter`() = testLuaEngine(
+        """
+            local graph = require("tng.graph")
+            return graph.text("hello world")
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val textData = result.data as LuaGraphResultData.TextData
+        assertEquals("hello world", textData.text)
+        assertEquals(TextSize.MEDIUM, textData.size)
+        assertEquals(TextAlignment.CENTER, textData.alignment)
+    }
+
+    @Test
+    fun `text function with number parameter`() = testLuaEngine(
+        """
+            local graph = require("tng.graph")
+            return graph.text(123.45)
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val textData = result.data as LuaGraphResultData.TextData
+        assertEquals("123.45", textData.text)
+        assertEquals(TextSize.MEDIUM, textData.size)
+        assertEquals(TextAlignment.CENTER, textData.alignment)
+    }
+
+    @Test
+    fun `text function with table parameter`() = testLuaEngine(
+        """
+            local graph = require("tng.graph")
+            return graph.text({
+                text = "custom text",
+                size = 1,
+                align = "start"
+            })
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val textData = result.data as LuaGraphResultData.TextData
+        assertEquals("custom text", textData.text)
+        assertEquals(TextSize.SMALL, textData.size)
+        assertEquals(TextAlignment.START, textData.alignment)
+    }
+    
+    @Test
+    fun `text function with nil parameter should handle gracefully`() = testLuaEngine(
+        """
+            local graph = require("tng.graph")
+            return graph.text(NIL)
+        """.trimIndent()
+    ) {
+        println(result)
+        assert(result.data is LuaGraphResultData.TextData)
+        val textData = result.data as LuaGraphResultData.TextData
+        assertEquals(null, textData.text)
+        assertEquals(TextSize.MEDIUM, textData.size)
+        assertEquals(TextAlignment.CENTER, textData.alignment)
+    }
 }

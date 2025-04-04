@@ -25,7 +25,7 @@ interface RemoteConfigProvider {
         TRUSTED_LUA_GRAPH_SOURCES("trusted-lua-script-sources"),
     }
 
-    suspend fun getRemoteConfigObject(remoteConfig: RemoteConfig): JSONObject
+    suspend fun getRemoteConfigObject(remoteConfig: RemoteConfig): JSONObject?
 
-    suspend fun getRemoteConfigArray(remoteConfig: RemoteConfig): JSONArray
+    suspend fun getRemoteConfigArray(remoteConfig: RemoteConfig): JSONArray?
 }

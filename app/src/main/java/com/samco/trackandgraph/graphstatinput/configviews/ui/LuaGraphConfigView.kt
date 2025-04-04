@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
+import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -58,7 +59,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,6 +68,7 @@ import com.samco.trackandgraph.base.R
 import com.samco.trackandgraph.base.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
+import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel.NetworkError
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
 import com.samco.trackandgraph.ui.compose.ui.AddBarButton
@@ -102,9 +103,8 @@ fun LuaGraphConfigView(
 
     val context = LocalContext.current
     LaunchedEffect(viewModel) {
-        for (uri in viewModel.failedDownloadToastEvents) {
-            val text = context.getString(R.string.failed_to_download_file, uri)
-            Toast.makeText(context, text, Toast.LENGTH_LONG).show()
+        for (networkError in viewModel.networkErrorToastEvents) {
+            showErrorToast(context, networkError)
         }
     }
 
@@ -133,6 +133,14 @@ fun LuaGraphConfigView(
         showUserConfirmDeepLinkDialog = viewModel.showUserConfirmDeepLink
             .collectAsStateWithLifecycle(),
     )
+}
+
+private fun showErrorToast(context: Context, networkError: NetworkError) {
+    val text = when (networkError) {
+        is NetworkError.Uri -> context.getString(R.string.failed_to_download_file, networkError.uri)
+        is NetworkError.Generic -> context.getString(R.string.network_generic_error)
+    }
+    Toast.makeText(context, text, Toast.LENGTH_LONG).show()
 }
 
 @Composable

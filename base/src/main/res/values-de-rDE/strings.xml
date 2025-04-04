@@ -363,4 +363,5 @@
     <string name="failed_to_download_file">Fehler beim Herunterladen der Datei: %s</string>
     <string name="confirm_deep_link">Sie haben einen Skriptlink von einer unbekannten Quelle erhalten. Installieren Sie nur Skripte aus vertrauenswürdigen Quellen. Möchten Sie dieses Skript installieren?</string>
     <string name="graph_stat_info_button_description">Tutorials zu Grafiken und Statistiken</string>
+    <string name="network_generic_error">Beim Versuch, auf das Netzwerk zuzugreifen, ist ein Fehler aufgetreten. Bitte überprüfen Sie Ihre Verbindung und versuchen Sie es erneut.</string>
 </resources>

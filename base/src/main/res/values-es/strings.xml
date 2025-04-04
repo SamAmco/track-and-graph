@@ -362,4 +362,5 @@
     <string name="failed_to_download_file">Error al descargar el archivo: %s</string>
     <string name="confirm_deep_link">Has recibido un enlace a un script de una fuente desconocida. Solo instala scripts de fuentes en las que confíes. ¿Te gustaría instalar este script?</string>
     <string name="graph_stat_info_button_description">Tutoriales de gráficos y estadísticas</string>
+    <string name="network_generic_error">Se produjo un error al intentar acceder a la red. Por favor, compruebe su conexión e inténtelo de nuevo.</string>
 </resources>
