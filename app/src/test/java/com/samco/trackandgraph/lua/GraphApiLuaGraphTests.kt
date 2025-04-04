@@ -269,9 +269,10 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         ),
         """
             local graph = require("tng.graph")
+            local graphext = require("tng.graphext")
             return function(sources) 
                 datapoints = sources["source"].dpall()
-                graph.apply_moving_averaging(datapoints, 10)
+                graphext.apply_moving_averaging(datapoints, 10)
                 return {
                     type = graph.GRAPH_TYPE.LINE_GRAPH,
                     lines = { { line_points = datapoints } },
@@ -303,10 +304,11 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         ),
         """
             local graph = require("tng.graph")
+            local graphext = require("tng.graphext")
             local core = require("tng.core")
             return function(sources) 
                 datapoints = sources["source"].dpall()
-                period_totals = graph.calculate_period_totals(datapoints, core.PERIOD.WEEK)
+                period_totals = graphext.calculate_period_totals(datapoints, core.PERIOD.WEEK)
                 return {
                     type = graph.GRAPH_TYPE.LINE_GRAPH,
                     lines = { { line_points = period_totals } },
@@ -363,10 +365,11 @@ class GraphApiLuaGraphTests : LuaEngineImplTest() {
         ),
         """
             local graph = require("tng.graph")
+            local graphext = require("tng.graphext")
             local core = require("tng.core")
             return function(sources) 
                 datapoints = sources["source"].dpall()
-                period_totals = graph.calculate_period_totals(datapoints, core.PERIOD.DAY)
+                period_totals = graphext.calculate_period_totals(datapoints, core.PERIOD.DAY)
                 return {
                     type = graph.GRAPH_TYPE.LINE_GRAPH,
                     lines = { { line_points = period_totals } },
