@@ -24,9 +24,7 @@ local function multi_input_text_output(totals)
 		end
 	end
 
-	return graph.text({
-		text = text,
-	})
+	return graph.text(text)
 end
 
 return function(sources)
@@ -51,9 +49,7 @@ return function(sources)
 	if #totals == 0 then
 		return nil
 	elseif #totals == 1 then
-		return graph.text({
-			text = totals[1].total,
-		})
+		return graph.text(totals[1].total)
 	else
 		return multi_input_text_output(totals)
 	end
