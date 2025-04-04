@@ -130,8 +130,14 @@ class LuaGraphConfigViewModel @Inject constructor(
     ) { uri, script -> uri != null || script != null }
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-    private val _onShowFailedDownload = Channel<String>()
-    val failedDownloadToastEvents: ReceiveChannel<String> = _onShowFailedDownload
+
+    sealed interface NetworkError {
+        data class Uri(val uri: String) : NetworkError
+        data object Generic : NetworkError
+    }
+
+    private val networkErrorEvents = Channel<NetworkError>()
+    val networkErrorToastEvents: ReceiveChannel<NetworkError> = networkErrorEvents
 
     init {
         viewModelScope.launch { observeDeepLinksUrls() }
@@ -159,12 +165,20 @@ class LuaGraphConfigViewModel @Inject constructor(
             )
             // Convert JSONObject to JSONArray if needed
             val jsonArray = trustedSourcesObj
-            for (i in 0 until jsonArray.length()) {
-                trustedSources.add(jsonArray.getString(i))
+
+            if (jsonArray != null) {
+                for (i in 0 until jsonArray.length()) {
+                    trustedSources.add(jsonArray.getString(i))
+                }
             }
         } catch (e: Exception) {
             // Handle parsing errors gracefully
             Timber.e(e, "Failed to parse trusted sources")
+        }
+
+        if (trustedSources.isEmpty()) {
+            networkErrorEvents.send(NetworkError.Generic)
+            return
         }
 
         if (trustedSources.none { uri.toString().startsWith(it) }) {
@@ -177,7 +191,7 @@ class LuaGraphConfigViewModel @Inject constructor(
     private fun downloadAndInstallScriptFromUri(uri: URI) = withUpdate {
         val scriptText = fileDownloader.downloadFileToString(uri)
         if (scriptText == null) {
-            _onShowFailedDownload.send(uri.toString())
+            networkErrorEvents.send(NetworkError.Uri(uri.toString()))
         } else {
             script = TextFieldValue(scriptText)
             onUpdate()
