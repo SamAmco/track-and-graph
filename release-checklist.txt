@@ -1,16 +1,22 @@
-1. Checkout a new release or hotfix branch if you haven't already
+- Verify the configuration links are correct in ./configuration/remote-configuration.json
 
-2. Update the build.gradle version code and name
+- Run `make validate-remote-config`
 
-3. Build an aab for the release (using Android Studio)
+- Run the community tests 
 
-4. Copy and paste a fastlane changelog file and add the changelog there e.g. 
+./gradlew :app:testDebugUnitTest --tests "com.samco.trackandgraph.lua.CommunityTestRunner"
+
+- Update the build.gradle version code and name
+
+- Build an aab for the release (using Android Studio)
+
+- Copy and paste a fastlane changelog file and add the changelog there e.g. 
 
 	# cp fastlane/metadata/android/en-GB/changelogs/10403.txt fastlane/metadata/android/en-GB/changelogs/10404.txt
 
 also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.
 
-5. Use fastlane to upload the new aab to the play store e.g. for alpha:
+- Use fastlane to upload the new aab to the play store e.g. for alpha:
 
 	# bundle exec fastlane supply --aab app/release/app-release.aab --track alpha
 
@@ -22,12 +28,12 @@ or for release:
 
 	# bundle exec fastlane supply --aab app/release/app-release.aab
 
-6. Wait for the upload to complete and then build an apk for the release (using Android Studio) .. Typically android studio deletes the aab when you start the apk build (hence why you might want to wait)
+- Wait for the upload to complete and then build an apk for the release (using Android Studio) .. Typically android studio deletes the aab when you start the apk build (hence why you might want to wait)
 
-7. PUSH THE RELEASE BRANCH (and never delete it otherwise the faq link won't work for that version)
+- PUSH THE RELEASE BRANCH (and never delete it otherwise the faq link won't work for that version)
 
-8. Commit everything and merge the release/hotfix branch back into master
+- Commit everything and merge the release/hotfix branch back into master
 
-9. Tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload) as F-droid uses these tags for its own releases
+- Tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload) as F-droid uses these tags for its own releases
 
-10. On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
+- On GitHub create a new release using the new tag and attatch the apk to it. Also copy the release notes in here.
