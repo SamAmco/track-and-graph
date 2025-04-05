@@ -123,13 +123,12 @@ return function(sources)
 	end_time = core.time(end_date)
 	bars = get_accumulation(datapoints, cutoff)
 
-	return {
-		type = graph.GRAPH_TYPE.TIME_BARCHART,
+	return graph.time_barchart({
 		bars = bars,
 		end_time = end_time,
 		duration_based_range = duration_based_range,
 		bar_period = totalling_period,
 		bar_period_multiple = totalling_period_multiplier or 1,
 		y_max = y_max,
-	}
+	})
 end

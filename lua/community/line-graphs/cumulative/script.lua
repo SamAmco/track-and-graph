@@ -1,5 +1,6 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+local graphext = require("tng.graphext")
 
 --- PREVIEW_START
 -- Script: Line Graphs - Cumulative
@@ -58,11 +59,11 @@ local function get_line_data(source)
 	if totalling_period == nil then
 		all_data = datapoints
 	elseif totalling_period ~= nil then
-		all_data = graph.calculate_period_totals(datapoints, totalling_period, totalling_period_multiplier)
+		all_data = graphext.calculate_period_totals(datapoints, totalling_period, totalling_period_multiplier)
 	end
 
 	apply_accumulation(all_data)
-	graph.apply_moving_averaging(all_data, averaging_duration)
+	graphext.apply_moving_averaging(all_data, averaging_duration)
 
 	local line_color = line_colors and line_colors[source.index] or nil
 
@@ -87,10 +88,9 @@ return function(sources)
 		end
 	end
 
-	return {
-		type = graph.GRAPH_TYPE.LINE_GRAPH,
+	return graph.line_graph({
 		lines = lines,
 		duration_based_range = duration_based_range,
 		range_bounds = range_bounds,
-	}
+	})
 end

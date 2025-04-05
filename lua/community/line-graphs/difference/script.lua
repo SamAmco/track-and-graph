@@ -1,5 +1,6 @@
 local core = require("tng.core")
 local graph = require("tng.graph")
+local graphext = require("tng.graphext")
 
 --- PREVIEW_START
 -- Script: Line Graphs - Difference
@@ -29,7 +30,7 @@ local get_difference = function(datapoints)
 	local difference = {}
 	for i = 2, #datapoints, 1 do
 		local datapoint = datapoints[i]
-		difference[i-1] = {
+		difference[i - 1] = {
 			timestamp = datapoint.timestamp,
 			offset = datapoint.offset,
 			value = datapoints[i - 1].value - datapoint.value,
@@ -64,11 +65,11 @@ local function get_line_data(source)
 	if totalling_period == nil then
 		all_data = datapoints
 	elseif totalling_period ~= nil then
-		all_data = graph.calculate_period_totals(datapoints, totalling_period, totalling_period_multiplier)
+		all_data = graphext.calculate_period_totals(datapoints, totalling_period, totalling_period_multiplier)
 	end
 
 	local difference = get_difference(all_data)
-	graph.apply_moving_averaging(difference, averaging_duration)
+	graphext.apply_moving_averaging(difference, averaging_duration)
 
 	local line_color = line_colors and line_colors[source.index] or nil
 
@@ -93,10 +94,9 @@ return function(sources)
 		end
 	end
 
-	return {
-		type = graph.GRAPH_TYPE.LINE_GRAPH,
+	return graph.line_graph({
 		lines = lines,
 		duration_based_range = duration_based_range,
 		range_bounds = range_bounds,
-	}
+	})
 end
