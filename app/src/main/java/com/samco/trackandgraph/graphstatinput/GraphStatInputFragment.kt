@@ -41,6 +41,7 @@ import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -62,11 +63,19 @@ class GraphStatInputFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        observePopBack()
         requireActivity().addMenuProvider(
             GraphStatInputFragmentMenuProvider(),
             viewLifecycleOwner,
             Lifecycle.State.RESUMED
         )
+    }
+
+    private fun observePopBack() {
+        lifecycleScope.launch {
+            viewModel.complete.receive()
+            navController?.popBackStack()
+        }
     }
 
     private inner class GraphStatInputFragmentMenuProvider : MenuProvider {
@@ -80,16 +89,10 @@ class GraphStatInputFragment : Fragment() {
                     urlNavigator.triggerNavigation(requireContext(), UrlNavigator.Location.TUTORIAL_GRAPHS)
                     true
                 }
+
                 else -> false
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        viewModel.complete.observe(viewLifecycleOwner, Observer {
-            if (it) navController?.popBackStack()
-        })
     }
 
     override fun onCreateView(

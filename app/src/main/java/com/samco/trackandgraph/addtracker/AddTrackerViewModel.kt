@@ -18,6 +18,7 @@ import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -128,7 +129,8 @@ class AddTrackerViewModelImpl @Inject constructor(
             // a conversion mode spinner
             a && (existingTracker?.dataType == DataType.DURATION) != b
         }.asLiveData(viewModelScope.coroutineContext)
-    val complete = MutableLiveData(false)
+
+    val complete = Channel<Unit>(1)
 
     private var groupId: Long = -1
     private var existingTracker: Tracker? = null
@@ -196,7 +198,7 @@ class AddTrackerViewModelImpl @Inject constructor(
             //should not be null here but just in case lets fallback to add
             existingTracker?.let { updateTracker(it) } ?: addTracker()
             withContext(ui) { isLoading.value = false }
-            withContext(ui) { complete.value = true }
+            withContext(ui) { complete.send(Unit) }
         }
     }
 
@@ -212,7 +214,7 @@ class AddTrackerViewModelImpl @Inject constructor(
                 withContext(ui) { isLoading.value = true }
                 addTracker()
                 withContext(ui) { isLoading.value = false }
-                withContext(ui) { complete.value = true }
+                withContext(ui) { complete.send(Unit) }
             }
         }
     }

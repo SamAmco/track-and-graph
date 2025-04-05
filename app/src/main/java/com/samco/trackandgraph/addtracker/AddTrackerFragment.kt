@@ -23,6 +23,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
@@ -32,6 +33,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class AddTrackerFragment : Fragment() {
@@ -50,6 +52,7 @@ class AddTrackerFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         navController = container?.findNavController()
+        observePopBack()
         return ComposeView(requireContext()).apply {
             setContent {
                 TnGComposeTheme {
@@ -59,10 +62,10 @@ class AddTrackerFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        viewModel.complete.observe(viewLifecycleOwner) {
-            if (it) navController?.popBackStack()
+    private fun observePopBack() {
+        lifecycleScope.launch {
+            viewModel.complete.receive()
+            navController?.popBackStack()
         }
     }
 
