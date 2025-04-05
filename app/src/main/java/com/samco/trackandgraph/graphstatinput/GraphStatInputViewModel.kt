@@ -36,6 +36,8 @@ import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import java.lang.Exception
@@ -86,7 +88,7 @@ interface GraphStatInputViewModel {
     val validationException: LiveData<GraphStatConfigEvent.ValidationException?>
     val demoViewData: LiveData<IGraphStatViewData?>
     val showLuaFirstTimeUserDialog: LiveData<Boolean>
-    val complete: LiveData<Boolean>
+    val complete: ReceiveChannel<Unit>
 
     fun initViewModel(graphStatGroupId: Long, graphStatId: Long)
     fun setGraphStatName(name: TextFieldValue)
@@ -120,7 +122,7 @@ class GraphStatInputViewModelImpl @Inject constructor(
     override val validationException =
         MutableLiveData<GraphStatConfigEvent.ValidationException?>(null)
     override val demoViewData = MutableLiveData<IGraphStatViewData?>(null)
-    override val complete = MutableLiveData(false)
+    override val complete = Channel<Unit>(1)
 
     private val _showLuaFirstTimeUserDialog = MutableLiveData(false)
     override val showLuaFirstTimeUserDialog: LiveData<Boolean> = _showLuaFirstTimeUserDialog
@@ -206,7 +208,7 @@ class GraphStatInputViewModelImpl @Inject constructor(
                 gsiProvider
                     .getDataSourceAdapter(graphStatType.value!!)
                     .writeConfig(constructGraphOrStat(), it, updateMode.value!!)
-                withContext(ui) { complete.value = true }
+                withContext(ui) { complete.send(Unit) }
             }
         }
     }
