@@ -53,15 +53,6 @@ class CommunityTestRunner {
         daggerComponent.provideLuaDataSourceProvider()
     }
 
-    @Before
-    fun setup() {
-        val globals = daggerComponent.provideGlobalsProvider().globals.value
-        globals["print"] = oneArgFunction {
-            println(it.checkjstring())
-            return@oneArgFunction LuaValue.Companion.NIL
-        }
-    }
-
     @Parameter(0)
     lateinit var testName: String
 

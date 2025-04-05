@@ -48,4 +48,5 @@ nav:
     - tutorial/timestamps.md
   - Lua:
     - lua/community/index.md
+    - lua/developer-guide/intro.md
 
