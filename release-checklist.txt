@@ -12,27 +12,25 @@
 
 - Copy and paste a fastlane changelog file and add the changelog there e.g. 
 
-	# cp fastlane/metadata/android/en-GB/changelogs/10403.txt fastlane/metadata/android/en-GB/changelogs/10404.txt
+cp fastlane/metadata/android/en-GB/changelogs/10403.txt fastlane/metadata/android/en-GB/changelogs/10404.txt
 
 also make sure you update any other fastlane resources you want proliferated e.g. screenshots or app description.
 
 - Use fastlane to upload the new aab to the play store e.g. for alpha:
 
-	# bundle exec fastlane supply --aab app/release/app-release.aab --track alpha
+bundle exec fastlane supply --aab app/release/app-release.aab --track alpha
 
 for beta:
 
-	# bundle exec fastlane supply --aab app/release/app-release.aab --track beta
+bundle exec fastlane supply --aab app/release/app-release.aab --track beta
 
 or for release:
 
-	# bundle exec fastlane supply --aab app/release/app-release.aab
+bundle exec fastlane supply --aab app/release/app-release.aab
 
 - Wait for the upload to complete and then build an apk for the release (using Android Studio) .. Typically android studio deletes the aab when you start the apk build (hence why you might want to wait)
 
-- PUSH THE RELEASE BRANCH (and never delete it otherwise the faq link won't work for that version)
-
-- Commit everything and merge the release/hotfix branch back into master
+- Commit everything
 
 - Tag the commit e.g. rc-v1.0.0 for release candidate or v1.0.0 for release (you only want to tag once google play has accepted the upload) as F-droid uses these tags for its own releases
 
