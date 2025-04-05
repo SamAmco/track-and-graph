@@ -132,6 +132,8 @@ class DemoDBGenerator {
         createScreenshotsGroup(dataInteractor)
         println("creating faq1 data")
         createFaq1Group(dataInteractor)
+        println("creating first open tutorial data")
+        createFirstOpenTutorialGroup(dataInteractor)
         println("writing to a db file")
         writeDBToFile()
     }
