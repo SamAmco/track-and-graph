@@ -35,9 +35,6 @@ class GlobalsProvider @Inject constructor(
         globals["pcall"] = LuaValue.NIL
         globals["xpcall"] = LuaValue.NIL
         globals["package"] = LuaValue.NIL
-        // Print isn't dangerous but it won't work so I would rather throw than
-        // fail silently as it may be confusing
-        globals["print"] = LuaValue.NIL
         LoadState.install(globals)
         LuaC.install(globals)
         requireApi.installIn(globals)
