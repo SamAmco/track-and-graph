@@ -1,0 +1,8 @@
+- Introduced the Lua graphs scripting API (currently only for graphs)
+- Introduced new docs website
+- Fix bug navigation not working after returning from adding a new track or graph
+- Fix bug showing empty group text when loading
+- Fix bug spinners should clear focus when tapped
+- Align graph input UI
+
+

@@ -1,1 +1,9 @@
-Track & Graph is a powerful tool for helping you track and analyse your habits, behaviours, and symptoms. Assign numerical values to track changes over time, or simply record when something happened. With Track & Graph, you can quickly and easily track everything in seconds and create insightful graphs to visualise your data. Set up line graphs, pie charts, and statistics to report useful information like moving averages and time between tracking. Organise your data into groups and arrange them however you like with ease. Track & Graph is completely free, open source, and has no authentication, ads, or in-app purchases. Your personal information, tracked data, and app activity are not recorded or stored online, and you can easily backup your data at any time. Enhance your self-awareness and facilitate self-reflection with Track & Graph.
+Track & Graph: Dashboards for life
+
+Track & Graph helps you record, visualize, and understand patterns in your daily life. Record numerical values or simple occurrences to build personal dashboards that provide insights into your habits, behaviors, and activities.
+
+Visualize your data through line graphs, pie charts, and statistical reports that show trends, moving averages, and intervals between events. Organize tracking items into customizable groups that make sense for your needs.
+
+Track & Graph now embeds a Lua scripting API, allowing you to create custom calculations (like cumulative totals, differentials, or financial metrics).
+
+Track & Graph is completely free and open source with no ads, accounts, or in-app purchases. Your data remains private—stored only on your device—and can be easily backed up at any time.
