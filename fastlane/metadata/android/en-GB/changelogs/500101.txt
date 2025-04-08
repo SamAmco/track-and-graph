@@ -1,0 +1,2 @@
+- Fix bug missing lua core api assets
+

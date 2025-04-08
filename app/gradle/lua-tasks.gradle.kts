@@ -27,7 +27,7 @@ tasks.register("copyLuaToAssets") {
 }
 
 // Ensure the assets copy runs before every build
-tasks.matching { it.name.startsWith("assemble") }.configureEach {
+tasks.matching { it.name.contains("assemble", ignoreCase = true) || it.name.contains("bundle", ignoreCase = true) }.configureEach {
     dependsOn("copyLuaToAssets")
 }
 

@@ -49,8 +49,8 @@ android {
         minSdkVersion 23
         targetSdkVersion 35
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
-        versionCode 500100
-        versionName "5.1.0"
+        versionCode 500101
+        versionName "5.1.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables {
