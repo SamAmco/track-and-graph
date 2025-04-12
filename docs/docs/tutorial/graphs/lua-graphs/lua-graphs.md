@@ -8,10 +8,7 @@ return function(sources)
   if not first then
     return nil
   end
-  return {
-    type = require("tng.graph").GRAPH_TYPE.DATA_POINT,
-    datapoint = first.dp(),
-  }
+  return require("tng.graph").data_point(first.dp())
 end
 ```
 
@@ -134,3 +131,7 @@ You can also use the following named colors from Track & Graph's default colour 
 | `core.COLOR.BLUE_NAVY` | `#313695` | <span style="display:inline-block;width:60px;height:30px;background-color:#313695;border:1px solid #ccc"></span> |
 | `core.COLOR.GREEN_LIGHT` | `#54D931` | <span style="display:inline-block;width:60px;height:30px;background-color:#54D931;border:1px solid #ccc"></span> |
 | `core.COLOR.GREEN_DARK` | `#1B8200` | <span style="display:inline-block;width:60px;height:30px;background-color:#1B8200;border:1px solid #ccc"></span> |
+
+## Disabling Lua
+
+It should be hard to write a script that crashes the app, but if you do you can start the app without the lua engine enabled by long pressing on the app launcher and selecting "Launch Lua disabled". You will still see the cards for the Lua graphs you created so you can delete or edit them before restarting the app again.

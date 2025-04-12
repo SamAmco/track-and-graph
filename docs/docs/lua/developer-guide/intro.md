@@ -117,7 +117,15 @@ Returning to the tng/graph.lua file notice the params object references the clas
 
 Note that a parameter with a `?` after it means that it is optional. If you don't provide a value for that parameter, the function will use a default value. 
 
-You can also see the other types of graphs you can return and the parameters they expect in this file. For further inspiration I recommend checking out the [community scripts](../community/index.md).
+You can also see the other types of graphs you can return and the parameters they expect in this file, they are: 
+
+- Text
+- Data Point
+- Time Bar charts (but not Histograms currently)
+- Line Graphs
+- Pie Charts
+
+For further inspiration I recommend checking out the [community scripts](../community/index.md).
 
 ## Using data sources
 
