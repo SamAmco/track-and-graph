@@ -1116,7 +1116,15 @@
 <span class="c1">--- @field align? string: start, centre, or end The alignment of the text. Defaults to centre.</span>
 </code></pre></div>
 <p>Note that a parameter with a <code>?</code> after it means that it is optional. If you don't provide a value for that parameter, the function will use a default value. </p>
-<p>You can also see the other types of graphs you can return and the parameters they expect in this file. For further inspiration I recommend checking out the <a href="../../community/">community scripts</a>.</p>
+<p>You can also see the other types of graphs you can return and the parameters they expect in this file, they are: </p>
+<ul>
+<li>Text</li>
+<li>Data Point</li>
+<li>Time Bar charts (but not Histograms currently)</li>
+<li>Line Graphs</li>
+<li>Pie Charts</li>
+</ul>
+<p>For further inspiration I recommend checking out the <a href="../../community/">community scripts</a>.</p>
 <h2 id="using-data-sources">Using data sources<a class="headerlink" href="#using-data-sources" title="Permanent link">#</a></h2>
 <p>A Lua graph script can actually return one of two things. It can return a table with the data in it as we've seen above, or it can return a function which accepts a table of named data sources. Track &amp; Graph will then:</p>
 <ol>

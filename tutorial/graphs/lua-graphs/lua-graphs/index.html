@@ -624,6 +624,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#disabling-lua" class="md-nav__link">
+    <span class="md-ellipsis">
+      Disabling Lua
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -925,6 +934,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#disabling-lua" class="md-nav__link">
+    <span class="md-ellipsis">
+      Disabling Lua
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -948,10 +966,7 @@
 <span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="ow">not</span><span class="w"> </span><span class="nv">first</span><span class="w"> </span><span class="kr">then</span>
 <span class="w">    </span><span class="kr">return</span><span class="w"> </span><span class="kc">nil</span>
 <span class="w">  </span><span class="kr">end</span>
-<span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nb">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">).</span><span class="nv">GRAPH_TYPE</span><span class="p">.</span><span class="py">DATA_POINT</span><span class="p">,</span>
-<span class="w">    </span><span class="nv">datapoint</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">first</span><span class="p">.</span><span class="nf">dp</span><span class="p">(),</span>
-<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="kr">return</span><span class="w"> </span><span class="nb">require</span><span class="p">(</span><span class="s2">&quot;tng.graph&quot;</span><span class="p">).</span><span class="nf">data_point</span><span class="p">(</span><span class="nv">first</span><span class="p">.</span><span class="nf">dp</span><span class="p">())</span>
 <span class="kr">end</span>
 </code></pre></div>
 <p>Don't worry if that seems a bit complicated, there are many scripts already written for you over at <a href="../../../../lua/community/">the community script hub</a>. </p>
@@ -1090,6 +1105,8 @@
 </tr>
 </tbody>
 </table>
+<h2 id="disabling-lua">Disabling Lua<a class="headerlink" href="#disabling-lua" title="Permanent link">#</a></h2>
+<p>It should be hard to write a script that crashes the app, but if you do you can start the app without the lua engine enabled by long pressing on the app launcher and selecting "Launch Lua disabled". You will still see the cards for the Lua graphs you created so you can delete or edit them before restarting the app again.</p>
 
 
 
