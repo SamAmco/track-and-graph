@@ -9,6 +9,6 @@
         <intent
             android:action="com.samco.trackandgraph.action.DISABLE_LUA_ENGINE"
             android:targetClass="com.samco.trackandgraph.MainActivity"
-            android:targetPackage="com.samco.trackandgraph" />
+            android:targetPackage="com.samco.trackandgraph.debug" />
     </shortcut>
 </shortcuts>
