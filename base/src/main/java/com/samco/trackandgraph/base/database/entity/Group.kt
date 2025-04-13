@@ -52,7 +52,7 @@ internal data class Group(
         id,
         name,
         displayIndex,
-        parentGroupId ?: 0L,
+        parentGroupId,
         colorIndex,
     )
 }

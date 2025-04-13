@@ -42,7 +42,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.lang.Exception
 import javax.inject.Inject
 import kotlin.math.min
 
@@ -105,11 +104,11 @@ class MoveToDialogFragment : DialogFragment() {
     }
 
     private fun inflateGroupItems(groupPathProvider: GroupPathProvider) {
-        for (item in groupPathProvider.filteredGroups) {
+        for (item in groupPathProvider.filteredSortedGroups) {
             val groupItemView =
                 ListItemMoveToGroupBinding.inflate(layoutInflater, binding.groupsLayout, false)
-            groupItemView.groupNameText.text = groupPathProvider.getPathForGroup(item.id)
-            groupItemView.itemBackground.setOnClickListener { viewModel.moveTo(item.id) }
+            groupItemView.groupNameText.text = item.path
+            groupItemView.itemBackground.setOnClickListener { viewModel.moveTo(item.group.id) }
             binding.groupsLayout.addView(groupItemView.root)
         }
         setDialogHeight(groupPathProvider.groups.size)
