@@ -104,7 +104,7 @@ class PathProviderTest {
         //VERIFY
         assertEquals(
             listOf(0L, 1L, 2L, 3L),
-            provider.filteredGroups.map { it.id }
+            provider.filteredSortedGroups.map { it.group.id }
         )
     }
 
@@ -122,6 +122,30 @@ class PathProviderTest {
         assertEquals("/Test", ans0)
         assertEquals("/group1/Test2", ans1)
         assertEquals("/group1/group1child1/Test3", ans2)
+    }
+
+    @Test
+    fun `filtered sorted groups come in alphabetical order`() {
+        //PREPARE
+        val unsortedGroups = listOf(
+            group(parentId = null),
+            group("Apple", 2, 0),
+            group("Zebra", 1, 0),
+            group("Apple", 5, 1),
+            group("Zebra", 6, 2),
+            group("Banana", 3, 0),
+            group("Carrot", 4, 0)
+        )
+        val provider = GroupPathProvider(unsortedGroups)
+
+        //EXECUTE
+        val sortedGroups = provider.filteredSortedGroups.map { it.path }
+
+        //VERIFY
+        assertEquals(
+            listOf("/", "/Apple", "/Apple/Zebra", "/Banana", "/Carrot", "/Zebra", "/Zebra/Apple"),
+            sortedGroups
+        )
     }
 
     private fun group(name: String = "", id: Long = 0, parentId: Long? = 0): Group {

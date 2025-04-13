@@ -46,9 +46,6 @@ open class GroupPathProvider(
     private val filteredGroupChains = groupParentChains
         .filter { (_, chain) -> chain.none { it.id == groupFilterId } }
 
-    val filteredGroups = filteredGroupChains
-        .map { (_, chain) -> chain.first() }
-
     private val groupPaths = filteredGroupChains
         .mapValues { (_, chain) ->
             chain
@@ -60,6 +57,20 @@ open class GroupPathProvider(
                 .joinToString(separator = separator, prefix = separator) { it.name }
         }
 
-
     fun getPathForGroup(id: Long): String = groupPaths[id] ?: ""
+
+    val filteredSortedGroups: List<GroupInfo> = filteredGroupChains
+        .mapNotNull { (_, chain) ->
+            val group = chain.first()
+            GroupInfo(
+                group = group,
+                path = groupPaths[group.id] ?: return@mapNotNull null
+            )
+        }
+        .sortedBy { it.path }
+
+    data class GroupInfo(
+        val group: Group,
+        val path: String,
+    )
 }
