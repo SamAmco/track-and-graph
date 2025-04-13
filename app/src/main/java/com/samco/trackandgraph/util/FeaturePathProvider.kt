@@ -21,26 +21,24 @@ import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.base.database.dto.Group
 
 open class FeaturePathProvider(
-    private val featureGroupMap: Map<Feature, Group>,
-) : GroupPathProvider(featureGroupMap.values) {
+    features: List<Feature>,
+    groups: List<Group>,
+) : GroupPathProvider(groups) {
 
-    constructor(features: List<Feature>, groups: List<Group>) : this(
-        features.mapNotNull { feature ->
-            val group = groups.firstOrNull { it.id == feature.groupId }
-                ?: return@mapNotNull null
-            feature to group
-        }.toMap()
-    )
+    private val featureGroupMap: Map<Feature, Group> = features.mapNotNull { feature ->
+        val group = groups.firstOrNull { it.id == feature.groupId }
+            ?: return@mapNotNull null
+        feature to group
+    }.toMap()
 
-    fun sortedFeatureMap() = sortedPaths().associate { it.first.featureId to it.second }
+    fun sortedFeatureMap(): Map<Long, String> = sortedPaths()
+        .associate { it.first.featureId to it.second }
 
     val features get() = featureGroupMap.keys
 
     fun featureName(featureId: Long) = featureGroupMap.keys.firstOrNull { it.featureId == featureId }?.name
 
-    fun sortedAlphabetically() = featureGroupMap.keys.sortedBy { getPathForFeature(it.featureId) }
-
-    fun sortedPaths() = featureGroupMap.keys
+    fun sortedPaths(): List<Pair<Feature, String>> = featureGroupMap.keys
         .map { it to getPathForFeature(it.featureId) }
         .sortedBy { it.second }
 
