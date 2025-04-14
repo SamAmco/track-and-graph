@@ -388,4 +388,13 @@ internal interface TrackAndGraphDatabaseDao {
 
     @Query("SELECT EXISTS (SELECT 1 FROM lua_graphs_table LIMIT 1)")
     fun hasAnyLuaGraphs(): Boolean
+
+    @Query("SELECT EXISTS (SELECT 1 FROM graphs_and_stats_table2 LIMIT 1)")
+    fun hasAnyGraphs(): Boolean
+
+    @Query("SELECT EXISTS (SELECT 1 FROM features_table LIMIT 1)")
+    fun hasAnyFeatures(): Boolean
+
+    @Query("SELECT EXISTS (SELECT 1 FROM groups_table LIMIT 1)")
+    fun hasAnyGroups(): Boolean
 }

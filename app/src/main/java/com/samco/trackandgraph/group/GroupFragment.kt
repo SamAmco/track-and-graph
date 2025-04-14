@@ -42,6 +42,7 @@ import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.addtracker.*
+import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
@@ -51,8 +52,10 @@ import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -80,6 +83,10 @@ class GroupFragment : Fragment(),
 
     @Inject
     lateinit var tngSettings: TngSettings
+
+    @Inject
+    @MainDispatcher
+    lateinit var ui: CoroutineDispatcher
 
     init {
         initNotificationsPermissionRequester(this)
@@ -178,7 +185,8 @@ class GroupFragment : Fragment(),
     }
 
     private fun addItemTouchHelper() {
-        ItemTouchHelper(DragTouchHelperCallback(
+        ItemTouchHelper(
+            DragTouchHelperCallback(
             { start: Int, end: Int -> adapter.moveItem(start, end) },
             { viewModel.adjustDisplayIndexes(adapter.getItems()) }
         )).attachToRecyclerView(binding.itemList)
@@ -364,12 +372,22 @@ class GroupFragment : Fragment(),
     }
 
     private fun listenToViewModel() {
-        viewModel.loading.observe(viewLifecycleOwner) {
-            binding.loadingOverlay.visibility = if (it) View.VISIBLE else View.GONE
+        lifecycleScope.launch {
+            viewModel.loading.collect {
+                withContext(ui) {
+                    binding.loadingOverlay.visibility = if (it) View.VISIBLE else View.GONE
+                }
+            }
         }
+
         viewModel.hasTrackers.observe(viewLifecycleOwner) {}
-        viewModel.showEmptyGroupText.observe(viewLifecycleOwner) {
-            binding.emptyGroupText.visibility = if (it) View.VISIBLE else View.INVISIBLE
+
+        lifecycleScope.launch {
+            viewModel.showEmptyGroupText.collect {
+                withContext(ui) {
+                    binding.emptyGroupText.visibility = if (it) View.VISIBLE else View.INVISIBLE
+                }
+            }
         }
         viewModel.allChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it, forceNextNotifyDataSetChanged)

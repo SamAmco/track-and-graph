@@ -25,7 +25,6 @@ import org.threeten.bp.OffsetDateTime
 import java.io.InputStream
 import java.io.OutputStream
 
-//TODO This is too monolithic right now, needs to be split into multiple repository classes ideally.
 interface DataInteractor : TrackerHelper, DataSampler {
     suspend fun insertGroup(group: Group): Long
 
@@ -159,4 +158,10 @@ interface DataInteractor : TrackerHelper, DataSampler {
     suspend fun updateLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures)
 
     suspend fun hasAnyLuaGraphs(): Boolean
+
+    suspend fun hasAnyGraphs(): Boolean
+
+    suspend fun hasAnyFeatures(): Boolean
+
+    suspend fun hasAnyGroups(): Boolean
 }
