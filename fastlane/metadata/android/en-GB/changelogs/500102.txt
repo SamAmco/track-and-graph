@@ -1,0 +1,5 @@
+- Fix broken disable lua shortcut
+- Fix broken loading state and empty group text
+- Fix incorrect move to group path ordering
+- Fix incorrect feature paths in feature select spinner
+
