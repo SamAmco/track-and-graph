@@ -367,7 +367,8 @@ class GroupViewModel @Inject constructor(
 
     val showEmptyGroupText: StateFlow<Boolean> = allChildrenFlow
         .map {
-            listOf(
+            if (!inRootGroup()) return@map false
+            return@map listOf(
                 dataInteractor.hasAnyFeatures(),
                 dataInteractor.hasAnyGraphs(),
                 dataInteractor.hasAnyGroups(),
@@ -386,8 +387,10 @@ class GroupViewModel @Inject constructor(
         showEmptyGroupText,
         allChildrenFlow
     ) { showEmptyGroupText, allChildren ->
-        allChildren.isEmpty() && !showEmptyGroupText
+        inRootGroup() && allChildren.isEmpty() && !showEmptyGroupText
     }.stateIn(viewModelScope, SharingStarted.Lazily, true)
+
+    private suspend fun inRootGroup() = groupId.first() == 0L
 
     val trackers
         get() = allChildren.value
