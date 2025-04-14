@@ -54,6 +54,7 @@ import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -389,11 +390,13 @@ class GroupFragment : Fragment(),
                 }
             }
         }
+
         viewModel.allChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it, forceNextNotifyDataSetChanged)
             forceNextNotifyDataSetChanged = false
             updateShowQueueTrackButton()
         }
+
         viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
             if (it == null) return@observe
 
@@ -402,6 +405,14 @@ class GroupFragment : Fragment(),
                 customInitialValue = it.duration.seconds.toDouble()
             )
             viewModel.onConsumedShowDurationInputDialog()
+        }
+
+        lifecycleScope.launch {
+            viewModel.hasAnyReminders.filter{ it }.collect {
+                withContext(ui) {
+                    requestNotificationPermission( requireContext() )
+                }
+            }
         }
     }
 

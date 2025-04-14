@@ -365,11 +365,19 @@ class GroupViewModel @Inject constructor(
 
     val allChildren = allChildrenFlow.asLiveData(viewModelScope.coroutineContext)
 
-    val showEmptyGroupText: StateFlow<Boolean> = flow {
-        val hasAnyFeatures = dataInteractor.hasAnyFeatures()
-        val hasAnyGraphs = dataInteractor.hasAnyGraphs()
-        val hasAnyGroups = dataInteractor.hasAnyGroups()
-        emit(listOf(hasAnyFeatures, hasAnyGraphs, hasAnyGroups).none())
+    val showEmptyGroupText: StateFlow<Boolean> = allChildrenFlow
+        .map {
+            listOf(
+                dataInteractor.hasAnyFeatures(),
+                dataInteractor.hasAnyGraphs(),
+                dataInteractor.hasAnyGroups(),
+            ).none { it }
+        }
+        .flowOn(io)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    val hasAnyReminders: StateFlow<Boolean> = flow {
+        emit(dataInteractor.hasAnyReminders())
     }
         .flowOn(io)
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
