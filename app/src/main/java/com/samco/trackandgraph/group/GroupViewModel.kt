@@ -58,17 +58,6 @@ class GroupViewModel @Inject constructor(
 
     private val hasTrackersFlow = dataInteractor.hasAtLeastOneTracker()
 
-    /**
-     * Show a loading screen until the database has been loaded in case we're in the middle of a
-     * heavy migration.
-     */
-    private val databaseLoading = hasTrackersFlow
-        .map { false }
-        .flowOn(io)
-        .onStart { emit(true) }
-
-    val loading = databaseLoading.asLiveData(viewModelScope.coroutineContext)
-
     val hasTrackers: LiveData<Boolean> = hasTrackersFlow
         .asLiveData(viewModelScope.coroutineContext)
 
@@ -376,19 +365,21 @@ class GroupViewModel @Inject constructor(
 
     val allChildren = allChildrenFlow.asLiveData(viewModelScope.coroutineContext)
 
-    val showEmptyGroupText: LiveData<Boolean> = databaseLoading
-        .flatMapLatest {
-            if (it) flowOf(false)
-            else combine(
-                allChildrenFlow.map { it.isEmpty() },
-                groupId
-            ) { childrenEmpty, groupId -> childrenEmpty && groupId == 0L }
-                //Give a short delay to give the data a chance to load
-                .onStart { delay(200) }
-        }
-        .onStart { emit(false) }
-        .distinctUntilChanged()
-        .asLiveData(viewModelScope.coroutineContext)
+    val showEmptyGroupText: StateFlow<Boolean> = flow {
+        val hasAnyFeatures = dataInteractor.hasAnyFeatures()
+        val hasAnyGraphs = dataInteractor.hasAnyGraphs()
+        val hasAnyGroups = dataInteractor.hasAnyGroups()
+        emit(listOf(hasAnyFeatures, hasAnyGraphs, hasAnyGroups).none())
+    }
+        .flowOn(io)
+        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    val loading = combine(
+        showEmptyGroupText,
+        allChildrenFlow
+    ) { showEmptyGroupText, allChildren ->
+        allChildren.isEmpty() && !showEmptyGroupText
+    }.stateIn(viewModelScope, SharingStarted.Lazily, true)
 
     val trackers
         get() = allChildren.value

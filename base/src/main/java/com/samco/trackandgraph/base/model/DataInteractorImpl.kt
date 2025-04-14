@@ -632,4 +632,10 @@ internal class DataInteractorImpl @Inject constructor(
         }
 
     override suspend fun hasAnyLuaGraphs(): Boolean = withContext(io) { dao.hasAnyLuaGraphs() }
+
+    override suspend fun hasAnyGraphs(): Boolean = withContext(io) { dao.hasAnyGraphs() }
+
+    override suspend fun hasAnyFeatures(): Boolean = withContext(io) { dao.hasAnyFeatures() }
+
+    override suspend fun hasAnyGroups(): Boolean = withContext(io) { dao.hasAnyGroups() }
 }
