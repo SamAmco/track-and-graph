@@ -75,4 +75,22 @@ class FeaturePathProviderTest {
             sorted.map { it.key to it.value }
         )
     }
+
+    @Test
+    fun `a feature in a nested group with no other features in it gives a full path`() {
+        val groups = listOf(
+            group(parentId = null),
+            group("Apple", 1, 0),
+            group("Banana", 2, 1),
+        )
+
+        val features = listOf( FeatureDto(1L, "Carrot", 2))
+
+        val sorted = FeaturePathProvider(features, groups).sortedFeatureMap()
+
+        assertEquals(
+            listOf(1L to "/Apple/Banana/Carrot"),
+            sorted.map { it.key to it.value }
+        )
+    }
 }
