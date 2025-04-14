@@ -164,4 +164,6 @@ interface DataInteractor : TrackerHelper, DataSampler {
     suspend fun hasAnyFeatures(): Boolean
 
     suspend fun hasAnyGroups(): Boolean
+
+    suspend fun hasAnyReminders(): Boolean
 }

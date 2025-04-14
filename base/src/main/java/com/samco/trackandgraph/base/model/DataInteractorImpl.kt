@@ -638,4 +638,6 @@ internal class DataInteractorImpl @Inject constructor(
     override suspend fun hasAnyFeatures(): Boolean = withContext(io) { dao.hasAnyFeatures() }
 
     override suspend fun hasAnyGroups(): Boolean = withContext(io) { dao.hasAnyGroups() }
+
+    override suspend fun hasAnyReminders(): Boolean = withContext(io) { dao.hasAnyReminders() }
 }

@@ -395,6 +395,9 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT EXISTS (SELECT 1 FROM features_table LIMIT 1)")
     fun hasAnyFeatures(): Boolean
 
-    @Query("SELECT EXISTS (SELECT 1 FROM groups_table LIMIT 1)")
+    @Query("SELECT EXISTS (SELECT 1 FROM groups_table WHERE parent_group_id IS NOT NULL LIMIT 1)")
     fun hasAnyGroups(): Boolean
+
+    @Query("SELECT EXISTS (SELECT 1 FROM reminders_table LIMIT 1)")
+    fun hasAnyReminders(): Boolean
 }
