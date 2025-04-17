@@ -277,6 +277,7 @@ private fun drawLineGraphFeatures(
     listMode: Boolean
 ) {
     for (line in plottableData) {
+        if (line.line == null) continue
         addSeries(
             context = context,
             binding = binding,
