@@ -17,8 +17,6 @@
 
 package com.samco.trackandgraph.navigation
 
-import android.app.ActivityOptions
-import android.app.ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -46,7 +44,6 @@ class PendingIntentProviderImpl @Inject constructor(
                     0,
                     it,
                     PendingIntent.FLAG_IMMUTABLE,
-                    getStartActivityOptionsBundle()
                 )
             }
     }
@@ -57,15 +54,6 @@ class PendingIntentProviderImpl @Inject constructor(
             .putExtra(AddDataPointFromTimerActivity.TRACKER_ID_KEY, trackerId)
             .putExtra(AddDataPointFromTimerActivity.START_TIME_KEY, startInstant)
     }
-
-    private fun getStartActivityOptionsBundle() =
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            ActivityOptions.makeBasic()
-                .setPendingIntentBackgroundActivityStartMode(
-                    MODE_BACKGROUND_ACTIVITY_START_ALLOWED
-                )
-                .toBundle()
-        } else null
 
     override fun getDurationInputActivityPendingIntent(
         trackerId: Long,
@@ -78,7 +66,6 @@ class PendingIntentProviderImpl @Inject constructor(
                 startInstant.hashCode() + trackerId.toInt(),
                 it,
                 PendingIntent.FLAG_IMMUTABLE,
-                getStartActivityOptionsBundle()
             )
         }
     }
@@ -93,7 +80,6 @@ class PendingIntentProviderImpl @Inject constructor(
                 appWidgetId,
                 it,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                getStartActivityOptionsBundle()
             )
         }
     }
