@@ -1,0 +1,3 @@
+- Fix bug crashing on start up with tracker widgets on API >= 35
+- Fix bug crashing with graph containing one empty line and one non-empty line
+
