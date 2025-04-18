@@ -48,6 +48,7 @@ import com.samco.trackandgraph.base.helpers.*
 import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
+import com.samco.trackandgraph.base.service.TimerServiceInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
 import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
@@ -82,6 +83,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var luaEngineSettingsProvider: LuaEngineSettingsProvider
 
+    @Inject
+    lateinit var timerServiceInteractor: TimerServiceInteractor
+
     private val viewModel by viewModels<MainActivityViewModel>()
 
     val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
@@ -96,10 +100,15 @@ class MainActivity : AppCompatActivity() {
         onDrawerHideKeyboard()
         initDrawerSpinners()
         viewModel.syncAlarms()
+        recoverTimerServiceIfNecessary()
         if (prefHelper.isFirstRun()) showTutorial()
         else destroyTutorial()
         intent?.data?.let { handleDeepLink(it) }
         addOnBackPressedCallback()
+    }
+
+    private fun recoverTimerServiceIfNecessary() {
+        timerServiceInteractor.startTimerNotificationService()
     }
 
     private fun checkDisableLuaEngine() {
