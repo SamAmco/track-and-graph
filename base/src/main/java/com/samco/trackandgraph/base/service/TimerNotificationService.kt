@@ -229,6 +229,7 @@ class TimerNotificationService : Service() {
             .setOnlyAlertOnce(true)
             .setSilent(true)
             .setCategory(CATEGORY_STOPWATCH)
+            .setContentIntent(pendingIntentProvider.getMainActivityPendingIntent(false))
             .addAction(stopAction)
             .setAutoCancel(true)
     }

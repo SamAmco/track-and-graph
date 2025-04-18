@@ -24,7 +24,7 @@ interface PendingIntentProvider {
     /**
      * Get a pending intent that will start the main activity of the app
      */
-    fun getMainActivityPendingIntent(): PendingIntent
+    fun getMainActivityPendingIntent(clearTask: Boolean = true): PendingIntent
 
     /**
      * Get an intent to start the duration input activity directly
