@@ -71,7 +71,7 @@
 
                 <data
                     android:host="lua_inject_file"
-                    android:scheme="http" />
+                    android:scheme="trackandgraph" />
             </intent-filter>
 
             <meta-data
