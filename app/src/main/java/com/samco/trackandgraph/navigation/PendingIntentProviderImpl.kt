@@ -35,17 +35,14 @@ import javax.inject.Inject
 class PendingIntentProviderImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : PendingIntentProvider {
-    override fun getMainActivityPendingIntent(): PendingIntent {
-        return Intent(context, MainActivity::class.java)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-            .let {
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    it,
-                    PendingIntent.FLAG_IMMUTABLE,
-                )
-            }
+    override fun getMainActivityPendingIntent(clearTask: Boolean): PendingIntent {
+        val intent = when {
+            clearTask -> Intent(context, MainActivity::class.java)
+                .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+
+            else -> context.packageManager.getLaunchIntentForPackage(context.packageName)
+        }
+        return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
     override fun getDurationInputActivityIntent(trackerId: Long, startInstant: String): Intent {
