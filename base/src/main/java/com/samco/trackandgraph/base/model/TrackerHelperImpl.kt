@@ -308,7 +308,7 @@ internal class TrackerHelperImpl @Inject constructor(
             dao.getDataPointByTimestampAndFeatureSync(
                 featureId = it,
                 epochMilli = timestamp.toInstant().toEpochMilli()
-            ).toDto()
+            )?.toDto()
         }
     }
 }
