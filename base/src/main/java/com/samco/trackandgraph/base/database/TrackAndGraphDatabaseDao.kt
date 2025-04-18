@@ -193,7 +193,7 @@ internal interface TrackAndGraphDatabaseDao {
     fun getDataPointsForFeatureSync(featureId: Long): List<DataPoint>
 
     @Query("SELECT * FROM data_points_table WHERE feature_id = :featureId AND epoch_milli = :epochMilli")
-    fun getDataPointByTimestampAndFeatureSync(featureId: Long, epochMilli: Long): DataPoint
+    fun getDataPointByTimestampAndFeatureSync(featureId: Long, epochMilli: Long): DataPoint?
 
     @Query("SELECT COUNT(*) FROM data_points_table WHERE feature_id = :featureId")
     fun getDataPointCount(featureId: Long): Int
