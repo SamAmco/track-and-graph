@@ -73,65 +73,55 @@ class TimerNotificationService : Service() {
     }
 
     private inner class NotificationUpdater {
-        private var notifications: List<Int>? = null
-        private var updateJobs: List<Job>? = null
-        private var calledStartForeGround = false
+        private var activeTrackers: List<DisplayTracker> = emptyList()
+        private var updateJob: Job? = null
 
-        private fun clearOldNotifications() {
-            this.notifications?.forEach { notificationManager.cancel(it) }
-            this.updateJobs?.forEach { it.cancel() }
+        private fun clearOldNotificationsAndJob() {
+            // Cancel the previous update job if it's running
+            updateJob?.cancel()
+            updateJob = null
+
+            // Cancel notifications shown by the previous job
+            activeTrackers.forEach { notificationManager.cancel(it.id.toInt()) }
+            activeTrackers = emptyList() // Clear the list for the next update
         }
 
-        private fun createUpdateJob(tracker: DisplayTracker, isPrimary: Boolean): Job? {
-            val instant = tracker.timerStartInstant ?: return null
-            val builder = buildNotification(tracker.id, tracker.name, instant)
-            val id = tracker.id.toInt()
-            return jobScope.launch {
-                while (true) {
-                    val durationSecs = Duration.between(instant, Instant.now()).seconds
-                    builder.setContentText(formatTimeDuration(durationSecs))
-                    val notification = builder.build()
-                    if (isPrimary) {
-                        startForegroundService(id, notification)
-                        calledStartForeGround = true
-                    } else notificationManager.notify(id, notification)
+        @Synchronized
+        fun setNotifications(newTrackers: List<DisplayTracker>) {
+            clearOldNotificationsAndJob()
+
+            activeTrackers = newTrackers
+                .filter { it.timerStartInstant != null }
+                .sortedBy { it.timerStartInstant }
+
+            if (activeTrackers.isEmpty()) return
+
+            // Start a single job to update all notifications
+            updateJob = jobScope.launch {
+                while (isActive) {
+                    activeTrackers.forEachIndexed { index, tracker ->
+                        val instant = tracker.timerStartInstant ?: return@forEachIndexed // Should not happen due to filter
+                        val builder = buildNotification(tracker.id, tracker.name, instant)
+                        val durationSecs = Duration.between(instant, Instant.now()).seconds
+                        builder.setContentText(formatTimeDuration(durationSecs))
+                        val notification = builder.build()
+                        val notificationId = tracker.id.toInt()
+
+                        // Always use startForegroundService for the first notification (index 0)
+                        // to correctly update the foreground state notification.
+                        if (index == 0) {
+                            startForegroundService(notificationId, notification)
+                            // Ensure the service-level flag is set
+                            this@TimerNotificationService.calledStartForeGround = true
+                        } else {
+                            // Use notify for all subsequent notifications.
+                            notificationManager.notify(notificationId, notification)
+                        }
+                    }
                     delay(1000)
                 }
             }
         }
-
-        fun setNotifications(features: List<DisplayTracker>) =
-            synchronized(this@TimerNotificationService) {
-                clearOldNotifications()
-
-                notifications = features
-                    .filter { it.timerStartInstant != null }
-                    .map { it.id.toInt() }
-
-                //We have to call start foreground before stop foreground so we always
-                // call startForeground even if there are no notifications somehow like if
-                // the timer was deleted from the db between start timer being called and the
-                // service starting.
-                if (!calledStartForeGround && notifications?.isEmpty() != false) {
-                    notifications = listOf(123)
-                    startForegroundService(
-                        123,
-                        NotificationCompat
-                            .Builder(this@TimerNotificationService, CHANNEL_ID)
-                            .setSmallIcon(R.drawable.timer_notification_icon)
-                            .setOnlyAlertOnce(true)
-                            .setSilent(true)
-                            .setAutoCancel(true)
-                            .build()
-                    )
-                    calledStartForeGround = true
-                }
-
-                updateJobs = features
-                    .sortedBy { it.timerStartInstant }
-                    .mapIndexed { index, feature -> createUpdateJob(feature, index == 0) }
-                    .filterNotNull()
-            }
     }
 
     private fun startForegroundService(id: Int, notification: Notification) {
@@ -143,6 +133,10 @@ class TimerNotificationService : Service() {
     }
 
     private val notificationUpdater = NotificationUpdater()
+
+    // Flag to track if startForeground has been called at least once
+    // This is managed by ensureForegroundState and the NotificationUpdater loop
+    private var calledStartForeGround = false
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -164,25 +158,30 @@ class TimerNotificationService : Service() {
         if (updateJobIsRunning) return super.onStartCommand(intent, flags, startId)
 
         createChannel()
-        notificationUpdater.setNotifications(emptyList())
 
         updateJobIsRunning = true
         jobScope.launch {
             dataInteractor.getDataUpdateEvents()
                 .filter { it is DataUpdateType.TrackerUpdated || it is DataUpdateType.TrackerDeleted }
-                .map { }
-                .onStart { emit(Unit) }
-                .debounce(200)
+                .map { } // Map to Unit to trigger debounce/collection
+                .onStart { emit(Unit) } // Emit immediately on start to load initial state
+                .debounce(200) // Debounce rapid updates
                 .collect {
-                    val newFeatures = withContext(io) {
+                    val newTrackers = withContext(io) {
                         dataInteractor.getAllActiveTimerTrackers()
                             .filter { it.timerStartInstant != null }
                     }
-                    if (newFeatures.isEmpty()) {
-                        notificationUpdater.setNotifications(emptyList())
+
+
+                    // If after the update there are no active trackers, stop the service
+                    if (newTrackers.isEmpty()) {
+                        ensureStartForegroundCalled() // Ensure startForeground was called if needed
                         stopForeground()
                         stopSelf()
-                    } else notificationUpdater.setNotifications(newFeatures)
+                        // Exiting the collect block will allow the service jobScope to complete if needed
+                    } else {
+                        notificationUpdater.setNotifications(newTrackers)
+                    }
                 }
         }
 
@@ -198,10 +197,30 @@ class TimerNotificationService : Service() {
         }
     }
 
+    /**
+     * Ensures startForeground is called at least once, even if no timers are active,
+     * to comply with foreground service requirements. Creates and immediately cancels
+     * a temporary notification if needed.
+     */
+    private fun ensureStartForegroundCalled() {
+        if (!calledStartForeGround) {
+            // Use a temporary ID
+            val tempId = 123
+            val tempNotification = NotificationCompat
+                .Builder(this@TimerNotificationService, CHANNEL_ID)
+                .setSmallIcon(R.drawable.timer_notification_icon)
+                .setSilent(true)
+                .setAutoCancel(true)
+                .build()
+            startForegroundService(tempId, tempNotification)
+            calledStartForeGround = true
+            // Immediately cancel the temporary notification as it's not needed
+            notificationManager.cancel(tempId)
+        }
+    }
+
     override fun onDestroy() {
         job.cancel()
-        updateJobIsRunning = false
-        super.onDestroy()
     }
 
     private fun buildNotification(
