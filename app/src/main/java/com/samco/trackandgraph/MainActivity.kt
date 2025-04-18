@@ -69,8 +69,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
 
-    private lateinit var currentNavBarConfig: NavBarConfig
-
     @Inject
     lateinit var dataInteractor: DataInteractor
 
@@ -200,7 +198,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setActionBarConfig(config: NavBarConfig) {
-        currentNavBarConfig = config
         val title = config.title ?: getString(R.string.app_name)
         supportActionBar?.title = title
 
