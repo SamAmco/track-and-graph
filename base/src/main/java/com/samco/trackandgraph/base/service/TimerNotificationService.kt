@@ -30,23 +30,19 @@ import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.DataUpdateType
-import com.samco.trackandgraph.base.model.di.DefaultDispatcher
-import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
+import timber.log.Timber
+import java.util.concurrent.Executors
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class)
 @AndroidEntryPoint
 class TimerNotificationService : Service() {
-
-    companion object {
-        private const val CHANNEL_ID = "TIMER_NOTIFICATION_SERVICE_CHANNEL"
-    }
 
     @Inject
     lateinit var dataInteractor: DataInteractor
@@ -54,19 +50,17 @@ class TimerNotificationService : Service() {
     @Inject
     lateinit var pendingIntentProvider: PendingIntentProvider
 
-    @Inject
-    @IODispatcher
-    lateinit var io: CoroutineDispatcher
-
-    @Inject
-    @DefaultDispatcher
-    lateinit var defaultDispatcher: CoroutineDispatcher
-
-    private val job = Job()
-    private val jobScope by lazy { CoroutineScope(job + defaultDispatcher) }
+    private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private val serviceScope by lazy { CoroutineScope(SupervisorJob() + serviceDispatcher) }
+    private var serviceJob: Job? = null
     private var updateJobIsRunning = false
+    private val notificationUpdater = NotificationUpdater()
 
-    private val notificationManager by lazy {
+    // Flag to track if startForeground has been called at least once
+    // This is managed by ensureForegroundState and the NotificationUpdater loop
+    private var calledStartForeGround = false
+
+    private val notificationManager: NotificationManager by lazy {
         ContextCompat.getSystemService(
             this@TimerNotificationService, NotificationManager::class.java
         ) as NotificationManager
@@ -77,17 +71,13 @@ class TimerNotificationService : Service() {
         private var updateJob: Job? = null
 
         private fun clearOldNotificationsAndJob() {
-            // Cancel the previous update job if it's running
-            updateJob?.cancel()
-            updateJob = null
-
-            // Cancel notifications shown by the previous job
+            // Cancel all notifications except the persistent one
             activeTrackers.forEach { notificationManager.cancel(it.id.toInt()) }
-            activeTrackers = emptyList() // Clear the list for the next update
+            activeTrackers = emptyList()
         }
 
-        @Synchronized
         fun setNotifications(newTrackers: List<DisplayTracker>) {
+            updateJob?.cancel()
             clearOldNotificationsAndJob()
 
             activeTrackers = newTrackers
@@ -97,31 +87,95 @@ class TimerNotificationService : Service() {
             if (activeTrackers.isEmpty()) return
 
             // Start a single job to update all notifications
-            updateJob = jobScope.launch {
+            updateJob = serviceScope.launch {
                 while (isActive) {
-                    activeTrackers.forEachIndexed { index, tracker ->
-                        val instant = tracker.timerStartInstant ?: return@forEachIndexed // Should not happen due to filter
-                        val builder = buildNotification(tracker.id, tracker.name, instant)
-                        val durationSecs = Duration.between(instant, Instant.now()).seconds
-                        builder.setContentText(formatTimeDuration(durationSecs))
-                        val notification = builder.build()
-                        val notificationId = tracker.id.toInt()
-
-                        // Always use startForegroundService for the first notification (index 0)
-                        // to correctly update the foreground state notification.
-                        if (index == 0) {
-                            startForegroundService(notificationId, notification)
-                            // Ensure the service-level flag is set
-                            this@TimerNotificationService.calledStartForeGround = true
-                        } else {
-                            // Use notify for all subsequent notifications.
-                            notificationManager.notify(notificationId, notification)
-                        }
-                    }
+                    syncNotifications()
                     delay(1000)
                 }
             }
         }
+
+        private fun syncNotifications() {
+            try {
+                activeTrackers.forEachIndexed { index, tracker ->
+                    val instant = tracker.timerStartInstant ?: return@forEachIndexed
+                    val durationSecs = Duration.between(instant, Instant.now()).seconds
+                    val notification = buildNotification(tracker.id, tracker.name, instant)
+                        .setContentText(formatTimeDuration(durationSecs))
+                        .build()
+
+                    // First tracker should always use the persistent notification ID
+                    val notificationId =
+                        if (index == 0) PERSISTENT_NOTIFICATION_ID
+                        else tracker.id.toInt()
+
+                    try {
+                        if (!calledStartForeGround && index == 0) {
+                            // First time showing the first notification - use startForeground
+                            startForegroundService(notificationId, notification)
+                            calledStartForeGround = true
+                        } else {
+                            // Use notify for all subsequent notifications and updates
+                            notificationManager.notify(notificationId, notification)
+                        }
+                    } catch (e: Exception) {
+                        // Log error but continue with other notifications
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e)
+            }
+        }
+    }
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (updateJobIsRunning) return super.onStartCommand(intent, flags, startId)
+
+        createChannel()
+
+        updateJobIsRunning = true
+        serviceJob?.cancel() // Cancel any existing job
+        serviceJob = serviceScope.launch {
+            try {
+                dataInteractor.getDataUpdateEvents()
+                    .filter { it is DataUpdateType.TrackerUpdated || it is DataUpdateType.TrackerDeleted }
+                    .map { } // Map to Unit to trigger debounce/collection
+                    .onStart { emit(Unit) } // Emit immediately on start to load initial state
+                    .debounce(200) // Debounce rapid updates
+                    .catch { e ->
+                        // Log error
+                        Timber.e(e)
+                        updateJobIsRunning = false
+                        stopService()
+                    }
+                    .collect {
+                        try {
+                            val newTrackers = dataInteractor
+                                .getAllActiveTimerTrackers()
+                                .filter { it.timerStartInstant != null }
+
+                            // If after the update there are no active trackers, stop the service
+                            if (newTrackers.isEmpty()) {
+                                // Ensure startForeground was called if needed
+                                ensureStartForegroundCalled()
+                                stopService()
+                            } else {
+                                notificationUpdater.setNotifications(newTrackers)
+                            }
+                        } catch (t: Throwable) {
+                            // Log error
+                            Timber.e(t)
+                            stopService()
+                        }
+                    }
+            } finally {
+                updateJobIsRunning = false
+            }
+        }
+
+        return super.onStartCommand(intent, flags, startId)
     }
 
     private fun startForegroundService(id: Int, notification: Notification) {
@@ -130,62 +184,6 @@ class TimerNotificationService : Service() {
         } else {
             startForeground(id, notification)
         }
-    }
-
-    private val notificationUpdater = NotificationUpdater()
-
-    // Flag to track if startForeground has been called at least once
-    // This is managed by ensureForegroundState and the NotificationUpdater loop
-    private var calledStartForeGround = false
-
-    override fun onBind(intent: Intent?): IBinder? = null
-
-    private fun createChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val notificationChannel = NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.timer_notification_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            notificationChannel.setSound(null, null)
-            notificationChannel.setShowBadge(true)
-            val notificationManager = getSystemService(NotificationManager::class.java)
-            notificationManager.createNotificationChannel(notificationChannel)
-        }
-    }
-
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (updateJobIsRunning) return super.onStartCommand(intent, flags, startId)
-
-        createChannel()
-
-        updateJobIsRunning = true
-        jobScope.launch {
-            dataInteractor.getDataUpdateEvents()
-                .filter { it is DataUpdateType.TrackerUpdated || it is DataUpdateType.TrackerDeleted }
-                .map { } // Map to Unit to trigger debounce/collection
-                .onStart { emit(Unit) } // Emit immediately on start to load initial state
-                .debounce(200) // Debounce rapid updates
-                .collect {
-                    val newTrackers = withContext(io) {
-                        dataInteractor.getAllActiveTimerTrackers()
-                            .filter { it.timerStartInstant != null }
-                    }
-
-
-                    // If after the update there are no active trackers, stop the service
-                    if (newTrackers.isEmpty()) {
-                        ensureStartForegroundCalled() // Ensure startForeground was called if needed
-                        stopForeground()
-                        stopSelf()
-                        // Exiting the collect block will allow the service jobScope to complete if needed
-                    } else {
-                        notificationUpdater.setNotifications(newTrackers)
-                    }
-                }
-        }
-
-        return super.onStartCommand(intent, flags, startId)
     }
 
     @Suppress("DEPRECATION")
@@ -219,8 +217,33 @@ class TimerNotificationService : Service() {
         }
     }
 
+    private fun stopService() {
+        stopForeground()
+        stopSelf()
+    }
+
     override fun onDestroy() {
-        job.cancel()
+        try {
+            serviceJob?.cancel()
+            serviceScope.cancel()
+            serviceDispatcher.close()
+        } catch (t: Throwable) {
+            Timber.e(t)
+        }
+        super.onDestroy()
+    }
+
+    private fun createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                CHANNEL_ID,
+                getString(R.string.timer_notification_channel_name),
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            notificationChannel.setSound(null, null)
+            notificationChannel.setShowBadge(true)
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
 
     private fun buildNotification(
@@ -252,4 +275,10 @@ class TimerNotificationService : Service() {
             .addAction(stopAction)
             .setAutoCancel(true)
     }
+
+    companion object {
+        private const val CHANNEL_ID = "TIMER_NOTIFICATION_SERVICE_CHANNEL"
+        private const val PERSISTENT_NOTIFICATION_ID = Int.MAX_VALUE - 123
+    }
+
 }
