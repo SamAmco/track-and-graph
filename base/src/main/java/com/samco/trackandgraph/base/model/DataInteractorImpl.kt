@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.map
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 import java.io.InputStream
 import java.io.OutputStream
 import javax.inject.Inject
@@ -547,6 +548,8 @@ internal class DataInteractorImpl @Inject constructor(
                 .associateWith { getDataSampleForFeatureId(it.featureId) }
             try {
                 csvReadWriter.writeFeaturesToCSV(outStream, featureMap)
+            } catch (t: Throwable) {
+                Timber.e(t)
             } finally {
                 featureMap.values.forEach { it.dispose() }
             }
@@ -601,7 +604,10 @@ internal class DataInteractorImpl @Inject constructor(
             }.also { dataUpdateEvents.emit(DataUpdateType.GraphOrStatCreated(newGraphStat)) }
         }
 
-    override suspend fun insertLuaGraph(graphOrStat: GraphOrStat, luaGraph: LuaGraphWithFeatures): Long =
+    override suspend fun insertLuaGraph(
+        graphOrStat: GraphOrStat,
+        luaGraph: LuaGraphWithFeatures
+    ): Long =
         performAtomicUpdate(DataUpdateType.GraphOrStatCreated(graphOrStat.id)) {
             shiftUpGroupChildIndexes(graphOrStat.groupId)
             val id = insertGraphStat(graphOrStat)

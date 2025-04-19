@@ -23,7 +23,7 @@ import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CSVReadWriterImplTest {
-    private val testCSV = """
+    private val legacyImportTestCSV = """
 FeatureName,Timestamp,Value,Note
 A,2022-09-14T21:30:41.432+01:00,1,
 A,2022-09-14T12:55:37.508+01:00,-10.1,
@@ -39,6 +39,24 @@ D,2021-02-09T11:07:28Z,1:10:00:,
 D,2021-02-08T11:17:39.165Z,-10:-30:20:Some: :la:bel,
 D,2021-02-05T11:10:01.808Z,12345:18:20,Some note ending with colon:,
 D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
+    """.trimIndent()
+
+    private val importTestCSV = """
+FeatureName,Timestamp,Value,Label,Note
+A,2022-09-14T21:30:41.432+01:00,1,,
+A,2022-09-14T12:55:37.508+01:00,-10.1,,
+B,2022-09-17T21:14:56.864+01:00,0.0,,
+B,2022-09-03T19:36:45.924+01:00,2.859,,
+B,2022-08-28T19:30:39.711+01:00,1.0,,So:me n:ot:e
+Tracker C,2022-09-16T00:13:27.182+01:00,0.0,Label 1,
+Tracker C,2022-09-15T00:20:40.986+01:00,1.0,Label 2,
+Tracker C,2022-09-13T22:55:46.533+01:00,3,Label 1,
+Tracker C,2022-09-12T23:00:55.750+01:00,-2,Label 3,
+D,2021-02-09T11:07:28Z,1:10:00,,
+D,2021-02-09T11:07:28Z,1:10:00,,
+D,2021-02-08T11:17:39.165Z,-10:-30:20,Some: :la:bel,
+D,2021-02-05T11:10:01.807Z,12345:18:20,,Some note ending with colon:
+D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
     """.trimIndent()
 
     private val testDataPoints = listOf(
@@ -354,7 +372,16 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
 
     @Test
     @Suppress("UNCHECKED_CAST")
+    fun `can import the legacy test CSV correctly`() = runTest(dispatcher) {
+        runImportTest(legacyImportTestCSV)
+    }
+
+    @Test
     fun `can import the test CSV correctly`() = runTest(dispatcher) {
+        runImportTest(importTestCSV)
+    }
+
+    private suspend fun runImportTest(testCSV: String) {
         //PREPARE
         val allInsertedDataPoints = mutableListOf<DataPoint>()
 
@@ -428,21 +455,21 @@ D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:,
         //VERIFY
 
         val expectedExportCSV = """
-FeatureName,Timestamp,Value,Note
-A,2022-09-14T21:30:41.432+01:00,1.0,
-A,2022-09-14T12:55:37.508+01:00,-10.1,
-B,2022-09-17T21:14:56.864+01:00,0.0,
-B,2022-09-03T19:36:45.924+01:00,2.859,
-B,2022-08-28T19:30:39.711+01:00,1.0,So:me n:ot:e
-Tracker C,2022-09-16T00:13:27.182+01:00,0.0:Label 1,
-Tracker C,2022-09-15T00:20:40.986+01:00,1.0:Label 2,
-Tracker C,2022-09-13T22:55:46.533+01:00,3.0:Label 1,
-Tracker C,2022-09-12T23:00:55.750+01:00,-2.0:Label 3,
-D,2021-02-09T11:07:28Z,1:10:00,
-D,2021-02-09T11:07:28Z,1:10:00,
-D,2021-02-08T11:17:39.165Z,-10:-29:-40:Some: :la:bel,
-D,2021-02-05T11:10:01.807Z,12345:18:20,Some note ending with colon:
-D,2021-02-05T11:10:01.808Z,12345:18:20:Label,Some note ending with colon:
+FeatureName,Timestamp,Value,Label,Note
+A,2022-09-14T21:30:41.432+01:00,1.0,,
+A,2022-09-14T12:55:37.508+01:00,-10.1,,
+B,2022-09-17T21:14:56.864+01:00,0.0,,
+B,2022-09-03T19:36:45.924+01:00,2.859,,
+B,2022-08-28T19:30:39.711+01:00,1.0,,So:me n:ot:e
+Tracker C,2022-09-16T00:13:27.182+01:00,0.0,Label 1,
+Tracker C,2022-09-15T00:20:40.986+01:00,1.0,Label 2,
+Tracker C,2022-09-13T22:55:46.533+01:00,3.0,Label 1,
+Tracker C,2022-09-12T23:00:55.750+01:00,-2.0,Label 3,
+D,2021-02-09T11:07:28Z,1:10:00,,
+D,2021-02-09T11:07:28Z,1:10:00,,
+D,2021-02-08T11:17:39.165Z,-10:-29:-40,Some: :la:bel,
+D,2021-02-05T11:10:01.807Z,12345:18:20,,Some note ending with colon:
+D,2021-02-05T11:10:01.808Z,12345:18:20,Label,Some note ending with colon:
 
         """.trimIndent()
             .replace("\n", "\r\n")
