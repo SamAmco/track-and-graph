@@ -34,6 +34,7 @@ import org.apache.commons.csv.CSVPrinter
 import org.apache.commons.csv.CSVRecord
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
+import timber.log.Timber
 import java.io.InputStream
 import java.io.InputStreamReader
 import java.io.OutputStream
@@ -41,7 +42,6 @@ import java.io.OutputStreamWriter
 import javax.inject.Inject
 import com.samco.trackandgraph.base.database.entity.DataPoint as DataPointEntity
 
-//TODO really need to test this class
 internal class CSVReadWriterImpl @Inject constructor(
     private val dao: TrackAndGraphDatabaseDao,
     private val trackerHelper: TrackerHelper,
@@ -57,6 +57,7 @@ internal class CSVReadWriterImpl @Inject constructor(
         FeatureName,
         Timestamp,
         Value,
+        Label,
         Note
     }
 
@@ -65,31 +66,36 @@ internal class CSVReadWriterImpl @Inject constructor(
         features: Map<Feature, DataSample>
     ) {
         withContext(io) {
-            outStream.writer().use { writer ->
-                writeFeaturesToCSVImpl(features, writer).getOrThrow()
-            }
+            outStream.writer().use { writeFeaturesToCSVImpl(features, it) }
         }
     }
 
     private suspend fun writeFeaturesToCSVImpl(
         features: Map<Feature, DataSample>,
         writer: OutputStreamWriter
-    ) = runCatching {
+    ) {
         val csvWriter = CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(Headers::class.java))
-        for (kvp in features) {
-            val feature = kvp.key
-            val dataPoints = kvp.value.toList()
-            val notes = kvp.value.getRawDataPoints().associate { it.timestamp to it.note }
+        try {
+            for (kvp in features) {
+                val feature = kvp.key
+                val dataPoints = kvp.value.toList()
+                val notes = kvp.value.getRawDataPoints().associate { it.timestamp to it.note }
 
-            writeDataPointsToCSV(
-                csvWriter,
-                dataPoints,
-                notes,
-                feature.name,
-                kvp.value.dataSampleProperties.isDuration
-            )
+                writeDataPointsToCSV(
+                    csvWriter,
+                    dataPoints,
+                    notes,
+                    feature.name,
+                    kvp.value.dataSampleProperties.isDuration
+                )
+            }
+        } catch (e: Throwable) {
+            Timber.tag("CSVReadWriterImpl").e(e, "CSV writer threw exception")
+            if (e is ImportFeaturesException) throw e
+            else throw ImportFeaturesException.Unknown()
+        } finally {
+            csvWriter.close(true)
         }
-        writer.flush()
     }
 
     private suspend fun writeDataPointsToCSV(
@@ -99,18 +105,17 @@ internal class CSVReadWriterImpl @Inject constructor(
         featureName: String,
         isDuration: Boolean
     ) = dataPoints.forEach { dp ->
-        var dataPointString = if (isDuration) {
+        val dataPointString = if (isDuration) {
             dp.value.toLong().let { seconds ->
                 String.format("%d:%02d:%02d", seconds / 3600, (seconds % 3600) / 60, (seconds % 60))
             }
         } else dp.value.toString()
 
-        if (dp.label.isNotBlank()) dataPointString = "${dataPointString}:${dp.label}"
-
         csvPrinter.printRecord(
             featureName,
             dp.timestamp.toString(),
             dataPointString,
+            dp.label,
             notes[dp.timestamp] ?: ""
         )
         yield()
@@ -133,8 +138,8 @@ internal class CSVReadWriterImpl @Inject constructor(
             val headerMap = records.headerMap
             validateHeaderMap(headerMap)
             ingestRecords(records, trackGroupId)
-        } catch (e: Exception) {
-            Log.e("CSVReadWriterImpl", "CSV reader through exception", e)
+        } catch (e: Throwable) {
+            Timber.tag("CSVReadWriterImpl").e(e, "CSV reader through exception")
             if (e is ImportFeaturesException) throw e
             else throw ImportFeaturesException.Unknown()
         }
@@ -274,12 +279,14 @@ internal class CSVReadWriterImpl @Inject constructor(
             ?: throw ImportFeaturesException.InconsistentRecord(lineNumber)
         val valueString = record.get(Headers.Value)
             ?: throw ImportFeaturesException.InconsistentRecord(lineNumber)
+        val label = if (record.isMapped(Headers.Label.name)) record.get(Headers.Label) else null
         //For legacy reasons (CSV's didn't used to contain notes)
         val note = if (record.isMapped(Headers.Note.name)) record.get(Headers.Note) else ""
 
         return parseToRecordData(
             trackerName = trackerName,
             timestamp = timestamp,
+            csvLabel = label,
             valueString = valueString,
             note = note,
             lineNumber = lineNumber
@@ -289,6 +296,7 @@ internal class CSVReadWriterImpl @Inject constructor(
     private fun parseToRecordData(
         trackerName: String,
         timestamp: String,
+        csvLabel: String?,
         valueString: String,
         note: String,
         lineNumber: Int
@@ -331,7 +339,7 @@ internal class CSVReadWriterImpl @Inject constructor(
         return RecordData(
             trackerName = trackerName,
             value = value,
-            label = label,
+            label = csvLabel ?: label,
             isDuration = isDuration,
             timestamp = parsedTimestamp,
             note = note
@@ -352,10 +360,11 @@ internal class CSVReadWriterImpl @Inject constructor(
     }
 
     private fun validateHeaderMap(headerIndexes: Map<String, Int>) {
-        val ourHeaders = RequiredHeaders.values().map { v -> v.name }
-        val exception = ImportFeaturesException.BadHeaders(ourHeaders.joinToString())
-        RequiredHeaders.values().forEach {
-            if (!headerIndexes.containsKey(it.name)) throw exception
+        val ourHeaders = RequiredHeaders.entries.map { v -> v.name }
+        RequiredHeaders.entries.forEach {
+            if (!headerIndexes.containsKey(it.name)) {
+                throw ImportFeaturesException.BadHeaders(ourHeaders.joinToString())
+            }
         }
     }
 }
