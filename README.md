@@ -11,6 +11,9 @@ An android app for tracking personal data and creating custom graphs
 	<a href='https://f-droid.org/packages/com.samco.trackandgraph/'>
 		<img alt='Get it on F-Droid' src='https://fdroid.gitlab.io/artwork/badge/get-it-on.png' height="100px" />
 	</a>
+  <a href='https://apt.izzysoft.de/packages/com.samco.trackandgraph'>
+    <img alt='Get it on IzzySoft' src='https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png' height="100px" />
+  </a>
 </p>
 
 # Screenshots
