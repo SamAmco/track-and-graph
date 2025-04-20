@@ -98,6 +98,16 @@ android {
         compose true
     }
 
+    // Dependency info blocks may present a security vulnerability in some cases and they are not
+    // required for APK builds e.g. F-Droid builds. However they may contain useful info for
+    // debugging issues on the Google Play Store.
+    dependenciesInfo {
+        // Disables dependency metadata when building APKs (for IzzyOnDroid/F-Droid)
+        includeInApk = false
+        // Enables dependency metadata when building Android App Bundles (for Google Play)
+        includeInBundle = true
+    }
+
     namespace 'com.samco.trackandgraph'
 }
 
