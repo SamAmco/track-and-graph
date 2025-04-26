@@ -147,7 +147,7 @@ function DataSource:dpafter(datetime) end
 --- Calculates a timestamp by subtracting the given period*multiplier from the specified end time or now.
 --- @since v5.1.0
 --- @param params CutoffParams: The parameters for calculating the cutoff.
---- @param end_time (Timestamp|Date)?: The end time for the cutoff. If not provided, the current time will be used.
+--- @param end_time (Timestamp|Date|integer)?: The end time for the cutoff. If not provided, the current time will be used. If an integer is provided, it will be treated as a timestamp in milliseconds since the epoch.
 --- @return integer|nil: The cutoff timestamp obtained by subtracting the given period from the specified end time (as a Unix epoch millisecond) or the current time, or nil if the period is not provided.
 M.get_cutoff = function(params, end_time)
 	if not params.period then
