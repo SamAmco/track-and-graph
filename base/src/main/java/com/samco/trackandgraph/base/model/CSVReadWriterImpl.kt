@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.base.model
 
-import android.util.Log
 import com.samco.trackandgraph.base.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.IDataPoint

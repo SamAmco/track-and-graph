@@ -124,8 +124,8 @@ class MainActivity : AppCompatActivity() {
             override fun handleOnBackPressed() {
                 if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                     drawerLayout.closeDrawer(GravityCompat.START)
-                } else {
-                    navController.navigateUp()
+                } else if (!navController.popBackStack()) {
+                    finish()
                 }
             }
         })
