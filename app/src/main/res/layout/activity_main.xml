@@ -51,51 +51,9 @@
 
     </androidx.drawerlayout.widget.DrawerLayout>
 
-    <FrameLayout
+    <androidx.compose.ui.platform.ComposeView
         android:id="@+id/tutorialOverlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <androidx.viewpager.widget.ViewPager
-            android:id="@+id/tutorialViewPager"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="invisible" />
-
-        <LinearLayout
-            android:id="@+id/tutorialPips"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center|bottom"
-            android:layout_marginBottom="40dp"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/pip1"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_margin="5dp"
-                app:srcCompat="@drawable/filled_circle"
-                app:tint="@color/ap_white"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/pip2"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_margin="5dp"
-                app:srcCompat="@drawable/filled_circle"
-                app:tint="@color/ap_white"
-                tools:ignore="ContentDescription" />
-
-            <ImageView
-                android:id="@+id/pip3"
-                android:layout_width="15dp"
-                android:layout_height="15dp"
-                android:layout_margin="5dp"
-                app:srcCompat="@drawable/filled_circle"
-                app:tint="@color/ap_white"
-                tools:ignore="ContentDescription" />
-        </LinearLayout>
-    </FrameLayout>
+    </androidx.compose.ui.platform.ComposeView>
 </merge>
