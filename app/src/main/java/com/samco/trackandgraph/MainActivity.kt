@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.ImageView
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -34,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.Toolbar
+import androidx.compose.ui.platform.ComposeView
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModel
@@ -42,16 +42,14 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupWithNavController
-import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.base.helpers.*
 import com.samco.trackandgraph.base.model.AlarmInteractor
-import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.TimerServiceInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
-import com.samco.trackandgraph.tutorial.TutorialPagerAdapter
+import com.samco.trackandgraph.tutorial.TutorialScreen
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -68,9 +66,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navView: NavigationView
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
-
-    @Inject
-    lateinit var dataInteractor: DataInteractor
 
     @Inject
     lateinit var prefHelper: PrefHelper
@@ -322,31 +317,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showTutorial() {
-        val pips = listOf(
-            findViewById<ImageView>(R.id.pip1),
-            findViewById(R.id.pip2),
-            findViewById(R.id.pip3)
-        )
-        val viewPager = findViewById<ViewPager>(R.id.tutorialViewPager)
-        val refreshPips = { position: Int ->
-            pips.forEachIndexed { i, p -> p.alpha = if (i == position) 1f else 0.5f }
+        findViewById<ComposeView>(R.id.tutorialOverlay).setContent {
+            TutorialScreen { destroyTutorial() }
         }
-        refreshPips.invoke(0)
-        viewPager.visibility = View.VISIBLE
-        viewPager.adapter = TutorialPagerAdapter(applicationContext, this::destroyTutorial)
-        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
-            override fun onPageScrollStateChanged(state: Int) {}
-            override fun onPageScrolled(
-                position: Int,
-                positionOffset: Float,
-                positionOffsetPixels: Int
-            ) {
-            }
-
-            override fun onPageSelected(position: Int) {
-                refreshPips.invoke(position)
-            }
-        })
     }
 
     override fun onSupportNavigateUp(): Boolean {
