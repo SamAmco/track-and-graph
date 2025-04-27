@@ -438,16 +438,16 @@ class GroupFragment : Fragment(),
 
     override fun onStart() {
         super.onStart()
-        (requireActivity() as MainActivity).toolbar.overflowIcon =
-            ContextCompat.getDrawable(requireContext(), R.drawable.add_icon)
+//        (requireActivity() as MainActivity).toolbar.overflowIcon =
+//            ContextCompat.getDrawable(requireContext(), R.drawable.add_icon)
     }
 
     override fun onStop() {
         super.onStop()
-        if (navController?.currentDestination?.id != R.id.groupFragment) {
-            (requireActivity() as MainActivity).toolbar.overflowIcon =
-                ContextCompat.getDrawable(requireContext(), R.drawable.list_menu_icon)
-        }
+//        if (navController?.currentDestination?.id != R.id.groupFragment) {
+//            (requireActivity() as MainActivity).toolbar.overflowIcon =
+//                ContextCompat.getDrawable(requireContext(), R.drawable.list_menu_icon)
+//        }
     }
 
     private fun onExportClicked() {

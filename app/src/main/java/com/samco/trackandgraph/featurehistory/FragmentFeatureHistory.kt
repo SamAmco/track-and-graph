@@ -74,13 +74,15 @@ class FragmentFeatureHistory : Fragment() {
     }
 
     private fun updateDataPointsCount(numDataPoints: Int) {
-        val text = if (numDataPoints > 0) {
+        val subtitle = if (numDataPoints > 0) {
             context?.getString(R.string.data_points, numDataPoints)
         } else {
             null
         }
 
-        (requireActivity() as MainActivity).setActionBarSubtitle(text)
+        (requireActivity() as MainActivity).setActionBarConfig(
+            NavButtonStyle.UP, args.featureName, subtitle
+        )
     }
 
     private inner class FeatureHistoryMenuProvider(
@@ -103,7 +105,7 @@ class FragmentFeatureHistory : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(NavButtonStyle.UP, args.featureName, true)
+        (requireActivity() as MainActivity).setActionBarConfig(NavButtonStyle.UP, args.featureName)
     }
 }
 
