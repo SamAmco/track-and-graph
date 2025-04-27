@@ -22,18 +22,20 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.view.View
-import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatSpinner
 import androidx.appcompat.widget.Toolbar
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModel
@@ -49,7 +51,6 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.TimerServiceInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
-import com.samco.trackandgraph.tutorial.TutorialScreen
 import com.samco.trackandgraph.util.*
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -67,6 +68,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
 
+
     @Inject
     lateinit var prefHelper: PrefHelper
 
@@ -76,32 +78,26 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var luaEngineSettingsProvider: LuaEngineSettingsProvider
 
-    @Inject
-    lateinit var timerServiceInteractor: TimerServiceInteractor
-
     private val viewModel by viewModels<MainActivityViewModel>()
 
-    val toolbar: Toolbar by lazy { findViewById(R.id.toolbar) }
-
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         checkDisableLuaEngine()
         readThemeValue()
-        setContentView(R.layout.activity_main)
-        initializeNav()
-        initializeAppBar()
-        onDrawerHideKeyboard()
-        initDrawerSpinners()
-        viewModel.syncAlarms()
-        recoverTimerServiceIfNecessary()
-        if (prefHelper.isFirstRun()) showTutorial()
-        else destroyTutorial()
+        viewModel.init(getString(R.string.app_name))
+//        initializeNav()
+//        initializeAppBar()
+//        onDrawerHideKeyboard()
+//        initDrawerSpinners()
         intent?.data?.let { handleDeepLink(it) }
-        addOnBackPressedCallback()
-    }
-
-    private fun recoverTimerServiceIfNecessary() {
-        timerServiceInteractor.startTimerNotificationService()
+//        addOnBackPressedCallback()
+        setContent {
+            MainScreen(
+                activity = this,
+                navBarConfig = viewModel.navBarConfigState,
+            )
+        }
     }
 
     private fun checkDisableLuaEngine() {
@@ -132,23 +128,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun handleDeepLink(uri: Uri) = deepLinkHandler.handleUri(uri.toString())
 
-    private fun initializeNav() {
-        drawerLayout = findViewById(R.id.drawer_layout)
-        navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_fragment)!! as NavHostFragment
-        navController = navHostFragment.navController
-        navView = findViewById(R.id.nav_view)
-        navView.setupWithNavController(navController)
-    }
+//    private fun initializeNav() {
+//        drawerLayout = findViewById(R.id.drawer_layout)
+//        navHostFragment = supportFragmentManager
+//            .findFragmentById(R.id.nav_fragment)!! as NavHostFragment
+//        navController = navHostFragment.navController
+//        navView = findViewById(R.id.nav_view)
+//        navView.setupWithNavController(navController)
+//    }
 
     private fun initializeAppBar() {
-        setSupportActionBar(toolbar)
+//        setSupportActionBar(toolbar)
         supportActionBar?.let {
             //The ActionBarDrawerToggle draws the navigation button/back button in the top left of
             //the action bar
-            actionBarDrawerToggle = ActionBarDrawerToggle(
-                this, drawerLayout, toolbar, R.string.open, R.string.close
-            )
+//            actionBarDrawerToggle = ActionBarDrawerToggle(
+//                this, drawerLayout, toolbar, R.string.open, R.string.close
+//            )
             //This click listener is called only when the button is "disabled" (i.e. the back button
             // is showing rather than the hamburger icon)
             actionBarDrawerToggle.setToolbarNavigationClickListener { onBackPressed() }
@@ -162,43 +158,29 @@ class MainActivity : AppCompatActivity() {
         setActionBarConfig(NavBarConfig(NavButtonStyle.MENU))
     }
 
-    override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onPostCreate(savedInstanceState, persistentState)
-        //See the documentation of syncState for the eplanation of why this is done here
-        actionBarDrawerToggle.syncState()
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        //Doing this here was reccomended on stack overflow. See the documentation of syncState
-        actionBarDrawerToggle.syncState()
-    }
-
-    private data class NavBarConfig(
-        val buttonStyle: NavButtonStyle,
-        val title: String? = null,
-        val clearSubtitle: Boolean = false
-    )
-
-    fun setActionBarSubtitle(subtitle: String? = null) {
-        supportActionBar?.subtitle = subtitle
-    }
-
     /**
      * Set the title in the action bar and whether to show the menu button or the back button
      * in the top left. Every fragment should call this.
      */
-    fun setActionBarConfig(buttonStyle: NavButtonStyle, title: String? = null, clearSubtitle: Boolean = false) {
-        setActionBarConfig(NavBarConfig(buttonStyle, title, clearSubtitle))
+    fun setActionBarConfig(
+        buttonStyle: NavButtonStyle,
+        title: String? = null,
+        subtitle: String? = null,
+    ) {
+        viewModel.updateNavBarConfig(
+            NavBarConfig(
+                buttonStyle = buttonStyle,
+                title = title ?: getString(R.string.app_name),
+                subtitle = subtitle
+            )
+        )
     }
 
     private fun setActionBarConfig(config: NavBarConfig) {
         val title = config.title ?: getString(R.string.app_name)
         supportActionBar?.title = title
 
-        if (!config.clearSubtitle) {
-            supportActionBar?.subtitle = null
-        }
+        supportActionBar?.subtitle = config.subtitle
 
         when (config.buttonStyle) {
             NavButtonStyle.MENU -> {
@@ -310,31 +292,52 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    private fun destroyTutorial() {
-        val tutorialLayout = findViewById<ViewGroup>(R.id.tutorialOverlay)
-        tutorialLayout.removeAllViews()
-        prefHelper.setFirstRun(false)
-    }
-
-    private fun showTutorial() {
-        findViewById<ComposeView>(R.id.tutorialOverlay).setContent {
-            TutorialScreen { destroyTutorial() }
-        }
-    }
-
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(drawerLayout) || super.onNavigateUp()
     }
 }
 
+data class NavBarConfig(
+    val buttonStyle: NavButtonStyle,
+    val title: String? = null,
+    val subtitle: String? = null,
+)
+
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     private val alarmInteractor: AlarmInteractor,
+    private val timerServiceInteractor: TimerServiceInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
-    fun syncAlarms() {
+
+    private var hasInitialized = false
+
+    private val navBarConfig = mutableStateOf(NavBarConfig(NavButtonStyle.MENU))
+    val navBarConfigState: State<NavBarConfig> get() = navBarConfig
+
+    fun init(appName: String) {
+        if (hasInitialized) return
+        hasInitialized = true
+
+        navBarConfig.value = NavBarConfig(
+            buttonStyle = NavButtonStyle.MENU,
+            title = appName
+        )
+        syncAlarms()
+        recoverTimerServiceIfNecessary()
+    }
+
+    private fun syncAlarms() {
         viewModelScope.launch(io) {
             alarmInteractor.syncAlarms()
         }
+    }
+
+    private fun recoverTimerServiceIfNecessary() {
+        timerServiceInteractor.startTimerNotificationService()
+    }
+
+    fun updateNavBarConfig(config: NavBarConfig) {
+        navBarConfig.value = config
     }
 }
