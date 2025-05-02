@@ -27,8 +27,8 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
+import com.samco.trackandgraph.main.MainActivity
+import com.samco.trackandgraph.main.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.*

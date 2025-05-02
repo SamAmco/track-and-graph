@@ -31,8 +31,8 @@ import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.*
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
+import com.samco.trackandgraph.main.MainActivity
+import com.samco.trackandgraph.main.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl

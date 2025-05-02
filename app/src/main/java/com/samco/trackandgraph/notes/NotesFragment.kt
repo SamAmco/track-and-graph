@@ -25,8 +25,8 @@ import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
+import com.samco.trackandgraph.main.MainActivity
+import com.samco.trackandgraph.main.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.settings.TngSettings

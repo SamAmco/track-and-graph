@@ -14,7 +14,7 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-package com.samco.trackandgraph
+package com.samco.trackandgraph.main
 
 import android.app.UiModeManager
 import android.content.Intent
@@ -35,6 +35,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.IntentActions
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.*
 import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher

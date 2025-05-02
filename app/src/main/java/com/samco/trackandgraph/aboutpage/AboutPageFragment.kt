@@ -23,8 +23,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.lifecycleScope
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
+import com.samco.trackandgraph.main.MainActivity
+import com.samco.trackandgraph.main.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme

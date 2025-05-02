@@ -21,7 +21,7 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
-import com.samco.trackandgraph.MainActivity
+import com.samco.trackandgraph.main.MainActivity
 import com.samco.trackandgraph.base.navigation.PendingIntentProvider
 import com.samco.trackandgraph.base.service.TrackWidgetProvider
 import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.DELETE_FEATURE_ID
