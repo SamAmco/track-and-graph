@@ -87,6 +87,7 @@
         <item>Light</item>
         <item>Dark</item>
     </string-array>
+
     <string name="graph_type_line_graph">Line Graph</string>
     <string name="graph_type_pie_chart">Pie Chart</string>
     <string name="graph_type_average_time_between">Average Time Between</string>
