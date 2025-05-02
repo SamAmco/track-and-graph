@@ -24,20 +24,22 @@ import android.view.ViewGroup
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import com.samco.trackandgraph.main.MainActivity
-import com.samco.trackandgraph.main.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.getValue
 
 @AndroidEntryPoint
 class BackupAndRestoreFragment : Fragment() {
 
     private val viewModel by viewModels<BackupAndRestoreViewModelImpl>()
+    private val appBarViewModel by activityViewModels<AppBarViewModel>()
 
     @Inject
     lateinit var tngSettings: TngSettings
@@ -60,9 +62,10 @@ class BackupAndRestoreFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(
-            NavButtonStyle.MENU,
-            getString(R.string.backup_and_restore)
+        appBarViewModel.setNavBarConfig(
+            AppBarViewModel.NavBarConfig(
+                title = getString(R.string.backup_and_restore),
+            )
         )
     }
 }

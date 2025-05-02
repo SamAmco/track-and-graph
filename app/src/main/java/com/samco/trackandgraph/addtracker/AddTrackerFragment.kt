@@ -22,23 +22,25 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import com.samco.trackandgraph.main.MainActivity
-import com.samco.trackandgraph.main.NavButtonStyle
-import com.samco.trackandgraph.R
+import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.*
+import com.samco.trackandgraph.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import kotlin.getValue
 
 @AndroidEntryPoint
 class AddTrackerFragment : Fragment() {
     private val args: AddTrackerFragmentArgs by navArgs()
     private val viewModel by viewModels<AddTrackerViewModelImpl>()
+    private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private var navController: NavController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,9 +73,10 @@ class AddTrackerFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(
-            NavButtonStyle.UP,
-            getString(R.string.add_tracker)
+        appBarViewModel.setNavBarConfig(
+            AppBarViewModel.NavBarConfig(
+                title = getString(R.string.add_tracker),
+            )
         )
     }
 
