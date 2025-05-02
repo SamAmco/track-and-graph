@@ -16,42 +16,32 @@
 */
 package com.samco.trackandgraph
 
+import android.app.UiModeManager
 import android.content.Intent
-import android.content.res.Configuration
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemSelectedListener
-import android.widget.ArrayAdapter
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.widget.AppCompatSpinner
-import androidx.appcompat.widget.Toolbar
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.core.view.GravityCompat
-import androidx.drawerlayout.widget.DrawerLayout
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupWithNavController
-import com.google.android.material.navigation.NavigationView
 import com.samco.trackandgraph.base.helpers.*
 import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.TimerServiceInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
-import com.samco.trackandgraph.util.*
+import com.samco.trackandgraph.tutorial.TutorialScreen
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -60,14 +50,37 @@ import javax.inject.Inject
 
 enum class NavButtonStyle { UP, MENU }
 
+enum class ThemeSelection(
+    val appCompatMode: Int,
+    val uiManagerMode: Int,
+) {
+    LIGHT(
+        appCompatMode = AppCompatDelegate.MODE_NIGHT_NO,
+        uiManagerMode = UiModeManager.MODE_NIGHT_NO
+    ),
+    DARK(
+        appCompatMode = AppCompatDelegate.MODE_NIGHT_YES,
+        uiManagerMode = UiModeManager.MODE_NIGHT_YES
+    ),
+    SYSTEM(
+        appCompatMode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+        else AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY,
+        uiManagerMode = UiModeManager.MODE_NIGHT_AUTO
+    );
+}
+
+data class NavBarConfig(
+    val buttonStyle: NavButtonStyle,
+    val title: String? = null,
+    val subtitle: String? = null,
+)
+
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
-    private lateinit var drawerLayout: DrawerLayout
-    private lateinit var navController: NavController
-    private lateinit var navView: NavigationView
-    private lateinit var navHostFragment: NavHostFragment
-    private lateinit var actionBarDrawerToggle: ActionBarDrawerToggle
+    private val themeMap = ThemeSelection.entries.associateBy { it.appCompatMode }
 
+    private val uiModeManager by lazy { getSystemService(UI_MODE_SERVICE) as UiModeManager }
 
     @Inject
     lateinit var prefHelper: PrefHelper
@@ -80,24 +93,51 @@ class MainActivity : AppCompatActivity() {
 
     private val viewModel by viewModels<MainActivityViewModel>()
 
+    private val currentTheme: MutableState<ThemeSelection> by lazy { mutableStateOf(getThemeValue()) }
+    private val currentDateFormat: MutableState<Int> by lazy { mutableStateOf(prefHelper.getDateFormatValue()) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         checkDisableLuaEngine()
-        readThemeValue()
         viewModel.init(getString(R.string.app_name))
-//        initializeNav()
-//        initializeAppBar()
-//        onDrawerHideKeyboard()
-//        initDrawerSpinners()
         intent?.data?.let { handleDeepLink(it) }
-//        addOnBackPressedCallback()
+        onThemeSelected(currentTheme.value)
         setContent {
-            MainScreen(
-                activity = this,
-                navBarConfig = viewModel.navBarConfigState,
-            )
+            var showTutorial by remember { mutableStateOf(prefHelper.isFirstRun()) }
+            AnimatedContent(showTutorial) { show ->
+                if (show) {
+                    TutorialScreen {
+                        showTutorial = false
+                        prefHelper.setFirstRun(false)
+                    }
+                } else {
+                    MainScreen(
+                        activity = this@MainActivity,
+                        navBarConfig = viewModel.navBarConfigState,
+                        currentTheme = currentTheme,
+                        onThemeSelected = ::onThemeSelected,
+                        currentDateFormat = currentDateFormat,
+                        onDateFormatSelected = ::onDateFormatSelected,
+                    )
+                }
+            }
         }
+    }
+
+    private fun getThemeFromPrefs() = themeMap[prefHelper.getThemeValue(ThemeSelection.SYSTEM.appCompatMode)]
+    private fun getThemeValue() = getThemeFromPrefs() ?: ThemeSelection.SYSTEM
+    private fun onThemeSelected(theme: ThemeSelection) {
+        currentTheme.value = theme
+        // https://developer.android.com/develop/ui/views/theming/darktheme#change-themes
+        if (Build.VERSION.SDK_INT >= 31) uiModeManager.setApplicationNightMode(theme.uiManagerMode)
+        else AppCompatDelegate.setDefaultNightMode(theme.appCompatMode)
+        prefHelper.setThemeValue(theme.appCompatMode)
+    }
+
+    private fun onDateFormatSelected(dateFormatIndex: Int) {
+        currentDateFormat.value = dateFormatIndex
+        prefHelper.setDateTimeFormatIndex(dateFormatIndex)
     }
 
     private fun checkDisableLuaEngine() {
@@ -110,53 +150,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun addOnBackPressedCallback() = onBackPressedDispatcher.addCallback(this,
-        object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                } else if (!navController.popBackStack()) {
-                    finish()
-                }
-            }
-        })
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         intent.data?.let { handleDeepLink(it) }
     }
 
     private fun handleDeepLink(uri: Uri) = deepLinkHandler.handleUri(uri.toString())
-
-//    private fun initializeNav() {
-//        drawerLayout = findViewById(R.id.drawer_layout)
-//        navHostFragment = supportFragmentManager
-//            .findFragmentById(R.id.nav_fragment)!! as NavHostFragment
-//        navController = navHostFragment.navController
-//        navView = findViewById(R.id.nav_view)
-//        navView.setupWithNavController(navController)
-//    }
-
-    private fun initializeAppBar() {
-//        setSupportActionBar(toolbar)
-        supportActionBar?.let {
-            //The ActionBarDrawerToggle draws the navigation button/back button in the top left of
-            //the action bar
-//            actionBarDrawerToggle = ActionBarDrawerToggle(
-//                this, drawerLayout, toolbar, R.string.open, R.string.close
-//            )
-            //This click listener is called only when the button is "disabled" (i.e. the back button
-            // is showing rather than the hamburger icon)
-            actionBarDrawerToggle.setToolbarNavigationClickListener { onBackPressed() }
-            //This notifies the button of when the drawer is open or closed
-            drawerLayout.addDrawerListener(actionBarDrawerToggle)
-            //This function should be called to synchronise the button with the drawers current state
-            actionBarDrawerToggle.syncState()
-        }
-        //supportActionBar?.setHomeButtonEnabled(true)
-        //supportActionBar?.setDisplayShowHomeEnabled(true)
-        setActionBarConfig(NavBarConfig(NavButtonStyle.MENU))
-    }
 
     /**
      * Set the title in the action bar and whether to show the menu button or the back button
@@ -175,133 +174,7 @@ class MainActivity : AppCompatActivity() {
             )
         )
     }
-
-    private fun setActionBarConfig(config: NavBarConfig) {
-        val title = config.title ?: getString(R.string.app_name)
-        supportActionBar?.title = title
-
-        supportActionBar?.subtitle = config.subtitle
-
-        when (config.buttonStyle) {
-            NavButtonStyle.MENU -> {
-                actionBarDrawerToggle.isDrawerIndicatorEnabled = true
-                supportActionBar?.setDisplayHomeAsUpEnabled(false)
-            }
-
-            NavButtonStyle.UP -> {
-                actionBarDrawerToggle.isDrawerIndicatorEnabled = false
-                supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            }
-        }
-        actionBarDrawerToggle.syncState()
-    }
-
-    private fun initDrawerSpinners() {
-        setUpThemeSpinner()
-        setUpDateFormatSpinner()
-    }
-
-    private fun setUpDateFormatSpinner() {
-        val spinner = navView.menu.findItem(R.id.dateFormatSpinner).actionView as AppCompatSpinner
-        val formatNames = resources.getStringArray(R.array.date_formats)
-        spinner.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            formatNames
-        )
-        spinner.setSelection(prefHelper.getDateFormatValue())
-        spinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
-                prefHelper.setDateTimeFormatIndex(position)
-            }
-
-            override fun onNothingSelected(p0: AdapterView<*>?) {
-            }
-        }
-    }
-
-    private fun setUpThemeSpinner() {
-        val spinner = navView.menu.findItem(R.id.themeSpinner).actionView as AppCompatSpinner
-        spinner.adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_spinner_dropdown_item,
-            getThemeNames()
-        )
-        val currentTheme = getThemeValue()
-        updateStatusBarColor()
-        when (currentTheme) {
-            AppCompatDelegate.MODE_NIGHT_NO -> spinner.setSelection(1)
-            AppCompatDelegate.MODE_NIGHT_YES -> spinner.setSelection(2)
-            else -> spinner.setSelection(0)
-        }
-        spinner.onItemSelectedListener = object : OnItemSelectedListener {
-            override fun onItemSelected(av: AdapterView<*>?, v: View?, position: Int, id: Long) {
-                onThemeSelected(position)
-                updateStatusBarColor()
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
-        }
-    }
-
-    private fun updateStatusBarColor() {
-        window.statusBarColor = getColorFromAttr(R.attr.colorSecondaryVariant)
-    }
-
-    private fun onThemeSelected(position: Int) {
-        when (position) {
-            0 -> setThemeValue(getDefaultThemeValue())
-            1 -> setThemeValue(AppCompatDelegate.MODE_NIGHT_NO)
-            2 -> setThemeValue(AppCompatDelegate.MODE_NIGHT_YES)
-        }
-    }
-
-    private fun getDefaultThemeValue() =
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
-            AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-        else AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY
-
-    private fun getThemeValue() = prefHelper.getThemeValue(getDefaultThemeValue())
-
-    private fun setThemeValue(themeValue: Int) {
-        AppCompatDelegate.setDefaultNightMode(themeValue)
-        prefHelper.setThemeValue(themeValue)
-    }
-
-    private fun readThemeValue() {
-        val themeValue = getThemeValue()
-        AppCompatDelegate.setDefaultNightMode(themeValue)
-    }
-
-    private fun getThemeNames() =
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q)
-            resources.getStringArray(R.array.theme_names_Q)
-        else resources.getStringArray(R.array.theme_names_pre_Q)
-
-    private fun onDrawerHideKeyboard() {
-        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
-            override fun onDrawerStateChanged(newState: Int) {}
-            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
-                window.hideKeyboard()
-            }
-
-            override fun onDrawerClosed(drawerView: View) {}
-            override fun onDrawerOpened(drawerView: View) {
-                window.hideKeyboard()
-            }
-        })
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(drawerLayout) || super.onNavigateUp()
-    }
 }
-
-data class NavBarConfig(
-    val buttonStyle: NavButtonStyle,
-    val title: String? = null,
-    val subtitle: String? = null,
-)
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
