@@ -5,6 +5,7 @@ import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,6 +21,8 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -52,10 +55,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.main.AppBarViewModel.NavBarConfig
+import com.samco.trackandgraph.main.AppBarViewModel.NavButtonStyle
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.Divider
@@ -73,7 +79,6 @@ import kotlin.Int
 @Composable
 fun MainScreen(
     activity: FragmentActivity,
-    navBarConfig: State<NavBarConfig>,
     currentTheme: State<ThemeSelection>,
     onThemeSelected: (ThemeSelection) -> Unit,
     currentDateFormat: State<Int>,
@@ -86,16 +91,35 @@ fun MainScreen(
     var navController by remember { mutableStateOf<NavController?>(null) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
+    val appBarViewModel = viewModel<AppBarViewModel>(
+        viewModelStoreOwner = activity
+    )
+
+    var isAtNavRoot = remember { mutableStateOf(true) }
+
+    // TODO the menu back button behaviour isn't working right now
+    // TODO this isn't working. We need to set isAtNavRoot based on the navController
+    // TODO need to ellipsize end the title i think? currently it wraps and then clips the subtitle
+    // TODO might also want to make app bar size adapt to content though. Test with larger font size
+    LaunchedEffect(navController) {
+        navController?.currentBackStackEntryFlow?.collect {
+            print("samsam: $it")
+        }
+    }
+
     MainView(
-        navBarConfig = navBarConfig,
+        navBarConfig = appBarViewModel.navBarConfigState,
         drawerState = drawerState,
+        isAtNavRoot = isAtNavRoot,
         onUpClicked = {},
+        onAppBarAction = appBarViewModel::onAction,
         navController = navController,
         currentTheme = currentTheme,
         onThemeSelected = onThemeSelected,
         currentDateFormat = currentDateFormat,
-        onDateFormatSelected = onDateFormatSelected
-    ) { contentPadding ->
+        onDateFormatSelected = onDateFormatSelected,
+
+        ) { contentPadding ->
         AndroidView(
             modifier = Modifier
                 .fillMaxSize()
@@ -123,7 +147,9 @@ fun MainScreen(
 private fun MainView(
     navBarConfig: State<NavBarConfig>,
     drawerState: DrawerState,
+    isAtNavRoot: State<Boolean>,
     onUpClicked: () -> Unit,
+    onAppBarAction: (AppBarViewModel.Action) -> Unit,
     navController: NavController?,
     currentTheme: State<ThemeSelection>,
     onThemeSelected: (ThemeSelection) -> Unit,
@@ -169,8 +195,10 @@ private fun MainView(
                 AppBar(
                     scope = scope,
                     navBarConfig = navBarConfig,
+                    isAtNavRoot = isAtNavRoot,
                     onUpClicked = onUpClicked,
-                    drawerState = drawerState
+                    drawerState = drawerState,
+                    onAction = onAppBarAction
                 )
             },
             content = content,
@@ -361,21 +389,31 @@ fun MenuItem(
 fun AppBar(
     scope: CoroutineScope,
     navBarConfig: State<NavBarConfig>,
+    isAtNavRoot: State<Boolean>,
     onUpClicked: () -> Unit,
     drawerState: DrawerState,
+    onAction: (AppBarViewModel.Action) -> Unit,
 ) {
+
     TopAppBar(
         windowInsets = WindowInsets.statusBarsIgnoringVisibility,
         navigationIcon = {
             NavigationIcon(
-                navButtonStyle = navBarConfig.value.buttonStyle,
+                navButtonStyle = if (isAtNavRoot.value) NavButtonStyle.MENU else NavButtonStyle.UP,
                 onClick = {
-                    if (navBarConfig.value.buttonStyle == NavButtonStyle.UP) {
-                        onUpClicked()
-                    } else {
-                        scope.launch { drawerState.open() }
-                    }
+                    if (!isAtNavRoot.value) onUpClicked()
+                    else scope.launch { drawerState.open() }
                 }
+            )
+        },
+        actions = {
+            AppBarActions(
+                actions = navBarConfig.value.actions,
+                onAction = onAction,
+            )
+            AppBarOverflowActions(
+                collapsedActions = navBarConfig.value.collapsedActions,
+                onAction = onAction,
             )
         },
         title = {
@@ -393,6 +431,61 @@ fun AppBar(
         },
         backgroundColor = MaterialTheme.tngColors.toolbarBackgroundColor,
     )
+}
+
+@Composable
+private fun AppBarActions(
+    actions: List<AppBarViewModel.Action>,
+    onAction: (AppBarViewModel.Action) -> Unit,
+) = Row {
+    for (action in actions) {
+        IconButton(onClick = { onAction(action) }) {
+            Icon(
+                painter = painterResource(action.iconId),
+                contentDescription = stringResource(action.titleId),
+                tint = MaterialTheme.tngColors.onSurface,
+            )
+        }
+    }
+}
+
+@Composable
+private fun AppBarOverflowActions(
+    collapsedActions: AppBarViewModel.CollapsedActions?,
+    onAction: (AppBarViewModel.Action) -> Unit,
+) {
+    if (collapsedActions == null) return
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                painter = painterResource(id = collapsedActions.overflowIconId),
+                contentDescription = null,
+                tint = MaterialTheme.tngColors.onSurface,
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            for (action in collapsedActions.actions) {
+                DropdownMenuItem(
+                    onClick = {
+                        onAction(action)
+                        expanded = false
+                    }
+                ) {
+                    Text(
+                        text = stringResource(action.titleId),
+                        style = MaterialTheme.typography.subtitle1
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -423,7 +516,6 @@ fun MainViewPreview() {
             navBarConfig = remember {
                 mutableStateOf(
                     NavBarConfig(
-                        buttonStyle = NavButtonStyle.MENU,
                         title = "Track & Graph",
                         subtitle = null,
                     )
@@ -432,12 +524,14 @@ fun MainViewPreview() {
             drawerState = rememberDrawerState(
                 initialValue = DrawerValue.Open
             ),
+            onAppBarAction = {},
             navController = null,
+            isAtNavRoot = remember { mutableStateOf(true) },
             onUpClicked = {},
             currentTheme = remember { mutableStateOf(ThemeSelection.SYSTEM) },
-            onThemeSelected = { _ -> },
+            onThemeSelected = {},
             currentDateFormat = remember { mutableStateOf(0) },
-            onDateFormatSelected = { _ -> },
+            onDateFormatSelected = {},
         ) { _ -> }
     }
 }

@@ -21,18 +21,15 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.*
-import com.samco.trackandgraph.main.MainActivity
-import com.samco.trackandgraph.main.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
@@ -43,6 +40,7 @@ import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.addtracker.*
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.settings.TngSettings
@@ -50,13 +48,16 @@ import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
+import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.getValue
 
 /**
  * The group fragment is used on the home page and in any nested group to display the contents of
@@ -75,6 +76,7 @@ class GroupFragment : Fragment(),
 
     private lateinit var adapter: GroupAdapter
     private val viewModel by viewModels<GroupViewModel>()
+    private val appBarViewModel by activityViewModels<AppBarViewModel>()
 
     private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
     private val addGroupDialogViewModel by viewModels<AddGroupDialogViewModelImpl>()
@@ -140,30 +142,43 @@ class GroupFragment : Fragment(),
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().addMenuProvider(
-            GroupMenuProvider(),
-            viewLifecycleOwner,
-            Lifecycle.State.RESUMED
-        )
+    override fun onResume() {
+        super.onResume()
+        resumeScoped { setupMenu() }
     }
 
-    private inner class GroupMenuProvider : MenuProvider {
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.group_menu, menu)
-        }
+    private fun isRootGroup(): Boolean {
+        return args.groupId == 0L
+    }
 
-        override fun onMenuItemSelected(item: MenuItem): Boolean {
-            when (item.itemId) {
-                R.id.add_tracker -> onAddTrackerClicked()
-                R.id.add_graph_stat -> onAddGraphStatClicked()
-                R.id.add_group -> onAddGroupClicked()
-                R.id.export_button -> onExportClicked()
-                R.id.import_button -> onImportClicked()
-                else -> return false
+    private suspend fun setupMenu() {
+        appBarViewModel.setNavBarConfig(
+            AppBarViewModel.NavBarConfig(
+                title = if (isRootGroup()) getString(R.string.app_name) else args.groupName,
+                actions = listOf(
+                    AppBarViewModel.Action.ImportCSV,
+                    AppBarViewModel.Action.ExportCSV,
+                ),
+                collapsedActions = AppBarViewModel.CollapsedActions(
+                    overflowIconId = R.drawable.add_icon,
+                    actions = listOf(
+                        AppBarViewModel.Action.AddTracker,
+                        AppBarViewModel.Action.AddGraphStat,
+                        AppBarViewModel.Action.AddGroup,
+                    ),
+                )
+            )
+        )
+
+        for (action in appBarViewModel.actionsTaken) {
+            when (action) {
+                AppBarViewModel.Action.ImportCSV -> onImportClicked()
+                AppBarViewModel.Action.ExportCSV -> onExportClicked()
+                AppBarViewModel.Action.AddTracker -> onAddTrackerClicked()
+                AppBarViewModel.Action.AddGraphStat -> onAddGraphStatClicked()
+                AppBarViewModel.Action.AddGroup -> onAddGroupClicked()
+                else -> {}
             }
-            return true
         }
     }
 
@@ -187,9 +202,9 @@ class GroupFragment : Fragment(),
     private fun addItemTouchHelper() {
         ItemTouchHelper(
             DragTouchHelperCallback(
-            { start: Int, end: Int -> adapter.moveItem(start, end) },
-            { viewModel.adjustDisplayIndexes(adapter.getItems()) }
-        )).attachToRecyclerView(binding.itemList)
+                { start: Int, end: Int -> adapter.moveItem(start, end) },
+                { viewModel.adjustDisplayIndexes(adapter.getItems()) }
+            )).attachToRecyclerView(binding.itemList)
     }
 
     private fun scrollToTopOnItemAdded() {
@@ -204,13 +219,6 @@ class GroupFragment : Fragment(),
                 }
             }
         )
-    }
-
-    override fun onResume() {
-        super.onResume()
-        val activity = (requireActivity() as MainActivity)
-        args.groupName?.let { activity.setActionBarConfig(NavButtonStyle.UP, it) }
-            ?: run { activity.setActionBarConfig(NavButtonStyle.MENU) }
     }
 
     private fun createGroupClickListener() = GroupClickListener(
@@ -407,9 +415,9 @@ class GroupFragment : Fragment(),
         }
 
         lifecycleScope.launch {
-            viewModel.hasAnyReminders.filter{ it }.collect {
+            viewModel.hasAnyReminders.filter { it }.collect {
                 withContext(ui) {
-                    requestNotificationPermission( requireContext() )
+                    requestNotificationPermission(requireContext())
                 }
             }
         }
@@ -433,20 +441,6 @@ class GroupFragment : Fragment(),
             binding.itemList.removeOnScrollListener(queueAddAllButtonShowHideListener)
             binding.queueAddAllButton.hide()
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-//        (requireActivity() as MainActivity).toolbar.overflowIcon =
-//            ContextCompat.getDrawable(requireContext(), R.drawable.add_icon)
-    }
-
-    override fun onStop() {
-        super.onStop()
-//        if (navController?.currentDestination?.id != R.id.groupFragment) {
-//            (requireActivity() as MainActivity).toolbar.overflowIcon =
-//                ContextCompat.getDrawable(requireContext(), R.drawable.list_menu_icon)
-//        }
     }
 
     private fun onExportClicked() {

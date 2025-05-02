@@ -28,7 +28,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.*
 import com.samco.trackandgraph.base.model.AlarmInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -49,8 +47,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-enum class NavButtonStyle { UP, MENU }
 
 enum class ThemeSelection(
     val appCompatMode: Int,
@@ -71,12 +67,6 @@ enum class ThemeSelection(
         uiManagerMode = UiModeManager.MODE_NIGHT_AUTO
     );
 }
-
-data class NavBarConfig(
-    val buttonStyle: NavButtonStyle,
-    val title: String? = null,
-    val subtitle: String? = null,
-)
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -102,7 +92,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         checkDisableLuaEngine()
-        viewModel.init(getString(R.string.app_name))
+        viewModel.init()
         intent?.data?.let { handleDeepLink(it) }
         onThemeSelected(currentTheme.value)
         setContent {
@@ -116,7 +106,6 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     MainScreen(
                         activity = this@MainActivity,
-                        navBarConfig = viewModel.navBarConfigState,
                         currentTheme = currentTheme,
                         onThemeSelected = ::onThemeSelected,
                         currentDateFormat = currentDateFormat,
@@ -158,24 +147,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleDeepLink(uri: Uri) = deepLinkHandler.handleUri(uri.toString())
-
-    /**
-     * Set the title in the action bar and whether to show the menu button or the back button
-     * in the top left. Every fragment should call this.
-     */
-    fun setActionBarConfig(
-        buttonStyle: NavButtonStyle,
-        title: String? = null,
-        subtitle: String? = null,
-    ) {
-        viewModel.updateNavBarConfig(
-            NavBarConfig(
-                buttonStyle = buttonStyle,
-                title = title ?: getString(R.string.app_name),
-                subtitle = subtitle
-            )
-        )
-    }
 }
 
 @HiltViewModel
@@ -187,17 +158,10 @@ class MainActivityViewModel @Inject constructor(
 
     private var hasInitialized = false
 
-    private val navBarConfig = mutableStateOf(NavBarConfig(NavButtonStyle.MENU))
-    val navBarConfigState: State<NavBarConfig> get() = navBarConfig
-
-    fun init(appName: String) {
+    fun init() {
         if (hasInitialized) return
         hasInitialized = true
 
-        navBarConfig.value = NavBarConfig(
-            buttonStyle = NavButtonStyle.MENU,
-            title = appName
-        )
         syncAlarms()
         recoverTimerServiceIfNecessary()
     }
@@ -210,9 +174,5 @@ class MainActivityViewModel @Inject constructor(
 
     private fun recoverTimerServiceIfNecessary() {
         timerServiceInteractor.startTimerNotificationService()
-    }
-
-    fun updateNavBarConfig(config: NavBarConfig) {
-        navBarConfig.value = config
     }
 }
