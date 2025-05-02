@@ -48,7 +48,7 @@
             tools:node="merge" />
 
         <activity
-            android:name="com.samco.trackandgraph.MainActivity"
+            android:name="com.samco.trackandgraph.main.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:theme="@style/AppTheme"

@@ -25,8 +25,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
+import com.samco.trackandgraph.main.MainActivity
+import com.samco.trackandgraph.main.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
