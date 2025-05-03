@@ -1,3 +1,19 @@
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.main
 
 import android.os.Build
@@ -51,6 +67,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -58,6 +75,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.fragment.findNavController
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.main.AppBarViewModel.NavBarConfig
@@ -85,33 +103,25 @@ fun MainScreen(
     onDateFormatSelected: (Int) -> Unit,
 ) = TnGComposeTheme {
 
-    //TODO back behaviour for back button
-    //TODO back behaviour for menu back button
-
-    var navController by remember { mutableStateOf<NavController?>(null) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
     val appBarViewModel = viewModel<AppBarViewModel>(
         viewModelStoreOwner = activity
     )
 
-    var isAtNavRoot = remember { mutableStateOf(true) }
-
-    // TODO the menu back button behaviour isn't working right now
-    // TODO this isn't working. We need to set isAtNavRoot based on the navController
-    // TODO need to ellipsize end the title i think? currently it wraps and then clips the subtitle
-    // TODO might also want to make app bar size adapt to content though. Test with larger font size
-    LaunchedEffect(navController) {
-        navController?.currentBackStackEntryFlow?.collect {
-            print("samsam: $it")
-        }
+    var navController by remember { mutableStateOf<NavController?>(null) }
+    val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
+    var isAtNavRoot = remember { mutableStateOf(false) }
+    LaunchedEffect(navController, currentBackStackEntry) {
+        isAtNavRoot.value = navController?.previousBackStackEntry == null
     }
+    BackHandler(!isAtNavRoot.value) { navController?.popBackStack() }
 
     MainView(
         navBarConfig = appBarViewModel.navBarConfigState,
         drawerState = drawerState,
         isAtNavRoot = isAtNavRoot,
-        onUpClicked = {},
+        onUpClicked = { navController?.popBackStack() },
         onAppBarAction = appBarViewModel::onAction,
         navController = navController,
         currentTheme = currentTheme,
@@ -393,45 +403,51 @@ fun AppBar(
     onUpClicked: () -> Unit,
     drawerState: DrawerState,
     onAction: (AppBarViewModel.Action) -> Unit,
-) {
-
-    TopAppBar(
-        windowInsets = WindowInsets.statusBarsIgnoringVisibility,
-        navigationIcon = {
-            NavigationIcon(
-                navButtonStyle = if (isAtNavRoot.value) NavButtonStyle.MENU else NavButtonStyle.UP,
-                onClick = {
-                    if (!isAtNavRoot.value) onUpClicked()
-                    else scope.launch { drawerState.open() }
-                }
-            )
-        },
-        actions = {
-            AppBarActions(
-                actions = navBarConfig.value.actions,
-                onAction = onAction,
-            )
-            AppBarOverflowActions(
-                collapsedActions = navBarConfig.value.collapsedActions,
-                onAction = onAction,
-            )
-        },
-        title = {
-            Column(verticalArrangement = Arrangement.Center) {
-                navBarConfig.value.title?.let {
-                    Text(text = it)
-                }
-                navBarConfig.value.subtitle?.let {
-                    Text(
-                        text = it,
-                        style = MaterialTheme.typography.body2,
-                    )
-                }
+) = TopAppBar(
+    windowInsets = WindowInsets.statusBarsIgnoringVisibility,
+    navigationIcon = {
+        NavigationIcon(
+            navButtonStyle = if (isAtNavRoot.value) NavButtonStyle.MENU else NavButtonStyle.UP,
+            onClick = {
+                if (!isAtNavRoot.value) onUpClicked()
+                else scope.launch { drawerState.open() }
             }
-        },
-        backgroundColor = MaterialTheme.tngColors.toolbarBackgroundColor,
-    )
-}
+        )
+    },
+    actions = {
+        AppBarActions(
+            actions = navBarConfig.value.actions,
+            onAction = onAction,
+        )
+        AppBarOverflowActions(
+            collapsedActions = navBarConfig.value.collapsedActions,
+            onAction = onAction,
+        )
+    },
+    title = {
+        Column(verticalArrangement = Arrangement.Center) {
+            navBarConfig.value.title?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.h6,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            // TODO this can be clipped with very large font sizes. We should be able to fix
+            // it in material3: https://issuetracker.google.com/issues/308540676
+            navBarConfig.value.subtitle?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.body2,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+        }
+    },
+    backgroundColor = MaterialTheme.tngColors.toolbarBackgroundColor,
+)
 
 @Composable
 private fun AppBarActions(
