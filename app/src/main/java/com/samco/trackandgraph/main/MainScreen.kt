@@ -128,8 +128,7 @@ fun MainScreen(
         onThemeSelected = onThemeSelected,
         currentDateFormat = currentDateFormat,
         onDateFormatSelected = onDateFormatSelected,
-
-        ) { contentPadding ->
+    ) { contentPadding ->
         AndroidView(
             modifier = Modifier
                 .fillMaxSize()
