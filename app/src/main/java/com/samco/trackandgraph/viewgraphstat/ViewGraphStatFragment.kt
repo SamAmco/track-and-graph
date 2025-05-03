@@ -28,7 +28,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
 import android.widget.LinearLayout
-import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
@@ -39,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -49,6 +49,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.FragmentViewGraphStatBinding
 import com.samco.trackandgraph.graphstatview.ui.GraphStatView
+import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.showDataPointDescriptionDialog
 import com.samco.trackandgraph.ui.showNoteDialog
@@ -59,6 +60,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class ViewGraphStatFragment : Fragment() {
     private var navController: NavController? = null
     private val viewModel: ViewGraphStatViewModel by viewModels<ViewGraphStatViewModelImpl>()
+    private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private var binding: FragmentViewGraphStatBinding by bindingForViewLifecycle()
     private lateinit var adapter: NotesAdapter
     private val args: ViewGraphStatFragmentArgs by navArgs()
@@ -235,12 +237,9 @@ class ViewGraphStatFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (activity as AppCompatActivity).supportActionBar!!.hide()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        (activity as AppCompatActivity).supportActionBar!!.show()
+        appBarViewModel.setNavBarConfig(
+            AppBarViewModel.NavBarConfig(visible = false)
+        )
     }
 }
 
