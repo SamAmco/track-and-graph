@@ -32,7 +32,8 @@ class AppBarViewModel @Inject constructor() : ViewModel() {
         val title: String? = null,
         val subtitle: String? = null,
         val actions: List<Action> = emptyList(),
-        val collapsedActions: CollapsedActions? = null
+        val collapsedActions: CollapsedActions? = null,
+        val visible: Boolean = true,
     )
 
     enum class NavButtonStyle { UP, MENU }

@@ -202,14 +202,16 @@ private fun MainView(
         Scaffold(
             contentWindowInsets = WindowInsets.systemBarsIgnoringVisibility,
             topBar = {
-                AppBar(
-                    scope = scope,
-                    navBarConfig = navBarConfig,
-                    isAtNavRoot = isAtNavRoot,
-                    onUpClicked = onUpClicked,
-                    drawerState = drawerState,
-                    onAction = onAppBarAction
-                )
+                if (navBarConfig.value.visible) {
+                    AppBar(
+                        scope = scope,
+                        navBarConfig = navBarConfig,
+                        isAtNavRoot = isAtNavRoot,
+                        onUpClicked = onUpClicked,
+                        drawerState = drawerState,
+                        onAction = onAppBarAction
+                    )
+                }
             },
             content = content,
         )
