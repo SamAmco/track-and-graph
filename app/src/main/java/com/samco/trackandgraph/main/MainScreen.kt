@@ -188,8 +188,13 @@ private fun MainView(
                 onThemeSelected = onThemeSelected,
                 onNavigateFromMenu = {
                     scope.launch { drawerState.close() }
+                    val root = navController?.visibleEntries?.value
+                        ?.firstOrNull()?.destination?.id
+                    // TODO this doesn't work we need to pop to the root but
+                    // visible entries [0] isn't the root, sometimes it has 2 entries
+                    // idk why. maybe just currentBackStackEntry?.destination?.id
                     val navOptions = NavOptions.Builder()
-                        .setPopUpTo(R.id.groupFragment, false)
+                        .setPopUpTo(root ?: R.id.groupFragment, true)
                         .build()
                     navController?.navigate(it, null, navOptions)
                 },
