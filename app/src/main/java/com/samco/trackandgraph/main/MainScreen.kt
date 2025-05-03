@@ -34,7 +34,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsIgnoringVisibility
 import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CutCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DrawerState
 import androidx.compose.material.DrawerValue
 import androidx.compose.material.DropdownMenu
@@ -54,6 +56,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -111,7 +114,7 @@ fun MainScreen(
 
     var navController by remember { mutableStateOf<NavController?>(null) }
     val currentBackStackEntry = navController?.currentBackStackEntryAsState()?.value
-    var isAtNavRoot = remember { mutableStateOf(false) }
+    val isAtNavRoot = remember { mutableStateOf(false) }
     LaunchedEffect(navController, currentBackStackEntry) {
         isAtNavRoot.value = navController?.previousBackStackEntry == null
     }
@@ -231,6 +234,7 @@ fun MenuDrawerContent(
     onDateFormatSelected: (Int) -> Unit
 ) = Column(
     modifier = Modifier
+        .verticalScroll(rememberScrollState())
         .windowInsetsPadding(WindowInsets.systemBarsIgnoringVisibility)
 ) {
     Text(
@@ -356,7 +360,7 @@ fun DateFormatSpinner(
     horizontalArrangement = Arrangement.SpaceBetween,
 ) {
     Text(
-        stringResource(R.string.theme_colon),
+        stringResource(R.string.date_format_colon),
         style = MaterialTheme.typography.h6,
     )
 
@@ -551,7 +555,7 @@ fun MainViewPreview() {
             onUpClicked = {},
             currentTheme = remember { mutableStateOf(ThemeSelection.SYSTEM) },
             onThemeSelected = {},
-            currentDateFormat = remember { mutableStateOf(0) },
+            currentDateFormat = remember { mutableIntStateOf(0) },
             onDateFormatSelected = {},
         ) { _ -> }
     }
