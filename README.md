@@ -2,7 +2,7 @@
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
-An android app for tracking personal data and creating custom graphs
+An android app for tracking personal data and creating custom graphs. Check out the [new docs site here](https://samamco.github.io/track-and-graph/).
 
 <p align="center">
 	<a href='https://play.google.com/store/apps/details?id=com.samco.trackandgraph'>
