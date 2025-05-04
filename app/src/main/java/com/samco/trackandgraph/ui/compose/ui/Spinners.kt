@@ -89,10 +89,11 @@ fun <T> Spinner(
             verticalAlignment = Alignment.CenterVertically
         ) {
             selectedItemFactory(Modifier, selectedItem, expanded)
-            if (enableTrailingIcon)
+            if (enableTrailingIcon) {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded) {
                     if (enabled) expanded = !expanded
                 }
+            }
         }
 
         val dropdownPositionAlignment = remember(dropdownContentAlignment) {

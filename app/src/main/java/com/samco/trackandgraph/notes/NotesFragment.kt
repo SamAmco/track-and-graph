@@ -21,24 +21,25 @@ import android.os.Bundle
 import android.view.*
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
+import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.getValue
 
 @AndroidEntryPoint
 class NotesFragment : Fragment() {
     private val notesViewModel by viewModels<NotesViewModel>()
     private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
+    private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private val globalNoteDialogViewModel: GlobalNoteInputViewModel by viewModels<GlobalNoteInputViewModelImpl>()
 
     @Inject
@@ -64,34 +65,24 @@ class NotesFragment : Fragment() {
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        requireActivity().addMenuProvider(
-            NotesMenuProvider(),
-            viewLifecycleOwner,
-            Lifecycle.State.RESUMED
-        )
-    }
-
-    private inner class NotesMenuProvider : MenuProvider {
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.notes_menu, menu)
-        }
-
-        override fun onMenuItemSelected(item: MenuItem): Boolean {
-            if (item.itemId == R.id.add_global_note) {
-                globalNoteDialogViewModel.openDialog(null)
-                return true
-            }
-            return false
-        }
-    }
-
     override fun onResume() {
         super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(
-            NavButtonStyle.MENU,
-            getString(R.string.notes)
+        resumeScoped { setupMenu() }
+    }
+
+    private suspend fun setupMenu() {
+        appBarViewModel.setNavBarConfig(
+            AppBarViewModel.NavBarConfig(
+                title = getString(R.string.notes),
+                actions = listOf(AppBarViewModel.Action.AddGlobalNote),
+            )
         )
+
+        for (action in appBarViewModel.actionsTaken) {
+            when (action) {
+                AppBarViewModel.Action.AddGlobalNote -> globalNoteDialogViewModel.openDialog(null)
+                else -> {}
+            }
+        }
     }
 }

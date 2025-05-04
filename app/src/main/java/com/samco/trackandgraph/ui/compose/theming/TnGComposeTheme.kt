@@ -38,11 +38,14 @@ import com.samco.trackandgraph.ui.compose.ui.shapes
 private val lightGray = Color(0xFFE0E0E0)
 private val darkGray = Color(0xFF4C4C4C)
 private val midCharcoal = Color(0xFF222222)
+private val lightCharcoal = Color(0xFF373737)
+private val blueWhitePastel = Color(0xFFD3DADE)
 
 data class TngColors(
     val material: Colors,
     val selectorButtonColor: Color,
-    val textColorSecondary: Color
+    val textColorSecondary: Color,
+    val toolbarBackgroundColor: Color,
 ) {
     val primary get() = material.primary
     val primaryVariant get() = material.primaryVariant
@@ -87,13 +90,15 @@ data class TngTypography(
 private val LightColorPalette = TngColors(
     material = lightColors(),
     selectorButtonColor = lightGray,
-    textColorSecondary = darkGray
+    textColorSecondary = darkGray,
+    toolbarBackgroundColor = blueWhitePastel,
 )
 
 private val DarkColorPalette = TngColors(
     material = darkColors(),
     selectorButtonColor = darkGray,
-    textColorSecondary = lightGray
+    textColorSecondary = lightGray,
+    toolbarBackgroundColor = lightCharcoal,
 )
 
 val TngColors.disabledAlpha get() = 0.4f

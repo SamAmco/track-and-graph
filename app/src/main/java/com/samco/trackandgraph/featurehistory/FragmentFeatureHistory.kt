@@ -20,24 +20,25 @@ import android.os.Bundle
 import android.view.*
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
-import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.map
 import androidx.navigation.fragment.navArgs
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.getValue
 
 @AndroidEntryPoint
 class FragmentFeatureHistory : Fragment() {
     private val viewModel by viewModels<FeatureHistoryViewModelImpl>()
+    private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private val args: FragmentFeatureHistoryArgs by navArgs()
 
     @Inject
@@ -49,7 +50,7 @@ class FragmentFeatureHistory : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         viewModel.initViewModel(args.featureId)
-        viewModel.tracker.map { it != null }.observe(viewLifecycleOwner) { initMenuProvider(it) }
+        setAppBarTitle()
         viewModel.dateScrollData.map { it.items.size }.observe(viewLifecycleOwner) { updateDataPointsCount(it) }
 
         return ComposeView(requireContext()).apply {
@@ -63,47 +64,40 @@ class FragmentFeatureHistory : Fragment() {
         }
     }
 
-    private var menuProvider: MenuProvider? = null
-
-    private fun initMenuProvider(isTracker: Boolean) {
-        menuProvider?.let { requireActivity().removeMenuProvider(it) }
-        FeatureHistoryMenuProvider(isTracker).let {
-            menuProvider = it
-            requireActivity().addMenuProvider(it, viewLifecycleOwner, Lifecycle.State.RESUMED)
-        }
-    }
-
     private fun updateDataPointsCount(numDataPoints: Int) {
-        val text = if (numDataPoints > 0) {
+        val subtitle = if (numDataPoints > 0) {
             context?.getString(R.string.data_points, numDataPoints)
         } else {
             null
         }
 
-        (requireActivity() as MainActivity).setActionBarSubtitle(text)
+        setAppBarTitle(subtitle)
     }
 
-    private inner class FeatureHistoryMenuProvider(
-        private val isTracker: Boolean
-    ) : MenuProvider {
-        override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-            menuInflater.inflate(R.menu.feature_history_menu, menu)
-            if (!isTracker) menu.removeItem(R.id.updateButton)
-        }
-
-        override fun onMenuItemSelected(item: MenuItem): Boolean {
-            when (item.itemId) {
-                R.id.infoButton -> viewModel.onShowFeatureInfo()
-                R.id.updateButton -> viewModel.showUpdateAllDialog()
-                else -> return false
-            }
-            return true
-        }
+    private fun setAppBarTitle(subtitle: String? = null) {
+        appBarViewModel.setNavBarConfig(
+            AppBarViewModel.NavBarConfig(
+                title = args.featureName,
+                subtitle = subtitle,
+                actions = listOf(
+                    AppBarViewModel.Action.Info,
+                    AppBarViewModel.Action.Update
+                )
+            )
+        )
     }
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(NavButtonStyle.UP, args.featureName, true)
+        resumeScoped {
+            for (action in appBarViewModel.actionsTaken) {
+                when (action) {
+                    AppBarViewModel.Action.Info -> viewModel.onShowFeatureInfo()
+                    AppBarViewModel.Action.Update -> viewModel.showUpdateAllDialog()
+                    else -> {}
+                }
+            }
+        }
     }
 }
 
