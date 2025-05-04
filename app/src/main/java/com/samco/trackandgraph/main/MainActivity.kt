@@ -41,6 +41,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.service.TimerServiceInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.tutorial.TutorialScreen
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -83,6 +84,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var luaEngineSettingsProvider: LuaEngineSettingsProvider
 
+    @Inject
+    lateinit var urlNavigator: UrlNavigator
+
     private val viewModel by viewModels<MainActivityViewModel>()
 
     private val currentTheme: MutableState<ThemeSelection> by lazy { mutableStateOf(getThemeValue()) }
@@ -106,6 +110,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     MainScreen(
                         activity = this@MainActivity,
+                        onNavigateToBrowser = ::onNavigateToBrowser,
                         currentTheme = currentTheme,
                         onThemeSelected = ::onThemeSelected,
                         currentDateFormat = currentDateFormat,
@@ -116,7 +121,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getThemeFromPrefs() = themeMap[prefHelper.getThemeValue(ThemeSelection.SYSTEM.appCompatMode)]
+    private fun onNavigateToBrowser(location: DrawerMenuBrowserLocation) {
+        when (location) {
+            DrawerMenuBrowserLocation.FAQ -> urlNavigator
+                .triggerNavigation(this, UrlNavigator.Location.TUTORIAL_ROOT)
+
+            DrawerMenuBrowserLocation.RATE_APP -> urlNavigator
+                .triggerNavigation(this, UrlNavigator.Location.PLAY_STORE_PAGE)
+        }
+    }
+
+    private fun getThemeFromPrefs() =
+        themeMap[prefHelper.getThemeValue(ThemeSelection.SYSTEM.appCompatMode)]
+
     private fun getThemeValue() = getThemeFromPrefs() ?: ThemeSelection.SYSTEM
     private fun onThemeSelected(theme: ThemeSelection) {
         currentTheme.value = theme
