@@ -22,22 +22,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.getValue
 
 @AndroidEntryPoint
 class AboutPageFragment : Fragment() {
 
     @Inject
     lateinit var urlNavigator: UrlNavigator
+
+    private val appBarViewModel by activityViewModels<AppBarViewModel>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,9 +81,10 @@ class AboutPageFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(
-            NavButtonStyle.MENU,
-            getString(R.string.about)
+        appBarViewModel.setNavBarConfig(
+            AppBarViewModel.NavBarConfig(
+                title = getString(R.string.app_name),
+            )
         )
     }
 }

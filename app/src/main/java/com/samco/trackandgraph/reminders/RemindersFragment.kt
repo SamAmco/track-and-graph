@@ -20,14 +20,14 @@ package com.samco.trackandgraph.reminders
 import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.MainActivity
-import com.samco.trackandgraph.NavButtonStyle
+import com.samco.trackandgraph.main.MainActivity
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.CheckedDays
 import com.samco.trackandgraph.base.database.dto.Reminder
@@ -35,10 +35,12 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.RemindersFragmentBinding
+import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.hideKeyboard
+import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -46,12 +48,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalTime
 import javax.inject.Inject
+import kotlin.getValue
 
 @AndroidEntryPoint
 class RemindersFragment : Fragment(),
     PermissionRequesterUseCase by PermissionRequesterUseCaseImpl() {
     private var binding: RemindersFragmentBinding by bindingForViewLifecycle()
     private val viewModel by viewModels<RemindersViewModel>()
+    private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private lateinit var adapter: ReminderListAdapter
 
     init { initNotificationsPermissionRequester(this) }
@@ -80,17 +84,28 @@ class RemindersFragment : Fragment(),
         binding.remindersList.itemAnimator = DefaultItemAnimator()
         registerForContextMenu(binding.remindersList)
 
-        setHasOptionsMenu(true)
-
         return binding.root
     }
 
     override fun onResume() {
         super.onResume()
-        (requireActivity() as MainActivity).setActionBarConfig(
-            NavButtonStyle.MENU,
-            getString(R.string.reminders)
+        resumeScoped { setUpMenu() }
+    }
+
+    private suspend fun setUpMenu() {
+        appBarViewModel.setNavBarConfig(
+            AppBarViewModel.NavBarConfig(
+                title = getString(R.string.reminders),
+                actions = listOf(AppBarViewModel.Action.AddReminder),
+            )
         )
+
+        for (action in appBarViewModel.actionsTaken) {
+            when (action) {
+                AppBarViewModel.Action.AddReminder -> onAddClicked()
+                else -> {}
+            }
+        }
     }
 
     override fun onStart() {
@@ -159,16 +174,6 @@ class RemindersFragment : Fragment(),
 
             adapter.submitList(it)
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.reminders_menu, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (item.itemId == R.id.add_reminder) onAddClicked()
-        return super.onOptionsItemSelected(item)
     }
 
     private fun onAddClicked() {

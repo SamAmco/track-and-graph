@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 
@@ -35,6 +36,7 @@ fun <T> TextMapSpinner(
     selectedItem: T,
     enabled: Boolean = true,
     textAlign: TextAlign = TextAlign.Start,
+    textStyle: TextStyle = MaterialTheme.typography.body1,
     paddingValues: PaddingValues = PaddingValues(
         horizontal = dimensionResource(id = R.dimen.card_padding),
     ),
@@ -60,16 +62,16 @@ fun <T> TextMapSpinner(
                 modifier = modifier.weight(1f),
                 text = strings[item] ?: "",
                 textAlign = textAlign,
-                fontSize = MaterialTheme.typography.body1.fontSize,
-                fontWeight = MaterialTheme.typography.body1.fontWeight,
+                fontSize = textStyle.fontSize,
+                fontWeight = textStyle.fontWeight,
             )
         },
         dropdownItemFactory = { item, _ ->
             Text(
                 text = strings[item] ?: "",
                 textAlign = textAlign,
-                fontSize = MaterialTheme.typography.body1.fontSize,
-                fontWeight = MaterialTheme.typography.body1.fontWeight
+                fontSize = textStyle.fontSize,
+                fontWeight = textStyle.fontWeight
             )
         },
         paddingValues = paddingValues,

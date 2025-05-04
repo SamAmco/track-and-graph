@@ -7,7 +7,7 @@
         android:shortcutShortLabel="@string/launch_lua_disabled">
         <intent
             android:action="com.samco.trackandgraph.action.DISABLE_LUA_ENGINE"
-            android:targetClass="com.samco.trackandgraph.MainActivity"
+            android:targetClass="com.samco.trackandgraph.main.MainActivity"
             android:targetPackage="com.samco.trackandgraph" />
     </shortcut>
 </shortcuts>
