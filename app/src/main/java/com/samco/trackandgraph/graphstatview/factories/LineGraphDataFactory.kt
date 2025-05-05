@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatview.factories
 
 import com.androidplot.xy.FastXYSeries
 import com.androidplot.xy.RectRegion
-import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DurationPlottingMode
@@ -34,7 +33,6 @@ import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.DefaultDispatcher
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.functions.CompositeFunction
 import com.samco.trackandgraph.functions.functions.DataClippingFunction
 import com.samco.trackandgraph.functions.functions.DataPaddingFunction
@@ -65,7 +63,8 @@ class LineGraphDataFactory @Inject constructor(
     private val androidPlotSeriesHelper: AndroidPlotSeriesHelper,
     private val dataDisplayIntervalHelper: DataDisplayIntervalHelper,
     @IODispatcher ioDispatcher: CoroutineDispatcher,
-    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
+    private val timeHelper: TimeHelper,
 ) : ViewDataFactory<LineGraphWithFeatures, ILineGraphViewData>(dataInteractor, ioDispatcher) {
 
     override suspend fun createViewData(
@@ -194,12 +193,17 @@ class LineGraphDataFactory @Inject constructor(
             dataInteractor.getDataSampleForFeatureId(lineGraphFeature.featureId)
         }
 
-        val timeHelper = TimeHelper(GlobalAggregationPreferences)
         val aggregationCalculator = when (lineGraphFeature.plottingMode) {
             LineGraphPlottingModes.WHEN_TRACKED -> IdentityFunction()
             else -> CompositeFunction(
                 DurationAggregationFunction(timeHelper, plottingPeriod!!),
-                DataPaddingFunction(timeHelper, config.endDate.toOffsetDateTime(), config.sampleSize)
+                DataPaddingFunction(
+                    timeHelper = timeHelper,
+                    endTime = config.endDate.toOffsetDateTime(
+                        fallback = getLastDataPointTimestamp(rawDataSample)
+                    ),
+                    duration = config.sampleSize
+                )
             )
         }
         val averageCalculator = when (lineGraphFeature.averagingMode) {
@@ -208,6 +212,12 @@ class LineGraphDataFactory @Inject constructor(
         }
         return CompositeFunction(aggregationCalculator, averageCalculator)
             .mapSample(rawDataSample)
+    }
+
+    private fun getLastDataPointTimestamp(rawDataSample: DataSample): OffsetDateTime {
+        val dataPeekIterator = rawDataSample.iterator()
+        return if (!dataPeekIterator.hasNext()) OffsetDateTime.now()
+        else dataPeekIterator.next().timestamp
     }
 
     private fun getXYSeriesFromDataPoints(

@@ -32,6 +32,8 @@ import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandlerImpl
 import com.samco.trackandgraph.downloader.FileDownloader
 import com.samco.trackandgraph.downloader.FileDownloaderImpl
+import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
+import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.LuaEngineImpl
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
@@ -69,6 +71,9 @@ class AppModule {
     @Provides
     @Singleton
     fun getTngSettings(impl: TngSettingsImpl): TngSettings = impl
+
+    @Provides
+    fun getTimerHelper(): TimeHelper = TimeHelper(GlobalAggregationPreferences)
 
     @Provides
     @Singleton

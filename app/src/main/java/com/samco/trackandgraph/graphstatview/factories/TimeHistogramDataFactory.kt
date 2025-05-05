@@ -36,7 +36,8 @@ import kotlin.math.min
 
 class TimeHistogramDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
-    @IODispatcher ioDispatcher: CoroutineDispatcher
+    @IODispatcher ioDispatcher: CoroutineDispatcher,
+    private val timeHelper: TimeHelper,
 ) : ViewDataFactory<TimeHistogram, ITimeHistogramViewData>(dataInteractor, ioDispatcher) {
     override suspend fun createViewData(
         graphOrStat: GraphOrStat,
@@ -61,8 +62,7 @@ class TimeHistogramDataFactory @Inject constructor(
         onDataSampled: (List<DataPoint>) -> Unit
     ): ITimeHistogramViewData {
         return try {
-            val timeHistogramDataHelper =
-                TimeHistogramDataHelper(TimeHelper(GlobalAggregationPreferences))
+            val timeHistogramDataHelper = TimeHistogramDataHelper(timeHelper)
             val barValues =
                 getBarValues(config, onDataSampled, timeHistogramDataHelper)
             val largestBin = timeHistogramDataHelper.getLargestBin(barValues?.map { it.values })
