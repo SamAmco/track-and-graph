@@ -53,6 +53,7 @@ class BarChartDataFactory @Inject constructor(
     dataInteractor: DataInteractor,
     private val dataDisplayIntervalHelper: DataDisplayIntervalHelper,
     @IODispatcher ioDispatcher: CoroutineDispatcher,
+    private val timeHelper: TimeHelper,
 ) : ViewDataFactory<BarChart, IBarChartViewData>(dataInteractor, ioDispatcher) {
 
     companion object {
@@ -287,7 +288,6 @@ class BarChartDataFactory @Inject constructor(
         try {
             //TODO basically everywhere you see zone id i think you might wanna use time helper
             // and inject it.
-            val timeHelper = TimeHelper(GlobalAggregationPreferences)
             val endTime = config.endDate.toOffsetDateTime()?.let { timeHelper.toZonedDateTime(it) }
 
             val barData = withContext(ioDispatcher) {

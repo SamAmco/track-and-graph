@@ -29,6 +29,7 @@ import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.database.sampling.DataSample
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
+import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -59,7 +60,8 @@ class BarChartDataFactoryTest {
     private fun uut() = BarChartDataFactory(
         dataInteractor = dataInteractor,
         dataDisplayIntervalHelper = DataDisplayIntervalHelper(),
-        ioDispatcher = testCoroutineDispatcher
+        ioDispatcher = testCoroutineDispatcher,
+        timeHelper = TimeHelper(GlobalAggregationPreferences),
     )
 
     @Test

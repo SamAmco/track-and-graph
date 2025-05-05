@@ -30,4 +30,12 @@ sealed class GraphEndDate {
             is Date -> date
         }
     }
+
+    fun toOffsetDateTime(fallback: OffsetDateTime): OffsetDateTime {
+        return when (this) {
+            is Latest -> fallback
+            is Now -> OffsetDateTime.now()
+            is Date -> date
+        }
+    }
 }
