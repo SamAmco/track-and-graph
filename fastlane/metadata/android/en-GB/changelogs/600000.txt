@@ -1,0 +1,7 @@
+- Change CSV output to put label in a separate column (importing legacy format is still supported)
+- Fix bug line graph ending at latest should end at latest even with plot totalling
+- Enable predictive back
+- Make the app bar edge to edge
+- Fix bug tutorial end button behind navigation bars
+- Fix bug back button should close the app from the root group
+- Allow open app from timer notification
