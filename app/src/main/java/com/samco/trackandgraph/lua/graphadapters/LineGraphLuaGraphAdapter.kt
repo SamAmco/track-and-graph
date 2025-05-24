@@ -103,7 +103,7 @@ class LineGraphLuaGraphAdapter @Inject constructor(
 
     private fun parsePointStyle(data: LuaValue): LinePointStyle? {
         return when {
-            data.isstring() -> LinePointStyle.entries.first { it.luaVlaue == data.tojstring() }
+            data.isstring() -> LinePointStyle.entries.first { it.luaValue == data.tojstring() }
             else -> null
         }
     }
