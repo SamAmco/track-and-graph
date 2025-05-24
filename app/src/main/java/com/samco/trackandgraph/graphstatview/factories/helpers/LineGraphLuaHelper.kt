@@ -105,6 +105,7 @@ class LineGraphLuaHelper @Inject constructor(
         LinePointStyle.NONE -> LineGraphPointStyle.NONE
         LinePointStyle.CIRCLE -> LineGraphPointStyle.CIRCLES
         LinePointStyle.CIRCLE_VALUE -> LineGraphPointStyle.CIRCLES_AND_NUMBERS
+        LinePointStyle.CIRCLES_ONLY -> LineGraphPointStyle.CIRCLES_ONLY
         null -> LineGraphPointStyle.NONE
     }
 }
