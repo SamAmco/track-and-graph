@@ -16,8 +16,9 @@
  */
 package com.samco.trackandgraph.lua.dto
 
-enum class LinePointStyle(val luaVlaue: String) {
+enum class LinePointStyle(val luaValue: String) {
     NONE("none"),
     CIRCLE("circle"),
     CIRCLE_VALUE("circle_value"),
+    CIRCLES_ONLY("circles_only")
 }

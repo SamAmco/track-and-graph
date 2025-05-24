@@ -20,5 +20,6 @@ package com.samco.trackandgraph.base.database.dto
 enum class LineGraphPointStyle {
     NONE,
     CIRCLES,
-    CIRCLES_AND_NUMBERS
+    CIRCLES_AND_NUMBERS,
+    CIRCLES_ONLY
 }
