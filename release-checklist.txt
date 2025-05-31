@@ -26,7 +26,7 @@ bundle exec fastlane supply --aab app/release/app-release.aab --track beta
 
 or for release:
 
-bundle exec fastlane supply --aab app/release/app-release.aab
+bundle exec fastlane supply --aab app/release/app-release.aab --rollout 0.5
 
 - Wait for the upload to complete and then build an apk for the release (using Android Studio) .. Typically android studio deletes the aab when you start the apk build (hence why you might want to wait)
 
