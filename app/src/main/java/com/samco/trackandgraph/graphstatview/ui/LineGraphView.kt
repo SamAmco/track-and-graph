@@ -20,14 +20,12 @@ package com.samco.trackandgraph.graphstatview.ui
 import android.content.Context
 import android.graphics.Paint
 import android.util.TypedValue
-import androidx.annotation.ColorInt
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.core.content.ContextCompat.getColor
 import com.androidplot.ui.VerticalPosition
 import com.androidplot.ui.VerticalPositioning
 import com.androidplot.xy.BoundaryMode
@@ -45,10 +43,8 @@ import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.base.helpers.formatDayMonth
 import com.samco.trackandgraph.base.helpers.formatMonthYear
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
-import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
-import com.samco.trackandgraph.ui.dataVisColorList
 import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
@@ -305,16 +301,23 @@ private fun getLineAndPointFormatter(
     line: Line,
 ): LineAndPointFormatter {
     val formatter = LineAndPointFormatter()
-    formatter.linePaint.apply {
-        color = getColorInt(context, line.color)
-        strokeWidth = getLinePaintWidth(context)
+
+    if (line.pointStyle == LineGraphPointStyle.CIRCLES_ONLY) {
+        formatter.linePaint = null
+    } else {
+        formatter.linePaint.apply {
+            color = getColorInt(context, line.color)
+            strokeWidth = getLinePaintWidth(context)
+        }
     }
+
     getVertexPaintColor(context, line)?.let {
         formatter.vertexPaint.color = it
         formatter.vertexPaint.strokeWidth = getVertexPaintWidth(context)
     } ?: run {
         formatter.vertexPaint = null
     }
+
     getPointLabelFormatter(context, line)?.let {
         formatter.pointLabelFormatter = it
         formatter.setPointLabeler { series, index ->
@@ -331,13 +334,25 @@ private fun getFastLineAndPointFormatter(
     context: Context,
     line: Line,
 ): LineAndPointFormatter {
+
+    // Setting lineColor to null sets the linePaint to null also
+    val lineColor =
+        if (line.pointStyle == LineGraphPointStyle.CIRCLES_ONLY) null
+        else getColorInt(context, line.color)
+
+    val vertexColor = getVertexPaintColor(context, line)
+
     val formatter = FastLineAndPointRenderer.Formatter(
-        getColorInt(context, line.color),
-        getVertexPaintColor(context, line),
+        lineColor,
+        vertexColor,
         getPointLabelFormatter(context, line)
     )
-    formatter.linePaint?.apply { isAntiAlias = false }
-    formatter.linePaint?.apply { strokeWidth = getLinePaintWidth(context) }
+
+    formatter.linePaint?.apply {
+        isAntiAlias = false
+        strokeWidth = getLinePaintWidth(context)
+    }
+
     formatter.vertexPaint?.apply { strokeWidth = getVertexPaintWidth(context) }
     return formatter
 }
@@ -351,8 +366,10 @@ private fun getVertexPaintWidth(
 ) = context.resources.getDimension(R.dimen.line_graph_vertex_thickness)
 
 private fun getVertexPaintColor(context: Context, line: Line): Int? {
-    return if (line.pointStyle == LineGraphPointStyle.NONE) null
-    else getColorInt(context, line.color)
+    return when (line.pointStyle) {
+        LineGraphPointStyle.NONE -> null
+        else -> getColorInt(context, line.color)
+    }
 }
 
 private fun getPointLabelFormatter(
