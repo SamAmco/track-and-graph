@@ -14,9 +14,14 @@ M.GRAPH_TYPE = {
 --- @since v5.1.0
 --- @enum LINE_POINT_STYLE
 M.LINE_POINT_STYLE = {
+	--- just lines
 	NONE = "none",
+	--- lines with circles at each point
 	CIRCLE = "circle",
+	--- lines with circles and values at each point
 	CIRCLE_VALUE = "circle_value",
+	--- @since v7.0.0 circles with no connecting lines
+	CIRCLE_ONLY = "circles_only",
 }
 
 --- @since v5.1.0
