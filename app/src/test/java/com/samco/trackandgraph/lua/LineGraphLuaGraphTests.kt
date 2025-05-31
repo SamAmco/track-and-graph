@@ -277,6 +277,22 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
                             { timestamp = 3, value = 30 }, 
                             { timestamp = 1, value = 40 } 
                         } 
+                    },
+                    {
+                        line_color = core.COLOR.BLUE,
+                        point_style = graph.LINE_POINT_STYLE.NONE,
+                        line_points = {
+                            { timestamp = 4, value = 50 },
+                            { timestamp = 2, value = 60 }
+                        }
+                    },
+                    {
+                        line_color = "#FFFF00",
+                        point_style = graph.LINE_POINT_STYLE.CIRCLE_ONLY,
+                        line_points = {
+                            { timestamp = 5, value = 70 },
+                            { timestamp = 3, value = 80 }
+                        }
                     }
                 }
             }
@@ -303,6 +319,24 @@ class LineGraphLuaGraphTests : LuaEngineImplTest() {
                     linePoints = listOf(
                         LinePoint(OffsetDateTime.ofInstant(Instant.ofEpochMilli(3), ZoneOffset.UTC), 30.0),
                         LinePoint(OffsetDateTime.ofInstant(Instant.ofEpochMilli(1), ZoneOffset.UTC), 40.0)
+                    )
+                ),
+                Line(
+                    lineColor = ColorSpec.ColorIndex(7),
+                    pointStyle = LinePointStyle.NONE,
+                    label = null,
+                    linePoints = listOf(
+                        LinePoint(OffsetDateTime.ofInstant(Instant.ofEpochMilli(4), ZoneOffset.UTC), 50.0),
+                        LinePoint(OffsetDateTime.ofInstant(Instant.ofEpochMilli(2), ZoneOffset.UTC), 60.0)
+                    )
+                ),
+                Line(
+                    lineColor = ColorSpec.HexColor("#FFFF00"),
+                    pointStyle = LinePointStyle.CIRCLES_ONLY,
+                    label = null,
+                    linePoints = listOf(
+                        LinePoint(OffsetDateTime.ofInstant(Instant.ofEpochMilli(5), ZoneOffset.UTC), 70.0),
+                        LinePoint(OffsetDateTime.ofInstant(Instant.ofEpochMilli(3), ZoneOffset.UTC), 80.0)
                     )
                 )
             ),

@@ -189,7 +189,8 @@ private fun LineGraphFeatureInputView(
                 val pointStyleIcons = listOf(
                     R.drawable.point_style_none_icon,
                     R.drawable.point_style_circles_icon,
-                    R.drawable.point_style_circles_and_numbers_icon
+                    R.drawable.point_style_circles_and_numbers_icon,
+                    R.drawable.point_style_circles_only_icon,
                 )
 
                 CircleSpinner(
