@@ -23,7 +23,7 @@ pymdown-extensions==10.14.3
 python-dateutil==2.9.0.post0
 PyYAML==6.0.2
 pyyaml_env_tag==0.1
-requests==2.32.3
+requests==2.32.4
 six==1.17.0
 urllib3==2.3.0
 watchdog==6.0.0
