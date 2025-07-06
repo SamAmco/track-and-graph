@@ -25,17 +25,23 @@ class GraphNote {
     val dataPoint: DataPoint?
     val globalNote: GlobalNote?
     val timestamp: OffsetDateTime
+    val featurePath: String?
+    val isDuration: Boolean?
 
-    constructor(dataPoint: DataPoint) {
+    constructor(dataPoint: DataPoint, featurePath: String, isDuration: Boolean) {
         this.dataPoint = dataPoint
         this.globalNote = null
         this.timestamp = dataPoint.timestamp
+        this.featurePath = featurePath
+        this.isDuration = isDuration
     }
 
     constructor(globalNote: GlobalNote) {
         this.globalNote = globalNote
         this.dataPoint = null
         this.timestamp = globalNote.timestamp
+        this.featurePath = null
+        this.isDuration = null
     }
 
     fun isDataPoint() = dataPoint != null
