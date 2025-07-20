@@ -190,6 +190,11 @@ class ViewGraphStatFragment : Fragment() {
 //        adapter.submitList(notes)
 //    }
 
+//    private val maxGraphHeightRatioPortrait = 0.77f
+//    private val minGraphHeightRatioPortrait = 0.3f
+//    private val maxGraphHeightRatioLandscape = 0.7f
+//    private val minGraphHeightRatioLandscape = 0f
+
 //    private fun onShowingNotesChanged(showNotes: Boolean) {
 //        val maxGraphHeightRatio =
 //            if (isPortrait()) maxGraphHeightRatioPortrait else maxGraphHeightRatioLandscape
