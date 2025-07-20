@@ -18,20 +18,17 @@
 package com.samco.trackandgraph.viewgraphstat
 
 import android.content.res.Configuration
-import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -41,17 +38,24 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.ui.compose.theming.tngColors
-import com.samco.trackandgraph.ui.compose.theming.tngTypography
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.PopupTabBackground
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun ViewGraphStatScreen(
@@ -80,86 +84,53 @@ private fun ViewGraphStatView(
     notes: List<GraphNote>,
     showHideNotesClicked: () -> Unit,
     noteClicked: (note: GraphNote) -> Unit,
-) {
-    val configuration = LocalConfiguration.current
-    val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-
-    BoxWithConstraints(
+) = TnGComposeTheme {
+    Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        //TODO this code is wrong but it's something close
+        val configuration = LocalConfiguration.current
+        val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
-        // Use actual available height from parent container
-        val availableHeight = maxHeight
-        val buttonHeight = 56.dp // Approximate toggle button height
-        val contentHeight = availableHeight - buttonHeight
-
-        // Define proportions based on orientation
-        val maxGraphHeightRatio = if (isPortrait) 0.77f else 0.7f
-        val minGraphHeightRatio = if (isPortrait) 0.3f else 0f
-
-        // Calculate target heights with min/max constraints based on available space
-        val maxGraphHeight = (contentHeight * maxGraphHeightRatio).coerceAtLeast(200.dp)
-        val minGraphHeight = if (isPortrait) {
-            (contentHeight * minGraphHeightRatio).coerceAtLeast(150.dp)
-        } else {
-            0.dp // Can be 0 in landscape
+        val targetGraphHeight = remember(showingNotes, isPortrait) {
+            val minGraphHeight = if (isPortrait) 0.3f else 0f
+            if (showingNotes) minGraphHeight else 1f
         }
-
-        val targetGraphHeight = if (showingNotes) minGraphHeight else maxGraphHeight
-        val maxNotesHeight = contentHeight - minGraphHeight
-        val targetNotesHeight = if (showingNotes) maxNotesHeight else 0.dp
-
-        // Animate the heights
-        val animatedGraphHeight by animateDpAsState(
+        val animatedGraphHeightRatio by animateFloatAsState(
             targetValue = targetGraphHeight,
             animationSpec = tween(durationMillis = 300),
-            label = "graphHeight"
-        )
-        val animatedNotesHeight by animateDpAsState(
-            targetValue = targetNotesHeight,
-            animationSpec = tween(durationMillis = 300),
-            label = "notesHeight"
+            label = "graphHeightRatio"
         )
 
-        Column(
-            modifier = Modifier.fillMaxSize()
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(animatedGraphHeightRatio)
+                .background(MaterialTheme.colors.surface)
         ) {
-            // Graph Section - constrained height for readability
+            GraphViewStub(
+                graphStatViewData = graphStatViewData,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        NotesToggleButton(
+            showingNotes = showingNotes,
+            onToggleClicked = showHideNotesClicked,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        if (animatedGraphHeightRatio < 1f) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(animatedGraphHeight)
-                    .background(MaterialTheme.colors.surface)
+                    .weight(1f - animatedGraphHeightRatio)
             ) {
-                GraphViewStub(
-                    graphStatViewData = graphStatViewData,
+                NotesListStub(
+                    notes = notes,
+                    markedNote = markedNote,
+                    onNoteClicked = noteClicked,
                     modifier = Modifier.fillMaxSize()
                 )
-            }
-
-            // Notes Toggle Button - fixed height
-            NotesToggleButton(
-                showingNotes = showingNotes,
-                onToggleClicked = showHideNotesClicked,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            // Notes Section - remaining space with max constraint
-            if (animatedNotesHeight > 0.dp) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(animatedNotesHeight)
-                        .background(MaterialTheme.colors.background)
-                ) {
-                    NotesListStub(
-                        notes = notes,
-                        markedNote = markedNote,
-                        onNoteClicked = noteClicked,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
             }
         }
     }
@@ -188,15 +159,18 @@ private fun NotesToggleButton(
     onToggleClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Box(
         modifier = modifier
-            .clickable { onToggleClicked() }
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .fillMaxWidth()
+            .clickable { onToggleClicked() },
     ) {
+        PopupTabBackground(
+            modifier = Modifier.matchParentSize()
+        )
         Row(
-            modifier = Modifier
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(vertical = cardPadding),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -210,7 +184,7 @@ private fun NotesToggleButton(
                 painter = painterResource(
                     id = if (showingNotes) R.drawable.down_arrow else R.drawable.up_arrow
                 ),
-                contentDescription = if (showingNotes) "Hide notes" else "Show notes",
+                contentDescription = null,
                 tint = MaterialTheme.colors.onSurface
             )
         }
@@ -260,3 +234,16 @@ private fun NotesListStub(
         }
     }
 }
+
+@Preview(showBackground = true)
+@Composable
+private fun ViewGraphStatScreenPreview() = ViewGraphStatView(
+    graphStatViewData = null,
+    showingNotes = true,
+    markedNote = null,
+    notes = listOf(
+
+    ),
+    showHideNotesClicked = {},
+    noteClicked = {},
+)
