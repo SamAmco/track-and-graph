@@ -21,6 +21,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.database.dto.GlobalNote
+import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
@@ -144,7 +146,12 @@ class ViewGraphStatViewModelImpl @Inject constructor(
             .map { dp ->
                 val featurePath = featureProvider.getPathForFeature(dp.featureId)
                 val isDuration = featureProvider.getDataSampleProperties(dp.featureId)?.isDuration ?: false
-                GraphNote(dp, featurePath, isDuration)
+                GraphNote.DataPointNote(
+                    timestamp = dp.timestamp,
+                    noteText = dp.note,
+                    displayValue = dp.getDisplayValue(isDuration),
+                    featurePath = featurePath
+                )
             }
     }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
@@ -157,7 +164,12 @@ class ViewGraphStatViewModelImpl @Inject constructor(
 
             val filteredGlobalNotes = globalNotes
                 .filter { g -> g.timestamp in oldestTime..newestTime }
-                .map { GraphNote(it) }
+                .map { globalNote ->
+                    GraphNote.GlobalNote(
+                        timestamp = globalNote.timestamp,
+                        noteText = globalNote.note
+                    )
+                }
 
             dataPointNotes
                 .union(filteredGlobalNotes)
