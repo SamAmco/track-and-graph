@@ -20,7 +20,6 @@ package com.samco.trackandgraph.viewgraphstat
 import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -30,8 +29,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -41,13 +42,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,6 +57,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.PopupTabBackground
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 
 @Composable
 fun ViewGraphStatScreen(
@@ -80,6 +82,7 @@ fun ViewGraphStatScreen(
 private fun ViewGraphStatView(
     graphStatViewData: IGraphStatViewData?,
     showingNotes: Boolean,
+    // TODO : implement marked note
     markedNote: GraphNote?,
     notes: List<GraphNote>,
     showHideNotesClicked: () -> Unit,
@@ -125,9 +128,8 @@ private fun ViewGraphStatView(
                     .fillMaxWidth()
                     .weight(1f - animatedGraphHeightRatio)
             ) {
-                NotesListStub(
+                NotesList(
                     notes = notes,
-                    markedNote = markedNote,
                     onNoteClicked = noteClicked,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -192,45 +194,104 @@ private fun NotesToggleButton(
 }
 
 @Composable
-private fun NotesListStub(
+private fun NotesList(
     notes: List<GraphNote>,
-    markedNote: GraphNote?,
     onNoteClicked: (GraphNote) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = modifier.padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier.padding(cardPadding),
+        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
     ) {
         items(notes) { note ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onNoteClicked(note) },
+            NoteCard(
+                note = note,
+                onNoteClicked = onNoteClicked,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+private fun NoteCard(
+    note: GraphNote,
+    onNoteClicked: (GraphNote) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .clickable { onNoteClicked(note) },
+        elevation = 4.dp,
+        shape = RoundedCornerShape(4.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(cardPadding)
+        ) {
+            // Top row: timestamp and feature path (for data point notes)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Text(
-                        text = "Note: ${note.timestamp}",
-                        style = MaterialTheme.typography.body1
-                    )
-                    if (note.isDataPoint()) {
+                Text(
+                    text = note.timestamp.toString(), // TODO: Format properly
+                    style = MaterialTheme.typography.body2,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                when (note) {
+                    is GraphNote.DataPointNote -> {
                         Text(
-                            text = "Feature: ${note.featurePath ?: "Unknown"}",
+                            text = note.featurePath,
                             style = MaterialTheme.typography.body2,
-                            color = MaterialTheme.colors.onSurface
+                            color = MaterialTheme.colors.onSurface,
+                            textAlign = TextAlign.End,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f).padding(start = dialogInputSpacing)
                         )
                     }
-                    if (markedNote == note) {
-                        Text(
-                            text = "★ Marked",
-                            style = MaterialTheme.typography.body2,
-                            color = MaterialTheme.colors.primary
-                        )
+                    is GraphNote.GlobalNote -> {
+                        // No feature path for global notes
                     }
                 }
             }
+
+            // Middle row: display value (only for data point notes)
+            when (note) {
+                is GraphNote.DataPointNote -> {
+                    Text(
+                        text = note.displayValue,
+                        style = MaterialTheme.typography.body2,
+                        fontStyle = FontStyle.Italic,
+                        color = MaterialTheme.colors.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth(Alignment.End)
+                    )
+                }
+                is GraphNote.GlobalNote -> {
+                    // No display value for global notes
+                }
+            }
+
+            // Bottom row: note text
+            Text(
+                text = note.noteText,
+                style = MaterialTheme.typography.body2,
+                color = MaterialTheme.colors.onSurface,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = dialogInputSpacing)
+            )
         }
     }
 }
