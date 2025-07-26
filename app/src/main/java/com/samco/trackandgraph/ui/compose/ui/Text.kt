@@ -18,6 +18,7 @@ package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -28,17 +29,37 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
+import org.threeten.bp.OffsetDateTime
 
-@Preview
+@Preview(showBackground = true)
 @Composable
-private fun TrackerNameHeadlinePreview() = TnGComposeTheme {
-    TrackerNameHeadline(name = "Tracker name")
+private fun TextPreview() = TnGComposeTheme {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(cardPadding),
+    ) {
+        TrackerNameHeadline(name = "Tracker name")
+        TextBody1(text = "Text body 1")
+        TextSubtitle2(text = "Text body 2")
+        TextLink(text = "Text link", onClick = {})
+        DayMonthYearHourMinuteWeekDayOneLineText(
+            dateTime = OffsetDateTime.parse("2025-07-25T10:30:00Z"),
+        )
+    }
 }
 
 @Composable
@@ -105,3 +126,49 @@ fun TextLink(
     color = MaterialTheme.colors.secondaryVariant,
     maxLines = maxLines
 )
+
+@Composable
+fun DayMonthYearHourMinuteWeekDayOneLineText(
+    dateTime: OffsetDateTime,
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.body2,
+    fontWeight: FontWeight = FontWeight.Bold,
+    fontStyle: FontStyle = FontStyle.Italic,
+    overflow: TextOverflow = TextOverflow.Ellipsis,
+    maxLines: Int = 1,
+) {
+    val context = LocalContext.current
+    val weekDayNames = remember {
+        listOf(
+            context.getString(R.string.mon),
+            context.getString(R.string.tue),
+            context.getString(R.string.wed),
+            context.getString(R.string.thu),
+            context.getString(R.string.fri),
+            context.getString(R.string.sat),
+            context.getString(R.string.sun)
+        )
+    }
+
+    val isPreview = LocalInspectionMode.current
+
+    val formattedText = remember(dateTime, weekDayNames, isPreview) {
+        val offsetDiffHours = if (isPreview) 1 else null
+        formatDayMonthYearHourMinuteWeekDayOneLine(
+            context = context, 
+            weekDayNames = weekDayNames, 
+            dateTime = dateTime,
+            offsetDiffHours = offsetDiffHours
+        )
+    }
+    
+    Text(
+        modifier = modifier,
+        text = formattedText,
+        style = style,
+        fontWeight = fontWeight,
+        fontStyle = fontStyle,
+        overflow = overflow,
+        maxLines = maxLines
+    )
+}
