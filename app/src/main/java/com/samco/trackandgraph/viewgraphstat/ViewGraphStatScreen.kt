@@ -46,7 +46,6 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,9 +54,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.PopupTabBackground
+import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLineText
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.PopupTabBackground
+import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun ViewGraphStatScreen(
@@ -219,6 +220,7 @@ private fun NoteCard(
     onNoteClicked: (GraphNote) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    //TODO extract elevation and shape
     Card(
         modifier = modifier
             .clickable { onNoteClicked(note) },
@@ -234,14 +236,7 @@ private fun NoteCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = note.timestamp.toString(), // TODO: Format properly
-                    style = MaterialTheme.typography.body2,
-                    fontWeight = FontWeight.Bold,
-                    fontStyle = FontStyle.Italic,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
+                DayMonthYearHourMinuteWeekDayOneLineText(note.timestamp)
 
                 when (note) {
                     is GraphNote.DataPointNote -> {
@@ -252,9 +247,12 @@ private fun NoteCard(
                             textAlign = TextAlign.End,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f).padding(start = dialogInputSpacing)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(start = dialogInputSpacing)
                         )
                     }
+
                     is GraphNote.GlobalNote -> {
                         // No feature path for global notes
                     }
@@ -276,6 +274,7 @@ private fun NoteCard(
                             .wrapContentWidth(Alignment.End)
                     )
                 }
+
                 is GraphNote.GlobalNote -> {
                     // No display value for global notes
                 }
@@ -303,7 +302,32 @@ private fun ViewGraphStatScreenPreview() = ViewGraphStatView(
     showingNotes = true,
     markedNote = null,
     notes = listOf(
-
+        GraphNote.DataPointNote(
+            timestamp = OffsetDateTime.parse("2025-07-25T10:30:00Z"),
+            noteText = "Felt great today after morning workout! Really pushed myself on the deadlifts.",
+            displayValue = "85.2 : Good",
+            featurePath = "Health > Weight"
+        ),
+        GraphNote.GlobalNote(
+            timestamp = OffsetDateTime.parse("2025-07-24T08:15:00Z"),
+            noteText = "Started new diet plan"
+        ),
+        GraphNote.DataPointNote(
+            timestamp = OffsetDateTime.parse("2025-07-23T19:45:00Z"),
+            noteText = "Long day at work, stress eating kicked in unfortunately. Need to work on better coping strategies when deadlines approach.",
+            displayValue = "2847 : Bad",
+            featurePath = "Nutrition > Daily Calories"
+        ),
+        GraphNote.DataPointNote(
+            timestamp = OffsetDateTime.parse("2025-07-21T07:00:00Z"),
+            noteText = "Perfect sleep!",
+            displayValue = "8:23:00 : Refreshed",
+            featurePath = "Sleep > Duration"
+        ),
+        GraphNote.GlobalNote(
+            timestamp = OffsetDateTime.parse("2025-07-19T06:00:00Z"),
+            noteText = "Switched to morning workouts instead of evening - let's see how this affects my energy levels throughout the week."
+        )
     ),
     showHideNotesClicked = {},
     noteClicked = {},
