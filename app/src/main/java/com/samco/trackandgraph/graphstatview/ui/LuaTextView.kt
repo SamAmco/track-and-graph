@@ -38,7 +38,7 @@ fun LuaTextView(
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun LuaTextViewPreview() {
     LuaTextView(

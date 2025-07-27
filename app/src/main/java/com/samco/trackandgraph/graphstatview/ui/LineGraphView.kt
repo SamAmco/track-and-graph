@@ -63,9 +63,8 @@ import kotlin.math.max
 fun LineGraphView(
     modifier: Modifier = Modifier,
     viewData: ILineGraphViewData,
-    listMode: Boolean,
+    graphViewMode: GraphViewMode,
     timeMarker: OffsetDateTime? = null,
-    graphHeight: Int? = null
 ) {
     if (!viewData.hasPlottableData) {
         GraphErrorView(
@@ -77,8 +76,7 @@ fun LineGraphView(
             modifier = modifier,
             viewData = viewData,
             timeMarker = timeMarker,
-            listMode = listMode,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode
         )
     }
 }
@@ -88,11 +86,11 @@ fun LineGraphBodyView(
     modifier: Modifier,
     viewData: ILineGraphViewData,
     timeMarker: OffsetDateTime? = null,
-    listMode: Boolean,
-    graphHeight: Int? = null
+    graphViewMode: GraphViewMode,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
+    val listMode = graphViewMode is GraphViewMode.ListMode
 
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
         val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
@@ -126,7 +124,7 @@ fun LineGraphBodyView(
             bounds = viewData.bounds,
             yRangeType = viewData.yRangeType,
             endTime = viewData.endTime,
-            listMode = listMode
+            listMode = listMode,
         )
 
         if (!listMode) {
@@ -142,7 +140,9 @@ fun LineGraphBodyView(
             timeMarker = timeMarker
         )
 
-        if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
+        if (graphViewMode is GraphViewMode.FullScreenMode) {
+            xyPlot.layoutParams.height = (graphViewMode.availableHeight * 0.8).toInt()
+        }
         xyPlot.requestLayout()
     })
 

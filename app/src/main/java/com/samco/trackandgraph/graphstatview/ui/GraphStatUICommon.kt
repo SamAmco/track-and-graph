@@ -37,10 +37,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.Plot
@@ -200,13 +202,24 @@ fun GraphLegend(
     horizontalArrangement = Arrangement.Center
 ) {
     items.forEach {
-        GraphLegentItemView(item = it)
+        GraphLegendItemView(item = it)
         DialogInputSpacing()
     }
 }
 
+val graphLegendCircleSize = 20.dp
+
 @Composable
-fun GraphLegentItemView(
+fun getLegendItemHeight(): Dp {
+    val density = LocalDensity.current
+    return maxOf(
+        with(density) { MaterialTheme.typography.body2.lineHeight.toDp() },
+        graphLegendCircleSize,
+    )
+}
+
+@Composable
+fun GraphLegendItemView(
     modifier: Modifier = Modifier,
     item: GraphLegendItem
 ) = Row(
@@ -216,7 +229,7 @@ fun GraphLegentItemView(
 
     ColorCircle(
         color = item.color,
-        size = 20.dp
+        size = graphLegendCircleSize,
     )
 
     Spacer(modifier = Modifier.width(2.dp))

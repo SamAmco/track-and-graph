@@ -21,7 +21,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.database.dto.GlobalNote
 import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
@@ -44,6 +43,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
 interface ViewGraphStatViewModel {
@@ -51,7 +51,7 @@ interface ViewGraphStatViewModel {
 
     val graphStatViewData: StateFlow<IGraphStatViewData?>
     val showingNotes: StateFlow<Boolean>
-    val markedNote: StateFlow<GraphNote?>
+    val timeMarker: StateFlow<OffsetDateTime?>
     val notes: StateFlow<List<GraphNote>>
 
     fun showHideNotesClicked()
@@ -69,7 +69,7 @@ class ViewGraphStatViewModelImpl @Inject constructor(
     private val graphStatId = MutableStateFlow<Long?>(null)
 
     override val showingNotes = MutableStateFlow(false)
-    override val markedNote = MutableStateFlow<GraphNote?>(null)
+    override val timeMarker = MutableStateFlow<OffsetDateTime?>(null)
 
     // Data structure to hold both view data and data points
     private data class GraphStatResult(
@@ -185,6 +185,6 @@ class ViewGraphStatViewModelImpl @Inject constructor(
     }
 
     override fun noteClicked(note: GraphNote) {
-        markedNote.value = note
+        timeMarker.value = note.timestamp
     }
 }

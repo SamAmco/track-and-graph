@@ -34,6 +34,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -53,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.graphstatview.ui.FullScreenGraphStatView
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLineText
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
@@ -66,13 +68,13 @@ fun ViewGraphStatScreen(
 ) {
     val graphStatViewData by viewModel.graphStatViewData.collectAsStateWithLifecycle(null)
     val showingNotes by viewModel.showingNotes.collectAsStateWithLifecycle(false)
-    val markedNote by viewModel.markedNote.collectAsStateWithLifecycle(null)
+    val timeMarker by viewModel.timeMarker.collectAsStateWithLifecycle(null)
     val notes by viewModel.notes.collectAsStateWithLifecycle(emptyList())
 
     ViewGraphStatView(
         graphStatViewData = graphStatViewData,
         showingNotes = showingNotes,
-        markedNote = markedNote,
+        timeMarker = timeMarker,
         notes = notes,
         showHideNotesClicked = viewModel::showHideNotesClicked,
         noteClicked = viewModel::noteClicked
@@ -83,8 +85,7 @@ fun ViewGraphStatScreen(
 private fun ViewGraphStatView(
     graphStatViewData: IGraphStatViewData?,
     showingNotes: Boolean,
-    // TODO : implement marked note
-    markedNote: GraphNote?,
+    timeMarker: OffsetDateTime?,
     notes: List<GraphNote>,
     showHideNotesClicked: () -> Unit,
     noteClicked: (note: GraphNote) -> Unit,
@@ -105,16 +106,19 @@ private fun ViewGraphStatView(
             label = "graphHeightRatio"
         )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(animatedGraphHeightRatio)
-                .background(MaterialTheme.colors.surface)
-        ) {
-            GraphViewStub(
-                graphStatViewData = graphStatViewData,
-                modifier = Modifier.fillMaxSize()
-            )
+        if (animatedGraphHeightRatio > 0f) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(animatedGraphHeightRatio)
+                    .background(MaterialTheme.colors.surface)
+            ) {
+                GraphStatView(
+                    modifier = Modifier.fillMaxSize(),
+                    graphStatViewData = graphStatViewData,
+                    timeMarker = timeMarker,
+                )
+            }
         }
 
         NotesToggleButton(
@@ -140,18 +144,20 @@ private fun ViewGraphStatView(
 }
 
 @Composable
-private fun GraphViewStub(
+private fun GraphStatView(
+    modifier: Modifier = Modifier,
     graphStatViewData: IGraphStatViewData?,
-    modifier: Modifier = Modifier
+    timeMarker: OffsetDateTime?
 ) {
-    Box(
-        modifier = modifier,
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = "Graph View Placeholder\n${graphStatViewData?.let { "Data: ${it.javaClass.simpleName}" } ?: "Loading..."}",
-            style = MaterialTheme.typography.body1,
-            color = MaterialTheme.colors.onSurface
+    if (graphStatViewData == null) {
+        CircularProgressIndicator(
+            modifier = modifier
+        )
+    } else {
+        FullScreenGraphStatView(
+            modifier = modifier,
+            graphStatViewData = graphStatViewData,
+            timeMarker = timeMarker,
         )
     }
 }
@@ -300,13 +306,13 @@ private fun NoteCard(
 private fun ViewGraphStatScreenPreview() = ViewGraphStatView(
     graphStatViewData = null,
     showingNotes = true,
-    markedNote = null,
+    timeMarker = null,
     notes = listOf(
         GraphNote.DataPointNote(
             timestamp = OffsetDateTime.parse("2025-07-25T10:30:00Z"),
             noteText = "Felt great today after morning workout! Really pushed myself on the deadlifts.",
             displayValue = "85.2 : Good",
-            featurePath = "Health > Weight"
+            featurePath = "Health/Weight"
         ),
         GraphNote.GlobalNote(
             timestamp = OffsetDateTime.parse("2025-07-24T08:15:00Z"),
@@ -316,13 +322,13 @@ private fun ViewGraphStatScreenPreview() = ViewGraphStatView(
             timestamp = OffsetDateTime.parse("2025-07-23T19:45:00Z"),
             noteText = "Long day at work, stress eating kicked in unfortunately. Need to work on better coping strategies when deadlines approach.",
             displayValue = "2847 : Bad",
-            featurePath = "Nutrition > Daily Calories"
+            featurePath = "Nutrition/Daily Calories"
         ),
         GraphNote.DataPointNote(
             timestamp = OffsetDateTime.parse("2025-07-21T07:00:00Z"),
             noteText = "Perfect sleep!",
             displayValue = "8:23:00 : Refreshed",
-            featurePath = "Sleep > Duration"
+            featurePath = "Sleep/Duration"
         ),
         GraphNote.GlobalNote(
             timestamp = OffsetDateTime.parse("2025-07-19T06:00:00Z"),
