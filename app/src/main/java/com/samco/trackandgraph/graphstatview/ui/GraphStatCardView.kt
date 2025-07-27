@@ -64,7 +64,6 @@ private class AutoCancelMutableInteractionSourceImpl : MutableInteractionSource 
             }
         }
 
-
     override suspend fun emit(interaction: Interaction) {
         interactionsInput.emit(interaction)
     }
@@ -113,10 +112,7 @@ fun GraphStatCardView(
                 )
             }
 
-            GraphStatView(
-                graphStatViewData = graphStatViewData,
-                listMode = true
-            )
+            ListItemGraphStatView(graphStatViewData = graphStatViewData)
         }
     }
 }

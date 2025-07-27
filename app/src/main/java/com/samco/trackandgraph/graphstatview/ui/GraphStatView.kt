@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -54,19 +55,67 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
 import org.luaj.vm2.LuaError
 import org.threeten.bp.OffsetDateTime
 
 @Composable
-fun GraphStatView(
+fun FullScreenGraphStatView(
     modifier: Modifier = Modifier,
     graphStatViewData: IGraphStatViewData,
-    listMode: Boolean,
+    timeMarker: OffsetDateTime? = null,
+) = BoxWithConstraints(modifier = modifier) {
+    val maxHeight = constraints.maxHeight
+    FadingScrollColumn(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        content = {
+            DialogInputSpacing()
+            GraphStatViewContent(
+                modifier = Modifier.fillMaxWidth(),
+                graphStatViewData = graphStatViewData,
+                graphViewMode = GraphViewMode.FullScreenMode(maxHeight),
+                timeMarker = timeMarker,
+            )
+            DialogInputSpacing()
+        }
+    )
+}
+
+@Composable
+fun ListItemGraphStatView(
+    modifier: Modifier = Modifier,
+    graphStatViewData: IGraphStatViewData,
     timeMarker: OffsetDateTime? = null,
     graphHeight: Int? = null
 ) = Column(
     modifier = modifier.fillMaxWidth(),
-    horizontalAlignment = Alignment.CenterHorizontally
+    horizontalAlignment = Alignment.CenterHorizontally,
+    content = {
+        GraphStatViewContent(
+            modifier = Modifier.fillMaxWidth(),
+            graphStatViewData = graphStatViewData,
+            graphViewMode = GraphViewMode.ListMode,
+            timeMarker = timeMarker,
+            graphHeight = graphHeight
+        )
+    }
+)
+
+sealed class GraphViewMode {
+    data object ListMode : GraphViewMode()
+    data class FullScreenMode(
+        val availableHeight: Int
+    ) : GraphViewMode()
+}
+
+@Composable
+private fun GraphStatViewContent(
+    modifier: Modifier = Modifier,
+    graphStatViewData: IGraphStatViewData,
+    graphViewMode: GraphViewMode,
+    timeMarker: OffsetDateTime? = null,
+    graphHeight: Int? = null
 ) {
     GraphHeading(graphStatViewData)
 
@@ -85,7 +134,7 @@ fun GraphStatView(
         else -> GraphStatInnerViewOrLuaGraph(
             modifier = modifier,
             graphStatViewData = graphStatViewData,
-            listMode = listMode,
+            graphViewMode = graphViewMode,
             timeMarker = timeMarker,
             graphHeight = graphHeight
         )
@@ -185,7 +234,7 @@ private fun guessHeight(graphStatViewData: IGraphStatViewData): Dp {
 private fun GraphStatInnerViewOrLuaGraph(
     modifier: Modifier,
     graphStatViewData: IGraphStatViewData,
-    listMode: Boolean,
+    graphViewMode: GraphViewMode,
     timeMarker: OffsetDateTime? = null,
     graphHeight: Int? = null
 ) {
@@ -193,14 +242,14 @@ private fun GraphStatInnerViewOrLuaGraph(
         UnwrappedLuaGraphView(
             modifier = modifier,
             graphStatViewData = graphStatViewData,
-            listMode = listMode,
+            graphViewMode = graphViewMode,
             timeMarker = timeMarker,
             graphHeight = graphHeight
         )
     } else {
         GraphStatInnerView(
             graphStatViewData = graphStatViewData,
-            listMode = listMode,
+            graphViewMode = graphViewMode,
             timeMarker = timeMarker,
             graphHeight = graphHeight
         )
@@ -211,7 +260,7 @@ private fun GraphStatInnerViewOrLuaGraph(
 private fun UnwrappedLuaGraphView(
     modifier: Modifier,
     graphStatViewData: ILuaGraphViewData,
-    listMode: Boolean,
+    graphViewMode: GraphViewMode,
     timeMarker: OffsetDateTime? = null,
     graphHeight: Int? = null
 ) {
@@ -230,7 +279,7 @@ private fun UnwrappedLuaGraphView(
     } else {
         GraphStatInnerView(
             graphStatViewData = unwrapped,
-            listMode = listMode,
+            graphViewMode = graphViewMode,
             timeMarker = timeMarker,
             graphHeight = graphHeight
         )
@@ -241,7 +290,7 @@ private fun UnwrappedLuaGraphView(
 private fun GraphStatInnerView(
     modifier: Modifier = Modifier,
     graphStatViewData: IGraphStatViewData,
-    listMode: Boolean,
+    graphViewMode: GraphViewMode,
     timeMarker: OffsetDateTime? = null,
     graphHeight: Int? = null
 ) = when (graphStatViewData.graphOrStat.type) {
@@ -250,8 +299,7 @@ private fun GraphStatInnerView(
             modifier = modifier,
             viewData = graphStatViewData as ILineGraphViewData,
             timeMarker = timeMarker,
-            listMode = listMode,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode,
         )
 
     GraphStatType.PIE_CHART ->
@@ -272,7 +320,7 @@ private fun GraphStatInnerView(
         LastValueStatView(
             modifier = modifier,
             viewData = graphStatViewData as ILastValueViewData,
-            listMode = listMode,
+            listMode = graphViewMode is GraphViewMode.ListMode,
             graphHeight = graphHeight
         )
 
@@ -288,7 +336,7 @@ private fun GraphStatInnerView(
             modifier = modifier,
             viewData = graphStatViewData as IBarChartViewData,
             timeMarker = timeMarker,
-            listMode = listMode,
+            listMode = graphViewMode is GraphViewMode.ListMode,
             graphHeight = graphHeight
         )
 
