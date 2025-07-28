@@ -44,6 +44,7 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -75,9 +76,7 @@ private fun LastValueStatViewBody(
     isDuration: Boolean,
     graphViewMode: GraphViewMode
 ) = Column(
-    modifier = modifier
-        .padding(dimensionResource(id = R.dimen.card_padding))
-        .applyGraphHeightIfPresent(graphViewMode),
+    modifier = modifier.padding(cardPadding),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
     val context = LocalContext.current

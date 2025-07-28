@@ -83,6 +83,8 @@ private fun TimeHistogramBodyView(
 
     val context = LocalContext.current
 
+    val hasLegend = barValues.size > 1
+
     AndroidViewBinding(
         factory = { inflater, parent, attachToParent ->
             val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
@@ -124,13 +126,14 @@ private fun TimeHistogramBodyView(
             setGraphHeight(
                 graphView = xyPlot,
                 graphViewMode = graphViewMode,
+                hasLegend = hasLegend,
             )
             xyPlot.requestLayout()
         })
 
     DialogInputSpacing()
 
-    if (barValues.size > 1) {
+    if (hasLegend) {
         GraphLegend(
             items = barValues.mapIndexed { i, bar ->
                 val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size

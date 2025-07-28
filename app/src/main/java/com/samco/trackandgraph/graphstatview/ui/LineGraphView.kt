@@ -144,6 +144,7 @@ fun LineGraphBodyView(
             setGraphHeight(
                 graphView = xyPlot,
                 graphViewMode = graphViewMode,
+                hasLegend = true,
             )
         }
         xyPlot.requestLayout()

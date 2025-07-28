@@ -17,6 +17,7 @@
 
 package com.samco.trackandgraph.graphstatview.ui
 
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -31,7 +32,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetwe
 fun AverageTimeBetweenView(
     modifier: Modifier = Modifier,
     viewData: IAverageTimeBetweenViewData,
-    graphViewMode: GraphViewMode,
 ) {
     if (!viewData.enoughData) {
         GraphErrorView(
@@ -39,9 +39,8 @@ fun AverageTimeBetweenView(
             error = R.string.graph_stat_view_not_enough_data_graph
         )
     } else {
-
         Text(
-            modifier = modifier.applyGraphHeightIfPresent(graphViewMode),
+            modifier = modifier.fillMaxSize(),
             text = formatTimeToDaysHoursMinutesSeconds(
                 context = LocalContext.current,
                 millis = viewData.averageMillis.toLong()

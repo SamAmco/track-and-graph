@@ -318,6 +318,8 @@ private fun BarChartBodyView(
 
     val context = LocalContext.current
 
+    val hasLegend = bars.size > 1
+
     AndroidViewBinding(
         factory = { inflater, parent, attachToParent ->
             val binding = GraphXyPlotBinding.inflate(inflater, parent, attachToParent)
@@ -385,6 +387,7 @@ private fun BarChartBodyView(
             setGraphHeight(
                 graphView = this.xyPlot,
                 graphViewMode = graphViewMode,
+                hasLegend = hasLegend
             )
             xyPlot.requestLayout()
             xyPlot.redraw()
@@ -392,7 +395,7 @@ private fun BarChartBodyView(
 
     DialogInputSpacing()
 
-    if (bars.size > 1) {
+    if (hasLegend) {
         GraphLegend(
             items = bars.mapIndexed { i, bar ->
                 val label = bar.segmentSeries.title

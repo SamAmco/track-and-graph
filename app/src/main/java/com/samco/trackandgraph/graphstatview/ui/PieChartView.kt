@@ -149,6 +149,7 @@ private fun PieChartViewBody(
         setGraphHeight(
             graphView = pieChart,
             graphViewMode = graphViewMode,
+            hasLegend = true,
         )
         pieChart.redraw()
         pieChart.getRenderer(PieRenderer::class.java)
