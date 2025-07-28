@@ -53,9 +53,11 @@ interface ViewGraphStatViewModel {
     val showingNotes: StateFlow<Boolean>
     val timeMarker: StateFlow<OffsetDateTime?>
     val notes: StateFlow<List<GraphNote>>
+    val selectedNoteForDialog: StateFlow<GraphNote?>
 
     fun showHideNotesClicked()
     fun noteClicked(note: GraphNote)
+    fun dismissNoteDialog()
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -70,6 +72,7 @@ class ViewGraphStatViewModelImpl @Inject constructor(
 
     override val showingNotes = MutableStateFlow(false)
     override val timeMarker = MutableStateFlow<OffsetDateTime?>(null)
+    override val selectedNoteForDialog = MutableStateFlow<GraphNote?>(null)
 
     // Data structure to hold both view data and data points
     private data class GraphStatResult(
@@ -186,5 +189,10 @@ class ViewGraphStatViewModelImpl @Inject constructor(
 
     override fun noteClicked(note: GraphNote) {
         timeMarker.value = note.timestamp
+        selectedNoteForDialog.value = note
+    }
+
+    override fun dismissNoteDialog() {
+        selectedNoteForDialog.value = null
     }
 }

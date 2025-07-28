@@ -43,7 +43,6 @@ import com.samco.trackandgraph.ui.compose.ui.*
 @Composable
 fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     val dateScrollData = viewModel.dateScrollData.observeAsState().value
-    val weekdayNames = getWeekDayNames(LocalContext.current)
     val isDuration by viewModel.isDuration.observeAsState(false)
     val tracker by viewModel.tracker.observeAsState(null)
     val featureInfo by viewModel.showFeatureInfo.observeAsState()
@@ -61,7 +60,7 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
                 dataPoint = it,
                 addDataPointsViewModel = dataPointDialogViewModel,
                 viewModel = viewModel,
-                weekdayNames = weekdayNames,
+                weekdayNames = getWeekDayNames(LocalContext.current),
                 isDuration = isDuration,
                 tracker = tracker
             )
@@ -79,7 +78,6 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     dataPointInfo?.let {
         DataPointInfoDialog(
             dataPoint = it.toDataPoint(),
-            weekdayNames = weekdayNames,
             isDuration = isDuration,
             onDismissRequest = viewModel::onDismissDataPoint
         )
