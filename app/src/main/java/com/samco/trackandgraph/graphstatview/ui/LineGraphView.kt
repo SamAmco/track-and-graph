@@ -141,7 +141,10 @@ fun LineGraphBodyView(
         )
 
         if (graphViewMode is GraphViewMode.FullScreenMode) {
-            xyPlot.layoutParams.height = (graphViewMode.availableHeight * 0.8).toInt()
+            setGraphHeight(
+                graphView = xyPlot,
+                graphViewMode = graphViewMode,
+            )
         }
         xyPlot.requestLayout()
     })

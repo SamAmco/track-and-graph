@@ -25,6 +25,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,7 +33,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -56,10 +56,14 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.FullScreenGraphStatView
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.DataPointNoteDescriptionDialog
+import com.samco.trackandgraph.ui.compose.ui.GlobalNoteDescriptionDialog
 import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLineText
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.PopupTabBackground
+import com.samco.trackandgraph.ui.compose.ui.cardElevation
+import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -70,14 +74,17 @@ fun ViewGraphStatScreen(
     val showingNotes by viewModel.showingNotes.collectAsStateWithLifecycle(false)
     val timeMarker by viewModel.timeMarker.collectAsStateWithLifecycle(null)
     val notes by viewModel.notes.collectAsStateWithLifecycle(emptyList())
+    val selectedNoteForDialog by viewModel.selectedNoteForDialog.collectAsStateWithLifecycle(null)
 
     ViewGraphStatView(
         graphStatViewData = graphStatViewData,
         showingNotes = showingNotes,
         timeMarker = timeMarker,
         notes = notes,
+        selectedNoteForDialog = selectedNoteForDialog,
         showHideNotesClicked = viewModel::showHideNotesClicked,
-        noteClicked = viewModel::noteClicked
+        noteClicked = viewModel::noteClicked,
+        dismissNoteDialog = viewModel::dismissNoteDialog
     )
 }
 
@@ -87,8 +94,10 @@ private fun ViewGraphStatView(
     showingNotes: Boolean,
     timeMarker: OffsetDateTime?,
     notes: List<GraphNote>,
+    selectedNoteForDialog: GraphNote?,
     showHideNotesClicked: () -> Unit,
     noteClicked: (note: GraphNote) -> Unit,
+    dismissNoteDialog: () -> Unit,
 ) = TnGComposeTheme {
     Column(
         modifier = Modifier.fillMaxSize()
@@ -121,11 +130,13 @@ private fun ViewGraphStatView(
             }
         }
 
-        NotesToggleButton(
-            showingNotes = showingNotes,
-            onToggleClicked = showHideNotesClicked,
-            modifier = Modifier.fillMaxWidth()
-        )
+        if (notes.isNotEmpty()) {
+            NotesToggleButton(
+                showingNotes = showingNotes,
+                onToggleClicked = showHideNotesClicked,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
         if (animatedGraphHeightRatio < 1f) {
             Box(
@@ -141,6 +152,29 @@ private fun ViewGraphStatView(
             }
         }
     }
+
+    // Show dialog when a note is selected
+    selectedNoteForDialog?.let { note ->
+        when (note) {
+            is GraphNote.DataPointNote -> {
+                DataPointNoteDescriptionDialog(
+                    timestamp = note.timestamp,
+                    displayValue = note.displayValue,
+                    note = note.noteText,
+                    featureDisplayName = note.featurePath,
+                    onDismissRequest = dismissNoteDialog
+                )
+            }
+
+            is GraphNote.GlobalNote -> {
+                GlobalNoteDescriptionDialog(
+                    timestamp = note.timestamp,
+                    note = note.noteText,
+                    onDismissRequest = dismissNoteDialog
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -150,9 +184,12 @@ private fun GraphStatView(
     timeMarker: OffsetDateTime?
 ) {
     if (graphStatViewData == null) {
-        CircularProgressIndicator(
-            modifier = modifier
-        )
+        Box(
+            modifier = modifier,
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
     } else {
         FullScreenGraphStatView(
             modifier = modifier,
@@ -176,10 +213,11 @@ private fun NotesToggleButton(
         PopupTabBackground(
             modifier = Modifier.matchParentSize()
         )
+
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = cardPadding),
+                .padding(top = halfDialogInputSpacing, bottom = halfDialogInputSpacing),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -207,7 +245,8 @@ private fun NotesList(
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
-        modifier = modifier.padding(cardPadding),
+        modifier = modifier,
+        contentPadding = PaddingValues(cardPadding),
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
     ) {
         items(notes) { note ->
@@ -226,12 +265,11 @@ private fun NoteCard(
     onNoteClicked: (GraphNote) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    //TODO extract elevation and shape
     Card(
         modifier = modifier
             .clickable { onNoteClicked(note) },
-        elevation = 4.dp,
-        shape = RoundedCornerShape(4.dp)
+        elevation = cardElevation,
+        shape = MaterialTheme.shapes.small,
     ) {
         Column(
             modifier = Modifier.padding(cardPadding)
@@ -337,4 +375,6 @@ private fun ViewGraphStatScreenPreview() = ViewGraphStatView(
     ),
     showHideNotesClicked = {},
     noteClicked = {},
+    selectedNoteForDialog = null,
+    dismissNoteDialog = {},
 )

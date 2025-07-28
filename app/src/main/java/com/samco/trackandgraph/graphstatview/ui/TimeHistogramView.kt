@@ -54,7 +54,7 @@ import kotlin.math.roundToInt
 fun TimeHistogramView(
     modifier: Modifier = Modifier,
     viewData: ITimeHistogramViewData,
-    graphHeight: Int? = null
+    graphViewMode: GraphViewMode,
 ) {
     if (viewData.barValues.isNullOrEmpty()) {
         GraphErrorView(
@@ -67,7 +67,7 @@ fun TimeHistogramView(
             window = viewData.window,
             barValues = viewData.barValues!!,
             maxDisplayHeight = viewData.maxDisplayHeight,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode,
         )
     }
 }
@@ -78,7 +78,7 @@ private fun TimeHistogramBodyView(
     window: TimeHistogramWindowData,
     barValues: List<ITimeHistogramViewData.BarValue>,
     maxDisplayHeight: Double,
-    graphHeight: Int?
+    graphViewMode: GraphViewMode,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
@@ -121,7 +121,10 @@ private fun TimeHistogramBodyView(
             return@AndroidViewBinding binding
         },
         update = {
-            if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
+            setGraphHeight(
+                graphView = xyPlot,
+                graphViewMode = graphViewMode,
+            )
             xyPlot.requestLayout()
         })
 

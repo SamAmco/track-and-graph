@@ -86,8 +86,6 @@ fun FullScreenGraphStatView(
 fun ListItemGraphStatView(
     modifier: Modifier = Modifier,
     graphStatViewData: IGraphStatViewData,
-    timeMarker: OffsetDateTime? = null,
-    graphHeight: Int? = null
 ) = Column(
     modifier = modifier.fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally,
@@ -96,8 +94,6 @@ fun ListItemGraphStatView(
             modifier = Modifier.fillMaxWidth(),
             graphStatViewData = graphStatViewData,
             graphViewMode = GraphViewMode.ListMode,
-            timeMarker = timeMarker,
-            graphHeight = graphHeight
         )
     }
 )
@@ -115,7 +111,6 @@ private fun GraphStatViewContent(
     graphStatViewData: IGraphStatViewData,
     graphViewMode: GraphViewMode,
     timeMarker: OffsetDateTime? = null,
-    graphHeight: Int? = null
 ) {
     GraphHeading(graphStatViewData)
 
@@ -136,7 +131,6 @@ private fun GraphStatViewContent(
             graphStatViewData = graphStatViewData,
             graphViewMode = graphViewMode,
             timeMarker = timeMarker,
-            graphHeight = graphHeight
         )
     }
 }
@@ -236,7 +230,6 @@ private fun GraphStatInnerViewOrLuaGraph(
     graphStatViewData: IGraphStatViewData,
     graphViewMode: GraphViewMode,
     timeMarker: OffsetDateTime? = null,
-    graphHeight: Int? = null
 ) {
     if (graphStatViewData is ILuaGraphViewData) {
         UnwrappedLuaGraphView(
@@ -244,14 +237,12 @@ private fun GraphStatInnerViewOrLuaGraph(
             graphStatViewData = graphStatViewData,
             graphViewMode = graphViewMode,
             timeMarker = timeMarker,
-            graphHeight = graphHeight
         )
     } else {
         GraphStatInnerView(
             graphStatViewData = graphStatViewData,
             graphViewMode = graphViewMode,
             timeMarker = timeMarker,
-            graphHeight = graphHeight
         )
     }
 }
@@ -262,7 +253,6 @@ private fun UnwrappedLuaGraphView(
     graphStatViewData: ILuaGraphViewData,
     graphViewMode: GraphViewMode,
     timeMarker: OffsetDateTime? = null,
-    graphHeight: Int? = null
 ) {
     if (!graphStatViewData.hasData) {
         GraphErrorView(
@@ -281,7 +271,6 @@ private fun UnwrappedLuaGraphView(
             graphStatViewData = unwrapped,
             graphViewMode = graphViewMode,
             timeMarker = timeMarker,
-            graphHeight = graphHeight
         )
     }
 }
@@ -292,7 +281,6 @@ private fun GraphStatInnerView(
     graphStatViewData: IGraphStatViewData,
     graphViewMode: GraphViewMode,
     timeMarker: OffsetDateTime? = null,
-    graphHeight: Int? = null
 ) = when (graphStatViewData.graphOrStat.type) {
     GraphStatType.LINE_GRAPH ->
         LineGraphView(
@@ -306,29 +294,28 @@ private fun GraphStatInnerView(
         PieChartView(
             modifier = modifier,
             viewData = graphStatViewData as IPieChartViewData,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode,
         )
 
     GraphStatType.AVERAGE_TIME_BETWEEN ->
         AverageTimeBetweenView(
             modifier = modifier,
             viewData = graphStatViewData as IAverageTimeBetweenViewData,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode,
         )
 
     GraphStatType.LAST_VALUE ->
         LastValueStatView(
             modifier = modifier,
             viewData = graphStatViewData as ILastValueViewData,
-            listMode = graphViewMode is GraphViewMode.ListMode,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode,
         )
 
     GraphStatType.TIME_HISTOGRAM ->
         TimeHistogramView(
             modifier = modifier,
             viewData = graphStatViewData as ITimeHistogramViewData,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode,
         )
 
     GraphStatType.BAR_CHART ->
@@ -337,7 +324,7 @@ private fun GraphStatInnerView(
             viewData = graphStatViewData as IBarChartViewData,
             timeMarker = timeMarker,
             listMode = graphViewMode is GraphViewMode.ListMode,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode,
         )
 
     GraphStatType.LUA_SCRIPT -> {

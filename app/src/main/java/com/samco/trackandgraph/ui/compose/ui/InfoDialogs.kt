@@ -21,29 +21,24 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.base.helpers.getDisplayValue
-
+import org.threeten.bp.OffsetDateTime
 
 @Composable
 fun DataPointInfoDialog(
     dataPoint: DataPoint,
     isDuration: Boolean,
-    weekdayNames: List<String>,
     onDismissRequest: () -> Unit
 ) = CustomDialog(onDismissRequest) {
-    Text(
-        formatDayMonthYearHourMinuteWeekDayOneLine(
-            LocalContext.current,
-            weekdayNames,
-            dataPoint.timestamp
-        ),
-        fontSize = MaterialTheme.typography.h5.fontSize,
-        fontWeight = MaterialTheme.typography.h5.fontWeight
+    DayMonthYearHourMinuteWeekDayOneLineText(
+        dateTime = dataPoint.timestamp,
+        style = MaterialTheme.typography.h5,
+        fontWeight = FontWeight.Bold
     )
     DialogInputSpacing()
     Text(dataPoint.getDisplayValue(isDuration))
@@ -94,3 +89,66 @@ fun FeatureInfoDialog(
     Text(feature.description)
 }
 
+@Composable
+fun GlobalNoteDescriptionDialog(
+    timestamp: OffsetDateTime,
+    note: String,
+    onDismissRequest: () -> Unit
+) = CustomDialog(onDismissRequest) {
+    // Header with timestamp
+    DayMonthYearHourMinuteWeekDayOneLineText(
+        dateTime = timestamp,
+        style = MaterialTheme.typography.h6,
+        fontWeight = FontWeight.Bold
+    )
+    
+    DialogInputSpacing()
+    
+    // Note text (scrollable body)
+    Text(
+        text = note,
+        style = MaterialTheme.typography.body1
+    )
+}
+
+@Composable
+fun DataPointNoteDescriptionDialog(
+    timestamp: OffsetDateTime,
+    displayValue: String,
+    note: String,
+    featureDisplayName: String,
+    onDismissRequest: () -> Unit
+) = CustomDialog(onDismissRequest) {
+    // Header with timestamp
+    DayMonthYearHourMinuteWeekDayOneLineText(
+        dateTime = timestamp,
+        style = MaterialTheme.typography.h6,
+        fontWeight = FontWeight.Bold
+    )
+    
+    // Feature display name
+    Text(
+        text = featureDisplayName,
+        style = MaterialTheme.typography.body1,
+        fontStyle = FontStyle.Italic,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+    
+    // Display value
+    Text(
+        text = displayValue,
+        style = MaterialTheme.typography.body1,
+        fontStyle = FontStyle.Italic,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
+    )
+    
+    DialogInputSpacing()
+    
+    // Note text (scrollable body)
+    Text(
+        text = note,
+        style = MaterialTheme.typography.body1
+    )
+}

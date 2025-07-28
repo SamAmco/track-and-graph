@@ -21,7 +21,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -35,7 +34,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
@@ -46,8 +44,6 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 
@@ -55,8 +51,7 @@ import org.threeten.bp.OffsetDateTime
 fun LastValueStatView(
     modifier: Modifier = Modifier,
     viewData: ILastValueViewData,
-    listMode: Boolean,
-    graphHeight: Int? = null
+    graphViewMode: GraphViewMode
 ) = CompositionLocalProvider(
     LocalContentColor provides MaterialTheme.tngColors.onSurface,
 ) {
@@ -65,8 +60,7 @@ fun LastValueStatView(
             modifier = modifier,
             dataPoint = it,
             isDuration = viewData.isDuration,
-            listMode = listMode,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode
         )
     } ?: GraphErrorView(
         modifier = modifier,
@@ -79,27 +73,18 @@ private fun LastValueStatViewBody(
     modifier: Modifier = Modifier,
     dataPoint: DataPoint,
     isDuration: Boolean,
-    listMode: Boolean,
-    graphHeight: Int?
+    graphViewMode: GraphViewMode
 ) = Column(
     modifier = modifier
         .padding(dimensionResource(id = R.dimen.card_padding))
-        .let {
-            if (graphHeight != null) it.height(graphHeight.dp)
-            else it
-        },
+        .applyGraphHeightIfPresent(graphViewMode),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
     val context = LocalContext.current
 
     val weekdayNames = getWeekDayNames(context)
 
-    val now = flow {
-        while (true) {
-            emit(OffsetDateTime.now())
-            delay(1000)
-        }
-    }.collectAsStateWithLifecycle(OffsetDateTime.now()).value
+    val now = OffsetDateTime.now()
 
     val duration = Duration.between(dataPoint.timestamp, now)
 
@@ -144,7 +129,7 @@ private fun LastValueStatViewBody(
                 modifier = Modifier.weight(1f),
                 dataPoint = dataPoint,
                 isDuration = isDuration,
-                restrictNoteText = listMode
+                restrictNoteText = graphViewMode is GraphViewMode.ListMode
             )
         }
     }

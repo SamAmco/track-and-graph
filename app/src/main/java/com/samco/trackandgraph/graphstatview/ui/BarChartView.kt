@@ -120,7 +120,7 @@ fun BarChartView(
     viewData: IBarChartViewData,
     listMode: Boolean,
     timeMarker: OffsetDateTime? = null,
-    graphHeight: Int? = null
+    graphViewMode: GraphViewMode,
 ) = Box(modifier = modifier) {
     if (viewData.xDates.isEmpty() || viewData.bars.isEmpty()) {
         GraphErrorView(
@@ -146,7 +146,7 @@ fun BarChartView(
             yAxisSubdivides = viewData.yAxisSubdivides,
             listMode = listMode,
             barMarkerStore = barMarkerStore,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode
         )
 
         if (!listMode) barMarkerStore.highlightedIndex?.let {
@@ -313,7 +313,7 @@ private fun BarChartBodyView(
     yAxisSubdivides: Int,
     listMode: Boolean,
     barMarkerStore: BarMarkerStore,
-    graphHeight: Int? = null
+    graphViewMode: GraphViewMode,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
@@ -382,7 +382,10 @@ private fun BarChartBodyView(
                 )
             }
 
-            if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
+            setGraphHeight(
+                graphView = this.xyPlot,
+                graphViewMode = graphViewMode,
+            )
             xyPlot.requestLayout()
             xyPlot.redraw()
         })

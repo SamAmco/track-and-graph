@@ -29,11 +29,13 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -42,7 +44,6 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.Plot
@@ -146,6 +147,17 @@ fun setUpXYPlotYAxis(
     }
 }
 
+fun setGraphHeight(
+    graphView: View,
+    graphViewMode: GraphViewMode,
+) {
+    if (graphViewMode is GraphViewMode.FullScreenMode) {
+        graphView.layoutParams.height = (graphViewMode.availableHeight * 0.85).toInt()
+    } else {
+        graphView.layoutParams.height = graphView.context.resources.getDimensionPixelSize(R.dimen.graph_height)
+    }
+}
+
 @Composable
 fun GraphErrorView(
     modifier: Modifier = Modifier,
@@ -191,6 +203,26 @@ fun getColor(
     colorSpec: ColorSpec,
 ) = Color(getColorInt(context, colorSpec))
 
+private val graphLegendCircleSize = 20.dp
+private val graphLegendTextStyle @Composable get() = MaterialTheme.typography.body2
+
+@Composable
+fun legendItemLineHeight(): Int {
+    val density = LocalDensity.current
+    val typography = graphLegendTextStyle
+
+    return remember(density, typography) {
+        val body2LineHeight = with(density) {
+            typography.lineHeight.toPx()
+        }
+        val circleSize = with(density) {
+            graphLegendCircleSize.toPx()
+        }
+
+        maxOf(body2LineHeight, circleSize).toInt()
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun GraphLegend(
@@ -205,17 +237,6 @@ fun GraphLegend(
         GraphLegendItemView(item = it)
         DialogInputSpacing()
     }
-}
-
-val graphLegendCircleSize = 20.dp
-
-@Composable
-fun getLegendItemHeight(): Dp {
-    val density = LocalDensity.current
-    return maxOf(
-        with(density) { MaterialTheme.typography.body2.lineHeight.toDp() },
-        graphLegendCircleSize,
-    )
 }
 
 @Composable
@@ -236,6 +257,20 @@ fun GraphLegendItemView(
 
     Text(
         text = item.label,
-        style = MaterialTheme.typography.body2
+        style = graphLegendTextStyle
     )
+}
+
+/**
+ * Applies height modifier based on GraphViewMode for full screen display
+ */
+@Composable
+fun Modifier.applyGraphHeightIfPresent(graphViewMode: GraphViewMode): Modifier {
+    return if (graphViewMode is GraphViewMode.FullScreenMode) {
+        val density = LocalDensity.current
+        val heightInDp = with(density) { graphViewMode.availableHeight.toDp() }
+        this.height(heightInDp)
+    } else {
+        this
+    }
 }
