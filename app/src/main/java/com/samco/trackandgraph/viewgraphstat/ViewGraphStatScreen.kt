@@ -106,7 +106,7 @@ private fun ViewGraphStatView(
         val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
 
         val targetGraphHeight = remember(showingNotes, isPortrait) {
-            val minGraphHeight = if (isPortrait) 0.3f else 0f
+            val minGraphHeight = if (isPortrait) 0.35f else 0f
             if (showingNotes) minGraphHeight else 1f
         }
         val animatedGraphHeightRatio by animateFloatAsState(

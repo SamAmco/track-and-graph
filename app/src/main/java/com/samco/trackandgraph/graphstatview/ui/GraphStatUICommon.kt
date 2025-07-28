@@ -29,7 +29,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
@@ -150,9 +149,11 @@ fun setUpXYPlotYAxis(
 fun setGraphHeight(
     graphView: View,
     graphViewMode: GraphViewMode,
+    hasLegend: Boolean,
 ) {
     if (graphViewMode is GraphViewMode.FullScreenMode) {
-        graphView.layoutParams.height = (graphViewMode.availableHeight * 0.85).toInt()
+        val multiplier = if (hasLegend) 0.85 else 0.9
+        graphView.layoutParams.height = (graphViewMode.availableHeight * multiplier).toInt()
     } else {
         graphView.layoutParams.height = graphView.context.resources.getDimensionPixelSize(R.dimen.graph_height)
     }
@@ -259,18 +260,4 @@ fun GraphLegendItemView(
         text = item.label,
         style = graphLegendTextStyle
     )
-}
-
-/**
- * Applies height modifier based on GraphViewMode for full screen display
- */
-@Composable
-fun Modifier.applyGraphHeightIfPresent(graphViewMode: GraphViewMode): Modifier {
-    return if (graphViewMode is GraphViewMode.FullScreenMode) {
-        val density = LocalDensity.current
-        val heightInDp = with(density) { graphViewMode.availableHeight.toDp() }
-        this.height(heightInDp)
-    } else {
-        this
-    }
 }
