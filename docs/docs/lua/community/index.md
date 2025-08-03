@@ -10,7 +10,8 @@
 - [Merge Inputs](./bar-charts/merge-inputs/README.md): Plots all provided data sources in a single bar chart where all data points are sorted by their timestamp.
 
 ## Text
-- [Total this period](./text/total-this-period/README.md): Displays the total value of from the provided data sources in the given period e.g. the total this week.
+- [Total this period](./text/total-this-period/README.md): Displays the total value from the provided data sources for a fixed time period (e.g., this week from Monday to Sunday, this month from 1st to last day).
+- [Total in Last Duration](./text/total-in-last-duration/README.md): Displays the total value from the provided data sources over a rolling time window (e.g., last 7 days, last 24 hours, last 30 days).
 - [Fraction](./text/fraction/README.md): Displays a fraction representing the ratio of values with specified labels to total values. 
 - [Average in duration](./text/average-in-duration/README.md): Calculates the average value of a data source over a specified duration, such as the last 24 hours or the last week.
 
