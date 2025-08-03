@@ -18,12 +18,18 @@
 package com.samco.trackandgraph.viewgraphstat
 
 import android.content.res.Configuration
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
+import androidx.compose.foundation.gestures.drag
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -39,11 +45,21 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerInputScope
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -57,14 +73,15 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.graphstatview.ui.FullScreenGraphStatView
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.DataPointNoteDescriptionDialog
-import com.samco.trackandgraph.ui.compose.ui.GlobalNoteDescriptionDialog
 import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLineText
+import com.samco.trackandgraph.ui.compose.ui.GlobalNoteDescriptionDialog
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.PopupTabBackground
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.PopupTabBackground
 import org.threeten.bp.OffsetDateTime
+import kotlin.math.abs
 
 @Composable
 fun ViewGraphStatScreen(
@@ -99,80 +116,127 @@ private fun ViewGraphStatView(
     noteClicked: (note: GraphNote) -> Unit,
     dismissNoteDialog: () -> Unit,
 ) = TnGComposeTheme {
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
+    BoxWithConstraints {
         val configuration = LocalConfiguration.current
         val isPortrait = configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        val density = LocalDensity.current
+        val containerHeight = maxHeight
 
-        val targetGraphHeight = remember(showingNotes, isPortrait) {
-            val minGraphHeight = if (isPortrait) 0.35f else 0f
-            if (showingNotes) minGraphHeight else 1f
+        // Calculate container height in pixels once and remember it
+        val containerHeightPx = remember(containerHeight, density) {
+            with(density) { containerHeight.toPx() }
         }
-        val animatedGraphHeightRatio by animateFloatAsState(
-            targetValue = targetGraphHeight,
-            animationSpec = tween(durationMillis = 300),
-            label = "graphHeightRatio"
-        )
 
-        if (animatedGraphHeightRatio > 0f) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(animatedGraphHeightRatio)
-                    .background(MaterialTheme.colors.surface)
-            ) {
-                GraphStatView(
-                    modifier = Modifier.fillMaxSize(),
-                    graphStatViewData = graphStatViewData,
-                    timeMarker = timeMarker,
-                )
+        // Store the user's preferred notes position (when notes are visible)
+        val defaultNotesPosition = if (isPortrait) 0.35f else 0f
+        var savedGraphWeight by rememberSaveable { mutableFloatStateOf(defaultNotesPosition) }
+        var currentGraphWeight by remember { mutableFloatStateOf(if (showingNotes) savedGraphWeight else 1f) }
+
+        // Track whether we're currently dragging
+        var isDraggingNotesButton by remember { mutableStateOf(false) }
+        var justTappedNotesButton by remember { mutableStateOf(false) }
+
+        //Bug - Drag from bottom, then minimize, it animates back to open
+        // Solution - show/hide notes should not just be a toggle function, but a mutable state we can
+        // set to true or false. Let's use a mutable state flow in the viewmodel, and a function that takes
+        // a boolean as a parameter. Also keep the toggle function that doesn't take a boolean and we'll use
+        // that for the toggle button
+        LaunchedEffect(showingNotes, isDraggingNotesButton, justTappedNotesButton) {
+            // If the user is dragging, or the current graph weight and the saved graph weight are very close
+            // (meaning the user just finished dragging), don't animate
+            if (isDraggingNotesButton || !justTappedNotesButton) return@LaunchedEffect
+
+            val duration = 300
+            val animationSpec = tween<Float>(
+                durationMillis = duration,
+                easing = FastOutSlowInEasing
+            )
+            val initialValue = if (showingNotes) 1f else currentGraphWeight
+            val targetValue = if (showingNotes) savedGraphWeight else 1f
+
+            animate(
+                initialValue = initialValue,
+                targetValue = targetValue,
+                animationSpec = animationSpec
+            ) { value, _ ->
+                currentGraphWeight = value
             }
         }
 
-        if (notes.isNotEmpty()) {
-            NotesToggleButton(
-                showingNotes = showingNotes,
-                onToggleClicked = showHideNotesClicked,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (currentGraphWeight > 0f) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(currentGraphWeight)
+                        .background(MaterialTheme.colors.surface)
+                ) {
+                    GraphStatView(
+                        modifier = Modifier.fillMaxSize(),
+                        graphStatViewData = graphStatViewData,
+                        timeMarker = timeMarker,
+                    )
+                }
+            }
 
-        if (animatedGraphHeightRatio < 1f) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f - animatedGraphHeightRatio)
-            ) {
-                NotesList(
-                    notes = notes,
-                    onNoteClicked = noteClicked,
-                    modifier = Modifier.fillMaxSize()
+            if (notes.isNotEmpty()) {
+                NotesToggleButton(
+                    showingNotes = showingNotes,
+                    onToggleClicked = {
+                        justTappedNotesButton = true
+                        showHideNotesClicked()
+                    },
+                    onDrag = { dragOffset ->
+                        justTappedNotesButton = false
+                        println("samsam setting onDrag called with $dragOffset, $showingNotes")
+                        // Convert pixel offset to weight change
+                        val weightChange = -dragOffset.y / containerHeightPx
+                        val newWeight = (currentGraphWeight - weightChange).coerceIn(0.1f, 0.9f)
+
+                        // Update saved position and current weight
+                        savedGraphWeight = newWeight
+                        println("samsam setting currentGraphWeight to $newWeight")
+                        currentGraphWeight = newWeight
+                    },
+                    onDraggingChanged = { isDraggingNotesButton = it },
+                    modifier = Modifier.fillMaxWidth()
                 )
+            }
+
+            if (currentGraphWeight < 1f) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f - currentGraphWeight)
+                ) {
+                    NotesList(
+                        notes = notes,
+                        onNoteClicked = noteClicked,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
             }
         }
     }
 
-    // Show dialog when a note is selected
+    // Handle dialog display
     selectedNoteForDialog?.let { note ->
-        when (note) {
-            is GraphNote.DataPointNote -> {
-                DataPointNoteDescriptionDialog(
-                    timestamp = note.timestamp,
-                    displayValue = note.displayValue,
-                    note = note.noteText,
-                    featureDisplayName = note.featurePath,
-                    onDismissRequest = dismissNoteDialog
-                )
-            }
-
-            is GraphNote.GlobalNote -> {
-                GlobalNoteDescriptionDialog(
-                    timestamp = note.timestamp,
-                    note = note.noteText,
-                    onDismissRequest = dismissNoteDialog
-                )
-            }
+        if (note is GraphNote.GlobalNote) {
+            GlobalNoteDescriptionDialog(
+                timestamp = note.timestamp,
+                note = note.noteText,
+                onDismissRequest = dismissNoteDialog
+            )
+        } else if (note is GraphNote.DataPointNote) {
+            DataPointNoteDescriptionDialog(
+                timestamp = note.timestamp,
+                displayValue = note.displayValue,
+                note = note.noteText,
+                featureDisplayName = note.featurePath,
+                onDismissRequest = dismissNoteDialog
+            )
         }
     }
 }
@@ -199,16 +263,55 @@ private fun GraphStatView(
     }
 }
 
+suspend fun PointerInputScope.detectTapAndDragGestures(
+    onTap: () -> Unit,
+    onDrag: (Offset) -> Unit,
+    onDraggingChanged: (Boolean) -> Unit = {}
+) {
+    forEachGesture {
+        awaitPointerEventScope {
+            val down = awaitFirstDown()
+            var dragStarted = false
+
+            val drag = awaitTouchSlopOrCancellation(down.id) { change, _ ->
+                dragStarted = true
+                onDraggingChanged(true)
+                change.consume()
+            }
+
+            if (drag != null && dragStarted) {
+                // Drag started
+                drag(drag.id) { change ->
+                    onDrag(change.positionChange())
+                    change.consume()
+                }
+                // Drag ended
+                onDraggingChanged(false)
+            } else if (!dragStarted) {
+                onTap()
+            }
+        }
+    }
+}
+
 @Composable
 private fun NotesToggleButton(
     showingNotes: Boolean,
     onToggleClicked: () -> Unit,
+    onDrag: (Offset) -> Unit,
+    onDraggingChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onToggleClicked() },
+            .pointerInput(Unit) {
+                detectTapAndDragGestures(
+                    onTap = onToggleClicked,
+                    onDrag = onDrag,
+                    onDraggingChanged = onDraggingChanged
+                )
+            },
     ) {
         PopupTabBackground(
             modifier = Modifier.matchParentSize()
