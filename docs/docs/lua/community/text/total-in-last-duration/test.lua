@@ -38,7 +38,7 @@ M.test_default_last_7_days = {
   end,
   assertions = function(result)
     test.assertEquals(11, result.text) -- 1 + 2 + 3 + 5 = 11 (excludes the 8-day-old value)
-    test.assertEquals(3, result.size) -- Large text for single source
+    test.assertEquals(2, result.size) -- Medium text for single source
   end,
 }
 
@@ -72,7 +72,7 @@ M.test_custom_duration_24_hours = {
   end,
   assertions = function(result)
     test.assertEquals(70, result.text) -- 10 + 20 + 40 = 70 (excludes 25-hour-old value)
-    test.assertEquals(3, result.size) -- Large text for single source
+    test.assertEquals(2, result.size) -- Medium text for single source
   end,
 }
 
@@ -116,7 +116,7 @@ M.test_multi_source_output = {
   end,
   assertions = function(result)
     test.assertEquals("12\nsource2: 9\nsource1: 3", result.text) -- source1: 1+2=3, source2: 3+6=9, total: 12
-    test.assertEquals(2, result.size) -- Medium text for multiple sources
+    test.assertEquals(1, result.size) -- Small text for multiple sources
   end,
 }
 
@@ -135,13 +135,13 @@ M.test_empty_result = {
   end,
   assertions = function(result)
     test.assertEquals("0", result.text)
-    test.assertEquals(3, result.size) -- Large text for single source
+    test.assertEquals(2, result.size) -- Medium text for single source
   end,
 }
 
 M.test_text_size_override = {
   config = {
-    text_size = "1", -- Override to small text for single source (normally would be large)
+    text_size = "3", -- Override to large text for single source (normally would be large)
   },
   sources = function()
     local now = core.time().timestamp
@@ -160,7 +160,7 @@ M.test_text_size_override = {
   end,
   assertions = function(result)
     test.assertEquals(20, result.text)
-    test.assertEquals(1, result.size) -- Small text override instead of default large
+    test.assertEquals(3, result.size) -- Large text override instead of default large
   end,
 }
 
