@@ -5,6 +5,8 @@ local graph = require("tng.graph")
 -- Script: Text - Total This Period
 -- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
 local period = core.PERIOD.WEEK
+-- Multiplier for the period (e.g. 2 for this 2 weeks when period is WEEK)
+local multiplier = 1
 -- Text size (1=small, 2=medium, 3=large). If nil, uses smart defaults.
 local text_size = nil
 --- PREVIEW_END
@@ -34,7 +36,7 @@ end
 
 return function(sources)
 	local next_end = core.get_end_of_period(period, core.time().timestamp)
-	local next_start = core.shift(next_end, period, -1)
+	local next_start = core.shift(next_end, period, -multiplier)
 
 	local data = {}
 	for name, source in pairs(sources) do
@@ -54,13 +56,13 @@ return function(sources)
 	if #totals == 0 then
 		return nil
 	elseif #totals == 1 then
-		local size = text_size or 3  -- Default to large for single source
+		local size = text_size or 2  -- Default to medium for single source
 		return graph.text({
 			text = totals[1].total,
 			size = size
 		})
 	else
-		local size = text_size or 2  -- Default to medium for multiple sources
+		local size = text_size or 1  -- Default to small for multiple sources
 		return multi_input_text_output(totals, size)
 	end
 end

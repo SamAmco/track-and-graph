@@ -57,13 +57,13 @@ return function(sources)
 	if #totals == 0 then
 		return nil
 	elseif #totals == 1 then
-		local size = text_size or 3  -- Default to large for single source
+		local size = text_size or 2  -- Default to medium for single source
 		return graph.text({
 			text = totals[1].total,
 			size = size
 		})
 	else
-		local size = text_size or 2  -- Default to medium for multiple sources
+		local size = text_size or 1  -- Default to small for multiple sources
 		return multi_input_text_output(totals, size)
 	end
 end
