@@ -39,11 +39,14 @@ M.test_basic_fraction = {
 	end,
 }
 
+local print_date = function(date)
+    print(date.year .. "/" .. date.month .. "/" .. date.day .. " " .. date.hour .. ":" .. date.min .. ":" .. date.sec)
+end
+
 M.test_fraction_with_period = {
 	config = {
 		numerator_labels = "{'A'}",
 		period = "core.PERIOD.WEEK",
-		period_multiplier = "1",
 	},
 	sources = function()
 		local now = core.time().timestamp
@@ -74,7 +77,7 @@ M.test_fraction_with_period = {
 	assertions = function(result)
 		test.assert("result was nil", result)
 		test.assertEquals(graph.GRAPH_TYPE.TEXT, result.type)
-		test.assertEquals("25/30", result.text)
+		test.assertEquals("10/15", result.text)
 	end,
 }
 
