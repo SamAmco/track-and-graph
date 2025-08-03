@@ -36,6 +36,7 @@ M.test_default_period_week = {
   end,
   assertions = function(result)
     test.assertEquals(6, result.text)
+    test.assertEquals(3, result.size) -- Large text for single source
   end,
 }
 
@@ -69,6 +70,7 @@ M.test_period_month = {
   end,
   assertions = function(result)
     test.assertEquals(6, result.text)
+    test.assertEquals(3, result.size) -- Large text for single source
   end,
 }
 
@@ -118,6 +120,33 @@ M.test_multi_source_output = {
   end,
   assertions = function(result)
     test.assertEquals("18\nsource2: 12\nsource1: 6", result.text)
+    test.assertEquals(2, result.size) -- Medium text for multiple sources
+  end,
+}
+
+M.test_text_size_override = {
+  config = {
+    text_size = "1", -- Override to small text for single source (normally would be large)
+  },
+  sources = function()
+    local end_of_week_date = core.get_end_of_period(PWEEK, core.time().timestamp)
+    local end_of_week = core.time(end_of_week_date).timestamp
+    return {
+      source1 = {
+        {
+          timestamp = end_of_week - DDAY,
+          value = 5,
+        },
+        {
+          timestamp = end_of_week - (DDAY * 2),
+          value = 10,
+        },
+      },
+    }
+  end,
+  assertions = function(result)
+    test.assertEquals(15, result.text)
+    test.assertEquals(1, result.size) -- Small text override instead of default large
   end,
 }
 

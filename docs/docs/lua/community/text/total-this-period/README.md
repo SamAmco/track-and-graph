@@ -20,7 +20,15 @@ This script accepts the following configuration parameters:
 ```lua
 -- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
 local period = core.PERIOD.WEEK
+
+-- Text size (1=small, 2=medium, 3=large). If nil, uses smart defaults.
+local text_size = nil
 ```
+
+**Smart defaults for text size:**
+- Single data source: Large text (size 3)
+- Multiple data sources: Medium text (size 2) for better readability
+- Override: Use specified size for all cases
 
 [Install via deeplink](trackandgraph://lua_inject_url?url=https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/docs/docs/lua/community/text/total-this-period/script.lua)
 

@@ -8,9 +8,11 @@ local graph = require("tng.graph")
 local duration = core.DURATION.DAY
 -- Multiplier for the duration (e.g. 7 for last 7 days when duration is DAY)
 local multiplier = 7
+-- Text size (1=small, 2=medium, 3=large). If nil, uses smart defaults.
+local text_size = nil
 --- PREVIEW_END
 
-local function multi_input_text_output(totals)
+local function multi_input_text_output(totals, size)
 	table.sort(totals, function(a, b)
 		return a.total > b.total
 	end)
@@ -27,7 +29,10 @@ local function multi_input_text_output(totals)
 		end
 	end
 
-	return graph.text(text)
+	return graph.text({
+		text = text,
+		size = size
+	})
 end
 
 return function(sources)
@@ -52,8 +57,13 @@ return function(sources)
 	if #totals == 0 then
 		return nil
 	elseif #totals == 1 then
-		return graph.text(totals[1].total)
+		local size = text_size or 3  -- Default to large for single source
+		return graph.text({
+			text = totals[1].total,
+			size = size
+		})
 	else
-		return multi_input_text_output(totals)
+		local size = text_size or 2  -- Default to medium for multiple sources
+		return multi_input_text_output(totals, size)
 	end
 end
