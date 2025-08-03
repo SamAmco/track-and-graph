@@ -32,7 +32,7 @@ M.LINE_POINT_STYLE = {
 --- @since v5.1.0
 --- @class TextGraphParams
 --- @field text (string|number): The text to display.
---- @field size? integer: 1-3 The size of the text small, medium or large. Defaults to large.
+--- @field size? integer: 1-3 The size of the text small, medium or large. Defaults to medium.
 --- @field align? string: start, centre, or end The alignment of the text. Defaults to centre.
 
 --- @since v5.1.0
