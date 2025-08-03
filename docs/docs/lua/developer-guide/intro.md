@@ -312,6 +312,8 @@ assertions = function(result)
 end
 ```
 
+For more comprehensive testing examples, see the [community script test files](https://github.com/SamAmco/track-and-graph/tree/master/docs/docs/lua/community) which demonstrate common patterns for time-based scenarios, multi-source testing, and edge cases.
+
 ### Running tests
 
 Since the tests run in the actual Track & Graph Lua engine, you need an Android development environment to run them. You should be ok with just the CLI tools, or you can install Android Studio if you prefer. [ You can download those things here. ](https://developer.android.com/studio)
