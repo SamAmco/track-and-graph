@@ -662,7 +662,12 @@
 
 
 <h1 id="total-this-period">Total this period<a class="headerlink" href="#total-this-period" title="Permanent link">#</a></h1>
-<p>Shows the total of a given input over a specified period of time. For example, the total this week (Monday to Sunday) or the total this month. If multiple data sources are given then the total of each data source is shown separately, as well as the overall total.</p>
+<p>Shows the total of a given input over a specified period of time <strong>from the beginning of that period</strong>. For example:
+- "Total this week" shows data from Monday 00:00 to Sunday 23:59 of the current week
+- "Total this month" shows data from the 1st day 00:00 to the last day 23:59 of the current month
+- "Total this day" shows data from 00:00 to 23:59 of today</p>
+<p>This is different from a rolling window approach - it uses fixed period boundaries that reset at specific times (start of week, month, etc.).</p>
+<p>If multiple data sources are given then the total of each data source is shown separately, as well as the overall total.</p>
 <div style="text-align: center;">
     <img src="image.jpg" alt="Total this period" style="width: 400px; height: auto;">
 </div>
@@ -671,7 +676,25 @@
 <p>This script accepts the following configuration parameters:</p>
 <div class="highlight"><pre><span></span><code><span class="c1">-- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week</span>
 <span class="kd">local</span><span class="w"> </span><span class="nv">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">core</span><span class="p">.</span><span class="py">PERIOD</span><span class="p">.</span><span class="py">WEEK</span>
+
+<span class="c1">-- Multiplier for the period (e.g. 2 for this 2 weeks when period is WEEK)</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">multiplier</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
+
+<span class="c1">-- Text size (1=small, 2=medium, 3=large). If nil, uses smart defaults.</span>
+<span class="kd">local</span><span class="w"> </span><span class="nv">text_size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">nil</span>
 </code></pre></div>
+<p>Available period units:
+- <code>core.PERIOD.DAY</code> - Days
+- <code>core.PERIOD.WEEK</code> - Weeks<br />
+- <code>core.PERIOD.MONTH</code> - Months
+- <code>core.PERIOD.YEAR</code> - Years</p>
+<p>The multiplier allows you to extend periods beyond single units. For example:
+- <code>period = core.PERIOD.WEEK, multiplier = 2</code> shows "this 2 weeks"
+- <code>period = core.PERIOD.MONTH, multiplier = 3</code> shows "this 3 months"</p>
+<p><strong>Smart defaults for text size:</strong>
+- Single data source: Large text (size 3)
+- Multiple data sources: Medium text (size 2) for better readability
+- Override: Use specified size for all cases</p>
 <p><a href="trackandgraph://lua_inject_url?url=https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/docs/docs/lua/community/text/total-this-period/script.lua">Install via deeplink</a></p>
 <p><a href="script.lua">Read the full script</a></p>
 <p>Author: <a href="https://github.com/SamAmco">SamAmco</a></p>

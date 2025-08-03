@@ -2,11 +2,12 @@ local core = require("tng.core")
 local graph = require("tng.graph")
 
 --- PREVIEW_START
--- Script: Text - Total This Period
--- Period of data to be displayed e.g. core.PERIOD.WEEK to show data for this week
-local period = core.PERIOD.WEEK
--- Multiplier for the period (e.g. 2 for this 2 weeks when period is WEEK)
-local multiplier = 1
+-- Script: Text - Total in Last Duration
+-- Duration of data to total over prior to now (rolling window)
+-- e.g. core.DURATION.DAY for total in last day
+local duration = core.DURATION.DAY
+-- Multiplier for the duration (e.g. 7 for last 7 days when duration is DAY)
+local multiplier = 7
 -- Text size (1=small, 2=medium, 3=large). If nil, uses smart defaults.
 local text_size = nil
 --- PREVIEW_END
@@ -35,12 +36,12 @@ local function multi_input_text_output(totals, size)
 end
 
 return function(sources)
-	local next_end = core.get_end_of_period(period, core.time().timestamp)
-	local next_start = core.shift(next_end, period, -multiplier)
+	local now = core.time().timestamp
+	local cutoff = now - (duration * multiplier)
 
 	local data = {}
 	for name, source in pairs(sources) do
-		local data_points = source.dpafter(next_start)
+		local data_points = source.dpafter(cutoff)
 		local total = 0
 		for _, dp in ipairs(data_points) do
 			total = total + dp.value
