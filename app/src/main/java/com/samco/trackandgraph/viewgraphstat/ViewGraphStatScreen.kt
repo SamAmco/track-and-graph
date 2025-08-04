@@ -23,10 +23,10 @@ import androidx.compose.animation.core.animate
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -100,6 +100,7 @@ fun ViewGraphStatScreen(
         notes = notes,
         selectedNoteForDialog = selectedNoteForDialog,
         showHideNotesClicked = viewModel::showHideNotesClicked,
+        setNotesVisibility = viewModel::setNotesVisibility,
         noteClicked = viewModel::noteClicked,
         dismissNoteDialog = viewModel::dismissNoteDialog
     )
@@ -113,6 +114,7 @@ private fun ViewGraphStatView(
     notes: List<GraphNote>,
     selectedNoteForDialog: GraphNote?,
     showHideNotesClicked: () -> Unit,
+    setNotesVisibility: (Boolean) -> Unit,
     noteClicked: (note: GraphNote) -> Unit,
     dismissNoteDialog: () -> Unit,
 ) = TnGComposeTheme {
@@ -136,11 +138,6 @@ private fun ViewGraphStatView(
         var isDraggingNotesButton by remember { mutableStateOf(false) }
         var justTappedNotesButton by remember { mutableStateOf(false) }
 
-        //Bug - Drag from bottom, then minimize, it animates back to open
-        // Solution - show/hide notes should not just be a toggle function, but a mutable state we can
-        // set to true or false. Let's use a mutable state flow in the viewmodel, and a function that takes
-        // a boolean as a parameter. Also keep the toggle function that doesn't take a boolean and we'll use
-        // that for the toggle button
         LaunchedEffect(showingNotes, isDraggingNotesButton, justTappedNotesButton) {
             // If the user is dragging, or the current graph weight and the saved graph weight are very close
             // (meaning the user just finished dragging), don't animate
@@ -190,15 +187,13 @@ private fun ViewGraphStatView(
                     },
                     onDrag = { dragOffset ->
                         justTappedNotesButton = false
-                        println("samsam setting onDrag called with $dragOffset, $showingNotes")
-                        // Convert pixel offset to weight change
                         val weightChange = -dragOffset.y / containerHeightPx
-                        val newWeight = (currentGraphWeight - weightChange).coerceIn(0.1f, 0.9f)
+                        val newWeight = (currentGraphWeight - weightChange)
 
                         // Update saved position and current weight
                         savedGraphWeight = newWeight
-                        println("samsam setting currentGraphWeight to $newWeight")
                         currentGraphWeight = newWeight
+                        setNotesVisibility(true)
                     },
                     onDraggingChanged = { isDraggingNotesButton = it },
                     modifier = Modifier.fillMaxWidth()
@@ -268,28 +263,26 @@ suspend fun PointerInputScope.detectTapAndDragGestures(
     onDrag: (Offset) -> Unit,
     onDraggingChanged: (Boolean) -> Unit = {}
 ) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val down = awaitFirstDown()
-            var dragStarted = false
+    awaitEachGesture {
+        val down = awaitFirstDown()
+        var dragStarted = false
 
-            val drag = awaitTouchSlopOrCancellation(down.id) { change, _ ->
-                dragStarted = true
-                onDraggingChanged(true)
+        val drag = awaitTouchSlopOrCancellation(down.id) { change, _ ->
+            dragStarted = true
+            onDraggingChanged(true)
+            change.consume()
+        }
+
+        if (drag != null && dragStarted) {
+            // Drag started
+            drag(drag.id) { change ->
+                onDrag(change.positionChange())
                 change.consume()
             }
-
-            if (drag != null && dragStarted) {
-                // Drag started
-                drag(drag.id) { change ->
-                    onDrag(change.positionChange())
-                    change.consume()
-                }
-                // Drag ended
-                onDraggingChanged(false)
-            } else if (!dragStarted) {
-                onTap()
-            }
+            // Drag ended
+            onDraggingChanged(false)
+        } else if (!dragStarted) {
+            onTap()
         }
     }
 }
@@ -477,6 +470,7 @@ private fun ViewGraphStatScreenPreview() = ViewGraphStatView(
         )
     ),
     showHideNotesClicked = {},
+    setNotesVisibility = {},
     noteClicked = {},
     selectedNoteForDialog = null,
     dismissNoteDialog = {},

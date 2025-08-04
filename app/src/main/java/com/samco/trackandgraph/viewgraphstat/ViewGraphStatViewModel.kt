@@ -56,6 +56,7 @@ interface ViewGraphStatViewModel {
     val selectedNoteForDialog: StateFlow<GraphNote?>
 
     fun showHideNotesClicked()
+    fun setNotesVisibility(visible: Boolean)
     fun noteClicked(note: GraphNote)
     fun dismissNoteDialog()
 }
@@ -184,7 +185,11 @@ class ViewGraphStatViewModelImpl @Inject constructor(
     }
 
     override fun showHideNotesClicked() {
-        showingNotes.update { it.not() }
+        showingNotes.value = !showingNotes.value
+    }
+
+    override fun setNotesVisibility(visible: Boolean) {
+        showingNotes.value = visible
     }
 
     override fun noteClicked(note: GraphNote) {
