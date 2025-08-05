@@ -120,7 +120,7 @@ fun BarChartView(
     viewData: IBarChartViewData,
     listMode: Boolean,
     timeMarker: OffsetDateTime? = null,
-    graphHeight: Int? = null
+    graphViewMode: GraphViewMode,
 ) = Box(modifier = modifier) {
     if (viewData.xDates.isEmpty() || viewData.bars.isEmpty()) {
         GraphErrorView(
@@ -146,7 +146,7 @@ fun BarChartView(
             yAxisSubdivides = viewData.yAxisSubdivides,
             listMode = listMode,
             barMarkerStore = barMarkerStore,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode
         )
 
         if (!listMode) barMarkerStore.highlightedIndex?.let {
@@ -313,10 +313,12 @@ private fun BarChartBodyView(
     yAxisSubdivides: Int,
     listMode: Boolean,
     barMarkerStore: BarMarkerStore,
-    graphHeight: Int? = null
+    graphViewMode: GraphViewMode,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
+
+    val hasLegend = bars.size > 1
 
     AndroidViewBinding(
         factory = { inflater, parent, attachToParent ->
@@ -382,14 +384,18 @@ private fun BarChartBodyView(
                 )
             }
 
-            if (graphHeight != null) xyPlot.layoutParams.height = graphHeight
+            setGraphHeight(
+                graphView = this.xyPlot,
+                graphViewMode = graphViewMode,
+                hasLegend = hasLegend
+            )
             xyPlot.requestLayout()
             xyPlot.redraw()
         })
 
     DialogInputSpacing()
 
-    if (bars.size > 1) {
+    if (hasLegend) {
         GraphLegend(
             items = bars.mapIndexed { i, bar ->
                 val label = bar.segmentSeries.title

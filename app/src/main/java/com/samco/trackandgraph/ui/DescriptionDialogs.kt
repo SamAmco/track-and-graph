@@ -25,7 +25,6 @@ import androidx.appcompat.app.AlertDialog
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
-import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.base.helpers.getWeekDayNames
 import com.samco.trackandgraph.databinding.DescriptionBodyTextBinding
 import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
@@ -50,15 +49,6 @@ private fun getBodyTextView(context: Context, text: String): View {
     val bodyView = DescriptionBodyTextBinding.inflate(LayoutInflater.from(context))
     bodyView.text.text = text
     return bodyView.root
-}
-
-fun showNoteDialog(inflater: LayoutInflater, context: Context, note: GlobalNote) {
-    val headerView = getNoteDialogHeader(inflater, context, note.timestamp, null, null)
-    AlertDialog.Builder(context)
-        .setCustomTitle(headerView)
-        .setView(getBodyTextView(context, note.note))
-        .create()
-        .show()
 }
 
 fun showNoteDialog(
@@ -92,37 +82,4 @@ private fun getNoteDialogHeader(
         if (featureDisplayName.isNullOrEmpty()) View.GONE else View.VISIBLE
     featureDisplayName?.let { headerView.featureDisplayNameText.text = it }
     return headerView.root
-}
-
-fun showDataPointDescriptionDialog(
-    context: Context,
-    inflater: LayoutInflater,
-    dataPoint: DataPoint,
-    isDuration: Boolean,
-    featureDispalayName: String? = null
-) {
-    showDataPointDescriptionDialog(
-        context,
-        inflater,
-        dataPoint.timestamp,
-        dataPoint.getDisplayValue(isDuration),
-        dataPoint.note,
-        featureDispalayName
-    )
-}
-
-fun showDataPointDescriptionDialog(
-    context: Context, inflater: LayoutInflater, timestamp: OffsetDateTime, displayValue: String,
-    note: String, featureDispalayName: String? = null
-) {
-    val headerView =
-        getNoteDialogHeader(inflater, context, timestamp, displayValue, featureDispalayName)
-
-    val bodyView = getBodyTextView(context, note)
-
-    AlertDialog.Builder(context)
-        .setCustomTitle(headerView)
-        .setView(bodyView)
-        .create()
-        .show()
 }

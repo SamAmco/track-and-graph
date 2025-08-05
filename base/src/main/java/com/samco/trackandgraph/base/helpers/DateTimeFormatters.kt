@@ -65,13 +65,20 @@ fun getWeekDayNames(context: Context) = listOf(
 private fun weekDayPart(dateTime: OffsetDateTime, weekDayNames: List<String>) =
     "(${weekDayNames[dateTime.dayOfWeek.value - 1]})"
 
+/**
+ * Formats date/time as "Day Month Year (Weekday)  HH:MM:SS (±offset)"
+ * @param offsetDiffHours Optional timezone offset difference in hours to display.
+ *                        Pass null (default) in production to auto-calculate using current time.
+ *                        Pass specific value for testing/preview to avoid OffsetDateTime.now() calls.
+ */
 fun formatDayMonthYearHourMinuteWeekDayOneLine(
     context: Context,
     weekDayNames: List<String>,
-    dateTime: OffsetDateTime
+    dateTime: OffsetDateTime,
+    offsetDiffHours: Int? = null
 ) = formatDayMonthYear(context, weekDayNames, dateTime) +
         "  " +
-        formatHourMinuteSecondAndOffset(dateTime)
+        formatHourMinuteSecondAndOffset(dateTime, offsetDiffHours)
 
 fun DataPoint.getDisplayValue(isDuration: Boolean): String {
     val time = this.timestamp
@@ -103,20 +110,31 @@ fun formatDayMonthYearHourMinuteWeekDayTwoLines(
         "\n" +
         formatHourMinuteSecondAndOffset(dateTime)
 
-fun formatHourMinuteSecondAndOffset(dateTime: OffsetDateTime): String {
+/**
+ * Formats time with optional timezone offset display as "HH:MM:SS (±hours)"
+ * @param offsetDiffHours Optional timezone offset difference in hours to display.
+ *                        Pass null (default) in production to auto-calculate using OffsetDateTime.now().
+ *                        Pass specific value for testing/preview to avoid OffsetDateTime.now() calls.
+ */
+fun formatHourMinuteSecondAndOffset(
+    dateTime: OffsetDateTime,
+    offsetDiffHours: Int? = null
+): String {
     val stringBuilder = StringBuilder()
     stringBuilder.append(formatHourMinute(dateTime))
 
-    val offsetDiff = OffsetDateTime.now().offset.totalSeconds - dateTime.offset.totalSeconds
-    val offsetDiffHours = offsetDiff / 3600
-    if (offsetDiffHours != 0) {
+    val actualOffsetDiffHours = offsetDiffHours ?: run {
+        val offsetDiff = OffsetDateTime.now().offset.totalSeconds - dateTime.offset.totalSeconds
+        offsetDiff / 3600
+    }
+    
+    if (actualOffsetDiffHours != 0) {
         stringBuilder.append(" (")
-        if (offsetDiffHours > 0) stringBuilder.append("+")
-        stringBuilder.append(offsetDiffHours)
+        if (actualOffsetDiffHours > 0) stringBuilder.append("+")
+        stringBuilder.append(actualOffsetDiffHours)
         stringBuilder.append(")")
     }
     return stringBuilder.toString()
-
 }
 
 fun formatDayMonthYear(

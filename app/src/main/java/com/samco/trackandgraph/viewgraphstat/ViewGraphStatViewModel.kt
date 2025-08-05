@@ -17,124 +17,187 @@
 
 package com.samco.trackandgraph.viewgraphstat
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.GlobalNote
+import com.samco.trackandgraph.base.database.dto.Feature
+import com.samco.trackandgraph.base.helpers.getDisplayValue
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.util.FeatureDataProvider
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.util.FeatureDataProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
+import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
-
 
 interface ViewGraphStatViewModel {
     fun initFromGraphStatId(graphStatId: Long)
 
-    //TODO This won't work when we implement features. FeatureDataProvider
-    // iterates all data in every feature
-    val featureDataProvider: LiveData<FeatureDataProvider>
-    val graphStatViewData: LiveData<IGraphStatViewData>
-    val showingNotes: LiveData<Boolean>
-    val markedNote: LiveData<GraphNote?>
-    val notes: LiveData<List<GraphNote>>
+    val graphStatViewData: StateFlow<IGraphStatViewData?>
+    val showingNotes: StateFlow<Boolean>
+    val timeMarker: StateFlow<OffsetDateTime?>
+    val notes: StateFlow<List<GraphNote>>
+    val selectedNoteForDialog: StateFlow<GraphNote?>
 
     fun showHideNotesClicked()
+    fun setNotesVisibility(visible: Boolean)
     fun noteClicked(note: GraphNote)
+    fun dismissNoteDialog()
 }
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ViewGraphStatViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val gsiProvider: GraphStatInteractorProvider,
-    @MainDispatcher private val ui: CoroutineDispatcher,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel(), ViewGraphStatViewModel {
-    override val featureDataProvider = MutableLiveData<FeatureDataProvider>()
-    override val graphStatViewData = MutableLiveData<IGraphStatViewData>()
-    override val showingNotes = MutableLiveData(false)
 
-    private val globalNotes = MutableStateFlow<List<GlobalNote>>(emptyList())
-    private val dataPoints = MutableStateFlow<List<DataPoint>>(emptyList())
+    private val graphStatId = MutableStateFlow<Long?>(null)
 
-    override val notes: LiveData<List<GraphNote>> =
-        combine(dataPoints, globalNotes) { dataPoints, globalNotes ->
-            val distinctDataPoints = dataPoints.distinct()
-            val oldestTime = distinctDataPoints.minByOrNull { it.timestamp }?.timestamp
-            val newestTime = distinctDataPoints.maxByOrNull { it.timestamp }?.timestamp
+    override val showingNotes = MutableStateFlow(false)
+    override val timeMarker = MutableStateFlow<OffsetDateTime?>(null)
+    override val selectedNoteForDialog = MutableStateFlow<GraphNote?>(null)
 
-            if (oldestTime == null || newestTime == null) return@combine emptyList<GraphNote>()
+    // Data structure to hold both view data and data points
+    private data class GraphStatResult(
+        val viewData: IGraphStatViewData,
+        val dataPoints: List<DataPoint>
+    )
 
-            val filteredGlobalNotes = globalNotes
-                .filter { g -> g.timestamp in oldestTime..newestTime }
-                .map { GraphNote(it) }
+    // Single expensive operation that produces both view data and data points
+    private val graphStatResult = graphStatId
+        .filterNotNull()
+        .flatMapLatest { getGraphData(it) }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
 
-            distinctDataPoints
-                .filter { dp -> dp.note.isNotEmpty() }
-                .distinct()
-                .map { GraphNote(it) }
-                .union(filteredGlobalNotes)
-                .sortedByDescending { it.timestamp }
-        }.asLiveData(viewModelScope.coroutineContext)
+    private fun getGraphData(id: Long) = flow {
+        val graphStat = dataInteractor.getGraphStatById(id)
+        emit(GraphStatResult(IGraphStatViewData.loading(graphStat), emptyList()))
 
-    override val markedNote = MutableLiveData<GraphNote?>(null)
+        // Use a channel to handle the async callback
+        val dataPointsChannel = Channel<List<DataPoint>>(Channel.UNLIMITED)
 
-    private var initialized = false
+        val viewData = gsiProvider
+            .getDataFactory(graphStat.type)
+            .getViewData(graphStat) { dataPointsChannel.trySend(it) }
 
-    override fun initFromGraphStatId(graphStatId: Long) {
-        if (initialized) return
-        initialized = true
-
-        viewModelScope.launch(io) {
-            emitGraphData(graphStatId)
-            getAllDataSourceAttributes()
-            getAllGlobalNotes()
+        // Listen for data points from the callback
+        try {
+            for (dataPoints in dataPointsChannel) {
+                emit(GraphStatResult(viewData, dataPoints))
+            }
+        } finally {
+            dataPointsChannel.close()
         }
-    }
+    }.flowOn(io)
 
-    private suspend fun getAllGlobalNotes() = withContext(io) {
-        val n = dataInteractor.getAllGlobalNotesSync()
-        globalNotes.emit(n)
-    }
+    // Derive individual flows from the shared result
+    override val graphStatViewData: StateFlow<IGraphStatViewData?> = graphStatResult
+        .map { it.viewData }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-    private suspend fun getAllDataSourceAttributes() {
-        val allFeatures = dataInteractor.getAllFeaturesSync()
-        val allGroups = dataInteractor.getAllGroupsSync()
-        val dataSourceData = allFeatures.map { feature ->
+    private val dataPoints = graphStatResult
+        .map { it.dataPoints }
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    private val featureDataProvider = graphStatId
+        .filterNotNull()
+        .map {
+            val allGroups = dataInteractor.getAllGroupsSync()
+            val dataSourceData = getDataSourceData(dataInteractor.getAllFeaturesSync())
+            FeatureDataProvider(dataSourceData, allGroups)
+        }
+        .flowOn(io)
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    private suspend fun getDataSourceData(allFeatures: List<Feature>): List<FeatureDataProvider.DataSourceData> {
+        return allFeatures.map { feature ->
             FeatureDataProvider.DataSourceData(
                 feature,
                 dataInteractor.getDataSamplePropertiesForFeatureId(feature.featureId)
                     ?: return@map null
             )
         }.filterNotNull()
-        FeatureDataProvider(dataSourceData, allGroups).let {
-            withContext(ui) {
-                featureDataProvider.value = it
-            }
-        }
     }
 
-    private suspend fun emitGraphData(graphStatId: Long) {
-        val graphStat = dataInteractor.getGraphStatById(graphStatId)
-        withContext(ui) { graphStatViewData.value = IGraphStatViewData.loading(graphStat) }
-        val viewData = gsiProvider
-            .getDataFactory(graphStat.type)
-            .getViewData(graphStat) { viewModelScope.launch(io) { dataPoints.emit(it) } }
-        withContext(ui) { graphStatViewData.value = viewData }
+    private val globalNotes = graphStatId
+        .filterNotNull()
+        .map { dataInteractor.getAllGlobalNotesSync() }
+        .flowOn(io)
+        .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    private val dataPointNotes = combine(dataPoints, featureDataProvider) { dataPoints, featureProvider ->
+        dataPoints
+            .distinct()
+            .filter { dp -> dp.note.isNotEmpty() }
+            .map { dp ->
+                val featurePath = featureProvider.getPathForFeature(dp.featureId)
+                val isDuration = featureProvider.getDataSampleProperties(dp.featureId)?.isDuration ?: false
+                GraphNote.DataPointNote(
+                    timestamp = dp.timestamp,
+                    noteText = dp.note,
+                    displayValue = dp.getDisplayValue(isDuration),
+                    featurePath = featurePath
+                )
+            }
+    }.shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+    override val notes: StateFlow<List<GraphNote>> =
+        combine(dataPointNotes, globalNotes) { dataPointNotes, globalNotes ->
+            val oldestTime = dataPointNotes.minByOrNull { it.timestamp }?.timestamp
+            val newestTime = dataPointNotes.maxByOrNull { it.timestamp }?.timestamp
+
+            if (oldestTime == null || newestTime == null) return@combine dataPointNotes
+
+            val filteredGlobalNotes = globalNotes
+                .filter { g -> g.timestamp in oldestTime..newestTime }
+                .map { globalNote ->
+                    GraphNote.GlobalNote(
+                        timestamp = globalNote.timestamp,
+                        noteText = globalNote.note
+                    )
+                }
+
+            dataPointNotes
+                .union(filteredGlobalNotes)
+                .sortedByDescending { it.timestamp }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    override fun initFromGraphStatId(graphStatId: Long) {
+        this.graphStatId.value = graphStatId
     }
 
     override fun showHideNotesClicked() {
-        showingNotes.value = showingNotes.value?.not()
+        showingNotes.value = !showingNotes.value
+    }
+
+    override fun setNotesVisibility(visible: Boolean) {
+        showingNotes.value = visible
     }
 
     override fun noteClicked(note: GraphNote) {
-        markedNote.value = note
+        timeMarker.value = note.timestamp
+        selectedNoteForDialog.value = note
+    }
+
+    override fun dismissNoteDialog() {
+        selectedNoteForDialog.value = null
     }
 }

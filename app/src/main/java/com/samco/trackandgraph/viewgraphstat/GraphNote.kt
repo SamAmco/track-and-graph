@@ -17,46 +17,21 @@
 
 package com.samco.trackandgraph.viewgraphstat
 
-import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.GlobalNote
 import org.threeten.bp.OffsetDateTime
 
-class GraphNote {
-    val dataPoint: DataPoint?
-    val globalNote: GlobalNote?
-    val timestamp: OffsetDateTime
+sealed class GraphNote {
+    abstract val timestamp: OffsetDateTime
+    abstract val noteText: String
 
-    constructor(dataPoint: DataPoint) {
-        this.dataPoint = dataPoint
-        this.globalNote = null
-        this.timestamp = dataPoint.timestamp
-    }
+    data class GlobalNote(
+        override val timestamp: OffsetDateTime,
+        override val noteText: String
+    ) : GraphNote()
 
-    constructor(globalNote: GlobalNote) {
-        this.globalNote = globalNote
-        this.dataPoint = null
-        this.timestamp = globalNote.timestamp
-    }
-
-    fun isDataPoint() = dataPoint != null
-    fun isGlobalNote() = globalNote != null
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as GraphNote
-
-        if (dataPoint != other.dataPoint) return false
-        if (globalNote != other.globalNote) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = dataPoint?.hashCode() ?: 0
-        result = 31 * result + (globalNote?.hashCode() ?: 0)
-        result = 31 * result + timestamp.hashCode()
-        return result
-    }
+    data class DataPointNote(
+        override val timestamp: OffsetDateTime,
+        override val noteText: String,
+        val displayValue: String,
+        val featurePath: String
+    ) : GraphNote()
 }

@@ -45,7 +45,11 @@ val inputSpacingLarge: Dp
     @Composable
     get() = dimensionResource(id = R.dimen.input_spacing_large)
 
+val cardElevation = 4.dp
+
 val inputSpacingXLarge = 50.dp
+
+val wideDialogWidthPercentage = 0.9f
 
 
 @Composable

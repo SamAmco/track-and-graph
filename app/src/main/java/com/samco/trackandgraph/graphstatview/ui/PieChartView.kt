@@ -47,7 +47,7 @@ private data class SegmentInfo(
 fun PieChartView(
     modifier: Modifier = Modifier,
     viewData: IPieChartViewData,
-    graphHeight: Int? = null
+    graphViewMode: GraphViewMode,
 ) {
     val segments = viewData.segments
     if (segments.isNullOrEmpty()) {
@@ -108,7 +108,7 @@ fun PieChartView(
         PieChartViewBody(
             modifier = modifier,
             segments = segmentInfos,
-            graphHeight = graphHeight
+            graphViewMode = graphViewMode,
         )
     }
 }
@@ -117,7 +117,7 @@ fun PieChartView(
 private fun PieChartViewBody(
     modifier: Modifier = Modifier,
     segments: List<SegmentInfo>,
-    graphHeight: Int?
+    graphViewMode: GraphViewMode,
 ) = Column(modifier = modifier) {
 
     val context = LocalContext.current
@@ -146,8 +146,11 @@ private fun PieChartViewBody(
 
         return@AndroidViewBinding binding
     }, update = {
-
-        if (graphHeight != null) pieChart.layoutParams.height = graphHeight
+        setGraphHeight(
+            graphView = pieChart,
+            graphViewMode = graphViewMode,
+            hasLegend = true,
+        )
         pieChart.redraw()
         pieChart.getRenderer(PieRenderer::class.java)
             .setDonutSize(0f, PieRenderer.DonutMode.PERCENT)
