@@ -34,9 +34,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
@@ -144,6 +146,19 @@ fun setUpXYPlotYAxis(
     }
 }
 
+fun setGraphHeight(
+    graphView: View,
+    graphViewMode: GraphViewMode,
+    hasLegend: Boolean,
+) {
+    if (graphViewMode is GraphViewMode.FullScreenMode) {
+        val multiplier = if (hasLegend) 0.85 else 0.9
+        graphView.layoutParams.height = (graphViewMode.availableHeight * multiplier).toInt()
+    } else {
+        graphView.layoutParams.height = graphView.context.resources.getDimensionPixelSize(R.dimen.graph_height)
+    }
+}
+
 @Composable
 fun GraphErrorView(
     modifier: Modifier = Modifier,
@@ -189,6 +204,26 @@ fun getColor(
     colorSpec: ColorSpec,
 ) = Color(getColorInt(context, colorSpec))
 
+private val graphLegendCircleSize = 20.dp
+private val graphLegendTextStyle @Composable get() = MaterialTheme.typography.body2
+
+@Composable
+fun legendItemLineHeight(): Int {
+    val density = LocalDensity.current
+    val typography = graphLegendTextStyle
+
+    return remember(density, typography) {
+        val body2LineHeight = with(density) {
+            typography.lineHeight.toPx()
+        }
+        val circleSize = with(density) {
+            graphLegendCircleSize.toPx()
+        }
+
+        maxOf(body2LineHeight, circleSize).toInt()
+    }
+}
+
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun GraphLegend(
@@ -200,13 +235,13 @@ fun GraphLegend(
     horizontalArrangement = Arrangement.Center
 ) {
     items.forEach {
-        GraphLegentItemView(item = it)
+        GraphLegendItemView(item = it)
         DialogInputSpacing()
     }
 }
 
 @Composable
-fun GraphLegentItemView(
+fun GraphLegendItemView(
     modifier: Modifier = Modifier,
     item: GraphLegendItem
 ) = Row(
@@ -216,13 +251,13 @@ fun GraphLegentItemView(
 
     ColorCircle(
         color = item.color,
-        size = 20.dp
+        size = graphLegendCircleSize,
     )
 
     Spacer(modifier = Modifier.width(2.dp))
 
     Text(
         text = item.label,
-        style = MaterialTheme.typography.body2
+        style = graphLegendTextStyle
     )
 }

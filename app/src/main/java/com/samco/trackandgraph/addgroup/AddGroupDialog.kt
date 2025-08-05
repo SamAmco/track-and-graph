@@ -26,73 +26,92 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.theming.DialogTheme
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.ColorSpinner
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 
 @Composable
 fun AddGroupDialog(viewModel: AddGroupDialogViewModel, onDismissRequest: () -> Unit = {}) {
-    if (!viewModel.hidden) {
-        DialogTheme {
+    if (viewModel.hidden) return
 
-            val addEnabled = viewModel.addEnabled.collectAsStateWithLifecycle().value
-            val updateMode = viewModel.updateMode.collectAsStateWithLifecycle().value
+    val addEnabled by viewModel.addEnabled.collectAsStateWithLifecycle()
+    val updateMode by viewModel.updateMode.collectAsStateWithLifecycle()
 
-            CustomConfirmCancelDialog(
-                onDismissRequest = { onDismissRequest() },
-                onConfirm = {
-                    viewModel.addOrUpdateGroup()
-                    onDismissRequest()
-                },
-                customWidthPercentage = 0.9f,
-                continueText = if (updateMode) R.string.update else R.string.add,
-                dismissText = R.string.cancel,
-                continueEnabled = addEnabled,
-            ) {
-                AddGroupView(
-                    modifier = Modifier.fillMaxWidth(),
-                    viewModel = viewModel
-                )
-            }
-        }
+    CustomConfirmCancelDialog(
+        onDismissRequest = { onDismissRequest() },
+        onConfirm = {
+            viewModel.addOrUpdateGroup()
+            onDismissRequest()
+        },
+        continueText = if (updateMode) R.string.update else R.string.add,
+        dismissText = R.string.cancel,
+        continueEnabled = addEnabled,
+    ) {
+        AddGroupView(
+            modifier = Modifier.fillMaxWidth(),
+            colorIndex = viewModel.colorIndex,
+            name = viewModel.name,
+            onColorIndexChange = viewModel::updateColorIndex,
+            onNameChange = viewModel::updateName
+        )
     }
 }
 
 @Composable
-private fun AddGroupView(modifier: Modifier, viewModel: AddGroupDialogViewModel) =
-    Column(modifier) {
-        Text(
-            text = stringResource(id = R.string.add_group),
-            style = MaterialTheme.typography.h6
+private fun AddGroupView(
+    modifier: Modifier,
+    colorIndex: Int,
+    name: TextFieldValue,
+    onColorIndexChange: (Int) -> Unit,
+    onNameChange: (TextFieldValue) -> Unit
+) = Column(modifier) {
+    Text(
+        text = stringResource(id = R.string.add_group),
+        style = MaterialTheme.typography.h6
+    )
+
+    InputSpacingLarge()
+
+    val focusRequester = remember { FocusRequester() }
+
+    Row(modifier = Modifier.fillMaxWidth()) {
+        ColorSpinner(
+            selectedColor = colorIndex,
+            onColorSelected = onColorIndexChange,
         )
 
-        InputSpacingLarge()
-
-        val focusRequester = remember { FocusRequester() }
-
-        Row(modifier = Modifier.fillMaxWidth()) {
-            ColorSpinner(
-                selectedColor = viewModel.colorIndex,
-                onColorSelected = viewModel::updateColorIndex,
-            )
-
-            OutlinedTextField(
-                modifier = Modifier
-                    .weight(1f)
-                    .focusRequester(focusRequester),
-                value = viewModel.name,
-                onValueChange = viewModel::updateName
-            )
-        }
-
-        LaunchedEffect(viewModel.hidden) {
-            if (!viewModel.hidden) focusRequester.requestFocus()
-        }
+        OutlinedTextField(
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester),
+            value = name,
+            onValueChange = onNameChange
+        )
     }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun AddGroupViewPreview() = TnGComposeTheme {
+    AddGroupView(
+        modifier = Modifier.fillMaxWidth(),
+        colorIndex = 2,
+        name = TextFieldValue("Sample Group Name"),
+        onColorIndexChange = {},
+        onNameChange = {}
+    )
+}

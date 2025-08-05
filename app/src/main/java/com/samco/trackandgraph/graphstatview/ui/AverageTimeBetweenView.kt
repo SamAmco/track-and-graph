@@ -17,14 +17,13 @@
 
 package com.samco.trackandgraph.graphstatview.ui
 
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.helpers.formatTimeToDaysHoursMinutesSeconds
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetweenViewData
@@ -33,7 +32,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IAverageTimeBetwe
 fun AverageTimeBetweenView(
     modifier: Modifier = Modifier,
     viewData: IAverageTimeBetweenViewData,
-    graphHeight: Int? = null
 ) {
     if (!viewData.enoughData) {
         GraphErrorView(
@@ -42,10 +40,7 @@ fun AverageTimeBetweenView(
         )
     } else {
         Text(
-            modifier = modifier.let {
-                if (graphHeight != null) it.height(graphHeight.dp)
-                else it
-            },
+            modifier = modifier.fillMaxSize(),
             text = formatTimeToDaysHoursMinutesSeconds(
                 context = LocalContext.current,
                 millis = viewData.averageMillis.toLong()

@@ -43,7 +43,6 @@ import com.samco.trackandgraph.ui.compose.ui.*
 @Composable
 fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     val dateScrollData = viewModel.dateScrollData.observeAsState().value
-    val weekdayNames = getWeekDayNames(LocalContext.current)
     val isDuration by viewModel.isDuration.observeAsState(false)
     val tracker by viewModel.tracker.observeAsState(null)
     val featureInfo by viewModel.showFeatureInfo.observeAsState()
@@ -61,7 +60,7 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
                 dataPoint = it,
                 addDataPointsViewModel = dataPointDialogViewModel,
                 viewModel = viewModel,
-                weekdayNames = weekdayNames,
+                weekdayNames = getWeekDayNames(LocalContext.current),
                 isDuration = isDuration,
                 tracker = tracker
             )
@@ -79,14 +78,13 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     dataPointInfo?.let {
         DataPointInfoDialog(
             dataPoint = it.toDataPoint(),
-            weekdayNames = weekdayNames,
             isDuration = isDuration,
             onDismissRequest = viewModel::onDismissDataPoint
         )
     }
 
     if (viewModel.showDeleteConfirmDialog.observeAsState(false).value) {
-        ConfirmCancelDialog(
+        ContinueCancelDialog(
             body = R.string.ru_sure_del_data_point,
             onDismissRequest = viewModel::onDeleteDismissed,
             onConfirm = viewModel::onDeleteConfirmed
@@ -120,7 +118,7 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
 private fun UpdateWarningDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
-) = ConfirmCancelDialog(
+) = ContinueCancelDialog(
     body = R.string.ru_sure_update_data,
     onDismissRequest = onDismissRequest,
     onConfirm = onConfirm
@@ -132,7 +130,6 @@ private fun UpdateDialog(
     viewModel: UpdateDialogViewModel
 ) = CustomConfirmCancelDialog(
     onDismissRequest = viewModel::onCancelUpdate,
-    customWidthPercentage = 0.9f,
     onConfirm = viewModel::onUpdateClicked,
     continueText = R.string.update,
     continueEnabled = viewModel.updateButtonEnabled.observeAsState(false).value
