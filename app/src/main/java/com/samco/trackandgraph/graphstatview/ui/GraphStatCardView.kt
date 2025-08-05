@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.group.GraphStatClickListener
+import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
@@ -95,9 +96,7 @@ fun GraphStatCardView(
                     ) { clickListener.onClick(graphStatViewData) }
                 } else it
             },
-        elevation = if (isElevated)
-            dimensionResource(id = R.dimen.card_elevation) * 3f
-        else dimensionResource(R.dimen.card_elevation)
+        elevation = if (isElevated) cardElevation * 3f else cardElevation
     ) {
         Box(
             modifier = Modifier
