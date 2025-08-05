@@ -29,6 +29,7 @@ import androidx.compose.foundation.gestures.awaitTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +40,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -72,6 +74,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.ui.FullScreenGraphStatView
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointNoteDescriptionDialog
 import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLineText
 import com.samco.trackandgraph.ui.compose.ui.GlobalNoteDescriptionDialog
@@ -79,7 +82,7 @@ import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.PopupTabBackground
+import com.samco.trackandgraph.ui.compose.ui.shapeLarge
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.abs
 
@@ -180,6 +183,7 @@ private fun ViewGraphStatView(
 
             if (notes.isNotEmpty()) {
                 NotesToggleButton(
+                    modifier = Modifier.fillMaxWidth(),
                     showingNotes = showingNotes,
                     onToggleClicked = {
                         justTappedNotesButton = true
@@ -196,7 +200,6 @@ private fun ViewGraphStatView(
                         setNotesVisibility(true)
                     },
                     onDraggingChanged = { isDraggingNotesButton = it },
-                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
@@ -288,49 +291,63 @@ suspend fun PointerInputScope.detectTapAndDragGestures(
 }
 
 @Composable
+private fun PopupTabBackground(
+    modifier: Modifier = Modifier,
+    showingNotes: Boolean,
+    content: @Composable BoxScope.() -> Unit
+) = Box(
+    modifier = modifier
+        .background(
+            color = MaterialTheme.tngColors.selectorButtonColor,
+            shape = RoundedCornerShape(
+                topStart = shapeLarge,
+                topEnd = shapeLarge,
+                bottomStart = if (showingNotes) shapeLarge else 0.dp,
+                bottomEnd = if (showingNotes) shapeLarge else 0.dp
+            )
+        ),
+    content = content
+)
+
+@Composable
 private fun NotesToggleButton(
     showingNotes: Boolean,
     onToggleClicked: () -> Unit,
     onDrag: (Offset) -> Unit,
     onDraggingChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
+) = PopupTabBackground(
+    showingNotes = showingNotes,
+    modifier = modifier
+        .fillMaxWidth()
+        .pointerInput(Unit) {
+            detectTapAndDragGestures(
+                onTap = onToggleClicked,
+                onDrag = onDrag,
+                onDraggingChanged = onDraggingChanged
+            )
+        },
 ) {
-    Box(
-        modifier = modifier
+    Row(
+        modifier = Modifier
             .fillMaxWidth()
-            .pointerInput(Unit) {
-                detectTapAndDragGestures(
-                    onTap = onToggleClicked,
-                    onDrag = onDrag,
-                    onDraggingChanged = onDraggingChanged
-                )
-            },
+            .padding(top = halfDialogInputSpacing, bottom = halfDialogInputSpacing),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        PopupTabBackground(
-            modifier = Modifier.matchParentSize()
+        Text(
+            text = stringResource(R.string.notes),
+            style = MaterialTheme.typography.body1,
+            modifier = Modifier.padding(end = 8.dp)
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = halfDialogInputSpacing, bottom = halfDialogInputSpacing),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = stringResource(R.string.notes),
-                style = MaterialTheme.typography.body1,
-                modifier = Modifier.padding(end = 8.dp)
-            )
-
-            Icon(
-                painter = painterResource(
-                    id = if (showingNotes) R.drawable.down_arrow else R.drawable.up_arrow
-                ),
-                contentDescription = null,
-                tint = MaterialTheme.colors.onSurface
-            )
-        }
+        Icon(
+            painter = painterResource(
+                id = if (showingNotes) R.drawable.down_arrow else R.drawable.up_arrow
+            ),
+            contentDescription = null,
+            tint = MaterialTheme.colors.onSurface
+        )
     }
 }
 
@@ -365,7 +382,7 @@ private fun NoteCard(
         modifier = modifier
             .clickable { onNoteClicked(note) },
         elevation = cardElevation,
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.large,
     ) {
         Column(
             modifier = Modifier.padding(cardPadding)
