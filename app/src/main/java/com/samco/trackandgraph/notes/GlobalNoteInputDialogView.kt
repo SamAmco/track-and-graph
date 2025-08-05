@@ -54,7 +54,7 @@ fun GlobalNoteInputDialogView(viewModel: GlobalNoteInputViewModel) {
         ) {
             GlobalNoteDialogViewContent(viewModel)
             if (viewModel.showConfirmCancelDialog.observeAsState(false).value) {
-                ConfirmCancelDialog(
+                ContinueCancelDialog(
                     onDismissRequest = viewModel::onCancelDismissed,
                     onConfirm = viewModel::onCancelConfirmed,
                     body = R.string.confirm_cancel_notes_will_be_lost

@@ -84,7 +84,7 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
     }
 
     if (viewModel.showDeleteConfirmDialog.observeAsState(false).value) {
-        ConfirmCancelDialog(
+        ContinueCancelDialog(
             body = R.string.ru_sure_del_data_point,
             onDismissRequest = viewModel::onDeleteDismissed,
             onConfirm = viewModel::onDeleteConfirmed
@@ -118,7 +118,7 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
 private fun UpdateWarningDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
-) = ConfirmCancelDialog(
+) = ContinueCancelDialog(
     body = R.string.ru_sure_update_data,
     onDismissRequest = onDismissRequest,
     onConfirm = onConfirm
@@ -130,7 +130,6 @@ private fun UpdateDialog(
     viewModel: UpdateDialogViewModel
 ) = CustomConfirmCancelDialog(
     onDismissRequest = viewModel::onCancelUpdate,
-    customWidthPercentage = 0.9f,
     onConfirm = viewModel::onUpdateClicked,
     continueText = R.string.update,
     continueEnabled = viewModel.updateButtonEnabled.observeAsState(false).value

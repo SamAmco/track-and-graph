@@ -53,7 +53,6 @@ fun AddGroupDialog(viewModel: AddGroupDialogViewModel, onDismissRequest: () -> U
             viewModel.addOrUpdateGroup()
             onDismissRequest()
         },
-        customWidthPercentage = 0.9f,
         continueText = if (updateMode) R.string.update else R.string.add,
         dismissText = R.string.cancel,
         continueEnabled = addEnabled,

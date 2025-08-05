@@ -85,6 +85,7 @@ import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TimeButton
+import com.samco.trackandgraph.ui.compose.ui.wideDialogWidthPercentage
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import org.threeten.bp.OffsetDateTime
@@ -469,7 +470,6 @@ private fun ConfigureAutoBackupDialog(
 
     CustomConfirmCancelDialog(
         onDismissRequest = onDismiss,
-        customWidthPercentage = 0.9f,
         onConfirm = onConfirm,
         continueText = R.string.apply,
         continueEnabled = viewModel.autoBackupConfigValid.collectAsStateWithLifecycle().value,

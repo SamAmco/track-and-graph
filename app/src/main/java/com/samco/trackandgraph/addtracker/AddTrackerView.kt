@@ -84,7 +84,7 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
 private fun UpdateWarningDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit
-) = ConfirmCancelDialog(
+) = ContinueCancelDialog(
     body = R.string.ru_sure_update_data,
     onDismissRequest = onDismissRequest,
     onConfirm = onConfirm

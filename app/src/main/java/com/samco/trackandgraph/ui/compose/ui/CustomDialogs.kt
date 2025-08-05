@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -38,7 +37,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.samco.trackandgraph.R
@@ -49,7 +47,6 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 fun CustomDialog(
     onDismissRequest: () -> Unit,
     scrollContent: Boolean = true,
-    usePlatformDefaultWidth: Boolean = true,
     paddingValues: PaddingValues = PaddingValues(
         dimensionResource(id = R.dimen.card_padding_large)
     ),
@@ -57,10 +54,7 @@ fun CustomDialog(
 ) = DialogTheme {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = usePlatformDefaultWidth,
-            decorFitsSystemWindows = false
-        )
+        properties = DialogProperties(decorFitsSystemWindows = false)
     ) {
         Surface(
             modifier = Modifier.imePadding()
@@ -82,7 +76,6 @@ fun CustomDialog(
 fun CustomConfirmCancelDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
-    customWidthPercentage: Float? = null,
     @StringRes continueText: Int = R.string.continue_word,
     @StringRes dismissText: Int = R.string.cancel,
     continueEnabled: Boolean = true,
@@ -90,7 +83,6 @@ fun CustomConfirmCancelDialog(
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
     scrollContent = false,
-    usePlatformDefaultWidth = customWidthPercentage == null,
     paddingValues = PaddingValues(
         start = dimensionResource(id = R.dimen.card_padding_large),
         end = dimensionResource(id = R.dimen.card_padding_large),
@@ -99,14 +91,7 @@ fun CustomConfirmCancelDialog(
     )
 ) {
     Column(
-        modifier = Modifier
-            .let {
-                if (customWidthPercentage != null) {
-                    it.fillMaxWidth(customWidthPercentage)
-                } else {
-                    it.wrapContentWidth()
-                }
-            }
+        modifier = Modifier.wrapContentWidth()
     ) {
         Column(
             modifier = Modifier
@@ -168,7 +153,7 @@ fun ConfirmDialog(
 }
 
 @Composable
-fun ConfirmCancelDialog(
+fun ContinueCancelDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
     @StringRes continueText: Int = R.string.continue_word,
@@ -206,13 +191,13 @@ fun ConfirmCancelDialog(
 }
 
 @Composable
-fun ConfirmCancelDialog(
+fun ContinueCancelDialog(
     @StringRes body: Int,
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
     @StringRes continueText: Int = R.string.continue_word,
     @StringRes dismissText: Int = R.string.cancel
-) = ConfirmCancelDialog(
+) = ContinueCancelDialog(
     onDismissRequest = onDismissRequest,
     onConfirm = onConfirm,
     continueText = continueText,

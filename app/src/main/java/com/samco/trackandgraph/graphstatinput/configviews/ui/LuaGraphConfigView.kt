@@ -72,7 +72,7 @@ import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConf
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
 import com.samco.trackandgraph.ui.compose.ui.AddBarButton
-import com.samco.trackandgraph.ui.compose.ui.ConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.compose.ui.IconTextButton
@@ -240,7 +240,7 @@ private fun Dialogs(
 private fun LuaUserConfirmDeepLinkDialog(
     onConfirm: () -> Unit,
     onCancel: () -> Unit
-) = ConfirmCancelDialog(
+) = ContinueCancelDialog(
     body = R.string.confirm_deep_link,
     onDismissRequest = onCancel,
     onConfirm = onConfirm,
