@@ -382,7 +382,7 @@ private fun NoteCard(
         modifier = modifier
             .clickable { onNoteClicked(note) },
         elevation = cardElevation,
-        shape = MaterialTheme.shapes.large,
+        shape = MaterialTheme.shapes.medium,
     ) {
         Column(
             modifier = Modifier.padding(cardPadding)
