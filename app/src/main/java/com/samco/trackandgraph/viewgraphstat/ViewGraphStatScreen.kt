@@ -84,7 +84,6 @@ import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.shapeLarge
 import org.threeten.bp.OffsetDateTime
-import kotlin.math.abs
 
 @Composable
 fun ViewGraphStatScreen(
