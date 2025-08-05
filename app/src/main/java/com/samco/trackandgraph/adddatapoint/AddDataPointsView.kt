@@ -99,7 +99,7 @@ private fun AddDataPointsView(
     }
 
     if (viewModel.showCancelConfirmDialog.observeAsState(false).value) {
-        ConfirmCancelDialog(
+        ContinueCancelDialog(
             body = R.string.confirm_cancel_notes_will_be_lost,
             onDismissRequest = viewModel::onConfirmCancelDismissed,
             onConfirm = viewModel::onConfirmCancelConfirmed,
