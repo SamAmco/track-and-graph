@@ -34,8 +34,8 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
-import com.samco.trackandgraph.base.helpers.formatDayMonthYear
-import com.samco.trackandgraph.base.helpers.formatHourMinute
+import com.samco.trackandgraph.helpers.formatDayMonthYear
+import com.samco.trackandgraph.helpers.formatHourMinute
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Instant

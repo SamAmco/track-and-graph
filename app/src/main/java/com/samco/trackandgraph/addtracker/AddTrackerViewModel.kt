@@ -13,6 +13,7 @@ import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.TrackerHelper
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble
@@ -63,6 +64,7 @@ interface AddTrackerViewModel : DurationInputViewModel {
 @HiltViewModel
 class AddTrackerViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
+    private val timerServiceInteractor: TimerServiceInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher,
 ) : ViewModel(), AddTrackerViewModel, DurationInputViewModel by DurationInputViewModelImpl() {
@@ -250,6 +252,7 @@ class AddTrackerViewModelImpl @Inject constructor(
             suggestionType = suggestionType.value,
             suggestionOrder = suggestionOrder.value
         )
+        timerServiceInteractor.requestWidgetUpdatesForFeatureId(featureId = existingTracker.featureId)
     }
 
     private suspend fun addTracker() {

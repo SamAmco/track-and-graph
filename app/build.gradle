@@ -178,6 +178,10 @@ dependencies {
     implementation libs.hilt.work
     implementation libs.androidx.work.runtime.ktx
 
+    // Moshi for JSON serialization
+    implementation libs.moshi.kotlin
+    ksp libs.moshi.kotlin.codegen
+
     //Testing
     testImplementation libs.threetenbp
     testImplementation libs.junit

@@ -34,8 +34,7 @@ import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.base.service.TrackWidgetProvider
-import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
+import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.hideKeyboard

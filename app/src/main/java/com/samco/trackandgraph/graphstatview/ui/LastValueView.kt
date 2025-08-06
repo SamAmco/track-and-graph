@@ -36,9 +36,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
-import com.samco.trackandgraph.base.helpers.formatTimeToDaysHoursMinutesSeconds
-import com.samco.trackandgraph.base.helpers.getWeekDayNames
+import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
+import com.samco.trackandgraph.helpers.formatTimeToDaysHoursMinutesSeconds
+import com.samco.trackandgraph.helpers.getWeekDayNames
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILastValueViewData
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointValueAndDescription

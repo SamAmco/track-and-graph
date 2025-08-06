@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.helpers.getDisplayValue
+import com.samco.trackandgraph.helpers.getDisplayValue
 import org.threeten.bp.OffsetDateTime
 
 @Composable

@@ -29,9 +29,9 @@ import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.database.dto.TrackerSuggestionType
-import com.samco.trackandgraph.base.helpers.PrefHelper
-import com.samco.trackandgraph.base.helpers.doubleFormatter
-import com.samco.trackandgraph.base.helpers.formatTimeDuration
+import com.samco.trackandgraph.helpers.PrefHelper
+import com.samco.trackandgraph.helpers.doubleFormatter
+import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.remoteconfig.UrlNavigator

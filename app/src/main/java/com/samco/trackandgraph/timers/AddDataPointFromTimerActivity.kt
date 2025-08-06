@@ -94,13 +94,15 @@ class AddDataPointFromTimerActivity : AppCompatActivity() {
 
 @HiltViewModel
 class AddDataPointFromTimerViewModel @Inject constructor(
+    private val timerServiceInteractor: TimerServiceInteractor,
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
     fun stopTimer(trackerId: Long) {
         viewModelScope.launch(io) {
             dataInteractor.stopTimerForTracker(trackerId)
+            val tracker = dataInteractor.getTrackerById(trackerId)
+            tracker?.featureId?.let { timerServiceInteractor.requestWidgetUpdatesForFeatureId(it) }
         }
     }
-
 }

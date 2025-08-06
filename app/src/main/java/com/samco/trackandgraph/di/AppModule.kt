@@ -25,9 +25,9 @@ import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.assetreader.AssetReaderImpl
 import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractor
 import com.samco.trackandgraph.backupandrestore.BackupRestoreInteractorImpl
-import com.samco.trackandgraph.base.helpers.PrefHelper
-import com.samco.trackandgraph.base.helpers.PrefHelperImpl
-import com.samco.trackandgraph.base.navigation.PendingIntentProvider
+import com.samco.trackandgraph.helpers.PrefHelper
+import com.samco.trackandgraph.helpers.PrefHelperImpl
+import com.samco.trackandgraph.navigation.PendingIntentProvider
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandlerImpl
 import com.samco.trackandgraph.downloader.FileDownloader
@@ -37,12 +37,23 @@ import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.LuaEngineImpl
 import com.samco.trackandgraph.navigation.PendingIntentProviderImpl
+import com.samco.trackandgraph.reminders.AlarmInteractor
+import com.samco.trackandgraph.reminders.RemindersHelper
+import com.samco.trackandgraph.reminders.RemindersHelperImpl
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProvider
 import com.samco.trackandgraph.remoteconfig.RemoteConfigProviderImpl
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.remoteconfig.UrlNavigatorImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.settings.TngSettingsImpl
+import com.samco.trackandgraph.system.AlarmManagerWrapper
+import com.samco.trackandgraph.system.AlarmManagerWrapperImpl
+import com.samco.trackandgraph.system.ReminderPrefWrapper
+import com.samco.trackandgraph.system.ReminderPrefWrapperImpl
+import com.samco.trackandgraph.system.SystemInfoProvider
+import com.samco.trackandgraph.system.SystemInfoProviderImpl
+import com.samco.trackandgraph.timers.TimerServiceInteractor
+import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -100,4 +111,25 @@ class AppModule {
     @Provides
     @Singleton
     fun provideRemoteConfigProvider(impl: RemoteConfigProviderImpl): RemoteConfigProvider = impl
+
+    @Provides
+    internal fun getRemindersHelper(impl: RemindersHelperImpl): RemindersHelper = impl
+
+    @Provides
+    internal fun getAlarmInteractor(impl: RemindersHelper): AlarmInteractor = impl
+
+    @Provides
+    internal fun getServiceManager(impl: TimerServiceInteractorImpl): TimerServiceInteractor = impl
+
+    @Singleton
+    @Provides
+    internal fun getReminderPref(impl: ReminderPrefWrapperImpl): ReminderPrefWrapper = impl
+
+    @Provides
+    @Singleton
+    internal fun alarmManager(impl: AlarmManagerWrapperImpl): AlarmManagerWrapper = impl
+
+    @Provides
+    fun systemInfoProvider(impl: SystemInfoProviderImpl): SystemInfoProvider = impl
+
 }
