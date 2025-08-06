@@ -41,6 +41,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,6 +61,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -118,7 +121,7 @@ fun <T : Datable> DateScrollLazyColumn(
 
     val minItemsMet = remember(data.items) { data.items.size >= 50 }
     val isDragging = remember { mutableStateOf(false) }
-    val scrollToIndex = remember { mutableStateOf(0) }
+    val scrollToIndex = remember { mutableIntStateOf(0) }
     var isScrollBarVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(scrollState.isScrollInProgress, isDragging.value) {
@@ -131,17 +134,21 @@ fun <T : Datable> DateScrollLazyColumn(
     }
 
     LaunchedEffect(scrollToIndex, isDragging) {
-        snapshotFlow { scrollToIndex.value }
+        snapshotFlow { scrollToIndex.intValue }
             .filter { isDragging.value }
             .debounce(100)
             .collect { scrollState.scrollToItem(it) }
     }
 
-    val currentDateText = remember(scrollToIndex.value, data) {
-        derivedStateOf {
-            if (data.items.isEmpty() || scrollToIndex.value !in data.items.indices)
+    val localInspectionMode = LocalInspectionMode.current
+
+    val currentDateText = remember(scrollToIndex.intValue, data, localInspectionMode) {
+        if (localInspectionMode) return@remember mutableStateOf("")
+
+        return@remember derivedStateOf {
+            if (data.items.isEmpty() || scrollToIndex.intValue !in data.items.indices)
                 return@derivedStateOf null
-            val date = data.items[scrollToIndex.value].date
+            val date = data.items[scrollToIndex.intValue].date
             when (data.dateDisplayResolution) {
                 DateDisplayResolution.MONTH_DAY -> date.format(monthDayFormatter)
                 DateDisplayResolution.MONTH_YEAR -> date.format(monthYearFormatter)
@@ -212,13 +219,13 @@ private fun <T : Datable> ScrollBarCanvas(
     scrollToIndex: MutableState<Int>
 ) {
     // Scrollbar properties
-    var scrollbarOffsetY by remember { mutableStateOf(0f) }
+    var scrollbarOffsetY by remember { mutableFloatStateOf(0f) }
     val scrollGrabberColor = MaterialTheme.colors.primary
     val scrollGrabberDiamDp = 50.dp
     val scrollGrabberRadDp = remember(scrollGrabberDiamDp) { scrollGrabberDiamDp / 2 }
     val scrollGrabberDiamPx = with(LocalDensity.current) { scrollGrabberDiamDp.toPx() }
     val scrollGrabberRadPx = remember(scrollGrabberDiamPx) { scrollGrabberDiamPx / 2 }
-    var canvasHeight by remember { mutableStateOf(0) }
+    var canvasHeight by remember { mutableIntStateOf(0) }
 
     //The extra sweep is the extra degrees on a semi circle that we're adding to both sides to make it
     // feel like a circle with a bit of the side cut off.
