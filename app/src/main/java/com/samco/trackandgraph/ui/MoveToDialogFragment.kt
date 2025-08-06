@@ -36,6 +36,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.ListItemMoveToGroupBinding
 import com.samco.trackandgraph.databinding.MoveToGroupDialogBinding
+import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.util.GroupPathProvider
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import dagger.hilt.android.AndroidEntryPoint
@@ -132,6 +133,7 @@ enum class MoveToDialogState { INITIALIZING, WAITING, MOVING, MOVED }
 @HiltViewModel
 class MoveToDialogViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
+    private val timerServiceInteractor: TimerServiceInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
@@ -179,6 +181,7 @@ class MoveToDialogViewModel @Inject constructor(
             MoveDialogType.TRACKER -> {
                 tracker?.copy(groupId = newGroupId)?.let {
                     dataInteractor.updateTracker(it)
+                    timerServiceInteractor.requestWidgetUpdatesForFeatureId(it.featureId)
                 }
             }
             MoveDialogType.GRAPH -> {

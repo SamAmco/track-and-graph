@@ -28,6 +28,7 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.util.Stopwatch
 import com.samco.trackandgraph.util.debounceBuffer
 import com.samco.trackandgraph.util.flatMapLatestScan
@@ -43,6 +44,7 @@ import javax.inject.Inject
 class GroupViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val gsiProvider: GraphStatInteractorProvider,
+    private val timerServiceInteractor: TimerServiceInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
@@ -445,6 +447,7 @@ class GroupViewModel @Inject constructor(
 
     fun onDeleteFeature(id: Long) = viewModelScope.launch(io) {
         dataInteractor.deleteFeature(id)
+        timerServiceInteractor.requestWidgetsDisabledForFeatureId(id)
     }
 
     fun adjustDisplayIndexes(items: List<GroupChild>) = viewModelScope.launch(io) {
@@ -456,8 +459,10 @@ class GroupViewModel @Inject constructor(
     fun onDeleteGraphStat(id: Long) =
         viewModelScope.launch(io) { dataInteractor.deleteGraphOrStat(id) }
 
-    fun onDeleteGroup(id: Long) =
-        viewModelScope.launch(io) { dataInteractor.deleteGroup(id) }
+    fun onDeleteGroup(id: Long) = viewModelScope.launch(io) {
+        val deletedFeatureIds = dataInteractor.deleteGroup(id).deletedFeatureIds
+        deletedFeatureIds.forEach { timerServiceInteractor.requestWidgetsDisabledForFeatureId(it) }
+    }
 
     fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         viewModelScope.launch(io) {
@@ -476,9 +481,12 @@ class GroupViewModel @Inject constructor(
                 _showDurationInputDialog.value = DurationInputDialogData(tracker.id, it)
             }
         }
+        timerServiceInteractor.requestWidgetUpdatesForFeatureId(tracker.featureId)
     }
 
     fun playTimer(tracker: DisplayTracker) = viewModelScope.launch(io) {
         dataInteractor.playTimerForTracker(tracker.id)
+        timerServiceInteractor.startTimerNotificationService()
+        timerServiceInteractor.requestWidgetUpdatesForFeatureId(tracker.featureId)
     }
 }

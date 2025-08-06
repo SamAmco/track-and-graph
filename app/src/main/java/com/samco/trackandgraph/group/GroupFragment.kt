@@ -34,11 +34,14 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.addgroup.AddGroupDialog
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
+import com.samco.trackandgraph.importexport.ExportFeaturesDialog
+import com.samco.trackandgraph.importexport.GROUP_ID_KEY
+import com.samco.trackandgraph.importexport.GROUP_NAME_KEY
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
-import com.samco.trackandgraph.addtracker.*
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
@@ -50,7 +53,6 @@ import com.samco.trackandgraph.util.performTrackVibrate
 import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch

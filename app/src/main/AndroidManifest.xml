@@ -114,11 +114,11 @@
         </activity>
 
         <receiver
-            android:name=".base.service.AlarmReceiver"
+            android:name=".reminders.AlarmReceiver"
             android:exported="false" />
 
         <receiver
-            android:name=".base.service.RecreateAlarms"
+            android:name=".reminders.RecreateAlarms"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -131,7 +131,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".base.service.TrackWidgetProvider"
+            android:name=".widgets.TrackWidgetProvider"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -145,12 +145,12 @@
             https://developer.android.com/about/versions/14/changes/fgs-types-required
         -->
         <service
-            android:name=".base.service.TrackWidgetJobIntentService"
+            android:name=".widgets.TrackWidgetJobIntentService"
             android:foregroundServiceType="shortService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
-            android:name=".base.service.TimerNotificationService"
+            android:name=".timers.TimerNotificationService"
             android:enabled="true"
             android:foregroundServiceType="dataSync" />
     </application>

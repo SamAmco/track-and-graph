@@ -24,7 +24,8 @@ import android.view.inputmethod.EditorInfo
 import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.dto.CheckedDays
+import com.samco.trackandgraph.base.database.dto.Reminder
 import com.samco.trackandgraph.databinding.ListItemReminderBinding
 import org.threeten.bp.LocalTime
 import org.threeten.bp.ZoneId

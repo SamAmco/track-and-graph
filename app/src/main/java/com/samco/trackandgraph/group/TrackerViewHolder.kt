@@ -23,8 +23,8 @@ import android.widget.PopupMenu
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
-import com.samco.trackandgraph.base.helpers.formatRelativeTimeSpan
-import com.samco.trackandgraph.base.helpers.formatTimeDuration
+import com.samco.trackandgraph.helpers.formatRelativeTimeSpan
+import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.ListItemTrackerBinding
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant

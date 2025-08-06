@@ -21,7 +21,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.helpers.getDisplayValue
+import com.samco.trackandgraph.helpers.getDisplayValue
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.graphstatproviders.GraphStatInteractorProvider

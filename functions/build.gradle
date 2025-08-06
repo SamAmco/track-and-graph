@@ -56,8 +56,7 @@ android {
 }
 
 dependencies {
-    api project(":base")
-
+    api project(':data')
     //Date/Time
     testImplementation libs.threetenbp
 

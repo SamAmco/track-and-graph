@@ -35,8 +35,8 @@ import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsNavigationViewModel
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.database.dto.Tracker
-import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
-import com.samco.trackandgraph.base.helpers.getWeekDayNames
+import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayTwoLines
+import com.samco.trackandgraph.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 

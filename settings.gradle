@@ -14,5 +14,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "track-and-graph"
 include ':app'
-include ':base'
+include ':data'
 include ':functions'

@@ -73,10 +73,10 @@ import com.androidplot.xy.StepMode
 import com.androidplot.xy.XValueMarker
 import com.androidplot.xy.XYGraphWidget
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinute
-import com.samco.trackandgraph.base.helpers.formatTimeDuration
-import com.samco.trackandgraph.base.helpers.getDayMonthFormatter
-import com.samco.trackandgraph.base.helpers.getMonthYearFormatter
+import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinute
+import com.samco.trackandgraph.helpers.formatTimeDuration
+import com.samco.trackandgraph.helpers.getDayMonthFormatter
+import com.samco.trackandgraph.helpers.getMonthYearFormatter
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IBarChartViewData

@@ -23,8 +23,7 @@ import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.service.TrackWidgetProvider
-import com.samco.trackandgraph.base.service.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
+import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

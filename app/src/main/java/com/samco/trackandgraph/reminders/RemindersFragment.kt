@@ -18,16 +18,20 @@
 package com.samco.trackandgraph.reminders
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.main.MainActivity
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.CheckedDays
 import com.samco.trackandgraph.base.database.dto.Reminder
@@ -48,7 +52,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalTime
 import javax.inject.Inject
-import kotlin.getValue
 
 @AndroidEntryPoint
 class RemindersFragment : Fragment(),
@@ -193,6 +196,7 @@ class RemindersFragment : Fragment(),
 @HiltViewModel
 class RemindersViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
+    private val alarmInteractor: AlarmInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
@@ -226,7 +230,9 @@ class RemindersViewModel @Inject constructor(
             _currentReminders.value?.let {
                 val withDisplayIndices = it
                     .mapIndexed { index, reminder -> reminder.copy(displayIndex = index) }
+                alarmInteractor.clearAlarms()
                 dataInteractor.updateReminders(withDisplayIndices)
+                alarmInteractor.syncAlarms()
                 savedReminders = dataInteractor.getAllRemindersSync()
                 withContext(ui) {
                     _currentReminders.value = savedReminders.toMutableList()

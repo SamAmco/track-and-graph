@@ -35,11 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
-import com.samco.trackandgraph.base.helpers.*
-import com.samco.trackandgraph.base.model.AlarmInteractor
+import com.samco.trackandgraph.reminders.AlarmInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.service.TimerServiceInteractor
+import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
+import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.tutorial.TutorialScreen

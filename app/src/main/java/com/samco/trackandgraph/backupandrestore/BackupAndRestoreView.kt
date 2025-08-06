@@ -75,8 +75,8 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
-import com.samco.trackandgraph.base.helpers.getWeekDayNames
+import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
+import com.samco.trackandgraph.helpers.getWeekDayNames
 import com.samco.trackandgraph.ui.compose.ui.ConfirmDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DateButton
