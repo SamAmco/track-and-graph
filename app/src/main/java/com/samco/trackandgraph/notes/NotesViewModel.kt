@@ -31,14 +31,14 @@ import com.samco.trackandgraph.util.FeaturePathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import org.threeten.bp.Duration
@@ -53,16 +53,7 @@ data class NoteInfo(
     val featurePath: String,
     val groupId: Long?,
     val note: String
-) : Datable {
-    fun toDisplayNote(): DisplayNote = DisplayNote(
-        timestamp = date,
-        trackerId = trackerId,
-        featureId = featureId,
-        featureName = featureName,
-        groupId = groupId,
-        note = note
-    )
-}
+) : Datable
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -70,6 +61,9 @@ class NotesViewModel @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher
 ) : ViewModel() {
+    private val _selectedNoteForDialog = MutableStateFlow<NoteInfo?>(null)
+    val selectedNoteForDialog: StateFlow<NoteInfo?> = _selectedNoteForDialog.asStateFlow()
+
     private val notesFlow = dataInteractor.getAllDisplayNotes()
         .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 1)
 
@@ -98,22 +92,13 @@ class NotesViewModel @Inject constructor(
         }
         .asLiveData(viewModelScope.coroutineContext)
 
-    //Emits true and then false any time the top note in the list is changed so that the
-    // view knows to scroll back to the top of the list
-    val onNoteInsertedTop: LiveData<Boolean> =
-        notesFlow.scan(Pair<DisplayNote?, DisplayNote?>(null, null)) { acc, value ->
-            //Every time there's a new list of notes get the top note and save it along with
-            // the top note from the last list
-            return@scan Pair(acc.second, value.firstOrNull())
-        }.flatMapLatest {
-            //If the top note from the last list is not the same as the top note from this list
-            // emit true/false to scroll to the top
-            return@flatMapLatest if (it.first != it.second) flow {
-                emit(true)
-                emit(false)
-            } else emptyFlow()
-        }.asLiveData(viewModelScope.coroutineContext)
+    fun onNoteClicked(note: NoteInfo) {
+        _selectedNoteForDialog.value = note
+    }
 
+    fun onDialogDismissed() {
+        _selectedNoteForDialog.value = null
+    }
 
     fun deleteNote(note: NoteInfo) = viewModelScope.launch(io) {
         note.trackerId?.let {

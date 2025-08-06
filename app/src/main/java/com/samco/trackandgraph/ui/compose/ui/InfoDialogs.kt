@@ -101,9 +101,9 @@ fun GlobalNoteDescriptionDialog(
         style = MaterialTheme.typography.h6,
         fontWeight = FontWeight.Bold
     )
-    
+
     DialogInputSpacing()
-    
+
     // Note text (scrollable body)
     Text(
         text = note,
@@ -114,7 +114,7 @@ fun GlobalNoteDescriptionDialog(
 @Composable
 fun DataPointNoteDescriptionDialog(
     timestamp: OffsetDateTime,
-    displayValue: String,
+    displayValue: String? = null,
     note: String,
     featureDisplayName: String,
     onDismissRequest: () -> Unit
@@ -125,7 +125,7 @@ fun DataPointNoteDescriptionDialog(
         style = MaterialTheme.typography.h6,
         fontWeight = FontWeight.Bold
     )
-    
+
     // Feature display name
     Text(
         text = featureDisplayName,
@@ -134,18 +134,20 @@ fun DataPointNoteDescriptionDialog(
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
     )
-    
+
     // Display value
-    Text(
-        text = displayValue,
-        style = MaterialTheme.typography.body1,
-        fontStyle = FontStyle.Italic,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-    
+    if (displayValue != null) {
+        Text(
+            text = displayValue,
+            style = MaterialTheme.typography.body1,
+            fontStyle = FontStyle.Italic,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+
     DialogInputSpacing()
-    
+
     // Note text (scrollable body)
     Text(
         text = note,

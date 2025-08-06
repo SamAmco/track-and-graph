@@ -19,16 +19,9 @@ package com.samco.trackandgraph.ui
 
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.base.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
-import com.samco.trackandgraph.base.helpers.getWeekDayNames
-import com.samco.trackandgraph.databinding.DescriptionBodyTextBinding
-import com.samco.trackandgraph.databinding.ShowNoteDialogHeaderBinding
-import org.threeten.bp.OffsetDateTime
 
 fun showFeatureDescriptionDialog(context: Context, name: String, description: String) {
     val descriptionOrNone = description.ifEmpty { context.getString(R.string.no_description) }
@@ -43,43 +36,4 @@ fun showFeatureDescriptionDialog(context: Context, name: String, description: St
         .setView(descriptionView)
         .create()
         .show()
-}
-
-private fun getBodyTextView(context: Context, text: String): View {
-    val bodyView = DescriptionBodyTextBinding.inflate(LayoutInflater.from(context))
-    bodyView.text.text = text
-    return bodyView.root
-}
-
-fun showNoteDialog(
-    inflater: LayoutInflater,
-    context: Context,
-    note: DisplayNote,
-    featurePath: String?
-) {
-    val headerView =
-        getNoteDialogHeader(inflater, context, note.timestamp, null, featurePath)
-    AlertDialog.Builder(context)
-        .setCustomTitle(headerView)
-        .setView(getBodyTextView(context, note.note))
-        .create()
-        .show()
-}
-
-private fun getNoteDialogHeader(
-    inflater: LayoutInflater,
-    context: Context,
-    timestamp: OffsetDateTime,
-    displayValue: String?,
-    featureDisplayName: String?
-): View {
-    val headerView = ShowNoteDialogHeaderBinding.inflate(inflater)
-    headerView.dateTimeText.text =
-        formatDayMonthYearHourMinuteWeekDayOneLine(context, getWeekDayNames(context), timestamp)
-    headerView.valueText.visibility = if (displayValue.isNullOrEmpty()) View.GONE else View.VISIBLE
-    displayValue?.let { headerView.valueText.text = it }
-    headerView.featureDisplayNameText.visibility =
-        if (featureDisplayName.isNullOrEmpty()) View.GONE else View.VISIBLE
-    featureDisplayName?.let { headerView.featureDisplayNameText.text = it }
-    return headerView.root
 }

@@ -37,8 +37,6 @@ import kotlin.getValue
 
 @AndroidEntryPoint
 class NotesFragment : Fragment() {
-    private val notesViewModel by viewModels<NotesViewModel>()
-    private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
     private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private val globalNoteDialogViewModel: GlobalNoteInputViewModel by viewModels<GlobalNoteInputViewModelImpl>()
 
@@ -53,13 +51,7 @@ class NotesFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 CompositionLocalProvider(LocalSettings provides tngSettings) {
-                    TnGComposeTheme {
-                        NotesView(
-                            notesViewModel = notesViewModel,
-                            addDataPointsDialogViewModel = addDataPointsDialogViewModel,
-                            globalNoteDialogViewModel = globalNoteDialogViewModel
-                        )
-                    }
+                    NotesScreen()
                 }
             }
         }
