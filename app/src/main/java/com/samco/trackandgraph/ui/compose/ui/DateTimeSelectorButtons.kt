@@ -95,12 +95,12 @@ fun TimeButton(
     val tag = "TimePicker"
     val context = LocalContext.current
 
-    SelectorTextButton(
+    SelectorButton(
         modifier = modifier,
         text = formatHourMinute(dateTime),
         enabled = enabled,
         onClick = {
-            val fragmentManager = findFragmentManager(context) ?: return@SelectorTextButton
+            val fragmentManager = findFragmentManager(context) ?: return@SelectorButton
             val fragment = fragmentManager.findFragmentByTag(tag)
             val existingPicker = fragment as? MaterialTimePicker
             val picker = existingPicker ?: MaterialTimePicker.Builder()
@@ -129,7 +129,7 @@ fun DateButton(
 ) = Box {
     val context = LocalContext.current
     val firstDayOfWeek = LocalSettings.current.firstDayOfWeek
-    SelectorTextButton(
+    SelectorButton(
         modifier = modifier,
         text = formatDayMonthYear(context, dateTime),
         enabled = enabled,

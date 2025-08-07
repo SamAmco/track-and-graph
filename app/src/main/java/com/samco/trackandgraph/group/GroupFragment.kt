@@ -23,24 +23,27 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.*
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.addgroup.AddGroupDialog
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
+import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.model.di.MainDispatcher
+import com.samco.trackandgraph.databinding.FragmentGroupBinding
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog
 import com.samco.trackandgraph.importexport.GROUP_ID_KEY
 import com.samco.trackandgraph.importexport.GROUP_NAME_KEY
-import com.samco.trackandgraph.base.database.dto.*
-import com.samco.trackandgraph.databinding.FragmentGroupBinding
-import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
@@ -78,6 +81,7 @@ class GroupFragment : Fragment(),
     private lateinit var adapter: GroupAdapter
     private val viewModel by viewModels<GroupViewModel>()
     private val appBarViewModel by activityViewModels<AppBarViewModel>()
+    private val groupDialogsViewModel by viewModels<GroupDialogsViewModel>()
 
     private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
     private val addGroupDialogViewModel by viewModels<AddGroupDialogViewModelImpl>()
@@ -113,6 +117,13 @@ class GroupFragment : Fragment(),
                     viewModel = addGroupDialogViewModel,
                     onDismissRequest = { addGroupDialogViewModel.hide() }
                 )
+
+                if (groupDialogsViewModel.showImportDialog.collectAsStateWithLifecycle().value) {
+                    ImportFeaturesDialog(
+                        trackGroupId = args.groupId,
+                        onDismissRequest = { groupDialogsViewModel.hideImportDialog() }
+                    )
+                }
             }
         }
 
@@ -454,12 +465,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onImportClicked() {
-        val dialog = ImportFeaturesDialog()
-        val argBundle = Bundle()
-        argBundle.putLong(GROUP_ID_KEY, args.groupId)
-        argBundle.putString(GROUP_NAME_KEY, args.groupName)
-        dialog.arguments = argBundle
-        childFragmentManager.let { dialog.show(it, "import_features_dialog") }
+        groupDialogsViewModel.showImportDialog()
     }
 
     private fun onAddTrackerClicked() {
