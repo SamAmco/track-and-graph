@@ -27,7 +27,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.base.R
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.LuaGraphFeature
 import com.samco.trackandgraph.base.database.dto.LuaGraphWithFeatures
 import com.samco.trackandgraph.base.model.DataInteractor

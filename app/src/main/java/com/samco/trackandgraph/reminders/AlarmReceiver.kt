@@ -28,7 +28,7 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationCompat.DEFAULT_ALL
-import com.samco.trackandgraph.base.R
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.navigation.PendingIntentProvider
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking

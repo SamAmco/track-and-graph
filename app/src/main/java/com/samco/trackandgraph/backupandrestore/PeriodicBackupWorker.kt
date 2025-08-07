@@ -12,7 +12,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.samco.trackandgraph.backupandrestore.dto.BackupResult
-import com.samco.trackandgraph.base.R
+import com.samco.trackandgraph.R
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import timber.log.Timber

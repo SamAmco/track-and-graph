@@ -24,7 +24,7 @@ import android.content.Intent
 import android.view.View
 import android.widget.RemoteViews
 import androidx.core.app.JobIntentService
-import com.samco.trackandgraph.base.R
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
