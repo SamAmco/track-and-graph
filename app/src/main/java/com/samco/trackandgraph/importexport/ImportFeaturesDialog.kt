@@ -1,173 +1,58 @@
-/* 
-* This file is part of Track & Graph
-* 
-* Track & Graph is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-* 
-* Track & Graph is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-* 
-* You should have received a copy of the GNU General Public License
-* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-*/
+/*
+ * This file is part of Track & Graph
+ *
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Track & Graph is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.importexport
 
-import android.app.Dialog
-import android.content.ContentResolver
-import android.content.DialogInterface
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
-import android.view.View
-import android.widget.Button
-import android.widget.ProgressBar
+import android.provider.OpenableColumns
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.*
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.DataUpdateType
 import com.samco.trackandgraph.base.model.ImportFeaturesException
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.util.ImportExportFeatureUtils
-import com.samco.trackandgraph.util.getColorFromAttr
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import javax.inject.Inject
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import androidx.core.net.toUri
+import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 
-const val OPEN_FILE_REQUEST_CODE = 124
-
-enum class ImportState { WAITING, IMPORTING, DONE }
-
-@AndroidEntryPoint
-class ImportFeaturesDialog : DialogFragment() {
-    private var trackGroupName: String? = null
-    private var trackGroupId: Long? = null
-
-    private val viewModel by viewModels<ImportFeaturesViewModel>()
-    private lateinit var alertDialog: AlertDialog
-    private lateinit var fileButton: Button
-    private lateinit var progressBar: ProgressBar
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return activity?.let {
-            val view = it.layoutInflater.inflate(R.layout.import_features_dialog, null)
-            trackGroupName = requireArguments().getString(GROUP_NAME_KEY)
-            trackGroupId = requireArguments().getLong(GROUP_ID_KEY)
-
-            fileButton = view.findViewById(R.id.fileButton)
-            progressBar = view.findViewById(R.id.progressBar)
-
-            progressBar.visibility = View.INVISIBLE
-            fileButton.setOnClickListener { onFileButtonClicked() }
-            fileButton.text = getString(R.string.select_file)
-            fileButton.setTextColor(fileButton.context.getColorFromAttr(R.attr.colorError))
-
-            val builder = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
-            builder.setView(view)
-                .setPositiveButton(R.string.importButton) { _, _ -> run {} }
-                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
-            alertDialog = builder.create()
-            alertDialog.setCanceledOnTouchOutside(true)
-            alertDialog.setOnShowListener { setAlertDialogShowListeners() }
-            alertDialog
-        } ?: throw IllegalStateException("Activity cannot be null")
-    }
-
-    private fun setAlertDialogShowListeners() {
-        val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.isEnabled = false
-        positiveButton.setOnClickListener { onImportClicked() }
-        listenToUri()
-        listenToImportState()
-        listenToException()
-        val negativeButton = alertDialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-        negativeButton.setOnClickListener { dismiss() }
-        alertDialog.setOnCancelListener { run {} }
-    }
-
-    private fun listenToUri() {
-        viewModel.selectedFileUri.observe(this, Observer { uri ->
-            if (uri != null) {
-                ImportExportFeatureUtils.setFileButtonTextFromUri(
-                    activity,
-                    uri,
-                    fileButton,
-                    alertDialog
-                )
-                alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = true
-            }
-        })
-    }
-
-    private fun listenToImportState() {
-        viewModel.importState.observe(this, Observer { state ->
-            when (state) {
-                ImportState.WAITING -> {
-                    progressBar.visibility = View.INVISIBLE
-                }
-
-                ImportState.IMPORTING -> {
-                    progressBar.visibility = View.VISIBLE
-                    val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                    positiveButton.isEnabled = false
-                    fileButton.isEnabled = false
-                }
-
-                ImportState.DONE -> dismiss()
-                else -> {}
-            }
-        })
-    }
-
-    private fun listenToException() {
-        viewModel.importException.observe(this, Observer { exception ->
-            exception?.let {
-                Toast.makeText(
-                    requireActivity(),
-                    getStringForImportException(it),
-                    Toast.LENGTH_LONG
-                ).show()
-            }
-        })
-    }
-
-    private fun getStringForImportException(exception: ImportFeaturesException) = when (exception) {
-        is ImportFeaturesException.Unknown ->
-            getString(R.string.import_exception_unknown)
-
-        is ImportFeaturesException.InconsistentDataType -> getString(
-            R.string.import_exception_inconsistent_data_type,
-            exception.lineNumber
-        )
-
-        is ImportFeaturesException.InconsistentRecord -> getString(
-            R.string.import_exception_inconsistent_record,
-            exception.lineNumber
-        )
-
-        is ImportFeaturesException.BadTimestamp -> getString(
-            R.string.import_exception_bad_timestamp,
-            exception.lineNumber
-        )
-
-        is ImportFeaturesException.BadHeaders -> getString(
-            R.string.import_exception_bad_headers,
-            exception.requiredHeaders
-        )
-    }
-
-    private fun onFileButtonClicked() {
-        val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+/**
+ * Custom ActivityResultContract that supports multiple MIME types for CSV file selection.
+ * This replicates the functionality of the original DialogFragment's Intent.EXTRA_MIME_TYPES.
+ */
+private class GetCsvContent : ActivityResultContract<Unit, Uri?>() {
+    override fun createIntent(context: Context, input: Unit): Intent {
+        return Intent(Intent.ACTION_GET_CONTENT).apply {
             type = "text/csv"
             putExtra(
                 Intent.EXTRA_MIME_TYPES, arrayOf(
@@ -178,85 +63,217 @@ class ImportFeaturesDialog : DialogFragment() {
                 )
             )
         }
-        startActivityForResult(intent, OPEN_FILE_REQUEST_CODE)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, resultData)
-        if (requestCode == OPEN_FILE_REQUEST_CODE) {
-            resultData?.data.also { uri ->
-                if (uri != null) {
-                    viewModel.selectedFileUri.value = uri
-                }
-            }
-        }
-    }
-
-    private fun onImportClicked() {
-        progressBar.visibility = View.VISIBLE
-        viewModel.beginImport(trackGroupId!!)
-    }
-
-    override fun onCancel(dialog: DialogInterface) {
-        super.onCancel(dialog)
-        if (viewModel.importState.value != ImportState.IMPORTING) dismiss()
+    override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
+        return intent?.data
     }
 }
 
-@HiltViewModel
-class ImportFeaturesViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor,
-    private val contentResolver: ContentResolver,
-    @MainDispatcher private val ui: CoroutineDispatcher,
-    @IODispatcher private val io: CoroutineDispatcher
-) : ViewModel() {
+@Composable
+fun ImportFeaturesDialog(
+    trackGroupId: Long,
+    onDismissRequest: () -> Unit,
+) {
+    val viewModel: ImportFeaturesModuleViewModel = hiltViewModel<ImportFeaturesModuleViewModelImpl>()
+    val context = LocalContext.current
+    val selectedFileUri by viewModel.selectedFileUri.collectAsStateWithLifecycle()
+    val importState by viewModel.importState.collectAsStateWithLifecycle()
+    val importException by viewModel.importException.collectAsStateWithLifecycle()
 
-    val selectedFileUri: MutableLiveData<Uri?> by lazy {
-        val uri = MutableLiveData<Uri?>()
-        uri.value = null
-        return@lazy uri
-    }
-
-    val importState: LiveData<ImportState>
-        get() {
-            return _importState
-        }
-    private val _importState: MutableLiveData<ImportState> by lazy {
-        val state = MutableLiveData<ImportState>()
-        state.value = ImportState.WAITING
-        return@lazy state
-    }
-
-    private val _importException: MutableLiveData<ImportFeaturesException?> by lazy {
-        val exception = MutableLiveData<ImportFeaturesException?>()
-        exception.value = null
-        return@lazy exception
-    }
-
-    val importException: LiveData<ImportFeaturesException?>
-        get() {
-            return _importException
-        }
-
-    //TODO this should probably be scheduled to run in a service
-    fun beginImport(trackGroupId: Long) {
-        if (_importState.value == ImportState.IMPORTING) return
-        val uri = selectedFileUri.value ?: return
-        viewModelScope.launch(ui) {
-            _importState.value = ImportState.IMPORTING
-            doImport(uri, trackGroupId).exceptionOrNull()?.let {
-                if (it is ImportFeaturesException) _importException.value = it
-                else _importException.value = ImportFeaturesException.Unknown()
-            }
-            _importState.value = ImportState.DONE
-        }
-    }
-
-    private suspend fun doImport(uri: Uri, trackGroupId: Long) = runCatching {
-        withContext(io) {
-            contentResolver.openInputStream(uri)?.let { inputStream ->
-                dataInteractor.readFeaturesFromCSV(inputStream, trackGroupId)
+    // Derive file name from selected URI
+    val selectedFileName by remember {
+        derivedStateOf {
+            selectedFileUri?.let { uri ->
+                getFileNameFromUri(context, uri)
             }
         }
+    }
+
+    // Handle import completion and errors
+    LaunchedEffect(importState) {
+        when (importState) {
+            ImportState.DONE -> onDismissRequest()
+            else -> {}
+        }
+    }
+
+    LaunchedEffect(importException) {
+        importException?.let { exception ->
+            Toast.makeText(
+                context,
+                getStringForImportException(context, exception),
+                Toast.LENGTH_LONG
+            ).show()
+            viewModel.clearException()
+        }
+    }
+
+    // File picker launcher with support for multiple CSV MIME types
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = GetCsvContent()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.setSelectedFileUri(it) }
+    }
+
+    CustomConfirmCancelDialog(
+        onDismissRequest = onDismissRequest,
+        onConfirm = { viewModel.beginImport(trackGroupId) },
+        continueText = R.string.importButton,
+        continueEnabled = selectedFileUri != null && importState != ImportState.IMPORTING
+    ) {
+        ImportFeaturesDialogContent(
+            selectedFileUri = selectedFileUri,
+            selectedFileName = selectedFileName,
+            importState = importState,
+            onSelectFile = { filePickerLauncher.launch(Unit) }
+        )
+    }
+}
+
+@Composable
+private fun ImportFeaturesDialogContent(
+    selectedFileUri: Uri?,
+    selectedFileName: String?,
+    importState: ImportState,
+    onSelectFile: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.dialog_input_spacing))
+    ) {
+        // Header text
+        Text(
+            text = stringResource(R.string.import_from),
+            style = MaterialTheme.typography.body1
+        )
+
+        // File selection button
+        SelectorButton(
+            onClick = onSelectFile,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.card_padding)),
+            enabled = importState != ImportState.IMPORTING
+        ) {
+            Text(
+                text = selectedFileName ?: stringResource(R.string.select_file),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = if (selectedFileUri == null) {
+                    MaterialTheme.colors.error
+                } else {
+                    MaterialTheme.colors.onSurface
+                }
+            )
+        }
+
+        DialogInputSpacing()
+
+        // Warning section
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.dialog_input_spacing))
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.warning_icon),
+                contentDescription = null,
+                modifier = Modifier.size(40.dp),
+                tint = MaterialTheme.colors.primary.copy(alpha = 0.4f)
+            )
+
+            Text(
+                text = stringResource(R.string.import_warning),
+                style = MaterialTheme.typography.body2,
+                textAlign = TextAlign.Center
+            )
+        }
+
+        // Progress indicator during import
+        if (importState == ImportState.IMPORTING) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        }
+    }
+}
+
+private fun getStringForImportException(context: Context, exception: ImportFeaturesException): String {
+    return when (exception) {
+        is ImportFeaturesException.Unknown -> context.getString(
+            R.string.import_exception_unknown
+        )
+
+        is ImportFeaturesException.InconsistentDataType -> context.getString(
+            R.string.import_exception_inconsistent_data_type,
+            exception.lineNumber.toString()
+        )
+
+        is ImportFeaturesException.InconsistentRecord -> context.getString(
+            R.string.import_exception_inconsistent_record,
+            exception.lineNumber.toString()
+        )
+
+        is ImportFeaturesException.BadTimestamp -> context.getString(
+            R.string.import_exception_bad_timestamp,
+            exception.lineNumber.toString()
+        )
+
+        is ImportFeaturesException.BadHeaders -> context.getString(
+            R.string.import_exception_bad_headers,
+            exception.requiredHeaders
+        )
+    }
+}
+
+private fun getFileNameFromUri(context: Context, uri: Uri): String? {
+    val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
+    return context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        if (cursor.moveToFirst() && nameIndex >= 0) {
+            cursor.getString(nameIndex)
+        } else null
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ImportFeaturesDialogPreview() {
+    TnGComposeTheme {
+        ImportFeaturesDialogContent(
+            selectedFileUri = null,
+            selectedFileName = null,
+            importState = ImportState.WAITING,
+            onSelectFile = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ImportFeaturesDialogWithFilePreview() {
+    TnGComposeTheme {
+        ImportFeaturesDialogContent(
+            selectedFileUri = "content://com.android.providers.downloads.documents/document/sample.csv".toUri(),
+            selectedFileName = "sample.csv",
+            importState = ImportState.WAITING,
+            onSelectFile = {}
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ImportFeaturesDialogImportingPreview() {
+    TnGComposeTheme {
+        ImportFeaturesDialogContent(
+            selectedFileUri = "content://com.android.providers.downloads.documents/document/sample.csv".toUri(),
+            selectedFileName = "sample.csv",
+            importState = ImportState.IMPORTING,
+            onSelectFile = {}
+        )
     }
 }

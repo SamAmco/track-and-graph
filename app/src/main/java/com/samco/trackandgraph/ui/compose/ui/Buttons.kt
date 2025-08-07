@@ -23,6 +23,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -96,11 +97,29 @@ fun SmallTextButton(
 }
 
 @Composable
-fun SelectorTextButton(
+fun SelectorButton(
     modifier: Modifier,
     text: String,
     enabled: Boolean = true,
     onClick: () -> Unit
+) = SelectorButton(
+    modifier = modifier,
+    enabled = enabled,
+    onClick = onClick
+) {
+    Text(
+        text = text,
+        fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
+        fontSize = MaterialTheme.typography.subtitle2.fontSize,
+    )
+}
+
+@Composable
+fun SelectorButton(
+    modifier: Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+    content: @Composable RowScope.() -> Unit
 ) = Button(
     modifier = modifier,
     onClick = onClick,
@@ -112,14 +131,9 @@ fun SelectorTextButton(
     ),
     colors = ButtonDefaults.buttonColors(
         backgroundColor = MaterialTheme.tngColors.selectorButtonColor
-    )
-) {
-    Text(
-        text = text,
-        fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
-        fontSize = MaterialTheme.typography.subtitle2.fontSize,
-    )
-}
+    ),
+    content = content,
+)
 
 @Composable
 fun AddBarButton(
@@ -198,7 +212,7 @@ fun ButtonPreview() = TnGComposeTheme(
             stringRes = R.string.continue_word,
             onClick = {}
         )
-        SelectorTextButton(
+        SelectorButton(
             modifier = Modifier,
             text = "Selector Text Button",
             onClick = {}
