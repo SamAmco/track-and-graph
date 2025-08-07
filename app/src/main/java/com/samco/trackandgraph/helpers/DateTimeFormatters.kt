@@ -19,7 +19,7 @@ package com.samco.trackandgraph.helpers
 
 import android.content.Context
 import android.text.format.DateUtils
-import com.samco.trackandgraph.base.R
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.IDataPoint
 import org.threeten.bp.Duration

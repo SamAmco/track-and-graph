@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
@@ -12,6 +14,8 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <!--dataExtractionRules is only used for android 12 and up, otherwise fullBackupContent will be used-->
     <application
@@ -26,7 +30,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="${ALLOW_CLEAR_TEXT}"
-        tools:targetApi="n">
+        tools:targetApi="n"
+        >
 
         <!--This provider declaration is to enable hilt work manager compatibility it is documented here:
             https://developer.android.com/guide/background/persistent/configuration/custom-configuration#remove-default
@@ -39,13 +44,15 @@
         <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
-            tools:node="remove" />
+            tools:node="remove"
+            />
 
         <!-- This is also for the benefit of the work manager. See here: https://developer.android.com/develop/background-work/background-tasks/persistent/how-to/long-running#foreground-service-type -->
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:foregroundServiceType="dataSync"
-            tools:node="merge" />
+            tools:node="merge"
+            />
 
         <activity
             android:name="com.samco.trackandgraph.main.MainActivity"
@@ -54,7 +61,8 @@
             android:launchMode="singleTask"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"
-            tools:targetApi="tiramisu">
+            tools:targetApi="tiramisu"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -69,16 +77,19 @@
 
                 <data
                     android:host="lua_inject_url"
-                    android:scheme="trackandgraph" />
+                    android:scheme="trackandgraph"
+                    />
 
                 <data
                     android:host="lua_inject_file"
-                    android:scheme="trackandgraph" />
+                    android:scheme="trackandgraph"
+                    />
             </intent-filter>
 
             <meta-data
                 android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
+                android:resource="@xml/shortcuts"
+                />
 
             <!-- Custom launcher action to run the app with Lua engine disabled -->
             <intent-filter>
@@ -94,19 +105,22 @@
             android:name=".timers.AddDataPointFromTimerActivity"
             android:excludeFromRecents="true"
             android:noHistory="true"
-            android:theme="@style/TransparentTheme" />
+            android:theme="@style/TransparentTheme"
+            />
 
         <activity
             android:name=".widgets.TrackWidgetInputDataPointActivity"
             android:excludeFromRecents="true"
             android:noHistory="true"
-            android:theme="@style/TransparentTheme" />
+            android:theme="@style/TransparentTheme"
+            />
 
         <activity
             android:name=".widgets.TrackWidgetConfigureActivity"
             android:exported="true"
             android:label="Configure widget"
-            android:theme="@style/TransparentTheme">
+            android:theme="@style/TransparentTheme"
+            >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
                 <action android:name="android.appwidget.action.ACTION_APPWIDGET_DELETED" />
@@ -115,12 +129,14 @@
 
         <receiver
             android:name=".reminders.AlarmReceiver"
-            android:exported="false" />
+            android:exported="false"
+            />
 
         <receiver
             android:name=".reminders.RecreateAlarms"
             android:enabled="true"
-            android:exported="true">
+            android:exported="true"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.DATE_CHANGED" />
                 <action android:name="android.intent.action.TIME_SET" />
@@ -132,13 +148,15 @@
         </receiver>
         <receiver
             android:name=".widgets.TrackWidgetProvider"
-            android:exported="false">
+            android:exported="false"
+            >
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/track_widget_info" />
+                android:resource="@xml/track_widget_info"
+                />
         </receiver>
 
         <!--TODO you'll need to follow this guide when you target android 14
@@ -147,12 +165,14 @@
         <service
             android:name=".widgets.TrackWidgetJobIntentService"
             android:foregroundServiceType="shortService"
-            android:permission="android.permission.BIND_JOB_SERVICE" />
+            android:permission="android.permission.BIND_JOB_SERVICE"
+            />
 
         <service
             android:name=".timers.TimerNotificationService"
             android:enabled="true"
-            android:foregroundServiceType="dataSync" />
+            android:foregroundServiceType="dataSync"
+            />
     </application>
 
 </manifest>
