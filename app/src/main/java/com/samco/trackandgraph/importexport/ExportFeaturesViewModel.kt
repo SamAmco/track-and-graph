@@ -59,9 +59,6 @@ interface ExportFeaturesViewModel {
     fun beginExport()
 }
 
-// Add a preview to Loading overlay to make sure it works in both cases
-// TODO scroll behaviour is broken when setting up graph
-
 @HiltViewModel
 class ExportFeaturesViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
