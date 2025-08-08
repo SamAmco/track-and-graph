@@ -43,6 +43,7 @@ interface ImportFeaturesModuleViewModel {
     fun setSelectedFileUri(uri: Uri?)
     fun beginImport(trackGroupId: Long)
     fun clearException()
+    fun reset()
 }
 
 @HiltViewModel
@@ -81,6 +82,12 @@ class ImportFeaturesModuleViewModelImpl @Inject constructor(
 
     override fun clearException() {
         _importException.value = null
+    }
+
+    override fun reset() {
+        _selectedFileUri.value = null
+        _importException.value = null
+        _importState.value = ImportState.WAITING
     }
 
     private suspend fun doImport(uri: Uri, trackGroupId: Long) = runCatching {

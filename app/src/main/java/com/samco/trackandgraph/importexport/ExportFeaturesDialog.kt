@@ -31,12 +31,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.SelectorButton
@@ -119,7 +121,7 @@ private fun ExportFeaturesDialogContent(
     selectedFeatures: List<FeatureDto>,
     onCreateFile: () -> Unit,
     onToggleFeature: (FeatureDto) -> Unit,
-) = Box {
+) = BoxWithConstraints {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
@@ -149,36 +151,24 @@ private fun ExportFeaturesDialogContent(
             )
         }
 
-        // Feature selection section
-        if (availableFeatures.isNotEmpty()) {
-            // Feature checkboxes
-            LazyColumn(
+        for (feature in availableFeatures) {
+            Row(
                 modifier = Modifier
-                    .heightIn(max = 200.dp)
-                    .fillMaxWidth(),
+                    .fillMaxWidth()
+                    .clickable { onToggleFeature(feature) }
+                    .padding(cardPadding),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(availableFeatures) { feature ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onToggleFeature(feature) }
-                            .padding(cardPadding),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = selectedFeatures.contains(feature),
-                            onCheckedChange = null,
-                        )
-                        HalfDialogInputSpacing()
-                        Text(
-                            text = feature.name,
-                            style = MaterialTheme.typography.body2,
-                            modifier = Modifier.weight(1f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                }
+                Checkbox(
+                    checked = selectedFeatures.contains(feature),
+                    onCheckedChange = null,
+                )
+                HalfDialogInputSpacing()
+                Text(
+                    text = feature.name,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.weight(1f),
+                )
             }
         }
     }
