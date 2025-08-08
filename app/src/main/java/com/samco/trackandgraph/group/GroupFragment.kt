@@ -49,6 +49,7 @@ import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
+import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
 import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
 import com.samco.trackandgraph.util.resumeScoped
@@ -128,6 +129,15 @@ class GroupFragment : Fragment(),
                         trackGroupId = args.groupId,
                         trackGroupName = args.groupName,
                         onDismissRequest = { groupDialogsViewModel.hideExportDialog() }
+                    )
+                }
+
+                val displayTracker = groupDialogsViewModel.featureForDescriptionDialog.collectAsStateWithLifecycle().value
+                if (displayTracker != null) {
+                    FeatureInfoDialog(
+                        featureName = displayTracker.name,
+                        featureDescription = displayTracker.description,
+                        onDismissRequest = { groupDialogsViewModel.hideFeatureDescriptionDialog() }
                     )
                 }
             }
@@ -357,7 +367,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onTrackerDescriptionClicked(tracker: DisplayTracker) {
-        showFeatureDescriptionDialog(requireContext(), tracker.name, tracker.description)
+        groupDialogsViewModel.showFeatureDescriptionDialog(tracker)
     }
 
     private fun onTrackerMoveClicked(tracker: DisplayTracker) {
@@ -460,7 +470,7 @@ class GroupFragment : Fragment(),
             binding.queueAddAllButton.hide()
         }
     }
-    //
+
     private fun onExportClicked() {
         groupDialogsViewModel.showExportDialog()
     }

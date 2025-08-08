@@ -70,7 +70,8 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
 
     featureInfo?.let {
         FeatureInfoDialog(
-            feature = it,
+            featureName = it.name,
+            featureDescription = it.description,
             onDismissRequest = viewModel::onHideFeatureInfo
         )
     }
