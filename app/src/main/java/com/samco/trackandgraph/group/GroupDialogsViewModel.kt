@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.group
 
 import androidx.lifecycle.ViewModel
+import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -52,5 +53,17 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
 
     fun hideExportDialog() {
         _showExportDialog.value = false
+    }
+
+    // Feature Description Dialog
+    private val _featureForDescriptionDialog = MutableStateFlow<DisplayTracker?>(null)
+    val featureForDescriptionDialog: StateFlow<DisplayTracker?> = _featureForDescriptionDialog.asStateFlow()
+
+    fun showFeatureDescriptionDialog(feature: DisplayTracker) {
+        _featureForDescriptionDialog.value = feature
+    }
+
+    fun hideFeatureDescriptionDialog() {
+        _featureForDescriptionDialog.value = null
     }
 }

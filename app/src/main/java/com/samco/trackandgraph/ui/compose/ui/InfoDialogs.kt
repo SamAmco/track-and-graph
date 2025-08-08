@@ -21,12 +21,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataPoint
-import com.samco.trackandgraph.base.database.dto.Feature
 import com.samco.trackandgraph.helpers.getDisplayValue
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -41,8 +44,15 @@ fun DataPointInfoDialog(
         fontWeight = FontWeight.Bold
     )
     DialogInputSpacing()
-    Text(dataPoint.getDisplayValue(isDuration))
-    Text(dataPoint.note)
+    Text(
+        text = dataPoint.getDisplayValue(isDuration),
+        style = MaterialTheme.typography.body1,
+        fontWeight = FontWeight.Bold
+    )
+    Text(
+        text = dataPoint.note,
+        style = MaterialTheme.typography.body1
+    )
 }
 
 @Composable
@@ -77,16 +87,20 @@ fun DataPointValueAndDescription(
 
 @Composable
 fun FeatureInfoDialog(
-    feature: Feature,
+    featureName: String,
+    featureDescription: String,
     onDismissRequest: () -> Unit
 ) = CustomDialog(onDismissRequest) {
     Text(
-        feature.name,
-        fontSize = MaterialTheme.typography.h5.fontSize,
-        fontWeight = MaterialTheme.typography.h5.fontWeight
+        text = featureName,
+        style = MaterialTheme.typography.h5,
+        fontWeight = FontWeight.Bold
     )
     DialogInputSpacing()
-    Text(feature.description)
+    Text(
+        text = featureDescription.ifEmpty { stringResource(R.string.no_description) },
+        style = MaterialTheme.typography.body1
+    )
 }
 
 @Composable
@@ -98,7 +112,7 @@ fun GlobalNoteDescriptionDialog(
     // Header with timestamp
     DayMonthYearHourMinuteWeekDayOneLineText(
         dateTime = timestamp,
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.h5,
         fontWeight = FontWeight.Bold
     )
 
@@ -122,9 +136,11 @@ fun DataPointNoteDescriptionDialog(
     // Header with timestamp
     DayMonthYearHourMinuteWeekDayOneLineText(
         dateTime = timestamp,
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.h5,
         fontWeight = FontWeight.Bold
     )
+
+    HalfDialogInputSpacing()
 
     // Feature display name
     Text(
@@ -137,10 +153,11 @@ fun DataPointNoteDescriptionDialog(
 
     // Display value
     if (displayValue != null) {
+        HalfDialogInputSpacing()
         Text(
             text = displayValue,
             style = MaterialTheme.typography.body1,
-            fontStyle = FontStyle.Italic,
+            fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -152,5 +169,158 @@ fun DataPointNoteDescriptionDialog(
     Text(
         text = note,
         style = MaterialTheme.typography.body1
+    )
+}
+
+@Preview
+@Composable
+private fun DataPointInfoDialogPreview() = TnGComposeTheme {
+    val sampleDataPoint = DataPoint(
+        timestamp = OffsetDateTime.parse("2024-01-15T14:30:00+00:00"),
+        featureId = 1,
+        value = 75.5,
+        label = "",
+        note = "Felt great after morning run! Weather was perfect and I maintained a good pace throughout."
+    )
+
+    DataPointInfoDialog(
+        dataPoint = sampleDataPoint,
+        isDuration = false,
+        onDismissRequest = {}
+    )
+}
+
+@Preview
+@Composable
+private fun DataPointInfoDialogDurationPreview() = TnGComposeTheme {
+    val sampleDataPoint = DataPoint(
+        timestamp = OffsetDateTime.parse("2024-01-15T09:15:00+00:00"),
+        featureId = 2,
+        value = 3725.0, // 1 hour 2 minutes 5 seconds
+        label = "",
+        note = "Morning workout session with strength training and cardio"
+    )
+
+    DataPointInfoDialog(
+        dataPoint = sampleDataPoint,
+        isDuration = true,
+        onDismissRequest = {}
+    )
+}
+
+@Preview
+@Composable
+private fun DataPointValueAndDescriptionPreview() = TnGComposeTheme {
+    val sampleDataPoint = DataPoint(
+        timestamp = OffsetDateTime.parse("2024-02-10T16:45:00+00:00"),
+        featureId = 1,
+        value = 8.5,
+        label = "Good",
+        note = "Good session today, focused on technique and form. Made significant progress on challenging routes."
+    )
+
+    DataPointValueAndDescription(
+        dataPoint = sampleDataPoint,
+        isDuration = false,
+        restrictNoteText = true
+    )
+}
+
+@Preview
+@Composable
+private fun DataPointValueAndDescriptionUnrestrictedPreview() = TnGComposeTheme {
+    val sampleDataPoint = DataPoint(
+        timestamp = OffsetDateTime.parse("2024-03-05T11:20:00+00:00"),
+        featureId = 1,
+        value = 42.5,
+        label = "Excellent",
+        note = "This is a very long note that would normally be truncated with restrictNoteText=true, but since we're showing the unrestricted version, all of this text should be visible. This is useful for full dialogs where we want to show the complete note content without ellipsis truncation."
+    )
+
+    DataPointValueAndDescription(
+        dataPoint = sampleDataPoint,
+        isDuration = false,
+        restrictNoteText = false
+    )
+}
+
+@Preview
+@Composable
+private fun DataPointValueAndDescriptionEmptyNotePreview() = TnGComposeTheme {
+    val sampleDataPoint = DataPoint(
+        timestamp = OffsetDateTime.parse("2024-04-12T08:00:00+00:00"),
+        featureId = 1,
+        value = 15.2,
+        label = "Average",
+        note = ""
+    )
+
+    DataPointValueAndDescription(
+        dataPoint = sampleDataPoint,
+        isDuration = false
+    )
+}
+
+@Preview
+@Composable
+private fun FeatureInfoDialogPreview() = TnGComposeTheme {
+    FeatureInfoDialog(
+        featureName = "Daily Exercise",
+        featureDescription = "Track daily exercise duration and intensity. This helps monitor fitness progress and maintain consistency in workout routines.",
+        onDismissRequest = {}
+    )
+}
+
+@Preview
+@Composable
+private fun FeatureInfoDialogEmptyDescriptionPreview() = TnGComposeTheme {
+    FeatureInfoDialog(
+        featureName = "Weight",
+        featureDescription = "",
+        onDismissRequest = {}
+    )
+}
+
+@Preview
+@Composable
+private fun GlobalNoteDescriptionDialogPreview() = TnGComposeTheme {
+    GlobalNoteDescriptionDialog(
+        timestamp = OffsetDateTime.parse("2024-06-18T19:30:00+00:00"),
+        note = "Had a great day today! Started with meditation, then went for a long hike in the mountains. The weather was perfect and I felt really connected with nature. Planning to make this a regular weekend activity.",
+        onDismissRequest = {}
+    )
+}
+
+@Preview
+@Composable
+private fun GlobalNoteDescriptionDialogShortNotePreview() = TnGComposeTheme {
+    GlobalNoteDescriptionDialog(
+        timestamp = OffsetDateTime.parse("2024-07-22T12:15:00+00:00"),
+        note = "Quick note",
+        onDismissRequest = {}
+    )
+}
+
+@Preview
+@Composable
+private fun DataPointNoteDescriptionDialogPreview() = TnGComposeTheme {
+    DataPointNoteDescriptionDialog(
+        timestamp = OffsetDateTime.parse("2024-05-10T17:45:00+00:00"),
+        displayValue = "85.3 : Kilos",
+        note = "Weighed myself after dinner, so probably a bit higher than usual. Been focusing on strength training lately and feeling stronger overall.",
+        featureDisplayName = "/Health/Body Weight",
+        onDismissRequest = {}
+    )
+}
+
+@Preview
+@Composable
+private fun DataPointNoteDescriptionDialogNoValuePreview() = TnGComposeTheme {
+    DataPointNoteDescriptionDialog(
+        timestamp = OffsetDateTime.parse("2024-08-03T21:00:00+00:00"),
+        displayValue = null,
+        note = "Completed today's meditation session. Felt very centered and calm afterwards. The breathing techniques are really helping with stress management.",
+        featureDisplayName = "/Habits/Daily Meditation",
+        onDismissRequest = {}
     )
 }

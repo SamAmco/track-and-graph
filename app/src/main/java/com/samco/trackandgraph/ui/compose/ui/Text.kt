@@ -52,6 +52,47 @@ private fun TextPreview() = TnGComposeTheme {
     Column(
         verticalArrangement = Arrangement.spacedBy(cardPadding),
     ) {
+        Text(
+            style = MaterialTheme.typography.h1,
+            text = "Text h1"
+        )
+        Text(
+            style = MaterialTheme.typography.h2,
+            text = "Text h2"
+        )
+        Text(
+            style = MaterialTheme.typography.h3,
+            text = "Text h3"
+        )
+        Text(
+            style = MaterialTheme.typography.h4,
+            text = "Text h4"
+        )
+        Text(
+            style = MaterialTheme.typography.h5,
+            text = "Text h5"
+        )
+        Text(
+            style = MaterialTheme.typography.h6,
+            text = "Text h6"
+        )
+        Text(
+            style = MaterialTheme.typography.body1,
+            text = "Text body 1"
+        )
+        Text(
+            style = MaterialTheme.typography.body2,
+            text = "Text body 2"
+        )
+        Text(
+            style = MaterialTheme.typography.subtitle1,
+            text = "Text subtitle 1"
+        )
+        Text(
+            style = MaterialTheme.typography.subtitle2,
+            text = "Text subtitle 2"
+        )
+
         TrackerNameHeadline(name = "Tracker name")
         TextBody1(text = "Text body 1")
         TextSubtitle2(text = "Text body 2")
