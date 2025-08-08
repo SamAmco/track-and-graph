@@ -27,11 +27,13 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
@@ -99,26 +101,30 @@ class MainActivity : AppCompatActivity() {
         viewModel.init()
         intent?.data?.let { handleDeepLink(it) }
         onThemeSelected(currentTheme.value)
-        setContent {
-            var showTutorial by remember { mutableStateOf(prefHelper.isFirstRun()) }
-            AnimatedContent(showTutorial) { show ->
-                if (show) {
-                    TutorialScreen {
-                        showTutorial = false
-                        prefHelper.setFirstRun(false)
+        val content = ComposeView(this).apply {
+            consumeWindowInsets = false
+            setContent {
+                var showTutorial by remember { mutableStateOf(prefHelper.isFirstRun()) }
+                AnimatedContent(showTutorial) { show ->
+                    if (show) {
+                        TutorialScreen {
+                            showTutorial = false
+                            prefHelper.setFirstRun(false)
+                        }
+                    } else {
+                        MainScreen(
+                            activity = this@MainActivity,
+                            onNavigateToBrowser = ::onNavigateToBrowser,
+                            currentTheme = currentTheme,
+                            onThemeSelected = ::onThemeSelected,
+                            currentDateFormat = currentDateFormat,
+                            onDateFormatSelected = ::onDateFormatSelected,
+                        )
                     }
-                } else {
-                    MainScreen(
-                        activity = this@MainActivity,
-                        onNavigateToBrowser = ::onNavigateToBrowser,
-                        currentTheme = currentTheme,
-                        onThemeSelected = ::onThemeSelected,
-                        currentDateFormat = currentDateFormat,
-                        onDateFormatSelected = ::onDateFormatSelected,
-                    )
                 }
             }
         }
+        setContentView(content)
     }
 
     private fun onNavigateToBrowser(location: DrawerMenuBrowserLocation) {
