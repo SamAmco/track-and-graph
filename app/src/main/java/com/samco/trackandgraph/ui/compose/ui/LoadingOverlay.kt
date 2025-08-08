@@ -20,7 +20,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -32,14 +34,38 @@ import androidx.compose.ui.Modifier
 import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
+
 @Composable
 fun LoadingOverlay() = Box(
+    modifier = Modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
 ) {
     Surface(
         modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
+            .matchParentSize()
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null
+            ) { }
+            .focusable(),
+        color = MaterialTheme.tngColors.surface.copy(
+            alpha = MaterialTheme.tngColors.disabledAlpha
+        )
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            CircularProgressIndicator()
+        }
+    }
+}
+
+@Composable
+fun BoxScope.LoadingOverlay() = Box(
+    modifier = Modifier.matchParentSize(),
+    contentAlignment = Alignment.Center
+) {
+    Surface(
+        modifier = Modifier
+            .matchParentSize()
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null

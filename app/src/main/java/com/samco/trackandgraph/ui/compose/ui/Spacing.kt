@@ -49,8 +49,6 @@ val cardElevation = 4.dp
 
 val inputSpacingXLarge = 50.dp
 
-val wideDialogWidthPercentage = 0.9f
-
 
 @Composable
 fun CardMarginSmall() = Spacer(modifier = Modifier.size(cardMarginSmall))

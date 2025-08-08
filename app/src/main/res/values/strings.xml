@@ -40,6 +40,7 @@
     <string name="ru_sure_del_feature">Are you sure you want to delete this tracked data?</string>
     <string name="ru_sure_del_data_point">Are you sure you want to delete this data point?</string>
     <string name="export_file_name_suffix" translatable="false">%1$s-%2$s-%3$04d%4$02d%5$02d-%6$02d%7$02d%8$02d.csv</string>
+    <string name="export_file_name_null_group_suffix" translatable="false">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.csv</string>
     <string name="backup_file_name_suffix" translatable="false">%1$s-%2$04d%3$02d%4$02d-%5$02d%6$02d%7$02d.db</string>
     <string name="tracker_name_cannot_be_null">Please add a name</string>
     <string name="tracker_with_that_name_exists">You are already tracking something with that name</string>

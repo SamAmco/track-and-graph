@@ -1,270 +1,311 @@
-/* 
+/*
 * This file is part of Track & Graph
-* 
+*
 * Track & Graph is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
 * the Free Software Foundation, either version 3 of the License, or
 * (at your option) any later version.
-* 
+*
 * Track & Graph is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 * GNU General Public License for more details.
-* 
+*
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
 package com.samco.trackandgraph.importexport
 
-import android.app.Dialog
-import android.content.ContentResolver
-import android.content.DialogInterface
-import android.content.Intent
 import android.net.Uri
-import android.os.Bundle
-import android.view.View
-import android.widget.*
-import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.database.dto.Feature
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.util.ImportExportFeatureUtils
-import com.samco.trackandgraph.util.getColorFromAttr
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
-import org.threeten.bp.OffsetDateTime
-import javax.inject.Inject
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
+import com.samco.trackandgraph.ui.compose.ui.SelectorButton
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 
-const val GROUP_ID_KEY = "GROUP_ID_KEY"
-const val GROUP_NAME_KEY = "GROUP_NAME_KEY"
-const val CREATE_FILE_REQUEST_CODE = 123
+@Composable
+fun ExportFeaturesDialog(
+    trackGroupId: Long,
+    trackGroupName: String?,
+    onDismissRequest: () -> Unit,
+) {
+    val viewModel: ExportFeaturesViewModel = hiltViewModel<ExportFeaturesViewModelImpl>()
+    val context = LocalContext.current
 
-enum class ExportState { LOADING, WAITING, EXPORTING, DONE }
+    val exportState by viewModel.exportState.collectAsStateWithLifecycle()
+    val selectedFileUri by viewModel.selectedFileUri.collectAsStateWithLifecycle()
+    val availableFeatures by viewModel.availableFeatures.collectAsStateWithLifecycle()
+    val selectedFeatures by viewModel.selectedFeatures.collectAsStateWithLifecycle()
 
-@AndroidEntryPoint
-class ExportFeaturesDialog : DialogFragment() {
-
-    private var groupName: String? = null
-    private var groupId: Long? = null
-
-    private val viewModel by viewModels<ExportFeaturesViewModel>()
-
-    private lateinit var alertDialog: AlertDialog
-    private lateinit var fileButton: Button
-    private lateinit var progressBar: ProgressBar
-    private lateinit var checkboxLayout: LinearLayout
-    private lateinit var positiveButton: Button
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return activity?.let {
-            val view = it.layoutInflater.inflate(R.layout.export_features_dialog, null)
-            groupName = requireArguments().getString(GROUP_NAME_KEY)
-            groupId = requireArguments().getLong(GROUP_ID_KEY)
-
-            fileButton = view.findViewById(R.id.fileButton)
-            progressBar = view.findViewById(R.id.progressBar)
-            checkboxLayout = view.findViewById(R.id.checkboxLayout)
-
-            fileButton.setOnClickListener { onFileButtonClicked() }
-            fileButton.text = getString(R.string.select_file)
-            fileButton.setTextColor(fileButton.context.getColorFromAttr(R.attr.colorError))
-
-            alertDialog = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
-                .setView(view)
-                .setPositiveButton(R.string.exportButton) { _, _ -> run {} }
-                .setNegativeButton(R.string.cancel) { _, _ -> run {} }
-                .create()
-            alertDialog.setCanceledOnTouchOutside(true)
-            alertDialog.setOnShowListener { setAlertDialogShowListeners() }
-            alertDialog
-        } ?: throw IllegalStateException("Activity cannot be null")
-    }
-
-    private fun setAlertDialogShowListeners() {
-        positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-        positiveButton.isEnabled = false
-        viewModel.loadFeatures(groupId!!)
-        listenToState()
-        setUriListeners()
-        listenToFeatures()
-        positiveButton.setOnClickListener { viewModel.beginExport() }
-    }
-
-    private fun listenToState() {
-        viewModel.exportState.observe(this) { state ->
-            when (state) {
-                ExportState.LOADING -> {
-                    progressBar.visibility = View.VISIBLE
-                    positiveButton.isEnabled = false
-                }
-                ExportState.WAITING -> {
-                    progressBar.visibility = View.INVISIBLE
-                }
-                ExportState.EXPORTING -> {
-                    progressBar.visibility = View.VISIBLE
-                    positiveButton.isEnabled = false
-                }
-                ExportState.DONE -> {
-                    dismiss()
-                }
-                else -> {}
+    // Derive file name from selected URI
+    val selectedFileName by remember {
+        derivedStateOf {
+            selectedFileUri?.let { uri ->
+                ImportExportFeatureUtils.getFileNameFromUri(context, uri)
             }
         }
     }
 
-    private fun setUriListeners() {
-        viewModel.selectedFileUri.observe(this) { uri ->
-            if (uri != null) {
-                ImportExportFeatureUtils.setFileButtonTextFromUri(
-                    activity,
-                    uri,
-                    fileButton,
-                    alertDialog
-                )
-            }
+    // Handle export completion
+    LaunchedEffect(exportState) {
+        when (exportState) {
+            ExportState.DONE -> onDismissRequest()
+            else -> {}
         }
     }
 
-    private fun listenToFeatures() {
-        viewModel.featuresLoaded.observe(this) { loaded ->
-            if (loaded) {
-                createFeatureCheckboxes()
-            }
-        }
+    // Load features when dialog opens
+    LaunchedEffect(trackGroupId) {
+        viewModel.loadFeatures(trackGroupId)
     }
 
-    private fun onFileButtonClicked() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-            addCategory(Intent.CATEGORY_OPENABLE)
-            val now = OffsetDateTime.now()
-            val generatedName = getString(
-                R.string.export_file_name_suffix,
-                "TrackAndGraph", groupName, now.year, now.monthValue,
-                now.dayOfMonth, now.hour, now.minute, now.second
-            )
-            putExtra(Intent.EXTRA_TITLE, generatedName)
-            type = "text/csv"
-        }
-        startActivityForResult(intent, CREATE_FILE_REQUEST_CODE)
+    // File creation launcher
+    val fileCreationLauncher = rememberLauncherForActivityResult(
+        contract = CreateCsvDocumentActivityResultContract(trackGroupName)
+    ) { uri: Uri? ->
+        uri?.let { viewModel.setSelectedFileUri(it) }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, resultData)
-        if (requestCode == CREATE_FILE_REQUEST_CODE) {
-            resultData?.data.also { uri ->
-                if (uri != null) {
-                    viewModel.selectedFileUri.value = uri
-                }
-            }
-        }
-    }
-
-    private fun createFeatureCheckboxes() {
-        for (feature in viewModel.features) {
-            val item = layoutInflater.inflate(
-                R.layout.list_item_feature_checkbox,
-                checkboxLayout,
-                false
-            )
-            val checkBox = item.findViewById<CheckBox>(R.id.checkbox)
-            checkBox.text = feature.name
-            checkBox.isChecked = viewModel.selectedFeatures.contains(feature)
-            checkBox.setOnCheckedChangeListener { _, b ->
-                if (b && !viewModel.selectedFeatures.contains(feature)) viewModel.selectedFeatures.add(
-                    feature
-                )
-                else if (!b && viewModel.selectedFeatures.contains(feature)) viewModel.selectedFeatures.remove(
-                    feature
-                )
-            }
-            checkboxLayout.addView(item)
-        }
-    }
-
-    override fun onCancel(dialog: DialogInterface) {
-        super.onCancel(dialog)
-        dismiss()
+    CustomConfirmCancelDialog(
+        onDismissRequest = {
+            viewModel.reset()
+            onDismissRequest()
+        },
+        onConfirm = { viewModel.beginExport() },
+        continueText = R.string.exportButton,
+        continueEnabled = selectedFileUri != null &&
+            selectedFeatures.isNotEmpty() &&
+            exportState != ExportState.LOADING &&
+            exportState != ExportState.EXPORTING
+    ) {
+        ExportFeaturesDialogContent(
+            exportState = exportState,
+            selectedFileUri = selectedFileUri,
+            selectedFileName = selectedFileName,
+            availableFeatures = availableFeatures,
+            selectedFeatures = selectedFeatures,
+            onCreateFile = { fileCreationLauncher.launch(Unit) },
+            onToggleFeature = viewModel::toggleFeatureSelection,
+        )
     }
 }
 
+@Composable
+private fun ExportFeaturesDialogContent(
+    exportState: ExportState,
+    selectedFileUri: Uri?,
+    selectedFileName: String?,
+    availableFeatures: List<FeatureDto>,
+    selectedFeatures: List<FeatureDto>,
+    onCreateFile: () -> Unit,
+    onToggleFeature: (FeatureDto) -> Unit,
+) = Box {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
+    ) {
+        // File selection section
+        Text(
+            text = stringResource(R.string.export_to),
+            style = MaterialTheme.typography.body2
+        )
 
-@HiltViewModel
-class ExportFeaturesViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor,
-    @MainDispatcher private val ui: CoroutineDispatcher,
-    @IODispatcher private val io: CoroutineDispatcher,
-    private val contentResolver: ContentResolver
-) : ViewModel() {
-    lateinit var features: List<Feature>
-
-    val exportState: LiveData<ExportState>
-        get() {
-            return _exportState
-        }
-    private val _exportState by lazy {
-        val state = MutableLiveData<ExportState>()
-        state.value = ExportState.WAITING
-        return@lazy state
-    }
-
-    lateinit var selectedFeatures: MutableList<Feature>
-    val selectedFileUri by lazy {
-        val uri = MutableLiveData<Uri?>()
-        uri.value = null
-        return@lazy uri
-    }
-
-    val featuresLoaded: LiveData<Boolean>
-        get() {
-            return _featuresLoaded
-        }
-    private val _featuresLoaded by lazy {
-        val loaded = MutableLiveData<Boolean>()
-        loaded.value = false
-        return@lazy loaded
-    }
-
-    fun loadFeatures(groupId: Long) {
-        if (_featuresLoaded.value == false) {
-            viewModelScope.launch(ui) {
-                _exportState.value = ExportState.LOADING
-                withContext(io) {
-                    features = dataInteractor.getFeaturesForGroupSync(groupId).toMutableList()
+        SelectorButton(
+            onClick = onCreateFile,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = cardPadding),
+            enabled = exportState == ExportState.WAITING,
+        ) {
+            Text(
+                text = selectedFileName ?: stringResource(R.string.select_file),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = if (selectedFileUri == null) {
+                    MaterialTheme.colors.error
+                } else {
+                    MaterialTheme.colors.onSurface
                 }
-                selectedFeatures = features.toMutableList()
-                _featuresLoaded.value = true
-                _exportState.value = ExportState.WAITING
+            )
+        }
+
+        // Feature selection section
+        if (availableFeatures.isNotEmpty()) {
+            // Feature checkboxes
+            LazyColumn(
+                modifier = Modifier
+                    .heightIn(max = 200.dp)
+                    .fillMaxWidth(),
+            ) {
+                items(availableFeatures) { feature ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onToggleFeature(feature) }
+                            .padding(cardPadding),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Checkbox(
+                            checked = selectedFeatures.contains(feature),
+                            onCheckedChange = null,
+                        )
+                        HalfDialogInputSpacing()
+                        Text(
+                            text = feature.name,
+                            style = MaterialTheme.typography.body2,
+                            modifier = Modifier.weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
             }
         }
     }
 
-    //TODO this should probably be scheduled to run in a service
-    fun beginExport() {
-        selectedFileUri.value?.let { uri ->
-            viewModelScope.launch(ui) {
-                _exportState.value = ExportState.EXPORTING
-                doExport(uri)
-                _exportState.value = ExportState.DONE
-            }
-        }
+    // Loading/Progress indication
+    if (exportState != ExportState.WAITING) {
+        LoadingOverlay()
     }
+}
 
-    private suspend fun doExport(uri: Uri) = runCatching {
-        withContext(io) {
-            contentResolver.openOutputStream(uri)?.let { outStream ->
-                val featureIds = selectedFeatures.map { it.featureId }
-                dataInteractor.writeFeaturesToCSV(outStream, featureIds)
-            }
-        }
+@Preview(showBackground = true)
+@Composable
+private fun ExportFeaturesDialogContentPreview() {
+    TnGComposeTheme {
+        val sampleFeatures = listOf(
+            FeatureDto(1L, "Weight"),
+            FeatureDto(2L, "Sleep Hours"),
+            FeatureDto(3L, "Exercise")
+        )
+        ExportFeaturesDialogContent(
+            exportState = ExportState.WAITING,
+            selectedFileUri = "file://test.csv".toUri(),
+            selectedFileName = "test_export.csv",
+            availableFeatures = sampleFeatures,
+            selectedFeatures = sampleFeatures.take(2),
+            onCreateFile = {},
+            onToggleFeature = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ExportFeaturesDialogContentLoadingPreview() {
+    TnGComposeTheme {
+        ExportFeaturesDialogContent(
+            exportState = ExportState.LOADING,
+            selectedFileUri = null,
+            selectedFileName = null,
+            availableFeatures = emptyList(),
+            selectedFeatures = emptyList(),
+            onCreateFile = {},
+            onToggleFeature = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ExportFeaturesDialogContentNoFileSelectedPreview() {
+    TnGComposeTheme {
+        val sampleFeatures = listOf(
+            FeatureDto(1L, "Weight"),
+            FeatureDto(2L, "Sleep Hours"),
+            FeatureDto(3L, "Exercise"),
+            FeatureDto(4L, "Mood Rating"),
+            FeatureDto(5L, "Steps")
+        )
+        ExportFeaturesDialogContent(
+            exportState = ExportState.WAITING,
+            selectedFileUri = null,
+            selectedFileName = null,
+            availableFeatures = sampleFeatures,
+            selectedFeatures = sampleFeatures,
+            onCreateFile = {},
+            onToggleFeature = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ExportFeaturesDialogContentExportingPreview() {
+    TnGComposeTheme {
+        val sampleFeatures = listOf(
+            FeatureDto(1L, "Weight"),
+            FeatureDto(2L, "Sleep Hours"),
+            FeatureDto(3L, "Exercise")
+        )
+        ExportFeaturesDialogContent(
+            exportState = ExportState.EXPORTING,
+            selectedFileUri = "file://export_2024_01_15.csv".toUri(),
+            selectedFileName = "export_2024_01_15.csv",
+            availableFeatures = sampleFeatures,
+            selectedFeatures = listOf(sampleFeatures[0], sampleFeatures[2]),
+            onCreateFile = {},
+            onToggleFeature = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ExportFeaturesDialogContentNoFeaturesPreview() {
+    TnGComposeTheme {
+        ExportFeaturesDialogContent(
+            exportState = ExportState.WAITING,
+            selectedFileUri = "file://empty_group_export.csv".toUri(),
+            selectedFileName = "empty_group_export.csv",
+            availableFeatures = emptyList(),
+            selectedFeatures = emptyList(),
+            onCreateFile = {},
+            onToggleFeature = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ExportFeaturesDialogContentPartialSelectionPreview() {
+    TnGComposeTheme {
+        val sampleFeatures = listOf(
+            FeatureDto(1L, "Daily Weight"),
+            FeatureDto(2L, "Sleep Quality (1-10)"),
+            FeatureDto(3L, "Morning Exercise"),
+            FeatureDto(4L, "Water Intake (L)"),
+            FeatureDto(5L, "Mood Rating"),
+            FeatureDto(6L, "Work Productivity")
+        )
+        ExportFeaturesDialogContent(
+            exportState = ExportState.WAITING,
+            selectedFileUri = "file://partial_export.csv".toUri(),
+            selectedFileName = "partial_export.csv",
+            availableFeatures = sampleFeatures,
+            selectedFeatures = listOf(sampleFeatures[0], sampleFeatures[2], sampleFeatures[4]),
+            onCreateFile = {},
+            onToggleFeature = {},
+        )
     }
 }

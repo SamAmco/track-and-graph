@@ -42,8 +42,6 @@ import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog
-import com.samco.trackandgraph.importexport.GROUP_ID_KEY
-import com.samco.trackandgraph.importexport.GROUP_NAME_KEY
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
@@ -122,6 +120,14 @@ class GroupFragment : Fragment(),
                     ImportFeaturesDialog(
                         trackGroupId = args.groupId,
                         onDismissRequest = { groupDialogsViewModel.hideImportDialog() }
+                    )
+                }
+
+                if (groupDialogsViewModel.showExportDialog.collectAsStateWithLifecycle().value) {
+                    ExportFeaturesDialog(
+                        trackGroupId = args.groupId,
+                        trackGroupName = args.groupName,
+                        onDismissRequest = { groupDialogsViewModel.hideExportDialog() }
                     )
                 }
             }
@@ -454,14 +460,9 @@ class GroupFragment : Fragment(),
             binding.queueAddAllButton.hide()
         }
     }
-
+    //
     private fun onExportClicked() {
-        val dialog = ExportFeaturesDialog()
-        val argBundle = Bundle()
-        argBundle.putLong(GROUP_ID_KEY, args.groupId)
-        argBundle.putString(GROUP_NAME_KEY, args.groupName)
-        dialog.arguments = argBundle
-        childFragmentManager.let { dialog.show(it, "export_features_dialog") }
+        groupDialogsViewModel.showExportDialog()
     }
 
     private fun onImportClicked() {

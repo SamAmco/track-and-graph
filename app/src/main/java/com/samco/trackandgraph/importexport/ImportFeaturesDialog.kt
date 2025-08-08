@@ -17,19 +17,15 @@
 package com.samco.trackandgraph.importexport
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
-import android.provider.OpenableColumns
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -44,31 +40,10 @@ import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import androidx.core.net.toUri
+import com.samco.trackandgraph.importexport.ImportExportFeatureUtils.getFileNameFromUri
 import com.samco.trackandgraph.ui.compose.ui.SelectorButton
-
-/**
- * Custom ActivityResultContract that supports multiple MIME types for CSV file selection.
- * This replicates the functionality of the original DialogFragment's Intent.EXTRA_MIME_TYPES.
- */
-private class GetCsvContent : ActivityResultContract<Unit, Uri?>() {
-    override fun createIntent(context: Context, input: Unit): Intent {
-        return Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = "text/csv"
-            putExtra(
-                Intent.EXTRA_MIME_TYPES, arrayOf(
-                    "text/csv",
-                    "application/csv",
-                    "application/comma-separated-values",
-                    "text/comma-separated-values"
-                )
-            )
-        }
-    }
-
-    override fun parseResult(resultCode: Int, intent: Intent?): Uri? {
-        return intent?.data
-    }
-}
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 
 @Composable
 fun ImportFeaturesDialog(
@@ -111,7 +86,7 @@ fun ImportFeaturesDialog(
 
     // File picker launcher with support for multiple CSV MIME types
     val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = GetCsvContent()
+        contract = GetCsvContentActivityResultContract()
     ) { uri: Uri? ->
         uri?.let { viewModel.setSelectedFileUri(it) }
     }
@@ -140,7 +115,7 @@ private fun ImportFeaturesDialogContent(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.dialog_input_spacing))
+        verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
     ) {
         // Header text
         Text(
@@ -153,7 +128,7 @@ private fun ImportFeaturesDialogContent(
             onClick = onSelectFile,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.card_padding)),
+                .padding(horizontal = cardPadding),
             enabled = importState != ImportState.IMPORTING
         ) {
             Text(
@@ -173,7 +148,7 @@ private fun ImportFeaturesDialogContent(
         // Warning section
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.dialog_input_spacing))
+            verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)
         ) {
             Icon(
                 painter = painterResource(R.drawable.warning_icon),
@@ -226,16 +201,6 @@ private fun getStringForImportException(context: Context, exception: ImportFeatu
             R.string.import_exception_bad_headers,
             exception.requiredHeaders
         )
-    }
-}
-
-private fun getFileNameFromUri(context: Context, uri: Uri): String? {
-    val projection = arrayOf(OpenableColumns.DISPLAY_NAME)
-    return context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
-        val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        if (cursor.moveToFirst() && nameIndex >= 0) {
-            cursor.getString(nameIndex)
-        } else null
     }
 }
 
