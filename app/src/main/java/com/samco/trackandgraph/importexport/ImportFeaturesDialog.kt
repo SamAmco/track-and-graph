@@ -68,7 +68,10 @@ fun ImportFeaturesDialog(
     // Handle import completion and errors
     LaunchedEffect(importState) {
         when (importState) {
-            ImportState.DONE -> onDismissRequest()
+            ImportState.DONE -> {
+                viewModel.reset()
+                onDismissRequest()
+            }
             else -> {}
         }
     }
@@ -92,7 +95,10 @@ fun ImportFeaturesDialog(
     }
 
     CustomConfirmCancelDialog(
-        onDismissRequest = onDismissRequest,
+        onDismissRequest = {
+            viewModel.reset()
+            onDismissRequest()
+        },
         onConfirm = { viewModel.beginImport(trackGroupId) },
         continueText = R.string.importButton,
         continueEnabled = selectedFileUri != null && importState != ImportState.IMPORTING
