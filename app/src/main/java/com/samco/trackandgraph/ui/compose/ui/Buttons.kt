@@ -116,7 +116,7 @@ fun SelectorButton(
 
 @Composable
 fun SelectorButton(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     enabled: Boolean = true,
     onClick: () -> Unit,
     content: @Composable RowScope.() -> Unit

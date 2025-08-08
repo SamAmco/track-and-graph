@@ -104,7 +104,7 @@ internal fun GraphStatInputView(
             if (loading.value) LoadingOverlay()
 
             val showLuaFirstTimeUserDialog = viewModel.showLuaFirstTimeUserDialog.observeAsState(false)
-            if (showLuaFirstTimeUserDialog.value == true) {
+            if (showLuaFirstTimeUserDialog.value) {
                 LuaFirstTimeUserDialog(
                     onDismiss = viewModel::onLuaFirstTimeUserDialogDismiss,
                     onOpenLuaTutorialPath = viewModel::onOpenLuaTutorialPath
