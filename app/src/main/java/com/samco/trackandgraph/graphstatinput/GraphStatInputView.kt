@@ -257,7 +257,7 @@ private fun LuaFirstTimeUserDialog(
     onDismiss: () -> Unit,
     onOpenLuaTutorialPath: () -> Unit,
 ) {
-    ConfirmDialog(
+    ContinueDialog(
         onDismissRequest = onDismiss,
         onConfirm = onDismiss,
         content = {

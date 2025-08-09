@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -77,8 +76,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.helpers.getWeekDayNames
-import com.samco.trackandgraph.ui.compose.ui.ConfirmDialog
-import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
+import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DateButton
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
@@ -167,7 +166,7 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
 }
 
 @Composable
-fun RestoreErrorDialog(error: Int, onDismiss: () -> Unit) = ConfirmDialog(
+fun RestoreErrorDialog(error: Int, onDismiss: () -> Unit) = ContinueDialog(
     continueText = R.string.ok,
     onConfirm = onDismiss,
     onDismissRequest = onDismiss
@@ -390,7 +389,7 @@ private fun hasNotificationPermission(context: Context): Boolean {
 private fun NotificationPermissionPromptDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
-) = ConfirmDialog(
+) = ContinueDialog(
     onConfirm = onConfirm,
     onDismissRequest = onDismiss,
     continueText = R.string.ok
@@ -406,7 +405,7 @@ private fun NotificationPermissionPromptDialog(
 private fun PreRestoreDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
-) = ConfirmDialog(
+) = ContinueDialog(
     onConfirm = onConfirm,
     onDismissRequest = onDismiss
 ) {
@@ -418,7 +417,7 @@ private fun PreRestoreDialog(
 }
 
 @Composable
-private fun RestoreCompleteDialog() = ConfirmDialog(
+private fun RestoreCompleteDialog() = ContinueDialog(
     onConfirm = { exitProcess(0) },
     dismissOnClickOutside = false,
     onDismissRequest = { },
@@ -467,7 +466,7 @@ private fun ConfigureAutoBackupDialog(
         }
     }
 
-    CustomConfirmCancelDialog(
+    CustomContinueCancelDialog(
         onDismissRequest = onDismiss,
         onConfirm = onConfirm,
         continueText = R.string.apply,

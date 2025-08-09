@@ -64,7 +64,6 @@ import kotlin.getValue
  */
 @AndroidEntryPoint
 class GroupFragment : Fragment(),
-    YesCancelDialogFragment.YesCancelDialogListener,
     PermissionRequesterUseCase by PermissionRequesterUseCaseImpl() {
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
@@ -82,7 +81,7 @@ class GroupFragment : Fragment(),
     
     // State for FAB visibility based on scroll behavior
     private val showFab = mutableStateOf(true)
-
+    
     @Inject
     lateinit var tngSettings: TngSettings
 
@@ -216,12 +215,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onDeleteGroupClicked(group: Group) {
-        val dialog = YesCancelDialogFragment()
-        val args = Bundle()
-        args.putString("title", getString(R.string.ru_sure_del_group))
-        args.putString("id", group.id.toString())
-        dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "ru_sure_del_group_fragment") }
+        groupDialogsViewModel.showDeleteGroupDialog(group)
     }
 
     private fun onEditGroupClicked(group: Group) {
@@ -244,12 +238,7 @@ class GroupFragment : Fragment(),
     )
 
     private fun onDeleteGraphStatClicked(graphOrStat: IGraphStatViewData) {
-        val dialog = YesCancelDialogFragment()
-        val args = Bundle()
-        args.putString("title", getString(R.string.ru_sure_del_graph))
-        args.putString("id", graphOrStat.graphOrStat.id.toString())
-        dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "ru_sure_del_group_fragment") }
+        groupDialogsViewModel.showDeleteGraphStatDialog(graphOrStat)
     }
 
     private fun onMoveGraphStatClicked(graphOrStat: IGraphStatViewData) {
@@ -396,10 +385,7 @@ class GroupFragment : Fragment(),
 
     private fun onAddGraphStatClicked() {
         if (!viewModel.hasTrackers.value) {
-            AlertDialog.Builder(requireContext())
-                .setMessage(R.string.no_trackers_graph_stats_hint)
-                .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
-                .show()
+            groupDialogsViewModel.showNoTrackersDialog()
         } else {
             navigate(GroupFragmentDirections.actionGraphStatInput(groupId = args.groupId))
         }
@@ -413,20 +399,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onTrackerDeleteClicked(tracker: DisplayTracker) {
-        val dialog = YesCancelDialogFragment()
-        val args = Bundle()
-        args.putString("title", getString(R.string.ru_sure_del_feature))
-        args.putString("id", tracker.featureId.toString())
-        dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "ru_sure_del_feature_fragment") }
-    }
-
-    override fun onDialogYes(dialog: YesCancelDialogFragment, id: String?) {
-        when (dialog.title) {
-            getString(R.string.ru_sure_del_feature) -> id?.let { viewModel.onDeleteFeature(it.toLong()) }
-            getString(R.string.ru_sure_del_group) -> id?.let { viewModel.onDeleteGroup(it.toLong()) }
-            getString(R.string.ru_sure_del_graph) -> id?.let { viewModel.onDeleteGraphStat(it.toLong()) }
-        }
+        groupDialogsViewModel.showDeleteTrackerDialog(tracker)
     }
 
     private fun setupFabScrollListener() {

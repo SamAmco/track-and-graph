@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,8 @@ import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
+import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
@@ -112,6 +115,45 @@ fun GroupScreen(
             featureDescription = displayTracker.description,
             onDismissRequest = { groupDialogsViewModel.hideFeatureDescriptionDialog() }
         )
+    }
+    
+    // Confirmation dialogs
+    val itemForDeletion = groupDialogsViewModel.itemForDeletion.collectAsStateWithLifecycle().value
+    if (itemForDeletion != null) {
+        val bodyRes = when (itemForDeletion.type) {
+            DeleteType.GROUP -> R.string.ru_sure_del_group
+            DeleteType.GRAPH_STAT -> R.string.ru_sure_del_graph
+            DeleteType.TRACKER -> R.string.ru_sure_del_feature
+        }
+        
+        ContinueCancelDialog(
+            body = bodyRes,
+            onDismissRequest = { groupDialogsViewModel.hideDeleteDialog() },
+            onConfirm = {
+                when (itemForDeletion.type) {
+                    DeleteType.GROUP -> groupViewModel.onDeleteGroup(itemForDeletion.id)
+                    DeleteType.GRAPH_STAT -> groupViewModel.onDeleteGraphStat(itemForDeletion.id)
+                    DeleteType.TRACKER -> groupViewModel.onDeleteFeature(itemForDeletion.id)
+                }
+                groupDialogsViewModel.hideDeleteDialog()
+            },
+            continueText = R.string.delete,
+            dismissText = R.string.cancel
+        )
+    }
+    
+    if (groupDialogsViewModel.showNoTrackersDialog.collectAsStateWithLifecycle().value) {
+        ContinueDialog(
+            onConfirm = { groupDialogsViewModel.hideNoTrackersDialog() },
+            onDismissRequest = { groupDialogsViewModel.hideNoTrackersDialog() },
+            continueText = R.string.ok
+        ) {
+            Text(
+                text = stringResource(id = R.string.no_trackers_graph_stats_hint),
+                style = MaterialTheme.typography.subtitle1,
+                color = MaterialTheme.colors.onSurface
+            )
+        }
     }
 }
 

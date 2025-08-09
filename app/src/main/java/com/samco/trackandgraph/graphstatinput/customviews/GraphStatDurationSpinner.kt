@@ -41,7 +41,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.Spinner
@@ -328,7 +328,7 @@ private fun CustomDurationDialog(
         ChronoUnit.YEARS to stringResource(id = R.string.years_generic),
     )
 
-    CustomConfirmCancelDialog(
+    CustomContinueCancelDialog(
         onDismissRequest = onDismissRequest,
         continueText = R.string.ok,
         onConfirm = {

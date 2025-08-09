@@ -129,7 +129,7 @@ private fun UpdateWarningDialog(
 @Composable
 private fun UpdateDialog(
     viewModel: UpdateDialogViewModel
-) = CustomConfirmCancelDialog(
+) = CustomContinueCancelDialog(
     onDismissRequest = viewModel::onCancelUpdate,
     onConfirm = viewModel::onUpdateClicked,
     continueText = R.string.update,

@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.model.ImportFeaturesException
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import androidx.core.net.toUri
 import com.samco.trackandgraph.importexport.ImportExportFeatureUtils.getFileNameFromUri
@@ -94,7 +94,7 @@ fun ImportFeaturesDialog(
         uri?.let { viewModel.setSelectedFileUri(it) }
     }
 
-    CustomConfirmCancelDialog(
+    CustomContinueCancelDialog(
         onDismissRequest = {
             viewModel.reset()
             onDismissRequest()
