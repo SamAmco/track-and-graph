@@ -18,11 +18,28 @@ package com.samco.trackandgraph.group
 
 import androidx.lifecycle.ViewModel
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
+import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
+
+/**
+ * Simple DTO for delete confirmation dialogs containing only the essential data needed.
+ */
+data class DeleteItemDto(
+    val id: Long,
+    val type: DeleteType
+)
+
+/**
+ * Type of item being deleted to determine which delete operation to perform.
+ */
+enum class DeleteType {
+    GROUP, GRAPH_STAT, TRACKER
+}
 
 /**
  * ViewModel responsible for managing dialog visibility states in GroupFragment.
@@ -65,5 +82,46 @@ class GroupDialogsViewModel @Inject constructor() : ViewModel() {
 
     fun hideFeatureDescriptionDialog() {
         _featureForDescriptionDialog.value = null
+    }
+
+    // Delete Confirmation Dialog - unified for all delete operations
+    private val _itemForDeletion = MutableStateFlow<DeleteItemDto?>(null)
+    val itemForDeletion: StateFlow<DeleteItemDto?> = _itemForDeletion.asStateFlow()
+
+    fun showDeleteGroupDialog(group: Group) {
+        _itemForDeletion.value = DeleteItemDto(
+            id = group.id,
+            type = DeleteType.GROUP
+        )
+    }
+
+    fun showDeleteGraphStatDialog(graphStat: IGraphStatViewData) {
+        _itemForDeletion.value = DeleteItemDto(
+            id = graphStat.graphOrStat.id,
+            type = DeleteType.GRAPH_STAT
+        )
+    }
+
+    fun showDeleteTrackerDialog(tracker: DisplayTracker) {
+        _itemForDeletion.value = DeleteItemDto(
+            id = tracker.featureId,
+            type = DeleteType.TRACKER
+        )
+    }
+
+    fun hideDeleteDialog() {
+        _itemForDeletion.value = null
+    }
+
+    // No Trackers Warning Dialog
+    private val _showNoTrackersDialog = MutableStateFlow(false)
+    val showNoTrackersDialog: StateFlow<Boolean> = _showNoTrackersDialog.asStateFlow()
+
+    fun showNoTrackersDialog() {
+        _showNoTrackersDialog.value = true
+    }
+
+    fun hideNoTrackersDialog() {
+        _showNoTrackersDialog.value = false
     }
 }

@@ -37,7 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.ColorSpinner
-import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 
 @Composable
@@ -47,7 +47,7 @@ fun AddGroupDialog(viewModel: AddGroupDialogViewModel, onDismissRequest: () -> U
     val addEnabled by viewModel.addEnabled.collectAsStateWithLifecycle()
     val updateMode by viewModel.updateMode.collectAsStateWithLifecycle()
 
-    CustomConfirmCancelDialog(
+    CustomContinueCancelDialog(
         onDismissRequest = { onDismissRequest() },
         onConfirm = {
             viewModel.addOrUpdateGroup()

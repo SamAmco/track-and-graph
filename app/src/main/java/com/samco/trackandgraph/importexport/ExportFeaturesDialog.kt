@@ -33,7 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.CustomConfirmCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.SelectorButton
@@ -83,7 +83,7 @@ fun ExportFeaturesDialog(
         uri?.let { viewModel.setSelectedFileUri(it) }
     }
 
-    CustomConfirmCancelDialog(
+    CustomContinueCancelDialog(
         onDismissRequest = {
             viewModel.reset()
             onDismissRequest()

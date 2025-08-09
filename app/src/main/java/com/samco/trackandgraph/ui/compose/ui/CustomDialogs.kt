@@ -73,7 +73,7 @@ fun CustomDialog(
 }
 
 @Composable
-fun CustomConfirmCancelDialog(
+fun CustomContinueCancelDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
     @StringRes continueText: Int = R.string.continue_word,
@@ -123,7 +123,7 @@ fun CustomConfirmCancelDialog(
 }
 
 @Composable
-fun ConfirmDialog(
+fun ContinueDialog(
     onConfirm: () -> Unit,
     dismissOnClickOutside: Boolean = true,
     onDismissRequest: () -> Unit,
