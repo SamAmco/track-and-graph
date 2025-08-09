@@ -17,15 +17,15 @@
 package com.samco.trackandgraph.group
 
 import android.os.Bundle
-import android.view.*
-import androidx.appcompat.app.AlertDialog
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
@@ -37,14 +37,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
-import com.samco.trackandgraph.base.database.dto.*
+import com.samco.trackandgraph.base.database.dto.DisplayTracker
+import com.samco.trackandgraph.base.database.dto.Group
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.settings.TngSettings
-import com.samco.trackandgraph.ui.*
+import com.samco.trackandgraph.ui.MOVE_DIALOG_GROUP_KEY
+import com.samco.trackandgraph.ui.MOVE_DIALOG_TYPE_GRAPH
+import com.samco.trackandgraph.ui.MOVE_DIALOG_TYPE_GROUP
+import com.samco.trackandgraph.ui.MOVE_DIALOG_TYPE_KEY
+import com.samco.trackandgraph.ui.MOVE_DIALOG_TYPE_TRACK
+import com.samco.trackandgraph.ui.MoveToDialogFragment
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.performTrackVibrate
 import com.samco.trackandgraph.util.resumeScoped
@@ -54,7 +60,6 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.getValue
 
 /**
  * The group fragment is used on the home page and in any nested group to display the contents of
