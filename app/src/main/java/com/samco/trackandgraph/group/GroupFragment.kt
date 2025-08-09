@@ -20,6 +20,8 @@ import android.os.Bundle
 import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -33,29 +35,21 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
-import com.samco.trackandgraph.addgroup.AddGroupDialog
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.base.database.dto.*
 import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.databinding.FragmentGroupBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
-import com.samco.trackandgraph.importexport.ExportFeaturesDialog
-import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.*
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
-import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
-import com.samco.trackandgraph.util.bindingForViewLifecycle
 import com.samco.trackandgraph.util.performTrackVibrate
 import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -75,9 +69,8 @@ class GroupFragment : Fragment(),
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
 
-    private var binding: FragmentGroupBinding by bindingForViewLifecycle()
-
     private lateinit var adapter: GroupAdapter
+    private lateinit var recyclerView: RecyclerView
     private val viewModel by viewModels<GroupViewModel>()
     private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private val groupDialogsViewModel by viewModels<GroupDialogsViewModel>()
@@ -86,6 +79,9 @@ class GroupFragment : Fragment(),
     private val addGroupDialogViewModel by viewModels<AddGroupDialogViewModelImpl>()
 
     private var forceNextNotifyDataSetChanged: Boolean = false
+    
+    // State for FAB visibility based on scroll behavior
+    private val showFab = mutableStateOf(true)
 
     @Inject
     lateinit var tngSettings: TngSettings
@@ -103,71 +99,42 @@ class GroupFragment : Fragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentGroupBinding.inflate(inflater, container, false)
-
-        binding.composeView.setContent {
-            CompositionLocalProvider(LocalSettings provides tngSettings) {
-                AddDataPointsDialog(
-                    addDataPointsDialogViewModel,
-                    onDismissRequest = { addDataPointsDialogViewModel.reset() }
-                )
-
-                AddGroupDialog(
-                    viewModel = addGroupDialogViewModel,
-                    onDismissRequest = { addGroupDialogViewModel.hide() }
-                )
-
-                if (groupDialogsViewModel.showImportDialog.collectAsStateWithLifecycle().value) {
-                    ImportFeaturesDialog(
-                        trackGroupId = args.groupId,
-                        onDismissRequest = { groupDialogsViewModel.hideImportDialog() }
-                    )
-                }
-
-                if (groupDialogsViewModel.showExportDialog.collectAsStateWithLifecycle().value) {
-                    ExportFeaturesDialog(
-                        trackGroupId = args.groupId,
-                        trackGroupName = args.groupName,
-                        onDismissRequest = { groupDialogsViewModel.hideExportDialog() }
-                    )
-                }
-
-                val displayTracker = groupDialogsViewModel.featureForDescriptionDialog.collectAsStateWithLifecycle().value
-                if (displayTracker != null) {
-                    FeatureInfoDialog(
-                        featureName = displayTracker.name,
-                        featureDescription = displayTracker.description,
-                        onDismissRequest = { groupDialogsViewModel.hideFeatureDescriptionDialog() }
-                    )
-                }
-            }
-        }
-
         this.navController = container?.findNavController()
-        binding.lifecycleOwner = viewLifecycleOwner
-
+        
         viewModel.setGroup(args.groupId)
-
-        binding.emptyGroupText.visibility = View.INVISIBLE
-
+        
+        // Create and setup RecyclerView
+        recyclerView = RecyclerView(requireContext())
         initializeGridLayout()
         adapter = GroupAdapter(
             createTrackerClickListener(),
             createGraphStatClickListener(),
             createGroupClickListener()
         )
-        binding.itemList.adapter = adapter
-        //binding.itemList.itemAnimator = null
+        recyclerView.adapter = adapter
         addItemTouchHelper()
         scrollToTopOnItemAdded()
-
-        binding.queueAddAllButton.hide()
-        binding.queueAddAllButton.setOnClickListener { onQueueAddAllClicked() }
-        registerForContextMenu(binding.itemList)
+        setupFabScrollListener()
 
         listenToViewModel()
-        launchUpdateChildrenLoop()
-        return binding.root
+
+        return ComposeView(requireContext()).apply {
+            setContent {
+                CompositionLocalProvider(LocalSettings provides tngSettings) {
+                    GroupScreen(
+                        recyclerView = recyclerView,
+                        groupViewModel = viewModel,
+                        groupDialogsViewModel = groupDialogsViewModel,
+                        addDataPointsDialogViewModel = addDataPointsDialogViewModel,
+                        addGroupDialogViewModel = addGroupDialogViewModel,
+                        trackGroupId = args.groupId,
+                        trackGroupName = args.groupName,
+                        showFab = showFab.value,
+                        onQueueAddAllClicked = { onQueueAddAllClicked() }
+                    )
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -210,29 +177,12 @@ class GroupFragment : Fragment(),
         }
     }
 
-    /**
-     * Calls an update function on all children of the recycler view once a second. This is
-     * because graphs/statistics and trackers can have timers in the view holder that need to
-     * be updated every second and it could be too costly to emit an entire new set of data to
-     * the adapter every second for diffing.
-     */
-    private fun launchUpdateChildrenLoop() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            while (true) {
-                delay(1000)
-                for (i in 0..(binding.itemList.adapter?.itemCount ?: 0)) {
-                    (binding.itemList.findViewHolderForAdapterPosition(i) as GroupChildViewHolder?)?.update()
-                }
-            }
-        }
-    }
-
     private fun addItemTouchHelper() {
         ItemTouchHelper(
             DragTouchHelperCallback(
                 { start: Int, end: Int -> adapter.moveItem(start, end) },
                 { viewModel.adjustDisplayIndexes(adapter.getItems()) }
-            )).attachToRecyclerView(binding.itemList)
+            )).attachToRecyclerView(recyclerView)
     }
 
     private fun scrollToTopOnItemAdded() {
@@ -243,7 +193,7 @@ class GroupFragment : Fragment(),
                     //Scroll to the top when we've added something new to our group,
                     // but not when the adapter is being re-populated, e.g. when returning
                     // to this fragment from a nested group
-                    if (itemCount == 1) binding.itemList.smoothScrollToPosition(0)
+                    if (itemCount == 1) recyclerView.smoothScrollToPosition(0)
                 }
             }
         )
@@ -404,32 +354,13 @@ class GroupFragment : Fragment(),
                 }
             }
         }
-        binding.itemList.layoutManager = gridLayoutManager
+        recyclerView.layoutManager = gridLayoutManager
     }
 
     private fun listenToViewModel() {
-        lifecycleScope.launch {
-            viewModel.loading.collect {
-                withContext(ui) {
-                    binding.loadingOverlay.visibility = if (it) View.VISIBLE else View.GONE
-                }
-            }
-        }
-
-        viewModel.hasTrackers.observe(viewLifecycleOwner) {}
-
-        lifecycleScope.launch {
-            viewModel.showEmptyGroupText.collect {
-                withContext(ui) {
-                    binding.emptyGroupText.visibility = if (it) View.VISIBLE else View.INVISIBLE
-                }
-            }
-        }
-
         viewModel.allChildren.observe(viewLifecycleOwner) {
             adapter.submitList(it, forceNextNotifyDataSetChanged)
             forceNextNotifyDataSetChanged = false
-            updateShowQueueTrackButton()
         }
 
         viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
@@ -451,26 +382,6 @@ class GroupFragment : Fragment(),
         }
     }
 
-    private val queueAddAllButtonShowHideListener by lazy {
-        object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                if (dy > 0) binding.queueAddAllButton.hide()
-                else binding.queueAddAllButton.show()
-            }
-        }
-    }
-
-    private fun updateShowQueueTrackButton() {
-        if (viewModel.trackers.isNotEmpty()) {
-            binding.queueAddAllButton.show()
-            binding.itemList.removeOnScrollListener(queueAddAllButtonShowHideListener)
-            binding.itemList.addOnScrollListener(queueAddAllButtonShowHideListener)
-        } else {
-            binding.itemList.removeOnScrollListener(queueAddAllButtonShowHideListener)
-            binding.queueAddAllButton.hide()
-        }
-    }
-
     private fun onExportClicked() {
         groupDialogsViewModel.showExportDialog()
     }
@@ -484,7 +395,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onAddGraphStatClicked() {
-        if (viewModel.hasTrackers.value != true) {
+        if (!viewModel.hasTrackers.value) {
             AlertDialog.Builder(requireContext())
                 .setMessage(R.string.no_trackers_graph_stats_hint)
                 .setPositiveButton(R.string.ok) { dialog, _ -> dialog.dismiss() }
@@ -516,5 +427,18 @@ class GroupFragment : Fragment(),
             getString(R.string.ru_sure_del_group) -> id?.let { viewModel.onDeleteGroup(it.toLong()) }
             getString(R.string.ru_sure_del_graph) -> id?.let { viewModel.onDeleteGraphStat(it.toLong()) }
         }
+    }
+
+    private fun setupFabScrollListener() {
+        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (dy > 0) {
+                    showFab.value = false
+                } else if (dy < 0) {
+                    showFab.value = true
+                }
+            }
+        })
     }
 }

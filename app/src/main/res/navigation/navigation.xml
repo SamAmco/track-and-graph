@@ -22,8 +22,7 @@
 
     <fragment
         android:id="@+id/groupFragment"
-        android:name="com.samco.trackandgraph.group.GroupFragment"
-        tools:layout="@layout/fragment_group">
+        android:name="com.samco.trackandgraph.group.GroupFragment">
         <argument
             android:name="groupId"
             android:defaultValue="0L"
