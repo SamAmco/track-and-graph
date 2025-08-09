@@ -17,88 +17,64 @@
 
 package com.samco.trackandgraph.group
 
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupMenu
-import androidx.core.content.ContextCompat
-import com.samco.trackandgraph.R
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.ComposeView
 import com.samco.trackandgraph.base.database.dto.Group
-import com.samco.trackandgraph.databinding.ListItemGroupBinding
-import com.samco.trackandgraph.ui.dataVisColorList
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 
-class GroupViewHolder private constructor(private val binding: ListItemGroupBinding) :
-    GroupChildViewHolder(binding.root), PopupMenu.OnMenuItemClickListener {
+class GroupViewHolder private constructor(
+    private val composeView: ComposeView,
+) : GroupChildViewHolder(composeView) {
     private var clickListener: GroupClickListener? = null
-    private var dropElevation = 0f
-    private var groupItem: Group? = null
+    private var group: Group? = null
+    private var isElevated by mutableStateOf(false)
 
     fun bind(
         groupItem: Group,
         clickListener: GroupClickListener
     ) {
-        this.groupItem = groupItem
+        this.group = groupItem
         this.clickListener = clickListener
-        dropElevation = binding.cardView.cardElevation
-        binding.graphStatGroupNameText.text = groupItem.name
-        binding.cardView.setOnClickListener { clickListener.onClick(groupItem) }
-        binding.menuButton.setOnClickListener { createContextMenu(binding.menuButton) }
-        initCorner()
-    }
 
-    private fun initCorner() {
-        val colorId = dataVisColorList[groupItem?.colorIndex ?: 8]
-        binding.cornerTabImage.setColorFilter(ContextCompat.getColor(binding.root.context, colorId))
+        composeView.setContent {
+            TnGComposeTheme {
+                Group(
+                    isElevated = isElevated,
+                    group = groupItem,
+                    onEdit = { clickListener.onEdit.invoke(it) },
+                    onDelete = { clickListener.onDelete(it) },
+                    onMoveTo = { clickListener.onMove(it) },
+                    onClick = { clickListener.onClick(it) }
+                )
+            }
+        }
+
+        //This fixes a bug because compose views don't calculate their height immediately,
+        // scrolling up through a recycler view causes jumpy behavior. See this issue:
+        // https://issuetracker.google.com/issues/240449681
+        composeView.getChildAt(0)?.requestLayout()
     }
 
     override fun elevateCard() {
-        binding.cardView.postDelayed({
-            binding.cardView.cardElevation = binding.cardView.cardElevation * 3f
-        }, 10)
+        isElevated = true
     }
 
     override fun dropCard() {
-        binding.cardView.cardElevation = dropElevation
-    }
-
-    private fun createContextMenu(view: View) {
-        val popup = PopupMenu(view.context, view)
-        popup.menuInflater.inflate(R.menu.edit_group_context_menu, popup.menu)
-        popup.setOnMenuItemClickListener(this)
-        popup.show()
-    }
-
-    override fun onMenuItemClick(item: MenuItem?): Boolean {
-        groupItem?.let {
-            when (item?.itemId) {
-                R.id.edit -> clickListener?.onEdit(it)
-                R.id.delete -> clickListener?.onDelete(it)
-                R.id.moveTo -> clickListener?.onMove(it)
-                else -> {
-                }
-            }
-        }
-        return false
+        isElevated = false
     }
 
     companion object {
         fun from(parent: ViewGroup): GroupViewHolder {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val binding = ListItemGroupBinding.inflate(layoutInflater, parent, false)
-            return GroupViewHolder(binding)
+            val composeView = ComposeView(parent.context)
+            return GroupViewHolder(composeView)
         }
     }
 }
 
 class GroupClickListener(
-    val clickListener: (group: Group) -> Unit,
-    val onEditListener: (group: Group) -> Unit,
-    val onDeleteListener: (group: Group) -> Unit,
-    val onMoveListener: (group: Group) -> Unit
-) {
-    fun onClick(group: Group) = clickListener(group)
-    fun onEdit(group: Group) = onEditListener(group)
-    fun onDelete(group: Group) = onDeleteListener(group)
-    fun onMove(group: Group) = onMoveListener(group)
-}
+    val onClick: (group: Group) -> Unit,
+    val onEdit: (group: Group) -> Unit,
+    val onDelete: (group: Group) -> Unit,
+    val onMove: (group: Group) -> Unit
+)
