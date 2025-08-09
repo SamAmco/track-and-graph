@@ -17,12 +17,15 @@
 
 package com.samco.trackandgraph.group
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
-import com.samco.trackandgraph.graphstatview.factories.viewdto.*
-import com.samco.trackandgraph.graphstatview.ui.*
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
+import com.samco.trackandgraph.graphstatview.ui.GraphStatCardView
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-
 
 class GraphStatViewHolder(
     private val composeView: ComposeView,

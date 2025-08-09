@@ -46,8 +46,8 @@ import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
 import com.samco.trackandgraph.ui.compose.ui.FeatureInfoDialog
 import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
