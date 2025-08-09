@@ -17,32 +17,30 @@
 
 package com.samco.trackandgraph.reminders
 
-import android.app.TimePickerDialog
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.samco.trackandgraph.base.database.dto.CheckedDays
-import com.samco.trackandgraph.base.database.dto.Reminder
-import com.samco.trackandgraph.databinding.ListItemReminderBinding
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import com.samco.trackandgraph.base.database.dto.CheckedDays.Companion.withSet
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.showTimePickerDialog
 import org.threeten.bp.LocalTime
-import org.threeten.bp.ZoneId
-import org.threeten.bp.format.DateTimeFormatter
 
 internal class ReminderListAdapter(
-    private val clickListener: ReminderClickListener
+    private val onDeleteReminder: (ReminderViewData) -> Unit
 ) : RecyclerView.Adapter<ReminderViewHolder>() {
 
-    private val reminders = mutableListOf<Reminder>()
+    private val reminders = mutableListOf<ReminderViewData>()
 
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         holder.bind(reminders[position])
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ReminderViewHolder {
-        return ReminderViewHolder.from(parent, clickListener)
+        return ReminderViewHolder.from(parent, onDeleteReminder)
     }
 
     fun moveItem(fromPosition: Int, toPosition: Int) {
@@ -51,9 +49,9 @@ internal class ReminderListAdapter(
         super.notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun getItems(): List<Reminder> = reminders.toList()
+    fun getItems(): List<ReminderViewData> = reminders.toList()
 
-    fun submitList(newReminders: List<Reminder>) {
+    fun submitList(newReminders: List<ReminderViewData>) {
         if (reminders.size != newReminders.size) {
             //If an item was added or removed we want to animate the transition
             val diffCallback = ListDiffCallback(reminders, newReminders)
@@ -80,8 +78,8 @@ internal class ReminderListAdapter(
 }
 
 private class ListDiffCallback(
-    private val oldList: List<Reminder>,
-    private val newList: List<Reminder>
+    private val oldList: List<ReminderViewData>,
+    private val newList: List<ReminderViewData>
 ) : DiffUtil.Callback() {
     override fun getOldListSize(): Int = oldList.size
 
@@ -96,133 +94,46 @@ private class ListDiffCallback(
     }
 }
 
-
 internal class ReminderViewHolder private constructor(
-    private val binding: ListItemReminderBinding,
-    private val clickListener: ReminderClickListener
-) : RecyclerView.ViewHolder(binding.root) {
+    private val composeView: ComposeView,
+    private val onDeleteReminder: (ReminderViewData) -> Unit
+) : RecyclerView.ViewHolder(composeView) {
 
-    private val timeDisplayFormatter: DateTimeFormatter = DateTimeFormatter
-        .ofPattern("HH:mm")
-        .withZone(ZoneId.systemDefault())
-
-    private val checkboxes = listOf(
-        binding.monBox, binding.tueBox, binding.wedBox,
-        binding.thuBox, binding.friBox, binding.satBox, binding.sunBox
-    )
-
-    private var dropElevation = 0f
-    private var reminder: Reminder? = null
+    private var isElevated by mutableStateOf(false)
 
     init {
-        dropElevation = binding.cardView.cardElevation
-        binding.deleteButton.setOnClickListener {
-            reminder?.let { clickListener.delete(it) }
-        }
-        listenToCheckboxes()
-        listenToTimeButton()
-        listenToName()
+        composeView.setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
     }
 
-    fun bind(reminder: Reminder) {
-        this.reminder = reminder
-        setTime(reminder.time)
-        setReminderNameText(reminder.alarmName)
-        setCheckedDays(reminder.checkedDays)
-    }
-
-    private fun setCheckedDays(checkedDays: CheckedDays) {
-        val boolList = checkedDays.toList()
-        checkboxes.forEachIndexed { index, checkBox ->
-            checkBox.isChecked = boolList[index]
-        }
-    }
-
-    private fun listenToName() {
-        binding.reminderNameText.addTextChangedListener(afterTextChanged = {
-            reminder = reminder?.copy(alarmName = it.toString())
-            reminder?.let { rem -> clickListener.nameChanged(rem, it.toString()) }
-        })
-        binding.reminderNameText.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                binding.cardView.requestFocus()
-                clickListener.hideKeyboard()
-                return@setOnEditorActionListener true
-            }
-            return@setOnEditorActionListener false
-        }
-    }
-
-    private fun setReminderNameText(text: String) {
-        if (binding.reminderNameText.text.toString() != text) {
-            reminder = reminder?.copy(alarmName = text)
-            binding.reminderNameText.setText(text)
-            binding.reminderNameText.setSelection(text.length)
-        }
-    }
-
-    private fun setTime(t: LocalTime) {
-        if (reminder?.time != t) reminder = reminder?.copy(time = t)
-        val text = t.format(timeDisplayFormatter)
-        if (binding.timeText.text != text) binding.timeText.text = text
-    }
-
-    private fun listenToTimeButton() {
-        binding.timeText.setOnClickListener {
-            val picker = TimePickerDialog(
-                binding.root.context,
-                { _, hour, minute ->
-                    val time = LocalTime.of(hour, minute)
-                    setTime(time)
-                    clickListener.timeChanged(reminder!!, time)
-                }, reminder!!.time.hour, reminder!!.time.minute, true
-            )
-            picker.show()
-        }
-    }
-
-    private fun listenToCheckboxes() {
-        checkboxes.forEach { cb ->
-            cb.setOnCheckedChangeListener { _, _ ->
-                val boolList = checkboxes.map { x -> x.isChecked }
-                val newCheckedDays = CheckedDays.fromList(boolList)
-                reminder = reminder?.copy(checkedDays = newCheckedDays)
-                reminder?.let { clickListener.daysChanged(it, newCheckedDays) }
+    fun bind(reminder: ReminderViewData) {
+        composeView.setContent {
+            TnGComposeTheme {
+                Reminder(
+                    isElevated = isElevated,
+                    reminderViewData = reminder,
+                    onDeleteClick = { onDeleteReminder(reminder) }
+                )
             }
         }
+
+        //This fixes a bug because compose views don't calculate their height immediately,
+        // scrolling up through a recycler view causes jumpy behavior. See this issue:
+        // https://issuetracker.google.com/issues/240449681
+        composeView.getChildAt(0)?.requestLayout()
     }
 
     fun elevateCard() {
-        binding.cardView.postDelayed({
-            binding.cardView.cardElevation = binding.cardView.cardElevation * 3f
-        }, 10)
+        isElevated = true
     }
 
     fun dropCard() {
-        binding.cardView.cardElevation = dropElevation
+        isElevated = false
     }
 
     companion object {
-        fun from(parent: ViewGroup, clickListener: ReminderClickListener): ReminderViewHolder {
-            val layoutInflater = LayoutInflater.from(parent.context)
-            val binding = ListItemReminderBinding.inflate(layoutInflater, parent, false)
-            return ReminderViewHolder(binding, clickListener)
+        fun from(parent: ViewGroup, onDeleteReminder: (ReminderViewData) -> Unit): ReminderViewHolder {
+            val composeView = ComposeView(parent.context)
+            return ReminderViewHolder(composeView, onDeleteReminder)
         }
     }
-}
-
-internal class ReminderClickListener(
-    private val onDelete: (Reminder) -> Unit,
-    private val onDaysChanged: (Reminder, CheckedDays) -> Unit,
-    private val onTimeChanged: (Reminder, LocalTime) -> Unit,
-    private val onNameChanged: (Reminder, String) -> Unit,
-    private val onHideKeyboard: () -> Unit
-) {
-    fun delete(reminder: Reminder) = onDelete(reminder)
-    fun daysChanged(reminder: Reminder, checkedDays: CheckedDays) =
-        onDaysChanged(reminder, checkedDays)
-
-    fun timeChanged(reminder: Reminder, localTime: LocalTime) = onTimeChanged(reminder, localTime)
-    fun nameChanged(reminder: Reminder, name: String) = onNameChanged(reminder, name)
-    fun hideKeyboard() = onHideKeyboard()
 }

@@ -43,6 +43,8 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
 import java.util.Calendar
 
+//TODO these can be transitioned to compose once we transition to material 3
+
 @Composable
 fun DateTimeButtonRow(
     modifier: Modifier = Modifier,
@@ -91,8 +93,6 @@ fun TimeButton(
     enabled: Boolean = true,
     onTimeSelected: (SelectedTime) -> Unit
 ) = Box {
-
-    val tag = "TimePicker"
     val context = LocalContext.current
 
     SelectorButton(
@@ -100,23 +100,40 @@ fun TimeButton(
         text = formatHourMinute(dateTime),
         enabled = enabled,
         onClick = {
-            val fragmentManager = findFragmentManager(context) ?: return@SelectorButton
-            val fragment = fragmentManager.findFragmentByTag(tag)
-            val existingPicker = fragment as? MaterialTimePicker
-            val picker = existingPicker ?: MaterialTimePicker.Builder()
-                .setHour(dateTime.hour)
-                .setMinute(dateTime.minute)
-                .setTimeFormat(CLOCK_24H)
-                .setInputMode(INPUT_MODE_CLOCK)
-                .build()
-            picker.apply {
-                addOnPositiveButtonClickListener {
-                    onTimeSelected(SelectedTime(this.hour, this.minute))
-                }
-                show(fragmentManager, tag)
-            }
+            showTimePickerDialog(
+                context = context,
+                onTimeSelected = onTimeSelected,
+                hour = dateTime.hour,
+                minute = dateTime.minute
+            )
         }
     )
+}
+
+fun showTimePickerDialog(
+    context: Context,
+    onTimeSelected: (SelectedTime) -> Unit,
+    hour: Int? = null,
+    minute: Int? = null,
+) {
+    val tag = "TimePicker"
+    val fragmentManager = findFragmentManager(context) ?: return
+    val fragment = fragmentManager.findFragmentByTag(tag)
+    val existingPicker = fragment as? MaterialTimePicker
+    val picker = existingPicker ?: MaterialTimePicker.Builder()
+        .apply {
+            if (hour != null) setHour(hour)
+            if (minute != null) setMinute(minute)
+        }
+        .setTimeFormat(CLOCK_24H)
+        .setInputMode(INPUT_MODE_CLOCK)
+        .build()
+    picker.apply {
+        addOnPositiveButtonClickListener {
+            onTimeSelected(SelectedTime(this.hour, this.minute))
+        }
+        show(fragmentManager, tag)
+    }
 }
 
 @Composable
@@ -134,12 +151,12 @@ fun DateButton(
         text = formatDayMonthYear(context, dateTime),
         enabled = enabled,
         onClick = {
-            showDateDialog(context, onDateSelected, firstDayOfWeek, allowPastDates, dateTime)
+            showDatePickerDialog(context, onDateSelected, firstDayOfWeek, allowPastDates, dateTime)
         }
     )
 }
 
-fun showDateDialog(
+fun showDatePickerDialog(
     context: Context,
     onDateSelected: (OffsetDateTime) -> Unit,
     firstDayOfWeek: DayOfWeek,
@@ -184,7 +201,6 @@ fun showDateDialog(
         show(fragmentManager, tag)
     }
 }
-
 
 private fun findFragmentManager(context: Context): FragmentManager? {
     var currentContext = context

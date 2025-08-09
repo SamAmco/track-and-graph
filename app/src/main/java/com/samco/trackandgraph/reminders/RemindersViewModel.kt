@@ -26,9 +26,12 @@ import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.threeten.bp.LocalTime
@@ -36,19 +39,17 @@ import java.util.Collections
 import javax.inject.Inject
 
 interface RemindersViewModel {
-    val currentReminders: StateFlow<List<Reminder>>
+    val currentReminders: StateFlow<List<ReminderViewData>>
     val remindersChanged: StateFlow<Boolean>
     val loading: StateFlow<Boolean>
 
     fun saveChanges()
     fun addReminder(defaultName: String)
-    fun deleteReminder(reminder: Reminder)
-    fun adjustDisplayIndexes(indexUpdate: List<Reminder>)
-    fun daysChanged(reminder: Reminder, checkedDays: CheckedDays)
-    fun onTimeChanged(reminder: Reminder, localTime: LocalTime)
-    fun onNameChanged(reminder: Reminder, name: String)
+    fun deleteReminder(reminderViewData: ReminderViewData)
+    fun adjustDisplayIndexes(indexUpdate: List<ReminderViewData>)
 }
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class RemindersViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
@@ -57,8 +58,8 @@ class RemindersViewModelImpl @Inject constructor(
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel(), RemindersViewModel {
 
-    private val _currentReminders = MutableStateFlow<List<Reminder>>(emptyList())
-    override val currentReminders: StateFlow<List<Reminder>> = _currentReminders.asStateFlow()
+    private val _currentReminders = MutableStateFlow<List<ReminderViewData>>(emptyList())
+    override val currentReminders: StateFlow<List<ReminderViewData>> = _currentReminders.asStateFlow()
 
     private val savedReminders: MutableList<Reminder> = Collections.synchronizedList(mutableListOf())
 
@@ -74,8 +75,19 @@ class RemindersViewModelImpl @Inject constructor(
             val allReminders = dataInteractor.getAllRemindersSync()
             savedReminders.addAll(allReminders)
             withContext(ui) {
-                _currentReminders.value = allReminders
+                _currentReminders.value = allReminders.map { ReminderViewData.fromReminder(it) }
                 _loading.value = false
+            }
+        }
+
+        // Observe changes to the current reminders list and set up state observation
+        viewModelScope.launch {
+            _currentReminders.collect { reminders ->
+                reminders
+                    .map { it.stateChanges }
+                    .merge()
+                    .debounce(50)
+                    .collect { onRemindersUpdated() }
             }
         }
     }
@@ -83,18 +95,17 @@ class RemindersViewModelImpl @Inject constructor(
     override fun saveChanges() {
         viewModelScope.launch(io) {
             withContext(ui) { _loading.value = true }
-            _currentReminders.value.let {
-                val withDisplayIndices = it
-                    .mapIndexed { index, reminder -> reminder.copy(displayIndex = index) }
+            _currentReminders.value.let { reminders ->
+                val withDisplayIndices = reminders.mapIndexed { index, reminderViewData ->
+                    reminderViewData.toReminder().copy(displayIndex = index)
+                }
                 dataInteractor.updateReminders(withDisplayIndices)
                 alarmInteractor.syncAlarms()
                 val allReminders = dataInteractor.getAllRemindersSync()
                 savedReminders.clear()
                 savedReminders.addAll(allReminders)
                 withContext(ui) {
-                    // Copy so they're not the same object because we
-                    // want to be able to update them independently
-                    _currentReminders.value = allReminders.toMutableList()
+                    _currentReminders.value = allReminders.map { ReminderViewData.fromReminder(it) }
                     onRemindersUpdated()
                 }
             }
@@ -104,7 +115,7 @@ class RemindersViewModelImpl @Inject constructor(
 
     private fun onRemindersUpdated() {
         val a = savedReminders.toList() // Create a snapshot to avoid concurrent modification
-        val b = currentReminders.value
+        val b = currentReminders.value.map { it.toReminder() }
         //If the two lists are not equal we have an update
         _remindersChanged.value = !(a.size == b.size && a.zip(b).all { it.first == it.second })
     }
@@ -119,7 +130,7 @@ class RemindersViewModelImpl @Inject constructor(
             LocalTime.now(),
             CheckedDays.none()
         )
-        _currentReminders.value = _currentReminders.value.plus(newReminder)
+        _currentReminders.value = _currentReminders.value.plus(ReminderViewData.fromReminder(newReminder))
         onRemindersUpdated()
     }
 
@@ -130,35 +141,15 @@ class RemindersViewModelImpl @Inject constructor(
         }
     }
 
-    override fun deleteReminder(reminder: Reminder) {
-        _currentReminders.value = _currentReminders.value.filter { it.id != reminder.id }
+    override fun deleteReminder(reminderViewData: ReminderViewData) {
+        _currentReminders.value = _currentReminders.value.filter { it.id != reminderViewData.id }
         onRemindersUpdated()
     }
 
-    override fun adjustDisplayIndexes(indexUpdate: List<Reminder>) {
+    override fun adjustDisplayIndexes(indexUpdate: List<ReminderViewData>) {
         _currentReminders.value = indexUpdate.mapIndexed { i, r ->
             _currentReminders.value.firstOrNull { it.id == r.id }?.copy(displayIndex = i)
         }.filterNotNull()
-        onRemindersUpdated()
-    }
-
-    override fun daysChanged(reminder: Reminder, checkedDays: CheckedDays) =
-        updateReminder(reminder, reminder.copy(checkedDays = checkedDays))
-
-    override fun onTimeChanged(reminder: Reminder, localTime: LocalTime) =
-        updateReminder(reminder, reminder.copy(time = localTime))
-
-    override fun onNameChanged(reminder: Reminder, name: String) =
-        updateReminder(reminder, reminder.copy(alarmName = name))
-
-    private fun updateReminder(from: Reminder, to: Reminder) {
-        val mutable = _currentReminders.value.toMutableList()
-        val index = mutable.indexOfFirst { it.id == from.id }
-        if (index >= 0) {
-            mutable.removeAt(index)
-            mutable.add(index, to)
-        }
-        _currentReminders.value = mutable
         onRemindersUpdated()
     }
 }

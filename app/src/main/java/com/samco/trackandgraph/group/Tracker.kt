@@ -65,6 +65,7 @@ import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.fadedGreen
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
@@ -73,8 +74,6 @@ import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import kotlin.math.hypot
-
-private val buttonSize = 45.dp
 
 /**
  * Composable that displays a tracker item card with timer functionality,
