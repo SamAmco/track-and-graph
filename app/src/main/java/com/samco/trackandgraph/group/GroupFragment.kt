@@ -325,14 +325,14 @@ class GroupFragment : Fragment(),
     }
 
     private fun createTrackerClickListener() = TrackerClickListener(
-        this::onTrackerEditClicked,
-        this::onTrackerDeleteClicked,
-        this::onTrackerMoveClicked,
-        this::onTrackerDescriptionClicked,
-        this::onTrackerAddClicked,
-        this::onTrackerHistoryClicked,
-        this::onTrackerPlayTimerClicked,
-        this::onStopTimerClicked
+        onEdit = this::onTrackerEditClicked,
+        onDelete = this::onTrackerDeleteClicked,
+        onMoveTo = this::onTrackerMoveClicked,
+        onDescription = this::onTrackerDescriptionClicked,
+        onAdd = this::onTrackerAddClicked,
+        onHistory = this::onTrackerHistoryClicked,
+        onPlayTimer = this::onTrackerPlayTimerClicked,
+        onStopTimer = this::onStopTimerClicked
     )
 
     private fun onTrackerPlayTimerClicked(tracker: DisplayTracker) {
