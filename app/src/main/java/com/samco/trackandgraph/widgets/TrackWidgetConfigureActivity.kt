@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
 import dagger.hilt.android.AndroidEntryPoint
+import androidx.core.content.edit
 
 @AndroidEntryPoint
 class TrackWidgetConfigureActivity : AppCompatActivity(),
@@ -54,9 +55,9 @@ class TrackWidgetConfigureActivity : AppCompatActivity(),
             return
         }
 
-        val sharedPref = getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).edit()
-        sharedPref.putLong(TrackWidgetProvider.getFeatureIdPref(appWidgetId!!), featureId)
-        sharedPref.apply()
+        getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).edit {
+            putLong(TrackWidgetProvider.getFeatureIdPref(appWidgetId!!), featureId)
+        }
 
         val intent = Intent(
             AppWidgetManager.ACTION_APPWIDGET_UPDATE,
