@@ -40,6 +40,7 @@ private val darkGray = Color(0xFF4C4C4C)
 private val midCharcoal = Color(0xFF222222)
 private val lightCharcoal = Color(0xFF373737)
 private val blueWhitePastel = Color(0xFFD3DADE)
+val fadedGreen = Color(0xFF4ABF50)
 
 data class TngColors(
     val material: Colors,
