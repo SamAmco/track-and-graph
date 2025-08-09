@@ -62,15 +62,7 @@ class RemindersFragment : Fragment(),
         binding = RemindersFragmentBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
 
-        adapter = ReminderListAdapter(
-            ReminderClickListener(
-                viewModel::deleteReminder,
-                viewModel::daysChanged,
-                viewModel::onTimeChanged,
-                viewModel::onNameChanged,
-                this::onHideKeyboard
-            )
-        )
+        adapter = ReminderListAdapter(viewModel::deleteReminder)
         binding.remindersList.adapter = adapter
         ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.remindersList)
         binding.remindersList.layoutManager =

@@ -64,5 +64,11 @@ data class CheckedDays (
             saturday = true,
             sunday = true
         )
+
+        fun CheckedDays.withSet(index: Int, value: Boolean): CheckedDays {
+            val list = toList().toMutableList()
+            list[index] = value
+            return fromList(list)
+        }
     }
 }

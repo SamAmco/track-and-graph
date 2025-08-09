@@ -32,7 +32,7 @@ import com.samco.trackandgraph.helpers.formatDayMonthYear
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.Spinner
-import com.samco.trackandgraph.ui.compose.ui.showDateDialog
+import com.samco.trackandgraph.ui.compose.ui.showDatePickerDialog
 import org.threeten.bp.OffsetDateTime
 
 enum class SampleEndingAtOption {
@@ -102,7 +102,7 @@ fun GraphStatEndingAtSpinner(
                 when (option) {
                     SampleEndingAtOption.LATEST -> onSampleEndingAtChanged(SampleEndingAt.Latest)
                     SampleEndingAtOption.NOW -> onSampleEndingAtChanged(SampleEndingAt.Now)
-                    SampleEndingAtOption.CUSTOM -> showDateDialog(
+                    SampleEndingAtOption.CUSTOM -> showDatePickerDialog(
                         context = context,
                         firstDayOfWeek = firstDayOfWeek,
                         onDateSelected = {
