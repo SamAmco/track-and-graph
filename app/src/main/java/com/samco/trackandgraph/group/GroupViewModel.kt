@@ -60,8 +60,8 @@ class GroupViewModel @Inject constructor(
 
     private val hasTrackersFlow = dataInteractor.hasAtLeastOneTracker()
 
-    val hasTrackers: LiveData<Boolean> = hasTrackersFlow
-        .asLiveData(viewModelScope.coroutineContext)
+    val hasTrackers: StateFlow<Boolean> = hasTrackersFlow
+        .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = false)
 
     private val groupId = MutableSharedFlow<Long>(1, 1)
 

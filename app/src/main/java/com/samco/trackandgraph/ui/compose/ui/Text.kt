@@ -97,6 +97,7 @@ private fun TextPreview() = TnGComposeTheme {
         TextBody1(text = "Text body 1")
         TextSubtitle2(text = "Text body 2")
         TextLink(text = "Text link", onClick = {})
+        EmptyPageHintText(text = "Empty page hint text")
         DayMonthYearHourMinuteWeekDayOneLineText(
             dateTime = OffsetDateTime.parse("2025-07-25T10:30:00Z"),
         )
@@ -169,6 +170,18 @@ fun TextLink(
 )
 
 @Composable
+fun EmptyPageHintText(
+    modifier: Modifier = Modifier,
+    text: String,
+) = Text(
+    modifier = modifier,
+    text = text,
+    style = MaterialTheme.typography.subtitle2,
+    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+    textAlign = TextAlign.Center,
+)
+
+@Composable
 fun DayMonthYearHourMinuteWeekDayOneLineText(
     dateTime: OffsetDateTime,
     modifier: Modifier = Modifier,
@@ -196,13 +209,13 @@ fun DayMonthYearHourMinuteWeekDayOneLineText(
     val formattedText = remember(dateTime, weekDayNames, isPreview) {
         val offsetDiffHours = if (isPreview) 1 else null
         formatDayMonthYearHourMinuteWeekDayOneLine(
-            context = context, 
-            weekDayNames = weekDayNames, 
+            context = context,
+            weekDayNames = weekDayNames,
             dateTime = dateTime,
             offsetDiffHours = offsetDiffHours
         )
     }
-    
+
     Text(
         modifier = modifier,
         text = formattedText,
