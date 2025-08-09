@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.DataType
@@ -60,7 +61,6 @@ private val buttonSize = 45.dp
  * Composable that displays a tracker item card with timer functionality,
  * context menu, and click handling for add/history actions.
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Tracker(
     modifier: Modifier = Modifier,
@@ -119,7 +119,7 @@ fun Tracker(
             .fillMaxWidth()
             .padding(cardMarginSmall),
         elevation = if (isElevated) cardElevation * 3 else cardElevation,
-        shape = MaterialTheme.shapes.medium,
+        shape = MaterialTheme.shapes.small,
     ) {
         BoxWithConstraints {
             // Calculate ripple radius to fill entire card
@@ -134,160 +134,213 @@ fun Tracker(
                     .fillMaxWidth()
                     .clickable { onHistory(tracker) },
             ) {
-                // Menu button (top-right corner)
-                Box(
-                    modifier = Modifier
-                        .size(buttonSize)
-                        .align(Alignment.End)
-                ) {
-                    IconButton(
-                        modifier = Modifier.size(buttonSize),
-                        onClick = { showContextMenu = true },
-                    ) {
-                        Icon(
-                            painterResource(R.drawable.list_menu_icon),
-                            contentDescription = stringResource(R.string.tracked_data_menu_button_content_description),
-                            tint = MaterialTheme.colors.onSurface
-                        )
-                    }
-                    // Context menu
-                    DropdownMenu(
-                        expanded = showContextMenu,
-                        onDismissRequest = { showContextMenu = false }
-                    ) {
-                        DropdownMenuItem(
-                            onClick = {
-                                showContextMenu = false
-                                onEdit(tracker)
-                            }
-                        ) {
-                            Text(stringResource(R.string.edit))
-                        }
-                        DropdownMenuItem(
-                            onClick = {
-                                showContextMenu = false
-                                onDelete(tracker)
-                            }
-                        ) {
-                            Text(stringResource(R.string.delete))
-                        }
-                        DropdownMenuItem(
-                            onClick = {
-                                showContextMenu = false
-                                onMoveTo(tracker)
-                            }
-                        ) {
-                            Text(stringResource(R.string.move_to))
-                        }
-                        DropdownMenuItem(
-                            onClick = {
-                                showContextMenu = false
-                                onDescription(tracker)
-                            }
-                        ) {
-                            Text(stringResource(R.string.description))
-                        }
-                    }
-                }
-
-                // Tracker name text (main content area) - clickable for history
-                Text(
-                    text = tracker.name,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(cardMarginSmall),
-                    style = MaterialTheme.typography.h5,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center,
-                    maxLines = 10,
-                    overflow = TextOverflow.Ellipsis
+                TrackerMenuButton(
+                    modifier = Modifier.align(Alignment.End),
+                    showContextMenu = showContextMenu,
+                    onShowContextMenu = { showContextMenu = it },
+                    tracker = tracker,
+                    onEdit = onEdit,
+                    onDelete = onDelete,
+                    onMoveTo = onMoveTo,
+                    onDescription = onDescription
                 )
+
+                TrackerNameText(trackerName = tracker.name)
 
                 DialogInputSpacing()
 
-                // Date/Timer text area
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = inputSpacingLarge),
-                    contentAlignment = Alignment.Center
-                ) {
-                    // Last date text
-                    if (tracker.dataType == DataType.DURATION && tracker.timerStartInstant != null) {
-                        Text(
-                            text = timerText,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.h6,
-                            color = MaterialTheme.colors.error,
-                            maxLines = 1
-                        )
-                    } else {
-                        // Timer text (only visible when timer is running)
-                        Text(
-                            text = timeSinceLastText,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.body1
-                        )
-                    }
-                }
+                TrackerDateTimeArea(
+                    tracker = tracker,
+                    timerText = timerText,
+                    timeSinceLastText = timeSinceLastText
+                )
 
-                // Buttons area
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(buttonSize)
-                ) {
-                    // Timer control buttons (for DURATION trackers)
-                    if (tracker.dataType == DataType.DURATION) {
-                        IconButton(
-                            modifier = Modifier
-                                .size(buttonSize)
-                                .align(Alignment.BottomCenter),
-                            onClick = if (tracker.timerStartInstant == null) {
-                                { onPlayTimer(tracker) }
-                            } else {
-                                { onStopTimer(tracker) }
-                            },
-                        ) {
-                            val isRunning = tracker.timerStartInstant != null
-                            Icon(
-                                painter =
-                                    if (isRunning) painterResource(R.drawable.ic_stop_timer)
-                                    else painterResource(R.drawable.ic_play_timer),
-                                contentDescription = null,
-                                tint = if (isRunning) MaterialTheme.colors.error else fadedGreen
-                            )
-                        }
-                    }
-
-                    // Add button with unbounded ripple that fills the card
-                    val rippleIndication = remember(rippleRadius) {
-                        ripple(
-                            bounded = false,
-                            radius = rippleRadius
-                        )
-                    }
-
-                    Icon(
-                        painterResource(R.drawable.ic_add_record),
-                        contentDescription = stringResource(R.string.add_data_point_button_content_description),
-                        modifier = Modifier
-                            .size(buttonSize)
-                            .align(Alignment.BottomEnd)
-                            .combinedClickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = rippleIndication,
-                                onClick = { onAdd(tracker, tracker.hasDefaultValue) },
-                                onLongClick = { onAdd(tracker, false) }
-                            ),
-                        tint = if (tracker.hasDefaultValue) MaterialTheme.colors.secondary else MaterialTheme.colors.onSurface
-                    )
-                }
+                TrackerButtonsArea(
+                    tracker = tracker,
+                    rippleRadius = rippleRadius,
+                    onPlayTimer = onPlayTimer,
+                    onStopTimer = onStopTimer,
+                    onAdd = onAdd
+                )
             }
-
         }
+    }
+}
+
+@Composable
+private fun TrackerMenuButton(
+    modifier: Modifier = Modifier,
+    showContextMenu: Boolean,
+    onShowContextMenu: (Boolean) -> Unit,
+    tracker: DisplayTracker,
+    onEdit: (DisplayTracker) -> Unit,
+    onDelete: (DisplayTracker) -> Unit,
+    onMoveTo: (DisplayTracker) -> Unit,
+    onDescription: (DisplayTracker) -> Unit
+) {
+    Box(
+        modifier = modifier.size(buttonSize)
+    ) {
+        IconButton(
+            modifier = Modifier.size(buttonSize),
+            onClick = { onShowContextMenu(true) },
+        ) {
+            Icon(
+                painterResource(R.drawable.list_menu_icon),
+                contentDescription = stringResource(R.string.tracked_data_menu_button_content_description),
+                tint = MaterialTheme.colors.onSurface
+            )
+        }
+
+        // Context menu
+        DropdownMenu(
+            expanded = showContextMenu,
+            onDismissRequest = { onShowContextMenu(false) }
+        ) {
+            DropdownMenuItem(
+                onClick = {
+                    onShowContextMenu(false)
+                    onEdit(tracker)
+                }
+            ) {
+                Text(stringResource(R.string.edit))
+            }
+            DropdownMenuItem(
+                onClick = {
+                    onShowContextMenu(false)
+                    onDelete(tracker)
+                }
+            ) {
+                Text(stringResource(R.string.delete))
+            }
+            DropdownMenuItem(
+                onClick = {
+                    onShowContextMenu(false)
+                    onMoveTo(tracker)
+                }
+            ) {
+                Text(stringResource(R.string.move_to))
+            }
+            DropdownMenuItem(
+                onClick = {
+                    onShowContextMenu(false)
+                    onDescription(tracker)
+                }
+            ) {
+                Text(stringResource(R.string.description))
+            }
+        }
+    }
+}
+
+@Composable
+private fun TrackerNameText(
+    trackerName: String
+) {
+    Text(
+        text = trackerName,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(cardMarginSmall),
+        style = MaterialTheme.typography.h5,
+        fontWeight = FontWeight.Bold,
+        textAlign = TextAlign.Center,
+        maxLines = 10,
+        overflow = TextOverflow.Ellipsis
+    )
+}
+
+@Composable
+private fun TrackerDateTimeArea(
+    tracker: DisplayTracker,
+    timerText: String,
+    timeSinceLastText: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = inputSpacingLarge),
+        contentAlignment = Alignment.Center
+    ) {
+        if (tracker.dataType == DataType.DURATION && tracker.timerStartInstant != null) {
+            Text(
+                text = timerText,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.colors.error,
+                maxLines = 1
+            )
+        } else {
+            Text(
+                text = timeSinceLastText,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.body1
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun TrackerButtonsArea(
+    tracker: DisplayTracker,
+    rippleRadius: Dp,
+    onPlayTimer: (DisplayTracker) -> Unit,
+    onStopTimer: (DisplayTracker) -> Unit,
+    onAdd: (DisplayTracker, Boolean) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(buttonSize)
+    ) {
+        // Timer control buttons (for DURATION trackers)
+        if (tracker.dataType == DataType.DURATION) {
+            IconButton(
+                modifier = Modifier
+                    .size(buttonSize)
+                    .align(Alignment.BottomCenter),
+                onClick = if (tracker.timerStartInstant == null) {
+                    { onPlayTimer(tracker) }
+                } else {
+                    { onStopTimer(tracker) }
+                },
+            ) {
+                val isRunning = tracker.timerStartInstant != null
+                Icon(
+                    painter =
+                        if (isRunning) painterResource(R.drawable.ic_stop_timer)
+                        else painterResource(R.drawable.ic_play_timer),
+                    contentDescription = null,
+                    tint = if (isRunning) MaterialTheme.colors.error else fadedGreen
+                )
+            }
+        }
+
+        // Add button with unbounded ripple that fills the card
+        val rippleIndication = remember(rippleRadius) {
+            ripple(
+                bounded = false,
+                radius = rippleRadius
+            )
+        }
+
+        Icon(
+            painterResource(R.drawable.ic_add_record),
+            contentDescription = stringResource(R.string.add_data_point_button_content_description),
+            modifier = Modifier
+                .size(buttonSize)
+                .align(Alignment.BottomEnd)
+                .combinedClickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = rippleIndication,
+                    onClick = { onAdd(tracker, tracker.hasDefaultValue) },
+                    onLongClick = { onAdd(tracker, false) }
+                ),
+            tint = if (tracker.hasDefaultValue) MaterialTheme.colors.secondary else MaterialTheme.colors.onSurface
+        )
     }
 }
 
