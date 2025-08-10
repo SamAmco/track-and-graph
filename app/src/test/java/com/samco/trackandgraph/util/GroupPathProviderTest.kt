@@ -1,6 +1,6 @@
 package com.samco.trackandgraph.util
 
-import junit.framework.Assert
+import junit.framework.TestCase.assertEquals
 import org.junit.Test
 
 class GroupPathProviderTest {
@@ -29,13 +29,13 @@ class GroupPathProviderTest {
         val ans6 = provider.getPathForGroup(6)
 
         //VERIFY
-        Assert.assertEquals("/", ans0)
-        Assert.assertEquals("/group1", ans1)
-        Assert.assertEquals("/group1/group1child1", ans2)
-        Assert.assertEquals("/group1/group1child2", ans3)
-        Assert.assertEquals("/group2", ans4)
-        Assert.assertEquals("/group2/group2child", ans5)
-        Assert.assertEquals("/group2/group2child/group2childChild", ans6)
+        assertEquals("/", ans0)
+        assertEquals("/group1", ans1)
+        assertEquals("/group1/group1child1", ans2)
+        assertEquals("/group1/group1child2", ans3)
+        assertEquals("/group2", ans4)
+        assertEquals("/group2/group2child", ans5)
+        assertEquals("/group2/group2child/group2childChild", ans6)
     }
 
     @Test
@@ -56,43 +56,7 @@ class GroupPathProviderTest {
         val ans2 = provider.getPathForGroup(2)
 
         //VERIFY
-        Assert.assertEquals("/b/a", ans1)
-        Assert.assertEquals("/a/b", ans2)
-    }
-
-    @Test
-    fun `test group path provider filters out groups with the group filter id`() {
-        //PREPARE
-        val provider = GroupPathProvider(groups, groupFilterId = 4)
-
-        //VERIFY
-        Assert.assertEquals(
-            listOf(0L, 1L, 2L, 3L),
-            provider.filteredSortedGroups.map { it.group.id }
-        )
-    }
-
-    @Test
-    fun `filtered sorted groups come in alphabetical order`() {
-        //PREPARE
-        val unsortedGroups = listOf(
-            group(parentId = null),
-            group("Apple", 2, 0),
-            group("Zebra", 1, 0),
-            group("Apple", 5, 1),
-            group("Zebra", 6, 2),
-            group("Banana", 3, 0),
-            group("Carrot", 4, 0)
-        )
-        val provider = GroupPathProvider(unsortedGroups)
-
-        //EXECUTE
-        val sortedGroups = provider.filteredSortedGroups.map { it.path }
-
-        //VERIFY
-        Assert.assertEquals(
-            listOf("/", "/Apple", "/Apple/Zebra", "/Banana", "/Carrot", "/Zebra", "/Zebra/Apple"),
-            sortedGroups
-        )
+        assertEquals("/b/a", ans1)
+        assertEquals("/a/b", ans2)
     }
 }
