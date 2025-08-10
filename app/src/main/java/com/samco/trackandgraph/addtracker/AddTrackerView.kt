@@ -57,7 +57,11 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
     val openDialog by viewModel.showUpdateWarningAlertDialog.observeAsState(false)
 
     Surface(color = MaterialTheme.colors.background) {
-        Column(Modifier.fillMaxSize()) {
+        Column(
+            Modifier
+                .imePadding()
+                .fillMaxSize()
+        ) {
             AddTrackerInputForm(
                 modifier = Modifier.weight(1f),
                 viewModel = viewModel,
@@ -90,7 +94,6 @@ private fun UpdateWarningDialog(
     onConfirm = onConfirm
 )
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun AddTrackerInputForm(
     modifier: Modifier,

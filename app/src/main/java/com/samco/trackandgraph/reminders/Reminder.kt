@@ -155,10 +155,6 @@ private fun ReminderTimeDisplay(
                     }
                 )
             }
-            .background(
-                color = MaterialTheme.colors.surface,
-                shape = MaterialTheme.shapes.small
-            )
             .padding(
                 start = dimensionResource(id = R.dimen.dialog_input_spacing),
                 end = dimensionResource(id = R.dimen.dialog_input_spacing),
@@ -257,7 +253,8 @@ private fun ReminderDayLabels() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(
+    showBackground = true)
 @Composable
 private fun ReminderPreview() = TnGComposeTheme {
     Column(
