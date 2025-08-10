@@ -89,6 +89,49 @@ internal class DataInteractorImpl @Inject constructor(
         dao.getAllGroupsSync().map { it.toDto() }
     }
 
+    override suspend fun getGroupGraphSync(rootGroupId: Long?): GroupGraph = withContext(io) {
+        val rootGroup = if (rootGroupId != null) {
+            dao.getGroupById(rootGroupId).toDto()
+        } else {
+            // Get the root group (group with no parent)
+            dao.getRootGroupSync()?.toDto() ?: throw IllegalStateException("No root group found")
+        }
+
+        buildGroupGraph(rootGroup)
+    }
+
+    private suspend fun buildGroupGraph(group: Group): GroupGraph {
+        val children = mutableListOf<GroupGraphItem>()
+
+        // Get child groups for this specific group
+        val childGroups = dao.getGroupsForGroupSync(group.id)
+            .map { it.toDto() }
+
+        // Get trackers for this specific group using TrackerHelper
+        val trackers = getTrackersForGroupSync(group.id)
+
+        // Get graphs for this specific group
+        val graphs = dao.getGraphsAndStatsByGroupIdSync(group.id)
+            .map { it.toDto() }
+
+        // Add child groups recursively
+        for (childGroup in childGroups) {
+            children.add(GroupGraphItem.GroupNode(buildGroupGraph(childGroup)))
+        }
+
+        // Add trackers
+        for (tracker in trackers) {
+            children.add(GroupGraphItem.TrackerNode(tracker))
+        }
+
+        // Add graphs
+        for (graph in graphs) {
+            children.add(GroupGraphItem.GraphNode(graph))
+        }
+
+        return GroupGraph(group, children)
+    }
+
     override suspend fun getGroupById(id: Long): Group = withContext(io) {
         dao.getGroupById(id).toDto()
     }
@@ -446,7 +489,7 @@ internal class DataInteractorImpl @Inject constructor(
         dao.updateLineGraph(lineGraph.toLineGraph().toEntity())
         dao.deleteFeaturesForLineGraph(lineGraph.id)
         dao.insertLineGraphFeatures(lineGraph.features.map {
-            it.copy(lineGraphId = lineGraph.id).toEntity()
+            it.copy(id = 0L, lineGraphId = lineGraph.id).toEntity()
         })
     }
 
@@ -520,9 +563,9 @@ internal class DataInteractorImpl @Inject constructor(
             dao.getTimeHistogramByGraphStatId(graphStatId)?.toDto()
         }
 
-    override suspend fun getLastValueStatByGraphStatId(graphOrStatId: Long): LastValueStat? =
+    override suspend fun getLastValueStatByGraphStatId(graphStatId: Long): LastValueStat? =
         withContext(io) {
-            dao.getLastValueStatByGraphStatId(graphOrStatId)?.toDto()
+            dao.getLastValueStatByGraphStatId(graphStatId)?.toDto()
         }
 
     override suspend fun getBarChartByGraphStatId(graphStatId: Long): BarChart? =

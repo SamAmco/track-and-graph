@@ -20,9 +20,7 @@ package com.samco.trackandgraph.base.database.dto
 enum class GroupChildType { GROUP, TRACKER, GRAPH }
 
 /**
- * Represents all relevant view data that the GroupFragment might present. The obj will be one of:
- * com.samco.trackandgraph.base.database.dto.DisplayFeature, Group or Pair<Instant, IGraphStatViewData>.
- * The id and displayIndex fields are just there for convenience but will simply return properties of the obj.
+ * Represents all relevant view data that the GroupFragment might present.
  */
 data class GroupChild(
     val type: GroupChildType,
