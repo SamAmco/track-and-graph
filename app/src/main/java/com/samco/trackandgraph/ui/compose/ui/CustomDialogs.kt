@@ -50,11 +50,12 @@ fun CustomDialog(
     paddingValues: PaddingValues = PaddingValues(
         dimensionResource(id = R.dimen.card_padding_large)
     ),
+    properties: DialogProperties? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) = DialogTheme {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = DialogProperties(decorFitsSystemWindows = false)
+        properties = properties ?: DialogProperties(decorFitsSystemWindows = false)
     ) {
         Surface(
             modifier = Modifier.imePadding()
@@ -80,10 +81,12 @@ fun CustomContinueCancelDialog(
     @StringRes dismissText: Int = R.string.cancel,
     continueEnabled: Boolean = true,
     scrollContent: Boolean = true,
+    properties: DialogProperties? = null,
     content: @Composable ColumnScope.() -> Unit
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
     scrollContent = false,
+    properties = properties,
     paddingValues = PaddingValues(
         start = dimensionResource(id = R.dimen.card_padding_large),
         end = dimensionResource(id = R.dimen.card_padding_large),
@@ -162,7 +165,7 @@ fun ContinueCancelDialog(
     onConfirm: () -> Unit,
     @StringRes continueText: Int = R.string.continue_word,
     @StringRes dismissText: Int = R.string.cancel,
-    confirmButtonEnabled: Boolean = true,
+    continueEnabled: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) = DialogTheme {
     AlertDialog(
@@ -178,7 +181,7 @@ fun ContinueCancelDialog(
         confirmButton = {
             SmallTextButton(
                 stringRes = continueText,
-                enabled = confirmButtonEnabled,
+                enabled = continueEnabled,
                 onClick = onConfirm
             )
         },
