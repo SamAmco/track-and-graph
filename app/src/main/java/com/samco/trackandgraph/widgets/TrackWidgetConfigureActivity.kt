@@ -21,29 +21,39 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.*
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.edit
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
 import dagger.hilt.android.AndroidEntryPoint
-import androidx.core.content.edit
 
 @AndroidEntryPoint
-class TrackWidgetConfigureActivity : AppCompatActivity(),
-    TrackWidgetConfigureDialog.TrackWidgetConfigureDialogListener {
+class TrackWidgetConfigureActivity : AppCompatActivity() {
     private var appWidgetId: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val dialog = TrackWidgetConfigureDialog()
-        supportFragmentManager.let { dialog.show(it, "create_track_widget_dialog") }
+
         appWidgetId = intent?.extras
             ?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID, AppWidgetManager.INVALID_APPWIDGET_ID)
             ?: AppWidgetManager.INVALID_APPWIDGET_ID
 
         setResult(RESULT_CANCELED)
+
+        setContent {
+            TnGComposeTheme {
+                TrackWidgetConfigureDialog(
+                    onCreateWidget = ::onCreateWidget,
+                    onNoFeatures = ::onNoFeatures,
+                    onDismiss = ::onDismiss
+                )
+            }
+        }
     }
 
-    override fun onCreateWidget(featureId: Long?) {
+    private fun onCreateWidget(featureId: Long?) {
         if (appWidgetId == null) {
             finish()
             return
@@ -75,13 +85,13 @@ class TrackWidgetConfigureActivity : AppCompatActivity(),
         finish()
     }
 
-    override fun onNoFeatures() {
+    private fun onNoFeatures() {
         val errorString = getString(R.string.track_widget_configure_no_data_error)
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_LONG).show()
         finish()
     }
 
-    override fun onDismiss() {
+    private fun onDismiss() {
         finish()
     }
 }
