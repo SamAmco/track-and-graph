@@ -8,7 +8,7 @@ data class GroupGraph(
 sealed class GroupGraphItem {
     interface FeatureNode
 
-    data class GroupNode(val group: GroupGraph) : GroupGraphItem()
+    data class GroupNode(val groupGraph: GroupGraph) : GroupGraphItem()
     data class GraphNode(val graph: GraphOrStat) : GroupGraphItem()
     data class TrackerNode(val tracker: Tracker) : GroupGraphItem(), FeatureNode
 }

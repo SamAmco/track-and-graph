@@ -16,14 +16,17 @@
  */
 package com.samco.trackandgraph.selectitemdialog
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.samco.trackandgraph.base.database.dto.GroupGraph as ModelGroupGraph
+import com.samco.trackandgraph.base.database.dto.GroupGraphItem as ModelGroupGraphItem
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.selectitemdialog.HiddenItem
-import com.samco.trackandgraph.selectitemdialog.HiddenItemType
-import com.samco.trackandgraph.util.GroupPathProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,67 +36,211 @@ import javax.inject.Inject
 
 enum class SelectItemDialogState { LOADING, READY }
 
-enum class SelectableItemType { GROUP }
+enum class SelectableItemType { GROUP, TRACKER, GRAPH }
 
-sealed class SelectableItem {
+data class HiddenItem(
+    val type: SelectableItemType,
+    val id: Long
+)
+
+sealed class GraphNode {
     data class Group(
         val id: Long,
-        val path: String,
+        val name: String,
         val colorIndex: Int,
-    ) : SelectableItem()
+        val expanded: MutableState<Boolean>,
+        val children: List<GraphNode>,
+        val isRoot: Boolean = false,
+    ) : GraphNode()
+
+    data class Tracker(
+        val id: Long,
+        val name: String,
+    ) : GraphNode()
+
+    data class Graph(
+        val id: Long,
+        val name: String,
+    ) : GraphNode()
+}
+
+sealed class SelectionEvent {
+    data class TrackerSelected(val trackerId: Long) : SelectionEvent()
+    data class GraphSelected(val graphId: Long) : SelectionEvent()
+}
+
+interface SelectItemDialogViewModel {
+    val state: StateFlow<SelectItemDialogState>
+    val groupTree: StateFlow<GraphNode?>
+    val selectedGroupId: StateFlow<Long?>
+    val selectionEvents: ReceiveChannel<SelectionEvent>
+
+    fun init(selectableTypes: Set<SelectableItemType>, hiddenItems: Set<HiddenItem>)
+    fun onItemClicked(item: GraphNode)
+    fun reset()
 }
 
 @HiltViewModel
-class SelectItemDialogViewModel @Inject constructor(
+class SelectItemDialogViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     @IODispatcher private val io: CoroutineDispatcher
-) : ViewModel() {
+) : ViewModel(), SelectItemDialogViewModel {
 
     private val _state = MutableStateFlow(SelectItemDialogState.LOADING)
-    val state: StateFlow<SelectItemDialogState> = _state.asStateFlow()
+    override val state: StateFlow<SelectItemDialogState> = _state.asStateFlow()
 
-    private val _items = MutableStateFlow<List<SelectableItem>>(emptyList())
-    val items: StateFlow<List<SelectableItem>> = _items.asStateFlow()
+    private val _groupTree = MutableStateFlow<GraphNode?>(null)
+    override val groupTree: StateFlow<GraphNode?> = _groupTree.asStateFlow()
+
+    private val _selectedGroupId = MutableStateFlow<Long?>(null)
+    override val selectedGroupId: StateFlow<Long?> = _selectedGroupId.asStateFlow()
+
+    private val selectionEventChannel = Channel<SelectionEvent>(Channel.BUFFERED)
+    override val selectionEvents: ReceiveChannel<SelectionEvent> = selectionEventChannel
 
     private var initialized = false
+    private var selectableTypes: Set<SelectableItemType> = emptySet()
 
-    fun init(
-        allowedTypes: Set<SelectableItemType> = setOf(SelectableItemType.GROUP),
-        hiddenItems: Set<HiddenItem>,
+    override fun init(
+        selectableTypes: Set<SelectableItemType>,
+        hiddenItems: Set<HiddenItem>
     ) {
         if (initialized) return
         initialized = true
+        this.selectableTypes = selectableTypes
 
         viewModelScope.launch(io) {
             _state.value = SelectItemDialogState.LOADING
 
-            //TODO we will generalize this later to handle allowed types and allow selecting trackers and/or graphs
+            // Get the root group graph to build the tree structure
+            val rootGroupGraph = dataInteractor.getGroupGraphSync(rootGroupId = null)
 
-            val allGroups = dataInteractor.getAllGroupsSync()
-            
-            // Extract hidden group IDs from the hidden items set
-            val hiddenGroupIds = hiddenItems
-                .filter { it.type == HiddenItemType.GROUP }
-                .map { it.id }
-                .toSet()
-
-            _items.value = GroupPathProvider(allGroups, hiddenGroupIds)
-                .filteredSortedGroups
-                .map { groupInfo ->
-                    SelectableItem.Group(
-                        id = groupInfo.group.id,
-                        path = groupInfo.path,
-                        colorIndex = groupInfo.group.colorIndex,
-                    )
-                }
+            // Build the GraphNode tree from the GroupGraph
+            _groupTree.value = buildGraphNodeTree(
+                groupGraph = rootGroupGraph,
+                selectableTypes = selectableTypes,
+                hiddenItems = hiddenItems
+            )
 
             _state.value = SelectItemDialogState.READY
         }
     }
 
-    fun reset() {
+    override fun onItemClicked(item: GraphNode) {
+        when (item) {
+            is GraphNode.Group -> {
+                // Always toggle expansion when a group is clicked unless it is the root
+                if (!item.isRoot) item.expanded.value = !item.expanded.value
+
+                // Only set as selected if groups are selectable
+                if (SelectableItemType.GROUP in selectableTypes) {
+                    _selectedGroupId.value = item.id
+                }
+            }
+
+            is GraphNode.Tracker -> {
+                if (SelectableItemType.TRACKER !in selectableTypes) return
+                viewModelScope.launch { selectionEventChannel.send(SelectionEvent.TrackerSelected(item.id)) }
+            }
+
+            is GraphNode.Graph -> {
+                if (SelectableItemType.GRAPH !in selectableTypes) return
+                viewModelScope.launch { selectionEventChannel.send(SelectionEvent.GraphSelected(item.id)) }
+            }
+        }
+    }
+
+    override fun reset() {
         initialized = false
         _state.value = SelectItemDialogState.LOADING
-        _items.value = emptyList()
+        _groupTree.value = null
+        _selectedGroupId.value = null
+        selectableTypes = emptySet()
     }
+
+    private fun buildGraphNodeTree(
+        groupGraph: ModelGroupGraph,
+        selectableTypes: Set<SelectableItemType>,
+        hiddenItems: Set<HiddenItem>
+    ): GraphNode? {
+        // If the group is hidden, skip its entire subgraph
+        if (HiddenItem(SelectableItemType.GROUP, groupGraph.group.id) in hiddenItems) {
+            return null
+        }
+
+        // Process children of this group
+        val children = groupGraph.children.mapNotNull { child ->
+            when (child) {
+                is ModelGroupGraphItem.GroupNode -> {
+                    if (groupHidden(groupId = child.groupGraph.group.id, hiddenItems)) {
+                        return@mapNotNull null
+                    }
+                    // Recursively build child group nodes
+                    buildGraphNodeTree(
+                        groupGraph = child.groupGraph,
+                        selectableTypes = selectableTypes,
+                        hiddenItems = hiddenItems
+                    )
+                }
+
+                is ModelGroupGraphItem.TrackerNode -> {
+                    if (trackerHidden(trackerId = child.tracker.id, selectableTypes, hiddenItems)) {
+                        return@mapNotNull null
+                    }
+                    child.toGraphNode()
+                }
+
+                is ModelGroupGraphItem.GraphNode -> {
+                    if (graphHidden(graphId = child.graph.id, selectableTypes, hiddenItems)) {
+                        return@mapNotNull null
+                    }
+                    child.toGraphNode()
+                }
+            }
+        }
+
+        return GraphNode.Group(
+            isRoot = groupGraph.group.parentGroupId == null,
+            id = groupGraph.group.id,
+            name = if (groupGraph.group.parentGroupId == null) "/" else groupGraph.group.name,
+            colorIndex = groupGraph.group.colorIndex,
+            expanded = mutableStateOf(groupGraph.group.parentGroupId == null),
+            children = children,
+        )
+    }
+
+    private fun groupHidden(
+        groupId: Long,
+        hiddenItems: Set<HiddenItem>
+    ): Boolean {
+        return HiddenItem(SelectableItemType.GROUP, groupId) in hiddenItems
+    }
+
+    private fun trackerHidden(
+        trackerId: Long,
+        selectableTypes: Set<SelectableItemType>,
+        hiddenItems: Set<HiddenItem>
+    ): Boolean {
+        return SelectableItemType.TRACKER !in selectableTypes
+            || HiddenItem(SelectableItemType.TRACKER, trackerId) in hiddenItems
+    }
+
+    private fun graphHidden(
+        graphId: Long,
+        selectableTypes: Set<SelectableItemType>,
+        hiddenItems: Set<HiddenItem>
+    ): Boolean {
+        return SelectableItemType.GRAPH !in selectableTypes
+            || HiddenItem(SelectableItemType.GRAPH, graphId) in hiddenItems
+    }
+
+    private fun ModelGroupGraphItem.TrackerNode.toGraphNode() = GraphNode.Tracker(
+        id = tracker.id,
+        name = tracker.name,
+    )
+
+    private fun ModelGroupGraphItem.GraphNode.toGraphNode() = GraphNode.Graph(
+        id = graph.id,
+        name = graph.name,
+    )
 }

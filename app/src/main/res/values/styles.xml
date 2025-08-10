@@ -92,13 +92,4 @@
         <item name="android:textAlignment">center</item>
     </style>
 
-    <style name="Style.ExpansiveTextInputStyle" parent="Widget.AppCompat.EditText">
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:padding">12dp</item>
-        <item name="android:background">@drawable/expansive_text_box_background</item>
-        <item name="backgroundTint">@null</item>
-        <item name="android:inputType">textMultiLine|textAutoCorrect|textCapSentences</item>
-    </style>
-
 </resources>

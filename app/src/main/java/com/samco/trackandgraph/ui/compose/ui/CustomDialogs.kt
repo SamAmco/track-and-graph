@@ -79,6 +79,7 @@ fun CustomContinueCancelDialog(
     @StringRes continueText: Int = R.string.continue_word,
     @StringRes dismissText: Int = R.string.cancel,
     continueEnabled: Boolean = true,
+    scrollContent: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
@@ -96,7 +97,10 @@ fun CustomContinueCancelDialog(
         Column(
             modifier = Modifier
                 .weight(1f, fill = false)
-                .verticalScroll(rememberScrollState()),
+                .let {
+                    if (scrollContent) it.verticalScroll(state = rememberScrollState())
+                    else it
+                },
             content = content
         )
 
