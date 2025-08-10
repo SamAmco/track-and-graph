@@ -21,7 +21,7 @@ import com.samco.trackandgraph.base.database.dto.Group
 
 open class GroupPathProvider(
     val groups: Collection<Group>,
-    private val groupFilterId: Long? = null
+    private val excludedGroupIds: Set<Long> = emptySet(),
 ) {
     private val separator = "/"
 
@@ -44,7 +44,7 @@ open class GroupPathProvider(
     }
 
     private val filteredGroupChains = groupParentChains
-        .filter { (_, chain) -> chain.none { it.id == groupFilterId } }
+        .filter { (_, chain) -> chain.none { it.id in excludedGroupIds } }
 
     private val groupPaths = filteredGroupChains
         .mapValues { (_, chain) ->

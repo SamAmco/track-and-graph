@@ -45,12 +45,6 @@ import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.settings.TngSettings
-import com.samco.trackandgraph.selectitemdialog.MOVE_DIALOG_GROUP_KEY
-import com.samco.trackandgraph.selectitemdialog.MOVE_DIALOG_TYPE_GRAPH
-import com.samco.trackandgraph.selectitemdialog.MOVE_DIALOG_TYPE_GROUP
-import com.samco.trackandgraph.selectitemdialog.MOVE_DIALOG_TYPE_KEY
-import com.samco.trackandgraph.selectitemdialog.MOVE_DIALOG_TYPE_TRACK
-import com.samco.trackandgraph.selectitemdialog.MoveToDialogFragment
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.performTrackVibrate
 import com.samco.trackandgraph.util.resumeScoped
@@ -78,6 +72,7 @@ class GroupFragment : Fragment(),
     private val viewModel by viewModels<GroupViewModel>()
     private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private val groupDialogsViewModel by viewModels<GroupDialogsViewModel>()
+    private val moveItemViewModel by viewModels<MoveItemViewModel>()
 
     private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
     private val addGroupDialogViewModel by viewModels<AddGroupDialogViewModelImpl>()
@@ -129,10 +124,11 @@ class GroupFragment : Fragment(),
                         recyclerView = recyclerView,
                         groupViewModel = viewModel,
                         groupDialogsViewModel = groupDialogsViewModel,
+                        moveItemViewModel = moveItemViewModel,
                         addDataPointsDialogViewModel = addDataPointsDialogViewModel,
                         addGroupDialogViewModel = addGroupDialogViewModel,
-                        trackGroupId = args.groupId,
-                        trackGroupName = args.groupName,
+                        groupId = args.groupId,
+                        groupName = args.groupName,
                         showFab = showFab.value,
                         onQueueAddAllClicked = { onQueueAddAllClicked() }
                     )
@@ -211,12 +207,7 @@ class GroupFragment : Fragment(),
     )
 
     private fun onMoveGroupClicked(group: Group) {
-        val dialog = MoveToDialogFragment()
-        val args = Bundle()
-        args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_GROUP)
-        args.putLong(MOVE_DIALOG_GROUP_KEY, group.id)
-        dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "move_dialog") }
+        moveItemViewModel.showMoveGroupDialog(group)
     }
 
     private fun onDeleteGroupClicked(group: Group) {
@@ -247,12 +238,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onMoveGraphStatClicked(graphOrStat: IGraphStatViewData) {
-        val dialog = MoveToDialogFragment()
-        val args = Bundle()
-        args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_GRAPH)
-        args.putLong(MOVE_DIALOG_GROUP_KEY, graphOrStat.graphOrStat.id)
-        dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "move_dialog") }
+        moveItemViewModel.showMoveGraphDialog(graphOrStat)
     }
 
     private fun onGraphStatClicked(graphOrStat: IGraphStatViewData) {
@@ -315,12 +301,7 @@ class GroupFragment : Fragment(),
     }
 
     private fun onTrackerMoveClicked(tracker: DisplayTracker) {
-        val dialog = MoveToDialogFragment()
-        val args = Bundle()
-        args.putString(MOVE_DIALOG_TYPE_KEY, MOVE_DIALOG_TYPE_TRACK)
-        args.putLong(MOVE_DIALOG_GROUP_KEY, tracker.id)
-        dialog.arguments = args
-        childFragmentManager.let { dialog.show(it, "move_dialog") }
+        moveItemViewModel.showMoveTrackerDialog(tracker)
     }
 
     private fun onTrackerEditClicked(tracker: DisplayTracker) {

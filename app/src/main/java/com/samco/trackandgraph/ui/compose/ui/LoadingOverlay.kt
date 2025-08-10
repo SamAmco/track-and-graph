@@ -68,8 +68,10 @@ private fun LoadingOverlayContent() {
  * Loading overlay that fills the maximum available size
  */
 @Composable
-fun LoadingOverlay() = Box(
-    modifier = Modifier.fillMaxSize(),
+fun LoadingOverlay(
+    modifier: Modifier = Modifier
+) = Box(
+    modifier = modifier.fillMaxSize(),
     contentAlignment = Alignment.Center
 ) {
     LoadingOverlayContent()
