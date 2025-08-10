@@ -20,11 +20,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
 import com.samco.trackandgraph.base.database.dto.Group
+import com.samco.trackandgraph.base.database.dto.GroupGraphItem
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.selectitemdialog.HiddenItem
-import com.samco.trackandgraph.selectitemdialog.HiddenItemType
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineDispatcher
@@ -53,14 +54,11 @@ class MoveItemViewModel @Inject constructor(
     val moveDialogConfig: StateFlow<MoveDialogConfig?> = _moveDialogConfig.asStateFlow()
 
     fun showMoveGroupDialog(group: Group) {
-        viewModelScope.launch(io) {
-            val hiddenItems = getHiddenItemsForGroup(group)
-            _moveDialogConfig.value = MoveDialogConfig(
-                itemId = group.id,
-                itemType = MovableItemType.GROUP,
-                hiddenItems = hiddenItems
-            )
-        }
+        _moveDialogConfig.value = MoveDialogConfig(
+            itemId = group.id,
+            itemType = MovableItemType.GROUP,
+            hiddenItems = setOf(HiddenItem(SelectableItemType.GROUP, group.id))
+        )
     }
 
     fun showMoveGraphDialog(graphOrStat: IGraphStatViewData) {
@@ -119,34 +117,5 @@ class MoveItemViewModel @Inject constructor(
                 // On error, do nothing - move operation failed silently
             }
         }
-    }
-
-    private suspend fun getHiddenItemsForGroup(group: Group): Set<HiddenItem> {
-        val hiddenItems = mutableSetOf<HiddenItem>()
-
-        // Add the group itself to hidden items (can't move into itself)
-        hiddenItems.add(HiddenItem(HiddenItemType.GROUP, group.id))
-
-        // Get all descendant groups to prevent moving into children
-        val allGroups = dataInteractor.getAllGroupsSync()
-        val descendants = getAllDescendantGroups(group.id, allGroups)
-        descendants.forEach { descendantGroup ->
-            hiddenItems.add(HiddenItem(HiddenItemType.GROUP, descendantGroup.id))
-        }
-
-        return hiddenItems
-    }
-
-    private suspend fun getAllDescendantGroups(parentGroupId: Long, allGroups: List<Group>): List<Group> {
-        val descendants = mutableListOf<Group>()
-        val directChildren = allGroups.filter { it.parentGroupId == parentGroupId }
-
-        for (child in directChildren) {
-            descendants.add(child)
-            // Recursively get descendants of this child
-            descendants.addAll(getAllDescendantGroups(child.id, allGroups))
-        }
-
-        return descendants
     }
 }

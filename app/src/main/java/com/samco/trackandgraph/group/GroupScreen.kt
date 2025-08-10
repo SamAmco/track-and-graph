@@ -46,7 +46,6 @@ import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
-import com.samco.trackandgraph.selectitemdialog.SelectableItem
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
@@ -129,10 +128,7 @@ fun GroupScreen(
             title = stringResource(R.string.move_to),
             selectableTypes = setOf(SelectableItemType.GROUP),
             hiddenItems = moveDialogConfig.hiddenItems,
-            onItemSelected = {
-                val groupItem = it as? SelectableItem.Group ?: return@SelectItemDialog
-                moveItemViewModel.moveItemToGroup(groupItem.id)
-            },
+            onGroupSelected = moveItemViewModel::moveItemToGroup,
             onDismissRequest = { moveItemViewModel.dismissMoveDialog() }
         )
     }
