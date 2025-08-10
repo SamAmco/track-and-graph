@@ -54,7 +54,6 @@ fun DateTimeButtonRow(
     modifier = modifier,
     horizontalArrangement = Arrangement.SpaceEvenly
 ) {
-
     DateButton(
         modifier = Modifier.widthIn(min = 104.dp),
         dateTime = selectedDateTime,

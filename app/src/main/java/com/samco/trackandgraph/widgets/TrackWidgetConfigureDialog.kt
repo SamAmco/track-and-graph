@@ -92,7 +92,7 @@ private fun TrackWidgetConfigureDialogContent(
         onConfirm = onConfirm,
         continueText = R.string.create,
         dismissText = R.string.cancel,
-        confirmButtonEnabled = selectedFeatureId != null
+        continueEnabled = selectedFeatureId != null
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
