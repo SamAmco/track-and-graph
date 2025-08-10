@@ -40,7 +40,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramVie
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
-import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.temporal.WeekFields
 import java.text.FieldPosition

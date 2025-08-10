@@ -21,34 +21,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import kotlinx.coroutines.launch
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.databinding.RemindersFragmentBinding
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
-import com.samco.trackandgraph.util.bindingForViewLifecycle
-import com.samco.trackandgraph.util.hideKeyboard
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class RemindersFragment : Fragment(),
     PermissionRequesterUseCase by PermissionRequesterUseCaseImpl() {
-    private var binding: RemindersFragmentBinding by bindingForViewLifecycle()
+    
     private val viewModel: RemindersViewModel by viewModels<RemindersViewModelImpl>()
     private val appBarViewModel by activityViewModels<AppBarViewModel>()
-    private lateinit var adapter: ReminderListAdapter
 
     init {
         initNotificationsPermissionRequester(this)
@@ -59,22 +51,21 @@ class RemindersFragment : Fragment(),
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = RemindersFragmentBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = viewLifecycleOwner
-
-        adapter = ReminderListAdapter(viewModel::deleteReminder)
-        binding.remindersList.adapter = adapter
-        ItemTouchHelper(getDragTouchHelper()).attachToRecyclerView(binding.remindersList)
-        binding.remindersList.layoutManager =
-            LinearLayoutManager(context, RecyclerView.VERTICAL, false)
-        binding.remindersList.itemAnimator = DefaultItemAnimator()
-        registerForContextMenu(binding.remindersList)
-
-        observeSaveChangesButton()
-        observeLoading()
-        observeAndUpdateReminders()
-
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                TnGComposeTheme {
+                    RemindersScreen(
+                        reminders = viewModel.currentReminders.collectAsState().value,
+                        isLoading = viewModel.loading.collectAsState().value,
+                        hasChanges = viewModel.remindersChanged.collectAsState().value,
+                        onSaveChanges = viewModel::saveChanges,
+                        onDeleteReminder = viewModel::deleteReminder,
+                        onMoveReminder = { from, to -> viewModel.moveItem(from, to) },
+                    )
+                }
+            }
+        }
     }
 
     override fun onResume() {
@@ -98,86 +89,8 @@ class RemindersFragment : Fragment(),
         }
     }
 
-    private fun observeLoading() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.loading.collect {
-                    binding.loadingOverlay.visibility = if (it) View.VISIBLE else View.GONE
-                }
-            }
-        }
-    }
-
-    private fun observeSaveChangesButton() {
-        binding.saveChangesButton.setOnClickListener { viewModel.saveChanges() }
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.remindersChanged.collect {
-                    binding.saveChangesButton.visibility = if (it) View.VISIBLE else View.GONE
-                }
-            }
-        }
-    }
-
-    private fun onHideKeyboard() = requireActivity().window.hideKeyboard()
-
-    private fun getDragTouchHelper() = object : ItemTouchHelper.Callback() {
-        override fun getMovementFlags(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder
-        ): Int {
-            return makeFlag(
-                ItemTouchHelper.ACTION_STATE_DRAG,
-                ItemTouchHelper.UP or ItemTouchHelper.DOWN
-            )
-        }
-
-        override fun onMove(
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            target: RecyclerView.ViewHolder
-        ): Boolean {
-            adapter.moveItem(viewHolder.bindingAdapterPosition, target.bindingAdapterPosition)
-            return true
-        }
-
-        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-            super.onSelectedChanged(viewHolder, actionState)
-            if (viewHolder != null && viewHolder is ReminderViewHolder && actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-                viewHolder.elevateCard()
-            }
-        }
-
-        override fun clearView(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder) {
-            super.clearView(recyclerView, viewHolder)
-            (viewHolder as ReminderViewHolder).dropCard()
-            viewModel.adjustDisplayIndexes(adapter.getItems())
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {}
-    }
-
-    private fun observeAndUpdateReminders() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.currentReminders.collect {
-                    if (it.isEmpty()) binding.noRemindersHintText.visibility = View.VISIBLE
-                    else binding.noRemindersHintText.visibility = View.GONE
-
-                    adapter.submitList(it)
-                }
-            }
-        }
-    }
-
     private fun onAddClicked() {
         viewModel.addReminder(getString(R.string.default_reminder_name))
-        binding.remindersList.smoothScrollToPosition(viewModel.currentReminders.value.size)
         requestAlarmAndNotificationPermission(requireContext())
-    }
-
-    override fun onPause() {
-        onHideKeyboard()
-        super.onPause()
     }
 }

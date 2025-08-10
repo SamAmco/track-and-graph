@@ -45,7 +45,6 @@ import com.samco.trackandgraph.helpers.formatMonthYear
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.Line
-import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneId

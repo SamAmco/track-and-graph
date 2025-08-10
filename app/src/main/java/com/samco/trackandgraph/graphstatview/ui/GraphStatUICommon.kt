@@ -17,8 +17,10 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
+import android.util.TypedValue
 import android.graphics.Color as GColor
 import android.view.View
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
@@ -60,7 +62,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.dataVisColorList
-import com.samco.trackandgraph.util.getColorFromAttr
 import java.text.DecimalFormat
 import java.text.FieldPosition
 import java.text.Format
@@ -260,4 +261,14 @@ fun GraphLegendItemView(
         text = item.label,
         style = graphLegendTextStyle
     )
+}
+
+@ColorInt
+fun Context.getColorFromAttr(
+    @AttrRes attrColor: Int,
+    typedValue: TypedValue = TypedValue(),
+    resolveRefs: Boolean = true
+): Int {
+    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
+    return typedValue.data
 }

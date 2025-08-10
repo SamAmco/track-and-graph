@@ -30,6 +30,7 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.launch
@@ -46,7 +47,7 @@ interface RemindersViewModel {
     fun saveChanges()
     fun addReminder(defaultName: String)
     fun deleteReminder(reminderViewData: ReminderViewData)
-    fun adjustDisplayIndexes(indexUpdate: List<ReminderViewData>)
+    fun moveItem(from: Int, to: Int)
 }
 
 @OptIn(FlowPreview::class)
@@ -82,7 +83,7 @@ class RemindersViewModelImpl @Inject constructor(
 
         // Observe changes to the current reminders list and set up state observation
         viewModelScope.launch {
-            _currentReminders.collect { reminders ->
+            _currentReminders.collectLatest { reminders ->
                 reminders
                     .map { it.stateChanges }
                     .merge()
@@ -94,7 +95,7 @@ class RemindersViewModelImpl @Inject constructor(
 
     override fun saveChanges() {
         viewModelScope.launch(io) {
-            withContext(ui) { _loading.value = true }
+            _loading.value = true
             _currentReminders.value.let { reminders ->
                 val withDisplayIndices = reminders.mapIndexed { index, reminderViewData ->
                     reminderViewData.toReminder().copy(displayIndex = index)
@@ -104,12 +105,10 @@ class RemindersViewModelImpl @Inject constructor(
                 val allReminders = dataInteractor.getAllRemindersSync()
                 savedReminders.clear()
                 savedReminders.addAll(allReminders)
-                withContext(ui) {
-                    _currentReminders.value = allReminders.map { ReminderViewData.fromReminder(it) }
-                    onRemindersUpdated()
-                }
+                _remindersChanged.value = false
+                _currentReminders.value = allReminders.map { ReminderViewData.fromReminder(it) }
             }
-            withContext(ui) { _loading.value = false }
+            _loading.value = false
         }
     }
 
@@ -146,10 +145,10 @@ class RemindersViewModelImpl @Inject constructor(
         onRemindersUpdated()
     }
 
-    override fun adjustDisplayIndexes(indexUpdate: List<ReminderViewData>) {
-        _currentReminders.value = indexUpdate.mapIndexed { i, r ->
-            _currentReminders.value.firstOrNull { it.id == r.id }?.copy(displayIndex = i)
-        }.filterNotNull()
+    override fun moveItem(from: Int, to: Int) {
+        if (from == to) return
+        _currentReminders.value = _currentReminders.value.toMutableList()
+            .apply { add(to, removeAt(from)) }
         onRemindersUpdated()
     }
 }

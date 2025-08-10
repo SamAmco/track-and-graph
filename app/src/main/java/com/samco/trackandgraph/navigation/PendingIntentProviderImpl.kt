@@ -26,7 +26,7 @@ import com.samco.trackandgraph.widgets.TrackWidgetProvider
 import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.DELETE_FEATURE_ID
 import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.UPDATE_FEATURE_ID
 import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.UPDATE_FEATURE_TIMER
-import com.samco.trackandgraph.timers.AddDataPointFromTimerActivity
+import com.samco.trackandgraph.widgets.AddDataPointFromTimerActivity
 import com.samco.trackandgraph.widgets.TrackWidgetInputDataPointActivity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject

@@ -29,8 +29,6 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import java.lang.NumberFormatException
 
-fun getDoubleFromText(text: String): Double = getDoubleFromTextOrNull(text) ?: 0.0
-
 /**
  * Return a number given a string by attempting to parse it as a double
  *
@@ -62,53 +60,6 @@ fun getDoubleFromTextOrNull(text: String): Double? {
         return "$before$after".toDouble()
     } catch (e: NumberFormatException) {
         return null
-    }
-}
-
-@ColorInt
-fun Context.getColorFromAttr(
-    @AttrRes attrColor: Int,
-    typedValue: TypedValue = TypedValue(),
-    resolveRefs: Boolean = true
-): Int {
-    theme.resolveAttribute(attrColor, typedValue, resolveRefs)
-    return typedValue.data
-}
-
-fun View.focusAndShowKeyboard() {
-    //https://stackoverflow.com/a/71587766/13310191
-    /**
-     * This is to be called when the window already has focus.
-     */
-    fun View.showTheKeyboardNow() {
-        if (isFocused) {
-            post {
-                // We still post the call, just in case we are being notified of the windows focus
-                // but InputMethodManager didn't get properly setup yet.
-                val imm =
-                    context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-            }
-        }
-    }
-
-    requestFocus()
-    if (hasWindowFocus()) {
-        // No need to wait for the window to get focus.
-        showTheKeyboardNow()
-    } else {
-        // We need to wait until the window gets focus.
-        viewTreeObserver.addOnWindowFocusChangeListener(
-            object : ViewTreeObserver.OnWindowFocusChangeListener {
-                override fun onWindowFocusChanged(hasFocus: Boolean) {
-                    // This notification will arrive just before the InputMethodManager gets set up.
-                    if (hasFocus) {
-                        this@focusAndShowKeyboard.showTheKeyboardNow()
-                        // It’s very important to remove this listener once we are done.
-                        viewTreeObserver.removeOnWindowFocusChangeListener(this)
-                    }
-                }
-            })
     }
 }
 
