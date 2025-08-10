@@ -84,7 +84,6 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSer
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
-import com.samco.trackandgraph.util.getColorFromAttr
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZonedDateTime

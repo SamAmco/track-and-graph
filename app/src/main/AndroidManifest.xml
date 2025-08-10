@@ -102,7 +102,7 @@
         </activity>
 
         <activity
-            android:name=".timers.AddDataPointFromTimerActivity"
+            android:name=".widgets.AddDataPointFromTimerActivity"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@style/TransparentTheme"
