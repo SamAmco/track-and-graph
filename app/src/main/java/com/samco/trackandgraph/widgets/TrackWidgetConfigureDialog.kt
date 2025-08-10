@@ -17,138 +17,119 @@
 
 package com.samco.trackandgraph.widgets
 
-import android.app.Dialog
-import android.content.DialogInterface
-import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.base.model.DataInteractor
-import com.samco.trackandgraph.base.model.di.IODispatcher
-import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.databinding.TrackWidgetConfigureDialogBinding
-import com.samco.trackandgraph.util.FeaturePathProvider
-import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
-@AndroidEntryPoint
-class TrackWidgetConfigureDialog : DialogFragment() {
-    private val viewModel by viewModels<TrackWidgetConfigureDialogViewModel>()
-    private lateinit var binding: TrackWidgetConfigureDialogBinding
-    private lateinit var listener: TrackWidgetConfigureDialogListener
+@Composable
+fun TrackWidgetConfigureDialog(
+    onCreateWidget: (Long?) -> Unit,
+    onNoFeatures: () -> Unit,
+    onDismiss: () -> Unit,
+    viewModel: TrackWidgetConfigureDialogViewModel = hiltViewModel()
+) {
+    val featureMap by viewModel.featureMap.collectAsStateWithLifecycle()
 
-    internal interface TrackWidgetConfigureDialogListener {
-        fun onCreateWidget(featureId: Long?)
-        fun onNoFeatures()
-        fun onDismiss()
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return activity?.let {
-            binding = TrackWidgetConfigureDialogBinding.inflate(it.layoutInflater, null, false)
-            listener = activity as TrackWidgetConfigureDialogListener
-
-            val alertDialog = MaterialAlertDialogBuilder(it, R.style.AppTheme_AlertDialogTheme)
-                .setView(binding.root)
-                .setPositiveButton(R.string.create) { _, _ ->
-                    viewModel.onCreateClicked()
-                }
-                .setNegativeButton(R.string.cancel) { _, _ ->
-                    dismiss()
-                    listener.onDismiss()
-                }
-                .create()
-
-            alertDialog.setCanceledOnTouchOutside(true)
-            alertDialog.setOnShowListener { setAlertDialogShowListeners() }
-            alertDialog
-        } ?: throw IllegalStateException("Activity cannot be null")
-    }
-
-    private fun setAlertDialogShowListeners() {
-        observeAllFeatures()
-        observeOnCreateClicked()
-    }
-
-    private fun observeOnCreateClicked() {
-        viewModel.onCreateWidget.observe(this) {
-            listener.onCreateWidget(it)
+    // Handle create widget event
+    LaunchedEffect(viewModel.onCreateWidget) {
+        for (featureId in viewModel.onCreateWidget) {
+            onCreateWidget(featureId)
         }
     }
 
-    private fun observeAllFeatures() =
-        viewModel.featurePathProvider.observe(this) { featurePathProvider ->
-            val sortedFeatures = featurePathProvider.sortedPaths()
-            if (sortedFeatures.isEmpty()) listener.onNoFeatures()
-            val itemNames = sortedFeatures.map { it.second }
-            val adapter = ArrayAdapter(
-                requireContext(),
-                android.R.layout.simple_spinner_dropdown_item,
-                itemNames
-            )
-            binding.trackerSpinner.adapter = adapter
-            binding.trackerSpinner.setSelection(0)
-            binding.trackerSpinner.onItemSelectedListener =
-                object : AdapterView.OnItemSelectedListener {
-                    override fun onNothingSelected(parent: AdapterView<*>?) {}
-                    override fun onItemSelected(
-                        parent: AdapterView<*>?,
-                        view: View?,
-                        position: Int,
-                        id: Long
-                    ) {
-                        viewModel.onFeatureSelected(sortedFeatures[position].first.featureId)
-                    }
-                }
+    // Check if we have features and handle no features case
+    LaunchedEffect(featureMap) {
+        if (featureMap?.isEmpty() == true) {
+            onNoFeatures()
+            return@LaunchedEffect
         }
-
-    override fun onDismiss(dialog: DialogInterface) {
-        listener.onDismiss()
     }
+
+    TrackWidgetConfigureDialogContent(
+        featureMap = featureMap ?: emptyMap(),
+        onFeatureSelected = viewModel::onFeatureSelected,
+        onConfirm = viewModel::onCreateClicked,
+        onDismiss = onDismiss
+    )
 }
 
-@HiltViewModel
-class TrackWidgetConfigureDialogViewModel @Inject constructor(
-    private val dataInteractor: DataInteractor,
-    @IODispatcher private val io: CoroutineDispatcher,
-    @MainDispatcher private val ui: CoroutineDispatcher
-) : ViewModel() {
+@Composable
+private fun TrackWidgetConfigureDialogContent(
+    featureMap: Map<Long, String>,
+    onFeatureSelected: (Long) -> Unit,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    var selectedFeatureId by remember(featureMap) {
+        mutableStateOf(featureMap.keys.firstOrNull())
+    }
 
-    private val _featurePathProvider = MutableLiveData<FeaturePathProvider>()
-    val featurePathProvider: LiveData<FeaturePathProvider> get() = _featurePathProvider
+    // Update the view model when selection changes
+    LaunchedEffect(selectedFeatureId) {
+        selectedFeatureId?.let { onFeatureSelected(it) }
+    }
 
-    private val _onCreateWidget = MutableLiveData<Long?>()
-    val onCreateWidget: LiveData<Long?> get() = _onCreateWidget
+    ContinueCancelDialog(
+        onDismissRequest = onDismiss,
+        onConfirm = onConfirm,
+        continueText = R.string.create,
+        dismissText = R.string.cancel,
+        confirmButtonEnabled = selectedFeatureId != null
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = stringResource(R.string.select_a_feature),
+                style = MaterialTheme.typography.subtitle2,
+                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding))
+            )
 
-    private var selectedFeatureId: Long? = null
+            DialogInputSpacing()
 
-    init {
-        viewModelScope.launch(io) {
-            val groups = dataInteractor.getAllGroupsSync()
-            val trackers = dataInteractor.getAllTrackersSync()
-            withContext(ui) {
-                _featurePathProvider.value = FeaturePathProvider(trackers, groups)
+            selectedFeatureId?.let { selected ->
+                TextMapSpinner(
+                    modifier = Modifier.fillMaxWidth(),
+                    strings = featureMap,
+                    selectedItem = selected,
+                    onItemSelected = { featureId ->
+                        selectedFeatureId = featureId
+                    }
+                )
             }
         }
     }
+}
 
-    fun onCreateClicked() {
-        _onCreateWidget.value = selectedFeatureId
-    }
-
-    fun onFeatureSelected(featureId: Long) {
-        selectedFeatureId = featureId
-    }
+@Preview(showBackground = true)
+@Composable
+private fun TrackWidgetConfigureDialogContentPreview() {
+    TrackWidgetConfigureDialogContent(
+        featureMap = mapOf(
+            1L to "Group 1/Feature 1",
+            2L to "Group 1/Feature 2",
+            3L to "Group 2/Feature 3"
+        ),
+        onFeatureSelected = {},
+        onConfirm = {},
+        onDismiss = {}
+    )
 }
