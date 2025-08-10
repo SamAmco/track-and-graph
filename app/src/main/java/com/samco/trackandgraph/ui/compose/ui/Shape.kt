@@ -8,6 +8,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 
+val smallIconSize = 20.dp
+
 val buttonSize = 45.dp
 
 val cardCornerRadius: Dp

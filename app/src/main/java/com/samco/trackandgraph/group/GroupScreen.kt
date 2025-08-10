@@ -45,6 +45,9 @@ import com.samco.trackandgraph.addgroup.AddGroupDialog
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.importexport.ExportFeaturesDialog
 import com.samco.trackandgraph.importexport.ImportFeaturesDialog
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItem
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.ContinueDialog
@@ -63,10 +66,11 @@ fun GroupScreen(
     recyclerView: RecyclerView,
     groupViewModel: GroupViewModel,
     groupDialogsViewModel: GroupDialogsViewModel,
+    moveItemViewModel: MoveItemViewModel,
     addDataPointsDialogViewModel: AddDataPointsViewModelImpl,
     addGroupDialogViewModel: AddGroupDialogViewModelImpl,
-    trackGroupId: Long,
-    trackGroupName: String?,
+    groupId: Long,
+    groupName: String?,
     showFab: Boolean,
     onQueueAddAllClicked: () -> Unit
 ) {
@@ -95,15 +99,15 @@ fun GroupScreen(
 
     if (groupDialogsViewModel.showImportDialog.collectAsStateWithLifecycle().value) {
         ImportFeaturesDialog(
-            trackGroupId = trackGroupId,
+            trackGroupId = groupId,
             onDismissRequest = { groupDialogsViewModel.hideImportDialog() }
         )
     }
 
     if (groupDialogsViewModel.showExportDialog.collectAsStateWithLifecycle().value) {
         ExportFeaturesDialog(
-            trackGroupId = trackGroupId,
-            trackGroupName = trackGroupName,
+            trackGroupId = groupId,
+            trackGroupName = groupName,
             onDismissRequest = { groupDialogsViewModel.hideExportDialog() }
         )
     }
@@ -116,7 +120,23 @@ fun GroupScreen(
             onDismissRequest = { groupDialogsViewModel.hideFeatureDescriptionDialog() }
         )
     }
-    
+
+    // Move dialog
+    val moveDialogConfig = moveItemViewModel.moveDialogConfig.collectAsStateWithLifecycle().value
+
+    if (moveDialogConfig != null) {
+        SelectItemDialog(
+            title = stringResource(R.string.move_to),
+            selectableTypes = setOf(SelectableItemType.GROUP),
+            hiddenItems = moveDialogConfig.hiddenItems,
+            onItemSelected = {
+                val groupItem = it as? SelectableItem.Group ?: return@SelectItemDialog
+                moveItemViewModel.moveItemToGroup(groupItem.id)
+            },
+            onDismissRequest = { moveItemViewModel.dismissMoveDialog() }
+        )
+    }
+
     // Confirmation dialogs
     val itemForDeletion = groupDialogsViewModel.itemForDeletion.collectAsStateWithLifecycle().value
     if (itemForDeletion != null) {
@@ -125,7 +145,7 @@ fun GroupScreen(
             DeleteType.GRAPH_STAT -> R.string.ru_sure_del_graph
             DeleteType.TRACKER -> R.string.ru_sure_del_feature
         }
-        
+
         ContinueCancelDialog(
             body = bodyRes,
             onDismissRequest = { groupDialogsViewModel.hideDeleteDialog() },
@@ -141,7 +161,7 @@ fun GroupScreen(
             dismissText = R.string.cancel
         )
     }
-    
+
     if (groupDialogsViewModel.showNoTrackersDialog.collectAsStateWithLifecycle().value) {
         ContinueDialog(
             onConfirm = { groupDialogsViewModel.hideNoTrackersDialog() },
