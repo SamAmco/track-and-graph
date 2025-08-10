@@ -325,6 +325,9 @@ internal interface TrackAndGraphDatabaseDao {
     @Query("SELECT * FROM groups_table WHERE parent_group_id = :id")
     fun getGroupsForGroupSync(id: Long): List<Group>
 
+    @Query("SELECT * FROM groups_table WHERE parent_group_id IS NULL LIMIT 1")
+    fun getRootGroupSync(): Group?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertFeatureTimer(featureTimer: FeatureTimer)
 

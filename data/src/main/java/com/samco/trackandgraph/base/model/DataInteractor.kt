@@ -36,6 +36,8 @@ interface DataInteractor : TrackerHelper, DataSampler {
 
     suspend fun getAllGroupsSync(): List<Group>
 
+    suspend fun getGroupGraphSync(rootGroupId: Long? = null): GroupGraph
+
     suspend fun updateReminders(reminders: List<Reminder>)
 
     suspend fun getGroupById(id: Long): Group
