@@ -136,9 +136,6 @@ private fun MenuSection(
     )
 
     DropdownMenu(
-        modifier = Modifier
-            .widthIn(min = 180.dp)
-            .background(MaterialTheme.colors.background),
         expanded = expanded,
         onDismissRequest = { expanded = false }
     ) {
@@ -146,37 +143,25 @@ private fun MenuSection(
             clickListener.onDelete(graphStat = graphStatViewData)
             expanded = false
         }) {
-            Text(
-                text = stringResource(id = R.string.delete),
-                style = MaterialTheme.typography.body1
-            )
+            Text(stringResource(id = R.string.delete))
         }
         DropdownMenuItem(onClick = {
             clickListener.onEdit(graphStat = graphStatViewData)
             expanded = false
         }) {
-            Text(
-                text = stringResource(id = R.string.edit),
-                style = MaterialTheme.typography.body1
-            )
+            Text(stringResource(id = R.string.edit))
         }
         DropdownMenuItem(onClick = {
             clickListener.onMoveGraphStat(graphStat = graphStatViewData)
             expanded = false
         }) {
-            Text(
-                text = stringResource(id = R.string.move_to),
-                style = MaterialTheme.typography.body1
-            )
+            Text(stringResource(id = R.string.move_to))
         }
         DropdownMenuItem(onClick = {
             clickListener.onDuplicate(graphStat = graphStatViewData)
             expanded = false
         }) {
-            Text(
-                text = stringResource(id = R.string.duplicate),
-                style = MaterialTheme.typography.body1
-            )
+            Text(stringResource(id = R.string.duplicate))
         }
     }
 }

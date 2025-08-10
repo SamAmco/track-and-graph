@@ -44,9 +44,11 @@ data class HiddenItem(
 )
 
 sealed class GraphNode {
+    abstract val name: String
+
     data class Group(
         val id: Long,
-        val name: String,
+        override val name: String,
         val colorIndex: Int,
         val expanded: MutableState<Boolean>,
         val children: List<GraphNode>,
@@ -55,12 +57,12 @@ sealed class GraphNode {
 
     data class Tracker(
         val id: Long,
-        val name: String,
+        override val name: String,
     ) : GraphNode()
 
     data class Graph(
         val id: Long,
-        val name: String,
+        override val name: String,
     ) : GraphNode()
 }
 
@@ -205,7 +207,7 @@ class SelectItemDialogViewModelImpl @Inject constructor(
             name = if (groupGraph.group.parentGroupId == null) "/" else groupGraph.group.name,
             colorIndex = groupGraph.group.colorIndex,
             expanded = mutableStateOf(groupGraph.group.parentGroupId == null),
-            children = children,
+            children = children.sortedBy { it.name },
         )
     }
 
