@@ -21,32 +21,27 @@ import com.samco.trackandgraph.base.database.dto.Group
 
 open class GroupPathProvider(
     val groups: Collection<Group>,
-    private val excludedGroupIds: Set<Long> = emptySet(),
 ) {
     private val separator = "/"
 
     private val groupsById = groups.associateBy { it.id }
 
-    private val groupParentChains = groups.associate { group ->
-        group.id to run {
-            val chain = mutableListOf<Group>()
-            var currentGroup = group
-            do {
-                chain.add(currentGroup)
-                currentGroup = groupsById[currentGroup.parentGroupId] ?: break
+    private val groupPaths = groups
+        .associate { group ->
+            group.id to run {
+                val chain = mutableListOf<Group>()
+                var currentGroup = group
+                do {
+                    chain.add(currentGroup)
+                    currentGroup = groupsById[currentGroup.parentGroupId] ?: break
 
-                // It shouldn't be possible in the current version to create an infinite
-                // loop, but legacy versions may have a bug that allows this, so we must break
-                // out of the loop if we detect it.
-            } while (!chain.contains(currentGroup))
-            return@run chain
+                    // It shouldn't be possible in the current version to create an infinite
+                    // loop, but legacy versions may have a bug that allows this, so we must break
+                    // out of the loop if we detect it.
+                } while (!chain.contains(currentGroup))
+                return@run chain
+            }
         }
-    }
-
-    private val filteredGroupChains = groupParentChains
-        .filter { (_, chain) -> chain.none { it.id in excludedGroupIds } }
-
-    private val groupPaths = filteredGroupChains
         .mapValues { (_, chain) ->
             chain
                 //Iterate from root to leaf
@@ -58,19 +53,4 @@ open class GroupPathProvider(
         }
 
     fun getPathForGroup(id: Long): String = groupPaths[id] ?: ""
-
-    val filteredSortedGroups: List<GroupInfo> = filteredGroupChains
-        .mapNotNull { (_, chain) ->
-            val group = chain.first()
-            GroupInfo(
-                group = group,
-                path = groupPaths[group.id] ?: return@mapNotNull null
-            )
-        }
-        .sortedBy { it.path }
-
-    data class GroupInfo(
-        val group: Group,
-        val path: String,
-    )
 }
