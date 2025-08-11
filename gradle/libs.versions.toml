@@ -40,6 +40,7 @@ kotlin = "2.1.10"
 android = "8.8.2"
 ksp = "2.1.10-1.0.30"
 hiltAndroidGradlePlugin = "2.51.1"
+reorderable = "2.5.1"
 
 [plugins]
 org-jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
@@ -105,3 +106,4 @@ threetenabp = { module = "com.jakewharton.threetenabp:threetenabp", version.ref 
 threetenbp = { module = "org.threeten:threetenbp", version.ref = "threetenbp" }
 junit = { module = "junit:junit", version.ref = "junit" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "reorderable" }
