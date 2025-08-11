@@ -154,22 +154,17 @@ fun GroupScreen(
                 groupDialogsViewModel.hideDeleteDialog()
             },
             continueText = R.string.delete,
-            dismissText = R.string.cancel
+            cancelText = R.string.cancel
         )
     }
 
     if (groupDialogsViewModel.showNoTrackersDialog.collectAsStateWithLifecycle().value) {
         ContinueDialog(
+            body = R.string.no_trackers_graph_stats_hint,
             onConfirm = { groupDialogsViewModel.hideNoTrackersDialog() },
             onDismissRequest = { groupDialogsViewModel.hideNoTrackersDialog() },
             continueText = R.string.ok
-        ) {
-            Text(
-                text = stringResource(id = R.string.no_trackers_graph_stats_hint),
-                style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.onSurface
-            )
-        }
+        )
     }
 }
 

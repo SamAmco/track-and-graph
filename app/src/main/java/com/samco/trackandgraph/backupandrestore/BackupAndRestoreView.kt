@@ -167,16 +167,11 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
 
 @Composable
 fun RestoreErrorDialog(error: Int, onDismiss: () -> Unit) = ContinueDialog(
+    body = error,
     continueText = R.string.ok,
     onConfirm = onDismiss,
-    onDismissRequest = onDismiss
-) {
-    Text(
-        text = stringResource(id = error),
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.onSurface
-    )
-}
+    onDismissRequest = onDismiss,
+)
 
 @Composable
 private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
@@ -390,45 +385,30 @@ private fun NotificationPermissionPromptDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) = ContinueDialog(
+    body = R.string.notification_permission_prompt,
     onConfirm = onConfirm,
     onDismissRequest = onDismiss,
     continueText = R.string.ok
-) {
-    Text(
-        text = stringResource(id = R.string.notification_permission_prompt),
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.onSurface
-    )
-}
+)
 
 @Composable
 private fun PreRestoreDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) = ContinueDialog(
+    body = R.string.restore_hint_text,
     onConfirm = onConfirm,
     onDismissRequest = onDismiss
-) {
-    Text(
-        text = stringResource(id = R.string.restore_hint_text),
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.onSurface,
-    )
-}
+)
 
 @Composable
 private fun RestoreCompleteDialog() = ContinueDialog(
+    body = R.string.restore_successful,
     onConfirm = { exitProcess(0) },
     dismissOnClickOutside = false,
     onDismissRequest = { },
     continueText = R.string.ok
-) {
-    Text(
-        text = stringResource(id = R.string.restore_successful),
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.onSurface
-    )
-}
+)
 
 @Composable
 private fun CenterGradientDivider() = BoxWithConstraints(
