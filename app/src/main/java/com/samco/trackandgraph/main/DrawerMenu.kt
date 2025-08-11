@@ -179,7 +179,6 @@ private fun ThemeMenuSpinner(
         strings = themeValues.zip(stringArray).toMap(),
         selectedItem = currentTheme.value,
         textAlign = TextAlign.End,
-        textStyle = MaterialTheme.typography.subtitle1,
         paddingValues = PaddingValues(all = 0.dp),
     ) { onThemeSelected(it) }
 }
@@ -210,7 +209,6 @@ private fun DateFormatSpinner(
         strings = formatNames.indices.zip(formatNames).toMap(),
         selectedItem = currentFormat.value,
         textAlign = TextAlign.End,
-        textStyle = MaterialTheme.typography.subtitle1,
         paddingValues = PaddingValues(all = 0.dp),
     ) { onFormatSelected(it) }
 }

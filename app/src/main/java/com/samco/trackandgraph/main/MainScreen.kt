@@ -313,7 +313,6 @@ private fun AppBarOverflowActions(
                 ) {
                     Text(
                         text = stringResource(action.titleId),
-                        style = MaterialTheme.typography.subtitle1
                     )
                 }
             }

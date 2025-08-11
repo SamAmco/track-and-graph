@@ -126,16 +126,12 @@ fun GraphStatEndingAtSpinner(
                     modifier = modifier.weight(1f),
                     text = text,
                     textAlign = TextAlign.End,
-                    fontSize = MaterialTheme.typography.body1.fontSize,
-                    fontWeight = MaterialTheme.typography.body1.fontWeight,
                 )
             },
             dropdownItemFactory = { item, _ ->
                 Text(
                     text = spinnerItems[item] ?: "",
                     textAlign = TextAlign.End,
-                    fontSize = MaterialTheme.typography.body1.fontSize,
-                    fontWeight = MaterialTheme.typography.body1.fontWeight
                 )
             },
             dropdownContentAlignment = Alignment.End,

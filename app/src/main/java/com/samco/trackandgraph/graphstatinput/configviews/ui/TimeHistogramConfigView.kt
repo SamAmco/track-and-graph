@@ -16,7 +16,6 @@
 */
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
