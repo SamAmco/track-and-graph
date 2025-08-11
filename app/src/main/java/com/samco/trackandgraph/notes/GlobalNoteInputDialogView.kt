@@ -83,9 +83,7 @@ private fun GlobalNoteInputDialog(
     onConfirm: () -> Unit
 ) = CustomContinueCancelDialog(
     onDismissRequest = onDismissRequest,
-    properties = DialogProperties(
-        dismissOnClickOutside = false
-    ),
+    dismissOnClickOutside = false,
     onConfirm = onConfirm,
     continueText = if (updateMode) R.string.update else R.string.add,
     continueEnabled = addButtonEnabled

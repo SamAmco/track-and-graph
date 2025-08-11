@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AlertDialog
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -37,10 +36,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.DialogTheme
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
@@ -50,12 +51,15 @@ fun CustomDialog(
     paddingValues: PaddingValues = PaddingValues(
         dimensionResource(id = R.dimen.card_padding_large)
     ),
-    properties: DialogProperties? = null,
+    dismissOnClickOutside: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
 ) = DialogTheme {
     Dialog(
         onDismissRequest = onDismissRequest,
-        properties = properties ?: DialogProperties(decorFitsSystemWindows = false)
+        properties = DialogProperties(
+            decorFitsSystemWindows = false,
+            dismissOnClickOutside = dismissOnClickOutside,
+        )
     ) {
         Surface(
             modifier = Modifier.imePadding()
@@ -78,15 +82,16 @@ fun CustomContinueCancelDialog(
     onDismissRequest: () -> Unit,
     onConfirm: () -> Unit,
     @StringRes continueText: Int = R.string.continue_word,
-    @StringRes dismissText: Int = R.string.cancel,
+    @StringRes cancelText: Int = R.string.cancel,
     continueEnabled: Boolean = true,
+    cancelVisible: Boolean = true,
     scrollContent: Boolean = true,
-    properties: DialogProperties? = null,
+    dismissOnClickOutside: Boolean = true,
     content: @Composable ColumnScope.() -> Unit
 ) = CustomDialog(
     onDismissRequest = onDismissRequest,
     scrollContent = false,
-    properties = properties,
+    dismissOnClickOutside = dismissOnClickOutside,
     paddingValues = PaddingValues(
         start = dimensionResource(id = R.dimen.card_padding_large),
         end = dimensionResource(id = R.dimen.card_padding_large),
@@ -113,13 +118,15 @@ fun CustomContinueCancelDialog(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            SmallTextButton(
-                stringRes = dismissText,
-                onClick = onDismissRequest,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.tngColors.onSurface
+            if (cancelVisible) {
+                SmallTextButton(
+                    stringRes = cancelText,
+                    onClick = onDismissRequest,
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.tngColors.onSurface
+                    )
                 )
-            )
+            }
             SmallTextButton(
                 stringRes = continueText,
                 onClick = onConfirm,
@@ -131,84 +138,17 @@ fun CustomContinueCancelDialog(
 
 @Composable
 fun ContinueDialog(
+    @StringRes body: Int,
     onConfirm: () -> Unit,
     dismissOnClickOutside: Boolean = true,
     onDismissRequest: () -> Unit,
     @StringRes continueText: Int = R.string.continue_word,
-    content: @Composable ColumnScope.() -> Unit
-) = DialogTheme {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        shape = MaterialTheme.shapes.small,
-        text = {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(state = rememberScrollState()),
-                content = content
-            )
-        },
-        confirmButton = {
-            SmallTextButton(
-                stringRes = continueText,
-                onClick = onConfirm
-            )
-        },
-        properties = DialogProperties(
-            dismissOnClickOutside = dismissOnClickOutside
-        ),
-    )
-}
-
-@Composable
-fun ContinueCancelDialog(
-    onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit,
-    @StringRes continueText: Int = R.string.continue_word,
-    @StringRes dismissText: Int = R.string.cancel,
-    continueEnabled: Boolean = true,
-    content: @Composable ColumnScope.() -> Unit
-) = DialogTheme {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        shape = MaterialTheme.shapes.small,
-        text = {
-            Column(
-                modifier = Modifier
-                    .verticalScroll(state = rememberScrollState()),
-                content = content
-            )
-        },
-        confirmButton = {
-            SmallTextButton(
-                stringRes = continueText,
-                enabled = continueEnabled,
-                onClick = onConfirm
-            )
-        },
-        dismissButton = {
-            SmallTextButton(
-                stringRes = dismissText,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.tngColors.onSurface
-                ),
-                onClick = onDismissRequest
-            )
-        }
-    )
-}
-
-@Composable
-fun ContinueCancelDialog(
-    @StringRes body: Int,
-    onDismissRequest: () -> Unit,
-    onConfirm: () -> Unit,
-    @StringRes continueText: Int = R.string.continue_word,
-    @StringRes dismissText: Int = R.string.cancel
-) = ContinueCancelDialog(
-    onDismissRequest = onDismissRequest,
+) = CustomContinueCancelDialog(
     onConfirm = onConfirm,
+    dismissOnClickOutside = dismissOnClickOutside,
+    onDismissRequest = onDismissRequest,
     continueText = continueText,
-    dismissText = dismissText,
+    cancelVisible = false,
     content = {
         Text(
             text = stringResource(id = body),
@@ -217,3 +157,113 @@ fun ContinueCancelDialog(
         )
     }
 )
+
+@Composable
+fun ContinueCancelDialog(
+    @StringRes body: Int,
+    onDismissRequest: () -> Unit,
+    onConfirm: () -> Unit,
+    @StringRes continueText: Int = R.string.continue_word,
+    @StringRes cancelText: Int = R.string.cancel,
+) = CustomContinueCancelDialog(
+    onDismissRequest = onDismissRequest,
+    onConfirm = onConfirm,
+    continueText = continueText,
+    cancelText = cancelText,
+    content = {
+        Text(
+            text = stringResource(id = body),
+            style = MaterialTheme.typography.subtitle1,
+            color = MaterialTheme.tngColors.onSurface
+        )
+    }
+)
+
+@Preview
+@Composable
+private fun CustomDialogPreview() {
+    TnGComposeTheme {
+        CustomDialog(
+            onDismissRequest = { }
+        ) {
+            Text(
+                text = "This is a custom dialog with scrollable content. " +
+                        "It can contain multiple lines of text and other UI elements.",
+                style = MaterialTheme.typography.body1
+            )
+            DialogInputSpacing()
+            Text(
+                text = "Additional content below spacing",
+                style = MaterialTheme.typography.body2
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CustomContinueCancelDialogPreview() {
+    TnGComposeTheme {
+        CustomContinueCancelDialog(
+            onDismissRequest = { },
+            onConfirm = { }
+        ) {
+            Text(
+                text = "Headline",
+                style = MaterialTheme.typography.h5
+            )
+            DialogInputSpacing()
+            SelectorButton(
+                modifier = Modifier,
+                text = "Selector Text Button",
+                onClick = {}
+            )
+            DialogInputSpacing()
+            Text(
+                text = "This is a continue/cancel dialog. You can confirm or cancel this action.",
+                style = MaterialTheme.typography.body1
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun CustomContinueCancelDialogDisabledPreview() {
+    TnGComposeTheme {
+        CustomContinueCancelDialog(
+            onDismissRequest = { },
+            onConfirm = { },
+            continueEnabled = false
+        ) {
+            Text(
+                text = "This dialog has the continue button disabled.",
+                style = MaterialTheme.typography.body1
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ContinueDialogPreview() {
+    TnGComposeTheme {
+        ContinueDialog(
+            body = R.string.ru_sure_del_graph,
+            onConfirm = { },
+            onDismissRequest = { }
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ContinueCancelDialogPreview() {
+    TnGComposeTheme {
+        ContinueCancelDialog(
+            body = R.string.ru_sure_del_feature,
+            onDismissRequest = { },
+            onConfirm = { }
+        )
+    }
+}

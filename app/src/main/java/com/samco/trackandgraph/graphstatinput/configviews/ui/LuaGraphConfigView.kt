@@ -245,7 +245,7 @@ private fun LuaUserConfirmDeepLinkDialog(
     onDismissRequest = onCancel,
     onConfirm = onConfirm,
     continueText = R.string.yes,
-    dismissText = R.string.cancel,
+    cancelText = R.string.cancel,
 )
 
 @Composable

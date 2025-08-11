@@ -257,9 +257,10 @@ private fun LuaFirstTimeUserDialog(
     onDismiss: () -> Unit,
     onOpenLuaTutorialPath: () -> Unit,
 ) {
-    ContinueDialog(
+    CustomContinueCancelDialog(
         onDismissRequest = onDismiss,
         onConfirm = onDismiss,
+        cancelVisible = false,
         content = {
             Column {
                 Text(

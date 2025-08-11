@@ -36,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
+import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 
@@ -87,11 +88,11 @@ private fun TrackWidgetConfigureDialogContent(
         selectedFeatureId?.let { onFeatureSelected(it) }
     }
 
-    ContinueCancelDialog(
+    CustomContinueCancelDialog(
         onDismissRequest = onDismiss,
         onConfirm = onConfirm,
         continueText = R.string.create,
-        dismissText = R.string.cancel,
+        cancelText = R.string.cancel,
         continueEnabled = selectedFeatureId != null
     ) {
         Column(

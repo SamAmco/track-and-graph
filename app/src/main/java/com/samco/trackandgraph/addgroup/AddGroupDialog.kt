@@ -54,7 +54,7 @@ fun AddGroupDialog(viewModel: AddGroupDialogViewModel, onDismissRequest: () -> U
             onDismissRequest()
         },
         continueText = if (updateMode) R.string.update else R.string.add,
-        dismissText = R.string.cancel,
+        cancelText = R.string.cancel,
         continueEnabled = addEnabled,
     ) {
         AddGroupView(
