@@ -100,7 +100,7 @@ fun Tracker(
     var timerText by remember { mutableStateOf("") }
 
     val noDataText = stringResource(R.string.no_data)
-    var timeSinceLastText by remember {
+    var timeSinceLastText by remember(tracker.timestamp) {
         mutableStateOf(
             tracker.timestamp
                 ?.let { formatRelativeTimeSpan(context, it, Duration.ZERO) }
@@ -133,9 +133,10 @@ fun Tracker(
     }
 
     Card(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(cardMarginSmall),
+            .padding(cardMarginSmall)
+            .clickable { onHistory(tracker) },
         elevation = if (isElevated) cardElevation * 3 else cardElevation,
         shape = MaterialTheme.shapes.small,
     ) {
@@ -148,9 +149,7 @@ fun Tracker(
             }
 
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onHistory(tracker) },
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 TrackerMenuButton(
                     modifier = Modifier.align(Alignment.End),

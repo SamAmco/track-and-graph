@@ -1,7 +1,6 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -9,12 +8,10 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.Card
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -28,7 +25,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.group.GraphStatClickListener
@@ -140,25 +136,25 @@ private fun MenuSection(
         onDismissRequest = { expanded = false }
     ) {
         DropdownMenuItem(onClick = {
-            clickListener.onDelete(graphStat = graphStatViewData)
+            clickListener.onDelete(graphStatViewData)
             expanded = false
         }) {
             Text(stringResource(id = R.string.delete))
         }
         DropdownMenuItem(onClick = {
-            clickListener.onEdit(graphStat = graphStatViewData)
+            clickListener.onEdit(graphStatViewData)
             expanded = false
         }) {
             Text(stringResource(id = R.string.edit))
         }
         DropdownMenuItem(onClick = {
-            clickListener.onMoveGraphStat(graphStat = graphStatViewData)
+            clickListener.onMove(graphStatViewData)
             expanded = false
         }) {
             Text(stringResource(id = R.string.move_to))
         }
         DropdownMenuItem(onClick = {
-            clickListener.onDuplicate(graphStat = graphStatViewData)
+            clickListener.onDuplicate(graphStatViewData)
             expanded = false
         }) {
             Text(stringResource(id = R.string.duplicate))

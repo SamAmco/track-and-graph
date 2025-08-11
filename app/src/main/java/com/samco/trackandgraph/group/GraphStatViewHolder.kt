@@ -62,7 +62,6 @@ class GraphStatViewHolder(
         }
     }
 
-
     override fun elevateCard() {
         isElevated = true
     }
@@ -73,15 +72,9 @@ class GraphStatViewHolder(
 }
 
 class GraphStatClickListener(
-    private val onDelete: (graphStat: IGraphStatViewData) -> Unit,
-    private val onEdit: (graphStat: IGraphStatViewData) -> Unit,
-    private val onClick: (graphStat: IGraphStatViewData) -> Unit,
-    private val onMoveGraphStat: (graphStat: IGraphStatViewData) -> Unit,
-    private val onDuplicateGraphStat: (graphStat: IGraphStatViewData) -> Unit
-) {
-    fun onDelete(graphStat: IGraphStatViewData) = onDelete.invoke(graphStat)
-    fun onEdit(graphStat: IGraphStatViewData) = onEdit.invoke(graphStat)
-    fun onClick(graphStat: IGraphStatViewData) = onClick.invoke(graphStat)
-    fun onMoveGraphStat(graphStat: IGraphStatViewData) = onMoveGraphStat.invoke(graphStat)
-    fun onDuplicate(graphStat: IGraphStatViewData) = onDuplicateGraphStat.invoke(graphStat)
-}
+    val onDelete: (graphStat: IGraphStatViewData) -> Unit,
+    val onEdit: (graphStat: IGraphStatViewData) -> Unit,
+    val onClick: (graphStat: IGraphStatViewData) -> Unit,
+    val onMove: (graphStat: IGraphStatViewData) -> Unit,
+    val onDuplicate: (graphStat: IGraphStatViewData) -> Unit
+)
