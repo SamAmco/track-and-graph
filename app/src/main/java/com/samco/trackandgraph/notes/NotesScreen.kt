@@ -189,7 +189,6 @@ private fun Note(
             }) {
                 Text(
                     text = stringResource(id = R.string.edit),
-                    style = MaterialTheme.typography.body1
                 )
             }
 
@@ -199,7 +198,6 @@ private fun Note(
             }) {
                 Text(
                     text = stringResource(id = R.string.delete),
-                    style = MaterialTheme.typography.body1
                 )
             }
         }
