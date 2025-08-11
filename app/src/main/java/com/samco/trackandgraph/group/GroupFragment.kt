@@ -21,7 +21,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -31,9 +30,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
@@ -46,7 +42,6 @@ import com.samco.trackandgraph.permissions.PermissionRequesterUseCase
 import com.samco.trackandgraph.permissions.PermissionRequesterUseCaseImpl
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
-import com.samco.trackandgraph.util.performTrackVibrate
 import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineDispatcher
@@ -67,21 +62,12 @@ class GroupFragment : Fragment(),
     private var navController: NavController? = null
     private val args: GroupFragmentArgs by navArgs()
 
-    private lateinit var adapter: GroupAdapter
-    private lateinit var recyclerView: RecyclerView
-    private val viewModel by viewModels<GroupViewModel>()
+    private val viewModel: GroupViewModel by viewModels<GroupViewModelImpl>()
     private val appBarViewModel by activityViewModels<AppBarViewModel>()
     private val groupDialogsViewModel by viewModels<GroupDialogsViewModel>()
-    private val moveItemViewModel by viewModels<MoveItemViewModel>()
 
-    private val addDataPointsDialogViewModel by viewModels<AddDataPointsViewModelImpl>()
     private val addGroupDialogViewModel by viewModels<AddGroupDialogViewModelImpl>()
 
-    private var forceNextNotifyDataSetChanged: Boolean = false
-    
-    // State for FAB visibility based on scroll behavior
-    private val showFab = mutableStateOf(true)
-    
     @Inject
     lateinit var tngSettings: TngSettings
 
@@ -101,19 +87,6 @@ class GroupFragment : Fragment(),
         this.navController = container?.findNavController()
         
         viewModel.setGroup(args.groupId)
-        
-        // Create and setup RecyclerView
-        recyclerView = RecyclerView(requireContext())
-        initializeGridLayout()
-        adapter = GroupAdapter(
-            createTrackerClickListener(),
-            createGraphStatClickListener(),
-            createGroupClickListener()
-        )
-        recyclerView.adapter = adapter
-        addItemTouchHelper()
-        scrollToTopOnItemAdded()
-        setupFabScrollListener()
 
         listenToViewModel()
 
@@ -121,16 +94,19 @@ class GroupFragment : Fragment(),
             setContent {
                 CompositionLocalProvider(LocalSettings provides tngSettings) {
                     GroupScreen(
-                        recyclerView = recyclerView,
                         groupViewModel = viewModel,
                         groupDialogsViewModel = groupDialogsViewModel,
-                        moveItemViewModel = moveItemViewModel,
-                        addDataPointsDialogViewModel = addDataPointsDialogViewModel,
                         addGroupDialogViewModel = addGroupDialogViewModel,
                         groupId = args.groupId,
                         groupName = args.groupName,
-                        showFab = showFab.value,
-                        onQueueAddAllClicked = { onQueueAddAllClicked() }
+                        // Navigation callbacks only
+                        onTrackerEdit = this@GroupFragment::onTrackerEditClicked,
+                        onGraphStatEdit = this@GroupFragment::onEditGraphStat,
+                        onGraphStatClick = this@GroupFragment::onGraphStatClicked,
+                        onGroupClick = this@GroupFragment::onGroupSelected,
+                        onTrackerHistory = this@GroupFragment::onTrackerHistoryClicked,
+                        // Permission-related callback
+                        onRequestNotificationPermission = { requestNotificationPermission(requireContext()) },
                     )
                 }
             }
@@ -177,68 +153,8 @@ class GroupFragment : Fragment(),
         }
     }
 
-    private fun addItemTouchHelper() {
-        ItemTouchHelper(
-            DragTouchHelperCallback(
-                { start: Int, end: Int -> adapter.moveItem(start, end) },
-                { viewModel.adjustDisplayIndexes(adapter.getItems()) }
-            )).attachToRecyclerView(recyclerView)
-    }
-
-    private fun scrollToTopOnItemAdded() {
-        adapter.registerAdapterDataObserver(
-            object : RecyclerView.AdapterDataObserver() {
-                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                    super.onItemRangeInserted(positionStart, itemCount)
-                    //Scroll to the top when we've added something new to our group,
-                    // but not when the adapter is being re-populated, e.g. when returning
-                    // to this fragment from a nested group
-                    if (itemCount == 1) recyclerView.smoothScrollToPosition(0)
-                }
-            }
-        )
-    }
-
-    private fun createGroupClickListener() = GroupClickListener(
-        this::onGroupSelected,
-        this::onEditGroupClicked,
-        this::onDeleteGroupClicked,
-        this::onMoveGroupClicked
-    )
-
-    private fun onMoveGroupClicked(group: Group) {
-        moveItemViewModel.showMoveGroupDialog(group)
-    }
-
-    private fun onDeleteGroupClicked(group: Group) {
-        groupDialogsViewModel.showDeleteGroupDialog(group)
-    }
-
-    private fun onEditGroupClicked(group: Group) {
-        addGroupDialogViewModel.show(
-            parentGroupId = group.parentGroupId,
-            groupId = group.id
-        )
-    }
-
     private fun onGroupSelected(group: Group) {
         navigate(GroupFragmentDirections.actionSelectGroup(group.id, group.name))
-    }
-
-    private fun createGraphStatClickListener() = GraphStatClickListener(
-        this::onDeleteGraphStatClicked,
-        this::onEditGraphStat,
-        this::onGraphStatClicked,
-        this::onMoveGraphStatClicked,
-        viewModel::duplicateGraphOrStat
-    )
-
-    private fun onDeleteGraphStatClicked(graphOrStat: IGraphStatViewData) {
-        groupDialogsViewModel.showDeleteGraphStatDialog(graphOrStat)
-    }
-
-    private fun onMoveGraphStatClicked(graphOrStat: IGraphStatViewData) {
-        moveItemViewModel.showMoveGraphDialog(graphOrStat)
     }
 
     private fun onGraphStatClicked(graphOrStat: IGraphStatViewData) {
@@ -254,30 +170,6 @@ class GroupFragment : Fragment(),
         )
     }
 
-    private fun createTrackerClickListener() = TrackerClickListener(
-        onEdit = this::onTrackerEditClicked,
-        onDelete = this::onTrackerDeleteClicked,
-        onMoveTo = this::onTrackerMoveClicked,
-        onDescription = this::onTrackerDescriptionClicked,
-        onAdd = this::onTrackerAddClicked,
-        onHistory = this::onTrackerHistoryClicked,
-        onPlayTimer = this::onTrackerPlayTimerClicked,
-        onStopTimer = this::onStopTimerClicked
-    )
-
-    private fun onTrackerPlayTimerClicked(tracker: DisplayTracker) {
-        viewModel.playTimer(tracker)
-        requestNotificationPermission(requireContext())
-    }
-
-    private fun onStopTimerClicked(tracker: DisplayTracker) {
-        //Due to a bug with the GridLayoutManager when you stop a timer and the timer text disappears
-        // the views heights are not properly re-calculated and we need to call notifyDataSetChanged
-        // to get the view heights right again
-        forceNextNotifyDataSetChanged = true
-        viewModel.stopTimer(tracker)
-    }
-
     private fun onTrackerHistoryClicked(tracker: DisplayTracker) {
         navigate(GroupFragmentDirections.actionFeatureHistory(tracker.featureId, tracker.name))
     }
@@ -289,65 +181,11 @@ class GroupFragment : Fragment(),
         navController?.navigate(direction)
     }
 
-    private fun onTrackerAddClicked(tracker: DisplayTracker, useDefault: Boolean = true) {
-        if (tracker.hasDefaultValue && useDefault) {
-            requireContext().performTrackVibrate()
-            viewModel.addDefaultTrackerValue(tracker)
-        } else addDataPointsDialogViewModel.showAddDataPointDialog(trackerId = tracker.id)
-    }
-
-    private fun onTrackerDescriptionClicked(tracker: DisplayTracker) {
-        groupDialogsViewModel.showFeatureDescriptionDialog(tracker)
-    }
-
-    private fun onTrackerMoveClicked(tracker: DisplayTracker) {
-        moveItemViewModel.showMoveTrackerDialog(tracker)
-    }
-
     private fun onTrackerEditClicked(tracker: DisplayTracker) {
         navigate(GroupFragmentDirections.actionAddTracker(args.groupId, tracker.id))
     }
 
-    private fun onQueueAddAllClicked() {
-        viewModel.trackers.let { trackers ->
-            addDataPointsDialogViewModel.showAddDataPointsDialog(trackerIds = trackers.map { it.id })
-        }
-    }
-
-    private fun initializeGridLayout() {
-        val dm = resources.displayMetrics
-        val screenWidth = dm.widthPixels / dm.density
-        val itemSize = (screenWidth / 2f).coerceAtMost(180f)
-        val spanCount = (screenWidth / itemSize).coerceAtLeast(2f).toInt()
-        val gridLayoutManager = GridLayoutManager(context, spanCount)
-        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-            override fun getSpanSize(position: Int): Int {
-                return when (val spanMode = adapter.getSpanModeForItem(position)) {
-                    SpanMode.FullWidth -> spanCount
-                    is SpanMode.NumSpans -> spanMode.spans
-                    null -> 1
-                }
-            }
-        }
-        recyclerView.layoutManager = gridLayoutManager
-    }
-
     private fun listenToViewModel() {
-        viewModel.allChildren.observe(viewLifecycleOwner) {
-            adapter.submitList(it, forceNextNotifyDataSetChanged)
-            forceNextNotifyDataSetChanged = false
-        }
-
-        viewModel.showDurationInputDialog.observe(viewLifecycleOwner) {
-            if (it == null) return@observe
-
-            addDataPointsDialogViewModel.showAddDataPointDialog(
-                trackerId = it.trackerId,
-                customInitialValue = it.duration.seconds.toDouble()
-            )
-            viewModel.onConsumedShowDurationInputDialog()
-        }
-
         lifecycleScope.launch {
             viewModel.hasAnyReminders.filter { it }.collect {
                 withContext(ui) {
@@ -382,22 +220,5 @@ class GroupFragment : Fragment(),
             parentGroupId = args.groupId,
             groupId = null
         )
-    }
-
-    private fun onTrackerDeleteClicked(tracker: DisplayTracker) {
-        groupDialogsViewModel.showDeleteTrackerDialog(tracker)
-    }
-
-    private fun setupFabScrollListener() {
-        recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                if (dy > 0) {
-                    showFab.value = false
-                } else if (dy < 0) {
-                    showFab.value = true
-                }
-            }
-        })
     }
 }

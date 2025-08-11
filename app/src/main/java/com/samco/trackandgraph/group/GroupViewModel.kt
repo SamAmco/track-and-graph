@@ -19,10 +19,7 @@
 
 package com.samco.trackandgraph.group
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.DataPoint
 import com.samco.trackandgraph.base.database.dto.DisplayTracker
@@ -43,10 +40,13 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
@@ -69,46 +70,71 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import timber.log.Timber
 import javax.inject.Inject
 
+interface GroupViewModel {
+    data class DurationInputDialogData(
+        val trackerId: Long,
+        val duration: Duration
+    )
+
+    val showDurationInputDialog: StateFlow<DurationInputDialogData?>
+    val hasTrackers: StateFlow<Boolean>
+    val currentChildren: StateFlow<List<GroupChild>>
+    val showEmptyGroupText: StateFlow<Boolean>
+    val hasAnyReminders: StateFlow<Boolean>
+    val loading: StateFlow<Boolean>
+    val trackers: List<DisplayTracker>
+
+    fun setGroup(groupId: Long)
+    fun addDefaultTrackerValue(tracker: DisplayTracker)
+    fun onDeleteFeature(id: Long)
+    fun onDeleteGraphStat(id: Long)
+    fun onDeleteGroup(id: Long)
+    fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData)
+    fun onConsumedShowDurationInputDialog()
+    fun stopTimer(tracker: DisplayTracker)
+    fun playTimer(tracker: DisplayTracker)
+
+    fun onDragStart()
+    fun onDragSwap(from: Int, to: Int)
+    fun onDragEnd()
+}
+
 @HiltViewModel
-class GroupViewModel @Inject constructor(
+class GroupViewModelImpl @Inject constructor(
     private val dataInteractor: DataInteractor,
     private val gsiProvider: GraphStatInteractorProvider,
     private val timerServiceInteractor: TimerServiceInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
-) : ViewModel() {
+) : ViewModel(), GroupViewModel {
 
-    data class DurationInputDialogData(
-        val trackerId: Long,
-        val duration: Duration
-    )
-
-    private val _showDurationInputDialog = MutableLiveData<DurationInputDialogData?>()
-    val showDurationInputDialog: LiveData<DurationInputDialogData?> = _showDurationInputDialog
+    private val _showDurationInputDialog = MutableStateFlow<GroupViewModel.DurationInputDialogData?>(null)
+    override val showDurationInputDialog: StateFlow<GroupViewModel.DurationInputDialogData?> = _showDurationInputDialog
 
     private val hasTrackersFlow = dataInteractor.hasAtLeastOneTracker()
 
-    val hasTrackers: StateFlow<Boolean> = hasTrackersFlow
-        .stateIn(viewModelScope, started = SharingStarted.Lazily, initialValue = false)
+    override val hasTrackers: StateFlow<Boolean> = hasTrackersFlow
+        .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = false)
 
-    private val groupId = MutableSharedFlow<Long>(1, 1)
+    private val groupId = MutableStateFlow<Long?>(null)
 
     private sealed class UpdateType {
-        object Trackers : UpdateType()
-        object Groups : UpdateType()
-        object AllGraphs : UpdateType()
-        object GraphDeleted : UpdateType()
+        data object Trackers : UpdateType()
+        data object Groups : UpdateType()
+        data object AllGraphs : UpdateType()
+        data object GraphDeleted : UpdateType()
         data class GraphsForFeature(val featureId: Long) : UpdateType()
         data class Graph(val graphId: Long) : UpdateType()
-        object All : UpdateType()
-        object DisplayIndices : UpdateType()
-        object Preen : UpdateType()
+        data object All : UpdateType()
+        data object DisplayIndices : UpdateType()
+        data object Preen : UpdateType()
     }
 
     /**
@@ -174,7 +200,7 @@ class GroupViewModel @Inject constructor(
 
     private val onUpdateChildrenForGroup =
         combine(
-            groupId.distinctUntilChanged(),
+            groupId.filterNotNull(),
             dataInteractor.getDataUpdateEvents()
                 .map { asUpdateType(it) }
                 .filterNotNull()
@@ -243,13 +269,12 @@ class GroupViewModel @Inject constructor(
             val eventType = event.second
             val groupId = event.first
 
-            if (lastGraphList.isEmpty() || eventType !is UpdateType.GraphsForFeature) {
-                Pair(eventType, getGraphObjects(groupId))
-            }
             //Don't need to get the graphs from the database again if the update type is
             //GraphsForFeature as this simply means a feature was updated and we need to
             //recalculate the inner graph data
-            else Pair(eventType, lastGraphList)
+            if (lastGraphList.isEmpty() || eventType !is UpdateType.GraphsForFeature) {
+                Pair(eventType, getGraphObjects(groupId))
+            } else Pair(eventType, lastGraphList)
         }
         //Get the graph view data for the graphs
         .flatMapLatestScan(emptyList<GraphWithViewData>()) { viewData, graphUpdate ->
@@ -311,16 +336,21 @@ class GroupViewModel @Inject constructor(
     ): Flow<List<GraphWithViewData>> {
         val oldGraphsById = viewData.associateBy { it.graph.id }
 
+        // Ideally we just get the view data for all the graphs and map them to the
+        // new GraphOrStat objects.
         val dontUpdate = newGraphStats
             .map { Pair(it, oldGraphsById[it.id]?.viewData) }
             .filter { it.second?.viewData?.state == IGraphStatViewData.State.READY }
             .mapNotNull { pair -> pair.second?.let { GraphWithViewData(pair.first, it) } }
 
+        // But any graphs that had not finished loading we have lost the opportunity to
+        // get their view data
         val update = newGraphStats
             .map { Pair(it, oldGraphsById[it.id]?.viewData) }
             .filter { it.second?.viewData?.state != IGraphStatViewData.State.READY }
             .map { it.first }
 
+        // So we ensure we get the view data for any graphs that have not finished loading
         return getGraphViewData(update).map { dontUpdate + it }
     }
 
@@ -383,8 +413,10 @@ class GroupViewModel @Inject constructor(
         .map { getGroupChildren(it.first) }
         .flowOn(io)
 
-    private val allChildrenFlow: StateFlow<List<GroupChild>> =
-        combine(graphChildren, trackersChildren, groupChildren) { a, b, c -> Triple(a, b, c) }
+    private val allChildren: StateFlow<List<GroupChild>> =
+        combine(
+            graphChildren, trackersChildren, groupChildren
+        ) { a, b, c -> Triple(a, b, c) }
             //This debounce should be longer than the children debounce
             .debounce(50L)
             .map { (graphs, trackers, groups) ->
@@ -397,11 +429,19 @@ class GroupViewModel @Inject constructor(
                 children
             }
             .flowOn(io)
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+            .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-    val allChildren = allChildrenFlow.asLiveData(viewModelScope.coroutineContext)
+    private val isDragging = MutableStateFlow(false)
+    private val temporaryDragDropChildren = MutableStateFlow<List<GroupChild>>(emptyList())
 
-    val showEmptyGroupText: StateFlow<Boolean> = allChildrenFlow
+    override val currentChildren: StateFlow<List<GroupChild>> = isDragging
+        // We use a temporary copy of the current children for faster
+        // responsive mutations while dragging, so we don't have to wait
+        // for the database updates from a background thread
+        .flatMapLatest { if (it) temporaryDragDropChildren else allChildren }
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    override val showEmptyGroupText: StateFlow<Boolean> = currentChildren
         .map {
             if (!inRootGroup()) return@map false
             return@map listOf(
@@ -413,29 +453,28 @@ class GroupViewModel @Inject constructor(
         .flowOn(io)
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    val hasAnyReminders: StateFlow<Boolean> = flow {
+    override val hasAnyReminders: StateFlow<Boolean> = flow {
         emit(dataInteractor.hasAnyReminders())
     }
         .flowOn(io)
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
-    val loading = combine(
+    override val loading = combine(
         showEmptyGroupText,
-        allChildrenFlow
+        currentChildren
     ) { showEmptyGroupText, allChildren ->
         inRootGroup() && allChildren.isEmpty() && !showEmptyGroupText
     }.stateIn(viewModelScope, SharingStarted.Lazily, true)
 
     private suspend fun inRootGroup() = groupId.first() == 0L
 
-    val trackers
-        get() = allChildren.value
-            ?.filterIsInstance<GroupChild.ChildTracker>()
-            ?.map { it.displayTracker }
-            ?: emptyList()
+    override val trackers
+        get() = currentChildren.value
+            .filterIsInstance<GroupChild.ChildTracker>()
+            .map { it.displayTracker }
 
-    fun setGroup(groupId: Long) {
-        viewModelScope.launch { this@GroupViewModel.groupId.emit(groupId) }
+    override fun setGroup(groupId: Long) {
+        viewModelScope.launch { this@GroupViewModelImpl.groupId.emit(groupId) }
     }
 
     private fun sortChildren(children: MutableList<GroupChild>) = children.sortWith { a, b ->
@@ -468,59 +507,112 @@ class GroupViewModel @Inject constructor(
         }
     }
 
-    fun addDefaultTrackerValue(tracker: DisplayTracker) = viewModelScope.launch(io) {
-        val newDataPoint = DataPoint(
-            timestamp = OffsetDateTime.now(),
-            featureId = tracker.featureId,
-            value = tracker.defaultValue,
-            label = tracker.defaultLabel,
-            note = ""
-        )
-        dataInteractor.insertDataPoint(newDataPoint)
-    }
-
-    fun onDeleteFeature(id: Long) = viewModelScope.launch(io) {
-        dataInteractor.deleteFeature(id)
-        timerServiceInteractor.requestWidgetsDisabledForFeatureId(id)
-    }
-
-    fun adjustDisplayIndexes(items: List<GroupChild>) = viewModelScope.launch(io) {
-        groupId.take(1).collect {
-            dataInteractor.updateGroupChildOrder(it, items.map(GroupChild::toDto))
+    override fun addDefaultTrackerValue(tracker: DisplayTracker) {
+        viewModelScope.launch(io) {
+            val newDataPoint = DataPoint(
+                timestamp = OffsetDateTime.now(),
+                featureId = tracker.featureId,
+                value = tracker.defaultValue,
+                label = tracker.defaultLabel,
+                note = ""
+            )
+            dataInteractor.insertDataPoint(newDataPoint)
         }
     }
 
-    fun onDeleteGraphStat(id: Long) =
-        viewModelScope.launch(io) { dataInteractor.deleteGraphOrStat(id) }
-
-    fun onDeleteGroup(id: Long) = viewModelScope.launch(io) {
-        val deletedFeatureIds = dataInteractor.deleteGroup(id).deletedFeatureIds
-        deletedFeatureIds.forEach { timerServiceInteractor.requestWidgetsDisabledForFeatureId(it) }
+    override fun onDeleteFeature(id: Long) {
+        viewModelScope.launch(io) {
+            dataInteractor.deleteFeature(id)
+            timerServiceInteractor.requestWidgetsDisabledForFeatureId(id)
+        }
     }
 
-    fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
+    override fun onDeleteGraphStat(id: Long) {
+        viewModelScope.launch(io) {
+            dataInteractor.deleteGraphOrStat(id)
+        }
+    }
+
+    override fun onDeleteGroup(id: Long) {
+        viewModelScope.launch(io) {
+            val deletedFeatureIds = dataInteractor.deleteGroup(id).deletedFeatureIds
+            deletedFeatureIds.forEach { timerServiceInteractor.requestWidgetsDisabledForFeatureId(it) }
+        }
+    }
+
+    override fun duplicateGraphOrStat(graphOrStatViewData: IGraphStatViewData) {
         viewModelScope.launch(io) {
             val gs = graphOrStatViewData.graphOrStat
             gsiProvider.getDataSourceAdapter(gs.type).duplicateGraphOrStat(gs)
         }
     }
 
-    fun onConsumedShowDurationInputDialog() {
+    override fun onConsumedShowDurationInputDialog() {
         _showDurationInputDialog.value = null
     }
 
-    fun stopTimer(tracker: DisplayTracker) = viewModelScope.launch(io) {
-        dataInteractor.stopTimerForTracker(tracker.id)?.let {
-            withContext(ui) {
-                _showDurationInputDialog.value = DurationInputDialogData(tracker.id, it)
+    override fun stopTimer(tracker: DisplayTracker) {
+        viewModelScope.launch(io) {
+            dataInteractor.stopTimerForTracker(tracker.id)?.let {
+                withContext(ui) {
+                    _showDurationInputDialog.value = GroupViewModel.DurationInputDialogData(tracker.id, it)
+                }
             }
+            timerServiceInteractor.requestWidgetUpdatesForFeatureId(tracker.featureId)
         }
-        timerServiceInteractor.requestWidgetUpdatesForFeatureId(tracker.featureId)
     }
 
-    fun playTimer(tracker: DisplayTracker) = viewModelScope.launch(io) {
-        dataInteractor.playTimerForTracker(tracker.id)
-        timerServiceInteractor.startTimerNotificationService()
-        timerServiceInteractor.requestWidgetUpdatesForFeatureId(tracker.featureId)
+    override fun playTimer(tracker: DisplayTracker) {
+        viewModelScope.launch(io) {
+            dataInteractor.playTimerForTracker(tracker.id)
+            timerServiceInteractor.startTimerNotificationService()
+            timerServiceInteractor.requestWidgetUpdatesForFeatureId(tracker.featureId)
+        }
+    }
+
+    override fun onDragStart() {
+        if (isDragging.value) return
+        // Create a temporary copy of the current children for faster
+        // responsive mutations while dragging
+        temporaryDragDropChildren.value = currentChildren.value.toMutableList()
+        isDragging.value = true
+    }
+
+    override fun onDragSwap(from: Int, to: Int) {
+        // Swap the temporary children in place synchronously
+        temporaryDragDropChildren.value = temporaryDragDropChildren.value.toMutableList()
+            .apply { add(to, removeAt(from)) }
+    }
+
+    override fun onDragEnd() {
+        if (!isDragging.value) return
+
+        viewModelScope.launch {
+            dataInteractor.updateGroupChildOrder(
+                groupId.value ?: return@launch,
+                temporaryDragDropChildren.value.map(GroupChild::toDto)
+            )
+
+            val expectedOrder = temporaryDragDropChildren.value
+                .map { Pair(it.id, it.type) }
+
+            // Wait until all children have been updated in the database
+            // before switching back to the real children or the UI could
+            // glitch swapping back and forth.
+            try {
+                withTimeout(500) {
+                    allChildren.first { allChildren ->
+                        val actualOrder = allChildren.map { Pair(it.id, it.type) }
+                        actualOrder == expectedOrder
+                    }
+                }
+            } catch (e: TimeoutCancellationException) {
+                Timber.e("The database did not update the group child indexes within 500ms. Drag and drop update may have failed.")
+            }
+
+            // Switch back to showing the real children from the database
+            isDragging.value = false
+            temporaryDragDropChildren.value = emptyList()
+        }
     }
 }
