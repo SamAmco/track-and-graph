@@ -17,27 +17,22 @@
 
 package com.samco.trackandgraph.reminders
 
-import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.zIndex
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.EmptyPageHintText
@@ -45,6 +40,8 @@ import com.samco.trackandgraph.ui.compose.ui.LoadingOverlay
 import com.samco.trackandgraph.ui.compose.ui.WideButton
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingXLarge
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 @Composable
 fun RemindersScreen(
@@ -56,7 +53,10 @@ fun RemindersScreen(
     onMoveReminder: (Int, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dragAndDropListState = rememberDragAndDropListState(onMove = onMoveReminder)
+    val lazyListState = rememberLazyListState()
+    val reorderableLazyListState = rememberReorderableLazyListState(lazyListState) { from, to ->
+        onMoveReminder(from.index, to.index)
+    }
 
     Box(
         modifier = modifier
@@ -74,61 +74,26 @@ fun RemindersScreen(
         } else {
             // Reminders list with drag-and-drop
             LazyColumn(
-                state = dragAndDropListState.lazyListState,
+                state = lazyListState,
                 contentPadding = PaddingValues(bottom = 80.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(Unit) {
-                        detectDragGesturesAfterLongPress(
-                            onDragStart = { offset ->
-                                dragAndDropListState.onDragStart(offset)
-                            },
-                            onDrag = { change, offset ->
-                                change.consume()
-                                dragAndDropListState.onDrag(offset)
-                            },
-                            onDragEnd = {
-                                dragAndDropListState.onDragInterrupted()
-                            },
-                            onDragCancel = {
-                                dragAndDropListState.onDragInterrupted()
-                            }
-                        )
-                    }
+                modifier = Modifier.fillMaxSize()
             ) {
                 items(
                     items = reminders,
                     key = { it.id }
                 ) { reminder ->
-                    val isDragged = dragAndDropListState.draggedItemId == reminder.id
-
-                    Reminder(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .animateItem()
-                            // Hide original when dragged
-                            .alpha(if (isDragged) 0f else 1f),
-                        isElevated = isDragged,
-                        reminderViewData = reminder,
-                        onDeleteClick = { onDeleteReminder(reminder) }
-                    )
+                    ReorderableItem(reorderableLazyListState, key = reminder.id) { isDragging ->
+                        Reminder(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateItem()
+                                .longPressDraggableHandle(),
+                            isElevated = isDragging,
+                            reminderViewData = reminder,
+                            onDeleteClick = { onDeleteReminder(reminder) }
+                        )
+                    }
                 }
-            }
-        }
-
-        // Render dragged item globally positioned
-        dragAndDropListState.draggedItemId?.let { draggedId ->
-            val draggedReminder = reminders.find { it.id == draggedId }
-            if (draggedReminder != null) {
-                Reminder(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .absoluteOffset { IntOffset(x = 0, y = dragAndDropListState.draggedItemOffset) }
-                        .zIndex(10f),
-                    isElevated = true,
-                    reminderViewData = draggedReminder,
-                    onDeleteClick = { onDeleteReminder(draggedReminder) }
-                )
             }
         }
 

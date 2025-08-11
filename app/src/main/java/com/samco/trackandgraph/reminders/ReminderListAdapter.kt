@@ -18,16 +18,14 @@
 package com.samco.trackandgraph.reminders
 
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.runtime.*
-import androidx.compose.ui.platform.LocalContext
-import com.samco.trackandgraph.base.database.dto.CheckedDays.Companion.withSet
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.showTimePickerDialog
-import org.threeten.bp.LocalTime
 
 internal class ReminderListAdapter(
     private val onDeleteReminder: (ReminderViewData) -> Unit

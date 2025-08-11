@@ -154,6 +154,9 @@ dependencies {
     implementation libs.compose.theme.adapter
     implementation libs.accompanist.pager
 
+    // Reorderable drag and drop
+    implementation libs.reorderable
+
     // Android KTX
     implementation libs.androidx.lifecycle.viewmodel.ktx
     implementation libs.androidx.lifecycle.livedata.ktx
