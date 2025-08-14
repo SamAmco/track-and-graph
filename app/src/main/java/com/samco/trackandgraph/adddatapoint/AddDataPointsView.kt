@@ -23,7 +23,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -34,7 +34,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -91,7 +90,7 @@ private fun AddDataPointsView(
         modifier = modifier
             .heightIn(max = 400.dp)
             .background(color = MaterialTheme.tngColors.surface)
-            .padding(dimensionResource(id = R.dimen.card_padding))
+            .padding(cardPadding)
     ) {
         val showTutorial by viewModel.showTutorial.observeAsState(false)
         if (showTutorial) AddDataPointsTutorial(viewModel.tutorialViewModel)
@@ -266,7 +265,7 @@ private fun TrackerPage(
                 ValueInputTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                        .padding(horizontal = inputSpacingLarge),
                     textFieldValue = viewModel.value,
                     onValueChange = viewModel::setValueText,
                     focusManager = focusManager,
@@ -282,7 +281,7 @@ private fun TrackerPage(
                 DurationInput(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                        .padding(horizontal = inputSpacingLarge),
                     viewModel = viewModel,
                     focusManager = focusManager,
                     nextFocusDirection = FocusDirection.Down,
@@ -340,7 +339,7 @@ private fun LabelAndNoteInputs(
             modifier = Modifier
                 .fillMaxWidth()
                 .bringIntoViewRequester(bringIntoViewRequester)
-                .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large))
+                .padding(horizontal = inputSpacingLarge)
                 .onFocusEvent { state ->
                     if (state.isFocused) {
                         coroutineScope.launch { bringIntoViewRequester.bringIntoView() }
@@ -362,7 +361,7 @@ private fun LabelAndNoteInputs(
         FullWidthTextField(
             modifier = Modifier
                 .heightIn(max = 200.dp)
-                .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large))
+                .padding(horizontal = inputSpacingLarge)
                 .onGloballyPositioned {
                     if (noteBoxHeight != it.size.height) noteBoxHeight = it.size.height
                 },
@@ -379,7 +378,7 @@ private fun LabelAndNoteInputs(
     FlowRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+            .padding(horizontal = inputSpacingLarge),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         if (!labelAdded) {
@@ -412,15 +411,15 @@ private fun HintHeader(viewModel: AddDataPointsViewModel) =
         Text(
             modifier = Modifier.weight(1f),
             text = viewModel.indexText.observeAsState("").value,
-            fontSize = MaterialTheme.typography.body1.fontSize,
-            fontWeight = MaterialTheme.typography.body1.fontWeight,
+            fontSize = MaterialTheme.typography.bodyLarge.fontSize,
+            fontWeight = MaterialTheme.typography.bodyLarge.fontWeight,
         )
         //Faq vecotor icon as a button
         IconButton(onClick = { viewModel.onTutorialButtonPressed() }) {
             Icon(
                 painter = painterResource(id = R.drawable.faq_icon),
                 contentDescription = stringResource(id = R.string.help),
-                tint = MaterialTheme.colors.onSurface
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -435,7 +434,7 @@ private fun SuggestedValues(
     val focusManager = LocalFocusManager.current
     FadingLazyRow(
         horizontalArrangement = Arrangement.spacedBy(
-            dimensionResource(id = R.dimen.dialog_input_spacing),
+            dialogInputSpacing,
             Alignment.CenterHorizontally
         )
     ) {

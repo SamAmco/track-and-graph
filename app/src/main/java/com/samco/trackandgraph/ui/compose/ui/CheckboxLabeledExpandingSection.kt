@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Checkbox
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -17,10 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
-import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
@@ -39,7 +36,7 @@ fun CheckboxLabeledExpandingSection(
             BorderStroke(1.dp, MaterialTheme.tngColors.onSurface),
             shape = MaterialTheme.shapes.small
         )
-        .padding(dimensionResource(id = R.dimen.card_margin_small))
+        .padding(cardMarginSmall)
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,

@@ -28,13 +28,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.window.Dialog
@@ -49,7 +48,7 @@ fun CustomDialog(
     onDismissRequest: () -> Unit,
     scrollContent: Boolean = true,
     paddingValues: PaddingValues = PaddingValues(
-        dimensionResource(id = R.dimen.card_padding_large)
+        inputSpacingLarge
     ),
     dismissOnClickOutside: Boolean = true,
     content: @Composable ColumnScope.() -> Unit,
@@ -62,7 +61,8 @@ fun CustomDialog(
         )
     ) {
         Surface(
-            modifier = Modifier.imePadding()
+            modifier = Modifier.imePadding(),
+            shape = MaterialTheme.shapes.large,
         ) {
             Column(
                 modifier = Modifier
@@ -93,10 +93,10 @@ fun CustomContinueCancelDialog(
     scrollContent = false,
     dismissOnClickOutside = dismissOnClickOutside,
     paddingValues = PaddingValues(
-        start = dimensionResource(id = R.dimen.card_padding_large),
-        end = dimensionResource(id = R.dimen.card_padding_large),
-        bottom = dimensionResource(id = R.dimen.card_padding),
-        top = dimensionResource(id = R.dimen.card_padding_large),
+        start = inputSpacingLarge,
+        end = inputSpacingLarge,
+        bottom = halfDialogInputSpacing,
+        top = inputSpacingLarge,
     )
 ) {
     Column(
@@ -152,7 +152,7 @@ fun ContinueDialog(
     content = {
         Text(
             text = stringResource(id = body),
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.tngColors.onSurface
         )
     }
@@ -173,7 +173,7 @@ fun ContinueCancelDialog(
     content = {
         Text(
             text = stringResource(id = body),
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.tngColors.onSurface
         )
     }
@@ -189,12 +189,12 @@ private fun CustomDialogPreview() {
             Text(
                 text = "This is a custom dialog with scrollable content. " +
                         "It can contain multiple lines of text and other UI elements.",
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge
             )
             DialogInputSpacing()
             Text(
                 text = "Additional content below spacing",
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -210,7 +210,7 @@ private fun CustomContinueCancelDialogPreview() {
         ) {
             Text(
                 text = "Headline",
-                style = MaterialTheme.typography.h5
+                style = MaterialTheme.typography.titleMedium
             )
             DialogInputSpacing()
             SelectorButton(
@@ -221,7 +221,7 @@ private fun CustomContinueCancelDialogPreview() {
             DialogInputSpacing()
             Text(
                 text = "This is a continue/cancel dialog. You can confirm or cancel this action.",
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }
@@ -238,7 +238,7 @@ private fun CustomContinueCancelDialogDisabledPreview() {
         ) {
             Text(
                 text = "This dialog has the continue button disabled.",
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }

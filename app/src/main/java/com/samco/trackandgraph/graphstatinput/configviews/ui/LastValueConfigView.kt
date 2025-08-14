@@ -18,15 +18,13 @@ package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
@@ -38,6 +36,7 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinn
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun LastValueConfigView(
@@ -65,9 +64,9 @@ fun LastValueConfigView(
     InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
+        modifier = Modifier.padding(horizontal = cardPadding),
         text = stringResource(id = R.string.select_a_feature),
-        style = MaterialTheme.typography.subtitle2
+        style = MaterialTheme.typography.titleSmall
     )
 
     val featureId = viewModel.featureId

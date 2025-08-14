@@ -18,14 +18,13 @@ package com.samco.trackandgraph.featurehistory
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -53,7 +52,7 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
         EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
     } else {
         DateScrollLazyColumn(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.card_margin_small)),
+            modifier = Modifier.padding(cardMarginSmall),
             data = dateScrollData
         ) {
             DataPoint(
@@ -64,7 +63,7 @@ fun FeatureHistoryView(viewModel: FeatureHistoryViewModel) {
                 isDuration = isDuration,
                 tracker = tracker
             )
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.card_margin_small)))
+            Spacer(modifier = Modifier.height(cardMarginSmall))
         }
     }
 
@@ -138,15 +137,15 @@ private fun UpdateDialog(
 
     Text(
         stringResource(R.string.update_all_data_points),
-        fontSize = MaterialTheme.typography.h4.fontSize,
-        fontWeight = MaterialTheme.typography.h4.fontWeight,
+        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+        fontWeight = MaterialTheme.typography.titleLarge.fontWeight,
     )
     InputSpacingLarge()
 
     Text(
         stringResource(R.string.where_colon),
-        fontSize = MaterialTheme.typography.subtitle1.fontSize,
-        fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
     )
     DialogInputSpacing()
     WhereValueInput(viewModel)
@@ -157,8 +156,8 @@ private fun UpdateDialog(
 
     Text(
         stringResource(R.string.to_colon),
-        fontSize = MaterialTheme.typography.subtitle1.fontSize,
-        fontWeight = MaterialTheme.typography.subtitle1.fontWeight,
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        fontWeight = MaterialTheme.typography.titleMedium.fontWeight,
     )
 
     DialogInputSpacing()
@@ -269,12 +268,12 @@ private fun DataPoint(
 ) = Card(
     modifier = Modifier
         .clickable { viewModel.onDataPointClicked(dataPoint) },
-    elevation = dimensionResource(id = R.dimen.card_elevation)
+    elevation = CardDefaults.cardElevation(defaultElevation = cardMarginSmall)
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .padding(dimensionResource(id = R.dimen.card_margin_small))
+            .padding(cardMarginSmall)
     ) {
         Text(
             text = formatDayMonthYearHourMinuteWeekDayTwoLines(
@@ -283,7 +282,7 @@ private fun DataPoint(
                 dataPoint.date
             ),
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
         )
         DialogInputSpacing()
         DataPointValueAndDescription(

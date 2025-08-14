@@ -1,5 +1,19 @@
-@file:OptIn(ExperimentalMaterialApi::class, ExperimentalMaterialApi::class)
-
+/*
+ *  This file is part of Track & Graph
+ *
+ *  Track & Graph is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Track & Graph is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -10,11 +24,11 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.TextFieldColors
-import androidx.compose.material.TextFieldDefaults
-import androidx.compose.material.TextFieldDefaults.indicatorLine
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TextFieldDefaults.indicatorLine
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,6 +51,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MiniNumericTextField(
     modifier: Modifier = Modifier,
@@ -49,7 +64,7 @@ fun MiniNumericTextField(
     focusRequester: FocusRequester? = null,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     focusUpdateScope: CoroutineScope = rememberCoroutineScope(),
-    colors: TextFieldColors = TextFieldDefaults.textFieldColors(),
+    colors: TextFieldColors = TextFieldDefaults.colors(),
     enabled: Boolean = true
 ) {
     BasicTextField(
@@ -57,7 +72,7 @@ fun MiniNumericTextField(
         onValueChange = {
             if (charLimit == null || it.text.length <= charLimit) onValueChange(it)
         },
-        textStyle = MaterialTheme.typography.h5.copy(
+        textStyle = MaterialTheme.typography.titleMedium.copy(
             textAlign = textAlign,
             color = MaterialTheme.tngColors.onSurface
         ),
@@ -73,7 +88,7 @@ fun MiniNumericTextField(
             if (textFieldValue.text == "" && !isFocused) {
                 Text(
                     "0",
-                    style = MaterialTheme.typography.h5,
+                    style = MaterialTheme.typography.titleMedium,
                     textAlign = textAlign,
                     color = MaterialTheme.tngColors.onSurface.copy(
                         alpha = MaterialTheme.tngColors.disabledAlpha

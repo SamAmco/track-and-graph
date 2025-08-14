@@ -28,9 +28,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
@@ -70,6 +71,7 @@ fun LuaScriptEditDialog(
                 .fillMaxSize()
                 .padding(dialogInputSpacing)
                 .imePadding(),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = MaterialTheme.shapes.medium,
         ) {
             CodeEditor(
@@ -160,7 +162,7 @@ private fun CodeEditor(
             textStyle = MaterialTheme.tngTypography.code.copy(
                 color = MaterialTheme.tngColors.onSurface,
             ),
-            cursorBrush = SolidColor(MaterialTheme.colors.onSurface),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
         )
     }
 }

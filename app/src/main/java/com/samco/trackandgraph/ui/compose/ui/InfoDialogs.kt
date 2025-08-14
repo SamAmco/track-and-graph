@@ -17,8 +17,8 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,18 +40,18 @@ fun DataPointInfoDialog(
 ) = CustomDialog(onDismissRequest) {
     DayMonthYearHourMinuteWeekDayOneLineText(
         dateTime = dataPoint.timestamp,
-        style = MaterialTheme.typography.h5,
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold
     )
     DialogInputSpacing()
     Text(
         text = dataPoint.getDisplayValue(isDuration),
-        style = MaterialTheme.typography.body1,
+        style = MaterialTheme.typography.bodyLarge,
         fontWeight = FontWeight.Bold
     )
     Text(
         text = dataPoint.note,
-        style = MaterialTheme.typography.body1
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 
@@ -64,8 +64,8 @@ fun DataPointValueAndDescription(
 ) = Column(modifier = modifier) {
     Text(
         text = dataPoint.getDisplayValue(isDuration),
-        fontSize = MaterialTheme.typography.subtitle2.fontSize,
-        fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
+        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+        fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
     )
     if (dataPoint.note.isNotEmpty()) {
         DialogInputSpacing()
@@ -74,12 +74,12 @@ fun DataPointValueAndDescription(
                 text = dataPoint.note,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
         } else {
             Text(
                 text = dataPoint.note,
-                style = MaterialTheme.typography.body2
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }
@@ -93,13 +93,13 @@ fun FeatureInfoDialog(
 ) = CustomDialog(onDismissRequest) {
     Text(
         text = featureName,
-        style = MaterialTheme.typography.h5,
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold
     )
     DialogInputSpacing()
     Text(
         text = featureDescription.ifEmpty { stringResource(R.string.no_description) },
-        style = MaterialTheme.typography.body1
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 
@@ -112,7 +112,7 @@ fun GlobalNoteDescriptionDialog(
     // Header with timestamp
     DayMonthYearHourMinuteWeekDayOneLineText(
         dateTime = timestamp,
-        style = MaterialTheme.typography.h5,
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold
     )
 
@@ -121,7 +121,7 @@ fun GlobalNoteDescriptionDialog(
     // Note text (scrollable body)
     Text(
         text = note,
-        style = MaterialTheme.typography.body1
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 
@@ -136,7 +136,7 @@ fun DataPointNoteDescriptionDialog(
     // Header with timestamp
     DayMonthYearHourMinuteWeekDayOneLineText(
         dateTime = timestamp,
-        style = MaterialTheme.typography.h5,
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold
     )
 
@@ -145,7 +145,7 @@ fun DataPointNoteDescriptionDialog(
     // Feature display name
     Text(
         text = featureDisplayName,
-        style = MaterialTheme.typography.body1,
+        style = MaterialTheme.typography.bodyLarge,
         fontStyle = FontStyle.Italic,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis
@@ -156,7 +156,7 @@ fun DataPointNoteDescriptionDialog(
         HalfDialogInputSpacing()
         Text(
             text = displayValue,
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
@@ -168,7 +168,7 @@ fun DataPointNoteDescriptionDialog(
     // Note text (scrollable body)
     Text(
         text = note,
-        style = MaterialTheme.typography.body1
+        style = MaterialTheme.typography.bodyLarge
     )
 }
 

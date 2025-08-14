@@ -33,13 +33,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -54,7 +55,6 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -78,10 +78,11 @@ import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.compose.ui.IconTextButton
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
-import com.samco.trackandgraph.ui.compose.ui.SlimOutlinedTextField
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TextSubtitle2
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
+import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.samco.trackandgraph.R as AppR
@@ -306,12 +307,12 @@ private fun LuaGraphFeatureInputView(
     onChangeSelectedFeatureId: (Long) -> Unit,
 ) = Card {
     Column(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+        modifier = Modifier.padding(cardPadding),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             FullWidthTextField(
                 modifier = Modifier
-                    .padding(start = dimensionResource(id = R.dimen.card_padding))
+                    .padding(start = cardPadding)
                     .weight(1f),
                 textFieldValue = nameTextField,
                 onValueChange = onUpdateName,
@@ -331,7 +332,7 @@ private fun LuaGraphFeatureInputView(
         TextMapSpinner(
             strings = features,
             selectedItem = lgf.featureId,
-            paddingValues = PaddingValues(start = dimensionResource(id = AppR.dimen.card_padding) + 4.dp),
+            paddingValues = PaddingValues(start = cardPadding + 4.dp),
             onItemSelected = onChangeSelectedFeatureId
         )
     }
@@ -355,20 +356,22 @@ private fun ScriptTextInputPreview(
         }
     }
 
-    val surfaceColor = MaterialTheme.colors.surface
+    val surfaceColor = MaterialTheme.colorScheme.surface
 
     val localFocusManager = LocalFocusManager.current
 
-    SlimOutlinedTextField(
+    OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
+            .slimOutlinedTextField()
             .drawWithContent {
                 drawContent()
                 drawRect(color = surfaceColor.copy(alpha = 0.3f))
             },
         interactionSource = interactionSource,
-        colors = TextFieldDefaults.outlinedTextFieldColors(
-            backgroundColor = MaterialTheme.colors.surface
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.surface,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surface
         ),
         value = scriptPreviewText,
         onValueChange = {
@@ -378,7 +381,7 @@ private fun ScriptTextInputPreview(
         placeholder = {
             Text(
                 text = stringResource(R.string.lua_script_input_hint),
-                style = MaterialTheme.typography.body1,
+                style = MaterialTheme.typography.bodyLarge,
             )
         },
         visualTransformation = luaCodeVisualTransformation(),
@@ -396,8 +399,8 @@ private fun ScriptTextInputPreview(
                 .align(Alignment.BottomStart)
                 .padding(start = 12.dp, bottom = 12.dp),
             text = "...",
-            style = MaterialTheme.typography.h5,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.4f)
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
         )
     }
 }
@@ -480,4 +483,3 @@ fun PreviewLuaGraphConfigView() = TnGComposeTheme {
         )
     }
 }
-

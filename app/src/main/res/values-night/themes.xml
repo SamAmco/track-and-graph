@@ -28,11 +28,9 @@
         <item name="colorPrimaryContainer">@color/faded_orange</item>
         <item name="colorSecondaryContainer">@color/faded_orange</item>
         <item name="colorOnSecondaryContainer">@color/black</item>
-        <item name="selectorButtonColor">@color/dark_gray</item>
         <item name="colorSurface">@color/dark_charcoal</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorOnSurface">@color/light_gray</item>
-        <item name="alertDialogTheme">@style/AppTheme.AlertDialogTheme</item>
         <item name="colorOnSecondary">@color/blue_black</item>
         <item name="colorPrimaryVariant">@color/faded_dark_orange</item>
         <item name="colorSecondaryVariant">@color/faded_dark_blue</item>
@@ -40,7 +38,6 @@
         <item name="colorOnError">@color/faded_green</item>
         <item name="colorControlNormal">@color/blue_white_pastel</item>
         <item name="colorControlHighlight">@color/dark_gray</item>
-        <item name="toolbarBackgroundColor">@color/light_charcoal</item>
         <item name="android:textColorPrimary">@color/blue_white_pastel</item>
         <item name="android:textColorPrimaryDisableOnly">@color/blue_white_pastel</item>
         <item name="android:textColorSecondary">@color/light_gray</item>
@@ -48,34 +45,4 @@
         <item name="android:windowBackground">@color/dark_charcoal</item>
         <item name="android:colorBackground">@color/dark_charcoal</item>
     </style>
-
-    <style name="AppTheme.AlertDialogTheme" parent="Theme.Material3.DayNight.Dialog.Alert">
-        <item name="android:background">@color/mid_charcoal</item>
-        <item name="colorAccent">@color/faded_orange</item>
-        <item name="android:textColorPrimary">@color/blue_white_pastel</item>
-        <item name="android:textColorPrimaryDisableOnly">@color/blue_white_pastel</item>
-        <item name="buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
-        <item name="buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
-        <item name="buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
-        <item name="colorPrimary">@color/blue_black</item>
-        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
-        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
-        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.TnG.Corner.Small</item>
-    </style>
-
-    <style name="NegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
-    </style>
-
-    <style name="NeutralButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">?android:attr/textColorPrimary</item>
-        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
-    </style>
-
-    <style name="PositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
-        <item name="android:textColor">@color/faded_orange</item>
-        <item name="shapeAppearance">?shapeAppearanceSmallComponent</item>
-    </style>
-
 </resources>

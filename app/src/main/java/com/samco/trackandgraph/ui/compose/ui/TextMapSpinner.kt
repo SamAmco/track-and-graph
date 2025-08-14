@@ -18,7 +18,7 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,7 +35,7 @@ fun <T> TextMapSpinner(
     enabled: Boolean = true,
     textAlign: TextAlign = TextAlign.Start,
     paddingValues: PaddingValues = PaddingValues(
-        horizontal = dimensionResource(id = R.dimen.card_padding),
+        horizontal = cardPadding,
     ),
     onItemSelected: (T) -> Unit
 ) {

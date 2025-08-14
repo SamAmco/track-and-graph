@@ -23,8 +23,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.ripple
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
@@ -87,7 +87,7 @@ private fun TutorialPage2() = TnGComposeTheme {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colors.secondary)
+                    .background(MaterialTheme.colorScheme.secondary)
             )
         },
         showGotIt = false
@@ -105,7 +105,7 @@ private fun TutorialPage3(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(MaterialTheme.colors.primary)
+                    .background(MaterialTheme.colorScheme.primary)
             )
         },
         onGotItClicked = onGotItClicked,
@@ -140,8 +140,8 @@ private fun TutorialPage(
                     .fillMaxWidth()
                     .padding(bottom = 30.dp),
                 text = text,
-                color = MaterialTheme.colors.onSecondary,
-                style = MaterialTheme.typography.h4,
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = MaterialTheme.typography.titleLarge,
                 textAlign = TextAlign.Center,
             )
 
@@ -165,8 +165,8 @@ private fun TutorialPage(
                     ) { onGotItClicked() },
                 text = stringResource(id = R.string.got_it),
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.onSecondary,
-                style = MaterialTheme.typography.h5,
+                color = MaterialTheme.colorScheme.onSecondary,
+                style = MaterialTheme.typography.titleMedium,
             )
         }
     }

@@ -17,50 +17,90 @@
 package com.samco.trackandgraph.ui.compose.theming
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.Colors
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Typography
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Typography
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.google.android.material.composethemeadapter.createMdcTheme
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.shapes
 
-private val lightGray = Color(0xFFE0E0E0)
-private val darkGray = Color(0xFF4C4C4C)
-private val midCharcoal = Color(0xFF222222)
-private val lightCharcoal = Color(0xFF373737)
-private val blueWhitePastel = Color(0xFFD3DADE)
+// Color definitions from colors.xml
+val lightBlue = Color(0xFF74ADD1)
+val darkBlue = Color(0xFF427EA0)
+val orange = Color(0xFFF46D43)
+val darkOrange = Color(0xFFBB3D18)
+val blueBlack = Color(0xFF2B3B45)
+
+val darkCharcoal = Color(0xFF121212)
+val midCharcoal = Color(0xFF222222)
+val lightCharcoal = Color(0xFF373737)
+val fadedLightBlue = Color(0xFF88AABF)
+val fadedDarkBlue = Color(0xFF54788C)
+val fadedOrange = Color(0xFFE17656)
+val fadedDarkOrange = Color(0xFFA24A2F)
 val fadedGreen = Color(0xFF4ABF50)
 
+val blueWhitePastel = Color(0xFFD3DADE)
+val chalkyWhite = Color(0xFFF3F3F3)
+val lightGray = Color(0xFFE0E0E0)
+val midGray = Color(0xFF7C7C7C)
+val darkGray = Color(0xFF4C4C4C)
+val white = Color(0xFFFFFFFF)
+val black = Color(0xFF000000)
+
 data class TngColors(
-    val material: Colors,
+    val colorScheme: ColorScheme,
     val selectorButtonColor: Color,
     val textColorSecondary: Color,
     val toolbarBackgroundColor: Color,
+    val hyperlinkColor: Color,
 ) {
-    val primary get() = material.primary
-    val primaryVariant get() = material.primaryVariant
-    val secondary get() = material.secondary
-    val secondaryVariant get() = material.secondaryVariant
-    val background get() = material.background
-    val surface get() = material.surface
-    val error get() = material.error
-    val onPrimary get() = material.onPrimary
-    val onSecondary get() = material.onSecondary
-    val onBackground get() = material.onBackground
-    val onSurface get() = material.onSurface
-    val onError get() = material.onError
-    val isLight get() = material.isLight
+    // Convenience accessors for Material 3 ColorScheme
+    val primary get() = colorScheme.primary
+    val onPrimary get() = colorScheme.onPrimary
+    val primaryContainer get() = colorScheme.primaryContainer
+    val onPrimaryContainer get() = colorScheme.onPrimaryContainer
+    val secondary get() = colorScheme.secondary
+    val onSecondary get() = colorScheme.onSecondary
+    val secondaryContainer get() = colorScheme.secondaryContainer
+    val onSecondaryContainer get() = colorScheme.onSecondaryContainer
+    val tertiary get() = colorScheme.tertiary
+    val onTertiary get() = colorScheme.onTertiary
+    val tertiaryContainer get() = colorScheme.tertiaryContainer
+    val onTertiaryContainer get() = colorScheme.onTertiaryContainer
+    val error get() = colorScheme.error
+    val onError get() = colorScheme.onError
+    val errorContainer get() = colorScheme.errorContainer
+    val onErrorContainer get() = colorScheme.onErrorContainer
+    val background get() = colorScheme.background
+    val onBackground get() = colorScheme.onBackground
+    val surface get() = colorScheme.surface
+    val onSurface get() = colorScheme.onSurface
+    val surfaceVariant get() = colorScheme.surfaceVariant
+    val onSurfaceVariant get() = colorScheme.onSurfaceVariant
+    val outline get() = colorScheme.outline
+    val outlineVariant get() = colorScheme.outlineVariant
+    val scrim get() = colorScheme.scrim
+    val inverseSurface get() = colorScheme.inverseSurface
+    val inverseOnSurface get() = colorScheme.inverseOnSurface
+    val inversePrimary get() = colorScheme.inversePrimary
+    val surfaceDim get() = colorScheme.surfaceDim
+    val surfaceBright get() = colorScheme.surfaceBright
+    val surfaceContainerLowest get() = colorScheme.surfaceContainerLowest
+    val surfaceContainerLow get() = colorScheme.surfaceContainerLow
+    val surfaceContainer get() = colorScheme.surfaceContainer
+    val surfaceContainerHigh get() = colorScheme.surfaceContainerHigh
+    val surfaceContainerHighest get() = colorScheme.surfaceContainerHighest
+
+    val disabledAlpha get() = 0.38f
 }
 
 data class TngTypography(
@@ -69,75 +109,122 @@ data class TngTypography(
         fontFamily = FontFamily(
             Font(resId = R.font.roboto_mono, weight = FontWeight(750))
         ),
-        fontSize = materialTypography.body1.fontSize,
+        fontSize = materialTypography.bodyLarge.fontSize,
         lineHeight = 22.sp,
     )
-) {
-    val h1 get() = materialTypography.h1
-    val h2 get() = materialTypography.h2
-    val h3 get() = materialTypography.h3
-    val h4 get() = materialTypography.h4
-    val h5 get() = materialTypography.h5
-    val h6 get() = materialTypography.h6
-    val subtitle1 get() = materialTypography.subtitle1
-    val subtitle2 get() = materialTypography.subtitle2
-    val body1 get() = materialTypography.body1
-    val body2 get() = materialTypography.body2
-    val button get() = materialTypography.button
-    val caption get() = materialTypography.caption
-    val overline get() = materialTypography.overline
-}
+)
 
-private val LightColorPalette = TngColors(
-    material = lightColors(),
+// Custom Typography matching original Material 2 text sizes from dimens.xml
+private val CustomTypography = Typography(
+    // Display styles (largest text)
+    displayLarge = Typography().displayLarge.copy(fontSize = 70.sp),
+    displayMedium = Typography().displayMedium.copy(fontSize = 45.sp),
+    displaySmall = Typography().displaySmall.copy(fontSize = 36.sp),
+    
+    // Headline styles
+    headlineLarge = Typography().headlineLarge.copy(fontSize = 30.sp),
+    headlineMedium = Typography().headlineMedium.copy(fontSize = 22.sp),
+    headlineSmall = Typography().headlineSmall.copy(fontSize = 20.sp),
+    
+    // Title styles
+    titleLarge = Typography().titleLarge.copy(fontSize = 17.sp),
+    titleMedium = Typography().titleMedium.copy(fontSize = 17.sp),
+    titleSmall = Typography().titleSmall.copy(fontSize = 16.sp),
+    
+    // Body styles
+    bodyLarge = Typography().bodyLarge.copy(fontSize = 15.sp),
+    bodyMedium = Typography().bodyMedium.copy(fontSize = 15.sp),
+    bodySmall = Typography().bodySmall.copy(fontSize = 13.sp),
+    
+    // Label styles (smallest text)
+    labelLarge = Typography().labelLarge.copy(fontSize = 12.sp),
+    labelMedium = Typography().labelMedium.copy(fontSize = 11.sp),
+    labelSmall = Typography().labelSmall.copy(fontSize = 10.sp),
+)
+
+// Light theme ColorScheme based on themes.xml
+private val LightColorScheme = lightColorScheme(
+    primary = orange,
+    onPrimary = blueBlack,
+    primaryContainer = orange,
+    onPrimaryContainer = blueBlack,
+    secondary = lightBlue,
+    onSecondary = blueBlack,
+    secondaryContainer = orange,
+    onSecondaryContainer = white,
+    tertiary = lightBlue,
+    onTertiary = blueBlack,
+    error = darkOrange,
+    onError = fadedGreen,
+    errorContainer = darkOrange,
+    onErrorContainer = white,
+    background = chalkyWhite,
+    onBackground = black,
+    surface = white,
+    onSurface = black,
+    surfaceVariant = white,
+    onSurfaceVariant = darkGray,
+    outline = lightGray,
+    outlineVariant = lightGray,
+    scrim = black,
+)
+
+// Dark theme ColorScheme based on themes-night.xml
+private val DarkColorScheme = darkColorScheme(
+    primary = fadedOrange,
+    onPrimary = white,
+    primaryContainer = fadedOrange,
+    onPrimaryContainer = black,
+    secondary = fadedLightBlue,
+    onSecondary = blueBlack,
+    secondaryContainer = fadedOrange,
+    onSecondaryContainer = black,
+    tertiary = fadedLightBlue,
+    onTertiary = blueBlack,
+    error = fadedDarkOrange,
+    onError = fadedGreen,
+    errorContainer = fadedDarkOrange,
+    onErrorContainer = white,
+    background = darkCharcoal,
+    onBackground = lightGray,
+    surface = darkCharcoal,
+    onSurface = lightGray,
+    surfaceVariant = midCharcoal,
+    onSurfaceVariant = lightGray,
+    outline = darkGray,
+    outlineVariant = darkGray,
+    scrim = black,
+)
+
+private val LightTngColors = TngColors(
+    colorScheme = LightColorScheme,
     selectorButtonColor = lightGray,
     textColorSecondary = darkGray,
     toolbarBackgroundColor = blueWhitePastel,
+    hyperlinkColor = darkBlue, // Using dark_blue from colorSecondaryVariant
 )
 
-private val DarkColorPalette = TngColors(
-    material = darkColors(),
+private val DarkTngColors = TngColors(
+    colorScheme = DarkColorScheme,
     selectorButtonColor = darkGray,
     textColorSecondary = lightGray,
     toolbarBackgroundColor = lightCharcoal,
+    hyperlinkColor = fadedDarkBlue, // Using faded_dark_blue from colorSecondaryVariant
 )
-
-val TngColors.disabledAlpha get() = 0.4f
-
-private val LocalColors = staticCompositionLocalOf { LightColorPalette }
-
-private val LocalTypography = staticCompositionLocalOf<TngTypography> {
-    error("No typography provided")
-}
-
-val MaterialTheme.tngColors: TngColors
-    @Composable
-    @ReadOnlyComposable
-    get() = LocalColors.current
-
-val MaterialTheme.tngTypography: TngTypography
-    @Composable
-    @ReadOnlyComposable
-    get() = LocalTypography.current
 
 @Composable
 fun TnGComposeTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     block: @Composable () -> Unit
 ) {
-    val (materialColors, typography, _) = createMdcTheme(
-        context = LocalContext.current,
-        layoutDirection = LocalLayoutDirection.current
-    )
-
-    val colors = tngColors(darkTheme, materialColors)
-    val tngTypography = TngTypography(typography ?: Typography())
+    val colors = if (darkTheme) DarkTngColors else LightTngColors
+    val typography = TngTypography(CustomTypography)
 
     CompositionLocalProvider(LocalColors provides colors) {
-        CompositionLocalProvider(LocalTypography provides tngTypography) {
+        CompositionLocalProvider(LocalTypography provides typography) {
             MaterialTheme(
-                colors = colors.material,
-                typography = typography ?: MaterialTheme.typography,
+                colorScheme = colors.colorScheme,
+                typography = typography.materialTypography,
                 shapes = shapes,
                 content = block
             )
@@ -150,11 +237,10 @@ fun DialogTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     block: @Composable () -> Unit
 ) = TnGComposeTheme(darkTheme) {
-
     val colors = MaterialTheme.tngColors.let {
         if (darkTheme) {
             it.copy(
-                material = MaterialTheme.tngColors.material.copy(
+                colorScheme = it.colorScheme.copy(
                     background = midCharcoal,
                     surface = midCharcoal,
                 )
@@ -164,7 +250,7 @@ fun DialogTheme(
 
     CompositionLocalProvider(LocalColors provides colors) {
         MaterialTheme(
-            colors = colors.material,
+            colorScheme = colors.colorScheme,
             typography = MaterialTheme.typography,
             shapes = MaterialTheme.shapes,
             content = block
@@ -172,12 +258,20 @@ fun DialogTheme(
     }
 }
 
-@Composable
-private fun tngColors(
-    darkTheme: Boolean,
-    materialColors: Colors?
-) = if (darkTheme) {
-    DarkColorPalette.copy(material = materialColors ?: darkColors())
-} else {
-    LightColorPalette.copy(material = materialColors ?: lightColors())
+val LocalColors = staticCompositionLocalOf<TngColors> {
+    error("No TngColors provided")
 }
+
+val LocalTypography = staticCompositionLocalOf<TngTypography> {
+    error("No TngTypography provided")
+}
+
+val MaterialTheme.tngColors: TngColors
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalColors.current
+
+val MaterialTheme.tngTypography: TngTypography
+    @Composable
+    @ReadOnlyComposable
+    get() = LocalTypography.current

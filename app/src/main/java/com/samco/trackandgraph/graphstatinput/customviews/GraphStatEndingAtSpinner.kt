@@ -17,13 +17,11 @@
 package com.samco.trackandgraph.graphstatinput.customviews
 
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
@@ -32,6 +30,7 @@ import com.samco.trackandgraph.helpers.formatDayMonthYear
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.Spinner
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.showDatePickerDialog
 import org.threeten.bp.OffsetDateTime
 
@@ -83,7 +82,7 @@ fun GraphStatEndingAtSpinner(
 
     LabeledRow(
         label = stringResource(id = R.string.ending_at_colon),
-        paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding))
+        paddingValues = PaddingValues(start = cardPadding)
     ) {
         val spinnerItems = mapOf(
             SampleEndingAtOption.LATEST to strLatest,

@@ -2,13 +2,12 @@ package com.samco.trackandgraph.graphstatinput.customviews
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
@@ -16,6 +15,7 @@ import com.samco.trackandgraph.ui.compose.ui.CheckboxLabeledExpandingSection
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.FilterableFeatureConfigBehaviour
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun FilterByValueSection(viewModel: FilterableFeatureConfigBehaviour) {
@@ -28,11 +28,11 @@ fun FilterByValueSection(viewModel: FilterableFeatureConfigBehaviour) {
         focusRequester = focusRequester
     ) {
         DialogInputSpacing()
-        Row(Modifier.padding(dimensionResource(id = R.dimen.card_padding))) {
+        Row(Modifier.padding(cardPadding)) {
             Text(
                 modifier = Modifier.alignByBaseline(),
                 text = stringResource(id = R.string.from),
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge
             )
 
             MiniNumericTextField(
@@ -49,7 +49,7 @@ fun FilterByValueSection(viewModel: FilterableFeatureConfigBehaviour) {
             Text(
                 modifier = Modifier.alignByBaseline(),
                 text = stringResource(id = R.string.to),
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge
             )
 
             MiniNumericTextField(

@@ -31,13 +31,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -137,7 +138,8 @@ fun Tracker(
             .fillMaxWidth()
             .padding(cardMarginSmall)
             .clickable { onHistory(tracker) },
-        elevation = if (isElevated) cardElevation * 3 else cardElevation,
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = MaterialTheme.shapes.small,
     ) {
         BoxWithConstraints {
@@ -205,7 +207,7 @@ private fun TrackerMenuButton(
             Icon(
                 painterResource(R.drawable.list_menu_icon),
                 contentDescription = stringResource(R.string.tracked_data_menu_button_content_description),
-                tint = MaterialTheme.colors.onSurface
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -215,37 +217,33 @@ private fun TrackerMenuButton(
             onDismissRequest = { onShowContextMenu(false) }
         ) {
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
                 onClick = {
                     onShowContextMenu(false)
                     onEdit(tracker)
                 }
-            ) {
-                Text(stringResource(R.string.edit))
-            }
+            )
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.delete)) },
                 onClick = {
                     onShowContextMenu(false)
                     onDelete(tracker)
                 }
-            ) {
-                Text(stringResource(R.string.delete))
-            }
+            )
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.move_to)) },
                 onClick = {
                     onShowContextMenu(false)
                     onMoveTo(tracker)
                 }
-            ) {
-                Text(stringResource(R.string.move_to))
-            }
+            )
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.description)) },
                 onClick = {
                     onShowContextMenu(false)
                     onDescription(tracker)
                 }
-            ) {
-                Text(stringResource(R.string.description))
-            }
+            )
         }
     }
 }
@@ -259,7 +257,7 @@ private fun TrackerNameText(
         modifier = Modifier
             .fillMaxWidth()
             .padding(cardMarginSmall),
-        style = MaterialTheme.typography.h5,
+        style = MaterialTheme.typography.titleMedium,
         fontWeight = FontWeight.Bold,
         textAlign = TextAlign.Center,
         maxLines = 10,
@@ -284,8 +282,8 @@ private fun TrackerDateTimeArea(
                 text = timerText,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h6,
-                color = MaterialTheme.colors.error,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.error,
                 maxLines = 1
             )
         } else {
@@ -293,7 +291,7 @@ private fun TrackerDateTimeArea(
                 text = timeSinceLastText,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }
@@ -331,7 +329,7 @@ private fun TrackerButtonsArea(
                         if (isRunning) painterResource(R.drawable.ic_stop_timer)
                         else painterResource(R.drawable.ic_play_timer),
                     contentDescription = null,
-                    tint = if (isRunning) MaterialTheme.colors.error else fadedGreen
+                    tint = if (isRunning) MaterialTheme.colorScheme.error else fadedGreen
                 )
             }
         }
@@ -356,7 +354,7 @@ private fun TrackerButtonsArea(
                     onClick = { onAdd(tracker, tracker.hasDefaultValue) },
                     onLongClick = { onAdd(tracker, false) }
                 ),
-            tint = if (tracker.hasDefaultValue) MaterialTheme.colors.secondary else MaterialTheme.colors.onSurface
+            tint = if (tracker.hasDefaultValue) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onSurface
         )
     }
 }

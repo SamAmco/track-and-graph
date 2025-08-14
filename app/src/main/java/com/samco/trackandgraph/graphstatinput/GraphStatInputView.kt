@@ -20,7 +20,7 @@ package com.samco.trackandgraph.graphstatinput
 import androidx.compose.foundation.*
 import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -29,7 +29,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -58,7 +57,7 @@ internal fun GraphStatInputView(
         modifier = Modifier
             .fillMaxSize()
             .imePadding(),
-        color = MaterialTheme.colors.background
+        color = MaterialTheme.colorScheme.background
     ) {
         val loading = viewModel.loading.observeAsState(true)
         val demoViewData by viewModel.demoViewData.observeAsState()
@@ -131,9 +130,9 @@ private fun GraphStatInputViewForm(
 ) = Column(
     modifier = modifier
         .padding(
-            top = dimensionResource(id = R.dimen.card_padding),
-            start = dimensionResource(id = R.dimen.card_padding),
-            end = dimensionResource(id = R.dimen.card_padding)
+            top = cardPadding,
+            start = cardPadding,
+            end = cardPadding
         )
         .verticalScroll(state = scrollState)
 ) {
@@ -222,7 +221,7 @@ private fun DemoButton(
         Modifier
             .background(background)
             .fillMaxWidth()
-            .padding(vertical = dimensionResource(id = R.dimen.card_padding))
+            .padding(vertical = cardPadding)
             .pointerInput(Unit) {
                 awaitEachGesture {
                     awaitFirstDown(requireUnconsumed = true)
@@ -246,7 +245,7 @@ private fun DemoButton(
     ) {
         Text(
             text = stringResource(id = R.string.hold_to_preview).uppercase(),
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.tngColors.onPrimary
         )
     }
@@ -265,12 +264,12 @@ private fun LuaFirstTimeUserDialog(
             Column {
                 Text(
                     stringResource(id = R.string.lua_graph_first_time_user_title),
-                    style = MaterialTheme.typography.h5,
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 InputSpacingLarge()
                 Text(
                     stringResource(id = R.string.lua_graph_first_time_user_message),
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.bodyLarge,
                 )
                 InputSpacingLarge()
                 TextLink(
@@ -299,7 +298,7 @@ fun GraphStatTypeSelector(
     LabeledRow(
         label = stringResource(R.string.graph_type_label),
         paddingValues = PaddingValues(
-            start = dimensionResource(id = R.dimen.card_padding)
+            start = cardPadding
         )
     ) {
 

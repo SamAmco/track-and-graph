@@ -20,33 +20,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.samco.trackandgraph.R
 
-val cardMarginSmall: Dp
-    @Composable
-    get() = dimensionResource(id = R.dimen.card_margin_small)
-
-val halfDialogInputSpacing: Dp
-    @Composable
-    get() = dimensionResource(id = R.dimen.half_dialog_input_spacing)
-
-val cardPadding: Dp
-    @Composable
-    get() = dimensionResource(id = R.dimen.card_padding)
-
-val dialogInputSpacing: Dp
-    @Composable
-    get() = dimensionResource(id = R.dimen.dialog_input_spacing)
-
-val inputSpacingLarge: Dp
-    @Composable
-    get() = dimensionResource(id = R.dimen.input_spacing_large)
-
+val cardMarginSmall: Dp = 4.dp
+val halfDialogInputSpacing: Dp = 5.dp
+val cardPadding: Dp = 10.dp
+val dialogInputSpacing: Dp = 10.dp
+val inputSpacingLarge: Dp = 20.dp
 val cardElevation = 4.dp
-
 val inputSpacingXLarge = 50.dp
 
 

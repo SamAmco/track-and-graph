@@ -21,7 +21,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,7 +29,6 @@ import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -57,8 +56,8 @@ fun DurationInput(
 ) = Row(
     modifier = modifier
         .padding(
-            horizontal = dimensionResource(id = R.dimen.card_padding),
-            vertical = dimensionResource(id = R.dimen.card_padding)
+            horizontal = cardPadding,
+            vertical = cardPadding
         ),
     verticalAlignment = Alignment.Bottom,
     horizontalArrangement = Arrangement.Center

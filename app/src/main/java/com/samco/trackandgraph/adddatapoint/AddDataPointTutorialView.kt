@@ -21,16 +21,15 @@ package com.samco.trackandgraph.adddatapoint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -102,11 +101,11 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) {
     InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+        modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_3_description),
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.h5.fontSize,
-        fontWeight = MaterialTheme.typography.h5.fontWeight
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
     )
 
     InputSpacingLarge()
@@ -124,18 +123,18 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) {
     InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+        modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_3_hint),
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.body2.fontSize,
-        fontWeight = MaterialTheme.typography.body2.fontWeight
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
     )
 
     Text(
         modifier = Modifier
             .padding(
-                horizontal = dimensionResource(id = R.dimen.input_spacing_large),
-                vertical = dimensionResource(id = R.dimen.card_padding)
+                horizontal = inputSpacingLarge,
+                vertical = cardPadding
             )
             .fillMaxWidth()
             .clickable { onFaqClicked() },
@@ -143,8 +142,8 @@ private fun TutorialPage2(onFaqClicked: () -> Unit) {
         color = MaterialTheme.tngColors.secondary,
         textDecoration = TextDecoration.Underline,
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.body2.fontSize,
-        fontWeight = MaterialTheme.typography.body2.fontWeight
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
     )
 
     InputSpacingLarge()
@@ -157,11 +156,11 @@ private fun TutorialPage1() = Column(
     InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+        modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_2_description),
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.h5.fontSize,
-        fontWeight = MaterialTheme.typography.h5.fontWeight
+        fontSize = MaterialTheme.typography.titleMedium.fontSize,
+        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
     )
 
     InputSpacingLarge()
@@ -179,11 +178,11 @@ private fun TutorialPage1() = Column(
     InputSpacingLarge()
 
     Text(
-        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+        modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_2_hint),
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.body2.fontSize,
-        fontWeight = MaterialTheme.typography.body2.fontWeight
+        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+        fontWeight = MaterialTheme.typography.bodyMedium.fontWeight
     )
 
     InputSpacingLarge()
@@ -200,8 +199,8 @@ private fun TutorialPage0() {
         Text(
             text = stringResource(R.string.adding_your_first_data_point),
             textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.h4.fontSize,
-            fontWeight = MaterialTheme.typography.h4.fontWeight
+            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+            fontWeight = MaterialTheme.typography.titleLarge.fontWeight
         )
 
         InputSpacingLarge()
@@ -209,8 +208,8 @@ private fun TutorialPage0() {
         Text(
             text = stringResource(R.string.each_data_point_has_a_timestamp_and_value),
             textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.subtitle2.fontSize,
-            fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
+            fontSize = MaterialTheme.typography.titleSmall.fontSize,
+            fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
         )
 
         InputSpacingLarge()
@@ -249,8 +248,8 @@ private fun TutorialPage0() {
         Text(
             text = stringResource(R.string.it_can_also_optionally_have_a_label_and_a_note),
             textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.subtitle2.fontSize,
-            fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
+            fontSize = MaterialTheme.typography.titleSmall.fontSize,
+            fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
         )
 
         DialogInputSpacing()
@@ -263,7 +262,7 @@ private fun TutorialPage0() {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.input_spacing_large)),
+                    .padding(horizontal = inputSpacingLarge),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 AddChipButton(text = stringResource(id = R.string.add_a_label)) { }

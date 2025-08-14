@@ -24,13 +24,14 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -79,7 +80,8 @@ fun Group(
             .fillMaxWidth()
             .padding(cardMarginSmall)
             .clickable { onClick(group) },
-        elevation = if (isElevated) cardElevation * 3 else cardElevation,
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = MaterialTheme.shapes.small,
     ) {
         Box(
@@ -116,7 +118,7 @@ fun Group(
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(horizontal = cardPadding, vertical = inputSpacingLarge),
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleSmall,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -144,7 +146,7 @@ private fun GroupMenuButton(
             Icon(
                 painterResource(R.drawable.list_menu_icon),
                 contentDescription = stringResource(R.string.tracked_data_menu_button_content_description),
-                tint = MaterialTheme.colors.onSurface
+                tint = MaterialTheme.colorScheme.onSurface
             )
         }
 
@@ -154,29 +156,26 @@ private fun GroupMenuButton(
             onDismissRequest = { onShowContextMenu(false) }
         ) {
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.edit)) },
                 onClick = {
                     onShowContextMenu(false)
                     onEdit(group)
                 }
-            ) {
-                Text(stringResource(R.string.edit))
-            }
+            )
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.delete)) },
                 onClick = {
                     onShowContextMenu(false)
                     onDelete(group)
                 }
-            ) {
-                Text(stringResource(R.string.delete))
-            }
+            )
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.move_to)) },
                 onClick = {
                     onShowContextMenu(false)
                     onMoveTo(group)
                 }
-            ) {
-                Text(stringResource(R.string.move_to))
-            }
+            )
         }
     }
 }

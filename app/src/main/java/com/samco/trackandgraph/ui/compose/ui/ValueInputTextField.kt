@@ -19,8 +19,9 @@ package com.samco.trackandgraph.ui.compose.ui
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -36,7 +37,6 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -50,7 +50,7 @@ fun LabelInputTextField(
     focusRequester: FocusRequester? = null,
     onNextOverride: (() -> Unit)? = null
 ) {
-    SlimOutlinedTextField(
+    OutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = { Text(stringResource(id = R.string.label)) },
@@ -65,7 +65,7 @@ fun LabelInputTextField(
             capitalization = KeyboardCapitalization.Sentences
         ),
         singleLine = true,
-        modifier = modifier.let {
+        modifier = modifier.slimOutlinedTextField().let {
             if (focusRequester != null) it.focusRequester(focusRequester)
             else it
         }
@@ -83,7 +83,7 @@ fun ValueInputTextField(
 ) {
     val focusUpdateScope = rememberCoroutineScope()
 
-    SlimOutlinedTextField(
+    OutlinedTextField(
         value = textFieldValue,
         onValueChange = { onValueChange(it) },
         label = { Text(stringResource(id = R.string.value)) },
@@ -93,12 +93,12 @@ fun ValueInputTextField(
                 else focusManager?.moveFocus(FocusDirection.Down)
             }
         ),
-        textStyle = MaterialTheme.typography.subtitle2,
+        textStyle = MaterialTheme.typography.titleSmall,
         placeholder = {
             Text(
                 modifier = Modifier.fillMaxWidth(),
                 text = "1.0",
-                style = MaterialTheme.typography.subtitle2,
+                style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.tngColors.onSurface.copy(
                     alpha = MaterialTheme.tngColors.disabledAlpha
                 )
@@ -110,6 +110,7 @@ fun ValueInputTextField(
         ),
         singleLine = true,
         modifier = modifier
+            .slimOutlinedTextField()
             .onFocusChanged { focusState ->
                 if (focusState.isFocused) {
                     focusUpdateScope.launch {

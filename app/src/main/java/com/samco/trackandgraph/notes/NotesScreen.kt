@@ -23,13 +23,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,6 +63,9 @@ import com.samco.trackandgraph.ui.compose.ui.DataPointNoteDescriptionDialog
 import com.samco.trackandgraph.ui.compose.ui.DateDisplayResolution
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLineText
+import com.samco.trackandgraph.ui.compose.ui.cardElevation
+import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import org.threeten.bp.OffsetDateTime
 
 @Composable
@@ -132,7 +135,7 @@ private fun NotesView(
         EmptyScreenText(textId = R.string.no_data_points_history_fragment_hint)
     } else {
         DateScrollLazyColumn(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.card_margin_small)),
+            modifier = Modifier.padding(cardMarginSmall),
             data = dateScrollData
         ) { note ->
             Note(
@@ -141,7 +144,7 @@ private fun NotesView(
                 onEditClick = { onEditClick(note) },
                 onDeleteClick = { onDeleteClick(note) }
             )
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.card_margin_small)))
+            Spacer(modifier = Modifier.height(cardMarginSmall))
         }
     }
 }
@@ -153,8 +156,11 @@ private fun Note(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
 ) = Card(
-    modifier = Modifier.clickable { onNoteClick() },
-    elevation = dimensionResource(id = R.dimen.card_elevation),
+    modifier = Modifier
+        .padding(cardMarginSmall)
+        .clickable { onNoteClick() },
+    elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     shape = MaterialTheme.shapes.small
 ) {
 
@@ -183,23 +189,21 @@ private fun Note(
             offset = DpOffset(boxEnd.dp, 0.dp),
             onDismissRequest = { menuExpanded = false }
         ) {
-            DropdownMenuItem(onClick = {
-                menuExpanded = false
-                onEditClick()
-            }) {
-                Text(
-                    text = stringResource(id = R.string.edit),
-                )
-            }
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.edit)) },
+                onClick = {
+                    menuExpanded = false
+                    onEditClick()
+                }
+            )
 
-            DropdownMenuItem(onClick = {
-                menuExpanded = false
-                onDeleteClick()
-            }) {
-                Text(
-                    text = stringResource(id = R.string.delete),
-                )
-            }
+            DropdownMenuItem(
+                text = { Text(stringResource(id = R.string.delete)) },
+                onClick = {
+                    menuExpanded = false
+                    onDeleteClick()
+                }
+            )
         }
 
     }
@@ -207,23 +211,23 @@ private fun Note(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(dimensionResource(id = R.dimen.card_padding))
+            .padding(cardPadding)
     ) {
         DayMonthYearHourMinuteWeekDayOneLineText(
             dateTime = noteInfo.date,
-            style = MaterialTheme.typography.subtitle2,
+            style = MaterialTheme.typography.titleSmall,
         )
         HalfDialogInputSpacing()
         if (noteInfo.featurePath.isNotBlank()) {
             Text(
-                style = MaterialTheme.typography.body1,
+                style = MaterialTheme.typography.bodyLarge,
                 text = noteInfo.featurePath,
                 color = MaterialTheme.tngColors.onSurface.copy(alpha = 0.5f)
             )
             HalfDialogInputSpacing()
         }
         Text(
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             text = noteInfo.note,
             maxLines = 3
         )

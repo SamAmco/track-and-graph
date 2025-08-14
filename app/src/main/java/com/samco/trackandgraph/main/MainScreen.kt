@@ -25,26 +25,30 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsIgnoringVisibility
 import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
-import androidx.compose.foundation.shape.CutCornerShape
-import androidx.compose.material.DrawerState
-import androidx.compose.material.DrawerValue
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalDrawer
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.rememberDrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -56,6 +60,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -167,29 +172,34 @@ private fun MainView(
 
     BackHandler(drawerState.isOpen) { scope.launch { drawerState.close() } }
 
-    ModalDrawer(
+    ModalNavigationDrawer(
         drawerState = drawerState,
-        drawerShape = CutCornerShape(0.dp),
         gesturesEnabled = drawerState.isOpen,
         drawerContent = {
-            MenuDrawerContent(
-                onNavigateFromMenu = {
-                    scope.launch { drawerState.close() }
-                    // I don't love this, it assumes we're already at the root
-                    // (which should always be true). But it works for now.
-                    // Another improvement to make when transitioning to compose navigation
-                    val root = navController?.currentDestination?.id
-                    val navOptions = NavOptions.Builder()
-                        .setPopUpTo(root ?: R.id.groupFragment, true)
-                        .build()
-                    navController?.navigate(it, null, navOptions)
-                },
-                onNavigateToBrowser = onNavigateToBrowser,
-                currentTheme = currentTheme,
-                onThemeSelected = onThemeSelected,
-                currentDateFormat = currentDateFormat,
-                onDateFormatSelected = onDateFormatSelected,
-            )
+            ModalDrawerSheet(
+                modifier = Modifier
+                    .width(300.dp)
+                    .fillMaxHeight()
+            ) {
+                MenuDrawerContent(
+                    onNavigateFromMenu = {
+                        scope.launch { drawerState.close() }
+                        // I don't love this, it assumes we're already at the root
+                        // (which should always be true). But it works for now.
+                        // Another improvement to make when transitioning to compose navigation
+                        val root = navController?.currentDestination?.id
+                        val navOptions = NavOptions.Builder()
+                            .setPopUpTo(root ?: R.id.groupFragment, true)
+                            .build()
+                        navController?.navigate(it, null, navOptions)
+                    },
+                    onNavigateToBrowser = onNavigateToBrowser,
+                    currentTheme = currentTheme,
+                    onThemeSelected = onThemeSelected,
+                    currentDateFormat = currentDateFormat,
+                    onDateFormatSelected = onDateFormatSelected,
+                )
+            }
         },
     ) {
         Scaffold(
@@ -212,7 +222,7 @@ private fun MainView(
 }
 
 @Composable
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 fun AppBar(
     scope: CoroutineScope,
     navBarConfig: State<NavBarConfig>,
@@ -222,6 +232,9 @@ fun AppBar(
     onAction: (AppBarViewModel.Action) -> Unit,
 ) = TopAppBar(
     windowInsets = WindowInsets.statusBarsIgnoringVisibility,
+    colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = MaterialTheme.tngColors.toolbarBackgroundColor
+    ),
     navigationIcon = {
         NavigationIcon(
             navButtonStyle = if (isAtNavRoot.value) NavButtonStyle.MENU else NavButtonStyle.UP,
@@ -241,29 +254,27 @@ fun AppBar(
             onAction = onAction,
         )
     },
+    expandedHeight = TopAppBarDefaults.TopAppBarExpandedHeight * LocalConfiguration.current.fontScale,
     title = {
         Column(verticalArrangement = Arrangement.Center) {
             navBarConfig.value.title?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.h6,
+                    style = MaterialTheme.typography.titleSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
-            // TODO this can be clipped with very large font sizes. We should be able to fix
-            // it in material3: https://issuetracker.google.com/issues/308540676
             navBarConfig.value.subtitle?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
             }
         }
     },
-    backgroundColor = MaterialTheme.tngColors.toolbarBackgroundColor,
 )
 
 @Composable
@@ -306,15 +317,12 @@ private fun AppBarOverflowActions(
         ) {
             for (action in collapsedActions.actions) {
                 DropdownMenuItem(
+                    text = { Text(stringResource(action.titleId)) },
                     onClick = {
                         onAction(action)
                         expanded = false
                     }
-                ) {
-                    Text(
-                        text = stringResource(action.titleId),
-                    )
-                }
+                )
             }
         }
     }
@@ -354,7 +362,7 @@ private fun MainViewPreview() {
                 )
             },
             drawerState = rememberDrawerState(
-                initialValue = DrawerValue.Closed
+                initialValue = DrawerValue.Open
             ),
             onAppBarAction = {},
             navController = null,

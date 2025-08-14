@@ -41,10 +41,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
@@ -57,7 +57,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
@@ -84,6 +83,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.TimeBarSegmentSer
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import org.threeten.bp.Duration
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZonedDateTime
@@ -222,21 +222,21 @@ private fun BarChartDataOverlay(
     }
 
     Column(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding))
+        modifier = Modifier.padding(cardPadding)
     ) {
         Text(
             text = stringResource(id = R.string.from_formatted, fromText),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
         )
 
         Text(
             text = stringResource(id = R.string.to_formatted, toText),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
         )
 
         Text(
             text = stringResource(id = R.string.total_formatted, total),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
         )
 
         if (extraDetails.isNotEmpty()) BarChartDataOverlayExtraDetails(extraDetails)
@@ -265,7 +265,7 @@ private fun BarChartDataOverlayExtraDetails(
     ) {
         Text(
             text = stringResource(id = R.string.info),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
         )
         Icon(
             imageVector = Icons.Default.ArrowDropDown,
@@ -293,7 +293,7 @@ private fun BarChartDataOverlayExtraDetails(
                 HalfDialogInputSpacing()
                 Text(
                     text = labelInfo.label,
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }

@@ -1,7 +1,7 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Shapes
+import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
@@ -12,9 +12,7 @@ val smallIconSize = 20.dp
 
 val buttonSize = 45.dp
 
-val cardCornerRadius: Dp
-    @Composable
-    get() = dimensionResource(id = R.dimen.card_corner_radius)
+val cardCornerRadius: Dp = 4.dp
 
 val shapeMedium = 8.dp
 

@@ -28,12 +28,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +44,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -56,13 +57,13 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.CheckedDays
 import com.samco.trackandgraph.base.database.dto.CheckedDays.Companion.withSet
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.SlimOutlinedTextField
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.showTimePickerDialog
+import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter
 
@@ -76,8 +77,9 @@ fun Reminder(
     modifier = modifier
         .fillMaxWidth()
         .padding(halfDialogInputSpacing),
-    elevation = if (isElevated) cardElevation * 3f else cardElevation,
-    shape = MaterialTheme.shapes.small
+    elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3f else cardElevation),
+    shape = MaterialTheme.shapes.small,
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()
@@ -128,9 +130,10 @@ private fun RowScope.ReminderNameInput(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    SlimOutlinedTextField(
+    OutlinedTextField(
         modifier = Modifier
             .weight(1f)
+            .slimOutlinedTextField()
             .padding(top = cardPadding),
         value = reminderViewData.name.value,
         onValueChange = { reminderViewData.name.value = it },
@@ -169,12 +172,12 @@ private fun ReminderTimeDisplay(
                 )
             }
             .padding(
-                start = dimensionResource(id = R.dimen.dialog_input_spacing),
-                end = dimensionResource(id = R.dimen.dialog_input_spacing),
+                start = dialogInputSpacing,
+                end = dialogInputSpacing,
                 top = cardPadding
             ),
         text = reminderViewData.time.value.format(timeFormatter),
-        style = MaterialTheme.typography.h4,
+        style = MaterialTheme.typography.titleLarge,
         fontWeight = FontWeight.Bold
     )
 }
@@ -196,7 +199,7 @@ private fun ReminderDeleteButton(
         Icon(
             painter = painterResource(id = R.drawable.delete_icon),
             contentDescription = stringResource(id = R.string.delete_reminder_content_description),
-            tint = MaterialTheme.colors.onSurface
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -260,7 +263,7 @@ private fun ReminderDayLabels() {
                 modifier = Modifier.weight(1f),
                 text = label,
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyLarge
             )
         }
     }

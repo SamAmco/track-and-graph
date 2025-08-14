@@ -16,11 +16,10 @@
  */
 package com.samco.trackandgraph.ui.compose.ui
 
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -28,7 +27,13 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
-import com.samco.trackandgraph.R
+import com.samco.trackandgraph.ui.compose.theming.blueBlack
+import com.samco.trackandgraph.ui.compose.theming.blueWhitePastel
+import com.samco.trackandgraph.ui.compose.theming.darkOrange
+import com.samco.trackandgraph.ui.compose.theming.fadedOrange
+import com.samco.trackandgraph.ui.compose.theming.lightBlue
+import com.samco.trackandgraph.ui.compose.theming.midGray
+import com.samco.trackandgraph.ui.compose.theming.orange
 
 @Composable
 fun luaCodeVisualTransformation(): VisualTransformation {
@@ -105,16 +110,16 @@ private fun IntRange.overlaps(other: IntRange): Boolean {
 
 @Composable
 private fun getColorHighlightMap(): Map<String, Color> {
-    val midGray = colorResource(R.color.mid_gray)
-    val orange = colorResource(R.color.orange)
-    val darkBlue = colorResource(R.color.light_blue)
-    val darkOrange = colorResource(R.color.dark_orange)
-    val blueBlack = colorResource(R.color.blue_black)
-    val lightBlue = colorResource(R.color.light_blue)
-    val fadedOrange = colorResource(R.color.faded_orange)
-    val blueWhitePastel = colorResource(R.color.blue_white_pastel)
+    val midGray = midGray
+    val orange = orange
+    val darkBlue = lightBlue
+    val darkOrange = darkOrange
+    val blueBlack = blueBlack
+    val lightBlue = lightBlue
+    val fadedOrange = fadedOrange
+    val blueWhitePastel = blueWhitePastel
 
-    val isLight = MaterialTheme.colors.isLight
+    val isLight = !isSystemInDarkTheme()
     return remember(isLight) {
         if (isLight) {
             mapOf(

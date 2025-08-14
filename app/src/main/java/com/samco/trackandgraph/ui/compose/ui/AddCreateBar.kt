@@ -19,13 +19,12 @@ package com.samco.trackandgraph.ui.compose.ui
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
@@ -45,9 +44,9 @@ fun AddCreateBar(
 
         Text(
             text = errorText?.let { stringResource(id = it) } ?: "",
-            color = MaterialTheme.colors.error,
-            fontSize = MaterialTheme.typography.body2.fontSize,
-            fontWeight = MaterialTheme.typography.body2.fontWeight,
+            color = MaterialTheme.colorScheme.error,
+            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
+            fontWeight = MaterialTheme.typography.bodyMedium.fontWeight,
             modifier = Modifier
                 .weight(1f)
                 .padding(8.dp)
@@ -62,7 +61,7 @@ fun AddCreateBar(
             text = buttonText,
             onClick = onCreateUpdateClicked,
             enabled = errorText == null,
-            modifier = Modifier.padding(end = dimensionResource(id = R.dimen.card_margin_small))
+            modifier = Modifier.padding(end = cardMarginSmall)
         )
     }
 }

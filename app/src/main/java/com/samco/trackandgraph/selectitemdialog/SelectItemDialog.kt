@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -120,7 +120,7 @@ private fun SelectItemDialogContent(
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
         )
 
@@ -141,8 +141,8 @@ private fun SelectItemDialogContent(
                     ) {
                         Text(
                             text = stringResource(R.string.no_data),
-                            style = MaterialTheme.typography.body2,
-                            color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f)
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                     }
                 } else {
@@ -313,7 +313,7 @@ private fun IconItemRow(
         HalfDialogInputSpacing()
         Text(
             text = name,
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
         )
     }
@@ -342,7 +342,7 @@ private fun GroupItemRow(
                 if (isSelected) {
                     it.border(
                         width = 2.dp,
-                        color = MaterialTheme.colors.primary,
+                        color = MaterialTheme.colorScheme.primary,
                         shape = MaterialTheme.shapes.small
                     )
                 } else it
@@ -358,12 +358,12 @@ private fun GroupItemRow(
                 .size(smallIconSize)
                 .alpha(if (item.children.isEmpty()) 0f else 1f)
                 .rotate(if (item.expanded.value) 0f else -90f),
-            tint = MaterialTheme.colors.onSurface
+            tint = MaterialTheme.colorScheme.onSurface
         )
         HalfDialogInputSpacing()
         Text(
             text = item.name,
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             maxLines = 1,
         )
     }

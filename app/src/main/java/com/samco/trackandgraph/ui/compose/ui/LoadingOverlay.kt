@@ -26,10 +26,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -38,7 +38,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.disabledAlpha
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 /**
@@ -99,11 +98,11 @@ private fun LoadingOverlayPreview() {
             Column {
                 Text(
                     text = "This is sample content that should be covered by the loading overlay",
-                    style = MaterialTheme.typography.h6
+                    style = MaterialTheme.typography.titleSmall
                 )
                 Text(
                     text = "The overlay should cover this content completely with a semi-transparent background",
-                    style = MaterialTheme.typography.body1,
+                    style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier.padding(top = 8.dp)
                 )
             }
@@ -124,12 +123,12 @@ private fun BoxScopeLoadingOverlayPreview() {
             // Sample content that should be covered by the overlay
             Text(
                 text = "Sample BoxScope content",
-                style = MaterialTheme.typography.h5,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.align(Alignment.TopStart)
             )
             Text(
                 text = "This demonstrates the BoxScope loading overlay",
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.align(Alignment.BottomEnd)
             )
 

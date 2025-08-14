@@ -24,20 +24,21 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.YRangeConfigBehaviour
 import com.samco.trackandgraph.ui.compose.ui.DurationInput
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 
 @Composable
 fun YRangeFromToInputs(
@@ -59,7 +60,7 @@ private fun TimeBasedRangeInputs(
     toText: String
 ) = Column(
     modifier = Modifier
-        .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
+        .padding(horizontal = cardPadding)
         .fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
@@ -68,10 +69,10 @@ private fun TimeBasedRangeInputs(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = stringResource(id = R.string.from),
-                style = MaterialTheme.typography.subtitle2
+                style = MaterialTheme.typography.titleSmall
             )
 
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.dialog_input_spacing)))
+            Spacer(modifier = Modifier.width(dialogInputSpacing))
 
             DurationInput(
                 viewModel = viewModel.yRangeFromDurationViewModel,
@@ -83,10 +84,10 @@ private fun TimeBasedRangeInputs(
     Row(verticalAlignment = Alignment.CenterVertically) {
         Text(
             text = toText,
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.titleSmall
         )
 
-        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.dialog_input_spacing)))
+        Spacer(modifier = Modifier.width(dialogInputSpacing))
 
         DurationInput(viewModel = viewModel.yRangeToDurationViewModel)
     }
@@ -99,7 +100,7 @@ private fun NumericRangeInputs(
     toText: String
 ) = Row(
     modifier = Modifier
-        .padding(horizontal = dimensionResource(id = R.dimen.card_padding))
+        .padding(horizontal = cardPadding)
         .fillMaxWidth(),
     horizontalArrangement = Arrangement.SpaceEvenly
 ) {
@@ -107,7 +108,7 @@ private fun NumericRangeInputs(
         Text(
             modifier = Modifier.alignByBaseline(),
             text = stringResource(id = R.string.from),
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.titleSmall
         )
 
         MiniNumericTextField(
@@ -123,7 +124,7 @@ private fun NumericRangeInputs(
     Text(
         modifier = Modifier.alignByBaseline(),
         text = toText,
-        style = MaterialTheme.typography.subtitle2
+        style = MaterialTheme.typography.titleSmall
     )
 
     MiniNumericTextField(
