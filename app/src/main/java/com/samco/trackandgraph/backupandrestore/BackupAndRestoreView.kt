@@ -43,14 +43,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.Checkbox
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,7 +64,6 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -84,6 +83,8 @@ import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TimeButton
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import org.threeten.bp.OffsetDateTime
@@ -97,7 +98,7 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
     modifier = Modifier
         .fillMaxSize()
         .verticalScroll(rememberScrollState())
-        .padding(dimensionResource(id = R.dimen.input_spacing_large)),
+        .padding(inputSpacingLarge),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
@@ -131,7 +132,7 @@ fun BackupAndRestoreView(viewModel: BackupAndRestoreViewModel) = Column(
     ) {
         Text(
             text = stringResource(id = R.string.restore_data).uppercase(),
-            style = MaterialTheme.typography.button
+            style = MaterialTheme.typography.labelLarge
         )
     }
 
@@ -178,12 +179,12 @@ private fun BackupCard(viewModel: BackupAndRestoreViewModel) = Card(
     shape = MaterialTheme.shapes.medium
 ) {
     Column(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding_large))
+        modifier = Modifier.padding(inputSpacingLarge)
     ) {
         Text(
             text = stringResource(id = R.string.backup_hint_text),
-            style = MaterialTheme.typography.subtitle2,
-            color = MaterialTheme.colors.onSurface
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         InputSpacingLarge()
@@ -220,15 +221,15 @@ private fun ColumnScope.AutoBackupInfo(autoBackupInfo: BackupAndRestoreViewModel
     Text(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         text = stringResource(id = R.string.last_successful_backup),
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.onSurface,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 
     Text(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         text = lastSuccessful,
-        style = MaterialTheme.typography.body1,
-        color = MaterialTheme.colors.onSurface,
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 
     InputSpacingLarge()
@@ -240,15 +241,15 @@ private fun ColumnScope.AutoBackupInfo(autoBackupInfo: BackupAndRestoreViewModel
     Text(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         text = stringResource(id = R.string.next_scheduled_backup),
-        style = MaterialTheme.typography.subtitle2,
-        color = MaterialTheme.colors.onSurface,
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 
     Text(
         modifier = Modifier.align(Alignment.CenterHorizontally),
         text = nextScheduled,
-        style = MaterialTheme.typography.body1,
-        color = MaterialTheme.colors.onSurface,
+        style = MaterialTheme.typography.bodyLarge,
+        color = MaterialTheme.colorScheme.onSurface,
     )
 
     InputSpacingLarge()
@@ -280,7 +281,7 @@ private fun BackupButton(
         }) {
         Text(
             text = stringResource(id = R.string.backup_now).uppercase(),
-            style = MaterialTheme.typography.button
+            style = MaterialTheme.typography.labelLarge
         )
     }
 }
@@ -292,16 +293,16 @@ private fun AutoBackupControls(modifier: Modifier, viewModel: BackupAndRestoreVi
         .wrapContentWidth()
         .border(
             width = 1.dp,
-            color = MaterialTheme.colors.onSurface.copy(alpha = 0.2f),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
             shape = MaterialTheme.shapes.medium
         )
-        .padding(start = dimensionResource(id = R.dimen.card_padding)),
+        .padding(start = cardPadding),
     verticalAlignment = Alignment.CenterVertically
 ) {
 
     Text(
         text = stringResource(id = R.string.auto_backup).uppercase(),
-        style = MaterialTheme.typography.button
+        style = MaterialTheme.typography.labelLarge
     )
 
     DialogInputSpacing()
@@ -424,8 +425,8 @@ private fun CenterGradientDivider() = BoxWithConstraints(
             .background(
                 brush = Brush.radialGradient(
                     colors = listOf(
-                        MaterialTheme.colors.secondary,
-                        MaterialTheme.colors.surface.copy(alpha = 0.0f)
+                        MaterialTheme.colorScheme.secondary,
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.0f)
                     ),
                 ),
             )
@@ -475,7 +476,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = R.string.backup_location),
-            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+            style = MaterialTheme.typography.titleSmall.copy(textAlign = TextAlign.Center),
         )
 
         DialogInputSpacing()
@@ -483,7 +484,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
         if (location != null) {
             Text(
                 text = location,
-                style = MaterialTheme.typography.body2.copy(textAlign = TextAlign.Center),
+                style = MaterialTheme.typography.bodyMedium.copy(textAlign = TextAlign.Center),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
             )
@@ -502,7 +503,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
 
             Text(
                 text = text,
-                style = MaterialTheme.typography.button
+                style = MaterialTheme.typography.labelLarge
             )
         }
 
@@ -513,7 +514,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = R.string.backup_every),
-            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+            style = MaterialTheme.typography.titleSmall.copy(textAlign = TextAlign.Center),
         )
 
         DialogInputSpacing()
@@ -558,7 +559,7 @@ private fun AutoBackupInnerLayout(viewModel: AutoBackupViewModel) = Box(
         Text(
             modifier = Modifier.fillMaxWidth(),
             text = stringResource(id = R.string.next_backup_at),
-            style = MaterialTheme.typography.subtitle2.copy(textAlign = TextAlign.Center),
+            style = MaterialTheme.typography.titleSmall.copy(textAlign = TextAlign.Center),
         )
 
         DialogInputSpacing()

@@ -20,9 +20,9 @@ import android.content.Context
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,6 +46,7 @@ import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.Spinner
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import org.threeten.bp.Duration
 import org.threeten.bp.Period
 import org.threeten.bp.temporal.ChronoUnit
@@ -182,7 +183,7 @@ fun GraphStatDurationSpinner(
         modifier = modifier,
         label = label,
         paddingValues = PaddingValues(
-            start = dimensionResource(id = R.dimen.card_padding)
+            start = cardPadding
         )
     ) {
         val spinnerItems = mapOf(
@@ -346,7 +347,7 @@ private fun CustomDurationDialog(
                     .focusRequester(focusRequester)
                     .weight(0.6f),
                 value = selectedNumber,
-                textStyle = MaterialTheme.typography.h5.copy(
+                textStyle = MaterialTheme.typography.titleMedium.copy(
                     textAlign = TextAlign.Center,
                 ),
                 maxLines = 1,

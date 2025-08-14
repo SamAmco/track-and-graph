@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -31,9 +32,9 @@ import androidx.compose.foundation.layout.systemBarsIgnoringVisibility
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableIntStateOf
@@ -72,73 +73,76 @@ fun MenuDrawerContent(
     onThemeSelected: (ThemeSelection) -> Unit,
     currentDateFormat: State<Int>,
     onDateFormatSelected: (Int) -> Unit
-) = Column(
-    modifier = Modifier
-        .verticalScroll(rememberScrollState())
-        .windowInsetsPadding(WindowInsets.systemBarsIgnoringVisibility)
 ) {
-    Text(
-        modifier = Modifier.padding(inputSpacingLarge),
-        text = stringResource(R.string.app_name),
-        style = MaterialTheme.typography.h6,
-    )
+    Column(
+        modifier = Modifier
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
+            .windowInsetsPadding(WindowInsets.systemBarsIgnoringVisibility)
+    ) {
+        Text(
+            modifier = Modifier.padding(inputSpacingLarge),
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.titleSmall,
+        )
 
-    GradientDivider(
-        modifier = Modifier.padding(vertical = inputSpacingLarge / 2)
-    )
+        GradientDivider(
+            modifier = Modifier.padding(vertical = inputSpacingLarge / 2)
+        )
 
-    MenuItem(
-        title = stringResource(R.string.home),
-        icon = painterResource(R.drawable.home_menu_icon)
-    ) { onNavigateFromMenu(R.id.groupFragment) }
+        MenuItem(
+            title = stringResource(R.string.home),
+            icon = painterResource(R.drawable.home_menu_icon)
+        ) { onNavigateFromMenu(R.id.groupFragment) }
 
-    MenuItem(
-        title = stringResource(R.string.reminders),
-        icon = painterResource(R.drawable.reminders_icon)
-    ) { onNavigateFromMenu(R.id.remindersFragment) }
+        MenuItem(
+            title = stringResource(R.string.reminders),
+            icon = painterResource(R.drawable.reminders_icon)
+        ) { onNavigateFromMenu(R.id.remindersFragment) }
 
-    MenuItem(
-        title = stringResource(R.string.notes),
-        icon = painterResource(R.drawable.edit_icon)
-    ) { onNavigateFromMenu(R.id.notesFragment) }
+        MenuItem(
+            title = stringResource(R.string.notes),
+            icon = painterResource(R.drawable.edit_icon)
+        ) { onNavigateFromMenu(R.id.notesFragment) }
 
-    MenuItem(
-        title = stringResource(R.string.backup_and_restore),
-        icon = painterResource(R.drawable.backup_restore_icon)
-    ) { onNavigateFromMenu(R.id.backupAndRestoreFragment) }
+        MenuItem(
+            title = stringResource(R.string.backup_and_restore),
+            icon = painterResource(R.drawable.backup_restore_icon)
+        ) { onNavigateFromMenu(R.id.backupAndRestoreFragment) }
 
-    Divider(
-        modifier = Modifier.padding(vertical = inputSpacingLarge / 2)
-    )
+        Divider(
+            modifier = Modifier.padding(vertical = inputSpacingLarge / 2)
+        )
 
-    MenuItem(
-        title = stringResource(R.string.faq),
-        icon = painterResource(R.drawable.faq_icon)
-    ) { onNavigateToBrowser(DrawerMenuBrowserLocation.FAQ) }
+        MenuItem(
+            title = stringResource(R.string.faq),
+            icon = painterResource(R.drawable.faq_icon)
+        ) { onNavigateToBrowser(DrawerMenuBrowserLocation.FAQ) }
 
-    MenuItem(
-        title = stringResource(R.string.rate_the_app),
-        icon = painterResource(R.drawable.rate_icon)
-    ) { onNavigateToBrowser(DrawerMenuBrowserLocation.RATE_APP) }
+        MenuItem(
+            title = stringResource(R.string.rate_the_app),
+            icon = painterResource(R.drawable.rate_icon)
+        ) { onNavigateToBrowser(DrawerMenuBrowserLocation.RATE_APP) }
 
-    MenuItem(
-        title = stringResource(R.string.about),
-        icon = painterResource(R.drawable.about_icon)
-    ) { onNavigateFromMenu(R.id.aboutPageFragment) }
+        MenuItem(
+            title = stringResource(R.string.about),
+            icon = painterResource(R.drawable.about_icon)
+        ) { onNavigateFromMenu(R.id.aboutPageFragment) }
 
-    Divider(
-        modifier = Modifier.padding(top = inputSpacingLarge)
-    )
+        Divider(
+            modifier = Modifier.padding(top = inputSpacingLarge)
+        )
 
-    ThemeMenuSpinner(
-        currentTheme = currentTheme,
-        onThemeSelected = onThemeSelected
-    )
+        ThemeMenuSpinner(
+            currentTheme = currentTheme,
+            onThemeSelected = onThemeSelected
+        )
 
-    DateFormatSpinner(
-        currentFormat = currentDateFormat,
-        onFormatSelected = onDateFormatSelected
-    )
+        DateFormatSpinner(
+            currentFormat = currentDateFormat,
+            onFormatSelected = onDateFormatSelected
+        )
+    }
 }
 
 @Composable
@@ -158,7 +162,7 @@ private fun ThemeMenuSpinner(
 ) {
     Text(
         stringResource(R.string.theme_colon),
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.titleSmall,
     )
 
     val themeValues = arrayOf(
@@ -200,7 +204,7 @@ private fun DateFormatSpinner(
 ) {
     Text(
         stringResource(R.string.date_format_colon),
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.titleSmall,
     )
 
     val formatNames = stringArrayResource(R.array.date_formats)
@@ -237,7 +241,7 @@ private fun MenuItem(
     InputSpacingLarge()
     Text(
         text = title,
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.titleSmall,
     )
 }
 

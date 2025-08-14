@@ -20,7 +20,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -124,7 +124,7 @@ private fun ExportFeaturesDialogContent(
         // File selection section
         Text(
             text = stringResource(R.string.export_to),
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
 
         SelectorButton(
@@ -139,9 +139,9 @@ private fun ExportFeaturesDialogContent(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = if (selectedFileUri == null) {
-                    MaterialTheme.colors.error
+                    MaterialTheme.colorScheme.error
                 } else {
-                    MaterialTheme.colors.onSurface
+                    MaterialTheme.colorScheme.onSurface
                 }
             )
         }
@@ -161,7 +161,7 @@ private fun ExportFeaturesDialogContent(
                 HalfDialogInputSpacing()
                 Text(
                     text = feature.name,
-                    style = MaterialTheme.typography.body2,
+                    style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f),
                 )
             }

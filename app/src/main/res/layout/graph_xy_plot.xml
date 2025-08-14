@@ -7,7 +7,7 @@
         style="@style/APDefacto.Light"
         android:layout_width="match_parent"
         android:layout_height="@dimen/graph_height"
-        android:layout_margin="@dimen/card_padding"
+        android:layout_margin="10dp"
         app:domainLineColor="?attr/colorOnSurface"
         app:domainLineThickness="0.1dp"
         app:lineLabelRotationBottom="-28"
@@ -15,8 +15,8 @@
         app:lineLabelTextColorLeft="?android:attr/textColorPrimary"
         app:lineLabelTextColorRight="?android:attr/textColorPrimary"
         app:lineLabelTextColorTop="?android:attr/textColorPrimary"
-        app:lineLabelTextSizeBottom="@dimen/small_label_size"
-        app:lineLabelTextSizeLeft="@dimen/small_label_size"
+        app:lineLabelTextSizeBottom="10sp"
+        app:lineLabelTextSizeLeft="10sp"
         app:rangeLineColor="?attr/colorOnSurface"
         app:rangeLineThickness="0.1dp" />
 

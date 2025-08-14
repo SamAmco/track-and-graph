@@ -23,10 +23,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,7 +39,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.platform.SoftwareKeyboardController
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -56,7 +55,7 @@ fun AddTrackerView(viewModel: AddTrackerViewModel) {
     val errorText by viewModel.errorText.observeAsState()
     val openDialog by viewModel.showUpdateWarningAlertDialog.observeAsState(false)
 
-    Surface(color = MaterialTheme.colors.background) {
+    Surface(color = MaterialTheme.colorScheme.background) {
         Column(
             Modifier
                 .imePadding()
@@ -101,7 +100,7 @@ private fun AddTrackerInputForm(
     focusRequester: FocusRequester
 ) = Column(
     modifier = modifier
-        .padding(dimensionResource(id = R.dimen.card_padding))
+        .padding(cardPadding)
         .fillMaxWidth()
         .verticalScroll(state = rememberScrollState())
 ) {
@@ -164,7 +163,7 @@ private fun AdvancedOptions(viewModel: AddTrackerViewModel) = Column {
 
             Text(
                 text = stringResource(id = R.string.suggestions),
-                style = MaterialTheme.typography.subtitle2
+                style = MaterialTheme.typography.titleSmall
             )
 
             SuggestionType(viewModel)
@@ -242,7 +241,7 @@ private fun AdvancedSectionHeader(
     DialogInputSpacing()
     Text(
         text = stringResource(id = R.string.advanced_options),
-        style = MaterialTheme.typography.subtitle1
+        style = MaterialTheme.typography.titleMedium
     )
     Icon(
         modifier = Modifier.rotate(if (expanded) 180f else 0f),
@@ -259,7 +258,7 @@ private fun RowScope.Divider() {
         modifier = Modifier
             .weight(1f)
             .height(1.dp)
-            .background(MaterialTheme.colors.onSurface.copy(alpha = 0.2f))
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
     )
 }
 
@@ -305,8 +304,8 @@ private fun DurationConversionModeInput(
         Text(
             text = name,
             modifier = Modifier
-                .padding(horizontal = dimensionResource(id = R.dimen.card_padding)),
-            style = MaterialTheme.typography.subtitle2
+                .padding(horizontal = cardPadding),
+            style = MaterialTheme.typography.titleSmall
         )
         TextMapSpinner(
             strings = strings,

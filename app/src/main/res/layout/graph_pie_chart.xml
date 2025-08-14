@@ -6,7 +6,7 @@
         style="@style/APDefacto.Light"
         android:layout_width="match_parent"
         android:layout_height="@dimen/graph_height"
-        android:layout_margin="@dimen/card_padding"
+        android:layout_margin="10dp"
         android:minHeight="100dp"
         android:visibility="visible" />
 </layout>

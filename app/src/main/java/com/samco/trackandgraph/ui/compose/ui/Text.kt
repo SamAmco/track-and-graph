@@ -26,8 +26,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -53,43 +53,43 @@ private fun TextPreview() = TnGComposeTheme {
         verticalArrangement = Arrangement.spacedBy(cardPadding),
     ) {
         Text(
-            style = MaterialTheme.typography.h1,
+            style = MaterialTheme.typography.headlineLarge,
             text = "Text h1"
         )
         Text(
-            style = MaterialTheme.typography.h2,
+            style = MaterialTheme.typography.headlineMedium,
             text = "Text h2"
         )
         Text(
-            style = MaterialTheme.typography.h3,
+            style = MaterialTheme.typography.headlineSmall,
             text = "Text h3"
         )
         Text(
-            style = MaterialTheme.typography.h4,
+            style = MaterialTheme.typography.titleLarge,
             text = "Text h4"
         )
         Text(
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.titleMedium,
             text = "Text h5"
         )
         Text(
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleSmall,
             text = "Text h6"
         )
         Text(
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             text = "Text body 1"
         )
         Text(
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             text = "Text body 2"
         )
         Text(
-            style = MaterialTheme.typography.subtitle1,
+            style = MaterialTheme.typography.titleMedium,
             text = "Text subtitle 1"
         )
         Text(
-            style = MaterialTheme.typography.subtitle2,
+            style = MaterialTheme.typography.titleSmall,
             text = "Text subtitle 2"
         )
 
@@ -112,12 +112,12 @@ fun TrackerNameHeadline(
         modifier = Modifier.wrapContentWidth(),
         text = name,
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.h4.fontSize,
-        fontWeight = MaterialTheme.typography.h4.fontWeight
+        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+        fontWeight = MaterialTheme.typography.titleLarge.fontWeight
     )
     Box(
         Modifier
-            .background(MaterialTheme.colors.secondary)
+            .background(MaterialTheme.colorScheme.secondary)
             .fillMaxWidth()
             .height(1.dp)
     )
@@ -134,7 +134,7 @@ fun TextBody1(
     text = text,
     color = MaterialTheme.tngColors.textColorSecondary,
     textAlign = textAlign,
-    style = MaterialTheme.typography.body1,
+    style = MaterialTheme.typography.bodyLarge,
     maxLines = maxLines
 )
 
@@ -148,8 +148,8 @@ fun TextSubtitle2(
     modifier = modifier,
     text = text,
     textAlign = textAlign,
-    style = MaterialTheme.typography.subtitle2,
-    color = MaterialTheme.colors.onSurface,
+    style = MaterialTheme.typography.titleSmall,
+    color = MaterialTheme.colorScheme.onSurface,
     maxLines = maxLines
 )
 
@@ -164,8 +164,8 @@ fun TextLink(
     modifier = modifier.clickable(onClick = onClick),
     text = text,
     textAlign = textAlign,
-    style = MaterialTheme.typography.body1,
-    color = MaterialTheme.colors.secondaryVariant,
+    style = MaterialTheme.typography.bodyLarge,
+    color = MaterialTheme.tngColors.hyperlinkColor,
     maxLines = maxLines
 )
 
@@ -176,8 +176,8 @@ fun EmptyPageHintText(
 ) = Text(
     modifier = modifier,
     text = text,
-    style = MaterialTheme.typography.subtitle2,
-    color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+    style = MaterialTheme.typography.titleSmall,
+    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
     textAlign = TextAlign.Center,
 )
 
@@ -185,7 +185,7 @@ fun EmptyPageHintText(
 fun DayMonthYearHourMinuteWeekDayOneLineText(
     dateTime: OffsetDateTime,
     modifier: Modifier = Modifier,
-    style: TextStyle = MaterialTheme.typography.body2,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
     fontWeight: FontWeight = FontWeight.Bold,
     fontStyle: FontStyle = FontStyle.Italic,
     overflow: TextOverflow = TextOverflow.Ellipsis,

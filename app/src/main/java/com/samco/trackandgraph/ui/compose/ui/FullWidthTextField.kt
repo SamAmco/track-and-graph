@@ -20,7 +20,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Text
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -62,7 +63,7 @@ fun FullWidthTextField(
         )
     }
 
-    SlimOutlinedTextField(
+    OutlinedTextField(
         value = textFieldValue,
         label = { Text(text = label) },
         onValueChange = { onValueChange(it) },
@@ -71,6 +72,7 @@ fun FullWidthTextField(
         singleLine = singleLine,
         modifier = modifier
             .fillMaxWidth()
+            .slimOutlinedTextField()
             .wrapContentHeight()
             .onFocusChanged {
                 if (it.hasFocus) keyboardController?.show()

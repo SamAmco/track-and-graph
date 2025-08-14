@@ -14,8 +14,6 @@
  *  You should have received a copy of the GNU General Public License
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.annotation.ColorRes
@@ -31,12 +29,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuDefaults
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,12 +46,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.dataVisColorList
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <T> Spinner(
     modifier: Modifier = Modifier,
@@ -65,7 +63,7 @@ fun <T> Spinner(
     enabled: Boolean = true,
     enableTrailingIcon: Boolean = true,
     paddingValues: PaddingValues = PaddingValues(
-        horizontal = dimensionResource(id = R.dimen.card_padding)
+        horizontal = cardPadding
     ),
     dropdownContentAlignment: Alignment.Horizontal = Alignment.Start
 ) {
@@ -90,9 +88,7 @@ fun <T> Spinner(
         ) {
             selectedItemFactory(Modifier, selectedItem, expanded)
             if (enableTrailingIcon) {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded) {
-                    if (enabled) expanded = !expanded
-                }
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded)
             }
         }
 
@@ -110,7 +106,7 @@ fun <T> Spinner(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = dropDownModifier
-                    .background(color = MaterialTheme.colors.surface)
+                    .background(color = MaterialTheme.colorScheme.surface)
             ) {
                 items.forEachIndexed { index, element ->
                     DropdownMenuItem(
@@ -118,15 +114,16 @@ fun <T> Spinner(
                         onClick = {
                             onItemSelected(items[index])
                             expanded = false
+                        },
+                        text = {
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalAlignment = dropdownContentAlignment
+                            ) {
+                                dropdownItemFactory(element, index)
+                            }
                         }
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = dropdownContentAlignment
-                        ) {
-                            dropdownItemFactory(element, index)
-                        }
-                    }
+                    )
                 }
             }
         }
@@ -200,12 +197,13 @@ fun ColorCircle(
 fun Circle(
     modifier: Modifier = Modifier,
     size: Dp = 54.dp,
-    backgroundColor: Color = MaterialTheme.colors.surface,
+    backgroundColor: Color = MaterialTheme.colorScheme.surface,
     content: @Composable () -> Unit
 ) = Card(
     modifier = modifier.size(size),
     shape = RoundedCornerShape(100),
-    backgroundColor = backgroundColor,
-    elevation = 0.dp,
-    content = content
-)
+    colors = CardDefaults.cardColors(containerColor = backgroundColor),
+    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+) {
+    content()
+}

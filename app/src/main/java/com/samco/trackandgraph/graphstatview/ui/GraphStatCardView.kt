@@ -8,11 +8,13 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -22,13 +24,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.group.GraphStatClickListener
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
+import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
@@ -78,7 +82,7 @@ fun GraphStatCardView(
     clickListener: GraphStatClickListener? = null,
 ) = Box(
     modifier = Modifier
-        .padding(dimensionResource(id = R.dimen.card_margin_small))
+        .padding(cardMarginSmall)
         .fillMaxWidth()
 ) {
     Card(
@@ -92,11 +96,13 @@ fun GraphStatCardView(
                     ) { clickListener.onClick(graphStatViewData) }
                 } else it
             },
-        elevation = if (isElevated) cardElevation * 3f else cardElevation
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3f else cardElevation),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = MaterialTheme.shapes.small
     ) {
         Box(
             modifier = Modifier
-                .padding(dimensionResource(id = R.dimen.card_padding))
+                .padding(cardPadding)
                 .fillMaxWidth()
         ) {
             if (clickListener != null) {
@@ -135,29 +141,33 @@ private fun MenuSection(
         expanded = expanded,
         onDismissRequest = { expanded = false }
     ) {
-        DropdownMenuItem(onClick = {
-            clickListener.onDelete(graphStatViewData)
-            expanded = false
-        }) {
-            Text(stringResource(id = R.string.delete))
-        }
-        DropdownMenuItem(onClick = {
-            clickListener.onEdit(graphStatViewData)
-            expanded = false
-        }) {
-            Text(stringResource(id = R.string.edit))
-        }
-        DropdownMenuItem(onClick = {
-            clickListener.onMove(graphStatViewData)
-            expanded = false
-        }) {
-            Text(stringResource(id = R.string.move_to))
-        }
-        DropdownMenuItem(onClick = {
-            clickListener.onDuplicate(graphStatViewData)
-            expanded = false
-        }) {
-            Text(stringResource(id = R.string.duplicate))
-        }
+        DropdownMenuItem(
+            text = { Text(stringResource(id = R.string.delete)) },
+            onClick = {
+                clickListener.onDelete(graphStatViewData)
+                expanded = false
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(id = R.string.edit)) },
+            onClick = {
+                clickListener.onEdit(graphStatViewData)
+                expanded = false
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(id = R.string.move_to)) },
+            onClick = {
+                clickListener.onMove(graphStatViewData)
+                expanded = false
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(id = R.string.duplicate)) },
+            onClick = {
+                clickListener.onDuplicate(graphStatViewData)
+                expanded = false
+            }
+        )
     }
 }

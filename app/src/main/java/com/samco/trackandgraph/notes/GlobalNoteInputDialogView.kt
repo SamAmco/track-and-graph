@@ -18,8 +18,8 @@
 package com.samco.trackandgraph.notes
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -95,7 +95,7 @@ private fun GlobalNoteInputDialog(
     Text(
         modifier = Modifier.fillMaxWidth(),
         text = stringResource(id = R.string.add_a_global_note),
-        style = MaterialTheme.typography.h5,
+        style = MaterialTheme.typography.titleMedium,
         textAlign = TextAlign.Center
     )
 

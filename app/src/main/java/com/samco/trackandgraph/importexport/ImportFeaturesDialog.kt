@@ -21,7 +21,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -126,7 +126,7 @@ private fun ImportFeaturesDialogContent(
         // Header text
         Text(
             text = stringResource(R.string.import_from),
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.bodyLarge
         )
 
         // File selection button
@@ -142,9 +142,9 @@ private fun ImportFeaturesDialogContent(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = if (selectedFileUri == null) {
-                    MaterialTheme.colors.error
+                    MaterialTheme.colorScheme.error
                 } else {
-                    MaterialTheme.colors.onSurface
+                    MaterialTheme.colorScheme.onSurface
                 }
             )
         }
@@ -160,12 +160,12 @@ private fun ImportFeaturesDialogContent(
                 painter = painterResource(R.drawable.warning_icon),
                 contentDescription = null,
                 modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colors.primary.copy(alpha = 0.4f)
+                tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
             )
 
             Text(
                 text = stringResource(R.string.import_warning),
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
         }

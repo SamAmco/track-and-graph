@@ -26,10 +26,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.foundation.text.appendInlineContent
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -58,6 +58,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ITextViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ITimeHistogramViewData
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FadingScrollColumn
+import com.samco.trackandgraph.ui.compose.ui.smallIconSize
 import org.luaj.vm2.LuaError
 import org.threeten.bp.OffsetDateTime
 
@@ -150,7 +151,7 @@ private fun GraphHeading(
                 append(graphStatViewData.graphOrStat.name)
             }
         }
-        val iconSize = dimensionResource(id = R.dimen.icon_size_small).value.sp
+        val iconSize = smallIconSize.value.sp
         val inlineContentMap = mapOf(
             "lua_icon" to InlineTextContent(
                 placeholder = Placeholder(iconSize, iconSize, PlaceholderVerticalAlign.TextCenter),
@@ -159,14 +160,14 @@ private fun GraphHeading(
         )
         Text(
             text = annotatedString,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleSmall,
             inlineContent = inlineContentMap,
             textAlign = TextAlign.Center
         )
     } else {
         Text(
             text = graphStatViewData.graphOrStat.name,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleSmall,
             textAlign = TextAlign.Center
         )
     }
@@ -174,10 +175,9 @@ private fun GraphHeading(
 
 @Composable
 private fun LuaIcon(modifier: Modifier = Modifier) = Icon(
-    modifier = modifier
-        .size(dimensionResource(id = R.dimen.icon_size_small)),
+    modifier = modifier.size(smallIconSize),
     painter = painterResource(R.drawable.lua_icon),
-    tint = MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
     contentDescription = null
 )
 

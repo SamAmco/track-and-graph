@@ -579,6 +579,9 @@ class GroupViewModelImpl @Inject constructor(
     }
 
     override fun onDragSwap(from: Int, to: Int) {
+        if (!isDragging.value) return
+        if (from !in temporaryDragDropChildren.value.indices) return
+        if (to !in temporaryDragDropChildren.value.indices) return
         // Swap the temporary children in place synchronously
         temporaryDragDropChildren.value = temporaryDragDropChildren.value.toMutableList()
             .apply { add(to, removeAt(from)) }

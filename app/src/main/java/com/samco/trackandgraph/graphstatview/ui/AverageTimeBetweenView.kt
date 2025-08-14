@@ -18,8 +18,8 @@
 package com.samco.trackandgraph.graphstatview.ui
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -45,7 +45,7 @@ fun AverageTimeBetweenView(
                 context = LocalContext.current,
                 millis = viewData.averageMillis.toLong()
             ),
-            style = MaterialTheme.typography.h3,
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
         )
     }

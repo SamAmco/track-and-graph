@@ -20,9 +20,9 @@ package com.samco.trackandgraph.addgroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -77,7 +77,7 @@ private fun AddGroupView(
 ) = Column(modifier) {
     Text(
         text = stringResource(id = R.string.add_group),
-        style = MaterialTheme.typography.h6
+        style = MaterialTheme.typography.titleSmall
     )
 
     InputSpacingLarge()

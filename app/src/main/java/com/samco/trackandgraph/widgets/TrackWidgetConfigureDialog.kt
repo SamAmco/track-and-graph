@@ -20,8 +20,8 @@ package com.samco.trackandgraph.widgets
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,16 +29,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun TrackWidgetConfigureDialog(
@@ -100,8 +99,8 @@ private fun TrackWidgetConfigureDialogContent(
         ) {
             Text(
                 text = stringResource(R.string.select_a_feature),
-                style = MaterialTheme.typography.subtitle2,
-                modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.card_padding))
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(horizontal = cardPadding)
             )
 
             DialogInputSpacing()

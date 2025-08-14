@@ -22,16 +22,15 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
@@ -92,7 +91,7 @@ private fun LastValueStatViewBody(
 
     Text(
         text = durationText,
-        style = MaterialTheme.typography.h4,
+        style = MaterialTheme.typography.titleLarge,
         textAlign = TextAlign.Center
     )
 
@@ -102,13 +101,13 @@ private fun LastValueStatViewBody(
         modifier = Modifier
             .border(
                 1.dp,
-                MaterialTheme.colors.onSurface.copy(alpha = 0.12f),
+                MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
                 MaterialTheme.shapes.small
             )
             .alpha(0.8f)
     ) {
         Row(
-            modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+            modifier = Modifier.padding(cardPadding),
             verticalAlignment = Alignment.CenterVertically
         ) {
 
@@ -118,7 +117,7 @@ private fun LastValueStatViewBody(
                     weekdayNames,
                     dataPoint.timestamp
                 ),
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
             )
 

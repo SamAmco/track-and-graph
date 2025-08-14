@@ -18,7 +18,6 @@ package com.samco.trackandgraph.graphstatinput.customviews
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -26,6 +25,7 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.YRangeType
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 
 @Composable
 fun GraphStatYRangeTypeSpinner(
@@ -35,7 +35,7 @@ fun GraphStatYRangeTypeSpinner(
     LabeledRow(
         label = stringResource(id = R.string.range_style),
         paddingValues = PaddingValues(
-            start = dimensionResource(id = R.dimen.card_padding)
+            start = cardPadding
         )
     ) {
         val strings = stringArrayResource(id = R.array.y_range_styles)

@@ -41,11 +41,12 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -170,7 +171,7 @@ private fun ViewGraphStatView(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(currentGraphWeight)
-                        .background(MaterialTheme.colors.surface)
+                        .background(MaterialTheme.colorScheme.surface)
                 ) {
                     GraphStatView(
                         modifier = Modifier.fillMaxSize(),
@@ -336,7 +337,7 @@ private fun NotesToggleButton(
     ) {
         Text(
             text = stringResource(R.string.notes),
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.bodyLarge,
             modifier = Modifier.padding(end = 8.dp)
         )
 
@@ -345,7 +346,7 @@ private fun NotesToggleButton(
                 id = if (showingNotes) R.drawable.down_arrow else R.drawable.up_arrow
             ),
             contentDescription = null,
-            tint = MaterialTheme.colors.onSurface
+            tint = MaterialTheme.colorScheme.onSurface
         )
     }
 }
@@ -380,8 +381,9 @@ private fun NoteCard(
     Card(
         modifier = modifier
             .clickable { onNoteClicked(note) },
-        elevation = cardElevation,
-        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        shape = MaterialTheme.shapes.small,
     ) {
         Column(
             modifier = Modifier.padding(cardPadding)
@@ -398,8 +400,8 @@ private fun NoteCard(
                     is GraphNote.DataPointNote -> {
                         Text(
                             text = note.featurePath,
-                            style = MaterialTheme.typography.body2,
-                            color = MaterialTheme.colors.onSurface,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
                             textAlign = TextAlign.End,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -420,9 +422,9 @@ private fun NoteCard(
                 is GraphNote.DataPointNote -> {
                     Text(
                         text = note.displayValue,
-                        style = MaterialTheme.typography.body2,
+                        style = MaterialTheme.typography.bodyMedium,
                         fontStyle = FontStyle.Italic,
-                        color = MaterialTheme.colors.onSurface,
+                        color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
@@ -439,8 +441,8 @@ private fun NoteCard(
             // Bottom row: note text
             Text(
                 text = note.noteText,
-                style = MaterialTheme.typography.body2,
-                color = MaterialTheme.colors.onSurface,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier

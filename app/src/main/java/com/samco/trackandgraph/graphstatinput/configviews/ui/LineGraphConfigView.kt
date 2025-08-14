@@ -28,19 +28,18 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
@@ -68,6 +67,7 @@ import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -160,7 +160,7 @@ private fun LineGraphFeatureInputView(
     onUpdate: (LineGraphFeature) -> Unit
 ) = Card {
     Column(
-        modifier = Modifier.padding(dimensionResource(id = R.dimen.card_padding)),
+        modifier = Modifier.padding(cardPadding),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             FullWidthTextField(
@@ -233,7 +233,7 @@ private fun LineGraphFeatureInputView(
                 TextMapSpinner(
                     strings = featureNames,
                     selectedItem = selectedItem,
-                    paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding)),
+                    paddingValues = PaddingValues(start = cardPadding),
                     onItemSelected = {
                         onUpdate(
                             lgf.copy(
@@ -251,7 +251,7 @@ private fun LineGraphFeatureInputView(
 
                 TextMapSpinner(
                     strings = averagingModeNames,
-                    paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding)),
+                    paddingValues = PaddingValues(start = cardPadding),
                     selectedItem = lgf.averagingMode,
                     onItemSelected = { onUpdate(lgf.copy(averagingMode = it)) }
                 )
@@ -262,7 +262,7 @@ private fun LineGraphFeatureInputView(
 
                 TextMapSpinner(
                     strings = plotModeNames,
-                    paddingValues = PaddingValues(start = dimensionResource(id = R.dimen.card_padding)),
+                    paddingValues = PaddingValues(start = cardPadding),
                     selectedItem = lgf.plottingMode,
                     onItemSelected = { onUpdate(lgf.copy(plottingMode = it)) }
                 )
@@ -270,7 +270,7 @@ private fun LineGraphFeatureInputView(
                     Text(
                         modifier = Modifier.alignByBaseline(),
                         text = stringResource(id = R.string.offset),
-                        style = MaterialTheme.typography.body1
+                        style = MaterialTheme.typography.bodyLarge
                     )
 
                     MiniNumericTextField(
@@ -287,7 +287,7 @@ private fun LineGraphFeatureInputView(
                     Text(
                         modifier = Modifier.alignByBaseline(),
                         text = stringResource(id = R.string.scale),
-                        style = MaterialTheme.typography.body1
+                        style = MaterialTheme.typography.bodyLarge
                     )
 
                     MiniNumericTextField(

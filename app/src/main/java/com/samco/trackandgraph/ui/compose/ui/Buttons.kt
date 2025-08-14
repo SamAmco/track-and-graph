@@ -28,13 +28,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonColors
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -109,8 +109,8 @@ fun SelectorButton(
 ) {
     Text(
         text = text,
-        fontWeight = MaterialTheme.typography.subtitle2.fontWeight,
-        fontSize = MaterialTheme.typography.subtitle2.fontSize,
+        fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
+        fontSize = MaterialTheme.typography.titleSmall.fontSize,
     )
 }
 
@@ -130,7 +130,7 @@ fun SelectorButton(
         vertical = 6.dp
     ),
     colors = ButtonDefaults.buttonColors(
-        backgroundColor = MaterialTheme.tngColors.selectorButtonColor
+        containerColor = MaterialTheme.tngColors.selectorButtonColor
     ),
     content = content,
 )
@@ -161,7 +161,7 @@ fun TextButton(
 ) {
     Text(
         text = text,
-        style = MaterialTheme.typography.button
+        style = MaterialTheme.typography.labelLarge
     )
 }
 
@@ -179,12 +179,12 @@ fun IconTextButton(
         modifier = Modifier.size(24.dp),
         painter = painterResource(id = icon),
         contentDescription = text,
-        tint = MaterialTheme.colors.onPrimary,
+        tint = MaterialTheme.colorScheme.onPrimary,
     )
     HalfDialogInputSpacing()
     Text(
         text = text,
-        style = MaterialTheme.typography.button
+        style = MaterialTheme.typography.labelLarge
     )
 }
 

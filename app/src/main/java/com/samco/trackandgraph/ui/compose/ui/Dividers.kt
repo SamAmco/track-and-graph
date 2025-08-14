@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -24,8 +24,8 @@ fun GradientDivider(
         .background(
             brush = Brush.horizontalGradient(
                 colors = listOf(
-                    MaterialTheme.colors.secondary,
-                    MaterialTheme.colors.surface.copy(alpha = 0.0f)
+                    MaterialTheme.colorScheme.secondary,
+                    MaterialTheme.colorScheme.surface.copy(alpha = 0.0f)
                 ),
             ),
         ),
@@ -38,7 +38,7 @@ fun Divider(
     modifier = modifier
         .fillMaxWidth()
         .height(1.dp)
-        .background(MaterialTheme.colors.onSurface.copy(alpha = 0.2f))
+        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f))
 )
 
 @Preview

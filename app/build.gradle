@@ -29,7 +29,7 @@ plugins {
 apply from: 'gradle/lua-tasks.gradle.kts'
 
 android {
-    compileSdk 35
+    compileSdkVersion 36
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
@@ -125,7 +125,6 @@ dependencies {
     implementation project(":functions")
 
     implementation libs.kotlin.reflect
-    implementation libs.androidx.constraintlayout
     implementation libs.androidx.legacy.support.v4
 
     //Dependency Injection
@@ -139,7 +138,6 @@ dependencies {
 
     //UI
     implementation libs.androidx.cardview
-    implementation libs.androidx.recyclerview
 
     implementation libs.compose.ui
     implementation libs.compose.ui.tooling
@@ -152,6 +150,7 @@ dependencies {
     implementation libs.compose.runtime.livedata
     // Material design stuff you might need at some point
     implementation libs.compose.material
+    implementation libs.compose.material3
     implementation libs.compose.theme.adapter
     implementation libs.accompanist.pager
 

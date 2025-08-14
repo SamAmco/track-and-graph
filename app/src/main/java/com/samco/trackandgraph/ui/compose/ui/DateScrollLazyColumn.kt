@@ -34,8 +34,8 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
@@ -173,8 +173,8 @@ fun <T : Datable> DateScrollLazyColumn(
                 .background(
                     Brush.linearGradient(
                         colors = listOf(
-                            MaterialTheme.colors.background.copy(alpha = 1f),
-                            MaterialTheme.colors.background.copy(alpha = 0.4f)
+                            MaterialTheme.colorScheme.background.copy(alpha = 1f),
+                            MaterialTheme.colorScheme.background.copy(alpha = 0.4f)
                         )
                     )
                 )
@@ -182,8 +182,8 @@ fun <T : Datable> DateScrollLazyColumn(
             Text(
                 modifier = Modifier.align(Alignment.TopCenter),
                 text = currentDateText.value ?: "",
-                style = MaterialTheme.typography.h3,
-                color = MaterialTheme.colors.onBackground
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onBackground
             )
         }
     }
@@ -220,7 +220,7 @@ private fun <T : Datable> ScrollBarCanvas(
 ) {
     // Scrollbar properties
     var scrollbarOffsetY by remember { mutableFloatStateOf(0f) }
-    val scrollGrabberColor = MaterialTheme.colors.primary
+    val scrollGrabberColor = MaterialTheme.colorScheme.primary
     val scrollGrabberDiamDp = 50.dp
     val scrollGrabberRadDp = remember(scrollGrabberDiamDp) { scrollGrabberDiamDp / 2 }
     val scrollGrabberDiamPx = with(LocalDensity.current) { scrollGrabberDiamDp.toPx() }
@@ -237,7 +237,7 @@ private fun <T : Datable> ScrollBarCanvas(
     }
 
     val icPainter = rememberVectorPainter(ImageVector.vectorResource(R.drawable.ic_scroll_grabber))
-    val grabberIconColor = MaterialTheme.colors.onPrimary
+    val grabberIconColor = MaterialTheme.colorScheme.onPrimary
     val grabberIconColorFilter = remember { ColorFilter.tint(grabberIconColor) }
     val grabberSize = remember { Size(scrollGrabberDiamPx, scrollGrabberDiamPx) }
 

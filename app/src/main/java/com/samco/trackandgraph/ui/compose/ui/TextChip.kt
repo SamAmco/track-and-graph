@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,7 +50,7 @@ fun TextChip(
 ) {
     Text(
         text = text,
-        style = MaterialTheme.typography.subtitle2
+        style = MaterialTheme.typography.titleSmall
     )
 }
 
@@ -62,7 +61,7 @@ fun AddChipButton(
 ) = TngChip(
     onClick = onClick,
     shape = RoundedCornerShape(100.dp),
-    contentPaddingValues = PaddingValues(dimensionResource(id = R.dimen.card_margin_small))
+    contentPaddingValues = PaddingValues(cardMarginSmall)
 ) {
     Icon(
         painter = painterResource(id = R.drawable.add_icon),
@@ -71,7 +70,7 @@ fun AddChipButton(
     )
     Text(
         text = text,
-        style = MaterialTheme.typography.body1,
+        style = MaterialTheme.typography.bodyLarge,
         color = MaterialTheme.tngColors.onSurface
     )
     DialogInputSpacing()
@@ -85,7 +84,7 @@ fun TngChip(
     onLongPress: () -> Unit = {},
     shape: Shape = MaterialTheme.shapes.medium,
     contentPaddingValues: PaddingValues = PaddingValues(
-        horizontal = dimensionResource(id = R.dimen.card_padding),
+        horizontal = cardPadding,
         vertical = 8.dp
     ),
     content: @Composable RowScope.() -> Unit,
