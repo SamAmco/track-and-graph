@@ -18,6 +18,7 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -59,12 +60,14 @@ fun <T> TextMapSpinner(
                 modifier = modifier.weight(1f),
                 text = strings[item] ?: "",
                 textAlign = textAlign,
+                style = MaterialTheme.typography.labelLarge,
             )
         },
         dropdownItemFactory = { item, _ ->
             Text(
                 text = strings[item] ?: "",
                 textAlign = textAlign,
+                style = MaterialTheme.typography.labelLarge,
             )
         },
         paddingValues = paddingValues,

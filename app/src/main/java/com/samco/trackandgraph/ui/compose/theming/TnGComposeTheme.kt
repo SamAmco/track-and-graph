@@ -138,7 +138,7 @@ private val CustomTypography = Typography(
     bodySmall = Typography().bodySmall.copy(fontSize = 13.sp),
 
     // Label styles (smallest text)
-    labelLarge = Typography().labelLarge.copy(fontSize = 12.sp),
+    labelLarge = Typography().labelLarge.copy(fontSize = 14.sp),
     labelMedium = Typography().labelMedium.copy(fontSize = 11.sp),
     labelSmall = Typography().labelSmall.copy(fontSize = 10.sp),
 )
@@ -223,15 +223,12 @@ fun TnGComposeTheme(
 
     CompositionLocalProvider(LocalColors provides colors) {
         CompositionLocalProvider(LocalTypography provides typography) {
-            // TODO this isn't working
-            CompositionLocalProvider(LocalTextStyle provides typography.materialTypography.titleLarge) {
-                MaterialTheme(
-                    colorScheme = colors.colorScheme,
-                    typography = typography.materialTypography,
-                    shapes = shapes,
-                    content = block
-                )
-            }
+            MaterialTheme(
+                colorScheme = colors.colorScheme,
+                typography = typography.materialTypography,
+                shapes = shapes,
+                content = block
+            )
         }
     }
 }

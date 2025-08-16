@@ -92,7 +92,10 @@ fun SmallTextButton(
     colors = colors,
     interactionSource = interactionSource,
 ) {
-    Text(stringResource(stringRes))
+    Text(
+        text = stringResource(stringRes),
+        style = MaterialTheme.typography.labelLarge
+    )
 }
 
 @Composable
