@@ -64,8 +64,7 @@ fun DataPointValueAndDescription(
 ) = Column(modifier = modifier) {
     Text(
         text = dataPoint.getDisplayValue(isDuration),
-        fontSize = MaterialTheme.typography.titleSmall.fontSize,
-        fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
+        style = MaterialTheme.typography.titleSmall,
     )
     if (dataPoint.note.isNotEmpty()) {
         DialogInputSpacing()

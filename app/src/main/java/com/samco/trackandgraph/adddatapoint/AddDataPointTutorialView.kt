@@ -14,13 +14,22 @@
 * You should have received a copy of the GNU General Public License
 * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
 */
-@file:OptIn(ExperimentalPagerApi::class)
 
 package com.samco.trackandgraph.adddatapoint
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
+import androidx.compose.foundation.gestures.snapping.SnapPosition
+import androidx.compose.foundation.gestures.snapping.snapFlingBehavior
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.animation.core.spring
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,34 +44,65 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.settings.mockSettings
+import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.ZoneOffset
 
 @Composable
-fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = Column(
-    modifier = Modifier.fillMaxSize()
-) {
+fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = Column {
     val currentPage by viewModel.currentPage.observeAsState(0)
-    val pagerState = rememberPagerState(initialPage = currentPage)
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentPage)
 
-    HorizontalPager(
-        modifier = Modifier.weight(1f),
-        count = 3,
-        state = pagerState
-    ) { page ->
-        FadingScrollColumn(modifier = Modifier.fillMaxSize()) {
-            when (page) {
-                0 -> TutorialPage0()
-                1 -> TutorialPage1()
-                2 -> TutorialPage2 { viewModel.onNavigateToFaqClicked() }
+    // Snap layout info for center snapping
+    val snapInfo = remember(listState) {
+        SnapLayoutInfoProvider(
+            lazyListState = listState,
+            snapPosition = SnapPosition.Center
+        )
+    }
+
+    // Heavy fling behavior for better snapping
+    val heavyFling = remember(snapInfo) {
+        val heavyDecay = exponentialDecay<Float>(
+            frictionMultiplier = 2.5f
+        )
+        val firmSnap = spring<Float>(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessHigh
+        )
+
+        snapFlingBehavior(
+            snapLayoutInfoProvider = snapInfo,
+            decayAnimationSpec = heavyDecay,
+            snapAnimationSpec = firmSnap
+        )
+    }
+
+    LazyRow(
+        state = listState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .animateContentSize(), // Smooth height transitions
+        flingBehavior = heavyFling
+    ) {
+        items(3) { page ->
+            Box(
+                modifier = Modifier.fillParentMaxWidth()
+            ) {
+                when (page) {
+                    0 -> TutorialPage0()
+                    1 -> TutorialPage1()
+                    2 -> TutorialPage2 { viewModel.onNavigateToFaqClicked() }
+                }
             }
         }
     }
@@ -77,35 +117,34 @@ fun AddDataPointsTutorial(viewModel: AddDataPointTutorialViewModel) = Column(
         onClick = viewModel::onButtonClicked
     )
 
-    //Synchronise page between view model and view:
+    // Bidirectional synchronization between ViewModel and LazyRow
 
-    LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.currentPage }.distinctUntilChanged().collect {
-            viewModel.onSwipeToPage(it)
-        }
+    // LazyRow scroll position -> ViewModel
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemIndex }
+            .distinctUntilChanged()
+            .collect { page ->
+                viewModel.onSwipeToPage(page)
+            }
     }
 
-    val scope = rememberCoroutineScope()
-
-    if (currentPage != pagerState.currentPage) {
-        LaunchedEffect(currentPage) {
-            scope.launch {
-                pagerState.animateScrollToPage(currentPage)
-            }
+    // ViewModel currentPage -> LazyRow scroll position
+    LaunchedEffect(currentPage) {
+        if (currentPage != listState.firstVisibleItemIndex) {
+            listState.animateScrollToItem(currentPage)
         }
     }
 }
 
 @Composable
-private fun TutorialPage2(onFaqClicked: () -> Unit) {
+private fun TutorialPage2(onFaqClicked: () -> Unit) = Column {
     InputSpacingLarge()
 
     Text(
         modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_3_description),
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+        style = MaterialTheme.typography.titleMedium
     )
 
     InputSpacingLarge()
@@ -159,8 +198,7 @@ private fun TutorialPage1() = Column(
         modifier = Modifier.padding(horizontal = inputSpacingLarge),
         text = stringResource(R.string.data_point_tutorial_page_2_description),
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.titleMedium.fontSize,
-        fontWeight = MaterialTheme.typography.titleMedium.fontWeight
+        style = MaterialTheme.typography.titleMedium
     )
 
     InputSpacingLarge()
@@ -189,27 +227,28 @@ private fun TutorialPage1() = Column(
 }
 
 @Composable
-private fun TutorialPage0() {
+private fun TutorialPage0(
+    displayTime: OffsetDateTime = OffsetDateTime.now()
+) {
     Column(
-        modifier = Modifier.fillMaxHeight(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         DialogInputSpacing()
 
         Text(
+            modifier = Modifier.padding(horizontal = inputSpacingLarge),
             text = stringResource(R.string.adding_your_first_data_point),
             textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.titleLarge.fontSize,
-            fontWeight = MaterialTheme.typography.titleLarge.fontWeight
+            style = MaterialTheme.typography.titleLarge,
         )
 
         InputSpacingLarge()
 
         Text(
+            modifier = Modifier.padding(horizontal = inputSpacingLarge),
             text = stringResource(R.string.each_data_point_has_a_timestamp_and_value),
             textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.titleSmall.fontSize,
-            fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
+            style = MaterialTheme.typography.titleMedium,
         )
 
         InputSpacingLarge()
@@ -222,7 +261,7 @@ private fun TutorialPage0() {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 DateTimeButtonRow(
                     modifier = Modifier.fillMaxWidth(),
-                    selectedDateTime = OffsetDateTime.now(),
+                    selectedDateTime = displayTime,
                     onDateTimeSelected = {}
                 )
 
@@ -237,7 +276,7 @@ private fun TutorialPage0() {
             //An overlay that fills the parent with a semi transparent background that consumes all click events
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .matchParentSize()
                     .background(color = MaterialTheme.tngColors.surface.copy(alpha = 0.4f))
                     .clickable(enabled = false, onClick = {})
             )
@@ -246,38 +285,73 @@ private fun TutorialPage0() {
         InputSpacingLarge()
 
         Text(
+            modifier = Modifier.padding(horizontal = inputSpacingLarge),
             text = stringResource(R.string.it_can_also_optionally_have_a_label_and_a_note),
             textAlign = TextAlign.Center,
-            fontSize = MaterialTheme.typography.titleSmall.fontSize,
-            fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
+            style = MaterialTheme.typography.titleMedium,
         )
 
         DialogInputSpacing()
 
         Box(
-            modifier = Modifier
-                .height(intrinsicSize = IntrinsicSize.Max)
-                .scale(0.8f)
+            modifier = Modifier.scale(0.8f)
         ) {
-            Row(
+            FlowRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = inputSpacingLarge),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                AddChipButton(text = stringResource(id = R.string.add_a_label)) { }
+                AddChipButton(stringResource(id = R.string.add_a_label)) { }
                 AddChipButton(stringResource(id = R.string.add_a_note)) {}
             }
 
             //An overlay that fills the parent with a semi transparent background that consumes all click events
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .matchParentSize()
                     .background(color = MaterialTheme.tngColors.surface.copy(alpha = 0.4f))
                     .clickable(enabled = false, onClick = {})
             )
         }
 
         InputSpacingLarge()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TutorialPage0Preview() {
+    TnGComposeTheme {
+        CompositionLocalProvider(LocalSettings provides mockSettings) {
+            TutorialPage0(
+                OffsetDateTime.of(
+                    2023,
+                    1,
+                    1,
+                    0,
+                    0,
+                    0,
+                    0,
+                    ZoneOffset.UTC
+                )
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TutorialPage1Preview() {
+    TnGComposeTheme {
+        TutorialPage1()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TutorialPage2Preview() {
+    TnGComposeTheme {
+        TutorialPage2(onFaqClicked = {})
     }
 }

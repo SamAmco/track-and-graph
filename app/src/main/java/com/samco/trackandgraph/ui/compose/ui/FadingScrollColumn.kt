@@ -50,6 +50,8 @@ fun FadingScrollColumn(
     val bottomColors = listOf(Color.Transparent, color)
     val topColors = listOf(color, Color.Transparent)
 
+    val threshold = 20
+
     Box {
         Column(
             modifier = modifier.verticalScroll(scrollState),
@@ -58,7 +60,7 @@ fun FadingScrollColumn(
             content = content
         )
 
-        if (scrollState.value > 1) {
+        if (scrollState.value > threshold) {
             Spacer(
                 Modifier
                     .align(Alignment.TopCenter)
@@ -68,7 +70,7 @@ fun FadingScrollColumn(
             )
         }
 
-        if (scrollState.value < scrollState.maxValue - 1) {
+        if (scrollState.value < scrollState.maxValue - threshold) {
             Spacer(
                 Modifier
                     .align(Alignment.BottomCenter)

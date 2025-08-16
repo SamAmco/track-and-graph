@@ -39,7 +39,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material.ripple
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -139,7 +139,7 @@ fun Tracker(
             .padding(cardMarginSmall)
             .clickable { onHistory(tracker) },
         elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = MaterialTheme.shapes.small,
     ) {
         BoxWithConstraints {

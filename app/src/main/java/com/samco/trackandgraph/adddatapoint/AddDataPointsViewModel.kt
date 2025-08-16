@@ -19,6 +19,8 @@
 package com.samco.trackandgraph.adddatapoint
 
 import android.content.Context
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -48,18 +50,19 @@ import kotlinx.coroutines.launch
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
+@Parcelize
 data class SuggestedValueViewData(
     val value: Double?,
     val valueStr: String?,
     val label: String?
-)
+) : Parcelable
 
 sealed interface AddDataPointViewModel {
     val name: LiveData<String>
     val timestamp: LiveData<OffsetDateTime>
     val label: TextFieldValue
     val note: TextFieldValue
-    val suggestedValues: LiveData<List<SuggestedValueViewData>>
+    val suggestedValues: LiveData<List<SuggestedValueViewData>?>
     val currentValueAsSuggestion: LiveData<SuggestedValueViewData?>
 
     val focusOnValueEvent: Flow<Unit>
@@ -89,13 +92,11 @@ interface AddDataPointsViewModel {
     val updateMode: LiveData<Boolean>
     val indexText: LiveData<String>
     val skipButtonVisible: LiveData<Boolean>
-    val dataPointPages: LiveData<Int>
     val currentPageIndex: LiveData<Int>
     val tutorialViewModel: AddDataPointTutorialViewModel
     val showCancelConfirmDialog: LiveData<Boolean>
     val dismissEvents: Flow<Unit>
-
-    fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel>
+    val pageViewModels: StateFlow<List<AddDataPointViewModel>>
 
     fun onTutorialButtonPressed()
 
@@ -126,10 +127,10 @@ interface AddDataPointsNavigationViewModel : AddDataPointsViewModel {
 
 @HiltViewModel
 class AddDataPointsViewModelImpl @Inject constructor(
-    @ApplicationContext private val applicationContext: Context,
+    @param:ApplicationContext private val applicationContext: Context,
     private val dataInteractor: DataInteractor,
     private val suggestedValueHelper: SuggestedValueHelper,
-    @IODispatcher private val io: CoroutineDispatcher,
+    @param:IODispatcher private val io: CoroutineDispatcher,
     private val prefHelper: PrefHelper,
     private val urlNavigator: UrlNavigator,
 ) : ViewModel(), AddDataPointsNavigationViewModel {
@@ -191,22 +192,13 @@ class AddDataPointsViewModelImpl @Inject constructor(
         viewModelScope.launch { tutorialButtonPresses.emit(Unit) }
     }
 
-    override val dataPointPages = configFlow
-        .map { it.size }
-        .distinctUntilChanged()
-        .asLiveData(viewModelScope.coroutineContext)
-
     override val currentPageIndex = indexFlow
         .asLiveData(viewModelScope.coroutineContext)
 
-    private val viewModels: SharedFlow<List<AddDataPointViewModelInner>> = configFlow
+    private val _pageViewModels : StateFlow<List<AddDataPointViewModelInner>> = configFlow
         .map { it.map { config -> createViewModel(config) } }
-        .shareIn(viewModelScope, SharingStarted.Eagerly, 1)
-
-    override fun getViewModel(pageIndex: Int): LiveData<AddDataPointViewModel> = viewModels
-        .map { it.getOrNull(pageIndex) }
-        .filterNotNull()
-        .asLiveData(viewModelScope.coroutineContext)
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    override val pageViewModels: StateFlow<List<AddDataPointViewModel>> = _pageViewModels
 
     private fun createViewModel(config: Config): AddDataPointViewModelInner {
         return when (config.tracker.dataType) {
@@ -241,7 +233,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
         override var label by mutableStateOf(TextFieldValue(config.label ?: ""))
         override var note by mutableStateOf(TextFieldValue(config.note ?: ""))
 
-        override val suggestedValues: LiveData<List<SuggestedValueViewData>> = suggestedValueHelper
+        override val suggestedValues: LiveData<List<SuggestedValueViewData>?> = suggestedValueHelper
             .getSuggestedValues(config.tracker)
             .map { list ->
                 list.map {
@@ -253,7 +245,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
                 }
             }
             .flowOn(io)
-            .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+            .stateIn(viewModelScope, SharingStarted.Lazily, null)
             .asLiveData(viewModelScope.coroutineContext)
 
         protected val onUpdateCurrentSuggestion = MutableSharedFlow<Unit>()
@@ -442,7 +434,7 @@ class AddDataPointsViewModelImpl @Inject constructor(
 
     private fun onCurrentViewModel(action: suspend (AddDataPointViewModelInner) -> Unit) =
         viewModelScope.launch {
-            combine(indexFlow, viewModels) { index, viewModels -> viewModels.getOrNull(index) }
+            combine(indexFlow, _pageViewModels) { index, viewModels -> viewModels.getOrNull(index) }
                 .take(1)
                 .filterNotNull()
                 .collect { action(it) }

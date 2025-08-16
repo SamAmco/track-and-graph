@@ -3,9 +3,8 @@ package com.samco.trackandgraph.ui.compose.ui
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
@@ -43,37 +42,35 @@ fun FadingLazyRow(
     val endColors = listOf(Color.Transparent, fadeColor)
     val startColors = listOf(fadeColor, Color.Transparent)
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        LazyRow(
-            modifier = modifier
-                .fillMaxSize()
-                .graphicsLayer { alpha = 0.99f }
-                .drawWithContent {
-                    drawContent()
-                    drawRect(
-                        Brush.horizontalGradient(startColors, 0f, fadeSize),
-                        size = Size(fadeSize, this.size.height),
-                        blendMode = BlendMode.Companion.SrcOver
-                    )
-                    drawRect(
-                        brush = Brush.horizontalGradient(
-                            endColors,
-                            this.size.width - fadeSize,
-                            this.size.width
-                        ),
-                        topLeft = Offset(this.size.width - fadeSize, 0f),
-                        size = Size(fadeSize, this.size.height),
-                        blendMode = BlendMode.Companion.SrcOver
-                    )
-                },
-            state = state,
-            contentPadding = contentPadding,
-            reverseLayout = reverseLayout,
-            horizontalArrangement = horizontalArrangement,
-            verticalAlignment = verticalAlignment,
-            flingBehavior = flingBehavior,
-            userScrollEnabled = userScrollEnabled,
-            content = content
-        )
-    }
+    LazyRow(
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer { alpha = 0.99f }
+            .drawWithContent {
+                drawContent()
+                drawRect(
+                    Brush.horizontalGradient(startColors, 0f, fadeSize),
+                    size = Size(fadeSize, this.size.height),
+                    blendMode = BlendMode.Companion.SrcOver
+                )
+                drawRect(
+                    brush = Brush.horizontalGradient(
+                        endColors,
+                        this.size.width - fadeSize,
+                        this.size.width
+                    ),
+                    topLeft = Offset(this.size.width - fadeSize, 0f),
+                    size = Size(fadeSize, this.size.height),
+                    blendMode = BlendMode.Companion.SrcOver
+                )
+            },
+        state = state,
+        contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+        horizontalArrangement = horizontalArrangement,
+        verticalAlignment = verticalAlignment,
+        flingBehavior = flingBehavior,
+        userScrollEnabled = userScrollEnabled,
+        content = content
+    )
 }

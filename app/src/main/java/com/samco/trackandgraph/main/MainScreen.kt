@@ -16,6 +16,7 @@
  */
 package com.samco.trackandgraph.main
 
+import android.support.v4.media.session.MediaSessionCompat.Token.fromToken
 import android.view.View
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -362,7 +363,7 @@ private fun MainViewPreview() {
                 )
             },
             drawerState = rememberDrawerState(
-                initialValue = DrawerValue.Open
+                initialValue = DrawerValue.Closed
             ),
             onAppBarAction = {},
             navController = null,

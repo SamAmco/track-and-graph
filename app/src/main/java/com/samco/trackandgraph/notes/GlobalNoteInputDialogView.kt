@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.settings.mockSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.ui.*
@@ -127,11 +128,6 @@ private fun GlobalNoteInputDialog(
 @Preview
 @Composable
 fun PreviewGlobalNoteInputDialog() {
-    val mockSettings = object : TngSettings {
-        override val firstDayOfWeek = DayOfWeek.MONDAY
-        override val startTimeOfDay = Duration.ofSeconds(0)
-    }
-
     CompositionLocalProvider(LocalSettings provides mockSettings) {
         TnGComposeTheme {
             val note = remember { mutableStateOf(TextFieldValue("Hello")) }

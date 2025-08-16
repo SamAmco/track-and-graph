@@ -18,6 +18,7 @@ package com.samco.trackandgraph.ui.compose.theming
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
@@ -120,22 +121,22 @@ private val CustomTypography = Typography(
     displayLarge = Typography().displayLarge.copy(fontSize = 70.sp),
     displayMedium = Typography().displayMedium.copy(fontSize = 45.sp),
     displaySmall = Typography().displaySmall.copy(fontSize = 36.sp),
-    
+
     // Headline styles
     headlineLarge = Typography().headlineLarge.copy(fontSize = 30.sp),
     headlineMedium = Typography().headlineMedium.copy(fontSize = 22.sp),
     headlineSmall = Typography().headlineSmall.copy(fontSize = 20.sp),
-    
+
     // Title styles
-    titleLarge = Typography().titleLarge.copy(fontSize = 17.sp),
-    titleMedium = Typography().titleMedium.copy(fontSize = 17.sp),
-    titleSmall = Typography().titleSmall.copy(fontSize = 16.sp),
-    
+    titleLarge = Typography().titleLarge.copy(fontSize = 28.sp),
+    titleMedium = Typography().titleMedium.copy(fontSize = 20.sp),
+    titleSmall = Typography().titleSmall.copy(fontSize = 17.sp),
+
     // Body styles
     bodyLarge = Typography().bodyLarge.copy(fontSize = 15.sp),
     bodyMedium = Typography().bodyMedium.copy(fontSize = 15.sp),
     bodySmall = Typography().bodySmall.copy(fontSize = 13.sp),
-    
+
     // Label styles (smallest text)
     labelLarge = Typography().labelLarge.copy(fontSize = 12.sp),
     labelMedium = Typography().labelMedium.copy(fontSize = 11.sp),
@@ -208,7 +209,7 @@ private val DarkTngColors = TngColors(
     colorScheme = DarkColorScheme,
     selectorButtonColor = darkGray,
     textColorSecondary = lightGray,
-    toolbarBackgroundColor = lightCharcoal,
+    toolbarBackgroundColor = midCharcoal,
     hyperlinkColor = fadedDarkBlue, // Using faded_dark_blue from colorSecondaryVariant
 )
 
@@ -222,12 +223,15 @@ fun TnGComposeTheme(
 
     CompositionLocalProvider(LocalColors provides colors) {
         CompositionLocalProvider(LocalTypography provides typography) {
-            MaterialTheme(
-                colorScheme = colors.colorScheme,
-                typography = typography.materialTypography,
-                shapes = shapes,
-                content = block
-            )
+            // TODO this isn't working
+            CompositionLocalProvider(LocalTextStyle provides typography.materialTypography.titleLarge) {
+                MaterialTheme(
+                    colorScheme = colors.colorScheme,
+                    typography = typography.materialTypography,
+                    shapes = shapes,
+                    content = block
+                )
+            }
         }
     }
 }
@@ -249,12 +253,7 @@ fun DialogTheme(
     }
 
     CompositionLocalProvider(LocalColors provides colors) {
-        MaterialTheme(
-            colorScheme = colors.colorScheme,
-            typography = MaterialTheme.typography,
-            shapes = MaterialTheme.shapes,
-            content = block
-        )
+        block()
     }
 }
 

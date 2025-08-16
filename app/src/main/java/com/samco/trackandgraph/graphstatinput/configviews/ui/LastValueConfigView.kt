@@ -16,9 +16,8 @@
 */
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,7 +58,7 @@ fun LastValueConfigView(
 
     DialogInputSpacing()
 
-    Divider()
+    HorizontalDivider()
 
     InputSpacingLarge()
 

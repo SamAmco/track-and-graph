@@ -37,19 +37,52 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
-import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 
 @Preview(showBackground = true, device = Devices.PIXEL_3)
 @Composable
-private fun DurationInputPreview() = DurationInput(
-    modifier = Modifier,
-    viewModel = DurationInputViewModelImpl()
-)
+private fun DurationInputPreview() {
+    DurationInputView(
+        modifier = Modifier,
+        hours = TextFieldValue("1"),
+        minutes = TextFieldValue("30"),
+        seconds = TextFieldValue("45"),
+        onHoursChanged = {},
+        onMinutesChanged = {},
+        onSecondsChanged = {}
+    )
+}
 
+// Legacy ViewModel-based component for backward compatibility
 @Composable
 fun DurationInput(
     modifier: Modifier = Modifier,
     viewModel: DurationInputViewModel,
+    focusManager: FocusManager = LocalFocusManager.current,
+    nextFocusDirection: FocusDirection? = null,
+    focusRequester: FocusRequester? = null
+) = DurationInputView(
+    modifier = modifier,
+    hours = viewModel.hours,
+    minutes = viewModel.minutes,
+    seconds = viewModel.seconds,
+    onHoursChanged = { viewModel.setHoursText(it) },
+    onMinutesChanged = { viewModel.setMinutesText(it) },
+    onSecondsChanged = { viewModel.setSecondsText(it) },
+    focusManager = focusManager,
+    nextFocusDirection = nextFocusDirection,
+    focusRequester = focusRequester
+)
+
+// Pure UI component that doesn't depend on ViewModel
+@Composable
+fun DurationInputView(
+    modifier: Modifier = Modifier,
+    hours: TextFieldValue,
+    minutes: TextFieldValue,
+    seconds: TextFieldValue,
+    onHoursChanged: (TextFieldValue) -> Unit,
+    onMinutesChanged: (TextFieldValue) -> Unit,
+    onSecondsChanged: (TextFieldValue) -> Unit,
     focusManager: FocusManager = LocalFocusManager.current,
     nextFocusDirection: FocusDirection? = null,
     focusRequester: FocusRequester? = null
@@ -63,12 +96,12 @@ fun DurationInput(
     horizontalArrangement = Arrangement.Center
 ) {
     DurationInputComponent(
-        textFieldValue = viewModel.hours,
-        onValueChange = { viewModel.setHoursText(it) },
+        textFieldValue = hours,
+        onValueChange = onHoursChanged,
         suffix = stringResource(id = R.string.hours_suffix),
         charLimit = 8,
         focusManager = focusManager,
-        focusRequester = focusRequester
+        focusRequester = focusRequester,
     )
     Text(
         text = ":",
@@ -76,8 +109,8 @@ fun DurationInput(
         modifier = Modifier.alignByBaseline()
     )
     DurationInputComponent(
-        textFieldValue = viewModel.minutes,
-        onValueChange = { viewModel.setMinutesText(it) },
+        textFieldValue = minutes,
+        onValueChange = onMinutesChanged,
         suffix = stringResource(id = R.string.minutes_suffix),
         charLimit = 3,
         focusManager = focusManager
@@ -88,8 +121,8 @@ fun DurationInput(
         modifier = Modifier.alignByBaseline()
     )
     DurationInputComponent(
-        textFieldValue = viewModel.seconds,
-        onValueChange = { viewModel.setSecondsText(it) },
+        textFieldValue = seconds,
+        onValueChange = onSecondsChanged,
         suffix = stringResource(id = R.string.seconds_suffix),
         charLimit = 3,
         focusManager = focusManager,
@@ -109,7 +142,9 @@ private fun RowScope.DurationInputComponent(
     focusRequester: FocusRequester? = null
 ) {
     MiniNumericTextField(
-        modifier = Modifier.alignByBaseline(),
+        modifier = Modifier
+            .alignByBaseline()
+            .weight(1f, fill = false),
         textFieldValue = textFieldValue,
         onValueChange = onValueChange,
         charLimit = charLimit,
