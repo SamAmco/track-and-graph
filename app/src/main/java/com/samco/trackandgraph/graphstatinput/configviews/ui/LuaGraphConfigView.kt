@@ -335,9 +335,9 @@ private fun LuaGraphFeatureInputView(
         DialogInputSpacing()
 
         TextMapSpinner(
+            modifier = Modifier.padding(start = 4.dp),
             strings = features,
             selectedItem = lgf.featureId,
-            paddingValues = PaddingValues(start = cardPadding + 4.dp),
             onItemSelected = onChangeSelectedFeatureId
         )
     }

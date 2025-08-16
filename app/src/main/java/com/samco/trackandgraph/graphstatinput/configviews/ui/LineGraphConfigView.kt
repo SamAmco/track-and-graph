@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,6 +68,7 @@ import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
+import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -158,7 +160,10 @@ private fun LineGraphFeatureInputView(
     textFields: LineGraphConfigViewModel.FeatureTextFields,
     onRemove: () -> Unit,
     onUpdate: (LineGraphFeature) -> Unit
-) = Card {
+) = Card(
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
+) {
     Column(
         modifier = Modifier.padding(cardPadding),
     ) {
@@ -233,7 +238,6 @@ private fun LineGraphFeatureInputView(
                 TextMapSpinner(
                     strings = featureNames,
                     selectedItem = selectedItem,
-                    paddingValues = PaddingValues(start = cardPadding),
                     onItemSelected = {
                         onUpdate(
                             lgf.copy(
@@ -247,22 +251,20 @@ private fun LineGraphFeatureInputView(
                 val averagingModeNames =
                     stringArrayResource(id = R.array.line_graph_averaging_mode_names)
                         .mapIndexed { index, name -> index to name }
-                        .associate { (index, name) -> LineGraphAveraginModes.values()[index] to name }
+                        .associate { (index, name) -> LineGraphAveraginModes.entries.toTypedArray()[index] to name }
 
                 TextMapSpinner(
                     strings = averagingModeNames,
-                    paddingValues = PaddingValues(start = cardPadding),
                     selectedItem = lgf.averagingMode,
                     onItemSelected = { onUpdate(lgf.copy(averagingMode = it)) }
                 )
 
                 val plotModeNames = stringArrayResource(id = R.array.line_graph_plot_mode_names)
                     .mapIndexed { index, name -> index to name }
-                    .associate { (index, name) -> LineGraphPlottingModes.values()[index] to name }
+                    .associate { (index, name) -> LineGraphPlottingModes.entries.toTypedArray()[index] to name }
 
                 TextMapSpinner(
                     strings = plotModeNames,
-                    paddingValues = PaddingValues(start = cardPadding),
                     selectedItem = lgf.plottingMode,
                     onItemSelected = { onUpdate(lgf.copy(plottingMode = it)) }
                 )
