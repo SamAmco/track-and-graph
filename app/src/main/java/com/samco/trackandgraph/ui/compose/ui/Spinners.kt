@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -48,7 +49,10 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.material3.Text
 import com.samco.trackandgraph.ui.dataVisColorList
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,9 +66,7 @@ fun <T> Spinner(
     dropdownItemFactory: @Composable (T, Int) -> Unit,
     enabled: Boolean = true,
     enableTrailingIcon: Boolean = true,
-    paddingValues: PaddingValues = PaddingValues(
-        horizontal = cardPadding
-    ),
+    paddingValues: PaddingValues = PaddingValues(cardPadding),
     dropdownContentAlignment: Alignment.Horizontal = Alignment.Start
 ) {
     var expanded: Boolean by remember { mutableStateOf(false) }
@@ -73,7 +75,6 @@ fun <T> Spinner(
     Box(
         modifier = modifier
             .wrapContentSize(Alignment.TopStart)
-            .padding(paddingValues)
     ) {
         Row(
             modifier = modifier
@@ -83,7 +84,8 @@ fun <T> Spinner(
                         expanded = !expanded
                     }
                     else it
-                },
+                }
+                .padding(paddingValues),
             verticalAlignment = Alignment.CenterVertically
         ) {
             selectedItemFactory(Modifier, selectedItem, expanded)
@@ -206,4 +208,110 @@ fun Circle(
     elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
 ) {
     content()
+}
+
+// Previews
+@Preview(showBackground = true)
+@Composable
+fun SpinnerPreview() {
+    TnGComposeTheme {
+        val items = listOf("Option 1", "Option 2", "Option 3", "Option 4")
+        val selectedItem = remember { mutableStateOf(items[0]) }
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Generic Spinner Example:")
+            Spinner(
+                items = items,
+                selectedItem = selectedItem.value,
+                onItemSelected = { selectedItem.value = it },
+                selectedItemFactory = { modifier, item, expanded ->
+                    Text(
+                        text = item,
+                        modifier = modifier.weight(1f),
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                },
+                dropdownItemFactory = { item, _ ->
+                    Text(
+                        text = item,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ColorSpinnerPreview() {
+    TnGComposeTheme {
+        val selectedColor = remember { mutableStateOf(0) }
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Color Spinner Example:")
+            ColorSpinner(
+                selectedColor = selectedColor.value,
+                onColorSelected = { selectedColor.value = it }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CircleSpinnerPreview() {
+    TnGComposeTheme {
+        val selectedIndex = remember { mutableStateOf(0) }
+        val colors = listOf(Color.Red, Color.Green, Color.Blue, Color.Yellow, Color.Magenta)
+
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Circle Spinner Example:")
+            CircleSpinner(
+                numItems = colors.size,
+                selectedIndex = selectedIndex.value,
+                onIndexSelected = { selectedIndex.value = it },
+                circleContent = { index ->
+                    ColorCircle(color = colors[index])
+                }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ColorCirclePreview() {
+    TnGComposeTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Color Circle Examples:")
+            Row {
+                ColorCircle(color = Color.Red)
+                ColorCircle(color = Color.Green, size = 40.dp)
+                ColorCircle(color = Color.Blue, size = 30.dp)
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun CirclePreview() {
+    TnGComposeTheme {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text("Circle Examples:")
+            Row {
+                Circle {
+                    Text("A", modifier = Modifier.padding(16.dp))
+                }
+                Circle(backgroundColor = Color.LightGray) {
+                    Text("B", modifier = Modifier.padding(16.dp))
+                }
+                Circle(size = 40.dp, backgroundColor = Color.Cyan) {
+                    Text("C", modifier = Modifier.padding(8.dp))
+                }
+            }
+        }
+    }
 }

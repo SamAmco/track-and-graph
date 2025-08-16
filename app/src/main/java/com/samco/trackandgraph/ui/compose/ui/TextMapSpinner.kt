@@ -24,9 +24,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
-import com.samco.trackandgraph.R
 
 @Composable
 fun <T> TextMapSpinner(
@@ -35,9 +33,7 @@ fun <T> TextMapSpinner(
     selectedItem: T,
     enabled: Boolean = true,
     textAlign: TextAlign = TextAlign.Start,
-    paddingValues: PaddingValues = PaddingValues(
-        horizontal = cardPadding,
-    ),
+    paddingValues: PaddingValues = PaddingValues(cardPadding),
     onItemSelected: (T) -> Unit
 ) {
     val dropdownContentAlignment = remember(textAlign) {

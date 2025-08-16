@@ -58,7 +58,7 @@ fun FilledButton(
         modifier = modifier,
         onClick = onClick,
         enabled = enabled,
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.medium,
     ) {
         Text(text = text)
     }
@@ -125,7 +125,7 @@ fun SelectorButton(
 ) = Button(
     modifier = modifier,
     onClick = onClick,
-    shape = MaterialTheme.shapes.small,
+    shape = MaterialTheme.shapes.medium,
     enabled = enabled,
     contentPadding = PaddingValues(
         horizontal = 8.dp,
@@ -144,7 +144,7 @@ fun AddBarButton(
 ) = Button(
     modifier = modifier.widthIn(min = 160.dp),
     onClick = onClick,
-    shape = MaterialTheme.shapes.small
+    shape = MaterialTheme.shapes.medium
 ) {
     Icon(
         painter = painterResource(id = R.drawable.add_icon),
@@ -160,6 +160,8 @@ fun TextButton(
 ) = Button(
     modifier = modifier,
     onClick = onClick,
+    shape = MaterialTheme.shapes.medium,
+    contentPadding = PaddingValues(cardPadding)
 ) {
     Text(
         text = text,
@@ -176,6 +178,8 @@ fun IconTextButton(
 ) = Button(
     modifier = modifier,
     onClick = onClick,
+    shape = MaterialTheme.shapes.medium,
+    contentPadding = PaddingValues(cardPadding)
 ) {
     Icon(
         modifier = Modifier.size(24.dp),
