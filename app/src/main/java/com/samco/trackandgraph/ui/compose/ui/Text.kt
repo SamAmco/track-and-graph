@@ -52,45 +52,74 @@ private fun TextPreview() = TnGComposeTheme {
     Column(
         verticalArrangement = Arrangement.spacedBy(cardPadding),
     ) {
+        // Display typography
+        Text(
+            style = MaterialTheme.typography.displayLarge,
+            text = "Display Large"
+        )
+        Text(
+            style = MaterialTheme.typography.displayMedium,
+            text = "Display Medium"
+        )
+        Text(
+            style = MaterialTheme.typography.displaySmall,
+            text = "Display Small"
+        )
+        
+        // Headline typography
         Text(
             style = MaterialTheme.typography.headlineLarge,
-            text = "Text h1"
+            text = "Headline Large"
         )
         Text(
             style = MaterialTheme.typography.headlineMedium,
-            text = "Text h2"
+            text = "Headline Medium"
         )
         Text(
             style = MaterialTheme.typography.headlineSmall,
-            text = "Text h3"
+            text = "Headline Small"
         )
+        
+        // Title typography
         Text(
             style = MaterialTheme.typography.titleLarge,
-            text = "Text h4"
+            text = "Title Large"
         )
         Text(
             style = MaterialTheme.typography.titleMedium,
-            text = "Text h5"
+            text = "Title Medium"
         )
         Text(
             style = MaterialTheme.typography.titleSmall,
-            text = "Text h6"
+            text = "Title Small"
         )
+        
+        // Body typography
         Text(
             style = MaterialTheme.typography.bodyLarge,
-            text = "Text body 1"
+            text = "Body Large"
         )
         Text(
             style = MaterialTheme.typography.bodyMedium,
-            text = "Text body 2"
+            text = "Body Medium"
         )
         Text(
-            style = MaterialTheme.typography.titleMedium,
-            text = "Text subtitle 1"
+            style = MaterialTheme.typography.bodySmall,
+            text = "Body Small"
+        )
+        
+        // Label typography
+        Text(
+            style = MaterialTheme.typography.labelLarge,
+            text = "Label Large"
         )
         Text(
-            style = MaterialTheme.typography.titleSmall,
-            text = "Text subtitle 2"
+            style = MaterialTheme.typography.labelMedium,
+            text = "Label Medium"
+        )
+        Text(
+            style = MaterialTheme.typography.labelSmall,
+            text = "Label Small"
         )
 
         TrackerNameHeadline(name = "Tracker name")
@@ -111,9 +140,8 @@ fun TrackerNameHeadline(
     Text(
         modifier = Modifier.wrapContentWidth(),
         text = name,
+        style = MaterialTheme.typography.titleLarge,
         textAlign = TextAlign.Center,
-        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-        fontWeight = MaterialTheme.typography.titleLarge.fontWeight
     )
     Box(
         Modifier

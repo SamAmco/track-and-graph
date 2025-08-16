@@ -63,6 +63,7 @@ fun CustomDialog(
         Surface(
             modifier = Modifier.imePadding(),
             shape = MaterialTheme.shapes.large,
+            color = MaterialTheme.colorScheme.surfaceVariant,
         ) {
             Column(
                 modifier = Modifier

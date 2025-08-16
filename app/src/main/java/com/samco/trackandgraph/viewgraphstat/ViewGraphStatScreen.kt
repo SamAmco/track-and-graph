@@ -382,7 +382,7 @@ private fun NoteCard(
         modifier = modifier
             .clickable { onNoteClicked(note) },
         elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
         shape = MaterialTheme.shapes.small,
     ) {
         Column(

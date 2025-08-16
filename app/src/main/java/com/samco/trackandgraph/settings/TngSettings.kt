@@ -7,3 +7,8 @@ interface TngSettings {
     val firstDayOfWeek: DayOfWeek
     val startTimeOfDay: Duration
 }
+
+val mockSettings = object : TngSettings {
+    override val firstDayOfWeek = DayOfWeek.MONDAY
+    override val startTimeOfDay = Duration.ofSeconds(0)
+}

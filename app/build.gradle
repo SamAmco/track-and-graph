@@ -149,9 +149,7 @@ dependencies {
     implementation libs.lifecycle.runtime.compose
     implementation libs.compose.runtime.livedata
     // Material design stuff you might need at some point
-    implementation libs.compose.material
     implementation libs.compose.material3
-    implementation libs.compose.theme.adapter
     implementation libs.accompanist.pager
 
     // Reorderable drag and drop

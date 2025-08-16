@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -305,7 +306,11 @@ private fun LuaGraphFeatureInputView(
     onUpdateName: (TextFieldValue) -> Unit,
     onRemove: () -> Unit,
     onChangeSelectedFeatureId: (Long) -> Unit,
-) = Card {
+) = Card(
+    colors = CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant
+    )
+) {
     Column(
         modifier = Modifier.padding(cardPadding),
     ) {

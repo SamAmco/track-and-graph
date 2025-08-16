@@ -13,7 +13,7 @@ import javax.inject.Inject
 // in one place. I think that place is here, but we need to be able to inject this where it's
 // needed in the factories which might require some refactoring, so there's a duplicate for now.
 class TngSettingsImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    @param:ApplicationContext private val context: Context
 ) : TngSettings {
     override val firstDayOfWeek: DayOfWeek
         get() = WeekFields.of(getLocale()).firstDayOfWeek

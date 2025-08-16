@@ -89,7 +89,6 @@ fun SmallTextButton(
     onClick = onClick,
     modifier = modifier,
     enabled = enabled,
-    shape = MaterialTheme.shapes.small,
     colors = colors,
     interactionSource = interactionSource,
 ) {

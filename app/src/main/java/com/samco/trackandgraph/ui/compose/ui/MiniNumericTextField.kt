@@ -17,10 +17,10 @@
 package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -44,11 +44,11 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,24 +79,6 @@ fun MiniNumericTextField(
         cursorBrush = SolidColor(MaterialTheme.tngColors.primary),
         enabled = enabled,
         interactionSource = interactionSource,
-        //Due to a bug tracked here: https://issuetracker.google.com/issues/215116019
-        //we currently can't use decorationBox to display a 0 when the field is empty.
-        //There's some sort of race condition that crashes the app when the focus changes
-        //and the text is added/removed.
-/*
-        decorationBox = {
-            if (textFieldValue.text == "" && !isFocused) {
-                Text(
-                    "0",
-                    style = MaterialTheme.typography.titleMedium,
-                    textAlign = textAlign,
-                    color = MaterialTheme.tngColors.onSurface.copy(
-                        alpha = MaterialTheme.tngColors.disabledAlpha
-                    )
-                )
-            } else it()
-        },
-*/
         keyboardActions = KeyboardActions(
             onNext = {
                 focusManager.moveFocus(
@@ -106,9 +88,9 @@ fun MiniNumericTextField(
         ),
         singleLine = true,
         modifier = modifier
-            .width(IntrinsicSize.Min)
+            .wrapContentWidth()
+            .widthIn(min = 40.dp, max = 80.dp)
             .padding(start = 4.dp)
-            .widthIn(min = 40.dp, max = 40.dp)
             .indicatorLine(
                 enabled = true,
                 isError = false,
@@ -118,13 +100,14 @@ fun MiniNumericTextField(
             .onFocusChanged { focusState ->
                 if (focusState.isFocused) {
                     focusUpdateScope.launch {
-                        delay(20)
                         onValueChange(
                             textFieldValue.copy(
                                 selection = TextRange(0, textFieldValue.text.length)
                             )
                         )
                     }
+                } else if (textFieldValue.text.isEmpty()) {
+                    onValueChange(TextFieldValue(text = "0"))
                 }
             }
             .let {
@@ -134,6 +117,22 @@ fun MiniNumericTextField(
         keyboardOptions = KeyboardOptions(
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Next
-        )
+        ),
+        decorationBox = {
+            TextFieldDefaults.DecorationBox(
+                value = textFieldValue.text,
+                innerTextField = it,
+                enabled = enabled,
+                singleLine = true,
+                visualTransformation = VisualTransformation.None,
+                interactionSource = interactionSource,
+                // Had a bug here where the duration input nested in a lazy row
+                // would cause the scroll state to slowly drift when focused.
+                // Somehow adding a content padding of 1dp fixed it.
+                contentPadding = PaddingValues(horizontal = 1.dp),
+                colors = colors,
+                container = {},
+            )
+        }
     )
 }
