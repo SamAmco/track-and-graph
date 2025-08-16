@@ -129,7 +129,7 @@ private val CustomTypography = Typography(
 
     // Title styles
     titleLarge = Typography().titleLarge.copy(fontSize = 28.sp),
-    titleMedium = Typography().titleMedium.copy(fontSize = 20.sp),
+    titleMedium = Typography().titleMedium.copy(fontSize = 18.sp),
     titleSmall = Typography().titleSmall.copy(fontSize = 17.sp),
 
     // Body styles

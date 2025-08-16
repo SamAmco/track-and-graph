@@ -173,64 +173,63 @@ private fun Note(
     ) {
         var menuExpanded by remember { mutableStateOf(false) }
 
-        IconButton(
-            modifier = Modifier.align(Alignment.TopEnd),
-            onClick = { menuExpanded = true }
-        ) {
-            Icon(
-                imageVector = ImageVector.vectorResource(id = R.drawable.list_menu_icon),
-                contentDescription = stringResource(id = R.string.edit),
-                tint = MaterialTheme.tngColors.onSurface
-            )
+        Box(modifier = Modifier.align(Alignment.TopEnd)) {
+            IconButton(
+                onClick = { menuExpanded = true }
+            ) {
+                Icon(
+                    imageVector = ImageVector.vectorResource(id = R.drawable.list_menu_icon),
+                    contentDescription = stringResource(id = R.string.edit),
+                    tint = MaterialTheme.tngColors.onSurface
+                )
+            }
+
+            DropdownMenu(
+                expanded = menuExpanded,
+                offset = DpOffset(boxEnd.dp, 0.dp),
+                onDismissRequest = { menuExpanded = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(id = R.string.edit)) },
+                    onClick = {
+                        menuExpanded = false
+                        onEditClick()
+                    }
+                )
+
+                DropdownMenuItem(
+                    text = { Text(stringResource(id = R.string.delete)) },
+                    onClick = {
+                        menuExpanded = false
+                        onDeleteClick()
+                    }
+                )
+            }
         }
-
-        DropdownMenu(
-            expanded = menuExpanded,
-            offset = DpOffset(boxEnd.dp, 0.dp),
-            onDismissRequest = { menuExpanded = false }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(cardPadding)
         ) {
-            DropdownMenuItem(
-                text = { Text(stringResource(id = R.string.edit)) },
-                onClick = {
-                    menuExpanded = false
-                    onEditClick()
-                }
-            )
-
-            DropdownMenuItem(
-                text = { Text(stringResource(id = R.string.delete)) },
-                onClick = {
-                    menuExpanded = false
-                    onDeleteClick()
-                }
-            )
-        }
-
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(cardPadding)
-    ) {
-        DayMonthYearHourMinuteWeekDayOneLineText(
-            dateTime = noteInfo.date,
-            style = MaterialTheme.typography.titleSmall,
-        )
-        HalfDialogInputSpacing()
-        if (noteInfo.featurePath.isNotBlank()) {
-            Text(
-                style = MaterialTheme.typography.bodyLarge,
-                text = noteInfo.featurePath,
-                color = MaterialTheme.tngColors.onSurface.copy(alpha = 0.5f)
+            DayMonthYearHourMinuteWeekDayOneLineText(
+                dateTime = noteInfo.date,
+                style = MaterialTheme.typography.titleSmall,
             )
             HalfDialogInputSpacing()
+            if (noteInfo.featurePath.isNotBlank()) {
+                Text(
+                    style = MaterialTheme.typography.bodyLarge,
+                    text = noteInfo.featurePath,
+                    color = MaterialTheme.tngColors.onSurface.copy(alpha = 0.5f)
+                )
+                HalfDialogInputSpacing()
+            }
+            Text(
+                style = MaterialTheme.typography.bodyLarge,
+                text = noteInfo.note,
+                maxLines = 3
+            )
         }
-        Text(
-            style = MaterialTheme.typography.bodyLarge,
-            text = noteInfo.note,
-            maxLines = 3
-        )
     }
 }
 
