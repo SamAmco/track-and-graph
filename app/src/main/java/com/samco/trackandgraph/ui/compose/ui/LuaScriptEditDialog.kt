@@ -18,9 +18,9 @@ package com.samco.trackandgraph.ui.compose.ui
 
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -28,8 +28,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -46,9 +44,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
-import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.theming.tngTypography
 import kotlin.math.log10
@@ -58,32 +53,15 @@ fun LuaScriptEditDialog(
     script: TextFieldValue,
     onDismiss: () -> Unit,
     onValueChanged: (TextFieldValue) -> Unit
-) = DialogTheme {
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            decorFitsSystemWindows = false,
-            usePlatformDefaultWidth = false
-        ),
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dialogInputSpacing)
-                .imePadding(),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            shape = MaterialTheme.shapes.medium,
-        ) {
-            CodeEditor(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .imePadding()
-                    .padding(8.dp),
-                script = script,
-                onValueChanged = onValueChanged
-            )
-        }
-    }
+) = CustomDialog(
+    onDismissRequest = onDismiss,
+    scrollContent = false,
+    paddingValues = PaddingValues(halfDialogInputSpacing),
+) {
+    CodeEditor(
+        script = script,
+        onValueChanged = onValueChanged
+    )
 }
 
 @Composable
