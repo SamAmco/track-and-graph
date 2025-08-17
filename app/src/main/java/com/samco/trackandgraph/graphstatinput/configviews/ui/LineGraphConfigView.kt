@@ -161,7 +161,7 @@ private fun LineGraphFeatureInputView(
     onRemove: () -> Unit,
     onUpdate: (LineGraphFeature) -> Unit
 ) = Card(
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
 ) {
     Column(

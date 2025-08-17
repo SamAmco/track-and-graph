@@ -79,7 +79,7 @@ fun Reminder(
         .padding(halfDialogInputSpacing),
     elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3f else cardElevation),
     shape = MaterialTheme.shapes.small,
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
 ) {
     Column(
         modifier = Modifier.fillMaxWidth()

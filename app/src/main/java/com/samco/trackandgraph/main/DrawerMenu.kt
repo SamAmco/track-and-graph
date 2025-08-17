@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.Divider
 import com.samco.trackandgraph.ui.compose.ui.GradientDivider
 import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
@@ -83,7 +84,7 @@ fun MenuDrawerContent(
         Text(
             modifier = Modifier.padding(inputSpacingLarge),
             text = stringResource(R.string.app_name),
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.headlineMedium,
         )
 
         GradientDivider(
@@ -165,6 +166,8 @@ private fun ThemeMenuSpinner(
         style = MaterialTheme.typography.titleSmall,
     )
 
+    DialogInputSpacing()
+
     val themeValues = arrayOf(
         ThemeSelection.SYSTEM,
         ThemeSelection.LIGHT,
@@ -183,7 +186,6 @@ private fun ThemeMenuSpinner(
         strings = themeValues.zip(stringArray).toMap(),
         selectedItem = currentTheme.value,
         textAlign = TextAlign.End,
-        paddingValues = PaddingValues(all = 0.dp),
     ) { onThemeSelected(it) }
 }
 
@@ -207,13 +209,14 @@ private fun DateFormatSpinner(
         style = MaterialTheme.typography.titleSmall,
     )
 
+    DialogInputSpacing()
+
     val formatNames = stringArrayResource(R.array.date_formats)
 
     TextMapSpinner(
         strings = formatNames.indices.zip(formatNames).toMap(),
         selectedItem = currentFormat.value,
         textAlign = TextAlign.End,
-        paddingValues = PaddingValues(all = 0.dp),
     ) { onFormatSelected(it) }
 }
 

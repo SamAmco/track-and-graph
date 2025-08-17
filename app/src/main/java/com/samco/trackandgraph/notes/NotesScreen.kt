@@ -160,7 +160,7 @@ private fun Note(
         .padding(cardMarginSmall)
         .clickable { onNoteClick() },
     elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     shape = MaterialTheme.shapes.small
 ) {
 
