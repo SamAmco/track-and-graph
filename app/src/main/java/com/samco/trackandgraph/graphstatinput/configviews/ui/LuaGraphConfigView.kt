@@ -308,7 +308,7 @@ private fun LuaGraphFeatureInputView(
     onChangeSelectedFeatureId: (Long) -> Unit,
 ) = Card(
     colors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
+        containerColor = MaterialTheme.colorScheme.surface
     )
 ) {
     Column(

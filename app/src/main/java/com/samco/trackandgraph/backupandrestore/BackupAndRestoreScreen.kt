@@ -224,7 +224,7 @@ private fun BackupCard(
 ) = Card(
     shape = MaterialTheme.shapes.large,
     colors = CardDefaults.cardColors(
-        containerColor = MaterialTheme.colorScheme.surfaceVariant
+        containerColor = MaterialTheme.colorScheme.surface
     )
 ) {
     Column(

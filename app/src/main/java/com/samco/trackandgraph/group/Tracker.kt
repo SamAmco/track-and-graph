@@ -139,7 +139,7 @@ fun Tracker(
             .padding(cardMarginSmall)
             .clickable { onHistory(tracker) },
         elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = MaterialTheme.shapes.small,
     ) {
         BoxWithConstraints {

@@ -269,7 +269,7 @@ private fun DataPoint(
     modifier = Modifier
         .clickable { viewModel.onDataPointClicked(dataPoint) },
     elevation = CardDefaults.cardElevation(defaultElevation = cardMarginSmall),
-    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
