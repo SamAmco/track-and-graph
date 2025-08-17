@@ -152,7 +152,7 @@ fun LineGraphBodyView(
     GraphLegend(
         items = viewData.lines.map {
             GraphLegendItem(
-                color = Color(getColorInt(context, it.color)),
+                color = Color(getColorInt(it.color)),
                 label = it.name
             )
         }
@@ -309,12 +309,12 @@ private fun getLineAndPointFormatter(
         formatter.linePaint = null
     } else {
         formatter.linePaint.apply {
-            color = getColorInt(context, line.color)
+            color = getColorInt(line.color)
             strokeWidth = getLinePaintWidth(context)
         }
     }
 
-    getVertexPaintColor(context, line)?.let {
+    getVertexPaintColor(line)?.let {
         formatter.vertexPaint.color = it
         formatter.vertexPaint.strokeWidth = getVertexPaintWidth(context)
     } ?: run {
@@ -341,9 +341,9 @@ private fun getFastLineAndPointFormatter(
     // Setting lineColor to null sets the linePaint to null also
     val lineColor =
         if (line.pointStyle == LineGraphPointStyle.CIRCLES_ONLY) null
-        else getColorInt(context, line.color)
+        else getColorInt(line.color)
 
-    val vertexColor = getVertexPaintColor(context, line)
+    val vertexColor = getVertexPaintColor(line)
 
     val formatter = FastLineAndPointRenderer.Formatter(
         lineColor,
@@ -368,10 +368,10 @@ private fun getVertexPaintWidth(
     context: Context
 ) = context.resources.getDimension(R.dimen.line_graph_vertex_thickness)
 
-private fun getVertexPaintColor(context: Context, line: Line): Int? {
+private fun getVertexPaintColor(line: Line): Int? {
     return when (line.pointStyle) {
         LineGraphPointStyle.NONE -> null
-        else -> getColorInt(context, line.color)
+        else -> getColorInt(line.color)
     }
 }
 

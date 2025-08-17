@@ -24,7 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.androidplot.pie.PieRenderer
@@ -65,7 +64,7 @@ fun PieChartView(
             val color = when (segment.color) {
                 is ColorSpec.ColorIndex -> {
                     lastColorIndex = segment.color.index
-                    colorResource(dataVisColorList[segment.color.index])
+                    dataVisColorList[segment.color.index]
                 }
 
                 is ColorSpec.ColorValue -> Color(segment.color.value)
@@ -73,10 +72,10 @@ fun PieChartView(
                 null -> {
                     if (lastColorIndex != null) {
                         val colorIndex = (dataVisColorGenerator * ++lastColorIndex) % dataVisColorList.size
-                        colorResource(dataVisColorList[colorIndex])
+                        dataVisColorList[colorIndex]
                     } else {
                         lastColorIndex = index
-                        colorResource(dataVisColorList[index])
+                        dataVisColorList[index]
                     }
                 }
             }
@@ -123,7 +122,7 @@ private fun PieChartViewBody(
     val context = LocalContext.current
 
     val smallLabelSize = context.resources.getDimension(R.dimen.small_label_size)
-    val labelColor = colorResource(id = R.color.white).toArgb()
+    val labelColor = Color.White.toArgb()
 
     AndroidViewBinding(factory = { inflater, parent, attachToParent ->
         val binding = GraphPieChartBinding.inflate(inflater, parent, attachToParent)

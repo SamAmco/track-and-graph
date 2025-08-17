@@ -134,7 +134,7 @@ fun <T> Spinner(
 @Composable
 fun ColorSpinner(
     modifier: Modifier = Modifier,
-    colors: List<Int> = dataVisColorList,
+    colors: List<Color> = dataVisColorList,
     selectedColor: Int,
     onColorSelected: (Int) -> Unit
 ) = CircleSpinner(

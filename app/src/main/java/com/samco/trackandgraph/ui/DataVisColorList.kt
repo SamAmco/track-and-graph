@@ -17,21 +17,27 @@
 
 package com.samco.trackandgraph.ui
 
-import com.samco.trackandgraph.R
+import androidx.compose.ui.graphics.Color
 
 //this is a number coprime to the number of colours used to select them in a pseudo random order for greater contrast
 const val dataVisColorGenerator = 7
+
+// Data visualisation colors have been moved to Compose in DataVisColorList.kt
+// Some useful tools for finding color blind safe color palettes:
+// For checking how safe the palette is: https://projects.susielu.com/viz-palette
+// For generating palette's: http://paletton.com/#uid=12K0Q0kw0w0jyC+oRxVy4oIDfjr
+// The source for the original scheme: https://colorbrewer2.org/#type=diverging&scheme=RdYlBu&n=10
 val dataVisColorList = listOf(
-    R.color.visColor1,
-    R.color.visColor2,
-    R.color.visColor3,
-    R.color.visColor4,
-    R.color.visColor5,
-    R.color.visColor6,
-    R.color.visColor7,
-    R.color.visColor8,
-    R.color.visColor9,
-    R.color.visColor10,
-    R.color.visColor11,
-    R.color.visColor12
+    Color(0xFFA50026),
+    Color(0xFFD73027),
+    Color(0xFFF46D43),
+    Color(0xFFFDAE61),
+    Color(0xFFFEE090),
+    Color(0xFFE0F3F8),
+    Color(0xFFABD9E9),
+    Color(0xFF74ADD1),
+    Color(0xFF4575B4),
+    Color(0xFF313695),
+    Color(0xFF54D931),
+    Color(0xFF1B8200),
 )
