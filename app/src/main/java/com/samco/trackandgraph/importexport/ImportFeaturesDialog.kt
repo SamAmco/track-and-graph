@@ -131,23 +131,20 @@ private fun ImportFeaturesDialogContent(
 
         // File selection button
         SelectorButton(
-            onClick = onSelectFile,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = cardPadding),
-            enabled = importState != ImportState.IMPORTING
-        ) {
-            Text(
-                text = selectedFileName ?: stringResource(R.string.select_file),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = if (selectedFileUri == null) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                }
-            )
-        }
+            text = selectedFileName ?: stringResource(R.string.select_file),
+            enabled = importState != ImportState.IMPORTING,
+            textColor = if (selectedFileUri == null) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            onClick = onSelectFile
+        )
 
         DialogInputSpacing()
 
