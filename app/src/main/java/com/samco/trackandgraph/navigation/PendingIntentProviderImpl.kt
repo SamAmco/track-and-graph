@@ -22,12 +22,10 @@ import android.appwidget.AppWidgetManager
 import android.content.Context
 import android.content.Intent
 import com.samco.trackandgraph.main.MainActivity
-import com.samco.trackandgraph.widgets.TrackWidgetProvider
-import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.DELETE_FEATURE_ID
-import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.UPDATE_FEATURE_ID
-import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.UPDATE_FEATURE_TIMER
-import com.samco.trackandgraph.widgets.AddDataPointFromTimerActivity
+import com.samco.trackandgraph.base.service.TrackWidgetProvider
 import com.samco.trackandgraph.widgets.TrackWidgetInputDataPointActivity
+import com.samco.trackandgraph.widgets.TrackWidgetState.DELETE_FEATURE_ID
+import com.samco.trackandgraph.widgets.TrackWidgetState.UPDATE_FEATURE_ID
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
@@ -44,22 +42,16 @@ class PendingIntentProviderImpl @Inject constructor(
         return PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
     }
 
-    override fun getDurationInputActivityIntent(trackerId: Long, startInstant: String): Intent {
-        return Intent(context, AddDataPointFromTimerActivity::class.java)
-            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            .putExtra(AddDataPointFromTimerActivity.TRACKER_ID_KEY, trackerId)
-            .putExtra(AddDataPointFromTimerActivity.START_TIME_KEY, startInstant)
+    private fun getDurationInputActivityIntent(featureId: Long): Intent {
+        return TrackWidgetInputDataPointActivity.createStopTimerIntent(context, featureId)
     }
 
-    override fun getDurationInputActivityPendingIntent(
-        trackerId: Long,
-        startInstant: String
-    ): PendingIntent {
-        return getDurationInputActivityIntent(trackerId, startInstant).let {
+    override fun getDurationInputActivityPendingIntent(featureId: Long): PendingIntent {
+        return getDurationInputActivityIntent(featureId).let {
             PendingIntent.getActivity(
                 context,
                 //A key unique to this request to allow updating notification
-                startInstant.hashCode() + trackerId.toInt(),
+                featureId.toInt(),
                 it,
                 PendingIntent.FLAG_IMMUTABLE,
             )
@@ -108,7 +100,6 @@ class PendingIntentProviderImpl @Inject constructor(
             null, context, TrackWidgetProvider::class.java
         ).apply {
             putExtra(UPDATE_FEATURE_ID, featureId)
-            putExtra(UPDATE_FEATURE_TIMER, startTimer)
         }.let {
             PendingIntent.getBroadcast(
                 context,

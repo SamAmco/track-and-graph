@@ -15,6 +15,8 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
@@ -29,26 +31,26 @@ plugins {
 apply from: 'gradle/lua-tasks.gradle.kts'
 
 android {
-    compileSdkVersion 36
+    compileSdkVersion libs.versions.androidSdk.get().toInteger()
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
     }
-    kotlinOptions {
-        jvmTarget = "17"
-        //Using experimental kotlin co-routines api's
-        freeCompilerArgs += [
-                "-opt-in=kotlin.RequiresOptIn",
-                // The below option is here because of this issue: https://github.com/Kotlin/kotlinx.serialization/issues/2145
-                "-Xstring-concat=inline"
-        ]
+
+    kotlin {
+        jvmToolchain(libs.versions.jdk.get().toInteger())
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            optIn.add("kotlin.RequiresOptIn")
+        }
     }
 
     defaultConfig {
         applicationId "com.samco.trackandgraph"
-        minSdkVersion 23
-        targetSdkVersion 35
+        minSdkVersion libs.versions.minSdk.get().toInteger()
+        targetSdkVersion libs.versions.targetSdk.get().toInteger()
         //If the backup file is not backwards compatible after this update, upgrade the major version number!
         versionCode 700000
         versionName "7.0.0"
@@ -154,6 +156,12 @@ dependencies {
 
     // Reorderable drag and drop
     implementation libs.reorderable
+    
+    // Glance for widgets
+    implementation libs.glance.appwidget
+    implementation libs.glance.material3
+    implementation libs.glance.appwidget.preview
+    implementation libs.glance.preview
 
     // Android KTX
     implementation libs.androidx.lifecycle.viewmodel.ktx

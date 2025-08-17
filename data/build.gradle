@@ -15,6 +15,7 @@
  *  along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id 'org.jetbrains.kotlin.android'
@@ -24,11 +25,11 @@ plugins {
 }
 
 android {
-    compileSdk 35
+    compileSdk libs.versions.androidSdk.get().toInteger()
 
     defaultConfig {
-        minSdk 23
-        targetSdk 35
+        minSdk libs.versions.minSdk.get().toInteger()
+        targetSdk libs.versions.targetSdk.get().toInteger()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -63,17 +64,16 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.jdk.get())
     }
-    kotlinOptions {
-        jvmTarget = "17"
-        //Using experimental kotlin co-routines api's
-        freeCompilerArgs += [
-                "-opt-in=kotlin.RequiresOptIn",
-                // The below option is here because of this issue: https://github.com/Kotlin/kotlinx.serialization/issues/2145
-                "-Xstring-concat=inline"
-        ]
+    kotlin {
+        jvmToolchain(libs.versions.jdk.get().toInteger())
+
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+            optIn.add("kotlin.RequiresOptIn")
+        }
     }
     namespace 'com.samco.trackandgraph.base'
 }

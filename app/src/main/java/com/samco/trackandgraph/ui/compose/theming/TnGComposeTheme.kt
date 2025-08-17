@@ -114,7 +114,7 @@ data class TngTypography(
 )
 
 // Custom Typography matching original Material 2 text sizes from dimens.xml
-private val CustomTypography = Typography(
+val CustomTypography = Typography(
     // Display styles (largest text)
     displayLarge = Typography().displayLarge.copy(fontSize = 70.sp),
     displayMedium = Typography().displayMedium.copy(fontSize = 45.sp),
@@ -143,7 +143,7 @@ private val CustomTypography = Typography(
 
 // All hard-coded colors here were generated using the Material 3 color tool based on the core theme colours:
 // https://material-foundation.github.io/material-theme-builder/
-private val LightColorScheme = lightColorScheme(
+val LightColorScheme = lightColorScheme(
     primary = orange,
     onPrimary = blueBlack,
     primaryContainer = orange,
@@ -184,7 +184,7 @@ private val LightColorScheme = lightColorScheme(
 
 // All hard-coded colors here were generated using the Material 3 color tool based on the core theme colours:
 // https://material-foundation.github.io/material-theme-builder/
-private val DarkColorScheme = darkColorScheme(
+val DarkColorScheme = darkColorScheme(
     primary = fadedOrange,
     onPrimary = white,
     primaryContainer = fadedOrange,

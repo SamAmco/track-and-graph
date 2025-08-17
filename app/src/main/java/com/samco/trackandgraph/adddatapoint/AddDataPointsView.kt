@@ -50,7 +50,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Velocity
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.ui.compose.theming.DialogTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.*
 import kotlinx.coroutines.flow.*
@@ -64,22 +63,20 @@ fun AddDataPointsDialog(viewModel: AddDataPointsViewModel, onDismissRequest: () 
     LaunchedEffect(Unit) { viewModel.dismissEvents.collect { onDismissRequest() } }
 
     if (!hidden) {
-        DialogTheme {
-            CustomDialog(
-                onDismissRequest = { onDismissRequest() },
-                dismissOnClickOutside = false,
-                scrollContent = false,
-                paddingValues = PaddingValues(
-                    vertical = halfDialogInputSpacing,
-                    horizontal = inputSpacingLarge,
-                )
-            ) {
-                AddDataPointsScreen(viewModel = viewModel)
-                BackHandler {
-                    if (viewModel.showCancelConfirmDialog.value == true) {
-                        viewModel.onConfirmCancelDismissed()
-                    } else viewModel.onCancelClicked()
-                }
+        CustomDialog(
+            onDismissRequest = { onDismissRequest() },
+            dismissOnClickOutside = false,
+            scrollContent = false,
+            paddingValues = PaddingValues(
+                vertical = halfDialogInputSpacing,
+                horizontal = inputSpacingLarge,
+            )
+        ) {
+            AddDataPointsScreen(viewModel = viewModel)
+            BackHandler {
+                if (viewModel.showCancelConfirmDialog.value == true) {
+                    viewModel.onConfirmCancelDismissed()
+                } else viewModel.onCancelClicked()
             }
         }
     }
@@ -319,7 +316,6 @@ private fun TrackerPager(
     ) {
         itemsIndexed(trackerPages, key = { idx, _ -> idx }) { index, viewModel ->
             val suggestedValues by viewModel.suggestedValues.observeAsState(null)
-            println("samsam $index $suggestedValues")
             TrackerPage(
                 modifier = Modifier
                     .blockDescendantHandoff()
