@@ -39,8 +39,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.samco.trackandgraph.R
@@ -86,25 +88,10 @@ fun SelectorButton(
     modifier: Modifier,
     text: String,
     enabled: Boolean = true,
+    textColor: Color = MaterialTheme.colorScheme.onSurface,
+    overflow: TextOverflow = TextOverflow.Clip,
+    maxLines: Int = Int.MAX_VALUE,
     onClick: () -> Unit
-) = SelectorButton(
-    modifier = modifier,
-    enabled = enabled,
-    onClick = onClick
-) {
-    Text(
-        text = text,
-        fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
-        fontSize = MaterialTheme.typography.titleSmall.fontSize,
-    )
-}
-
-@Composable
-fun SelectorButton(
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-    content: @Composable RowScope.() -> Unit
 ) = Button(
     modifier = modifier,
     onClick = onClick,
@@ -117,8 +104,17 @@ fun SelectorButton(
     colors = ButtonDefaults.buttonColors(
         containerColor = MaterialTheme.tngColors.selectorButtonColor
     ),
-    content = content,
-)
+) {
+    Text(
+        text = text,
+        fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
+        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+        color = textColor,
+        overflow = overflow,
+        maxLines = maxLines
+    )
+}
+
 
 @Composable
 fun AddBarButton(
@@ -146,11 +142,12 @@ fun TextButton(
     onClick = onClick,
     enabled = enabled,
     shape = MaterialTheme.shapes.medium,
-    contentPadding = PaddingValues(cardPadding)
+    contentPadding = PaddingValues(vertical = cardPadding, horizontal = inputSpacingLarge)
 ) {
     Text(
         text = text,
-        style = MaterialTheme.typography.labelLarge
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onPrimary
     )
 }
 
@@ -164,7 +161,7 @@ fun IconTextButton(
     modifier = modifier,
     onClick = onClick,
     shape = MaterialTheme.shapes.medium,
-    contentPadding = PaddingValues(cardPadding)
+    contentPadding = PaddingValues(vertical = cardPadding, horizontal = inputSpacingLarge)
 ) {
     Icon(
         modifier = Modifier.size(24.dp),
@@ -175,7 +172,8 @@ fun IconTextButton(
     HalfDialogInputSpacing()
     Text(
         text = text,
-        style = MaterialTheme.typography.labelLarge
+        style = MaterialTheme.typography.titleSmall,
+        color = MaterialTheme.colorScheme.onPrimary
     )
 }
 

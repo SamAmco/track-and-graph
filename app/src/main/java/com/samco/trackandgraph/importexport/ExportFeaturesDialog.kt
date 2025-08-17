@@ -128,23 +128,20 @@ private fun ExportFeaturesDialogContent(
         )
 
         SelectorButton(
-            onClick = onCreateFile,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = cardPadding),
+            text = selectedFileName ?: stringResource(R.string.select_file),
             enabled = exportState == ExportState.WAITING,
-        ) {
-            Text(
-                text = selectedFileName ?: stringResource(R.string.select_file),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                color = if (selectedFileUri == null) {
-                    MaterialTheme.colorScheme.error
-                } else {
-                    MaterialTheme.colorScheme.onSurface
-                }
-            )
-        }
+            textColor = if (selectedFileUri == null) {
+                MaterialTheme.colorScheme.error
+            } else {
+                MaterialTheme.colorScheme.onSurface
+            },
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1,
+            onClick = onCreateFile
+        )
 
         for (feature in availableFeatures) {
             Row(

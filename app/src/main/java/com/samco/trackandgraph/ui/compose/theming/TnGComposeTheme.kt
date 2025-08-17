@@ -44,7 +44,7 @@ val midCharcoal = Color(0xFF222222)
 val fadedLightBlue = Color(0xFF88AABF)
 val fadedDarkBlue = Color(0xFF54788C)
 val fadedOrange = Color(0xFFE17656)
-val redOrange = Color(0xFFEA643C)
+val redOrange = Color(0xFFFF5329)
 val fadedGreen = Color(0xFF4ABF50)
 
 val blueWhitePastel = Color(0xFFD3DADE)
