@@ -140,7 +140,7 @@ fun Tracker(
             .clickable { onHistory(tracker) },
         elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.medium,
     ) {
         BoxWithConstraints {
             // Calculate ripple radius to fill entire card
@@ -165,8 +165,6 @@ fun Tracker(
                 )
 
                 TrackerNameText(trackerName = tracker.name)
-
-                DialogInputSpacing()
 
                 TrackerDateTimeArea(
                     tracker = tracker,
@@ -257,8 +255,7 @@ private fun TrackerNameText(
         modifier = Modifier
             .fillMaxWidth()
             .padding(cardMarginSmall),
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
+        style = MaterialTheme.typography.headlineMedium,
         textAlign = TextAlign.Center,
         maxLines = 10,
         overflow = TextOverflow.Ellipsis
@@ -274,6 +271,7 @@ private fun TrackerDateTimeArea(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .height(MaterialTheme.typography.headlineSmall.lineHeight.value.dp)
             .padding(horizontal = inputSpacingLarge),
         contentAlignment = Alignment.Center
     ) {
@@ -282,7 +280,7 @@ private fun TrackerDateTimeArea(
                 text = timerText,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.error,
                 maxLines = 1
             )

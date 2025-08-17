@@ -261,7 +261,7 @@ fun AppBar(
             navBarConfig.value.title?.let {
                 Text(
                     text = it,
-                    style = MaterialTheme.typography.titleSmall,
+                    style = MaterialTheme.typography.headlineSmall,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )

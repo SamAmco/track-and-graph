@@ -72,7 +72,7 @@ fun MiniNumericTextField(
         onValueChange = {
             if (charLimit == null || it.text.length <= charLimit) onValueChange(it)
         },
-        textStyle = MaterialTheme.typography.titleMedium.copy(
+        textStyle = MaterialTheme.typography.headlineMedium.copy(
             textAlign = textAlign,
             color = MaterialTheme.tngColors.onSurface
         ),

@@ -123,9 +123,9 @@ private val CustomTypography = Typography(
     displaySmall = Typography().displaySmall.copy(fontSize = 36.sp),
 
     // Headline styles
-    headlineLarge = Typography().headlineLarge.copy(fontSize = 30.sp),
-    headlineMedium = Typography().headlineMedium.copy(fontSize = 22.sp),
-    headlineSmall = Typography().headlineSmall.copy(fontSize = 20.sp),
+    headlineLarge = Typography().headlineLarge.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold),
+    headlineMedium = Typography().headlineMedium.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp),
+    headlineSmall = Typography().headlineSmall.copy(fontSize = 20.sp, fontWeight = FontWeight.Bold),
 
     // Title styles
     titleLarge = Typography().titleLarge.copy(fontSize = 28.sp),

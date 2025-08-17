@@ -160,14 +160,14 @@ private fun GraphHeading(
         )
         Text(
             text = annotatedString,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.headlineSmall,
             inlineContent = inlineContentMap,
             textAlign = TextAlign.Center
         )
     } else {
         Text(
             text = graphStatViewData.graphOrStat.name,
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center
         )
     }
