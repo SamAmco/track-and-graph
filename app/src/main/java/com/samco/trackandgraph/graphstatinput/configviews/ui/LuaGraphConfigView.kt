@@ -27,7 +27,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -81,6 +80,7 @@ import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.LuaScriptEditDialog
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.TextSubtitle2
+import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.luaCodeVisualTransformation
 import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
@@ -261,9 +261,7 @@ private fun LuaGraphFeaturesInputView(
     onSelectFeatureClicked: (Int, Long) -> Unit,
     onAddFeatureClicked: () -> Unit
 ) = Column(
-    modifier = Modifier
-        .fillMaxWidth()
-        .animateContentSize(),
+    modifier = Modifier.fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
     TextSubtitle2(text = stringResource(id = R.string.add_some_data_sources))
@@ -309,7 +307,8 @@ private fun LuaGraphFeatureInputView(
 ) = Card(
     colors = CardDefaults.cardColors(
         containerColor = MaterialTheme.colorScheme.surface
-    )
+    ),
+    elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
 ) {
     Column(
         modifier = Modifier.padding(cardPadding),

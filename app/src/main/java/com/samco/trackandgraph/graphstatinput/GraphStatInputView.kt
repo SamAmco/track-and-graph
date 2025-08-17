@@ -178,8 +178,8 @@ private fun DemoOverlay(
         .background(MaterialTheme.tngColors.surface.copy(alpha = 0.8f))
         .fillMaxSize()
 ) {
-    var displayHeight by remember { mutableStateOf(0f) }
-    var demoHeight by remember { mutableStateOf(0f) }
+    var displayHeight by remember { mutableFloatStateOf(0f) }
+    var demoHeight by remember { mutableFloatStateOf(0f) }
     Box(
         Modifier
             .fillMaxSize()

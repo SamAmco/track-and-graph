@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.graphstatinput.configviews.ui
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +28,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -122,12 +120,9 @@ private fun LineGraphFeaturesInputView(
     scrollState: ScrollState,
     viewModel: LineGraphConfigViewModel
 ) = Column(
-    modifier = Modifier
-        .fillMaxWidth()
-        .animateContentSize(),
+    modifier = Modifier.fillMaxWidth(),
     horizontalAlignment = Alignment.CenterHorizontally
 ) {
-
     for (index in viewModel.lineGraphFeatures.indices) {
         val lgf = viewModel.lineGraphFeatures[index]
         LineGraphFeatureInputView(
