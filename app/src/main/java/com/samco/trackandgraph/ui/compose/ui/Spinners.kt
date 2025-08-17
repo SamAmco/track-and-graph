@@ -108,7 +108,6 @@ fun <T> Spinner(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
                 modifier = dropDownModifier
-                    .background(color = MaterialTheme.colorScheme.surface)
             ) {
                 items.forEachIndexed { index, element ->
                     DropdownMenuItem(

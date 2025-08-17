@@ -46,74 +46,70 @@ import com.samco.trackandgraph.ui.compose.ui.*
 import java.lang.Float.max
 import java.lang.Float.min
 
-
 @Composable
 internal fun GraphStatInputView(
     viewModelStoreOwner: ViewModelStoreOwner,
     viewModel: GraphStatInputViewModel,
     graphStatId: Long
+) = Box(
+    modifier = Modifier
+        .fillMaxSize()
+        .imePadding(),
 ) {
-    Surface(
-        modifier = Modifier
-            .fillMaxSize()
-            .imePadding(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        val loading = viewModel.loading.observeAsState(true)
-        val demoViewData by viewModel.demoViewData.observeAsState()
+    val loading = viewModel.loading.observeAsState(true)
+    val demoViewData by viewModel.demoViewData.observeAsState()
 
-        Column(modifier = Modifier.fillMaxHeight()) {
-            var demoYOffset by remember { mutableFloatStateOf(0f) }
-            var demoVisible by remember { mutableStateOf(false) }
+    Column(modifier = Modifier.fillMaxHeight()) {
+        var demoYOffset by remember { mutableFloatStateOf(0f) }
+        var demoVisible by remember { mutableStateOf(false) }
 
-            val selectedGraphType = viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
+        val selectedGraphType = viewModel.graphStatType.observeAsState(GraphStatType.LINE_GRAPH)
 
-            Box(modifier = Modifier.weight(1f)) {
-                GraphStatInputViewForm(
-                    graphName = viewModel.graphName,
-                    selectedGraphType = selectedGraphType,
-                    setGraphType = viewModel::setGraphType,
-                    setGraphStatName = viewModel::setGraphStatName,
-                    updateMode = viewModel.updateMode.observeAsState(false),
-                    configInputView = { scrollState ->
-                        ConfigInputView(
-                            viewModelStoreOwner = viewModelStoreOwner,
-                            onConfigEvent = viewModel::onConfigEvent,
-                            graphType = selectedGraphType,
-                            graphStatId = graphStatId,
-                            scrollState = scrollState
-                        )
-                    },
-                )
-
-                if (demoVisible) demoViewData?.let { DemoOverlay(demoYOffset, it) }
-            }
-
-            if (demoViewData != null) {
-                DemoButton(
-                    isPressed = {
-                        demoVisible = it
-                        if (!it) demoYOffset = 0f
-                    },
-                    onDragOffset = { demoYOffset -= it })
-            }
-
-            AddCreateBar(
-                errorText = viewModel.validationException.observeAsState().value?.errorMessageId,
-                onCreateUpdateClicked = viewModel::createGraphOrStat,
-                isUpdateMode = viewModel.updateMode.observeAsState().value == true
+        Box(modifier = Modifier.weight(1f)) {
+            GraphStatInputViewForm(
+                graphName = viewModel.graphName,
+                selectedGraphType = selectedGraphType,
+                setGraphType = viewModel::setGraphType,
+                setGraphStatName = viewModel::setGraphStatName,
+                updateMode = viewModel.updateMode.observeAsState(false),
+                configInputView = { scrollState ->
+                    ConfigInputView(
+                        viewModelStoreOwner = viewModelStoreOwner,
+                        onConfigEvent = viewModel::onConfigEvent,
+                        graphType = selectedGraphType,
+                        graphStatId = graphStatId,
+                        scrollState = scrollState
+                    )
+                },
             )
+
+            if (demoVisible) demoViewData?.let { DemoOverlay(demoYOffset, it) }
         }
 
-        if (loading.value) LoadingOverlay()
-
-        val showLuaFirstTimeUserDialog = viewModel.showLuaFirstTimeUserDialog.observeAsState(false)
-        if (showLuaFirstTimeUserDialog.value) {
-            LuaFirstTimeUserDialog(
-                onDismiss = viewModel::onLuaFirstTimeUserDialogDismiss,
-                onOpenLuaTutorialPath = viewModel::onOpenLuaTutorialPath
-            )
+        if (demoViewData != null) {
+            DemoButton(
+                isPressed = {
+                    demoVisible = it
+                    if (!it) demoYOffset = 0f
+                },
+                onDragOffset = { demoYOffset -= it })
         }
+
+        AddCreateBar(
+            errorText = viewModel.validationException.observeAsState().value?.errorMessageId,
+            onCreateUpdateClicked = viewModel::createGraphOrStat,
+            isUpdateMode = viewModel.updateMode.observeAsState().value == true
+        )
+    }
+
+    if (loading.value) LoadingOverlay()
+
+    val showLuaFirstTimeUserDialog = viewModel.showLuaFirstTimeUserDialog.observeAsState(false)
+    if (showLuaFirstTimeUserDialog.value) {
+        LuaFirstTimeUserDialog(
+            onDismiss = viewModel::onLuaFirstTimeUserDialogDismiss,
+            onOpenLuaTutorialPath = viewModel::onOpenLuaTutorialPath
+        )
     }
 }
 

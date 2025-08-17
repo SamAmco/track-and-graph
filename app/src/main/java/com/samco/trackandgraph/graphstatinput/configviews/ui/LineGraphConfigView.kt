@@ -22,7 +22,6 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -31,6 +30,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -108,7 +108,7 @@ fun LineGraphConfigView(
 
     DialogInputSpacing()
 
-    Divider()
+    HorizontalDivider()
 
     DialogInputSpacing()
 
@@ -200,8 +200,8 @@ private fun LineGraphFeatureInputView(
 
                 CircleSpinner(
                     numItems = pointStyleIcons.size,
-                    selectedIndex = LineGraphPointStyle.values().indexOf(lgf.pointStyle),
-                    onIndexSelected = { onUpdate(lgf.copy(pointStyle = LineGraphPointStyle.values()[it])) }
+                    selectedIndex = LineGraphPointStyle.entries.indexOf(lgf.pointStyle),
+                    onIndexSelected = { onUpdate(lgf.copy(pointStyle = LineGraphPointStyle.entries[it])) }
                 ) {
                     Icon(
                         painter = painterResource(id = pointStyleIcons[it]),

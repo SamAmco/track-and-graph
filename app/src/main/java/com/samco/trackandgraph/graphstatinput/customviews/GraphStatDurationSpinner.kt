@@ -222,6 +222,7 @@ fun GraphStatDurationSpinner(
                     modifier = modifier.weight(1f),
                     text = text,
                     textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.labelLarge,
                 )
             },
             dropdownItemFactory = { item, _ ->

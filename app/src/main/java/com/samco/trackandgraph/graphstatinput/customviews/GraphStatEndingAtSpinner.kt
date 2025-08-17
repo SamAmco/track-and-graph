@@ -17,6 +17,7 @@
 package com.samco.trackandgraph.graphstatinput.customviews
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -53,12 +54,12 @@ sealed interface SampleEndingAt {
         }
     }
 
-    object Latest : SampleEndingAt {
+    data object Latest : SampleEndingAt {
         override val option = SampleEndingAtOption.LATEST
         override fun asGraphEndDate() = GraphEndDate.Latest
     }
 
-    object Now : SampleEndingAt {
+    data object Now : SampleEndingAt {
         override val option = SampleEndingAtOption.NOW
         override fun asGraphEndDate() = GraphEndDate.Now
     }
@@ -125,6 +126,7 @@ fun GraphStatEndingAtSpinner(
                     modifier = modifier.weight(1f),
                     text = text,
                     textAlign = TextAlign.End,
+                    style = MaterialTheme.typography.labelLarge,
                 )
             },
             dropdownItemFactory = { item, _ ->
