@@ -82,7 +82,7 @@ fun Group(
             .clickable { onClick(group) },
         elevation = CardDefaults.cardElevation(defaultElevation = if (isElevated) cardElevation * 3 else cardElevation),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = MaterialTheme.shapes.small,
+        shape = MaterialTheme.shapes.medium,
     ) {
         Box(
             modifier = Modifier
@@ -116,9 +116,9 @@ fun Group(
             Text(
                 text = group.name,
                 modifier = Modifier
-                    .align(Alignment.TopStart)
+                    .align(Alignment.CenterStart)
                     .padding(horizontal = cardPadding, vertical = inputSpacingLarge),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.headlineSmall,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
