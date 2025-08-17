@@ -53,7 +53,7 @@ class BackupAndRestoreFragment : Fragment() {
             setContent {
                 CompositionLocalProvider(LocalSettings provides tngSettings) {
                     TnGComposeTheme {
-                        BackupAndRestoreView(viewModel = viewModel)
+                        BackupAndRestoreScreen(viewModel = viewModel)
                     }
                 }
             }

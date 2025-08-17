@@ -62,7 +62,7 @@ interface AutoBackupViewModel {
     fun onBackupIntervalChanged(text: TextFieldValue)
     fun onBackupUnitChanged(unit: ChronoUnit)
     fun onAutoBackupFirstDateChanged(offsetDateTime: OffsetDateTime)
-    fun onAutoBackupFirstDateChanged(selectedTime: SelectedTime)
+    fun onAutoBackupFirstTimeChanged(selectedTime: SelectedTime)
     fun onCancelConfig()
 }
 
@@ -195,7 +195,7 @@ class AutoBackupViewModelImpl @Inject constructor(
         viewModelScope.launch { onUserSetAutoBackupDate.emit(new) }
     }
 
-    override fun onAutoBackupFirstDateChanged(selectedTime: SelectedTime) {
+    override fun onAutoBackupFirstTimeChanged(selectedTime: SelectedTime) {
         val current = autoBackupFirstDate.value
         val new = moveUntilValid(
             current

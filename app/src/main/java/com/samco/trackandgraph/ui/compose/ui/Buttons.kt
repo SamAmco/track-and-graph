@@ -48,29 +48,12 @@ import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 
 @Composable
-fun FilledButton(
-    text: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit,
-    enabled: Boolean = true
-) {
-    Button(
-        modifier = modifier,
-        onClick = onClick,
-        enabled = enabled,
-        shape = MaterialTheme.shapes.medium,
-    ) {
-        Text(text = text)
-    }
-}
-
-@Composable
 fun WideButton(
     text: String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
     enabled: Boolean = true
-) = FilledButton(
+) = TextButton(
     text = text,
     modifier = modifier.fillMaxWidth(),
     onClick = onClick,
@@ -156,10 +139,12 @@ fun AddBarButton(
 fun TextButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    enabled: Boolean = true,
     text: String,
 ) = Button(
     modifier = modifier,
     onClick = onClick,
+    enabled = enabled,
     shape = MaterialTheme.shapes.medium,
     contentPadding = PaddingValues(cardPadding)
 ) {
@@ -206,10 +191,6 @@ fun ButtonPreview() = TnGComposeTheme(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        FilledButton(
-            text = "Filled Button",
-            onClick = {}
-        )
         WideButton(
             text = "Wide Button",
             onClick = {}
