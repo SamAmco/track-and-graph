@@ -102,16 +102,11 @@
         </activity>
 
         <activity
-            android:name=".widgets.AddDataPointFromTimerActivity"
-            android:excludeFromRecents="true"
-            android:noHistory="true"
-            android:theme="@style/TransparentTheme"
-            />
-
-        <activity
             android:name=".widgets.TrackWidgetInputDataPointActivity"
             android:excludeFromRecents="true"
+            android:launchMode="singleTop"
             android:noHistory="true"
+            android:taskAffinity="com.samco.trackandgraph.widgets.TrackWidgetInputDataPointActivity"
             android:theme="@style/TransparentTheme"
             />
 
@@ -146,8 +141,9 @@
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
+        <!-- New Glance-based widget receiver -->
         <receiver
-            android:name=".widgets.TrackWidgetProvider"
+            android:name="com.samco.trackandgraph.base.service.TrackWidgetProvider"
             android:exported="false"
             >
             <intent-filter>
@@ -159,14 +155,19 @@
                 />
         </receiver>
 
-        <!--TODO you'll need to follow this guide when you target android 14
-            https://developer.android.com/about/versions/14/changes/fgs-types-required
-        -->
-        <service
-            android:name=".widgets.TrackWidgetJobIntentService"
-            android:foregroundServiceType="shortService"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            />
+        <!-- Keep old receiver for backward compatibility during transition -->
+        <!--        <receiver-->
+        <!--            android:name=".widgets.TrackWidgetProvider"-->
+        <!--            android:exported="false"-->
+        <!--            >-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />-->
+        <!--            </intent-filter>-->
+        <!--            <meta-data-->
+        <!--                android:name="android.appwidget.provider"-->
+        <!--                android:resource="@xml/track_widget_info"-->
+        <!--                />-->
+        <!--        </receiver>-->
 
         <service
             android:name=".timers.TimerNotificationService"

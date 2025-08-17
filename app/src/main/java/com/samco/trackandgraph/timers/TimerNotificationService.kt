@@ -100,7 +100,7 @@ class TimerNotificationService : Service() {
                 activeTrackers.forEachIndexed { index, tracker ->
                     val instant = tracker.timerStartInstant ?: return@forEachIndexed
                     val durationSecs = Duration.between(instant, Instant.now()).seconds
-                    val notification = buildNotification(tracker.id, tracker.name, instant)
+                    val notification = buildNotification(tracker.featureId, tracker.name, instant)
                         .setContentText(formatTimeDuration(durationSecs))
                         .build()
 
@@ -247,13 +247,12 @@ class TimerNotificationService : Service() {
     }
 
     private fun buildNotification(
-        trackerId: Long,
+        featureId: Long,
         name: String,
         startTimeInstant: Instant
     ): NotificationCompat.Builder {
         val durationSecs = Duration.between(startTimeInstant, Instant.now()).seconds
-        val pendingIntent = pendingIntentProvider
-            .getDurationInputActivityPendingIntent(trackerId, startTimeInstant.toString())
+        val pendingIntent = pendingIntentProvider.getDurationInputActivityPendingIntent(featureId)
 
         val stopAction = NotificationCompat.Action(
             R.drawable.ic_stop_timer,

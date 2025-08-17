@@ -25,8 +25,10 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.service.TrackWidgetProvider
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
+import com.samco.trackandgraph.widgets.TrackWidgetState.WIDGET_PREFS_NAME
+import com.samco.trackandgraph.widgets.TrackWidgetState.getFeatureIdPref
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -66,7 +68,7 @@ class TrackWidgetConfigureActivity : AppCompatActivity() {
         }
 
         getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).edit {
-            putLong(TrackWidgetProvider.getFeatureIdPref(appWidgetId!!), featureId)
+            putLong(getFeatureIdPref(appWidgetId!!), featureId)
         }
 
         val intent = Intent(

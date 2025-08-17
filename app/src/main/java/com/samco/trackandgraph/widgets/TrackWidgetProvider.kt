@@ -1,141 +1,218 @@
 /*
-* This file is part of Track & Graph
-*
-* Track & Graph is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* Track & Graph is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
-*/
-package com.samco.trackandgraph.widgets
+ * This file is part of Track & Graph
+ *
+ * Track & Graph is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Track & Graph is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+// This package has to be base service because that's where the original
+// TrackWidgetProvider was located. Any user widgets will be deleted/broken
+// after updating the app if FQCN (Full Qualified Class Name) of TrackWidgetProvider
+// changes.
+@file:Suppress("PackageDirectoryMismatch")
+package com.samco.trackandgraph.base.service
 
 import android.appwidget.AppWidgetManager
-import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import com.samco.trackandgraph.widgets.TrackWidgetJobIntentService.Companion.APP_WIDGET_ID_EXTRA
-import com.samco.trackandgraph.widgets.TrackWidgetJobIntentService.Companion.DISABLE_WIDGET_EXTRA
-import com.samco.trackandgraph.widgets.TrackWidgetJobIntentService.Companion.UPDATE_FEATURE_TIMER_EXTRA
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.action.ActionParameters
+import androidx.glance.GlanceId
+import androidx.glance.appwidget.action.ActionCallback
+import androidx.glance.appwidget.updateAll
+import com.samco.trackandgraph.base.model.DataInteractor
+import com.samco.trackandgraph.timers.TimerServiceInteractor
+import com.samco.trackandgraph.widgets.TrackWidgetGlance
+import com.samco.trackandgraph.widgets.TrackWidgetState.DELETE_FEATURE_ID
+import com.samco.trackandgraph.widgets.TrackWidgetState.UPDATE_FEATURE_ID
+import com.samco.trackandgraph.widgets.TrackWidgetState.WIDGET_PREFS_NAME
+import com.samco.trackandgraph.widgets.TrackWidgetState.getFeatureIdPref
+import com.samco.trackandgraph.widgets.TrackWidgetState.updateFromTracker
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.runBlocking
+import timber.log.Timber
+import javax.inject.Inject
 
-/**
- * Class for managing the track widgets.
- *
- * Besides normally updating widgets by widget id, this class can also be used to update or delete
- * widgets of a particular track feature.
- * In these cases, send a broadcast with a field in the extras of the intent.
- * Updating of the UI is done in the background in WidgetJobIntentService.
- */
-class TrackWidgetProvider : AppWidgetProvider() {
-    companion object {
-        const val WIDGET_PREFS_NAME = "TrackWidget"
-        const val DELETE_FEATURE_ID = "DELETE_FEATURE_ID"
-        const val UPDATE_FEATURE_ID = "UPDATE_FEATURE_ID"
-        const val UPDATE_FEATURE_TIMER = "UPDATE_FEATURE_TIMER"
+@AndroidEntryPoint
+class TrackWidgetProvider : GlanceAppWidgetReceiver() {
 
-        /**
-         * Return key to get the feature id for the widget id from shared preferences.
-         */
-        fun getFeatureIdPref(widgetId: Int): String {
-            return "widget_feature_id_$widgetId"
+    @Inject
+    lateinit var dataInteractor: DataInteractor
+
+    @Inject
+    lateinit var timerServiceInteractor: TimerServiceInteractor
+
+    override val glanceAppWidget: GlanceAppWidget = TrackWidgetGlance()
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        intent.extras?.let { extras ->
+            when {
+                extras.containsKey(UPDATE_FEATURE_ID) -> {
+                    updateWidgetsForFeature(context, extras.getLong(UPDATE_FEATURE_ID))
+                }
+
+                extras.containsKey(DELETE_FEATURE_ID) -> {
+                    onDeleted(context, intArrayOf(extras.getInt(DELETE_FEATURE_ID)))
+                }
+            }
         }
     }
 
     override fun onUpdate(
         context: Context,
         appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray?
+        appWidgetIds: IntArray
     ) {
         super.onUpdate(context, appWidgetManager, appWidgetIds)
-        appWidgetIds?.forEach { id ->
-            val workIntent = Intent(context, TrackWidgetJobIntentService::class.java).apply {
-                putExtra(APP_WIDGET_ID_EXTRA, id)
+        // Update all widgets with fresh data following ChatGPT pattern
+        runBlocking {
+            val glanceManager = GlanceAppWidgetManager(context)
+            appWidgetIds.forEach { appWidgetId ->
+                val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
+                updateWidgetState(context, glanceId, appWidgetId)
             }
-            TrackWidgetJobIntentService.enqueueWork(context, workIntent)
+            glanceAppWidget.updateAll(context)
         }
     }
 
-    override fun onDeleted(context: Context?, appWidgetIds: IntArray?) {
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         super.onDeleted(context, appWidgetIds)
-        appWidgetIds?.forEach { id ->
-            context?.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)?.edit()?.apply {
+        //Clean up widget preferences
+        appWidgetIds.forEach { id ->
+            context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE).edit().apply {
                 remove(getFeatureIdPref(id))
                 apply()
             }
         }
+
+        runBlocking { glanceAppWidget.updateAll(context) }
     }
 
-    override fun onReceive(context: Context, intent: Intent) {
-        intent.extras?.let { extras ->
-            when {
-                extras.containsKey(UPDATE_FEATURE_ID) -> {
-                    val id = extras.getLong(UPDATE_FEATURE_ID)
-                    val updateTimer =
-                        if (!extras.containsKey(UPDATE_FEATURE_TIMER)) null
-                        else extras.getBoolean(UPDATE_FEATURE_TIMER)
-                    updateWidgetsWithFeatureId(context, id, updateTimer)
-                }
-                extras.containsKey(DELETE_FEATURE_ID) -> {
-                    deleteWidgetsWithFeatureId(context, extras.getLong(DELETE_FEATURE_ID))
-                }
-                else -> {
-                    super.onReceive(context, intent)
-                }
-            }
-        } ?: super.onReceive(context, intent)
-    }
-
-    /**
-     * Update all widgets for the given feature id. and optionally put an extra to tell the job to
-     * start or stop the timer before updating the view.
-     */
-    private fun updateWidgetsWithFeatureId(
+    private suspend fun updateWidgetState(
         context: Context,
-        featureId: Long,
-        timerRunning: Boolean?
+        glanceId: GlanceId,
+        appWidgetId: Int,
     ) {
-        getWidgetIdsForFeatureId(context, featureId).forEach { id ->
-            val workIntent = Intent(context, TrackWidgetJobIntentService::class.java).apply {
-                putExtra(APP_WIDGET_ID_EXTRA, id)
-                if (timerRunning != null) putExtra(UPDATE_FEATURE_TIMER_EXTRA, timerRunning)
-            }
-            TrackWidgetJobIntentService.enqueueWork(context, workIntent)
-        }
+        val featureId = context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+            .getLong(getFeatureIdPref(appWidgetId), -1L)
+        updateWidgetState(
+            context = context,
+            glanceId = glanceId,
+            featureId = featureId,
+        )
     }
 
     /**
-     * Delete all widgets for the given feature id.
+     * Pre-compute widget state and pack into individual preference keys
      */
-    private fun deleteWidgetsWithFeatureId(context: Context, featureId: Long) {
-        getWidgetIdsForFeatureId(context, featureId).forEach { id ->
-            val workIntent = Intent(context, TrackWidgetJobIntentService::class.java).apply {
-                putExtra(APP_WIDGET_ID_EXTRA, id)
-                putExtra(DISABLE_WIDGET_EXTRA, true)
+    private suspend fun updateWidgetState(
+        context: Context,
+        glanceId: GlanceId,
+        featureId: Long,
+    ) {
+        val tracker = if (featureId != -1L) {
+            try {
+                dataInteractor.tryGetDisplayTrackerByFeatureIdSync(featureId)
+            } catch (e: Exception) {
+                null
             }
-            TrackWidgetJobIntentService.enqueueWork(context, workIntent)
+        } else null
+
+        updateAppWidgetState(context, glanceId) { prefs ->
+            prefs.updateFromTracker(featureId, tracker)
         }
     }
 
-    /**
-     * Return a list of all widget ids for the given feature id.
-     */
-    private fun getWidgetIdsForFeatureId(context: Context, featureId: Long): List<Int> {
-        return context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
-            .let { sharedPrefs ->
-                AppWidgetManager.getInstance(context)
-                    .getAppWidgetIds(ComponentName(context, TrackWidgetProvider::class.java))
-                    .let { ids ->
-                        ids.filter {
-                            sharedPrefs.getLong(getFeatureIdPref(it), -1) == featureId
-                        }
-                    }
+    private fun updateWidgetsForFeature(context: Context, featureId: Long) {
+        runBlocking {
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val appWidgetIds = appWidgetManager.getAppWidgetIds(
+                ComponentName(context, TrackWidgetProvider::class.java)
+            )
+            val glanceManager = GlanceAppWidgetManager(context)
+
+            appWidgetIds.forEach { appWidgetId ->
+                val widgetFeatureId = context.getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
+                    .getLong(getFeatureIdPref(appWidgetId), -1L)
+                if (widgetFeatureId == featureId) {
+                    val glanceId = glanceManager.getGlanceIdBy(appWidgetId)
+                    updateWidgetState(context, glanceId, featureId)
+                }
             }
+            glanceAppWidget.updateAll(context)
+        }
     }
 }
+
+/**
+ * ActionCallback for starting a timer from the widget
+ */
+class StartTimerAction : ActionCallback {
+    private lateinit var dataInteractor: DataInteractor
+    private lateinit var timerServiceInteractor: TimerServiceInteractor
+
+    /**
+     * Entry point to expose dependencies from the Singleton graph
+     */
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface WidgetDependencies {
+        fun dataInteractor(): DataInteractor
+        fun timerServiceInteractor(): TimerServiceInteractor
+    }
+
+    override suspend fun onAction(
+        context: Context,
+        glanceId: GlanceId,
+        parameters: ActionParameters
+    ) {
+        try {
+            val dependencies = EntryPointAccessors.fromApplication(
+                context = context.applicationContext,
+                entryPoint = WidgetDependencies::class.java
+            )
+            dataInteractor = dependencies.dataInteractor()
+            timerServiceInteractor = dependencies.timerServiceInteractor()
+
+            val featureId = parameters[FeatureIdKey] ?: return
+
+            val tracker = dataInteractor.getTrackerById(featureId) ?: return
+            dataInteractor.playTimerForTracker(tracker.id)
+            timerServiceInteractor.startTimerNotificationService()
+
+            // Update widget state with fresh data
+            val updatedTracker = dataInteractor.tryGetDisplayTrackerByFeatureIdSync(featureId)
+            updateAppWidgetState(context, glanceId) { prefs ->
+                prefs.updateFromTracker(featureId, updatedTracker)
+            }
+        } catch (e: Exception) {
+            Timber.e(e)
+        } finally {
+            TrackWidgetGlance().update(context, glanceId)
+        }
+    }
+
+    companion object {
+        val FeatureIdKey = ActionParameters.Key<Long>("featureId")
+    }
+}
+

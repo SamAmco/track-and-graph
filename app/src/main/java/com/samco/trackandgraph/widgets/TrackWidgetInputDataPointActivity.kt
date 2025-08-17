@@ -16,17 +16,22 @@
 */
 package com.samco.trackandgraph.widgets
 
-import android.appwidget.AppWidgetManager
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.glance.action.ActionParameters
+import androidx.glance.action.actionParametersOf
+import androidx.glance.action.actionStartActivity
+import android.content.ComponentName
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.samco.trackandgraph.adddatapoint.AddDataPointsDialog
 import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.base.database.dto.DataPoint
@@ -34,14 +39,18 @@ import com.samco.trackandgraph.base.database.dto.Tracker
 import com.samco.trackandgraph.base.model.DataInteractor
 import com.samco.trackandgraph.base.model.di.IODispatcher
 import com.samco.trackandgraph.base.model.di.MainDispatcher
-import com.samco.trackandgraph.widgets.TrackWidgetProvider.Companion.WIDGET_PREFS_NAME
 import com.samco.trackandgraph.settings.TngSettings
+import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.util.hideKeyboard
 import com.samco.trackandgraph.util.performTrackVibrate
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import org.threeten.bp.OffsetDateTime
 import javax.inject.Inject
 
@@ -56,86 +65,160 @@ class TrackWidgetInputDataPointActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val featureId = intent.extras?.getLong(EXTRA_FEATURE_ID) ?: run {
+            finish()
+            return
+        }
+        val isStopTimer = intent.extras?.getBoolean(EXTRA_IS_STOP_TIMER, false) ?: false
+
+        viewModel.initFromFeatureId(featureId, isStopTimer)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                observeDialogData()
+            }
+        }
+
         val composeView = ComposeView(this).apply {
             setContent {
                 CompositionLocalProvider(LocalSettings provides tngSettings) {
                     AddDataPointsDialog(
                         viewModel = addDataPointDialogViewModel,
-                        onDismissRequest = { finish() })
+                        onDismissRequest = { finish() }
+                    )
                 }
             }
         }
         setContentView(composeView)
-
-        val bundle = intent.extras
-
-        bundle?.getInt(AppWidgetManager.EXTRA_APPWIDGET_ID)?.let { widgetId ->
-            val sharedPref = getSharedPreferences(WIDGET_PREFS_NAME, Context.MODE_PRIVATE)
-            val featureId = sharedPref.getLong(TrackWidgetProvider.getFeatureIdPref(widgetId), -1)
-            if (featureId == -1L) {
-                finish()
-                return
-            }
-
-            viewModel.initFromFeatureId(featureId)
-            observeFeature()
-        } ?: finish()
     }
 
-    private fun observeFeature() = viewModel.tracker.observe(this) { tracker ->
-        if (tracker == null) finish()
-        else when (tracker.hasDefaultValue) {
-            true -> {
-                viewModel.addDefaultDataPoint()
-                performTrackVibrate()
-                finish()
-            }
+    private suspend fun observeDialogData() = viewModel.dialogData
+        .filterNotNull().collect { data ->
+            when (data) {
+                is DialogData.Invalid -> finish()
 
-            else -> showDialog(tracker.id)
+                is DialogData.Valid -> {
+                    val tracker = data.tracker
+                    when {
+                        tracker.hasDefaultValue && data.customInitialValue == null -> {
+                            viewModel.addDefaultDataPoint()
+                            performTrackVibrate()
+                            finish()
+                        }
+
+                        else -> {
+                            addDataPointDialogViewModel.showAddDataPointDialog(
+                                trackerId = data.trackerId,
+                                customInitialValue = data.customInitialValue
+                            )
+                        }
+                    }
+                }
+            }
         }
-    }
-
-    private fun showDialog(trackerId: Long) {
-        addDataPointDialogViewModel.showAddDataPointDialog(trackerId)
-    }
 
     override fun onDestroy() {
         super.onDestroy()
         window.hideKeyboard()
     }
+
+    companion object {
+        private const val EXTRA_FEATURE_ID = "featureId"
+        private const val EXTRA_IS_STOP_TIMER = "isStopTimer"
+
+        fun startActivityInputDataPoint(context: Context, featureId: Long) = actionStartActivity(
+            ComponentName(context, TrackWidgetInputDataPointActivity::class.java),
+            actionParametersOf(
+                ActionParameters.Key<Long>(EXTRA_FEATURE_ID) to featureId,
+                ActionParameters.Key<Boolean>(EXTRA_IS_STOP_TIMER) to false
+            ),
+        )
+
+        fun startActivityStopTimer(context: Context, featureId: Long) = actionStartActivity(
+            ComponentName(context, TrackWidgetInputDataPointActivity::class.java),
+            actionParametersOf(
+                ActionParameters.Key<Long>(EXTRA_FEATURE_ID) to featureId,
+                ActionParameters.Key<Boolean>(EXTRA_IS_STOP_TIMER) to true
+            )
+        )
+
+        fun createStopTimerIntent(context: Context, featureId: Long): Intent {
+            return Intent(context, TrackWidgetInputDataPointActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                putExtra(EXTRA_FEATURE_ID, featureId)
+                putExtra(EXTRA_IS_STOP_TIMER, true)
+            }
+        }
+    }
+}
+
+sealed class DialogData {
+    data class Valid(
+        val trackerId: Long,
+        val tracker: Tracker,
+        val customInitialValue: Double?
+    ) : DialogData()
+
+    data object Invalid : DialogData()
 }
 
 @HiltViewModel
 class TrackWidgetInputDataPointViewModel @Inject constructor(
     private var dataInteractor: DataInteractor,
+    private val timerServiceInteractor: TimerServiceInteractor,
     @IODispatcher private val io: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel() {
 
-    private val _tracker = MutableLiveData<Tracker?>()
-    val tracker: LiveData<Tracker?> get() = _tracker
+    private val _dialogData = MutableStateFlow<DialogData?>(null)
+    val dialogData: StateFlow<DialogData?> get() = _dialogData.asStateFlow()
 
     private var initialized = false
 
-    fun initFromFeatureId(featureId: Long) {
+    fun initFromFeatureId(featureId: Long, isStopTimer: Boolean) {
         if (initialized) return
         initialized = true
         viewModelScope.launch(io) {
             val tracker = dataInteractor.getTrackerByFeatureId(featureId)
-            withContext(ui) { _tracker.value = tracker }
+            if (tracker == null) {
+                withContext(ui) { _dialogData.value = DialogData.Invalid }
+                return@launch
+            }
+
+            val customInitialValue = if (isStopTimer) {
+                // Stop timer and get duration in seconds
+                val duration = dataInteractor.stopTimerForTracker(tracker.id)
+                timerServiceInteractor.requestWidgetUpdatesForFeatureId(featureId)
+                duration?.seconds?.toDouble()
+            } else {
+                null
+            }
+
+            withContext(ui) {
+                _dialogData.value = DialogData.Valid(
+                    trackerId = tracker.id,
+                    tracker = tracker,
+                    customInitialValue = customInitialValue
+                )
+            }
         }
     }
 
-    fun addDefaultDataPoint() = tracker.value?.let {
-        viewModelScope.launch(io) {
-            val newDataPoint = DataPoint(
-                timestamp = OffsetDateTime.now(),
-                featureId = it.featureId,
-                value = it.defaultValue,
-                label = it.defaultLabel,
-                note = ""
-            )
-            dataInteractor.insertDataPoint(newDataPoint)
+    fun addDefaultDataPoint() {
+        val currentData = _dialogData.value
+        if (currentData is DialogData.Valid) {
+            val tracker = currentData.tracker
+            viewModelScope.launch(io) {
+                val newDataPoint = DataPoint(
+                    timestamp = OffsetDateTime.now(),
+                    featureId = tracker.featureId,
+                    value = tracker.defaultValue,
+                    label = tracker.defaultLabel,
+                    note = ""
+                )
+                dataInteractor.insertDataPoint(newDataPoint)
+            }
         }
     }
 }
