@@ -18,7 +18,6 @@ package com.samco.trackandgraph.ui.compose.theming
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
@@ -42,11 +41,10 @@ val blueBlack = Color(0xFF2B3B45)
 
 val darkCharcoal = Color(0xFF121212)
 val midCharcoal = Color(0xFF222222)
-val lightCharcoal = Color(0xFF373737)
 val fadedLightBlue = Color(0xFF88AABF)
 val fadedDarkBlue = Color(0xFF54788C)
 val fadedOrange = Color(0xFFE17656)
-val fadedDarkOrange = Color(0xFFA24A2F)
+val redOrange = Color(0xFFEA643C)
 val fadedGreen = Color(0xFF4ABF50)
 
 val blueWhitePastel = Color(0xFFD3DADE)
@@ -143,58 +141,86 @@ private val CustomTypography = Typography(
     labelSmall = Typography().labelSmall.copy(fontSize = 10.sp),
 )
 
-// Light theme ColorScheme based on themes.xml
+// All hard-coded colors here were generated using the Material 3 color tool based on the core theme colours:
+// https://material-foundation.github.io/material-theme-builder/
 private val LightColorScheme = lightColorScheme(
     primary = orange,
     onPrimary = blueBlack,
     primaryContainer = orange,
     onPrimaryContainer = blueBlack,
+    inversePrimary = Color(0xffffb59f),
     secondary = lightBlue,
     onSecondary = blueBlack,
     secondaryContainer = orange,
     onSecondaryContainer = white,
     tertiary = lightBlue,
     onTertiary = blueBlack,
+    tertiaryContainer = Color(0xff74add1),
+    onTertiaryContainer = Color(0xff00405b),
+    background = chalkyWhite,
+    onBackground = black,
+    surface = Color(0xfffcf8f8),
+    onSurface = black,
+    surfaceVariant = white,
+    onSurfaceVariant = darkGray,
+    surfaceTint = orange,
+    inverseSurface = Color(0xff313030),
+    inverseOnSurface = Color(0xfff4f0ef),
     error = darkOrange,
     onError = fadedGreen,
     errorContainer = darkOrange,
     onErrorContainer = white,
-    background = chalkyWhite,
-    onBackground = black,
-    surface = white,
-    onSurface = black,
-    surfaceVariant = white,
-    onSurfaceVariant = darkGray,
     outline = lightGray,
     outlineVariant = lightGray,
     scrim = black,
+    surfaceBright = Color(0xfffcf8f8),
+    surfaceContainer = Color(0xfff1edec),
+    surfaceContainerHigh = Color(0xffebe7e7),
+    surfaceContainerHighest = Color(0xffe5e2e1),
+    surfaceContainerLow = Color(0xfff6f3f2),
+    surfaceContainerLowest = Color(0xffffffff),
+    surfaceDim = Color(0xffddd9d9),
 )
 
-// Dark theme ColorScheme based on themes-night.xml
+// All hard-coded colors here were generated using the Material 3 color tool based on the core theme colours:
+// https://material-foundation.github.io/material-theme-builder/
 private val DarkColorScheme = darkColorScheme(
     primary = fadedOrange,
     onPrimary = white,
     primaryContainer = fadedOrange,
     onPrimaryContainer = black,
+    inversePrimary = Color(0xffa93711),
     secondary = fadedLightBlue,
     onSecondary = blueBlack,
     secondaryContainer = fadedOrange,
     onSecondaryContainer = black,
     tertiary = fadedLightBlue,
     onTertiary = blueBlack,
-    error = fadedDarkOrange,
-    onError = fadedGreen,
-    errorContainer = fadedDarkOrange,
-    onErrorContainer = white,
+    tertiaryContainer = Color(0xff74add1),
+    onTertiaryContainer = Color(0xff00405b),
     background = darkCharcoal,
     onBackground = lightGray,
     surface = midCharcoal,
     onSurface = lightGray,
     surfaceVariant = midCharcoal,
     onSurfaceVariant = lightGray,
+    surfaceTint = fadedOrange,
+    inverseSurface = Color(0xffe5e2e1),
+    inverseOnSurface = Color(0xff313030),
+    error = redOrange,
+    onError = fadedGreen,
+    errorContainer = redOrange,
+    onErrorContainer = white,
     outline = darkGray,
     outlineVariant = darkGray,
     scrim = black,
+    surfaceBright = Color(0xff3a3939),
+    surfaceContainer = Color(0xff201f1f),
+    surfaceContainerHigh = Color(0xff2a2a2a),
+    surfaceContainerHighest = Color(0xff353434),
+    surfaceContainerLow = Color(0xff1c1b1b),
+    surfaceContainerLowest = Color(0xff0e0e0e),
+    surfaceDim = Color(0xff141313),
 )
 
 private val LightTngColors = TngColors(

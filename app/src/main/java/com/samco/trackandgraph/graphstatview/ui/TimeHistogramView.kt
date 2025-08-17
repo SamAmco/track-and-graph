@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
@@ -139,7 +140,7 @@ private fun TimeHistogramBodyView(
                 val label = bar.label
                     .ifEmpty { context.getString(R.string.no_label) }
                 GraphLegendItem(
-                    color = getResColor(dataVisColorList[colorIndex]),
+                    color = colorResource(dataVisColorList[colorIndex]),
                     label = label
                 )
             }

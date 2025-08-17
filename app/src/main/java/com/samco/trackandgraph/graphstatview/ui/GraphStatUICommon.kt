@@ -183,9 +183,6 @@ fun GraphErrorView(
     )
 }
 
-@Composable
-fun getResColor(@ColorRes color: Int): Color = colorResource(color)
-
 data class GraphLegendItem(
     val color: Color,
     val label: String
