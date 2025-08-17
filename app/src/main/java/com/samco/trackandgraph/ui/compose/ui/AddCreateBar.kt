@@ -57,7 +57,7 @@ fun AddCreateBar(
             if (isUpdateMode) stringResource(id = R.string.update)
             else stringResource(id = R.string.create)
 
-        FilledButton(
+        TextButton(
             text = buttonText,
             onClick = onCreateUpdateClicked,
             enabled = errorText == null,
