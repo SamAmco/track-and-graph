@@ -279,7 +279,7 @@ private fun BarChartDataOverlayExtraDetails(
 
     DialogInputSpacing()
 
-    extraDetails.forEachIndexed { index, labelInfo ->
+    extraDetails.forEachIndexed { _, labelInfo ->
         AnimatedVisibility(
             visible = expanded,
             enter = fadeIn() + expandVertically(),
@@ -287,7 +287,7 @@ private fun BarChartDataOverlayExtraDetails(
         ) {
             Row {
                 ColorCircle(
-                    color = Color(getColorInt(LocalContext.current, labelInfo.color)),
+                    color = Color(getColorInt(labelInfo.color)),
                     size = 16.dp
                 )
                 HalfDialogInputSpacing()
@@ -400,7 +400,7 @@ private fun BarChartBodyView(
                 val label = bar.segmentSeries.title
                     .ifEmpty { context.getString(R.string.no_label) }
                 GraphLegendItem(
-                    color = getColor(context, bar.color),
+                    color = getColor(bar.color),
                     label = label
                 )
             }
@@ -589,7 +589,7 @@ private fun drawBars(
         else PorterDuffXfermode(PorterDuff.Mode.DST)
 
     bars.forEachIndexed { i, bv ->
-        val color = getColorInt(context, bv.color)
+        val color = getColorInt(bv.color)
         val seriesFormatter = BarFormatter(color, outlineColor)
         seriesFormatter.borderPaint.xfermode = xfermode
         binding.xyPlot.addSeries(bv.segmentSeries, seriesFormatter)

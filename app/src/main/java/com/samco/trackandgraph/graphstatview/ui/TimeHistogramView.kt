@@ -22,8 +22,8 @@ import android.util.TypedValue
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
@@ -140,7 +140,7 @@ private fun TimeHistogramBodyView(
                 val label = bar.label
                     .ifEmpty { context.getString(R.string.no_label) }
                 GraphLegendItem(
-                    color = colorResource(dataVisColorList[colorIndex]),
+                    color = dataVisColorList[colorIndex],
                     label = label
                 )
             }
@@ -276,7 +276,7 @@ private fun drawBars(
         val series = (barValues[i]).values
         val xySeries = SimpleXYSeries(series, SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, bv.label)
         val colorIndex = (i * dataVisColorGenerator) % dataVisColorList.size
-        val color = getColor(context, dataVisColorList[colorIndex])
+        val color = dataVisColorList[colorIndex].toArgb()
         val seriesFormatter = BarFormatter(color, outlineColor)
         seriesFormatter.borderPaint.strokeWidth = PixelUtils.dpToPix(1f)
         binding.xyPlot.addSeries(xySeries, seriesFormatter)

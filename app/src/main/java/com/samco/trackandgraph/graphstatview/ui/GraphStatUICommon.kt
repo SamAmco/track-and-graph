@@ -40,12 +40,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getColor
 import com.androidplot.Plot
 import com.androidplot.ui.Anchor
 import com.androidplot.ui.HorizontalPositioning
@@ -190,17 +189,13 @@ data class GraphLegendItem(
 
 @ColorInt
 fun getColorInt(
-    context: Context,
     colorSpec: ColorSpec,
 ) = when (colorSpec) {
-    is ColorSpec.ColorIndex -> getColor(context, dataVisColorList[colorSpec.index])
+    is ColorSpec.ColorIndex -> dataVisColorList[colorSpec.index].toArgb()
     is ColorSpec.ColorValue -> colorSpec.value
 }
 
-fun getColor(
-    context: Context,
-    colorSpec: ColorSpec,
-) = Color(getColorInt(context, colorSpec))
+fun getColor(colorSpec: ColorSpec) = Color(getColorInt(colorSpec))
 
 private val graphLegendCircleSize = 20.dp
 private val graphLegendTextStyle @Composable get() = MaterialTheme.typography.bodyMedium
