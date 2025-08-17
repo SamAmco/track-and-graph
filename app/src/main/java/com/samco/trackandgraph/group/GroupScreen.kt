@@ -183,6 +183,7 @@ fun GroupScreen(
     )
 
     GroupScreenView(
+        lazyGridState = groupViewModel.lazyGridState,
         isLoading = isLoading,
         showEmptyText = showEmptyText,
         // Only show FAB if scroll allows it AND we have trackers
@@ -301,6 +302,7 @@ fun GroupScreen(
  */
 @Composable
 private fun GroupScreenView(
+    lazyGridState: LazyGridState,
     isLoading: Boolean,
     showEmptyText: Boolean,
     showFab: Boolean,
@@ -320,6 +322,7 @@ private fun GroupScreenView(
         // Group grid with items
         GroupGrid(
             modifier = Modifier.fillMaxSize(),
+            lazyGridState = lazyGridState,
             allChildren = allChildren,
             trackerClickListeners = trackerClickListeners ?: TrackerClickListeners(),
             graphStatClickListeners = graphStatClickListeners ?: GraphStatClickListeners(),
@@ -388,6 +391,7 @@ private fun GroupChild.toGroupChildKey(): GroupChildKey = when (this) {
 @Composable
 private fun GroupGrid(
     modifier: Modifier = Modifier,
+    lazyGridState: LazyGridState,
     allChildren: List<GroupChild>,
     trackerClickListeners: TrackerClickListeners,
     graphStatClickListeners: GraphStatClickListeners,
@@ -401,7 +405,6 @@ private fun GroupGrid(
         // Calculate column count based on maxWidth with minimum 100.dp per cell
         val columnCount = (maxWidth / 180.dp).toInt().coerceAtLeast(2)
 
-        val lazyGridState = rememberLazyGridState()
         val reorderableLazyGridState = rememberReorderableLazyGridState(lazyGridState) { from, to ->
             onDragSwap(from.index, to.index)
         }
@@ -559,6 +562,7 @@ private fun ReorderableCollectionItemScope.GraphStatItem(
 private fun GroupScreenViewEmptyPreview() {
     TnGComposeTheme {
         GroupScreenView(
+            lazyGridState = rememberLazyGridState(),
             allChildren = listOf(),
             isLoading = false,
             showEmptyText = true,

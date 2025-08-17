@@ -19,6 +19,7 @@
 
 package com.samco.trackandgraph.group
 
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.base.database.dto.DataPoint
@@ -40,19 +41,16 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
@@ -89,6 +87,7 @@ interface GroupViewModel {
     val hasAnyReminders: StateFlow<Boolean>
     val loading: StateFlow<Boolean>
     val trackers: List<DisplayTracker>
+    val lazyGridState: LazyGridState
 
     fun setGroup(groupId: Long)
     fun addDefaultTrackerValue(tracker: DisplayTracker)
@@ -114,6 +113,8 @@ class GroupViewModelImpl @Inject constructor(
     @DefaultDispatcher private val defaultDispatcher: CoroutineDispatcher,
     @MainDispatcher private val ui: CoroutineDispatcher
 ) : ViewModel(), GroupViewModel {
+
+    override val lazyGridState = LazyGridState()
 
     private val _showDurationInputDialog = MutableStateFlow<GroupViewModel.DurationInputDialogData?>(null)
     override val showDurationInputDialog: StateFlow<GroupViewModel.DurationInputDialogData?> = _showDurationInputDialog
