@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -40,11 +41,40 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.helpers.formatDayMonthYearHourMinuteWeekDayOneLine
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.tngColors
 import org.threeten.bp.OffsetDateTime
+
+// Custom Typography matching original Material 2 text sizes from dimens.xml
+val CustomTypography = Typography(
+    // Display styles (largest text)
+    displayLarge = Typography().displayLarge.copy(fontSize = 70.sp),
+    displayMedium = Typography().displayMedium.copy(fontSize = 45.sp),
+    displaySmall = Typography().displaySmall.copy(fontSize = 36.sp),
+
+    // Headline styles
+    headlineLarge = Typography().headlineLarge.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold),
+    headlineMedium = Typography().headlineMedium.copy(fontSize = 22.sp, fontWeight = FontWeight.Bold, lineHeight = 28.sp),
+    headlineSmall = Typography().headlineSmall.copy(fontSize = 20.sp, fontWeight = FontWeight.W500),
+
+    // Title styles
+    titleLarge = Typography().titleLarge.copy(fontSize = 28.sp),
+    titleMedium = Typography().titleMedium.copy(fontSize = 18.sp),
+    titleSmall = Typography().titleSmall.copy(fontSize = 16.sp),
+
+    // Body styles
+    bodyLarge = Typography().bodyLarge.copy(fontSize = 15.sp),
+    bodyMedium = Typography().bodyMedium.copy(fontSize = 15.sp),
+    bodySmall = Typography().bodySmall.copy(fontSize = 13.sp),
+
+    // Label styles (smallest text)
+    labelLarge = Typography().labelLarge.copy(fontSize = 14.sp),
+    labelMedium = Typography().labelMedium.copy(fontSize = 11.sp),
+    labelSmall = Typography().labelSmall.copy(fontSize = 10.sp),
+)
 
 @Preview(showBackground = true)
 @Composable

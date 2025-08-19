@@ -69,6 +69,7 @@ import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.coroutines.delay
 import org.threeten.bp.Duration
@@ -254,7 +255,7 @@ private fun TrackerNameText(
         text = trackerName,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(cardMarginSmall),
+            .padding(cardPadding),
         style = MaterialTheme.typography.headlineMedium,
         textAlign = TextAlign.Center,
         maxLines = 10,
