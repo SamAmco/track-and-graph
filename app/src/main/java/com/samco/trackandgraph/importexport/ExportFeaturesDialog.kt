@@ -116,7 +116,7 @@ private fun ExportFeaturesDialogContent(
     selectedFeatures: List<FeatureDto>,
     onCreateFile: () -> Unit,
     onToggleFeature: (FeatureDto) -> Unit,
-) = BoxWithConstraints {
+) = Box {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(dialogInputSpacing)

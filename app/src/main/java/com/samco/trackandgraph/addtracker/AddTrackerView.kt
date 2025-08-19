@@ -49,7 +49,7 @@ import com.samco.trackandgraph.ui.compose.ui.*
 
 @Composable
 fun AddTrackerView(viewModel: AddTrackerViewModel) {
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
     val isUpdateMode by viewModel.isUpdateMode.observeAsState(false)
     val errorText by viewModel.errorText.observeAsState()
     val openDialog by viewModel.showUpdateWarningAlertDialog.observeAsState(false)
