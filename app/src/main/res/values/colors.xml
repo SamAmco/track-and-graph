@@ -16,31 +16,22 @@
   ~ along with Track & Graph.  If not, see <https://www.gnu.org/licenses/>.
   -->
 <resources>
-    <!--Primarily light theme colors-->
+    <!--Widget card colors-->
     <color name="light_blue">#74add1</color>
-    <color name="dark_blue">#427ea0</color>
-    <color name="orange">#f46d43</color>
-    <color name="dark_orange">#bb3d18</color>
-    <color name="blue_black">#2B3B45</color>
-
-    <!--Primarily dark theme colors-->
-    <color name="dark_charcoal">#121212</color>
-    <color name="mid_charcoal">#222222</color>
-    <color name="light_charcoal">#373737</color>
     <color name="faded_light_blue">#88aabf</color>
-    <color name="faded_dark_blue">#54788c</color>
-
-    <color name="faded_orange">#e17656</color>
-    <color name="faded_dark_orange">#a24a2f</color>
-    <color name="faded_green">#4abf50</color>
-
-    <!--Generic colors-->
-    <color name="blue_white_pastel">#d3dade</color>
-    <color name="chalky_white">#f3f3f3</color>
-    <color name="black">#000000</color>
-    <color name="dark_gray">#4C4C4C</color>
-    <color name="mid_gray">#7C7C7C</color>
-    <color name="light_gray">#E0E0E0</color>
     <color name="white">#FFFFFF</color>
-
+    <color name="mid_charcoal">#222222</color>
+    
+    <!--Theme attribute colors-->
+    <color name="orange">#f46d43</color>
+    <color name="faded_orange">#e17656</color>
+    <color name="blue_black">#2B3B45</color>
+    <color name="blue_white_pastel">#d3dade</color>
+    <color name="black">#000000</color>
+    <color name="light_gray">#E0E0E0</color>
+    <color name="dark_gray">#4C4C4C</color>
+    
+    <!--Background colors for splash/startup screen-->
+    <color name="chalky_white">#f3f3f3</color>
+    <color name="dark_charcoal">#121212</color>
 </resources>

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ This file is part of Track & Graph
   ~ 
   ~ Track & Graph is free software: you can redistribute it and/or modify
@@ -23,12 +22,5 @@
     <dimen name="line_graph_vertex_thickness">6dp</dimen>
     <dimen name="line_graph_point_label_h_offset">-3dp</dimen>
     <dimen name="line_graph_point_label_v_offset">10dp</dimen>
-
-    <dimen name="headline2_size">70sp</dimen>
-    <dimen name="headline4_size">30sp</dimen>
-    <dimen name="headline5_size">22sp</dimen>
-    <dimen name="headline6_size">20sp</dimen>
-    <dimen name="subtitle_size">17sp</dimen>
-    <dimen name="text_body_size">15sp</dimen>
     <dimen name="small_label_size">10sp</dimen>
 </resources>
