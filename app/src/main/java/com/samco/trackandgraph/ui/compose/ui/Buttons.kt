@@ -161,10 +161,10 @@ fun IconTextButton(
     modifier = modifier,
     onClick = onClick,
     shape = MaterialTheme.shapes.medium,
-    contentPadding = PaddingValues(vertical = cardPadding, horizontal = inputSpacingLarge)
+    contentPadding = PaddingValues(cardPadding)
 ) {
     Icon(
-        modifier = Modifier.size(24.dp),
+        modifier = Modifier.size(smallIconSize),
         painter = painterResource(id = icon),
         contentDescription = text,
         tint = MaterialTheme.colorScheme.onPrimary,
