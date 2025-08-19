@@ -121,7 +121,6 @@ dependencies {
 
     implementation(project(":functions"))
 
-    implementation(libs.kotlin.reflect)
     implementation(libs.androidx.legacy.support.v4)
 
     //Dependency Injection
@@ -132,9 +131,6 @@ dependencies {
 
     //Lua
     implementation(libs.luak.jvm)
-
-    //UI
-    implementation(libs.androidx.cardview)
 
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.tooling)
@@ -147,7 +143,6 @@ dependencies {
     implementation(libs.compose.runtime.livedata)
     // Material design stuff you might need at some point
     implementation(libs.compose.material3)
-    implementation(libs.accompanist.pager)
 
     // Reorderable drag and drop
     implementation(libs.reorderable)
@@ -176,7 +171,6 @@ dependencies {
 
     //Graph drawing
     implementation(libs.androidplot.core)
-    implementation(libs.flexbox)
 
     //Work manager
     implementation(libs.hilt.work)
