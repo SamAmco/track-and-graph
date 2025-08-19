@@ -16,34 +16,38 @@
 */
 package com.samco.trackandgraph.ui.compose.ui
 
-import android.content.Context
-import android.content.ContextWrapper
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimePicker
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
-import com.google.android.material.datepicker.CalendarConstraints
-import com.google.android.material.datepicker.DateValidatorPointForward
-import com.google.android.material.datepicker.MaterialDatePicker
-import com.google.android.material.timepicker.MaterialTimePicker
-import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
-import com.google.android.material.timepicker.TimeFormat.CLOCK_24H
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.helpers.formatDayMonthYear
 import com.samco.trackandgraph.helpers.formatHourMinute
-import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
-import org.threeten.bp.DayOfWeek
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.tngColors
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
-import java.util.Calendar
-
-//TODO these can be transitioned to compose once we transition to material 3
 
 @Composable
 fun DateTimeButtonRow(
@@ -80,6 +84,36 @@ fun DateTimeButtonRow(
     )
 }
 
+@Composable
+fun DateButton(
+    modifier: Modifier = Modifier,
+    dateTime: OffsetDateTime,
+    enabled: Boolean = true,
+    allowPastDates: Boolean = true,
+    onDateSelected: (OffsetDateTime) -> Unit,
+) {
+    val context = LocalContext.current
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+
+    SelectorButton(
+        modifier = modifier,
+        text = formatDayMonthYear(context, dateTime),
+        enabled = enabled,
+        onClick = { showDatePicker = true }
+    )
+
+    if (showDatePicker) {
+        DatePickerDialogContent(
+            initialDateTime = dateTime,
+            onDismissRequest = { showDatePicker = false },
+            onDateSelected = { selectedDate ->
+                onDateSelected(selectedDate)
+                showDatePicker = false
+            }
+        )
+    }
+}
+
 data class SelectedTime(
     val hour: Int,
     val minute: Int
@@ -91,122 +125,123 @@ fun TimeButton(
     dateTime: OffsetDateTime,
     enabled: Boolean = true,
     onTimeSelected: (SelectedTime) -> Unit
-) = Box {
-    val context = LocalContext.current
+) {
+    var showTimePicker by rememberSaveable { mutableStateOf(false) }
 
     SelectorButton(
         modifier = modifier,
         text = formatHourMinute(dateTime),
         enabled = enabled,
-        onClick = {
-            showTimePickerDialog(
-                context = context,
-                onTimeSelected = onTimeSelected,
-                hour = dateTime.hour,
-                minute = dateTime.minute
+        onClick = { showTimePicker = true }
+    )
+
+    if (showTimePicker) {
+        TimePickerDialogContent(
+            initialHour = dateTime.hour,
+            initialMinute = dateTime.minute,
+            onCancel = { showTimePicker = false },
+            onConfirm = { selectedTime ->
+                onTimeSelected(selectedTime)
+                showTimePicker = false
+            }
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TimePickerDialogContent(
+    initialHour: Int = 14,
+    initialMinute: Int = 30,
+    onCancel: () -> Unit = {},
+    onConfirm: (SelectedTime) -> Unit = {}
+) {
+    val timePickerState = rememberTimePickerState(
+        initialHour = initialHour,
+        initialMinute = initialMinute,
+        is24Hour = true
+    )
+
+    CustomContinueCancelDialog(
+        onDismissRequest = onCancel,
+        onConfirm = { onConfirm(SelectedTime(timePickerState.hour, timePickerState.minute)) },
+        continueText = R.string.ok,
+        cancelText = R.string.cancel,
+        backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+        content = {
+            InputSpacingLarge()
+            TimePicker(
+                modifier = Modifier.fillMaxWidth(),
+                state = timePickerState
             )
         }
     )
 }
 
-fun showTimePickerDialog(
-    context: Context,
-    onTimeSelected: (SelectedTime) -> Unit,
-    hour: Int? = null,
-    minute: Int? = null,
-) {
-    val tag = "TimePicker"
-    val fragmentManager = findFragmentManager(context) ?: return
-    val fragment = fragmentManager.findFragmentByTag(tag)
-    val existingPicker = fragment as? MaterialTimePicker
-    val picker = existingPicker ?: MaterialTimePicker.Builder()
-        .apply {
-            if (hour != null) setHour(hour)
-            if (minute != null) setMinute(minute)
-        }
-        .setTimeFormat(CLOCK_24H)
-        .setInputMode(INPUT_MODE_CLOCK)
-        .build()
-    picker.apply {
-        addOnPositiveButtonClickListener {
-            onTimeSelected(SelectedTime(this.hour, this.minute))
-        }
-        show(fragmentManager, tag)
-    }
-}
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateButton(
-    modifier: Modifier = Modifier,
-    dateTime: OffsetDateTime,
-    enabled: Boolean = true,
-    allowPastDates: Boolean = true,
-    onDateSelected: (OffsetDateTime) -> Unit,
-) = Box {
-    val context = LocalContext.current
-    val firstDayOfWeek = LocalSettings.current.firstDayOfWeek
-    SelectorButton(
-        modifier = modifier,
-        text = formatDayMonthYear(context, dateTime),
-        enabled = enabled,
-        onClick = {
-            showDatePickerDialog(context, onDateSelected, firstDayOfWeek, allowPastDates, dateTime)
-        }
-    )
-}
-
-fun showDatePickerDialog(
-    context: Context,
-    onDateSelected: (OffsetDateTime) -> Unit,
-    firstDayOfWeek: DayOfWeek,
-    allowPastDates: Boolean = true,
-    dateTime: OffsetDateTime = OffsetDateTime.now()
+fun DatePickerDialogContent(
+    initialDateTime: OffsetDateTime,
+    onDismissRequest: () -> Unit = {},
+    onDateSelected: (OffsetDateTime) -> Unit = {}
 ) {
-    val tag = "DatePicker"
-    val fragmentManager = findFragmentManager(context) ?: return
-    val fragment = fragmentManager.findFragmentByTag(tag)
-    val existingPicker = fragment as? MaterialDatePicker<*>
-    val dowMap = mapOf(
-        DayOfWeek.MONDAY to Calendar.MONDAY,
-        DayOfWeek.TUESDAY to Calendar.TUESDAY,
-        DayOfWeek.WEDNESDAY to Calendar.WEDNESDAY,
-        DayOfWeek.THURSDAY to Calendar.THURSDAY,
-        DayOfWeek.FRIDAY to Calendar.FRIDAY,
-        DayOfWeek.SATURDAY to Calendar.SATURDAY,
-        DayOfWeek.SUNDAY to Calendar.SUNDAY
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialDateTime.toInstant().toEpochMilli()
     )
-    val picker = existingPicker ?: MaterialDatePicker.Builder
-        .datePicker()
-        .setSelection(dateTime.toInstant().toEpochMilli())
-        .setCalendarConstraints(
-            CalendarConstraints.Builder()
-                .let {
-                    if (allowPastDates) it
-                    else it.setValidator(DateValidatorPointForward.now())
-                }
-                .setFirstDayOfWeek(dowMap[firstDayOfWeek] ?: Calendar.MONDAY)
-                .build()
-        )
-        .build()
 
-    picker.apply {
-        addOnPositiveButtonClickListener { obj ->
-            val epochMillis = (obj as? Long) ?: return@addOnPositiveButtonClickListener
-            //epochMillis is 00:00 of a date in UTC, we want to return the same date in the local timezone
-            val utcDate = Instant.ofEpochMilli(epochMillis).atOffset(ZoneOffset.UTC)
-            val selected = utcDate.withOffsetSameLocal(OffsetDateTime.now().offset)
-            onDateSelected(selected)
-        }
-        show(fragmentManager, tag)
+    DatePickerDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        val utcDate = Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC)
+                        val selected = utcDate.withOffsetSameLocal(initialDateTime.offset)
+                        onDateSelected(selected)
+                    }
+                    onDismissRequest()
+                }
+            ) {
+                Text(stringResource(android.R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismissRequest
+            ) {
+                Text(
+                    text = stringResource(android.R.string.cancel),
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+        },
+        content = { DatePicker(state = datePickerState) }
+    )
+}
+
+@Preview
+@Composable
+fun DateTimeButtonRowPreview() {
+    TnGComposeTheme {
+        DateTimeButtonRow(
+            selectedDateTime = OffsetDateTime.parse("2023-06-15T14:30:00+01:00"),
+            onDateTimeSelected = { }
+        )
     }
 }
 
-private fun findFragmentManager(context: Context): FragmentManager? {
-    var currentContext = context
-    while (currentContext !is FragmentActivity) {
-        if (currentContext is ContextWrapper) {
-            currentContext = currentContext.baseContext
-        } else break
+@Preview
+@Composable
+fun TimePickerDialogPreview() {
+    TnGComposeTheme {
+        TimePickerDialogContent()
     }
-    return (currentContext as? FragmentActivity)?.supportFragmentManager
+}
+
+@Preview
+@Composable
+fun DatePickerDialogPreview() {
+    TnGComposeTheme {
+        DatePickerDialogContent(OffsetDateTime.parse("2023-06-15T14:30:00+01:00"))
+    }
 }

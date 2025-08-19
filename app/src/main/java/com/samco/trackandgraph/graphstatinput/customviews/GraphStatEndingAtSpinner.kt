@@ -20,6 +20,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,11 +32,10 @@ import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.base.database.dto.GraphEndDate
 import com.samco.trackandgraph.helpers.formatDayMonthYear
-import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.Spinner
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.ui.compose.ui.showDatePickerDialog
+import com.samco.trackandgraph.ui.compose.ui.DatePickerDialogContent
 import org.threeten.bp.OffsetDateTime
 
 enum class SampleEndingAtOption {
@@ -76,6 +79,7 @@ fun GraphStatEndingAtSpinner(
     sampleEndingAt: SampleEndingAt,
     onSampleEndingAtChanged: (SampleEndingAt) -> Unit
 ) {
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
 
     val strLatest = stringResource(id = R.string.ending_at_latest)
     val strCustom = stringResource(id = R.string.ending_at_custom_date)
@@ -92,7 +96,6 @@ fun GraphStatEndingAtSpinner(
         )
 
         val context = LocalContext.current
-        val firstDayOfWeek = LocalSettings.current.firstDayOfWeek
 
         Spinner(
             modifier = modifier,
@@ -102,13 +105,7 @@ fun GraphStatEndingAtSpinner(
                 when (option) {
                     SampleEndingAtOption.LATEST -> onSampleEndingAtChanged(SampleEndingAt.Latest)
                     SampleEndingAtOption.NOW -> onSampleEndingAtChanged(SampleEndingAt.Now)
-                    SampleEndingAtOption.CUSTOM -> showDatePickerDialog(
-                        context = context,
-                        firstDayOfWeek = firstDayOfWeek,
-                        onDateSelected = {
-                            onSampleEndingAtChanged(SampleEndingAt.Custom(it))
-                        }
-                    )
+                    SampleEndingAtOption.CUSTOM -> showDatePicker = true
                 }
             },
             selectedItemFactory = { modifier, item, expanded ->
@@ -136,6 +133,17 @@ fun GraphStatEndingAtSpinner(
                 )
             },
             dropdownContentAlignment = Alignment.End,
+        )
+    }
+
+    if (showDatePicker) {
+        DatePickerDialogContent(
+            initialDateTime = (sampleEndingAt as? SampleEndingAt.Custom)?.dateTime ?: OffsetDateTime.now(),
+            onDismissRequest = { showDatePicker = false },
+            onDateSelected = { selectedDate ->
+                onSampleEndingAtChanged(SampleEndingAt.Custom(selectedDate))
+                showDatePicker = false
+            }
         )
     }
 }
