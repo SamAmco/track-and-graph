@@ -25,8 +25,6 @@ import com.samco.trackandgraph.data.database.dto.GroupGraphItem as ModelGroupGra
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,7 +34,7 @@ import javax.inject.Inject
 
 enum class SelectItemDialogState { LOADING, READY }
 
-enum class SelectableItemType { GROUP, TRACKER, GRAPH }
+enum class SelectableItemType { GROUP, TRACKER, FEATURE, GRAPH }
 
 data class HiddenItem(
     val type: SelectableItemType,
@@ -56,7 +54,8 @@ sealed class GraphNode {
     ) : GraphNode()
 
     data class Tracker(
-        val id: Long,
+        val trackerId: Long,
+        val featureId: Long,
         override val name: String,
     ) : GraphNode()
 
@@ -66,16 +65,11 @@ sealed class GraphNode {
     ) : GraphNode()
 }
 
-sealed class SelectionEvent {
-    data class TrackerSelected(val trackerId: Long) : SelectionEvent()
-    data class GraphSelected(val graphId: Long) : SelectionEvent()
-}
 
 interface SelectItemDialogViewModel {
     val state: StateFlow<SelectItemDialogState>
     val groupTree: StateFlow<GraphNode?>
-    val selectedGroupId: StateFlow<Long?>
-    val selectionEvents: ReceiveChannel<SelectionEvent>
+    val selectedItem: StateFlow<GraphNode?>
 
     fun init(selectableTypes: Set<SelectableItemType>, hiddenItems: Set<HiddenItem>)
     fun onItemClicked(item: GraphNode)
@@ -94,11 +88,9 @@ class SelectItemDialogViewModelImpl @Inject constructor(
     private val _groupTree = MutableStateFlow<GraphNode?>(null)
     override val groupTree: StateFlow<GraphNode?> = _groupTree.asStateFlow()
 
-    private val _selectedGroupId = MutableStateFlow<Long?>(null)
-    override val selectedGroupId: StateFlow<Long?> = _selectedGroupId.asStateFlow()
+    private val _selectedItem = MutableStateFlow<GraphNode?>(null)
+    override val selectedItem: StateFlow<GraphNode?> = _selectedItem.asStateFlow()
 
-    private val selectionEventChannel = Channel<SelectionEvent>(Channel.BUFFERED)
-    override val selectionEvents: ReceiveChannel<SelectionEvent> = selectionEventChannel
 
     private var initialized = false
     private var selectableTypes: Set<SelectableItemType> = emptySet()
@@ -136,27 +128,30 @@ class SelectItemDialogViewModelImpl @Inject constructor(
 
                 // Only set as selected if groups are selectable
                 if (SelectableItemType.GROUP in selectableTypes) {
-                    _selectedGroupId.value = item.id
+                    _selectedItem.value = item
                 }
             }
 
             is GraphNode.Tracker -> {
-                if (SelectableItemType.TRACKER !in selectableTypes) return
-                viewModelScope.launch { selectionEventChannel.send(SelectionEvent.TrackerSelected(item.id)) }
+                if (SelectableItemType.TRACKER !in selectableTypes
+                    && SelectableItemType.FEATURE !in selectableTypes
+                ) return
+                _selectedItem.value = item
             }
 
             is GraphNode.Graph -> {
                 if (SelectableItemType.GRAPH !in selectableTypes) return
-                viewModelScope.launch { selectionEventChannel.send(SelectionEvent.GraphSelected(item.id)) }
+                _selectedItem.value = item
             }
         }
     }
+
 
     override fun reset() {
         initialized = false
         _state.value = SelectItemDialogState.LOADING
         _groupTree.value = null
-        _selectedGroupId.value = null
+        _selectedItem.value = null
         selectableTypes = emptySet()
     }
 
@@ -223,7 +218,9 @@ class SelectItemDialogViewModelImpl @Inject constructor(
         selectableTypes: Set<SelectableItemType>,
         hiddenItems: Set<HiddenItem>
     ): Boolean {
-        return SelectableItemType.TRACKER !in selectableTypes
+        val selectable = (SelectableItemType.TRACKER in selectableTypes
+            || SelectableItemType.FEATURE in selectableTypes)
+        return !selectable
             || HiddenItem(SelectableItemType.TRACKER, trackerId) in hiddenItems
     }
 
@@ -237,7 +234,8 @@ class SelectItemDialogViewModelImpl @Inject constructor(
     }
 
     private fun ModelGroupGraphItem.TrackerNode.toGraphNode() = GraphNode.Tracker(
-        id = tracker.id,
+        trackerId = tracker.id,
+        featureId = tracker.featureId,
         name = tracker.name,
     )
 
