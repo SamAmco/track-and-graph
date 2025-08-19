@@ -69,12 +69,7 @@ class UrlNavigatorImpl @Inject constructor(
     }
 
     private suspend fun loadConfig(): Map<String, String> {
-        val endpoints = remoteConfigProvider.getRemoteConfigObject(RemoteConfigProvider.RemoteConfig.ENDPOINTS)
-            ?: error("Failed to load remote config object for ENDPOINTS")
-
-        return endpoints.keys()
-            .asSequence()
-            .associateWith { endpoints.getString(it) }
-            .toMap()
+        return remoteConfigProvider.getEndpoints()
+            ?: error("Failed to load endpoints configuration")
     }
 }

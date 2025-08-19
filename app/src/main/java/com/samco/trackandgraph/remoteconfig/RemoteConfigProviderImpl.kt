@@ -18,19 +18,15 @@ package com.samco.trackandgraph.remoteconfig
 
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import com.samco.trackandgraph.downloader.FileDownloader
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
-import org.json.JSONArray
-import org.json.JSONObject
 import timber.log.Timber
 import java.net.URI
 import javax.inject.Inject
@@ -39,12 +35,15 @@ import kotlin.coroutines.CoroutineContext
 class RemoteConfigProviderImpl @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,
     private val fileDownloader: FileDownloader,
+    private val moshi: Moshi,
 ) : RemoteConfigProvider, CoroutineScope {
 
     override val coroutineContext: CoroutineContext = Job() + ioDispatcher
 
+    private val adapter = moshi.adapter(RemoteConfiguration::class.java)
+
     private sealed interface RemoteConfigResult {
-        data class Success(val jsonObject: JSONObject) : RemoteConfigResult
+        data class Success(val configuration: RemoteConfiguration) : RemoteConfigResult
         data class Failure(val error: Throwable) : RemoteConfigResult
     }
 
@@ -54,26 +53,38 @@ class RemoteConfigProviderImpl @Inject constructor(
                 URI("https://raw.githubusercontent.com/SamAmco/track-and-graph/refs/heads/master/configuration/remote-configuration.json")
             ) ?: error("Failed to load remote configuration")
 
-            emit(RemoteConfigResult.Success(JSONObject(configContent)))
+            val configuration = adapter.fromJson(configContent)
+                ?: error("Failed to parse remote configuration")
+
+            emit(RemoteConfigResult.Success(configuration))
         } catch (e: Exception) {
             Timber.e(e, "Failed to load remote configuration")
             emit(RemoteConfigResult.Failure(e))
         }
     }.shareIn(this, SharingStarted.Companion.Lazily, replay = 1)
 
-    override suspend fun getRemoteConfigObject(subConfig: RemoteConfigProvider.RemoteConfig): JSONObject? {
+    override suspend fun getRemoteConfiguration(): RemoteConfiguration? {
         return remoteConfig.map {
             when (it) {
-                is RemoteConfigResult.Success -> it.jsonObject.getJSONObject(subConfig.urlId)
+                is RemoteConfigResult.Success -> it.configuration
                 is RemoteConfigResult.Failure -> null
             }
         }.first()
     }
 
-    override suspend fun getRemoteConfigArray(subConfig: RemoteConfigProvider.RemoteConfig): JSONArray? {
+    override suspend fun getEndpoints(): Map<String, String>? {
         return remoteConfig.map {
             when (it) {
-                is RemoteConfigResult.Success -> it.jsonObject.getJSONArray(subConfig.urlId)
+                is RemoteConfigResult.Success -> it.configuration.endpoints
+                is RemoteConfigResult.Failure -> null
+            }
+        }.first()
+    }
+
+    override suspend fun getTrustedLuaScriptSources(): List<String>? {
+        return remoteConfig.map {
+            when (it) {
+                is RemoteConfigResult.Success -> it.configuration.trustedLuaScriptSources
                 is RemoteConfigResult.Failure -> null
             }
         }.first()

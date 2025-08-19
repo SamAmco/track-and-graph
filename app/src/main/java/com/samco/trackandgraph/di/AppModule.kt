@@ -54,6 +54,7 @@ import com.samco.trackandgraph.system.SystemInfoProvider
 import com.samco.trackandgraph.system.SystemInfoProviderImpl
 import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.timers.TimerServiceInteractorImpl
+import com.squareup.moshi.Moshi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -132,4 +133,7 @@ class AppModule {
     @Provides
     fun systemInfoProvider(impl: SystemInfoProviderImpl): SystemInfoProvider = impl
 
+    @Provides
+    @Singleton
+    fun provideMoshi(): Moshi = Moshi.Builder().build()
 }
