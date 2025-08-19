@@ -51,9 +51,9 @@ import org.threeten.bp.OffsetDateTime
 // Custom Typography matching original Material 2 text sizes from dimens.xml
 val CustomTypography = Typography(
     // Display styles (largest text)
-    displayLarge = Typography().displayLarge.copy(fontSize = 70.sp),
+    displayLarge = Typography().displayLarge.copy(fontSize = 60.sp),
     displayMedium = Typography().displayMedium.copy(fontSize = 45.sp),
-    displaySmall = Typography().displaySmall.copy(fontSize = 36.sp),
+    displaySmall = Typography().displaySmall.copy(fontSize = 34.sp),
 
     // Headline styles
     headlineLarge = Typography().headlineLarge.copy(fontSize = 30.sp, fontWeight = FontWeight.Bold),

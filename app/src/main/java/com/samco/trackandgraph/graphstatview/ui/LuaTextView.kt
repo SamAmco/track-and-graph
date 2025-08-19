@@ -25,9 +25,9 @@ fun LuaTextView(
             .padding(inputSpacingLarge),
         text = textData.text ?: "",
         style = when (textData.textSize) {
-            ITextViewData.TextSize.SMALL -> MaterialTheme.typography.bodyLarge
-            ITextViewData.TextSize.MEDIUM -> MaterialTheme.typography.titleLarge
-            ITextViewData.TextSize.LARGE -> MaterialTheme.typography.headlineMedium
+            ITextViewData.TextSize.SMALL -> MaterialTheme.typography.titleSmall
+            ITextViewData.TextSize.MEDIUM -> MaterialTheme.typography.displaySmall
+            ITextViewData.TextSize.LARGE -> MaterialTheme.typography.displayLarge
         },
         textAlign = when (textData.textAlignment) {
             ITextViewData.TextAlignment.START -> TextAlign.Start
