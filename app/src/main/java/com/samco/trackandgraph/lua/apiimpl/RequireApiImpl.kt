@@ -19,7 +19,6 @@ package com.samco.trackandgraph.lua.apiimpl
 import com.samco.trackandgraph.assetreader.AssetReader
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LuaError
-import org.luaj.vm2.LuaTable
 import org.luaj.vm2.LuaValue
 import javax.inject.Inject
 

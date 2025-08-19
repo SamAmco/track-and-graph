@@ -1,7 +1,12 @@
 package com.samco.trackandgraph.data.database.sampling
 
 import android.database.Cursor
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse

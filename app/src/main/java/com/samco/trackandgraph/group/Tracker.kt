@@ -53,7 +53,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -65,7 +64,6 @@ import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.ui.compose.theming.fadedGreen
-import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardMarginSmall

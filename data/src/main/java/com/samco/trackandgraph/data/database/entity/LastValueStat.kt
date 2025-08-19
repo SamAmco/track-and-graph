@@ -22,7 +22,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
-import org.threeten.bp.OffsetDateTime
 import com.samco.trackandgraph.data.database.dto.LastValueStat
 
 @Entity(tableName = "last_value_stats_table",

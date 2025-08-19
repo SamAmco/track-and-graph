@@ -17,8 +17,8 @@
 
 package com.samco.trackandgraph.data.database.sampling
 
-import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.IDataPoint
 
 /**
  * A sequence of data points in order from newest to oldest. When you are done iterating the

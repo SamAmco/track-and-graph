@@ -28,13 +28,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
+import com.samco.trackandgraph.R
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.util.*
-import com.samco.trackandgraph.R
+import com.samco.trackandgraph.util.hideKeyboard
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import kotlin.getValue
 
 @AndroidEntryPoint
 class AddTrackerFragment : Fragment() {

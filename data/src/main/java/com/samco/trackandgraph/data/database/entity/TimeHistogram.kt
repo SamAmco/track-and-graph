@@ -24,7 +24,6 @@ import androidx.room.PrimaryKey
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
-import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
 @Entity(

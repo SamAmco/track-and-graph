@@ -17,10 +17,10 @@
 package com.samco.trackandgraph.lua
 
 import com.samco.trackandgraph.lua.dto.ColorSpec
-import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import com.samco.trackandgraph.lua.dto.Line
 import com.samco.trackandgraph.lua.dto.LinePoint
 import com.samco.trackandgraph.lua.dto.LinePointStyle
+import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test

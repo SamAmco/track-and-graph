@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.graphstatview
 
-import com.androidplot.xy.StepMode
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertTrue

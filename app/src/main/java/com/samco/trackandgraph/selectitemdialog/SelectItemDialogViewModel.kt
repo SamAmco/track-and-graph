@@ -22,8 +22,6 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.samco.trackandgraph.data.database.dto.GroupGraph as ModelGroupGraph
-import com.samco.trackandgraph.data.database.dto.GroupGraphItem as ModelGroupGraphItem
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,6 +31,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.samco.trackandgraph.data.database.dto.GroupGraph as ModelGroupGraph
+import com.samco.trackandgraph.data.database.dto.GroupGraphItem as ModelGroupGraphItem
 
 enum class SelectItemDialogState { LOADING, READY }
 

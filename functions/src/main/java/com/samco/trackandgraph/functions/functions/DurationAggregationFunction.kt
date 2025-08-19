@@ -18,10 +18,10 @@
 package com.samco.trackandgraph.functions.functions
 
 import com.samco.trackandgraph.data.database.sampling.DataSample
-import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.functions.aggregation.FixedBinAggregator
 import com.samco.trackandgraph.functions.aggregation.dataPointsLabel
 import com.samco.trackandgraph.functions.aggregation.sumDataPoints
+import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.threeten.bp.temporal.TemporalAmount
 
 /**

@@ -19,9 +19,9 @@ package com.samco.trackandgraph.data.model
 
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataType
+import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.dto.Tracker
-import com.samco.trackandgraph.data.database.dto.Feature
 import com.samco.trackandgraph.data.database.odtFromString
 import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.data.model.di.IODispatcher

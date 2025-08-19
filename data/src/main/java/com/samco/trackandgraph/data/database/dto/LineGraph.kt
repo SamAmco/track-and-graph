@@ -17,8 +17,8 @@
 
 package com.samco.trackandgraph.data.database.dto
 
-import org.threeten.bp.temporal.TemporalAmount
 import com.samco.trackandgraph.data.database.entity.LineGraph
+import org.threeten.bp.temporal.TemporalAmount
 
 data class LineGraph(
     val id: Long,

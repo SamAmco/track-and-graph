@@ -31,7 +31,6 @@ import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.navArgs
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.addgroup.AddGroupDialogViewModelImpl
 import com.samco.trackandgraph.data.database.dto.DisplayTracker
 import com.samco.trackandgraph.data.database.dto.Group

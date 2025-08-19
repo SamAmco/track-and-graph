@@ -19,7 +19,6 @@ package com.samco.trackandgraph.graphstatinput.configviews.ui
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
@@ -27,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -39,7 +39,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -56,7 +55,6 @@ import androidx.lifecycle.ViewModelStoreOwner
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
 import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
-import com.samco.trackandgraph.data.database.dto.LineGraphFeature
 import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
 import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
 import com.samco.trackandgraph.data.database.dto.YRangeType
@@ -66,6 +64,8 @@ import com.samco.trackandgraph.graphstatinput.customviews.GraphStatDurationSpinn
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatEndingAtSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.GraphStatYRangeTypeSpinner
 import com.samco.trackandgraph.graphstatinput.customviews.YRangeFromToInputs
+import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
+import com.samco.trackandgraph.selectitemdialog.SelectableItemType
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
@@ -75,14 +75,12 @@ import com.samco.trackandgraph.ui.compose.ui.ColorSpinner
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
 import com.samco.trackandgraph.ui.compose.ui.HalfDialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import com.samco.trackandgraph.ui.compose.ui.MiniNumericTextField
 import com.samco.trackandgraph.ui.compose.ui.SelectorButton
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
-import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
-import com.samco.trackandgraph.selectitemdialog.SelectableItemType
-import com.samco.trackandgraph.ui.compose.ui.InputSpacingLarge
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.threeten.bp.DayOfWeek

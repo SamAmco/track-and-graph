@@ -55,13 +55,13 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import com.samco.trackandgraph.R
+import com.samco.trackandgraph.base.service.StartTimerAction
+import com.samco.trackandgraph.base.service.StartTimerAction.Companion.FeatureIdKey
 import com.samco.trackandgraph.ui.compose.theming.DarkColorScheme
 import com.samco.trackandgraph.ui.compose.theming.LightColorScheme
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
-import com.samco.trackandgraph.base.service.StartTimerAction
-import com.samco.trackandgraph.base.service.StartTimerAction.Companion.FeatureIdKey
 
 class TrackWidgetGlance : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {

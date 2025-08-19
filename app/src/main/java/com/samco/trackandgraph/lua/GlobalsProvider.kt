@@ -3,7 +3,6 @@ package com.samco.trackandgraph.lua
 import com.samco.trackandgraph.lua.apiimpl.RequireApiImpl
 import org.luaj.vm2.Globals
 import org.luaj.vm2.LoadState
-import javax.inject.Inject
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.compiler.LuaC
 import org.luaj.vm2.lib.Bit32Lib
@@ -13,6 +12,7 @@ import org.luaj.vm2.lib.StringLib
 import org.luaj.vm2.lib.TableLib
 import org.luaj.vm2.lib.jse.JseBaseLib
 import org.luaj.vm2.lib.jse.JseMathLib
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton

@@ -29,9 +29,9 @@ import com.samco.trackandgraph.graphstatview.factories.helpers.DataPointLuaHelpe
 import com.samco.trackandgraph.graphstatview.factories.helpers.ErrorLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.LineGraphLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.PieChartLuaHelper
-import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.helpers.TextLuaHelper
 import com.samco.trackandgraph.graphstatview.factories.helpers.TimeBarchartLuaHelper
+import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
 import com.samco.trackandgraph.lua.LuaEngine
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider

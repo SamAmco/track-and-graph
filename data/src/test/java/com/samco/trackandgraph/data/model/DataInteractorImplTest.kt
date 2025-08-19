@@ -17,15 +17,28 @@
 
 package com.samco.trackandgraph.data.model
 
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.eq
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabase
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
-import com.samco.trackandgraph.data.database.dto.*
+import com.samco.trackandgraph.data.database.dto.DataPoint
+import com.samco.trackandgraph.data.database.dto.DataType
+import com.samco.trackandgraph.data.database.dto.GlobalNote
+import com.samco.trackandgraph.data.database.dto.Tracker
 import com.samco.trackandgraph.data.database.entity.TrackerSuggestionType
 import com.samco.trackandgraph.data.database.entity.queryresponse.TrackerWithFeature
 import com.samco.trackandgraph.data.database.sampling.DataSampler
-import kotlinx.coroutines.*
-import kotlinx.coroutines.test.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.yield
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

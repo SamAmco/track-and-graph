@@ -20,7 +20,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import com.samco.trackandgraph.data.database.dto.DataPoint
-import com.samco.trackandgraph.data.database.dto.IDataPoint
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset

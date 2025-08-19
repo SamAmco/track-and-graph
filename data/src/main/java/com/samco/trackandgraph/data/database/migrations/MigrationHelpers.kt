@@ -21,7 +21,6 @@ import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
-import java.lang.Exception
 
 internal data class NTuple2<T1, T2>(val t1: T1, val t2: T2) {
     fun toList() = listOf(t1, t2)
