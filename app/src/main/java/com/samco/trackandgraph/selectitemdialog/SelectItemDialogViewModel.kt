@@ -203,7 +203,7 @@ class SelectItemDialogViewModelImpl @Inject constructor(
             }
         }
 
-        return GraphNode.Group(
+        val group = GraphNode.Group(
             isRoot = groupGraph.group.parentGroupId == null,
             id = groupGraph.group.id,
             name = if (groupGraph.group.parentGroupId == null) "/" else groupGraph.group.name,
@@ -211,6 +211,26 @@ class SelectItemDialogViewModelImpl @Inject constructor(
             expanded = mutableStateOf(groupGraph.group.parentGroupId == null),
             children = children.sortedBy { it.name },
         )
+
+        // If groups are not selectable, only include this group if it has selectable descendants
+        return if (SelectableItemType.GROUP in selectableTypes || hasSelectableDescendants(group, selectableTypes)) {
+            group
+        } else {
+            null
+        }
+    }
+
+    /**
+     * Recursively checks if a group has any selectable descendants in its subtree
+     */
+    private fun hasSelectableDescendants(group: GraphNode.Group, selectableTypes: Set<SelectableItemType>): Boolean {
+        return group.children.any { child ->
+            when (child) {
+                is GraphNode.Group -> hasSelectableDescendants(child, selectableTypes)
+                is GraphNode.Tracker -> SelectableItemType.TRACKER in selectableTypes || SelectableItemType.FEATURE in selectableTypes
+                is GraphNode.Graph -> SelectableItemType.GRAPH in selectableTypes
+            }
+        }
     }
 
     private fun groupHidden(
