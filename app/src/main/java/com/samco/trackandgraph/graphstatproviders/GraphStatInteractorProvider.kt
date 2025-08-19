@@ -18,8 +18,22 @@
 package com.samco.trackandgraph.graphstatproviders
 
 import com.samco.trackandgraph.data.database.dto.GraphStatType
-import com.samco.trackandgraph.graphstatproviders.datasourceadapters.*
-import com.samco.trackandgraph.graphstatview.factories.*
+import com.samco.trackandgraph.graphstatproviders.datasourceadapters.AverageTimeBetweenDataSourceAdapter
+import com.samco.trackandgraph.graphstatproviders.datasourceadapters.BarChartDataSourceAdapter
+import com.samco.trackandgraph.graphstatproviders.datasourceadapters.GraphStatDataSourceAdapter
+import com.samco.trackandgraph.graphstatproviders.datasourceadapters.LastValueDataSourceAdapter
+import com.samco.trackandgraph.graphstatproviders.datasourceadapters.LineGraphDataSourceAdapter
+import com.samco.trackandgraph.graphstatproviders.datasourceadapters.LuaGraphDataSourceAdapter
+import com.samco.trackandgraph.graphstatproviders.datasourceadapters.PieChartDataSourceAdapter
+import com.samco.trackandgraph.graphstatproviders.datasourceadapters.TimeHistogramDataSourceAdapter
+import com.samco.trackandgraph.graphstatview.factories.AverageTimeBetweenDataFactory
+import com.samco.trackandgraph.graphstatview.factories.BarChartDataFactory
+import com.samco.trackandgraph.graphstatview.factories.LastValueDataFactory
+import com.samco.trackandgraph.graphstatview.factories.LineGraphDataFactory
+import com.samco.trackandgraph.graphstatview.factories.LuaGraphDataFactory
+import com.samco.trackandgraph.graphstatview.factories.PieChartDataFactory
+import com.samco.trackandgraph.graphstatview.factories.TimeHistogramDataFactory
+import com.samco.trackandgraph.graphstatview.factories.ViewDataFactory
 import javax.inject.Inject
 
 interface GraphStatInteractorProvider {

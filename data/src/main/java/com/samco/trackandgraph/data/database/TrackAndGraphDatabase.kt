@@ -17,25 +17,39 @@
 package com.samco.trackandgraph.data.database
 
 import android.content.Context
-import androidx.room.*
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverter
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.samco.trackandgraph.data.database.dto.*
+import com.samco.trackandgraph.data.database.dto.BarChartBarPeriod
+import com.samco.trackandgraph.data.database.dto.CheckedDays
+import com.samco.trackandgraph.data.database.dto.DataType
+import com.samco.trackandgraph.data.database.dto.DurationPlottingMode
+import com.samco.trackandgraph.data.database.dto.GraphEndDate
+import com.samco.trackandgraph.data.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.dto.LineGraphAveraginModes
+import com.samco.trackandgraph.data.database.dto.LineGraphPlottingModes
+import com.samco.trackandgraph.data.database.dto.LineGraphPointStyle
+import com.samco.trackandgraph.data.database.dto.TimeHistogramWindow
+import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.database.entity.AverageTimeBetweenStat
+import com.samco.trackandgraph.data.database.entity.BarChart
 import com.samco.trackandgraph.data.database.entity.DataPoint
 import com.samco.trackandgraph.data.database.entity.Feature
 import com.samco.trackandgraph.data.database.entity.FeatureTimer
 import com.samco.trackandgraph.data.database.entity.GlobalNote
 import com.samco.trackandgraph.data.database.entity.GraphOrStat
 import com.samco.trackandgraph.data.database.entity.Group
+import com.samco.trackandgraph.data.database.entity.LastValueStat
 import com.samco.trackandgraph.data.database.entity.LineGraph
 import com.samco.trackandgraph.data.database.entity.LineGraphFeature
+import com.samco.trackandgraph.data.database.entity.LuaGraph
+import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
 import com.samco.trackandgraph.data.database.entity.PieChart
 import com.samco.trackandgraph.data.database.entity.Reminder
 import com.samco.trackandgraph.data.database.entity.TimeHistogram
-import com.samco.trackandgraph.data.database.entity.BarChart
-import com.samco.trackandgraph.data.database.entity.LastValueStat
-import com.samco.trackandgraph.data.database.entity.LuaGraph
-import com.samco.trackandgraph.data.database.entity.LuaGraphFeature
 import com.samco.trackandgraph.data.database.entity.Tracker
 import com.samco.trackandgraph.data.database.migrations.allMigrations
 import com.squareup.moshi.JsonAdapter
@@ -48,7 +62,6 @@ import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.Period
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAmount
-import java.lang.Exception
 
 private val databaseFormatter: DateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME
 

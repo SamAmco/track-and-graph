@@ -2,11 +2,9 @@ package com.samco.trackandgraph.util
 
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.launch
 
 fun <T, R> Flow<T>.flatMapLatestScan(

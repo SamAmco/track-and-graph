@@ -20,20 +20,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.getValue
 
 @AndroidEntryPoint
 class AboutPageFragment : Fragment() {

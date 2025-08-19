@@ -28,7 +28,6 @@ import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.functions.aggregation.GlobalAggregationPreferences
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.graphstatview.GraphStatInitException
 import com.samco.trackandgraph.graphstatview.factories.helpers.DataDisplayIntervalHelper

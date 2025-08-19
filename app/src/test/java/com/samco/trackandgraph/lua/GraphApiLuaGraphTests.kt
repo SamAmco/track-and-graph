@@ -2,7 +2,6 @@ package com.samco.trackandgraph.lua
 
 import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import junit.framework.TestCase.assertEquals
-import org.junit.Assert
 import org.junit.Test
 import org.luaj.vm2.LuaError
 import org.threeten.bp.OffsetDateTime

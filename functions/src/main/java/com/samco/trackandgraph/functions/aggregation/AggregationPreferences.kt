@@ -20,7 +20,7 @@ package com.samco.trackandgraph.functions.aggregation
 import org.threeten.bp.DayOfWeek
 import org.threeten.bp.Duration
 import org.threeten.bp.temporal.WeekFields
-import java.util.*
+import java.util.Locale
 
 interface AggregationPreferences {
     val firstDayOfWeek: DayOfWeek

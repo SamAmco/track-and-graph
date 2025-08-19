@@ -21,7 +21,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -37,13 +36,13 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.IntentActions
-import com.samco.trackandgraph.reminders.AlarmInteractor
 import com.samco.trackandgraph.data.model.di.IODispatcher
-import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.deeplinkhandler.DeepLinkHandler
 import com.samco.trackandgraph.helpers.PrefHelper
 import com.samco.trackandgraph.lua.LuaEngineSettingsProvider
+import com.samco.trackandgraph.reminders.AlarmInteractor
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
+import com.samco.trackandgraph.timers.TimerServiceInteractor
 import com.samco.trackandgraph.tutorial.TutorialScreen
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel

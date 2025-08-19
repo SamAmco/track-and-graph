@@ -22,7 +22,6 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.samco.trackandgraph.data.database.dto.GraphEndDate
 import com.samco.trackandgraph.data.database.dto.PieChart
-import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.temporal.TemporalAmount
 
 @Entity(tableName = "pie_charts_table2",

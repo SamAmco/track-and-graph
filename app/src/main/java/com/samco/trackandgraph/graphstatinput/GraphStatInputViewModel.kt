@@ -23,9 +23,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.data.database.dto.*
+import com.samco.trackandgraph.data.database.dto.AverageTimeBetweenStat
+import com.samco.trackandgraph.data.database.dto.BarChart
+import com.samco.trackandgraph.data.database.dto.GraphOrStat
+import com.samco.trackandgraph.data.database.dto.GraphStatType
+import com.samco.trackandgraph.data.database.dto.LastValueStat
+import com.samco.trackandgraph.data.database.dto.LineGraphWithFeatures
+import com.samco.trackandgraph.data.database.dto.LuaGraphWithFeatures
+import com.samco.trackandgraph.data.database.dto.PieChart
+import com.samco.trackandgraph.data.database.dto.TimeHistogram
 import com.samco.trackandgraph.data.model.DataInteractor
 import com.samco.trackandgraph.data.model.di.DefaultDispatcher
 import com.samco.trackandgraph.data.model.di.IODispatcher
@@ -35,12 +47,14 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewDat
 import com.samco.trackandgraph.remoteconfig.UrlNavigator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import java.lang.Exception
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 sealed interface GraphStatConfigEvent {

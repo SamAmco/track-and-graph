@@ -44,7 +44,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -60,13 +59,12 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.data.database.dto.CheckedDays
 import com.samco.trackandgraph.data.database.dto.CheckedDays.Companion.withSet
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.ui.TimePickerDialogContent
 import com.samco.trackandgraph.ui.compose.ui.buttonSize
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
 import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
-import com.samco.trackandgraph.ui.compose.ui.TimePickerDialogContent
-import com.samco.trackandgraph.ui.compose.ui.SelectedTime
 import com.samco.trackandgraph.ui.compose.ui.slimOutlinedTextField
 import org.threeten.bp.LocalTime
 import org.threeten.bp.format.DateTimeFormatter

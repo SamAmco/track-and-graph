@@ -21,7 +21,6 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -36,7 +35,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -74,10 +72,10 @@ import com.samco.trackandgraph.graphstatinput.GraphStatConfigEvent
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphConfigViewModel.NetworkError
 import com.samco.trackandgraph.graphstatinput.configviews.viewmodel.LuaGraphFeatureUiData
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.theming.tngTypography
 import com.samco.trackandgraph.selectitemdialog.SelectItemDialog
 import com.samco.trackandgraph.selectitemdialog.SelectableItemType
+import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
+import com.samco.trackandgraph.ui.compose.theming.tngTypography
 import com.samco.trackandgraph.ui.compose.ui.AddBarButton
 import com.samco.trackandgraph.ui.compose.ui.ContinueCancelDialog
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing

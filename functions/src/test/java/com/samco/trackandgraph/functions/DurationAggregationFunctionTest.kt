@@ -19,14 +19,18 @@ package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.aggregation.AggregationPreferences
-import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.functions.functions.DurationAggregationFunction
 import com.samco.trackandgraph.functions.helpers.TimeHelper
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.threeten.bp.*
+import org.threeten.bp.DayOfWeek
+import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
+import org.threeten.bp.Period
+import org.threeten.bp.ZoneId
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.temporal.TemporalAdjusters
 import org.threeten.bp.temporal.TemporalAmount

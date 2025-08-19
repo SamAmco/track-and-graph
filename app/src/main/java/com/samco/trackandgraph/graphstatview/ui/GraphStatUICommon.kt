@@ -18,7 +18,6 @@ package com.samco.trackandgraph.graphstatview.ui
 
 import android.content.Context
 import android.util.TypedValue
-import android.graphics.Color as GColor
 import android.view.View
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
@@ -53,9 +52,9 @@ import com.androidplot.xy.StepMode
 import com.androidplot.xy.XYGraphWidget
 import com.androidplot.xy.XYPlot
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.databinding.GraphXyPlotBinding
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
+import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.ui.compose.ui.ColorCircle
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
@@ -65,6 +64,7 @@ import java.text.FieldPosition
 import java.text.Format
 import java.text.ParsePosition
 import kotlin.math.roundToLong
+import android.graphics.Color as GColor
 
 fun xyPlotSetup(
     context: Context,

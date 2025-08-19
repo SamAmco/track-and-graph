@@ -17,7 +17,10 @@
 
 package com.samco.trackandgraph.timers
 
-import android.app.*
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.Service
 import android.content.Intent
 import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
 import android.os.Build
@@ -32,8 +35,20 @@ import com.samco.trackandgraph.data.model.DataUpdateType
 import com.samco.trackandgraph.helpers.formatTimeDuration
 import com.samco.trackandgraph.navigation.PendingIntentProvider
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import timber.log.Timber

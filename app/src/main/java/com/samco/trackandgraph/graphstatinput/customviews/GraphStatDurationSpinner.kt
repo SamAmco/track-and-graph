@@ -34,7 +34,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
@@ -42,8 +41,8 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.ui.compose.ui.CustomContinueCancelDialog
-import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.LabeledRow
 import com.samco.trackandgraph.ui.compose.ui.Spinner
 import com.samco.trackandgraph.ui.compose.ui.TextMapSpinner
 import com.samco.trackandgraph.ui.compose.ui.cardPadding

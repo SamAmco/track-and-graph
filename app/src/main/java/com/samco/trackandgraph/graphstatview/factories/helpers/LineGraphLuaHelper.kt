@@ -24,13 +24,13 @@ import com.samco.trackandgraph.data.database.dto.YRangeType
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IGraphStatViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILineGraphViewData
 import com.samco.trackandgraph.graphstatview.factories.viewdto.ILuaGraphViewData
-import com.samco.trackandgraph.graphstatview.factories.viewdto.Line as LineViewData
-import com.samco.trackandgraph.lua.dto.LuaGraphResultData
-import org.threeten.bp.OffsetDateTime
-import javax.inject.Inject
 import com.samco.trackandgraph.lua.dto.Line
 import com.samco.trackandgraph.lua.dto.LinePointStyle
+import com.samco.trackandgraph.lua.dto.LuaGraphResultData
 import org.threeten.bp.Duration
+import org.threeten.bp.OffsetDateTime
+import javax.inject.Inject
+import com.samco.trackandgraph.graphstatview.factories.viewdto.Line as LineViewData
 
 class LineGraphLuaHelper @Inject constructor(
     private val androidPlotSeriesHelper: AndroidPlotSeriesHelper,

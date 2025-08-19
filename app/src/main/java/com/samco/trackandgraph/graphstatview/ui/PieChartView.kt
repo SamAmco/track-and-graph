@@ -17,7 +17,6 @@
 
 package com.samco.trackandgraph.graphstatview.ui
 
-import android.graphics.Color as GColor
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -35,6 +34,7 @@ import com.samco.trackandgraph.graphstatview.factories.viewdto.ColorSpec
 import com.samco.trackandgraph.graphstatview.factories.viewdto.IPieChartViewData
 import com.samco.trackandgraph.ui.dataVisColorGenerator
 import com.samco.trackandgraph.ui.dataVisColorList
+import android.graphics.Color as GColor
 
 private data class SegmentInfo(
     val color: Color,

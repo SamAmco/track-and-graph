@@ -18,6 +18,7 @@ package com.samco.trackandgraph.remoteconfig
 
 import android.content.Context
 import android.content.Intent
+import androidx.core.net.toUri
 import com.samco.trackandgraph.data.model.di.IODispatcher
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -26,7 +27,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
-import androidx.core.net.toUri
 
 class UrlNavigatorImpl @Inject constructor(
     @IODispatcher private val ioDispatcher: CoroutineDispatcher,

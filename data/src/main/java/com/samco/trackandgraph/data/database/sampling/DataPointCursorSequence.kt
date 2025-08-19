@@ -23,7 +23,7 @@ import com.samco.trackandgraph.data.database.dto.IDataPoint
 import org.threeten.bp.Instant
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZoneOffset
-import java.util.*
+import java.util.Collections
 
 internal class DataPointCursorSequence(
     private val cursor: Cursor

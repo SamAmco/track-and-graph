@@ -18,16 +18,14 @@
 package com.samco.trackandgraph.util
 
 import android.content.Context
-import android.os.*
-import android.util.TypedValue
-import android.view.View
-import android.view.ViewTreeObserver
+import android.os.Build
+import android.os.IBinder
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
-import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
-import java.lang.NumberFormatException
 
 /**
  * Return a number given a string by attempting to parse it as a double

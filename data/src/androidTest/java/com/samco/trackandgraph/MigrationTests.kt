@@ -18,8 +18,8 @@
 package com.samco.trackandgraph
 
 import androidx.room.*
-import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.room.testing.MigrationTestHelper
+import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.runner.AndroidJUnit4
 import com.samco.trackandgraph.data.database.*

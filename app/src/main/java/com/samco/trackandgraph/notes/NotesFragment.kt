@@ -18,22 +18,21 @@
 package com.samco.trackandgraph.notes
 
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.samco.trackandgraph.R
-import com.samco.trackandgraph.adddatapoint.AddDataPointsViewModelImpl
 import com.samco.trackandgraph.main.AppBarViewModel
 import com.samco.trackandgraph.settings.TngSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
-import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import com.samco.trackandgraph.util.resumeScoped
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.getValue
 
 @AndroidEntryPoint
 class NotesFragment : Fragment() {

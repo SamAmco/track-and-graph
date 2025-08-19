@@ -18,14 +18,27 @@
 package com.samco.trackandgraph.adddatapoint
 
 import android.os.Parcelable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
-import androidx.compose.runtime.*
-import kotlinx.parcelize.Parcelize
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -40,8 +53,21 @@ import com.samco.trackandgraph.R
 import com.samco.trackandgraph.settings.mockSettings
 import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
-import com.samco.trackandgraph.ui.compose.ui.*
+import com.samco.trackandgraph.ui.compose.ui.AddChipButton
+import com.samco.trackandgraph.ui.compose.ui.DateTimeButtonRow
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.DurationInputView
+import com.samco.trackandgraph.ui.compose.ui.FadingLazyRow
+import com.samco.trackandgraph.ui.compose.ui.FullWidthTextField
+import com.samco.trackandgraph.ui.compose.ui.LabelInputTextField
+import com.samco.trackandgraph.ui.compose.ui.TextChip
+import com.samco.trackandgraph.ui.compose.ui.TrackerNameHeadline
+import com.samco.trackandgraph.ui.compose.ui.ValueInputTextField
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.inputSpacingLarge
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import org.threeten.bp.OffsetDateTime
 
 // Data classes for state representation

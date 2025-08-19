@@ -5,7 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.viewModelScope
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModel
 import com.samco.trackandgraph.ui.viewmodels.DurationInputViewModelImpl
 import com.samco.trackandgraph.ui.viewmodels.asValidatedDouble

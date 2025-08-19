@@ -33,7 +33,6 @@ import com.samco.trackandgraph.ui.compose.compositionlocals.LocalSettings
 import com.samco.trackandgraph.ui.compose.theming.TnGComposeTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
-import kotlin.getValue
 
 @AndroidEntryPoint
 class BackupAndRestoreFragment : Fragment() {

@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.core.content.ContextCompat.getColor
 import com.androidplot.util.PixelUtils
 import com.androidplot.xy.BarFormatter
 import com.androidplot.xy.BarRenderer

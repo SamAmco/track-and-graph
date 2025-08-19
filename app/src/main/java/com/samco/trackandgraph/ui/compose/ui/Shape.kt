@@ -3,10 +3,8 @@ package com.samco.trackandgraph.ui.compose.ui
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.samco.trackandgraph.R
 
 val smallIconSize = 20.dp
 

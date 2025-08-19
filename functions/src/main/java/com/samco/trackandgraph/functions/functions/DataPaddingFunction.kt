@@ -19,8 +19,8 @@ package com.samco.trackandgraph.functions.functions
 
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.data.database.sampling.DataSample
-import com.samco.trackandgraph.functions.helpers.TimeHelper
 import com.samco.trackandgraph.functions.exceptions.InvalidRegularityException
+import com.samco.trackandgraph.functions.helpers.TimeHelper
 import org.threeten.bp.OffsetDateTime
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.temporal.TemporalAmount

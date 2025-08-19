@@ -19,7 +19,6 @@ package com.samco.trackandgraph.functions
 
 import com.samco.trackandgraph.data.database.dto.IDataPoint
 import com.samco.trackandgraph.functions.functions.CompositeFunction
-import com.samco.trackandgraph.data.database.sampling.DataSample
 import com.samco.trackandgraph.functions.functions.FilterLabelFunction
 import com.samco.trackandgraph.functions.functions.FilterValueFunction
 import junit.framework.TestCase.assertEquals

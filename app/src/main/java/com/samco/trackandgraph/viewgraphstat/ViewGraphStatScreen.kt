@@ -79,8 +79,8 @@ import com.samco.trackandgraph.ui.compose.theming.tngColors
 import com.samco.trackandgraph.ui.compose.ui.DataPointNoteDescriptionDialog
 import com.samco.trackandgraph.ui.compose.ui.DayMonthYearHourMinuteWeekDayOneLineText
 import com.samco.trackandgraph.ui.compose.ui.GlobalNoteDescriptionDialog
-import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.cardElevation
+import com.samco.trackandgraph.ui.compose.ui.cardPadding
 import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.halfDialogInputSpacing
 import com.samco.trackandgraph.ui.compose.ui.shapeLarge

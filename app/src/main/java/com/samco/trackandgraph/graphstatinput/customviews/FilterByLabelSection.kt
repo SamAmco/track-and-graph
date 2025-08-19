@@ -1,6 +1,9 @@
 package com.samco.trackandgraph.graphstatinput.customviews
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -13,7 +16,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.samco.trackandgraph.R
 import com.samco.trackandgraph.graphstatinput.configviews.behaviour.FilterableFeatureConfigBehaviour
-import com.samco.trackandgraph.ui.compose.ui.*
+import com.samco.trackandgraph.ui.compose.ui.CardPadding
+import com.samco.trackandgraph.ui.compose.ui.CheckboxLabeledExpandingSection
+import com.samco.trackandgraph.ui.compose.ui.DialogInputSpacing
+import com.samco.trackandgraph.ui.compose.ui.FadingLazyRow
+import com.samco.trackandgraph.ui.compose.ui.TextChip
+import com.samco.trackandgraph.ui.compose.ui.dialogInputSpacing
 
 @Composable
 fun FilterByLabelSection(viewModel: FilterableFeatureConfigBehaviour) {

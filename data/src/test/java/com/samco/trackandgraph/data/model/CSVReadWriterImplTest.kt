@@ -1,6 +1,11 @@
 package com.samco.trackandgraph.data.model
 
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.never
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.data.database.TrackAndGraphDatabaseDao
 import com.samco.trackandgraph.data.database.dto.DataType
 import com.samco.trackandgraph.data.database.dto.Feature

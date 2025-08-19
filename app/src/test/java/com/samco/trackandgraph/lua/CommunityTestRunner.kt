@@ -4,11 +4,9 @@ import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import com.samco.trackandgraph.assetreader.AssetReader
 import com.samco.trackandgraph.data.model.DataInteractor
-import com.samco.trackandgraph.lua.apiimpl.oneArgFunction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
