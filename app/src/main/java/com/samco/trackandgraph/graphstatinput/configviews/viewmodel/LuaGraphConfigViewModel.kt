@@ -20,6 +20,7 @@ package com.samco.trackandgraph.graphstatinput.configviews.viewmodel
 import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -58,6 +59,11 @@ import java.io.InputStreamReader
 import java.net.URI
 import javax.inject.Inject
 
+data class LuaGraphFeatureUiData(
+    val nameTextField: MutableState<TextFieldValue>,
+    val selectedFeatureText: String
+)
+
 @HiltViewModel
 class LuaGraphConfigViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -78,8 +84,6 @@ class LuaGraphConfigViewModel @Inject constructor(
     dataInteractor = dataInteractor
 ) {
 
-    var featureMap: Map<Long, String>? by mutableStateOf(null)
-        private set
 
     var script: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
@@ -109,10 +113,17 @@ class LuaGraphConfigViewModel @Inject constructor(
         .map { TextFieldValue(it.text) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, TextFieldValue(""))
 
-    var selectedFeatures: List<LuaGraphFeature> by mutableStateOf(emptyList())
-        private set
-
+    private var selectedFeatures: List<LuaGraphFeature> by mutableStateOf(emptyList())
     private val featureTextFields = mutableListOf<MutableState<TextFieldValue>>()
+    
+    val featureUiDataList by derivedStateOf {
+        selectedFeatures.mapIndexed { index, feature ->
+            LuaGraphFeatureUiData(
+                nameTextField = featureTextFields[index],
+                selectedFeatureText = getSelectedFeatureText(feature.featureId)
+            )
+        }
+    }
 
     private var luaGraph = LuaGraphWithFeatures(
         id = 0,
@@ -218,7 +229,7 @@ class LuaGraphConfigViewModel @Inject constructor(
             return GraphStatConfigEvent.ValidationException(R.string.lua_script_empty)
         }
 
-        val inputNames = featureTextFields.map { it.value.text }
+        val inputNames = featureUiDataList.map { it.nameTextField.value.text }
         if (inputNames.size != inputNames.distinct().size) {
             return GraphStatConfigEvent.ValidationException(R.string.lua_feature_names_not_unique)
         }
@@ -261,8 +272,13 @@ class LuaGraphConfigViewModel @Inject constructor(
     fun onRemoveFeatureClicked(index: Int) {
         selectedFeatures = selectedFeatures.toMutableList().apply {
             removeAt(index)
-            featureTextFields.removeAt(index)
         }
+        featureTextFields.removeAt(index)
+        onUpdate()
+    }
+    
+    fun onUpdateFeatureName(index: Int, text: TextFieldValue) {
+        featureTextFields[index].value = text
         onUpdate()
     }
 
@@ -301,14 +317,6 @@ class LuaGraphConfigViewModel @Inject constructor(
         )
     }
 
-    fun getTextFieldFor(index: Int): TextFieldValue {
-        return featureTextFields[index].value
-    }
-
-    fun onUpdateFeatureName(index: Int, text: TextFieldValue) {
-        featureTextFields[index].value = text
-        onUpdate()
-    }
 
     fun updateScriptFromClipboard(text: String) {
         script = TextFieldValue(text)
@@ -338,9 +346,12 @@ class LuaGraphConfigViewModel @Inject constructor(
         }
     }
 
+    private fun getSelectedFeatureText(featureId: Long): String {
+        return featurePathProvider.getPathForFeature(featureId)
+    }
+
     override fun onDataLoaded(config: Any?) {
         val lgConfig = config as? LuaGraphWithFeatures
-        featureMap = featurePathProvider.sortedFeatureMap()
         lgConfig?.let { luaGraph = it }
         lgConfig?.script?.let { script = TextFieldValue(it) }
         lgConfig?.features?.let { features ->

@@ -36,7 +36,8 @@ open class FeaturePathProvider(
 
     val features get() = featureGroupMap.keys
 
-    fun featureName(featureId: Long) = featureGroupMap.keys.firstOrNull { it.featureId == featureId }?.name
+    fun featureName(featureId: Long) = featureGroupMap.keys
+        .firstOrNull { it.featureId == featureId }?.name
 
     fun sortedPaths(): List<Pair<Feature, String>> = featureGroupMap.keys
         .map { it to getPathForFeature(it.featureId) }

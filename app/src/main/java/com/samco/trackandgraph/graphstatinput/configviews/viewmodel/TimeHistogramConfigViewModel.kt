@@ -91,7 +91,7 @@ class TimeHistogramConfigViewModel @Inject constructor(
     }
 
     override suspend fun validate(): GraphStatConfigEvent.ValidationException? {
-        return if (singleFeatureConfigBehaviour.featureId == -1L) {
+        return if (singleFeatureConfigBehaviour.featureId == null || singleFeatureConfigBehaviour.featureId == -1L) {
             GraphStatConfigEvent.ValidationException(R.string.graph_stat_validation_no_line_graph_features)
         } else null
     }

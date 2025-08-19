@@ -22,14 +22,18 @@ import androidx.compose.runtime.setValue
 import javax.inject.Inject
 
 interface SingleFeatureConfigBehaviour {
-    val featureId: Long?
-    val featureMap: Map<Long, String>?
+    val selectedFeatureText: String
     fun updateFeatureId(id: Long)
 }
 
 class SingleFeatureConfigBehaviourImpl @Inject constructor() : SingleFeatureConfigBehaviour {
-    override var featureId: Long? by mutableStateOf(null)
-    override var featureMap: Map<Long, String>? by mutableStateOf(null)
+    override var selectedFeatureText: String by mutableStateOf("")
+        private set
+
+    private var featureMap: Map<Long, String>? by mutableStateOf(null)
+    
+    // Internal featureId for ViewModels to access - not exposed in interface
+    internal var featureId: Long? = null
         private set
 
     lateinit var onUpdate: () -> Unit
@@ -37,13 +41,15 @@ class SingleFeatureConfigBehaviourImpl @Inject constructor() : SingleFeatureConf
 
     override fun updateFeatureId(id: Long) {
         featureId = id
+        selectedFeatureText = featureMap?.get(id) ?: ""
         onUpdate()
         featureChangeCallback(id)
     }
 
     fun onConfigLoaded(map: Map<Long, String>, featureId: Long) {
         this.featureId = featureId
-        featureMap = map
+        this.featureMap = map
+        this.selectedFeatureText = map[featureId] ?: ""
     }
 
     fun initSingleFeatureConfigBehaviour(

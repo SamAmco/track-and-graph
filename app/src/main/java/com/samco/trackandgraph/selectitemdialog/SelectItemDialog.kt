@@ -17,12 +17,14 @@
 package com.samco.trackandgraph.selectitemdialog
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -63,6 +65,7 @@ fun SelectItemDialog(
     onFeatureSelected: ((Long) -> Unit)? = null,
     onGraphSelected: ((Long) -> Unit)? = null,
     onDismissRequest: () -> Unit,
+    resetOnClose: Boolean = false,
 ) {
     val viewModel: SelectItemDialogViewModel = hiltViewModel<SelectItemDialogViewModelImpl>()
 
@@ -80,9 +83,11 @@ fun SelectItemDialog(
         title = title,
         groupTree = groupTree,
         selectedItem = selectedItem,
+        lazyListState = viewModel.lazyListState,
+        horizontalScrollState = viewModel.horizontalScrollState,
         onDismissRequest = {
-            viewModel.reset()
             onDismissRequest()
+            if (resetOnClose) viewModel.reset()
         },
         onItemSelected = viewModel::onItemClicked,
         onContinue = {
@@ -93,10 +98,11 @@ fun SelectItemDialog(
                         onTrackerSelected?.invoke(item.trackerId)
                         onFeatureSelected?.invoke(item.featureId)
                     }
+
                     is GraphNode.Graph -> onGraphSelected?.invoke(item.id)
                 }
-                viewModel.reset()
                 onDismissRequest()
+                if (resetOnClose) viewModel.reset()
             }
         },
         continueEnabled = selectedItem != null,
@@ -109,6 +115,8 @@ private fun SelectItemDialogContent(
     title: String,
     groupTree: GraphNode?,
     selectedItem: GraphNode?,
+    lazyListState: LazyListState = LazyListState(),
+    horizontalScrollState: ScrollState = ScrollState(0),
     onItemSelected: (GraphNode) -> Unit = {},
     onDismissRequest: () -> Unit = {},
     onContinue: () -> Unit = {},
@@ -151,6 +159,8 @@ private fun SelectItemDialogContent(
                     SelectItemList(
                         rootNode = groupTree,
                         selectedItem = selectedItem,
+                        lazyListState = lazyListState,
+                        horizontalScrollState = horizontalScrollState,
                         onItemSelected = onItemSelected
                     )
                 }
@@ -163,6 +173,8 @@ private fun SelectItemDialogContent(
 private fun SelectItemList(
     rootNode: GraphNode,
     selectedItem: GraphNode?,
+    lazyListState: LazyListState = LazyListState(),
+    horizontalScrollState: ScrollState = ScrollState(0),
     onItemSelected: (GraphNode) -> Unit
 ) = BoxWithConstraints {
     // Use dialog width as the default minimum width
@@ -193,9 +205,10 @@ private fun SelectItemList(
     }
 
     LazyColumn(
+        state = lazyListState,
         modifier = Modifier
             .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
+            .horizontalScroll(horizontalScrollState),
     ) {
         graphNodeItem(
             node = rootNode,

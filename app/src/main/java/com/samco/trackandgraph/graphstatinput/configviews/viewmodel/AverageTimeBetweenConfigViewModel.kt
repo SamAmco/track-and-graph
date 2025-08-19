@@ -86,7 +86,7 @@ class AverageTimeBetweenConfigViewModel @Inject constructor(
 
     override fun updateConfig() {
         averageTimeBetweenStat = averageTimeBetweenStat.copy(
-            featureId = featureId ?: -1L,
+            featureId = filterableFeatureConfigBehaviour.featureId ?: -1L,
             fromValue = fromValue.text.toDoubleOrNull() ?: 0.0,
             toValue = toValue.text.toDoubleOrNull() ?: 1.0,
             sampleSize = selectedDuration.temporalAmount,

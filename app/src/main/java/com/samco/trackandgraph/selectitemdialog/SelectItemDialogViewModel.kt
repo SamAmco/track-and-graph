@@ -16,6 +16,8 @@
  */
 package com.samco.trackandgraph.selectitemdialog
 
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -70,6 +72,8 @@ interface SelectItemDialogViewModel {
     val state: StateFlow<SelectItemDialogState>
     val groupTree: StateFlow<GraphNode?>
     val selectedItem: StateFlow<GraphNode?>
+    val lazyListState: LazyListState
+    val horizontalScrollState: ScrollState
 
     fun init(selectableTypes: Set<SelectableItemType>, hiddenItems: Set<HiddenItem>)
     fun onItemClicked(item: GraphNode)
@@ -90,6 +94,9 @@ class SelectItemDialogViewModelImpl @Inject constructor(
 
     private val _selectedItem = MutableStateFlow<GraphNode?>(null)
     override val selectedItem: StateFlow<GraphNode?> = _selectedItem.asStateFlow()
+
+    override val lazyListState = LazyListState()
+    override val horizontalScrollState = ScrollState(0)
 
 
     private var initialized = false
